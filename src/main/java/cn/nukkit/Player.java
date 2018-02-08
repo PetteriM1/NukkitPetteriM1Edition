@@ -2416,13 +2416,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     ModalFormResponsePacket modalFormPacket = (ModalFormResponsePacket) packet;
 
                     if (formWindows.containsKey(modalFormPacket.formId)) {
-                        FormWindow window = formWindows.get(modalFormPacket.formId);
+                        FormWindow window = formWindows.remove(modalFormPacket.formId);
                         window.setResponse(modalFormPacket.data.trim());
 
                         PlayerFormRespondedEvent event = new PlayerFormRespondedEvent(this, modalFormPacket.formId, window);
                         getServer().getPluginManager().callEvent(event);
-
-                        formWindows.remove(modalFormPacket.formId);
                     } else if (serverSettings.containsKey(modalFormPacket.formId)) {
                         FormWindow window = serverSettings.get(modalFormPacket.formId);
                         window.setResponse(modalFormPacket.data.trim());
