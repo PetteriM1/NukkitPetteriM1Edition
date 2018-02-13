@@ -22,28 +22,24 @@ public class MainLogger extends ThreadedLogger {
     protected final String logPath;
     protected final ConcurrentLinkedQueue<String> logBuffer = new ConcurrentLinkedQueue<>();
     protected boolean shutdown;
-    protected LogLevel logLevel = LogLevel.DEFAULT_LEVEL;
+    protected boolean logDebug = false;
     private final Map<TextFormat, String> replacements = new EnumMap<>(TextFormat.class);
     private final TextFormat[] colors = TextFormat.values();
 
     protected static MainLogger logger;
 
     public MainLogger(String logFile) {
-        this(logFile, LogLevel.DEFAULT_LEVEL);
+        this(logFile, false);
     }
 
-    public MainLogger(String logFile, LogLevel logLevel) {
-
+    public MainLogger(String logFile, boolean logDebug) {
         if (logger != null) {
             throw new RuntimeException("MainLogger has been already created");
         }
         logger = this;
         this.logPath = logFile;
+        this.logDebug = logDebug;
         this.start();
-    }
-
-    public MainLogger(String logFile, boolean logDebug) {
-        this(logFile, logDebug ? LogLevel.DEBUG : LogLevel.INFO);
     }
 
     public static MainLogger getLogger() {
@@ -52,54 +48,46 @@ public class MainLogger extends ThreadedLogger {
 
     @Override
     public void emergency(String message) {
-        if (LogLevel.EMERGENCY.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.RED + "[EMERGENCY] " + message);
+        this.send(TextFormat.RED + "[EMERGENCY] " + message);
     }
 
     @Override
     public void alert(String message) {
-        if (LogLevel.ALERT.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.RED + "[ALERT] " + message);
+        this.send(TextFormat.RED + "[ALERT] " + message);
     }
 
     @Override
     public void critical(String message) {
-        if (LogLevel.CRITICAL.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.RED + "[CRITICAL] " + message);
+        this.send(TextFormat.RED + "[CRITICAL] " + message);
     }
 
     @Override
     public void error(String message) {
-        if (LogLevel.ERROR.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.DARK_RED + "[ERROR] " + message);
+        this.send(TextFormat.DARK_RED + "[ERROR] " + message);
     }
 
     @Override
     public void warning(String message) {
-        if (LogLevel.WARNING.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.YELLOW + "[WARNING] " + message);
+        this.send(TextFormat.YELLOW + "[WARNING] " + message);
     }
 
     @Override
     public void notice(String message) {
-        if (LogLevel.NOTICE.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.AQUA + "[NOTICE] " + message);
+        this.send(TextFormat.AQUA + "[NOTICE] " + message);
     }
 
     @Override
     public void info(String message) {
-        if (LogLevel.INFO.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.WHITE + "[INFO] " + message);
+        this.send(TextFormat.WHITE + "[INFO] " + message);
     }
 
     @Override
     public void debug(String message) {
-        if (LogLevel.DEBUG.getLevel() <= logLevel.getLevel())
-            this.send(TextFormat.GRAY + "[DEBUG] " + message);
+        this.send(TextFormat.GRAY + "[DEBUG] " + message);
     }
 
     public void setLogDebug(Boolean logDebug) {
-        this.logLevel = logDebug ? LogLevel.DEBUG : LogLevel.INFO;
+        this.logDebug = logDebug;
     }
 
     public void logException(Exception e) {
@@ -209,6 +197,7 @@ public class MainLogger extends ThreadedLogger {
     }
 
     private void flushBuffer(File logFile) {
+        Writer writer = null;
         if (logBuffer.isEmpty()) {
             try {
                 synchronized (this) {
@@ -219,7 +208,7 @@ public class MainLogger extends ThreadedLogger {
             }
         }
         try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8), 1024);
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8), 1024);
             Date now = new Date();
             String consoleDateFormat = new SimpleDateFormat("HH:mm:ss ").format(now);
             String fileDateFormat = new SimpleDateFormat("Y-M-d HH:mm:ss ").format(now);
@@ -236,9 +225,16 @@ public class MainLogger extends ThreadedLogger {
                 }
             }
             writer.flush();
-            writer.close();
         } catch (Exception e) {
             this.logException(e);
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                this.logException(e);
+            }
         }
     }
 

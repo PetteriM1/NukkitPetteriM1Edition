@@ -1,6 +1,7 @@
-package cn.nukkit.entity.mob;
+package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -8,38 +9,42 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 /**
  * @author PikyCZ
  */
-public class EntityBlaze extends EntityMob {
+public class EntityParrot extends EntityAnimal {
 
-    public static final int NETWORK_ID = 43;
+    public static final int NETWORK_ID = 105;
+
+    public EntityParrot(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityBlaze(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-        this.setMaxHealth(20);
+    public String getName() {
+        return "Bat";
     }
 
     @Override
     public float getWidth() {
-        return 0.6f;
+        return 0.5f;
     }
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return 0.9f;
     }
 
     @Override
-    public String getName() {
-        return "Blaze";
+    public void initEntity() {
+        super.initEntity();
+        this.setMaxHealth(6);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.FEATHER)};
     }
 
     @Override

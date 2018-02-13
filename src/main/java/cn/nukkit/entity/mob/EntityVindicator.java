@@ -1,6 +1,7 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -8,23 +9,23 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 /**
  * @author PikyCZ
  */
-public class EntityBlaze extends EntityMob {
+public class EntityVindicator extends EntityMob {
 
-    public static final int NETWORK_ID = 43;
+    public static final int NETWORK_ID = 57;
+
+    public EntityVindicator(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityBlaze(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
-
     @Override
     protected void initEntity() {
         super.initEntity();
-        this.setMaxHealth(20);
+        this.setMaxHealth(24);
     }
 
     @Override
@@ -34,12 +35,17 @@ public class EntityBlaze extends EntityMob {
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return 1.95f;
     }
 
     @Override
     public String getName() {
-        return "Blaze";
+        return "Vindicator";
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.IRON_AXE)};
     }
 
     @Override

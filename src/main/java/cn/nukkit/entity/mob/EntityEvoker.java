@@ -8,23 +8,23 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 /**
  * @author PikyCZ
  */
-public class EntityBlaze extends EntityMob {
+public class EntityEvoker extends EntityMob {
 
-    public static final int NETWORK_ID = 43;
+    public static final int NETWORK_ID = 104;
+
+    public EntityEvoker(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
 
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
-    public EntityBlaze(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
-
     @Override
     protected void initEntity() {
         super.initEntity();
-        this.setMaxHealth(20);
+        this.setMaxHealth(24);
     }
 
     @Override
@@ -34,12 +34,12 @@ public class EntityBlaze extends EntityMob {
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return 1.95f;
     }
 
     @Override
     public String getName() {
-        return "Blaze";
+        return "Evoker";
     }
 
     @Override

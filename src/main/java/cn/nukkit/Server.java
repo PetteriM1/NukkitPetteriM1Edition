@@ -219,7 +219,11 @@ public class Server {
         if (!new File(this.dataPath + "nukkit.yml").exists()) {
             this.getLogger().info(TextFormat.GREEN + "Welcome! Please choose a language first!");
             try {
-                String[] lines = Utils.readFile(this.getClass().getClassLoader().getResourceAsStream("lang/language.list")).split("\n");
+              InputStream languageList = this.getClass().getClassLoader().getResourceAsStream("lang/language.list");
+                if (languageList == null) {
+                    throw new RuntimeException("Language files are missing!");
+                }
+                String[] lines = Utils.readFile(languageList).split("\n");
                 for (String line : lines) {
                     this.getLogger().info(line);
                 }
@@ -544,7 +548,7 @@ public class Server {
         packet.encode();
         packet.isEncoded = true;
 
-        if(packet.pid() == ProtocolInfo.BATCH_PACKET) {
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
                 player.dataPacket(packet);
             }
@@ -1946,7 +1950,7 @@ public class Server {
         Entity.registerEntity("Snowball", EntitySnowball.class);
         Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
         Entity.registerEntity("Painting", EntityPainting.class);
-        //todo mobs
+        //Monsters
         Entity.registerEntity("Creeper", EntityCreeper.class);
         Entity.registerEntity("Zombie", EntityZombie.class);
         Entity.registerEntity("Blaze", EntityBlaze.class);
@@ -1955,20 +1959,28 @@ public class Server {
         Entity.registerEntity("EnderDragon", EntityEnderDragon.class);
         Entity.registerEntity("Enderman", EntityEnderman.class);
         Entity.registerEntity("Endermite", EntityEndermite.class);
+        Entity.registerEntity("Evoker", EntityEvoker.class);
         Entity.registerEntity("Firework", EntityFirework.class);
         Entity.registerEntity("Ghast", EntityGhast.class);
         Entity.registerEntity("Guardian", EntityGuardian.class);
         Entity.registerEntity("Husk", EntityHusk.class);
         Entity.registerEntity("MagmaCube", EntityMagmaCube.class);
         Entity.registerEntity("Shulker", EntityShulker.class);
-        Entity.registerEntity("Silferfish", EntitySilverfish.class);
+        Entity.registerEntity("Silverfish", EntitySilverfish.class);
         Entity.registerEntity("Skeleton", EntitySkeleton.class);
         Entity.registerEntity("SkeletonHorse", EntitySkeletonHorse.class);
         Entity.registerEntity("Slime", EntitySlime.class);
         Entity.registerEntity("Spider", EntitySpider.class);
         Entity.registerEntity("Stray", EntityStray.class);
+        Entity.registerEntity("Vindicator", EntityVindicator.class);
+        Entity.registerEntity("Vex", EntityVex.class);
+        Entity.registerEntity("WitherSkeleton", EntityWitherSkeleton.class);
+        Entity.registerEntity("Wither", EntityWither.class);
         Entity.registerEntity("Witch", EntityWitch.class);
-        //TODO: more mobs
+        Entity.registerEntity("ZombiePigman", EntityZombiePigman.class);
+        Entity.registerEntity("ZombieVillager", EntityZombieVillager.class);
+        Entity.registerEntity("Zombie", EntityZombie.class);
+        //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Chicken", EntityChicken.class);
         Entity.registerEntity("Cow", EntityCow.class);

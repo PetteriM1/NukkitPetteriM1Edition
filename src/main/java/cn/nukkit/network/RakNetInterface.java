@@ -214,7 +214,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         this.handler.sendOption("name",
                 "MCPE;" + Utils.rtrim(names[0].replace(";", "\\;"), '\\') + ";" +
                         ProtocolInfo.CURRENT_PROTOCOL + ";;" +
-                        info.getPlayerCount() + ";" +
+                        info.getPlayerCount() + 1 + ";" +
                         info.getMaxPlayerCount() + ";" +
                         this.server.getServerUniqueId().toString() + ";" +
                         (names.length > 1 ? Utils.rtrim(names[1].replace(";", "\\;"), '\\') : "") + ";" +
