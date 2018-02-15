@@ -291,7 +291,7 @@ public abstract class BlockLiquid extends BlockTransparent {
 
                 if (decay >= 8) {
                     this.flowIntoBlock(bottomBlock, decay);
-                } else {
+                } else if (decay > 0) {
                     this.flowIntoBlock(bottomBlock, decay | 0x08);
                 }
             }
