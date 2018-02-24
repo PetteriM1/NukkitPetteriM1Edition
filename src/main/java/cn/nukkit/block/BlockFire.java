@@ -115,7 +115,8 @@ public class BlockFire extends BlockFlowable {
                 int meta = this.getDamage();
 
                 if (meta < 15) {
-                    this.meta = meta + random.nextInt(3);
+                  int newMeta = meta + random.nextInt(3);
+                    this.setDamage(newMeta > 15 ? 15 : newMeta);
                     this.getLevel().setBlock(this, this, true);
                 }
 

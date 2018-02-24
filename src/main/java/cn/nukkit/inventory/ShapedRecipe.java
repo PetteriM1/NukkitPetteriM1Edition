@@ -2,6 +2,7 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.utils.Utils;
+import io.netty.util.collection.CharObjectHashMap;
 
 import java.util.*;
 
@@ -14,11 +15,11 @@ public class ShapedRecipe implements CraftingRecipe {
     private Item primaryResult;
     private List<Item> extraResults = new ArrayList<>();
 
-    private UUID uuid = null;
+    private long least,most;
 
     private final String[] shape;
 
-    private final Map<Character, Item> ingredients = new HashMap<>();
+    private final CharObjectHashMap<Item> ingredients = new CharObjectHashMap<>();
 
     /**
      * Constructs a ShapedRecipe instance.
@@ -89,15 +90,13 @@ public class ShapedRecipe implements CraftingRecipe {
 
     @Override
     public UUID getId() {
-        return uuid;
+        return new UUID(least, most);
     }
 
     @Override
-    public void setId(UUID id) {
-        if (this.uuid != null) {
-            throw new IllegalStateException("Id is already set");
-        }
-        this.uuid = id;
+    public void setId(UUID uuid) {
+        this.least = uuid.getLeastSignificantBits();
+        this.most = uuid.getMostSignificantBits();
     }
 
     public ShapedRecipe setIngredient(String key, Item item) {
@@ -111,6 +110,16 @@ public class ShapedRecipe implements CraftingRecipe {
 
         this.ingredients.put(key, item);
         return this;
+    }
+
+    public List<Item> getIngredientList() {
+        List<Item> items = new ArrayList<>();
+        for (int y = 0, y2 = getHeight(); y < y2; ++y) {
+            for (int x = 0, x2 = getWidth(); x < x2; ++x) {
+                items.add(getIngredient(x, y));
+            }
+        }
+        return items;
     }
 
     public Map<Integer, Map<Integer, Item>> getIngredientMap() {
