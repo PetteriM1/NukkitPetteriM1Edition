@@ -37,5 +37,3 @@ players/*
 resource_packs
 resource_packs/*
 *.md
-creativeitems.json
-recipes.json
