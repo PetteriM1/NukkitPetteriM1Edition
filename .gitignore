@@ -23,7 +23,6 @@ hs_err_pid*
 .settings/*
 banned-ips.json
 banned-players.json
-nukkit.yml
 ops.txt
 server.log
 server.properties
