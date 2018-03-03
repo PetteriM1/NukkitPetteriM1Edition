@@ -4,7 +4,7 @@
 
 settings:
  #Multi-language setting
- #Available: eng, chs, cht, jpn, rus, spa, pol, bra, kor, ukr, deu, ltu
+ #Available: eng
  language: "eng"
  #Whether to send all strings translated to server locale or let the device handle them
  force-language: false
