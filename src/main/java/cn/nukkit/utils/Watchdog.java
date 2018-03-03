@@ -48,6 +48,7 @@ public class Watchdog extends Thread {
                         }
                         logger.emergency("---------------------------------------------");
                         responding = false;
+                        this.server.forceShutdown();
                     }
                 } else {
                     responding = true;

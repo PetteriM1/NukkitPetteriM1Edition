@@ -46,6 +46,9 @@ public class StartGamePacket extends DataPacket {
     public int permissionLevel = 1;
     public int gamePublish = 4;
     public int serverChunkTickRange = 4;
+    public boolean hasPlatformBroadcast = true;
+    public int platformBroadcastMode = 3;
+    public boolean xblBroadcastIntent = false;
     public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
     public String premiumWorldTemplateId = "";
@@ -93,6 +96,9 @@ public class StartGamePacket extends DataPacket {
         this.putVarInt(this.permissionLevel);
         this.putVarInt(this.gamePublish);
         this.putLInt(this.serverChunkTickRange);
+        this.putBoolean(this.hasPlatformBroadcast);
+        this.putVarInt(this.platformBroadcastMode);
+        this.putBoolean(this.xblBroadcastIntent);
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
@@ -100,5 +106,4 @@ public class StartGamePacket extends DataPacket {
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
     }
-
 }

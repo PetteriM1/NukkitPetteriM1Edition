@@ -22,6 +22,7 @@ import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
 import cn.nukkit.event.inventory.InventoryPickupItemEvent;
 import cn.nukkit.event.player.*;
+import cn.nukkit.event.player.PlayerAsyncPreLoginEvent.LoginResult;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.event.server.DataPacketReceiveEvent;
@@ -63,6 +64,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
+import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
@@ -222,6 +224,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected Map<Integer, FormWindow> serverSettings = new HashMap<>();
 
     protected Map<Long, DummyBossBar> dummyBossBars = new HashMap<>();
+
+    private AsyncTask preLoginEventTask = null;
+    private boolean shouldLogin = false;
 
     public int getStartActionTick() {
         return startAction;
@@ -2023,7 +2028,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         kick(PlayerKickEvent.Reason.UNKNOWN, "disconnectionScreen.notAuthenticated", false);
                     }
 
-
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
                         break;
                     }
@@ -2074,6 +2078,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    Player playerInstance = this;
+                    this.preLoginEventTask = new AsyncTask() {
+
+                        private PlayerAsyncPreLoginEvent e;
+
+                        @Override
+                        public void onRun() {
+                            e = new PlayerAsyncPreLoginEvent(username, uuid, ip, port);
+                            server.getPluginManager().callEvent(e);
+                        }
+
+                        @Override
+                        public void onCompletion(Server server) {
+                            if (!playerInstance.closed) {
+                                if (e.getLoginResult() == LoginResult.KICK) {
+                                    playerInstance.close(e.getKickMessage(), e.getKickMessage());
+                                } else if (playerInstance.shouldLogin) {
+                                    playerInstance.completeLoginSequence();
+                                }
+                            }
+                        }
+                    };
+                    this.server.getScheduler().scheduleAsyncTask(this.preLoginEventTask);
+
                     this.processLogin();
                     break;
                 case ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET:
@@ -2106,7 +2134,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.dataPacket(stackPacket);
                             break;
                         case ResourcePackClientResponsePacket.STATUS_COMPLETED:
-                            this.completeLoginSequence();
+                            if (this.preLoginEventTask.isFinished()) {
+                                this.completeLoginSequence();
+                            } else {
+                                this.shouldLogin = true;
+                            }
                             break;
                     }
                     break;
@@ -4259,6 +4291,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.dropItem(drop);
                 }
             }
+
+            drops = this.inventory.addItem(this.cursorInventory.getItem(0));
+            if (drops.length > 0) {
+                for (Item drop : drops) {
+                    this.dropItem(drop);
+                }
+            }
+
+            this.cursorInventory.clearAll();
             this.craftingGrid.clearAll();
 
             if (this.craftingGrid instanceof BigCraftingGrid) {
