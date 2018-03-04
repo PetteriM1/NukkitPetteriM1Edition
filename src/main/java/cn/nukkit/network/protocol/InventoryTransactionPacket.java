@@ -40,7 +40,7 @@ public class InventoryTransactionPacket extends DataPacket {
      * determine whether we're doing a crafting transaction.
      */
     public boolean isCraftingPart = false;
-    
+
     @Override
     public byte pid() {
         return ProtocolInfo.INVENTORY_TRANSACTION_PACKET;
