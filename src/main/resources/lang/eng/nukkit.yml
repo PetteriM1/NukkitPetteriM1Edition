@@ -8,6 +8,7 @@ settings:
  language: "eng"
  #Whether to send all strings translated to server locale or let the device handle them
  force-language: false
+ #Message that player see when server stopped
  shutdown-message: "§cMaintenence Break"
  #Allow listing plugins via Query
  query-plugins: false
@@ -61,6 +62,7 @@ level-settings:
  default-format: anvil
  #Automatically change levels tick rate to maintain 20 ticks per second
  auto-tick-rate: true
+ #Set minium tick rate
  auto-tick-rate-limit: 20
  #Sets the base tick rate (1 = 20 ticks per second, 2 = 10 ticks per second, etc.)
  base-tick-rate: 1
@@ -83,6 +85,7 @@ chunk-ticking:
  per-tick: 40
  #Radius of chunks around a player to tick
  tick-radius: 3
+ #Enable random light updates
  light-updates: false
  clear-tick-list: false
 
@@ -94,16 +97,16 @@ chunk-generation:
 
 ticks-per:
  animal-spawns: 400
- monster-spawns: 1
+ monster-spawns: 400
  autosave: 6000
- cache-cleanup: 900
+ cache-cleanup: 600
 
 spawn-limits:
  #Max amount of these entities
- monsters: 70
- animals: 15
- water-animals: 5
- ambient: 15
+ monsters: 0
+ animals: 0
+ water-animals: 0
+ ambient: 0
 
 player:
  #If true, player data will be saved as players/playername.dat

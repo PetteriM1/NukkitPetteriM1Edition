@@ -48,14 +48,12 @@ public class UDPServerSocket extends ChannelInboundHandlerAdapter {
                         .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                         .handler(this)
                         .group(new EpollEventLoopGroup());
-                this.logger.info("Epoll is available. EpollEventLoop will be used.");
             } else {
                 bootstrap = new Bootstrap()
                         .group(new NioEventLoopGroup())
                         .channel(NioDatagramChannel.class)
                         .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                         .handler(this);
-                this.logger.info("Epoll is unavailable. Reverting to NioEventLoop.");
             }
             channel = bootstrap.bind(interfaz, port).sync().channel();
         } catch (Exception e) {

@@ -47,10 +47,10 @@ public class Nukkit {
 
     public static void main(String[] args) {
 
-        // prefer IPv4 to stop any weird RakNet issues.
+        //Prefer IPv4 to stop any weird RakNet issues
         System.setProperty("java.net.preferIPv4Stack", "true");
 
-        //Shorter title for windows 8/2012
+        //Shorter title for Windows 8/2012
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("windows")) {
             if (osName.contains("windows 8") || osName.contains("2012")) {
@@ -61,7 +61,6 @@ public class Nukkit {
         LogLevel logLevel = LogLevel.DEFAULT_LEVEL;
         int index = -1;
         boolean skip = false;
-        //启动参数
         for (String arg : args) {
             index++;
             if (skip) {
@@ -93,7 +92,6 @@ public class Nukkit {
         }
 
         MainLogger logger = new MainLogger(DATA_PATH + "server.log", logLevel);
-        System.out.printf("Using log level '%s'\n", logLevel);
 
         try {
             if (ANSI) {

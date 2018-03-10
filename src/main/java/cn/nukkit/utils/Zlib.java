@@ -19,7 +19,6 @@ public abstract class Zlib {
 
     public static void setProvider(int providerIndex) {
       provider = providers.get(providerIndex);
-      System.out.println("Selected Zlib Provider: " + provider.getClass().getCanonicalName());
     }
 
     public static byte[] deflate(byte[] data) throws Exception {
