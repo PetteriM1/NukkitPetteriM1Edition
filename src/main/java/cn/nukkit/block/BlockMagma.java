@@ -1,7 +1,12 @@
 package cn.nukkit.block;
 
+import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.EntityDamageByBlockEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.potion.Effect;
+import cn.nukkit.utils.BlockColor;
 
 public class BlockMagma extends BlockSolid {
 
@@ -57,5 +62,17 @@ public class BlockMagma extends BlockSolid {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
+            entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.LAVA, 1));
+        }
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
     }
 }
