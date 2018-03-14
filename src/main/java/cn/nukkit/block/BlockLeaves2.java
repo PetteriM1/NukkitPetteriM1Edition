@@ -58,7 +58,7 @@ public class BlockLeaves2 extends BlockLeaves {
         }
         return new Item[0];
     }
-private Boolean findLog(Block pos, LongSet visited, Integer distance, Integer check) {
+    private Boolean findLog(Block pos, LongSet visited, Integer distance, Integer check) {
         return findLog(pos, visited, distance, check, null);
     }
 
@@ -117,7 +117,7 @@ private Boolean findLog(Block pos, LongSet visited, Integer distance, Integer ch
         }
         return false;
     }
-    @Override
+    /*@Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM && (getDamage() & 0b00001100) == 0x00) {
             setDamage(getDamage() | 0x08);
@@ -139,5 +139,5 @@ private Boolean findLog(Block pos, LongSet visited, Integer distance, Integer ch
             }
         }
         return 0;
-    }
+    }*/
 }
