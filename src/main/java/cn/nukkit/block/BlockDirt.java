@@ -8,6 +8,7 @@ import cn.nukkit.utils.BlockColor;
 
 /**
  * author: MagicDroidX
+ * AMAZING COARSE DIRT added by kvetinac97
  * Nukkit Project
  */
 public class BlockDirt extends BlockSolid {
@@ -17,7 +18,7 @@ public class BlockDirt extends BlockSolid {
     }
 
     public BlockDirt(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
@@ -27,7 +28,7 @@ public class BlockDirt extends BlockSolid {
 
     @Override
     public boolean canBeActivated() {
-        return true;
+        return (this.getDamage() == 0);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class BlockDirt extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Dirt";
+        return this.getDamage() == 0 ? "Dirt" : "Coarse Dirt";
     }
 
     @Override
@@ -57,6 +58,7 @@ public class BlockDirt extends BlockSolid {
 
     @Override
     public boolean onActivate(Item item, Player player) {
+        if (this.getDamage() != 0) return false;
         if (item.isHoe()) {
             item.useOn(this);
             this.getLevel().setBlock(this, new BlockFarmland(), true);
