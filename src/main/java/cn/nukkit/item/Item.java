@@ -543,7 +543,7 @@ public class Item implements Cloneable {
 
     public static final int LINGERING_POTION = 441;
 
-    public static final int ELYTRA = 444;
+    public static final int ELYTRA = 443;
 
     public static final int SHULKER_SHELL = 445;
 
@@ -803,7 +803,7 @@ public class Item implements Cloneable {
 
             //TODO: list[LINGERING_POTION] = ItemPotionLingering.class; //441
 
-            list[ELYTRA] = ItemElytra.class; //444
+            list[ELYTRA] = ItemElytra.class; //443
 
             //TODO: list[SHULKER_SHELL] = ItemShulkerShell.class; //445
 
@@ -973,7 +973,7 @@ public class Item implements Cloneable {
 
         return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] : Utils.parseHexBinary(nbt));
     }
-    
+
     public static Item[] fromStringMultiple(String str) {
         String[] b = str.split(",");
         Item[] items = new Item[b.length - 1];
@@ -1001,7 +1001,7 @@ public class Item implements Cloneable {
     public boolean hasCompoundTag() {
         return this.tags != null && this.tags.length > 0;
     }
-    
+
     public void encodeCompoundTag() {
         if (cachedNBT != null) {
             this.tags = this.writeCompoundTag(this.cachedNBT);
