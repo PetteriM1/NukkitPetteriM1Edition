@@ -44,7 +44,7 @@ public class DummyBossBar {
 
         public Builder(Player player) {
             this.player = player;
-            this.bossBarId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
+            this.bossBarId = 1095216660480L; //This is hack to get one thing work, if you have problems with boss bar or you need more than one use original code: this.bossBarId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
         }
 
         public Builder text(String text) {
