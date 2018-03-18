@@ -67,6 +67,10 @@ public class BlockTNT extends BlockSolid {
     }
 
     public void prime(int fuse) {
+        prime(fuse, null);
+    }
+
+    public void prime(int fuse, Entity source) {
         this.getLevel().setBlock(this, new BlockAir(), true);
         double mot = (new NukkitRandom()).nextSignedFloat() * Math.PI * 2;
         CompoundTag nbt = new CompoundTag()
@@ -84,7 +88,7 @@ public class BlockTNT extends BlockSolid {
                 .putShort("Fuse", fuse);
         Entity tnt = new EntityPrimedTNT(
                 this.getLevel().getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4),
-                nbt
+                nbt, source
         );
         tnt.spawnToAll();
         this.level.addSound(new TNTPrimeSound(this));
@@ -95,6 +99,7 @@ public class BlockTNT extends BlockSolid {
         if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && this.level.isBlockPowered(this)) {
             this.prime();
         }
+
         return 0;
     }
 
@@ -102,7 +107,7 @@ public class BlockTNT extends BlockSolid {
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.FLINT_STEEL) {
             item.useOn(this);
-            this.prime();
+            this.prime(80, player);
             return true;
         }
         return false;

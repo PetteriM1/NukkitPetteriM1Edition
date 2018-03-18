@@ -57,8 +57,15 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
     protected int fuse;
 
+    protected Entity source;
+
     public EntityPrimedTNT(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntityPrimedTNT(FullChunk chunk, CompoundTag nbt, Entity source) {
         super(chunk, nbt);
+        this.source = source;
     }
 
     @Override
@@ -181,4 +188,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         super.spawnTo(player);
     }
 
+    public Entity getSource() {
+        return source;
+    }
 }
