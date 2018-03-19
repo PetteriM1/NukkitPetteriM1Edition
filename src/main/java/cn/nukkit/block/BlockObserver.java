@@ -3,24 +3,24 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-public class BlockDispenser extends BlockSolid {
+public class BlockObserver extends BlockSolid {
 
-    public BlockDispenser() {
+    public BlockObserver() {
         this(0);
     }
 
-    public BlockDispenser(int meta) {
+    public BlockObserver(int meta) {
         super(meta);
     }
 
     @Override
     public int getId() {
-        return DISPENSER;
+        return OBSERVER;
     }
 
     @Override
     public String getName() {
-        return "Dispenser";
+        return "Observer";
     }
 
     @Override

@@ -3,50 +3,44 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-public class BlockDispenser extends BlockSolid {
+public class BlockPistonExtension extends BlockTransparent {
 
-    public BlockDispenser() {
+    public BlockPistonExtension() {
         this(0);
     }
 
-    public BlockDispenser(int meta) {
+    public BlockPistonExtension(int meta) {
         super(meta);
     }
 
     @Override
     public int getId() {
-        return DISPENSER;
+        return PISTON_EXTENSION;
     }
 
     @Override
     public String getName() {
-        return "Dispenser";
+        return "Piston Extension";
     }
 
     @Override
     public double getHardness() {
-        return 3.5;
+        return 0.1;
     }
 
     @Override
     public double getResistance() {
-        return 17.5;
+        return 0.1;
     }
 
     @Override
     public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+        return ItemTool.TYPE_NONE;
     }
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
             return new Item[0];
-        }
     }
 
     @Override

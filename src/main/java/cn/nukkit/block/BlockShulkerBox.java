@@ -3,34 +3,34 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-public class BlockDispenser extends BlockSolid {
+public class BlockShulkerBox extends BlockSolid {
 
-    public BlockDispenser() {
+    public BlockShulkerBox() {
         this(0);
     }
 
-    public BlockDispenser(int meta) {
+    public BlockShulkerBox(int meta) {
         super(meta);
     }
 
     @Override
     public int getId() {
-        return DISPENSER;
+        return SHULKER_BOX;
     }
 
     @Override
     public String getName() {
-        return "Dispenser";
+        return "Shulker Box";
     }
 
     @Override
     public double getHardness() {
-        return 3.5;
+        return 6;
     }
 
     @Override
     public double getResistance() {
-        return 17.5;
+        return 30;
     }
 
     @Override

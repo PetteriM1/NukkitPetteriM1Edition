@@ -194,7 +194,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int DRAGON_EGG = 122;
     public static final int REDSTONE_LAMP = 123;
     public static final int LIT_REDSTONE_LAMP = 124;
-    //Note: dropper CAN NOT BE HARVESTED WITH HAND -- canHarvestWithHand method should be overridden FALSE.
     public static final int DROPPER = 125;
     public static final int ACTIVATOR_RAIL = 126;
     public static final int COCOA = 127;
@@ -290,7 +289,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int DOUBLE_PURPUR_SLAB = 204;
     public static final int PURPUR_SLAB = 205;
     public static final int END_BRICKS = 206;
-    //Note: frosted ice CAN NOT BE HARVESTED WITH HAND -- canHarvestWithHand method should be overridden FALSE.
     public static final int ICE_FROSTED = 207;
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
@@ -326,7 +324,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int BEETROOT_BLOCK = 244;
     public static final int STONECUTTER = 245;
     public static final int GLOWING_OBSIDIAN = 246;
-    public static final int NETHER_REACTOR = 247; //Should not be removed
+    public static final int NETHER_REACTOR = 247;
 
     public static final int PISTON_EXTENSION = 250;
 
@@ -381,7 +379,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[GLASS] = BlockGlass.class; //20
             list[LAPIS_ORE] = BlockOreLapis.class; //21
             list[LAPIS_BLOCK] = BlockLapis.class; //22
-            //TODO: list[DISPENSER] = BlockDispenser.class; //23
+            list[DISPENSER] = BlockDispenser.class; //23
             list[SANDSTONE] = BlockSandstone.class; //24
             list[NOTEBLOCK] = BlockNoteblock.class; //25
             list[BED_BLOCK] = BlockBed.class; //26
@@ -482,7 +480,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[DRAGON_EGG] = BlockDragonEgg.class; //122
             list[REDSTONE_LAMP] = BlockRedstoneLamp.class; //123
             list[LIT_REDSTONE_LAMP] = BlockRedstoneLampLit.class; //124
-            //TODO: list[DROPPER] = BlockDropper.class; //125
+            list[DROPPER] = BlockDropper.class; //125
             list[ACTIVATOR_RAIL] = BlockRailActivator.class; //126
             list[COCOA] = BlockCocoa.class; //127
             list[SANDSTONE_STAIRS] = BlockStairsSandstone.class; //128
@@ -553,7 +551,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[DARK_OAK_DOOR_BLOCK] = BlockDoorDarkOak.class; //197
             list[GRASS_PATH] = BlockGrassPath.class; //198
             list[ITEM_FRAME_BLOCK] = BlockItemFrame.class; //199
-            //TODO: list[CHORUS_FLOWER] = BlockChorusFlower.class; //200
+            list[CHORUS_FLOWER] = BlockChorusFlower.class; //200
             list[PURPUR_BLOCK] = BlockPurpur.class; //201
 
             list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
@@ -566,7 +564,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[BONE_BLOCK] = BlockBone.class; //216
             list[MAGMA] = BlockMagma.class; //213
 
-            //TODO: list[SHULKER_BOX] = BlockShulkerBox.class; //218
+            list[SHULKER_BOX] = BlockShulkerBox.class; //218
             list[PURPLE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedPurple.class; //219
             list[WHITE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedWhite.class; //220
             list[ORANGE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedOrange.class; //221
@@ -587,16 +585,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[CONCRETE] = BlockConcrete.class; //236
             list[CONCRETE_POWDER] = BlockConcretePowder.class; //237
 
-            //TODO: list[CHORUS_PLANT] = BlockChorusPlant.class; //240
+            list[CHORUS_PLANT] = BlockChorusPlant.class; //240
             list[STAINED_GLASS] = BlockGlassStained.class; //241
             list[PODZOL] = BlockPodzol.class; //243
             list[BEETROOT_BLOCK] = BlockBeetroot.class; //244
             list[GLOWING_OBSIDIAN] = BlockObsidianGlowing.class; //246
-            //TODO: list[NETHER_REACTOR] = BlockNetherReactor.class; //247 Should not be removed
+            list[NETHER_REACTOR] = BlockNetherReactor.class; //247
 
-            //TODO: list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
+            list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
 
-            //TODO: list[OBSERVER] = BlockObserver.class; //251
+            list[OBSERVER] = BlockObserver.class; //251
 
             for (int id = 0; id < 256; id++) {
                 Class c = list[id];

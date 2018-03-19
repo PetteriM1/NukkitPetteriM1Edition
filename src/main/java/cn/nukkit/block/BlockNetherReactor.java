@@ -3,34 +3,34 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-public class BlockDispenser extends BlockSolid {
+public class BlockNetherReactor extends BlockSolid {
 
-    public BlockDispenser() {
+    public BlockNetherReactor() {
         this(0);
     }
 
-    public BlockDispenser(int meta) {
+    public BlockNetherReactor(int meta) {
         super(meta);
     }
 
     @Override
     public int getId() {
-        return DISPENSER;
+        return NETHER_REACTOR;
     }
 
     @Override
     public String getName() {
-        return "Dispenser";
+        return "Nether Reactor";
     }
 
     @Override
     public double getHardness() {
-        return 3.5;
+        return 30;
     }
 
     @Override
     public double getResistance() {
-        return 17.5;
+        return 30;
     }
 
     @Override
@@ -40,13 +40,7 @@ public class BlockDispenser extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
+        return new Item[0];
     }
 
     @Override
