@@ -905,7 +905,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                 .map(Enchantment::getLevel).orElse(0);
         int hasteEffectLevel = Optional.ofNullable(player.getEffect(Effect.HASTE))
                 .map(Effect::getAmplifier).orElse(0);
-        boolean insideOfWaterWithoutAquaAffinity = player.isInsideOfWater() &&
+        boolean insideOfWaterWithoutAquaAffinity = player.isSubmerged() &&
                 Optional.ofNullable(player.getInventory().getHelmet().getEnchantment(Enchantment.ID_WATER_WORKER))
                         .map(Enchantment::getLevel).map(l -> l >= 1).orElse(false);
         boolean outOfWaterButNotOnGround = (!player.isInsideOfWater()) && (!player.isOnGround());

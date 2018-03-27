@@ -1459,13 +1459,24 @@ public abstract class Entity extends Location implements Metadatable {
         return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.level);
     }
 
-    public boolean isInsideOfWater() {
+    public boolean isSubmerged() {
         double y = this.y + this.getEyeHeight();
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
             double f = (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.1111111);
             return y < f;
+        }
+
+        return false;
+    }
+
+    public boolean isInsideOfWater() {
+        Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
+
+        if (block instanceof BlockWater) {
+            double f = (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.1111111);
+            return this.y < f;
         }
 
         return false;
