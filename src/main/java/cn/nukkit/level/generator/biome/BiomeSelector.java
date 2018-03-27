@@ -36,6 +36,10 @@ public class BiomeSelector {
             } else {
                 return Biome.SAVANNA;
             }
+        } else if (rainfall < 0.65) {
+            return Biome.ROOFED_FOREST;
+        } else if (rainfall < 0.70) {
+            return Biome.BIRCH_FOREST;
         } else if (rainfall < 0.80) {
             if (temperature < 0.25) {
                 return Biome.TAIGA;
