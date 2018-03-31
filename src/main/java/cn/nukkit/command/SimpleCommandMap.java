@@ -32,20 +32,20 @@ public class SimpleCommandMap implements CommandMap {
     private void setDefaultCommands() {
         this.register("nukkit", new VersionCommand("version"));
         this.register("nukkit", new PluginsCommand("plugins"));
-        this.register("nukkit", new SeedCommand("seed"));
+        //this.register("nukkit", new SeedCommand("seed"));
         this.register("nukkit", new HelpCommand("help"));
         this.register("nukkit", new StopCommand("stop"));
         this.register("nukkit", new TellCommand("tell"));
-        this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
+        //this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
         this.register("nukkit", new BanCommand("ban"));
         this.register("nukkit", new BanIpCommand("ban-ip"));
         this.register("nukkit", new BanListCommand("banlist"));
         this.register("nukkit", new PardonCommand("pardon"));
         this.register("nukkit", new PardonIpCommand("pardon-ip"));
         this.register("nukkit", new SayCommand("say"));
-        this.register("nukkit", new MeCommand("me"));
+        //this.register("nukkit", new MeCommand("me"));
         this.register("nukkit", new ListCommand("list"));
-        this.register("nukkit", new DifficultyCommand("difficulty"));
+        //this.register("nukkit", new DifficultyCommand("difficulty"));
         this.register("nukkit", new KickCommand("kick"));
         this.register("nukkit", new OpCommand("op"));
         this.register("nukkit", new DeopCommand("deop"));
@@ -63,8 +63,8 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new SetWorldSpawnCommand("setworldspawn"));
         this.register("nukkit", new TeleportCommand("tp"));
         this.register("nukkit", new TimeCommand("time"));
-        this.register("nukkit", new TimingsCommand("timings"));
-        this.register("nukkit", new TitleCommand("title"));
+        //this.register("nukkit", new TimingsCommand("timings"));
+        //this.register("nukkit", new TitleCommand("title"));
         this.register("nukkit", new ReloadCommand("reload"));
         this.register("nukkit", new WeatherCommand("weather"));
         this.register("nukkit", new XpCommand("xp"));
