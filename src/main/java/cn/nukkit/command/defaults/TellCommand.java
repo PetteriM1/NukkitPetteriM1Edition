@@ -61,7 +61,9 @@ public class TellCommand extends VanillaCommand {
 
         sender.sendMessage("[" + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
         player.sendMessage("[" + displayName + " -> " + player.getName() + "] " + msg);
-        sender.getServer().getLogger().info("[" + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
+        if (sender instanceof Player) {
+            sender.getServer().getLogger().info("[" + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
+        }
 
         return true;
     }
