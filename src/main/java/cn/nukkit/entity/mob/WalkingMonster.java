@@ -182,7 +182,7 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster {
         hasUpdate = super.entityBaseTick(tickDiff);
 
         this.attackDelay += tickDiff;
-        if (this instanceof Enderman) {
+        if (this instanceof EntityEnderman) {
             if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
                 this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
                 this.move(Utils.rand(-20, 20), Utils.rand(-20, 20), Utils.rand(-20, 20));
