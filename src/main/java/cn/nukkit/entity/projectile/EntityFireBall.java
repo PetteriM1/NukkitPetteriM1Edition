@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.Utils;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.format.FullChunk;
@@ -77,7 +78,8 @@ public class EntityFireBall extends EntityProjectile {
         boolean hasUpdate = super.onUpdate(currentTick);
 
         if (!this.hadCollision && this.critical) {
-            //TODO critical particle
+            this.level.addParticle(new CriticalParticle(
+                    this.add(this.getWidth() / 2 + Utils.rand(-100, 100) / 500, this.getHeight() / 2 + Utils.rand(-100, 100) / 500, this.getWidth() / 2 + Utils.rand(-100, 100) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }
