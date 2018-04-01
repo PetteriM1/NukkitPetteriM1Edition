@@ -7,7 +7,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.Utils;
 import cn.nukkit.entity.WalkingEntity;
-impprt cn.nukkit.entity.mob.EntityEnderman;
+import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.NukkitMath;
