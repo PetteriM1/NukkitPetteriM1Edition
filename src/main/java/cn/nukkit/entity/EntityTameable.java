@@ -2,7 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 
-public interface Tameable {
+public interface EntityTameable {
 
     public static final String NAMED_TAG_OWNER      = "Owner";
 
