@@ -166,7 +166,7 @@ public abstract class BaseEntity extends EntityCreature {
 
     @Override
     protected void updateMovement() {
-        if (MobPlugin.MOB_AI_ENABLED) {
+        //if (MobPlugin.MOB_AI_ENABLED) { //TODO option to disable mob ai
             if (this.lastX != this.x || this.lastY != this.y || this.lastZ != this.z || this.lastYaw != this.yaw || this.lastPitch != this.pitch) {
                 this.lastX = this.x;
                 this.lastY = this.y;
@@ -176,7 +176,7 @@ public abstract class BaseEntity extends EntityCreature {
 
                 this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
             }
-        }
+        //}
     }
 
     public boolean targetOption(EntityCreature creature, double distance) {
