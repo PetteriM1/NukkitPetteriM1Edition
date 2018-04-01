@@ -17,7 +17,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class WalkingEntity extends BaseEntity {
 
-    publoc boolean MOB_AI_ENABLED = true; //TODO
+    public boolean MOB_AI_ENABLED = true; //TODO
     
     public WalkingEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
