@@ -77,8 +77,7 @@ public class EntityFireBall extends EntityProjectile {
         boolean hasUpdate = super.onUpdate(currentTick);
 
         if (!this.hadCollision && this.critical) {
-            this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + level.rand(-100, 100) / 500, this.getHeight() / 2 + level.rand(-100, 100) / 500, this.getWidth() / 2 + level.rand(-100, 100) / 500)));
+            //TODO critical particle
         } else if (this.onGround) {
             this.critical = false;
         }
