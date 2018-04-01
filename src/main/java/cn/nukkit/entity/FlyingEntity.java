@@ -3,12 +3,15 @@ package cn.nukkit.entity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.Animal;
+import cn.nukkit.entity.Utils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class FlyingEntity extends BaseEntity {
+    
+    public boolean MOB_AI_ENABLED = true; //TODO
 
     public FlyingEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -89,7 +92,7 @@ public abstract class FlyingEntity extends BaseEntity {
 
     @Override
     public Vector3 updateMove(int tickDiff) {
-        if (MobPlugin.MOB_AI_ENABLED && !isImmobile()) {
+        if (MOB_AI_ENABLED && !isImmobile()) {
             if (!this.isMovement()) {
                 return null;
             }
