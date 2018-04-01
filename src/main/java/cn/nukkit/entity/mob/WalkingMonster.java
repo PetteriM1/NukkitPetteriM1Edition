@@ -1,4 +1,4 @@
-package suomicraftpe.mobplugin.entities.monster;
+package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
