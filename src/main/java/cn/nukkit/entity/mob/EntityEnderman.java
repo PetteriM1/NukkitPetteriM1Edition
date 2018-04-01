@@ -18,7 +18,7 @@ public class EntityEnderman extends WalkingMonster {
 
     public static final int NETWORK_ID = 38;
 
-    public Enderman(FullChunk chunk, CompoundTag nbt) {
+    public EntityEnderman(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
