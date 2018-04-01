@@ -10,7 +10,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
-import cn.nukkit.utils.Random;
 
 import java.util.List;
 
@@ -79,7 +78,7 @@ public class EntityFireBall extends EntityProjectile {
 
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + Random.rand(-100, 100) / 500, this.getHeight() / 2 + Random.rand(-100, 100) / 500, this.getWidth() / 2 + Random.rand(-100, 100) / 500)));
+                    this.add(this.getWidth() / 2 + level.rand(-100, 100) / 500, this.getHeight() / 2 + level.rand(-100, 100) / 500, this.getWidth() / 2 + level.rand(-100, 100) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }
