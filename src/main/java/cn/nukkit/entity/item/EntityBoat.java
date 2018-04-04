@@ -82,8 +82,8 @@ public class EntityBoat extends EntityVehicle {
         pk.speedX = 0;
         pk.speedY = 0;
         pk.speedZ = 0;
-        pk.yaw = (float) this.yaw;
-        pk.pitch = (float) this.pitch;
+        pk.yaw = (float) this.yaw / 360;
+        pk.pitch = (float) this.pitch / 360;
         pk.metadata = this.dataProperties;
         player.dataPacket(pk);
 
@@ -205,6 +205,11 @@ public class EntityBoat extends EntityVehicle {
         }
 
         super.mountEntity(player);
+        return true;
+    }
+
+    @Override
+    public boolean isRideable(){
         return true;
     }
 }
