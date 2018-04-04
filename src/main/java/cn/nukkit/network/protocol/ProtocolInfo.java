@@ -11,7 +11,7 @@ public interface ProtocolInfo {
     /**
      * Actual Minecraft: PE protocol version
      */
-    int MINIUM_PROTOCOL = Integer.valueOf("140");
+    int MINIUM_PROTOCOL = Integer.valueOf("150");
 
     String MINECRAFT_VERSION = "v1.2.x";
     String MINECRAFT_VERSION_NETWORK = "1.2.x";
