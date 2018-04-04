@@ -152,7 +152,7 @@ public class BlockLava extends BlockLiquid {
         return new BlockLava(meta);
     }
     
-    @Override
+    /*@Override
     public int tickRate() {
         return 30;
     }
@@ -191,5 +191,5 @@ public class BlockLava extends BlockLiquid {
         }else{
             super.flowIntoBlock(block, newFlowDecay);
         }
-    }
+    }*/
 }
