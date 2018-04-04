@@ -30,6 +30,11 @@ public class EntityBoat extends EntityVehicle {
         super(chunk, nbt);
     }
 
+    
+    public boolean isRideable(){
+        return true;
+    }
+
     @Override
     protected void initEntity() {
         super.initEntity();
@@ -205,11 +210,6 @@ public class EntityBoat extends EntityVehicle {
         }
 
         super.mountEntity(player);
-        return true;
-    }
-
-    @Override
-    public boolean isRideable(){
         return true;
     }
 }
