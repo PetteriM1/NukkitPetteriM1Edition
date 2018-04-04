@@ -2049,7 +2049,7 @@ public class Level implements ChunkManager, Metadatable {
 
         
         if (playSound) {
-            this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), false);
+            //this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), false);
         }
 
         if (item.getCount() <= 0) {
