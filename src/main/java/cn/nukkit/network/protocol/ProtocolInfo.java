@@ -15,7 +15,7 @@ public interface ProtocolInfo {
      */
     int CURRENT_PROTOCOL = Integer.valueOf("201"); //plugins can change it
 
-    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(140, 141, 150, 160, 200, 201, 224);
+    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(140, 141, 150, 160, 200, 201, 223, 224);
 
     String MINECRAFT_VERSION = "v1.2.x";
     String MINECRAFT_VERSION_NETWORK = "1.2.x";
