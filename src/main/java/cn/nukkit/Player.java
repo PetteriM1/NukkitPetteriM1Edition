@@ -2308,7 +2308,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case PlayerActionPacket.ACTION_GET_UPDATED_BLOCK:
                             break; //TODO
                         case PlayerActionPacket.ACTION_DROP_ITEM:
-                            this.sendMessage("DEBUG: protocolVersion=" + this.getProtocolVersion()); //debug
                             break; //TODO
                         case PlayerActionPacket.ACTION_STOP_SLEEPING:
                             this.stopSleep();
@@ -3207,7 +3206,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        if (this.getProtocolVersion() >= 223) {
+        if (this.getLoginChainData().getGameVersion().equals("1.2.13")) {
             TextPacket pk = new TextPacket();
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message);
@@ -3255,7 +3254,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        if (this.getProtocolVersion() >= 223) {
+        if (this.getLoginChainData().getGameVersion().equals("1.2.13")) {
             TextPacket pk = new TextPacket();
             pk.type = TextPacket.TYPE_CHAT;
             pk.source = source;
