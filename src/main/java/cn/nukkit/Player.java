@@ -3247,7 +3247,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        if (this.getProtocolVersion() > 223) {
+        if (this.getProtocolVersion() >= 223) {
             TextPacket pk = new TextPacket();
             pk.type = TextPacket.TYPE_CHAT;
             pk.source = source;
