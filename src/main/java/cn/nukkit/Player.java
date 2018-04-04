@@ -659,7 +659,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return port;
     }
     
-    @Override
     public int getProtocolVersion() {
         return protocolVersion;
     }
