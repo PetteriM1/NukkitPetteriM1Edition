@@ -151,6 +151,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean removeFormat = true;
 
     protected final int port;
+    protected final int protocolVersion;
     protected String username;
     protected String iusername;
     protected String displayName;
@@ -656,6 +657,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int getPort() {
         return port;
+    }
+    
+    public int getProtocolVersion() {
+        return protocolVersion;
     }
 
     public Position getNextPosition() {
@@ -2012,6 +2017,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                     this.username = TextFormat.clean(loginPacket.username);
+                    this.protocolVersion = loginPacket.protocol;
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
@@ -3241,11 +3247,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        TextPacket pk = new TextPacket();
-        pk.type = TextPacket.TYPE_CHAT;
-        pk.source = source;
-        pk.message = this.server.getLanguage().translateString(message);
-        this.dataPacket(pk);
+        if (this.getProtocolVersion() > 223) {
+            TextPacket pk = new TextPacket();
+            pk.type = TextPacket.TYPE_CHAT;
+            pk.source = source;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+         } else {
+            TextPacketOld pk = new TextPacketOld();
+            pk.type = TextPacketOld.TYPE_CHAT;
+            pk.source = source;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+         }
     }
 
     public void sendPopup(String message) {
