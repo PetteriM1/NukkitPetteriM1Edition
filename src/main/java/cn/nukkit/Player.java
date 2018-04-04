@@ -151,7 +151,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean removeFormat = true;
 
     protected final int port;
-    protected int protocolVersion;
+    public int protocolVersion;
     protected String username;
     protected String iusername;
     protected String displayName;
@@ -659,6 +659,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return port;
     }
     
+    @Override
     public int getProtocolVersion() {
         return protocolVersion;
     }
