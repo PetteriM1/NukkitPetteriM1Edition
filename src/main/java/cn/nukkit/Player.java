@@ -151,7 +151,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean removeFormat = true;
 
     protected final int port;
-    protected final int protocolVersion;
+    protected int protocolVersion;
     protected String username;
     protected String iusername;
     protected String displayName;
