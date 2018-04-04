@@ -3171,7 +3171,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             String message;
             if (isAdmin) {
                 if (!this.isBanned()) {
-                    message = "Kicked by admin." + (!reasonString.isEmpty() ? " Reason: " + reasonString : "");
+                    message = "Kicked!" + (!reasonString.isEmpty() ? " Reason: " + reasonString : "");
                 } else {
                     message = reasonString;
                 }
@@ -3206,10 +3206,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        TextPacket pk = new TextPacket();
-        pk.type = TextPacket.TYPE_RAW;
-        pk.message = this.server.getLanguage().translateString(message);
-        this.dataPacket(pk);
+        if (this.getProtocolVersion() >= 223) {
+            TextPacket pk = new TextPacket();
+            pk.type = TextPacket.TYPE_RAW;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+        } else {
+            TextPacketOld pk = new TextPacketOld();
+            pk.type = TextPacket.TYPE_RAW;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+        }
     }
 
     @Override
