@@ -37,7 +37,7 @@ public class VersionCommand extends VanillaCommand {
                     sender.getServer().getCodename(),
                     sender.getServer().getApiVersion(),
                     sender.getServer().getVersion(),
-                    String.valueOf(ProtocolInfo.CURRENT_PROTOCOL)
+                    String.valueOf(ProtocolInfo.MINIUM_PROTOCOL)
             }));
         } else {
             String pluginName = "";
