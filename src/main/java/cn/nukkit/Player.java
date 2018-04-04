@@ -2308,6 +2308,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case PlayerActionPacket.ACTION_GET_UPDATED_BLOCK:
                             break; //TODO
                         case PlayerActionPacket.ACTION_DROP_ITEM:
+                            this.sendMessage("DEBUG: protocolVersion=" + this.getProtocolVersion()); //debug
                             break; //TODO
                         case PlayerActionPacket.ACTION_STOP_SLEEPING:
                             this.stopSleep();
