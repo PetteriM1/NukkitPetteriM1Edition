@@ -55,7 +55,7 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
+import it.unimi.dsi.fastutil.longs.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -2427,7 +2427,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void processChunkRequest() {
         this.timings.syncChunkSendTimer.startTiming();
-        for (Long index : ImmutableList.copyOf(this.chunkSendQueue.keySet())) {
+        for (long index : new LongOpenHashSet(this.chunkSendQueue.keySet())) {
             if (this.chunkSendTasks.containsKey(index)) {
                 continue;
             }
