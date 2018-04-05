@@ -2589,7 +2589,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (thia.protocolVersion >= 223) {
+                    if (this.protocolVersion >= 223) {
                         TextPacket textPacket = (TextPacket) packet;
 
                         if (textPacket.type == TextPacket.TYPE_CHAT) {
