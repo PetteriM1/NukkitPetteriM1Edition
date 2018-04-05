@@ -2,10 +2,7 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.utils.RuleData;
 
-/**
- * Created on 15-10-13.
- */
-public class StartGamePacket extends DataPacket {
+public class StartGamePacketOld extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.START_GAME_PACKET;
 
