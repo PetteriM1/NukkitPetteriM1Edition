@@ -2010,7 +2010,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.close("", message, false);
                     break;
-
+                }
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
