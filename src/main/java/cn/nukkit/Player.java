@@ -227,6 +227,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private AsyncTask preLoginEventTask = null;
     private boolean shouldLogin = false;
+    
+    public int protocolVersion;
 
     public int getStartActionTick() {
         return startAction;
@@ -656,6 +658,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public int getPort() {
         return port;
+    }
+    
+    public int getProtocolVersion() {
+        return protocolVersion;
     }
 
     public Position getNextPosition() {
@@ -1994,30 +2000,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     LoginPacket loginPacket = (LoginPacket) packet;
 
                     String message;
-                    if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(loginPacket.getProtocol())) {
-                        if (loginPacket.getProtocol() < ProtocolInfo.CURRENT_PROTOCOL) {
-                            message = "disconnectionScreen.outdatedClient";
-
-                            this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
-                        } else {
-                            message = "disconnectionScreen.outdatedServer";
-
-                            this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_SERVER);
-                        }
-                        if (((LoginPacket) packet).protocol < 137) {
-                            DisconnectPacket disconnectPacket = new DisconnectPacket();
-                            disconnectPacket.message = message;
-                            disconnectPacket.encode();
-                            BatchPacket batch = new BatchPacket();
-                            batch.payload = disconnectPacket.getBuffer();
-                            this.directDataPacket(batch);
-                            // Still want to run close() to allow the player to be removed properly
-                        }
-                        this.close("", message, false);
-                        break;
+                    if (ProtocolInfo.MINIUM_PROTOCOL > (loginPacket.getProtocol())) {
+                        message = "disconnectionScreen.outdatedClient";
+                        this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
+                        
+                    if (((LoginPacket) packet).protocol < 137) {
+                        DisconnectPacket disconnectPacket = new DisconnectPacket();
+                        disconnectPacket.message = message;
+                        disconnectPacket.encode();
+                        BatchPacket batch = new BatchPacket();
+                        batch.payload = disconnectPacket.getBuffer();
+                        this.directDataPacket(batch);
+                        // Still want to run close() to allow the player to be removed properly
                     }
+                    this.close("", message, false);
+                    break;
+                }
 
                     this.username = TextFormat.clean(loginPacket.username);
+                    this.protocolVersion = loginPacket.protocol;
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
@@ -2588,10 +2589,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    TextPacket textPacket = (TextPacket) packet;
+                    if (this.protocolVersion >= 223) {
+                        TextPacket textPacket = (TextPacket) packet;
 
-                    if (textPacket.type == TextPacket.TYPE_CHAT) {
-                        this.chat(textPacket.message);
+                        if (textPacket.type == TextPacket.TYPE_CHAT) {
+                            this.chat(textPacket.message);
+                        }
+                    } else {
+                        TextPacketOld textPacket = (TextPacketOld) packet;
+
+                        if (textPacket.type == TextPacketOld.TYPE_CHAT) {
+                            this.chat(textPacket.message);
+                        }
                     }
                     break;
                 case ProtocolInfo.CONTAINER_CLOSE_PACKET:
@@ -3171,7 +3180,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             String message;
             if (isAdmin) {
                 if (!this.isBanned()) {
-                    message = "Kicked by admin." + (!reasonString.isEmpty() ? " Reason: " + reasonString : "");
+                    message = "Kicked!" + (!reasonString.isEmpty() ? " Reason: " + reasonString : "");
                 } else {
                     message = reasonString;
                 }
@@ -3206,10 +3215,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        TextPacket pk = new TextPacket();
-        pk.type = TextPacket.TYPE_RAW;
-        pk.message = this.server.getLanguage().translateString(message);
-        this.dataPacket(pk);
+        if (this.protocolVersion >= 223) {
+            TextPacket pk = new TextPacket();
+            pk.type = TextPacket.TYPE_RAW;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+        } else {
+            TextPacketOld pk = new TextPacketOld();
+            pk.type = TextPacket.TYPE_RAW;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+        }
     }
 
     @Override
@@ -3247,11 +3263,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        TextPacket pk = new TextPacket();
-        pk.type = TextPacket.TYPE_CHAT;
-        pk.source = source;
-        pk.message = this.server.getLanguage().translateString(message);
-        this.dataPacket(pk);
+        if (this.protocolVersion >= 223) {
+            TextPacket pk = new TextPacket();
+            pk.type = TextPacket.TYPE_CHAT;
+            pk.source = source;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+         } else {
+            TextPacketOld pk = new TextPacketOld();
+            pk.type = TextPacketOld.TYPE_CHAT;
+            pk.source = source;
+            pk.message = this.server.getLanguage().translateString(message);
+            this.dataPacket(pk);
+         }
     }
 
     public void sendPopup(String message) {
