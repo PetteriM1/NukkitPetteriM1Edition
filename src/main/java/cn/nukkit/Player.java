@@ -1994,11 +1994,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     LoginPacket loginPacket = (LoginPacket) packet;
 
                     String message;
-                    if (loginPacket.getProtocol() < ProtocolInfo.MINIUM_PROTOCOL) {
+                    if ((loginPacket.getProtocol()) < ProtocolInfo.MINIUM_PROTOCOL) {
                         message = "disconnectionScreen.outdatedClient";
-
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
-                    }
+                        
                     if (((LoginPacket) packet).protocol < 137) {
                         DisconnectPacket disconnectPacket = new DisconnectPacket();
                         disconnectPacket.message = message;
