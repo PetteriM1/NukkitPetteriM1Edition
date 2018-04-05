@@ -1916,32 +1916,88 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         Position spawnPosition = this.getSpawn();
 
-        StartGamePacket startGamePacket = new StartGamePacket();
-        startGamePacket.entityUniqueId = this.id;
-        startGamePacket.entityRuntimeId = this.id;
-        startGamePacket.playerGamemode = getClientFriendlyGamemode(this.gamemode);
-        startGamePacket.x = (float) this.x;
-        startGamePacket.y = (float) this.y;
-        startGamePacket.z = (float) this.z;
-        startGamePacket.yaw = (float) this.yaw;
-        startGamePacket.pitch = (float) this.pitch;
-        startGamePacket.seed = -1;
-        startGamePacket.dimension = (byte) (spawnPosition.level.getDimension() & 0xff);
-        startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
-        startGamePacket.difficulty = this.server.getDifficulty();
-        startGamePacket.spawnX = (int) spawnPosition.x;
-        startGamePacket.spawnY = (int) spawnPosition.y;
-        startGamePacket.spawnZ = (int) spawnPosition.z;
-        startGamePacket.hasAchievementsDisabled = true;
-        startGamePacket.dayCycleStopTime = -1;
-        startGamePacket.eduMode = false;
-        startGamePacket.rainLevel = 0;
-        startGamePacket.lightningLevel = 0;
-        startGamePacket.commandsEnabled = this.isEnableClientCommand();
-        startGamePacket.levelId = "";
-        startGamePacket.worldName = this.getServer().getNetwork().getName();
-        startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
-        this.dataPacket(startGamePacket);
+        if (this.protocolVersion < 201) {
+            StartGamePacketOld startGamePacket = new StartGamePacketOld();
+            startGamePacket.entityUniqueId = this.id;
+            startGamePacket.entityRuntimeId = this.id;
+            startGamePacket.playerGamemode = getClientFriendlyGamemode(this.gamemode);
+            startGamePacket.x = (float) this.x;
+            startGamePacket.y = (float) this.y;
+            startGamePacket.z = (float) this.z;
+            startGamePacket.yaw = (float) this.yaw;
+            startGamePacket.pitch = (float) this.pitch;
+            startGamePacket.seed = -1;
+            startGamePacket.dimension = (byte) (spawnPosition.level.getDimension() & 0xff);
+            startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
+            startGamePacket.difficulty = this.server.getDifficulty();
+            startGamePacket.spawnX = (int) spawnPosition.x;
+            startGamePacket.spawnY = (int) spawnPosition.y;
+            startGamePacket.spawnZ = (int) spawnPosition.z;
+            startGamePacket.hasAchievementsDisabled = true;
+            startGamePacket.dayCycleStopTime = -1;
+            startGamePacket.eduMode = false;
+            startGamePacket.rainLevel = 0;
+            startGamePacket.lightningLevel = 0;
+            startGamePacket.commandsEnabled = this.isEnableClientCommand();
+            startGamePacket.levelId = "";
+            startGamePacket.worldName = this.getServer().getNetwork().getName();
+            startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
+            this.dataPacket(startGamePacket);
+        } else if (this.protocolVersion == 201) {
+            StartGamePacket201 startGamePacket = new StartGamePacket201();
+            startGamePacket.entityUniqueId = this.id;
+            startGamePacket.entityRuntimeId = this.id;
+            startGamePacket.playerGamemode = getClientFriendlyGamemode(this.gamemode);
+            startGamePacket.x = (float) this.x;
+            startGamePacket.y = (float) this.y;
+            startGamePacket.z = (float) this.z;
+            startGamePacket.yaw = (float) this.yaw;
+            startGamePacket.pitch = (float) this.pitch;
+            startGamePacket.seed = -1;
+            startGamePacket.dimension = (byte) (spawnPosition.level.getDimension() & 0xff);
+            startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
+            startGamePacket.difficulty = this.server.getDifficulty();
+            startGamePacket.spawnX = (int) spawnPosition.x;
+            startGamePacket.spawnY = (int) spawnPosition.y;
+            startGamePacket.spawnZ = (int) spawnPosition.z;
+            startGamePacket.hasAchievementsDisabled = true;
+            startGamePacket.dayCycleStopTime = -1;
+            startGamePacket.eduMode = false;
+            startGamePacket.rainLevel = 0;
+            startGamePacket.lightningLevel = 0;
+            startGamePacket.commandsEnabled = this.isEnableClientCommand();
+            startGamePacket.levelId = "";
+            startGamePacket.worldName = this.getServer().getNetwork().getName();
+            startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
+            this.dataPacket(startGamePacket);
+        } else {
+            StartGamePacket startGamePacket = new StartGamePacket();
+            startGamePacket.entityUniqueId = this.id;
+            startGamePacket.entityRuntimeId = this.id;
+            startGamePacket.playerGamemode = getClientFriendlyGamemode(this.gamemode);
+            startGamePacket.x = (float) this.x;
+            startGamePacket.y = (float) this.y;
+            startGamePacket.z = (float) this.z;
+            startGamePacket.yaw = (float) this.yaw;
+            startGamePacket.pitch = (float) this.pitch;
+            startGamePacket.seed = -1;
+            startGamePacket.dimension = (byte) (spawnPosition.level.getDimension() & 0xff);
+            startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
+            startGamePacket.difficulty = this.server.getDifficulty();
+            startGamePacket.spawnX = (int) spawnPosition.x;
+            startGamePacket.spawnY = (int) spawnPosition.y;
+            startGamePacket.spawnZ = (int) spawnPosition.z;
+            startGamePacket.hasAchievementsDisabled = true;
+            startGamePacket.dayCycleStopTime = -1;
+            startGamePacket.eduMode = false;
+            startGamePacket.rainLevel = 0;
+            startGamePacket.lightningLevel = 0;
+            startGamePacket.commandsEnabled = this.isEnableClientCommand();
+            startGamePacket.levelId = "";
+            startGamePacket.worldName = this.getServer().getNetwork().getName();
+            startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
+            this.dataPacket(startGamePacket);
+        }
 
         this.loggedIn = true;
 
@@ -3093,13 +3149,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.PLAYER_HOTBAR_PACKET:
-                    PlayerHotbarPacket hotbarPacket = (PlayerHotbarPacket) packet;
+                    if (this.protocolVersion < 223) {
+                        PlayerHotbarPacketOld hotbarPacket = (PlayerHotbarPacketOld) packet;
 
-                    if (hotbarPacket.windowId != ContainerIds.INVENTORY) {
-                        return; //In PE this should never happen
+                        if (hotbarPacket.windowId != ContainerIds.INVENTORY) {
+                            return; //In PE this should never happen
+                        }
+
+                        this.inventory.equipItem(hotbarPacket.selectedHotbarSlot);
+                    } else {
+                        PlayerHotbarPacket hotbarPacket = (PlayerHotbarPacket) packet;
+
+                        if (hotbarPacket.windowId != ContainerIds.INVENTORY) {
+                            return; //In PE this should never happen
+                        }
+
+                        this.inventory.equipItem(hotbarPacket.selectedHotbarSlot);
                     }
-
-                    this.inventory.equipItem(hotbarPacket.selectedHotbarSlot);
                     break;
                 case ProtocolInfo.SERVER_SETTINGS_REQUEST_PACKET:
                     PlayerServerSettingsRequestEvent settingsRequestEvent = new PlayerServerSettingsRequestEvent(this, new HashMap<>(this.serverSettings));
@@ -3215,13 +3281,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        if (this.protocolVersion >= 223) {
-            TextPacket pk = new TextPacket();
+        if (this.protocolVersion < 223) {
+            TextPacketOld pk = new TextPacketOld();
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message);
             this.dataPacket(pk);
         } else {
-            TextPacketOld pk = new TextPacketOld();
+            TextPacket pk = new TextPacket();
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message);
             this.dataPacket(pk);
@@ -3263,14 +3329,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        if (this.protocolVersion >= 223) {
-            TextPacket pk = new TextPacket();
+        if (this.protocolVersion < 223) {
+            TextPacketOld pk = new TextPacketOld();
             pk.type = TextPacket.TYPE_CHAT;
             pk.source = source;
             pk.message = this.server.getLanguage().translateString(message);
             this.dataPacket(pk);
          } else {
-            TextPacketOld pk = new TextPacketOld();
+            TextPacket pk = new TextPacket();
             pk.type = TextPacketOld.TYPE_CHAT;
             pk.source = source;
             pk.message = this.server.getLanguage().translateString(message);
