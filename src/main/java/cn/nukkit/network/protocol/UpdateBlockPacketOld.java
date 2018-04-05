@@ -1,10 +1,5 @@
 package cn.nukkit.network.protocol;
 
-
-/**
- * author: MagicDroidX
- * Nukkit Project
- */
 public class UpdateBlockPacketOld extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.UPDATE_BLOCK_PACKET;
 
