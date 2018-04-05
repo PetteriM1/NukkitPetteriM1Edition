@@ -151,7 +151,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean removeFormat = true;
 
     protected final int port;
-    public int protocolVersion;
     protected String username;
     protected String iusername;
     protected String displayName;
@@ -228,6 +227,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private AsyncTask preLoginEventTask = null;
     private boolean shouldLogin = false;
+    
+    public int protocolVersion;
 
     public int getStartActionTick() {
         return startAction;
@@ -2588,10 +2589,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    TextPacket textPacket = (TextPacket) packet;
+                    if (thia.protocolVersion >= 223) {
+                        TextPacket textPacket = (TextPacket) packet;
 
-                    if (textPacket.type == TextPacket.TYPE_CHAT) {
-                        this.chat(textPacket.message);
+                        if (textPacket.type == TextPacket.TYPE_CHAT) {
+                            this.chat(textPacket.message);
+                        }
+                    } else {
+                        TextPacketOld textPacket = (TextPacketOld) packet;
+
+                        if (textPacket.type == TextPacketOld.TYPE_CHAT) {
+                            this.chat(textPacket.message);
+                        }
                     }
                     break;
                 case ProtocolInfo.CONTAINER_CLOSE_PACKET:
@@ -3206,7 +3215,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        if (this.getLoginChainData().getGameVersion().equals("1.2.13")) {
+        if (this.protocolVersion >= 223) {
             TextPacket pk = new TextPacket();
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message);
@@ -3254,7 +3263,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        if (this.getLoginChainData().getGameVersion().equals("1.2.13")) {
+        if (this.protocolVersion >= 223) {
             TextPacket pk = new TextPacket();
             pk.type = TextPacket.TYPE_CHAT;
             pk.source = source;
