@@ -92,7 +92,7 @@ public class Nukkit {
 
         try {
             if (ANSI) {
-                System.out.print((char) 0x1b + "]0;Starting Nukkit Server For Minecraft: PE" + (char) 0x07);
+                System.out.print((char) 0x1b + "]0;Starting Nukkit Server..." + (char) 0x07);
             }
             new Server(logger, PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Exception e) {
@@ -102,7 +102,7 @@ public class Nukkit {
         if (ANSI) {
             System.out.print((char) 0x1b + "]0;Stopping Server..." + (char) 0x07);
         }
-        logger.info("Stopping other threads");
+        logger.info("Stopping other threads...");
 
         for (Thread thread : java.lang.Thread.getAllStackTraces().keySet()) {
             if (!(thread instanceof InterruptibleThread)) {

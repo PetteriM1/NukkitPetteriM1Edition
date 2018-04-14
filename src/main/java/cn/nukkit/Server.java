@@ -958,8 +958,8 @@ public class Server {
                     this.logger.logException(e);
                 }
 
-                this.logger.critical(this.getLanguage().translateString("nukkit.level.tickError", new String[]{level.getName(), e.toString()}));
-                this.logger.logException(e);
+                //this.logger.critical(this.getLanguage().translateString("nukkit.level.tickError", new String[]{level.getName(), e.toString()}));
+                //this.logger.logException(e);
             }
         }
     }
