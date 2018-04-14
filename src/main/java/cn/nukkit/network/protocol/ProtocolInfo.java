@@ -2,8 +2,6 @@ package cn.nukkit.network.protocol;
 
 import com.google.common.primitives.Ints;
 
-import java.util.List;
-
 /**
  * author: MagicDroidX & iNevet
  * Nukkit Project
@@ -13,12 +11,10 @@ public interface ProtocolInfo {
     /**
      * Actual Minecraft: PE protocol version
      */
-    int CURRENT_PROTOCOL = Integer.valueOf("201"); //plugins can change it
+    int MINIUM_PROTOCOL = Integer.valueOf("223");
 
-    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(140, 141, 150, 160, 200, 201, 224);
-
-    String MINECRAFT_VERSION = "v1.2.x";
-    String MINECRAFT_VERSION_NETWORK = "1.2.x";
+    String MINECRAFT_VERSION = "v1.2.13";
+    String MINECRAFT_VERSION_NETWORK = "1.2.13";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;

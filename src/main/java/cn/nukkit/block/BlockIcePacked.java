@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
@@ -34,7 +35,17 @@ public class BlockIcePacked extends BlockIce {
 
     @Override
     public boolean onBreak(Item item) {
-        return true;
+        return this.getLevel().setBlock(this, new BlockAir(), true);
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if(item.hasEnchantment(Enchantment.ID_SILK_TOUCH)==true) {
+            return new Item[]{
+                    this.toItem()
+            };
+        }
+        return new Item[0];
     }
 
     @Override

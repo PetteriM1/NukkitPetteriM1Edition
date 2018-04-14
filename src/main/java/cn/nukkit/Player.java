@@ -1994,29 +1994,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     LoginPacket loginPacket = (LoginPacket) packet;
 
                     String message;
-                    if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(loginPacket.getProtocol())) {
-                        if (loginPacket.getProtocol() < ProtocolInfo.CURRENT_PROTOCOL) {
-                            message = "disconnectionScreen.outdatedClient";
-
-                            this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
-                        } else {
-                            message = "disconnectionScreen.outdatedServer";
-
-                            this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_SERVER);
-                        }
-                        if (((LoginPacket) packet).protocol < 137) {
-                            DisconnectPacket disconnectPacket = new DisconnectPacket();
-                            disconnectPacket.message = message;
-                            disconnectPacket.encode();
-                            BatchPacket batch = new BatchPacket();
-                            batch.payload = disconnectPacket.getBuffer();
-                            this.directDataPacket(batch);
-                            // Still want to run close() to allow the player to be removed properly
-                        }
-                        this.close("", message, false);
-                        break;
+                    if ((loginPacket.getProtocol()) < ProtocolInfo.MINIUM_PROTOCOL) {
+                        message = "disconnectionScreen.outdatedClient";
+                        this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
+                        
+                    if (((LoginPacket) packet).protocol < 137) {
+                        DisconnectPacket disconnectPacket = new DisconnectPacket();
+                        disconnectPacket.message = message;
+                        disconnectPacket.encode();
+                        BatchPacket batch = new BatchPacket();
+                        batch.payload = disconnectPacket.getBuffer();
+                        this.directDataPacket(batch);
+                        // Still want to run close() to allow the player to be removed properly
                     }
-
+                    this.close("", message, false);
+                    break;
+                }
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
@@ -3171,7 +3164,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             String message;
             if (isAdmin) {
                 if (!this.isBanned()) {
-                    message = "Kicked by admin." + (!reasonString.isEmpty() ? " Reason: " + reasonString : "");
+                    message = "Kicked!" + (!reasonString.isEmpty() ? " Reason: " + reasonString : "");
                 } else {
                     message = reasonString;
                 }

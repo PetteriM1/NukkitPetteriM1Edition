@@ -25,6 +25,11 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
     public MinecartType getType() {
         return MinecartType.valueOf(0);
     }
+    
+    @Override
+    public boolean isRideable(){
+        return true;
+    }
 
     @Override
     protected void activate(int x, int y, int z, boolean flag) {

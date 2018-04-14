@@ -973,7 +973,7 @@ public class Item implements Cloneable {
 
         return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbt.isEmpty() ? new byte[0] : Utils.parseHexBinary(nbt));
     }
-    
+
     public static Item[] fromStringMultiple(String str) {
         String[] b = str.split(",");
         Item[] items = new Item[b.length - 1];
@@ -1001,7 +1001,7 @@ public class Item implements Cloneable {
     public boolean hasCompoundTag() {
         return this.tags != null && this.tags.length > 0;
     }
-    
+
     public void encodeCompoundTag() {
         if (cachedNBT != null) {
             this.tags = this.writeCompoundTag(this.cachedNBT);
@@ -1165,6 +1165,14 @@ public class Item implements Cloneable {
         }
 
         return enchantments.stream().toArray(Enchantment[]::new);
+    }
+
+    public boolean hasEnchantment(int id) {
+        return this.getEnchantment(id) != null;
+    }
+
+    public boolean hasEnchantment(short id) {
+        return this.getEnchantment(id) != null;
     }
 
     public boolean hasCustomName() {

@@ -30,6 +30,11 @@ public class EntityBoat extends EntityVehicle {
         super(chunk, nbt);
     }
 
+    
+    public boolean isRideable(){
+        return true;
+    }
+
     @Override
     protected void initEntity() {
         super.initEntity();
@@ -82,8 +87,8 @@ public class EntityBoat extends EntityVehicle {
         pk.speedX = 0;
         pk.speedY = 0;
         pk.speedZ = 0;
-        pk.yaw = (float) this.yaw;
-        pk.pitch = (float) this.pitch;
+        pk.yaw = (float) this.yaw / 360;
+        pk.pitch = (float) this.pitch / 360;
         pk.metadata = this.dataProperties;
         player.dataPacket(pk);
 
@@ -95,42 +100,35 @@ public class EntityBoat extends EntityVehicle {
         if (invulnerable) {
             return false;
         } else {
-            // Event start
             VehicleDamageEvent event = new VehicleDamageEvent(this, source.getEntity(), source.getFinalDamage());
             getServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return false;
             }
-            // Event stop
             performHurtAnimation((int) event.getDamage());
 
-            boolean instantKill = false;
+            boolean instantKill = true;
+            boolean onCreative = false;
 
             if (source instanceof EntityDamageByEntityEvent) {
                 Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-                instantKill = damager instanceof Player && ((Player) damager).isCreative();
+                onCreative = damager instanceof Player && ((Player) damager).isCreative();
             }
 
-            if (instantKill || getDamage() > 40) {
-                // Event start
+            if (instantKill) {
                 VehicleDestroyEvent event2 = new VehicleDestroyEvent(this, source.getEntity());
                 getServer().getPluginManager().callEvent(event2);
                 if (event2.isCancelled()) {
                     return false;
                 }
-                // Event stop
                 if (linkedEntity != null) {
                     mountEntity(linkedEntity);
                 }
-
-                if (instantKill && (!hasCustomName())) {
-                    kill();
-                } else {
-                    if (level.getGameRules().getBoolean("doEntityDrops")) {
-                        this.level.dropItem(this, new ItemBoat());
-                    }
-                    close();
+                if (!onCreative && level.getGameRules().getBoolean("doEntityDrops")) {
+                    this.level.dropItem(this, new ItemBoat());
                 }
+                close();
+                kill();
             }
         }
 
