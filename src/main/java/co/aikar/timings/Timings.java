@@ -176,7 +176,7 @@ public final class Timings {
         //For special cases of servers with special permission to bypass the max.
         //This max helps keep data file sizes reasonable for processing on Aikar's Timing parser side.
         //Setting this will not help you bypass the max unless Aikar has added an exception on the API side.
-        if (Server.getInstance().getConfig().getPropertyBoolean("timings-bypass-max", false)) {
+        if (Server.getInstance().getPropertyBoolean("timings-bypass-max", false)) {
             maxLength = Integer.MAX_VALUE;
         }
 

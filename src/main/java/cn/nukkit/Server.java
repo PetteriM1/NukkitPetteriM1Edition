@@ -293,7 +293,7 @@ public class Server {
         this.forceLanguage = (Boolean) this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang((String) this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 
-        Object poolSize = this.getgetProperty("async-workers", "auto");
+        Object poolSize = this.getProperty("async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);

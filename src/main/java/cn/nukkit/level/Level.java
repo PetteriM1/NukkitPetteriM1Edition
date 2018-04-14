@@ -325,8 +325,8 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkGenerationQueueSize = (int) this.server.getPropertyInt("chunk-generation-queue-size", 8);
         this.chunkPopulationQueueSize = (int) this.server.getPropertyInt("chunk-generation-population-queue-size", 2);
         this.chunkTickList.clear();
-        this.clearChunksOnTick = (boolean) this.server.getPropertyInt("clear-chunk-tick-list", true);
-        this.cacheChunks = (boolean) this.server.getPropertyInt("cache-chunks", true);
+        this.clearChunksOnTick = (boolean) this.server.getPropertyBoolean("clear-chunk-tick-list", true);
+        this.cacheChunks = (boolean) this.server.getPropertyBoolean("cache-chunks", true);
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
