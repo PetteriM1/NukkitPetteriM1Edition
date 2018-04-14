@@ -286,7 +286,7 @@ public class Server {
                 put("ticks-per-autosave", 6000);
                 put("ticks-per-animal-spawns", 300);
                 put("ticks-per-monster-spawns", 300);
-                put("ticks-per-entity-despawns", 12000)
+                put("ticks-per-entity-despawns", 12000);
             } //TODO: max amount of entities
         });
 
