@@ -215,72 +215,29 @@ public class Server {
         this.pluginPath = new File(pluginPath).getAbsolutePath() + "/";
 
         this.console = new CommandReader();
-        //todo: VersionString
-
-        if (!new File(this.dataPath + "nukkit.yml").exists()) {
-            this.getLogger().info(TextFormat.GREEN + "Welcome! Please choose a language first!");
-            try {
-              InputStream languageList = this.getClass().getClassLoader().getResourceAsStream("lang/language.list");
-                if (languageList == null) {
-                    throw new RuntimeException("Language files are missing!");
-                }
-                String[] lines = Utils.readFile(languageList).split("\n");
-                for (String line : lines) {
-                    this.getLogger().info(line);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            String fallback = BaseLang.FALLBACK_LANGUAGE;
-            String language = null;
-            while (language == null) {
-                String lang = this.console.readLine();
-                InputStream conf = this.getClass().getClassLoader().getResourceAsStream("lang/" + lang + "/lang.ini");
-                if (conf != null) {
-                    language = lang;
-                }
-            }
-
-            InputStream advacedConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + language + "/nukkit.yml");
-            if (advacedConf == null) {
-                advacedConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + fallback + "/nukkit.yml");
-            }
-
-            try {
-                Utils.writeFile(this.dataPath + "nukkit.yml", advacedConf);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
 
         this.console.start();
-
-        this.logger.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
-        this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
 
         this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
             {
-                put("motd", "Nukkit Server For Minecraft: PE");
+                put("motd", "Minecraft Server");
                 put("sub-motd", "Powered by Nukkit");
                 put("server-port", 19132);
                 put("server-ip", "0.0.0.0");
-                put("view-distance", 10);
+                put("view-distance", 8);
                 put("white-list", false);
-                put("achievements", true);
-                put("announce-player-achievements", true);
-                put("spawn-protection", 16);
-                put("max-players", 20);
-                put("allow-flight", false);
+                put("achievements", false);
+                put("announce-player-achievements", false);
+                put("spawn-protection", 10);
+                put("max-players", 50);
                 put("spawn-animals", true);
                 put("spawn-mobs", true);
                 put("gamemode", 0);
-                put("force-gamemode", false);
+                put("force-gamemode", true);
                 put("hardcore", false);
                 put("pvp", true);
-                put("difficulty", 1);
+                put("difficulty", 2);
                 put("generator-settings", "");
                 put("level-name", "world");
                 put("level-seed", "");
@@ -291,13 +248,52 @@ public class Server {
                 put("auto-save", true);
                 put("force-resources", false);
                 put("xbox-auth", true);
-            }
+                put("mob-ai", true);
+                put("entity-despawn-task", true);
+                put("language", "eng");
+                put("force-language", false);
+                put("shutdown-message", "Server closed");
+                put("save-player-data", false);
+                put("query-plugins", false);
+                put("debug-level", 1);
+                put("async-workers", "auto");
+                put("zlib-provider", 0);
+                put("async-compression", true);
+                put("batch-treshold", 512);
+                put("compression-level", 1);
+                put("level-format", "anvil");
+                put("auto-tick-rate", true);
+                put("auto-tick-rate-limit", 20);
+                put("base-tick-rate", 1);
+                put("always-tick-players", false);
+                put("enable-timings", false);
+                put("timings-verbose", false);
+                put("timings-privacy", false);
+                put("timings-history-interval", 6000);
+                put("timings-history-length", 72000);
+                put("timings-bypass-max", false);
+                put("light-updates", true);
+                put("clear-chunk-tick-list", true);
+                put("cache-chunks", false);
+                put("spawn-treshold", 50);
+                put("max-chunks", 192);
+                put("chunk-sending-per-tick", 4);
+                put("chunk-ticking-per-tick", 40);
+                put("tick-radius", 3);
+                put("chunk-generation-queue-size", 8);
+                put("chunk-population-queue-size", 8);
+                put("ticks-per-cache-cleanup", 600);
+                put("ticks-per-autosave", 6000);
+                put("ticks-per-animal-spawns", 300);
+                put("ticks-per-monster-spawns", 300);
+                put("ticks-per-entity-despawns", 12000)
+            } //TODO: max amount of entities
         });
 
-        this.forceLanguage = (Boolean) this.getConfig("settings.force-language", false);
-        this.baseLang = new BaseLang((String) this.getConfig("settings.language", BaseLang.FALLBACK_LANGUAGE));
+        this.forceLanguage = (Boolean) this.getPropertyBoolean("force-language", false);
+        this.baseLang = new BaseLang((String) this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 
-        Object poolSize = this.getConfig("settings.async-workers", "auto");
+        Object poolSize = this.getgetProperty("async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);
@@ -308,16 +304,16 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        this.networkZlibProvider = (int) this.getConfig("network.zlib-provider", 0);
+        this.networkZlibProvider = (int) this.getPropertyInt("zlib-provider", 0);
         Zlib.setProvider(this.networkZlibProvider);
 
-        this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
-        this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
+        this.networkCompressionLevel = (int) this.getPropertyInt("compression-level", 1);
+        this.networkCompressionAsync = (boolean) this.getPropertyBoolean("async-compression", true);
 
-        this.autoTickRate = (boolean) this.getConfig("level-settings.auto-tick-rate", true);
-        this.autoTickRateLimit = (int) this.getConfig("level-settings.auto-tick-rate-limit", 20);
-        this.alwaysTickPlayers = (boolean) this.getConfig("level-settings.always-tick-players", false);
-        this.baseTickRate = (int) this.getConfig("level-settings.base-tick-rate", 1);
+        this.autoTickRate = (boolean) this.getPropertyBoolean("level-auto-tick-rate", true);
+        this.autoTickRateLimit = (int) this.getPropertyInt("level-auto-tick-rate-limit", 20);
+        this.alwaysTickPlayers = (boolean) this.getPropertyBoolean("always-tick-players", false);
+        this.baseTickRate = (int) this.getPropertyInt("level-base-tick-rate", 1);
 
         this.scheduler = new ServerScheduler();
 
@@ -336,14 +332,14 @@ public class Server {
         this.banByIP = new BanList(this.dataPath + "banned-ips.json");
         this.banByIP.load();
 
-        this.maxPlayers = this.getPropertyInt("max-players", 20);
+        this.maxPlayers = this.getPropertyInt("max-players", 50);
         this.setAutoSave(this.getPropertyBoolean("auto-save", true));
 
         if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
             this.setPropertyInt("difficulty", 3);
         }
 
-        Nukkit.DEBUG = (int) this.getConfig("debug.level", 1);
+        Nukkit.DEBUG = (int) this.getPropertyInt("debug-level", 1);
         if (this.logger instanceof MainLogger) {
             this.logger.setLogDebug(Nukkit.DEBUG > 1);
         }
@@ -397,9 +393,8 @@ public class Server {
         Generator.addGenerator(Normal.class, "normal", Generator.TYPE_INFINITE);
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         Generator.addGenerator(Nether.class, "nether", Generator.TYPE_NETHER);
-        //todo: add old generator and hell generator
 
-        for (String name : ((Map<String, Object>) this.getConfig("worlds", new HashMap<>())).keySet()) {
+        /*for (String name : ((Map<String, Object>) this.getConfig("worlds", new HashMap<>())).keySet()) {
             if (!this.loadLevel(name)) {
                 long seed;
                 try {
@@ -423,7 +418,7 @@ public class Server {
 
                 this.generateLevel(name, seed, generator, options);
             }
-        }
+        }*/
 
         if (this.getDefaultLevel() == null) {
             String defaultName = this.getPropertyString("level-name", "world");
@@ -456,8 +451,8 @@ public class Server {
             return;
         }
 
-        if ((int) this.getConfig("ticks-per.autosave", 6000) > 0) {
-            this.autoSaveTicks = (int) this.getConfig("ticks-per.autosave", 6000);
+        if ((int) this.getPropertyInt("ticks-per-autosave", 6000) > 0) {
+            this.autoSaveTicks = (int) this.getPropertyInt("ticks-per-autosave", 6000);
         }
 
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
@@ -674,7 +669,7 @@ public class Server {
 
         this.logger.info("Reloading properties...");
         this.properties.reload();
-        this.maxPlayers = this.getPropertyInt("max-players", 20);
+        this.maxPlayers = this.getPropertyInt("max-players", 50);
 
         if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
             this.setPropertyInt("difficulty", 3);
@@ -728,35 +723,35 @@ public class Server {
                 this.rcon.close();
             }
 
-            this.getLogger().debug("Disabling all plugins");
+            this.getLogger().debug("Disabling all plugins...");
             this.pluginManager.disablePlugins();
 
             for (Player player : new ArrayList<>(this.players.values())) {
-                player.close(player.getLeaveMessage(), (String) this.getConfig("settings.shutdown-message", "Server closed"));
+                player.close(player.getLeaveMessage(), (String) this.getPropertyString("shutdown-message", "Server closed"));
             }
 
-            this.getLogger().debug("Unloading all levels");
+            this.getLogger().debug("Unloading all levels...");
             for (Level level : new ArrayList<>(this.getLevels().values())) {
                 this.unloadLevel(level, true);
             }
 
-            this.getLogger().debug("Removing event handlers");
+            this.getLogger().debug("Removing event handlers...");
             HandlerList.unregisterAll();
 
-            this.getLogger().debug("Stopping all tasks");
+            this.getLogger().debug("Stopping all tasks...");
             this.scheduler.cancelAllTasks();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
-            this.getLogger().debug("Closing console");
+            this.getLogger().debug("Closing console...");
             this.console.interrupt();
 
-            this.getLogger().debug("Stopping network interfaces");
+            this.getLogger().debug("Stopping network interfaces...");
             for (SourceInterface interfaz : this.network.getInterfaces()) {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
             }
 
-            this.getLogger().debug("Disabling timings");
+            this.getLogger().debug("Disabling timings...");
             Timings.stopServer();
             //todo other things
         } catch (Exception e) {
@@ -1172,7 +1167,7 @@ public class Server {
     }
 
     public int getViewDistance() {
-        return this.getPropertyInt("view-distance", 10);
+        return this.getPropertyInt("view-distance", 8);
     }
 
     public String getIp() {
@@ -1207,7 +1202,7 @@ public class Server {
     }
 
     public boolean getForceGamemode() {
-        return this.getPropertyBoolean("force-gamemode", false);
+        return this.getPropertyBoolean("force-gamemode", true);
     }
 
     public static String getGamemodeString(int mode) {
@@ -1281,7 +1276,7 @@ public class Server {
     }
 
     public int getDifficulty() {
-        return this.getPropertyInt("difficulty", 1);
+        return this.getPropertyInt("difficulty", 2);
     }
 
     public boolean hasWhitelist() {
@@ -1289,12 +1284,12 @@ public class Server {
     }
 
     public int getSpawnRadius() {
-        return this.getPropertyInt("spawn-protection", 16);
+        return this.getPropertyInt("spawn-protection", 10);
     }
 
     public boolean getAllowFlight() {
         if (getAllowFlight == null) {
-            getAllowFlight = this.getPropertyBoolean("allow-flight", false);
+            getAllowFlight = true; //If false, this just cause problems. Use anticheat plugin if you want.
         }
         return getAllowFlight;
     }
@@ -1308,7 +1303,7 @@ public class Server {
     }
 
     public String getMotd() {
-        return this.getPropertyString("motd", "Nukkit Server For Minecraft: PE");
+        return this.getPropertyString("motd", "Minecraft Server");
     }
 
     public String getSubMotd() {
@@ -1317,6 +1312,10 @@ public class Server {
 
     public boolean getForceResources() {
         return this.getPropertyBoolean("force-resources", false);
+    }
+
+    public boolean getMobAiEnabled() {
+        return this.getPropertyBoolean("mob-ai", true);
     }
 
     public MainLogger getLogger() {
@@ -1656,7 +1655,7 @@ public class Server {
 
         if (provider == null) {
             if ((provider = LevelProviderManager.getProviderByName
-                    ((String) this.getConfig("level-settings.default-format", "anvil"))) == null) {
+                    ((String) this.getPropertyString("level-format", "anvil"))) == null) {
                 provider = LevelProviderManager.getProviderByName("anvil");
             }
         }
@@ -1897,7 +1896,7 @@ public class Server {
     }
 
     public Map<String, List<String>> getCommandAliases() {
-        Object section = this.getConfig("aliases");
+        /*Object section = this.getConfig("aliases");
         Map<String, List<String>> result = new LinkedHashMap<>();
         if (section instanceof Map) {
             for (Map.Entry entry : (Set<Map.Entry>) ((Map) section).entrySet()) {
@@ -1916,12 +1915,13 @@ public class Server {
             }
         }
 
-        return result;
+        return result;*/
+        return null;
 
     }
 
     public boolean shouldSavePlayerData() {
-        return (Boolean) this.getConfig("player.save-player-data", true);
+        return (Boolean) this.getPropertyBoolean("save-player-data", false);
     }
 
     /**

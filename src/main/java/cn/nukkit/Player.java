@@ -592,8 +592,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.port = port;
         this.clientID = clientID;
         this.loaderId = Level.generateChunkLoaderId(this);
-        this.chunksPerTick = (int) this.server.getConfig("chunk-sending.per-tick", 4);
-        this.spawnThreshold = (int) this.server.getConfig("chunk-sending.spawn-threshold", 56);
+        this.chunksPerTick = (int) this.server.getPropertyInt("chunk-sending-per-tick", 4);
+        this.spawnThreshold = (int) this.server.getPropertyInt("spawn-threshold", 50);
         this.spawnPosition = null;
         this.gamemode = this.server.getGamemode();
         this.setLevel(this.server.getDefaultLevel());
@@ -1997,7 +1997,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if ((loginPacket.getProtocol()) < ProtocolInfo.MINIUM_PROTOCOL) {
                         message = "disconnectionScreen.outdatedClient";
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
-                        
+
                     if (((LoginPacket) packet).protocol < 137) {
                         DisconnectPacket disconnectPacket = new DisconnectPacket();
                         disconnectPacket.message = message;
