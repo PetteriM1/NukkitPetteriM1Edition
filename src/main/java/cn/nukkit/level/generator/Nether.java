@@ -81,6 +81,7 @@ public class Nether extends Generator {
                 new OreType(new BlockOreQuartz(), 20, 16, 0, 128),
                 new OreType(new BlockSoulSand(), 5, 64, 0, 128),
                 new OreType(new BlockGravel(), 5, 64, 0, 128),
+                new OreType(new BlockMagma(), 5, 12, 30, 33),
                 new OreType(new BlockLava(), 1, 16, 0, (int) this.waterHeight),
         });
         this.populators.add(ores);
