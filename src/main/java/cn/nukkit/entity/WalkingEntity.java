@@ -1,5 +1,6 @@
 package cn.nukkit.entity;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFence;
 import cn.nukkit.block.BlockFenceGate;
@@ -17,8 +18,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class WalkingEntity extends BaseEntity {
 
-    public boolean MOB_AI_ENABLED = true; //TODO
-    
+    public boolean MOB_AI_ENABLED = this.getServer().getMobAiEnabled();
+
     public WalkingEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }

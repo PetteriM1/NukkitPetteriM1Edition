@@ -10,8 +10,8 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class FlyingEntity extends BaseEntity {
-    
-    public boolean MOB_AI_ENABLED = true; //TODO
+
+    public boolean MOB_AI_ENABLED = this.getServer().getMobAiEnabled();
 
     public FlyingEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
