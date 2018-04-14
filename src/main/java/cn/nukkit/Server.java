@@ -259,7 +259,7 @@ public class Server {
                 put("async-workers", "auto");
                 put("zlib-provider", 0);
                 put("async-compression", true);
-                put("batch-treshold", 512);
+                put("batch-threshold", 512);
                 put("compression-level", 1);
                 put("level-format", "anvil");
                 put("auto-tick-rate", true);
@@ -275,13 +275,13 @@ public class Server {
                 put("light-updates", true);
                 put("clear-chunk-tick-list", true);
                 put("cache-chunks", false);
-                put("spawn-treshold", 50);
+                put("spawn-threshold", 50);
                 put("max-chunks", 192);
                 put("chunk-sending-per-tick", 4);
                 put("chunk-ticking-per-tick", 40);
-                put("tick-radius", 3);
+                put("chunk-ticking-radius", 3);
                 put("chunk-generation-queue-size", 8);
-                put("chunk-population-queue-size", 8);
+                put("chunk-generation-population-queue-size", 8);
                 put("ticks-per-cache-cleanup", 600);
                 put("ticks-per-autosave", 6000);
                 put("ticks-per-animal-spawns", 300);
@@ -310,10 +310,10 @@ public class Server {
         this.networkCompressionLevel = (int) this.getPropertyInt("compression-level", 1);
         this.networkCompressionAsync = (boolean) this.getPropertyBoolean("async-compression", true);
 
-        this.autoTickRate = (boolean) this.getPropertyBoolean("level-auto-tick-rate", true);
-        this.autoTickRateLimit = (int) this.getPropertyInt("level-auto-tick-rate-limit", 20);
+        this.autoTickRate = (boolean) this.getPropertyBoolean("auto-tick-rate", true);
+        this.autoTickRateLimit = (int) this.getPropertyInt("auto-tick-rate-limit", 20);
         this.alwaysTickPlayers = (boolean) this.getPropertyBoolean("always-tick-players", false);
-        this.baseTickRate = (int) this.getPropertyInt("level-base-tick-rate", 1);
+        this.baseTickRate = (int) this.getPropertyInt("base-tick-rate", 1);
 
         this.scheduler = new ServerScheduler();
 
@@ -616,7 +616,7 @@ public class Server {
         }
 
         if (type == PluginLoadOrder.POSTWORLD) {
-            this.commandMap.registerServerAliases();
+            //this.commandMap.registerServerAliases();
             DefaultPermissions.registerCorePermissions();
         }
     }
@@ -1895,8 +1895,8 @@ public class Server {
         return serviceManager;
     }
 
-    public Map<String, List<String>> getCommandAliases() {
-        /*Object section = this.getConfig("aliases");
+    /*public Map<String, List<String>> getCommandAliases() {
+        Object section = this.getConfig("aliases");
         Map<String, List<String>> result = new LinkedHashMap<>();
         if (section instanceof Map) {
             for (Map.Entry entry : (Set<Map.Entry>) ((Map) section).entrySet()) {
@@ -1915,10 +1915,9 @@ public class Server {
             }
         }
 
-        return result;*/
-        return null;
+        return result;
 
-    }
+    }*/
 
     public boolean shouldSavePlayerData() {
         return (Boolean) this.getPropertyBoolean("save-player-data", false);

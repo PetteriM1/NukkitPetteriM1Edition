@@ -288,7 +288,7 @@ public class SimpleCommandMap implements CommandMap {
         return knownCommands;
     }
 
-    public void registerServerAliases() {
+    /*public void registerServerAliases() {
         Map<String, List<String>> values = this.server.getCommandAliases();
         for (Map.Entry<String, List<String>> entry : values.entrySet()) {
             String alias = entry.getKey();
@@ -326,5 +326,5 @@ public class SimpleCommandMap implements CommandMap {
                 this.knownCommands.remove(alias.toLowerCase());
             }
         }
-    }
+    }*/
 }
