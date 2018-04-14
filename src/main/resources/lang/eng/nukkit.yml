@@ -111,7 +111,8 @@ spawn-limits:
 player:
  #If true, player data will be saved as players/playername.dat
  #If false, nukkit won't save player data as "dat" files, in order that plugins can do something on it.
- save-player-data: true
+ #If you want to use this, create folder called "players".
+ save-player-data: false
 
 aliases:
  #Aliases for commands
