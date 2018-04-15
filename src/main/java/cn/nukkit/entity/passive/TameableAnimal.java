@@ -7,16 +7,12 @@ import cn.nukkit.entity.data.StringEntityData;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-/**
- * Author: BeYkeRYkt
- * Nukkit Project
- */
-public abstract class EntityTameable extends EntityAnimal implements EntityOwnable {
+public abstract class TameableAnimal extends WalkingAnimal implements EntityOwnable {
 
     public static final int DATA_TAMED_FLAG = 16;
     public static final int DATA_OWNER_NAME = 17;
 
-    public EntityTameable(FullChunk chunk, CompoundTag nbt) {
+    public TameableAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 

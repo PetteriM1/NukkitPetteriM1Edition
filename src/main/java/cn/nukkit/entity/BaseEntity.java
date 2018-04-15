@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public abstract class BaseEntity extends EntityCreature {
-    
-    public boolean MOB_AI_ENABLED = true; //TODO option to disable ai
 
     EntityDamageEvent source;
 
@@ -168,7 +166,7 @@ public abstract class BaseEntity extends EntityCreature {
 
     @Override
     protected void updateMovement() {
-        if (MOB_AI_ENABLED) {
+        if (this.getServer().getMobAiEnabled()) {
             if (this.lastX != this.x || this.lastY != this.y || this.lastZ != this.z || this.lastYaw != this.yaw || this.lastPitch != this.pitch) {
                 this.lastX = this.x;
                 this.lastY = this.y;
@@ -373,7 +371,7 @@ public abstract class BaseEntity extends EntityCreature {
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (MOB_AI_ENABLED) {
+        if (this.getServer().getMobAiEnabled()) {
             if (!this.justCreated) {
                 EntityMotionEvent ev = new EntityMotionEvent(this, motion);
                 this.server.getPluginManager().callEvent(ev);
@@ -391,7 +389,7 @@ public abstract class BaseEntity extends EntityCreature {
 
     @Override
     public boolean move(double dx, double dy, double dz) {
-        if (MOB_AI_ENABLED) {
+        if (this.getServer().getMobAiEnabled()) {
 
             Timings.entityMoveTimer.startTiming();
 

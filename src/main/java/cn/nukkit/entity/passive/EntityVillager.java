@@ -2,16 +2,14 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityAgeable;
-import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.passive.WalkingAnimal;
+import cn.nukkit.entity.Utils;
+import static cn.nukkit.entity.passive.EntityVillager.PROFESSION_GENERIC;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * Created by Pub4Game on 21.06.2016.
- */
-public class EntityVillager extends EntityCreature implements EntityNPC, EntityAgeable {
+public class EntityVillager extends WalkingAnimal {
 
     public static final int PROFESSION_FARMER = 0;
     public static final int PROFESSION_LIBRARIAN = 1;
@@ -23,6 +21,16 @@ public class EntityVillager extends EntityCreature implements EntityNPC, EntityA
 
     public EntityVillager(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public String getName() {
+        return "Villager";
     }
 
     @Override
@@ -42,18 +50,15 @@ public class EntityVillager extends EntityCreature implements EntityNPC, EntityA
     }
 
     @Override
-    public String getName() {
-        return "Villager";
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public double getSpeed() {
+        return 1.1;
     }
 
     @Override
     public void initEntity() {
         super.initEntity();
+        this.setMaxHealth(10);
+
         if (!this.namedTag.contains("Profession")) {
             this.setProfession(PROFESSION_GENERIC);
         }
@@ -70,6 +75,11 @@ public class EntityVillager extends EntityCreature implements EntityNPC, EntityA
     @Override
     public boolean isBaby() {
         return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 0;
     }
 
     @Override

@@ -277,7 +277,7 @@ public class Server {
                 put("cache-chunks", false);
                 put("spawn-threshold", 50);
                 put("max-chunks", 192);
-                put("chunk-sending-per-tick", 4);
+                put("chunk-sending-per-tick", 5);
                 put("chunk-ticking-per-tick", 40);
                 put("chunk-ticking-radius", 3);
                 put("chunk-generation-queue-size", 8);
@@ -287,7 +287,7 @@ public class Server {
                 put("ticks-per-animal-spawns", 300);
                 put("ticks-per-monster-spawns", 300);
                 put("ticks-per-entity-despawns", 12000);
-            } //TODO: max amount of entities
+            }
         });
 
         this.forceLanguage = (Boolean) this.getPropertyBoolean("force-language", false);

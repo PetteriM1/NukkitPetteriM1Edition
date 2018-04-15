@@ -11,8 +11,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class FlyingEntity extends BaseEntity {
 
-    public boolean MOB_AI_ENABLED = this.getServer().getMobAiEnabled();
-
     public FlyingEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -92,7 +90,7 @@ public abstract class FlyingEntity extends BaseEntity {
 
     @Override
     public Vector3 updateMove(int tickDiff) {
-        if (MOB_AI_ENABLED && !isImmobile()) {
+        if (this.getServer().getMobAiEnabled() && !isImmobile()) {
             if (!this.isMovement()) {
                 return null;
             }

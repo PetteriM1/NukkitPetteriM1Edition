@@ -1,21 +1,32 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityRideable;
+import cn.nukkit.entity.passive.WalkingAnimal;
+import cn.nukkit.entity.Utils;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * Author: BeYkeRYkt
- * Nukkit Project
- */
-public class EntityPig extends EntityAnimal {
+import java.util.ArrayList;
+import java.util.List;
+
+public class EntityPig extends WalkingAnimal {
 
     public static final int NETWORK_ID = 12;
 
     public EntityPig(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 
     @Override
@@ -43,31 +54,67 @@ public class EntityPig extends EntityAnimal {
     }
 
     @Override
+    public boolean isBaby() {
+        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
+    }
+
     public void initEntity() {
         super.initEntity();
+        this.fireProof = false;
         this.setMaxHealth(10);
     }
 
     @Override
-    public String getName() {
-        return this.getNameTag();
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed
+                    && (player.getInventory().getItemInHand().getId() == Item.CARROT
+                    || player.getInventory().getItemInHand().getId() == Item.POTATO
+                    || player.getInventory().getItemInHand().getId() == Item.BEETROOT)
+                    && distance <= 40;
+        }
+        return false;
     }
 
     @Override
+    public boolean onInteract(Player player, Item item) {
+        if (item.equals(Item.get(Item.CARROT,0)) && !this.isBaby()) {
+            player.getInventory().removeItem(Item.get(Item.CARROT,0,1));
+            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));
+            this.setInLove();
+            return true;
+        }else if (item.equals(Item.get(Item.POTATO,0)) && !this.isBaby()) {
+            player.getInventory().removeItem(Item.get(Item.POTATO,0,1));
+            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.POTATO)));
+            this.setInLove();
+            return true;
+        }else if (item.equals(Item.get(Item.BEETROOT,0)) && !this.isBaby()) {
+            player.getInventory().removeItem(Item.get(Item.BEETROOT,0,1));
+            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.BEETROOT)));
+            this.setInLove();
+            return true;
+        }
+        return false;
+    }
+
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.RAW_PORKCHOP)};
+        List<Item> drops = new ArrayList<>();
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            int drop = Utils.rand(1, 4);
+            for (int i = 0; i < drop; i++) {
+                drops.add(Item.get(this.isOnFire() ? Item.COOKED_PORKCHOP : Item.RAW_PORKCHOP, 0, 1));
+            }
+        }
+        return drops.toArray(new Item[drops.size()]);
     }
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public int getKillExperience() {
+        return Utils.rand(1, 4);
     }
 
-    @Override
-    public boolean isBreedingItem(Item item) {
-        int id = item.getId();
-
-        return id == Item.CARROT || id == Item.POTATO || id == Item.BEETROOT;
+    public boolean mountEntity(Entity entity) {
+        return false;
     }
 
     @Override
