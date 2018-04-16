@@ -2881,7 +2881,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void unloadChunks(boolean force) {
         if (!this.unloadQueue.isEmpty()) {
-            int maxUnload = 96;
+            int maxUnload = 100;
             long now = System.currentTimeMillis();
 
             for (Long index : new ArrayList<>(this.unloadQueue.keySet())) {
@@ -2893,7 +2893,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (!force) {
                     if (maxUnload <= 0) {
                         break;
-                    } else if (time > (now - 30000)) {
+                    } else if (time > (now - 20000)) {
                         continue;
                     }
                 }

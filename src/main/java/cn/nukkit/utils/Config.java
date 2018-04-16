@@ -460,7 +460,7 @@ public class Config {
     }
 
     private String writeProperties() {
-        String content = "#Properties Config file\r\n#" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()) + "\r\n";
+        String content = "#Properties Config File\r\n";
         for (Object o : this.config.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
             Object v = entry.getValue();

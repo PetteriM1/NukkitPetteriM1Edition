@@ -259,7 +259,6 @@ public class Server {
                 put("async-workers", "auto");
                 put("zlib-provider", 0);
                 put("async-compression", true);
-                put("batch-threshold", 512);
                 put("compression-level", 1);
                 put("level-format", "anvil");
                 put("auto-tick-rate", true);
@@ -276,16 +275,13 @@ public class Server {
                 put("clear-chunk-tick-list", true);
                 put("cache-chunks", false);
                 put("spawn-threshold", 50);
-                put("max-chunks", 192);
                 put("chunk-sending-per-tick", 5);
                 put("chunk-ticking-per-tick", 40);
                 put("chunk-ticking-radius", 3);
                 put("chunk-generation-queue-size", 8);
                 put("chunk-generation-population-queue-size", 8);
-                put("ticks-per-cache-cleanup", 600);
                 put("ticks-per-autosave", 6000);
-                put("ticks-per-animal-spawns", 300);
-                put("ticks-per-monster-spawns", 300);
+                put("ticks-per-entity-spawns", 300);
                 put("ticks-per-entity-despawns", 12000);
             }
         });
@@ -1947,9 +1943,8 @@ public class Server {
         Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
         Entity.registerEntity("Painting", EntityPainting.class);
         //Monsters
-        Entity.registerEntity("Creeper", EntityCreeper.class);
-        Entity.registerEntity("Zombie", EntityZombie.class);
         Entity.registerEntity("Blaze", EntityBlaze.class);
+        Entity.registerEntity("Creeper", EntityCreeper.class);
         Entity.registerEntity("CaveSpider", EntityCaveSpider.class);
         Entity.registerEntity("ElderGuardian", EntityElderGuardian.class);
         Entity.registerEntity("EnderDragon", EntityEnderDragon.class);
@@ -1985,6 +1980,7 @@ public class Server {
         Entity.registerEntity("Llama", EntityLlama.class);
         Entity.registerEntity("Mooshroom", EntityMooshroom.class);
         Entity.registerEntity("Mule", EntityMule.class);
+        Entity.registerEntity("Parrot", EntityParrot.class);
         Entity.registerEntity("PolarBear", EntityPolarBear.class);
         Entity.registerEntity("Pig", EntityPig.class);
         Entity.registerEntity("Rabbit", EntityRabbit.class);
@@ -1993,6 +1989,7 @@ public class Server {
         Entity.registerEntity("Wolf", EntityWolf.class);
         Entity.registerEntity("Ocelot", EntityOcelot.class);
         Entity.registerEntity("Villager", EntityVillager.class);
+        Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
 
         Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
         Entity.registerEntity("XpOrb", EntityXPOrb.class);
