@@ -186,8 +186,6 @@ public class Level implements ChunkManager, Metadatable {
     private Position temporalPosition;
     private Vector3 temporalVector;
 
-    private final Block[] blockStates;
-
     public int sleepTicks = 0;
 
     private int chunkTickRadius;
@@ -252,7 +250,7 @@ public class Level implements ChunkManager, Metadatable {
     public GameRules gameRules;
 
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
-        this.blockStates = Block.fullList;
+
         this.levelId = levelIdCounter++;
         this.blockMetadata = new BlockMetadataStore(this);
         this.server = server;
@@ -1442,35 +1440,35 @@ public class Level implements ChunkManager, Metadatable {
         return this.getChunk(x >> 4, z >> 4, false).getFullBlock(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
-    public Block getBlock(Vector3 pos) {
-        return this.getBlock(pos, true);
+    public synchronized Block getBlock(Vector3 pos) {
+        return this.getBlock(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ());
     }
 
-    public Block getBlock(Vector3 pos, boolean cached) {
-        long chunkIndex = Level.chunkHash((int) pos.x >> 4, (int) pos.z >> 4);
-        BlockVector3 index = Level.blockHash((int) pos.x, (int) pos.y, (int) pos.z);
+    public synchronized Block getBlock(int x, int y, int z) {
+
         int fullState;
+        if (y >= 0 && y < 256) {
+            int cx = x >> 4;
+            int cz = z >> 4;
+            BaseFullChunk chunk = getChunk(cx, cz);
 
-        Block block;
-        BaseFullChunk chunk;
+            if (chunk != null) {
 
-        if (cached && (block = (Block) this.blockCache.get(index)) != null) {
-            return block;
-        } else if (pos.y >= 0 && pos.y < 256 && (chunk = this.chunks.get(chunkIndex)) != null) {
-            fullState = chunk.getFullBlock((int) pos.x & 0x0f, (int) pos.y & 0xff,
-                    (int) pos.z & 0x0f);
+                fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF);
+            } else {
+                fullState = 0;
+            }
         } else {
             fullState = 0;
         }
 
-        block = this.blockStates[fullState & 0xfff].clone();
+        Block block = Block.fullList[fullState & 0xFFF].clone();
 
-        block.x = pos.x;
-        block.y = pos.y;
-        block.z = pos.z;
+        block.x = x;
+        block.y = y;
+        block.z = z;
         block.level = this;
 
-        this.blockCache.put(index, block);
 
         return block;
     }
@@ -1481,7 +1479,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void updateBlockSkyLight(int x, int y, int z) {
-        //TODO: sky light
+        //todo
     }
 
     public void updateBlockLight(int x, int y, int z) {
@@ -2652,20 +2650,15 @@ public class Level implements ChunkManager, Metadatable {
             logger.logException(e);
         }
 
-        this.chunks.remove(index);
-        this.chunkTickList.remove(index);
-        this.chunkCache.remove(index);
-
         this.timings.doChunkUnload.stopTiming();
 
         return true;
     }
 
     public boolean isSpawnChunk(int X, int Z) {
-        int spawnX = (int) this.provider.getSpawn().getX() >> 3;
-        int spawnZ = (int) this.provider.getSpawn().getZ() >> 3;
+        Vector3 spawn = this.provider.getSpawn();
 
-        return Math.abs(X - spawnX) <= 1 && Math.abs(Z - spawnZ) <= 1;
+        return Math.abs(X - (spawn.getFloorX() >> 4)) <= 1 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 1;
     }
 
     public Position getSafeSpawn() {
