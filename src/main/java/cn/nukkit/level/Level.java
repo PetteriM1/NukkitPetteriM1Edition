@@ -66,6 +66,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * author: MagicDroidX Nukkit Project
@@ -305,13 +307,13 @@ public class Level implements ChunkManager, Metadatable {
         this.raining = this.provider.isRaining();
         this.rainTime = this.provider.getRainTime();
         if (this.rainTime <= 0) {
-            setRainTime(rand.nextInt(168000) + 12000);
+            setRainTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
         }
 
         this.thundering = this.provider.isThundering();
         this.thunderTime = this.provider.getThunderTime();
         if (this.thunderTime <= 0) {
-            setThunderTime(rand.nextInt(168000) + 12000);
+            setThunderTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
         }
 
         this.levelCurrentTick = this.provider.getCurrentTick();
@@ -707,9 +709,9 @@ public class Level implements ChunkManager, Metadatable {
         if (this.rainTime <= 0) {
             if (!this.setRaining(!this.raining)) {
                 if (this.raining) {
-                    setRainTime(rand.nextInt(12000) + 12000);
+                    setRainTime(ThreadLocalRandom.current().nextInt(12000) + 12000);
                 } else {
-                    setRainTime(rand.nextInt(168000) + 12000);
+                    setRainTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
                 }
             }
         }
@@ -718,9 +720,9 @@ public class Level implements ChunkManager, Metadatable {
         if (this.thunderTime <= 0) {
             if (!this.setThundering(!this.thundering)) {
                 if (this.thundering) {
-                    setThunderTime(rand.nextInt(12000) + 3600);
+                    setThunderTime(ThreadLocalRandom.current().nextInt(12000) + 3600);
                 } else {
-                    setThunderTime(rand.nextInt(168000) + 12000);
+                    setThunderTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
                 }
             }
         }
@@ -870,7 +872,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (!list.isEmpty()) {
-            return list.get(this.rand.nextInt(list.size())).getPosition();
+            return list.get(ThreadLocalRandom.current().nextInt(list.size())).getPosition();
         } else {
             if (pos.getY() == -1) {
                 pos = pos.up(2);
@@ -1074,7 +1076,7 @@ public class Level implements ChunkManager, Metadatable {
             for (Entity entity : chunk.getEntities().values()) {
                 entity.scheduleUpdate();
             }
-            int tickSpeed = this.gameRules.getInt("randomTickSpeed");
+            int tickSpeed = 3;
 
             if (tickSpeed > 0) {
                 int blockId;
@@ -1139,7 +1141,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (this.clearChunksOnTick) {
-            this.chunkTickList = new HashMap<>();
+            this.chunkTickList.clear();
         }
     }
 
@@ -1674,8 +1676,8 @@ public class Level implements ChunkManager, Metadatable {
     public void dropItem(Vector3 source, Item item, Vector3 motion, boolean dropAround, int delay) {
         if (motion == null) {
             if (dropAround) {
-                float f = this.rand.nextFloat() * 0.5f;
-                float f1 = this.rand.nextFloat() * ((float) Math.PI * 2);
+                float f = ThreadLocalRandom.current().nextFloat() * 0.5f;
+                float f1 = ThreadLocalRandom.current().nextFloat() * ((float) Math.PI * 2);
 
                 motion = new Vector3(-MathHelper.sin(f1) * f, 0.20000000298023224, MathHelper.cos(f1) * f);
             } else {
