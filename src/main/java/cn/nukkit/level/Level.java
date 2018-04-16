@@ -2662,8 +2662,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isSpawnChunk(int X, int Z) {
-        int spawnX = (int) this.provider.getSpawn().getX() >> 4;
-        int spawnZ = (int) this.provider.getSpawn().getZ() >> 4;
+        int spawnX = (int) this.provider.getSpawn().getX() >> 3;
+        int spawnZ = (int) this.provider.getSpawn().getZ() >> 3;
 
         return Math.abs(X - spawnX) <= 1 && Math.abs(Z - spawnZ) <= 1;
     }
@@ -2698,7 +2698,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                for (; y >= 0 && y < 255; ++y) {
+                for (; y >= 0 && y < 255; y++) {
                     int b = chunk.getFullBlock(x, y + 1, z);
                     Block block = Block.get(b >> 4, b & 0x0f);
                     if (!this.isFullBlock(block)) {
@@ -3166,7 +3166,4 @@ public class Level implements ChunkManager, Metadatable {
         return true;
     }
 
-    public int getSpawnRadius() {
-        return getGameRules().getInt("spawnRadius");
-    }
 }

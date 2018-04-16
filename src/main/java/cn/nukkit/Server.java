@@ -1672,7 +1672,6 @@ public class Server {
             this.levels.put(level.getId(), level);
 
             level.initLevel();
-            level.getGameRules().setGameRule("spawnRadius", "" + this.getSpawnRadius());
 
             level.setTickRate(this.baseTickRate);
         } catch (Exception e) {

@@ -28,8 +28,7 @@ public class GameRules {
         this.addGameRule("randomTickSpeed", "3", ValueType.NUMERICAL_VALUE);
         this.addGameRule("sendCommandFeedback", "true", ValueType.BOOLEAN_VALUE);
         this.addGameRule("reducedDebugInfo", "false", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("spectatorsGenerateChunks", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("spawnRadius", "10", ValueType.NUMERICAL_VALUE);
+        this.addGameRule("spectatorsGenerateChunks", "false", ValueType.BOOLEAN_VALUE);
         this.addGameRule("disableElytraMovementCheck", "false", ValueType.BOOLEAN_VALUE);
         this.addGameRule("pvp", "true", ValueType.BOOLEAN_VALUE);
         this.addGameRule("showCoordinates", "false", ValueType.BOOLEAN_VALUE);
