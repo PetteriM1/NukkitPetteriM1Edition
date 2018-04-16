@@ -943,7 +943,12 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void sendBlocks(Player[] target, Vector3[] blocks, int flags, boolean optimizeRebuilds) {
-        List<UpdateBlockPacket> packets = new ArrayList<>();
+        int size = 0;
+        for (int i = 0; i < blocks.length; i++) {
+            if (blocks[i] != null) size++;
+        }
+        int packetIndex = 0;
+        UpdateBlockPacket[] packets = new UpdateBlockPacket[size];
         if (optimizeRebuilds) {
             Map<Long, Boolean> chunks = new HashMap<>();
             for (Vector3 b : blocks) {
@@ -957,54 +962,49 @@ public class Level implements ChunkManager, Metadatable {
                     chunks.put(index, true);
                     first = true;
                 }
-
+                UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
                 if (b instanceof Block) {
-                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
                     updateBlockPacket.x = (int) ((Block) b).x;
                     updateBlockPacket.y = (int) ((Block) b).y;
                     updateBlockPacket.z = (int) ((Block) b).z;
                     updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(((Block) b).getId(), ((Block) b).getDamage());
                     updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
-                    packets.add(updateBlockPacket);
                 } else {
                     int fullBlock = this.getFullBlock((int) b.x, (int) b.y, (int) b.z);
-                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+
                     updateBlockPacket.x = (int) b.x;
                     updateBlockPacket.y = (int) b.y;
                     updateBlockPacket.z = (int) b.z;
                     updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(fullBlock);
                     updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
-                    packets.add(updateBlockPacket);
                 }
+                packets[packetIndex++] = updateBlockPacket;
             }
         } else {
             for (Vector3 b : blocks) {
                 if (b == null) {
                     continue;
                 }
-                UpdateBlockPacket packet = new UpdateBlockPacket();
+                UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
                 if (b instanceof Block) {
-                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
                     updateBlockPacket.x = (int) ((Block) b).x;
                     updateBlockPacket.y = (int) ((Block) b).y;
                     updateBlockPacket.z = (int) ((Block) b).z;
                     updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(((Block) b).getId(), ((Block) b).getDamage());
                     updateBlockPacket.flags = flags;
-                    packets.add(updateBlockPacket);
                 } else {
                     int fullBlock = this.getFullBlock((int) b.x, (int) b.y, (int) b.z);
-                    UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+
                     updateBlockPacket.x = (int) b.x;
                     updateBlockPacket.y = (int) b.y;
                     updateBlockPacket.z = (int) b.z;
                     updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(fullBlock);
                     updateBlockPacket.flags = flags;
-                    packets.add(updateBlockPacket);
                 }
-                packets.add(packet);
+                packets[packetIndex++] = updateBlockPacket;
             }
         }
-        this.server.batchPackets(target, packets.toArray(new DataPacket[packets.size()]));
+        this.server.batchPackets(target, packets);
     }
 
     public void clearCache() {
@@ -1032,7 +1032,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void tickChunks() {
         if (this.chunksPerTicks <= 0 || this.loaders.isEmpty()) {
-            this.chunkTickList = new HashMap<>();
+            this.chunkTickList.clear();
             return;
         }
 
