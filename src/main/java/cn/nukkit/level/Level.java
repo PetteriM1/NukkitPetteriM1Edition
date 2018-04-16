@@ -1584,15 +1584,15 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
-    public boolean setBlock(Vector3 pos, Block block) {
+    public synchronized boolean setBlock(Vector3 pos, Block block) {
         return this.setBlock(pos, block, false);
     }
 
-    public boolean setBlock(Vector3 pos, Block block, boolean direct) {
+    public synchronized boolean setBlock(Vector3 pos, Block block, boolean direct) {
         return this.setBlock(pos, block, direct, true);
     }
 
-    public boolean setBlock(Vector3 pos, Block block, boolean direct, boolean update) {
+    public synchronized boolean setBlock(Vector3 pos, Block block, boolean direct, boolean update) {
         if (pos.y < 0 || pos.y >= 256) {
             return false;
         }
