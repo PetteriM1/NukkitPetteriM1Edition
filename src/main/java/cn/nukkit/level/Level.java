@@ -55,6 +55,7 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
 import com.google.common.cache.CacheBuilder;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.*;
 
 import java.io.File;
@@ -65,7 +66,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -99,15 +99,15 @@ public class Level implements ChunkManager, Metadatable {
     // Lower values use less memory
     public static final int MAX_BLOCK_CACHE = 512;
 
-    private final Map<Long, BlockEntity> blockEntities = new HashMap<>();
+    private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Player> players = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Player> players = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Entity> entities = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
 
-    public final Map<Long, Entity> updateEntities = new HashMap<>();
+    public final Long2ObjectOpenHashMap<Entity> updateEntities = new Long2ObjectOpenHashMap<>();
 
-    public final Map<Long, BlockEntity> updateBlockEntities = new HashMap<>();
+    public final Long2ObjectOpenHashMap<BlockEntity> updateBlockEntities = new Long2ObjectOpenHashMap<>();
 
     // Use a weak map to avoid OOM
     private final ConcurrentMap<Object, Object> blockCache = CacheBuilder.newBuilder()
@@ -129,17 +129,17 @@ public class Level implements ChunkManager, Metadatable {
 
     private LevelProvider provider;
 
-    private final Map<Integer, ChunkLoader> loaders = new HashMap<>();
+    private final Int2ObjectOpenHashMap<ChunkLoader> loaders = new Int2ObjectOpenHashMap<>();
 
     private final Map<Integer, Integer> loaderCounter = new HashMap<>();
 
-    private final Map<Long, Map<Integer, ChunkLoader>> chunkLoaders = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Map<Integer, ChunkLoader>> chunkLoaders = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Map<Integer, Player>> playerLoaders = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Map<Integer, Player>> playerLoaders = new Long2ObjectOpenHashMap<>();
 
-    private Map<Long, List<DataPacket>> chunkPackets = new HashMap<>();
+    private Long2ObjectOpenHashMap<List<DataPacket>> chunkPackets = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Long> unloadQueue = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Long> unloadQueue = new Long2ObjectOpenHashMap<>();
 
     private float time;
     public boolean stopTime;
@@ -2571,7 +2571,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void queueUnloadChunk(int x, int z) {
         long index = Level.chunkHash(x, z);
-        this.unloadQueue.put(index, System.currentTimeMillis());
+        this.unloadQueue.put(index, (Long) System.currentTimeMillis());
         this.chunkTickList.remove(index);
     }
 
