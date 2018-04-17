@@ -1044,12 +1044,10 @@ public class Server {
 
         if (this.sendUsageTicker > 0 && --this.sendUsageTicker == 0) {
             this.sendUsageTicker = 6000;
-            //todo sendUsage
         }
 
         if (this.tickCounter % 100 == 0) {
             for (Level level : this.levels.values()) {
-                level.clearCache();
                 level.doChunkGarbageCollection();
             }
         }
