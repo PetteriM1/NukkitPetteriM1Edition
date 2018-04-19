@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.AxisAlignedBB;
@@ -341,6 +342,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public AxisAlignedBB collisionBoundingBox = null;
     protected int meta = 0;
 
+    public static boolean[] hasMeta = null;
+
     protected Block(Integer meta) {
         this.meta = (meta != null ? meta : 0);
     }
@@ -355,6 +358,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             solid = new boolean[256];
             hardness = new double[256];
             transparent = new boolean[256];
+            hasMeta = new boolean[256];
 
             list[AIR] = BlockAir.class; //0
             list[STONE] = BlockStone.class; //1
@@ -646,35 +650,39 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public static Block get(int id) {
-        return get(id, 0);
+        return fullList[id << 4].clone();
     }
 
     public static Block get(int id, Integer meta) {
-        return get(id, meta, null);
+      if (meta != null) {
+            return fullList[(id << 4) + meta].clone();
+        } else {
+            return fullList[id << 4].clone();
+        }
     }
 
     @SuppressWarnings("unchecked")
     public static Block get(int id, Integer meta, Position pos) {
-        Block block;
-        try {
-            Class c = list[id];
-            if (c != null) {
-                Constructor constructor = c.getDeclaredConstructor(int.class);
-                constructor.setAccessible(true);
-                block = (Block) constructor.newInstance(meta);
-            } else {
-                block = new BlockUnknown(id, meta);
-            }
-        } catch (Exception e) {
-            block = new BlockUnknown(id, meta);
-        }
-
+        Block block = fullList[(id << 4) | (meta == null ? 0 : meta)].clone();
         if (pos != null) {
             block.x = pos.x;
             block.y = pos.y;
             block.z = pos.z;
             block.level = pos.level;
         }
+        return block;
+    }
+
+    public static Block get(int id, int data) {
+        return fullList[(id << 4) + data].clone();
+    }
+
+    public static Block get(int fullId, Level level, int x, int y, int z) {
+        Block block = fullList[fullId].clone();
+        block.x = x;
+        block.y = y;
+        block.z = z;
+        block.level = level;
         return block;
     }
 
@@ -798,6 +806,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public abstract String getName();
 
     public abstract int getId();
+
+    /**
+     * The full id is a combination of the id and data.
+     * @return
+     */
+    public int getFullId() {
+        return (getId() << 4);
+    }
 
     public void addVelocityToEntity(Entity entity, Vector3 vector) {
 

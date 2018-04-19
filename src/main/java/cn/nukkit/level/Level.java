@@ -6,6 +6,7 @@ import cn.nukkit.block.*;
 import cn.nukkit.block.GlobalBlockPalette;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.collection.PrimitiveList;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
@@ -1142,18 +1143,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void saveChunks() {
-        for (FullChunk chunk : new ArrayList<>(this.chunks.values())) {
-            if (chunk.hasChanged()) {
-                try {
-                    this.provider.setChunk(chunk.getX(), chunk.getZ(), chunk);
-                    this.provider.saveChunk(chunk.getX(), chunk.getZ());
-
-                    chunk.setChanged(false);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+        provider.saveChunks();
     }
 
     public void updateAroundRedstone(Vector3 pos, BlockFace face) {
@@ -1601,7 +1591,6 @@ public class Level implements ChunkManager, Metadatable {
         currentMap.put(Level.localBlockHash(x, y, z), changeBlocksPresent);
     }
 
-    @Override
     public synchronized void setBlockFullIdAt(int x, int y, int z, int fullId) {
         setBlock(x, y, z, Block.fullList[fullId], false, false);
     }
@@ -1653,12 +1642,13 @@ public class Level implements ChunkManager, Metadatable {
             BlockUpdateEvent ev = new BlockUpdateEvent(block);
             this.server.getPluginManager().callEvent(ev);
             if (!ev.isCancelled()) {
-                for (Entity entity : this.getNearbyEntities(new SimpleAxisAlignedBB(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1))) {
+                for (Entity entity : this.getNearbyEntities(new AxisAlignedBB(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1))) {
                     entity.scheduleUpdate();
                 }
                 block = ev.getBlock();
                 block.onUpdate(BLOCK_UPDATE_NORMAL);
-                this.updateAround(x, y, z);
+                Vector3 xyz = new Vector3(x, y, z);
+                this.updateAround(xyz);
             }
         }
         return true;
@@ -2245,7 +2235,7 @@ public class Level implements ChunkManager, Metadatable {
         this.getChunk(x >> 4, z >> 4, true).setHeightMap(x & 0x0f, z & 0x0f, value & 0x0f);
     }
 
-    public int[] getBiomeColor(int x, int z) {
+    public int getBiomeColor(int x, int z) {
         return this.getChunk(x >> 4, z >> 4, true).getBiomeColor(x & 0x0f, z & 0x0f);
     }
 
