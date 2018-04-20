@@ -1076,7 +1076,7 @@ public class Level implements ChunkManager, Metadatable {
             for (Entity entity : chunk.getEntities().values()) {
                 entity.scheduleUpdate();
             }
-            int tickSpeed = this.gameRules.getInt("randomTickSpeed");
+            int tickSpeed = 3;
 
             if (tickSpeed > 0) {
                 int blockId;
@@ -2047,10 +2047,8 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        
-        if (playSound) {
-            //this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), false);
-        }
+
+        this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), hand, false);
 
         if (item.getCount() <= 0) {
             item = new ItemBlock(new BlockAir(), 0, 0);
@@ -2400,9 +2398,6 @@ public class Level implements ChunkManager, Metadatable {
 
     public void requestChunk(int x, int z, Player player) {
         Long index = Level.chunkHash(x, z);
-        if (player.getGamemode() == Player.SPECTATOR && !this.gameRules.getBoolean("spectatorsGenerateChunks") && isChunkGenerated(x, z)) {
-            return;
-        }
 
         if (!this.chunkSendQueue.containsKey(index)) {
             this.chunkSendQueue.put(index, new HashMap<>());
@@ -2664,8 +2659,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isSpawnChunk(int X, int Z) {
-        int spawnX = (int) this.provider.getSpawn().getX() >> 4;
-        int spawnZ = (int) this.provider.getSpawn().getZ() >> 4;
+        int spawnX = (int) this.provider.getSpawn().getX() >> 3;
+        int spawnZ = (int) this.provider.getSpawn().getZ() >> 3;
 
         return Math.abs(X - spawnX) <= 1 && Math.abs(Z - spawnZ) <= 1;
     }
@@ -2700,7 +2695,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                for (; y >= 0 && y < 255; ++y) {
+                for (; y >= 0 && y < 255; y++) {
                     int b = chunk.getFullBlock(x, y + 1, z);
                     Block block = Block.get(b >> 4, b & 0x0f);
                     if (!this.isFullBlock(block)) {
@@ -2893,7 +2888,7 @@ public class Level implements ChunkManager, Metadatable {
                 if (!force) {
                     if (maxUnload <= 0) {
                         break;
-                    } else if (time > (now - 30000)) {
+                    } else if (time > (now - 20000)) {
                         continue;
                     }
                 }
