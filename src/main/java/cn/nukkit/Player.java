@@ -693,29 +693,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
     }
 
-    @Override
-    protected boolean switchLevel(Level targetLevel) {
-        Level oldLevel = this.level;
-        if (super.switchLevel(targetLevel)) {
-            for (long index : new ArrayList<>(this.usedChunks.keySet())) {
-                int chunkX = Level.getHashX(index);
-                int chunkZ = Level.getHashZ(index);
-                this.unloadChunk(chunkX, chunkZ, oldLevel);
-            }
-
-            this.usedChunks = new HashMap<>();
-            SetTimePacket pk = new SetTimePacket();
-            pk.time = this.level.getTime();
-            this.dataPacket(pk);
-
-            // TODO: Remove this hack
-            int distance = this.viewDistance * 2 * 16 * 2;
-            this.sendPosition(this.add(distance, 0, distance), this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
-            return true;
-        }
-        return false;
-    }
-
     public void unloadChunk(int x, int z) {
         this.unloadChunk(x, z, null);
     }
@@ -1997,7 +1974,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if ((loginPacket.getProtocol()) < ProtocolInfo.MINIUM_PROTOCOL) {
                         message = "disconnectionScreen.outdatedClient";
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
-                        
+
                     if (((LoginPacket) packet).protocol < 137) {
                         DisconnectPacket disconnectPacket = new DisconnectPacket();
                         disconnectPacket.message = message;
@@ -3994,15 +3971,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) return false;
             to = event.getTo();
-            if (from.getLevel().getId() != to.getLevel().getId()) { //Different level, update compass position
-                SetSpawnPositionPacket pk = new SetSpawnPositionPacket();
-                pk.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
-                Position spawn = to.getLevel().getSpawnLocation();
-                pk.x = spawn.getFloorX();
-                pk.y = spawn.getFloorY();
-                pk.z = spawn.getFloorZ();
-                dataPacket(pk);
-            }
+        }
+
+        boolean levelChange = from.getLevel() != to.getLevel();
+        if (levelChange) {
+            switchLevel(to.getLevel());
         }
 
         //TODO Remove it! A hack to solve the client-side teleporting bug! (inside into the block)
@@ -4011,7 +3984,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.teleportPosition = new Vector3(this.x, this.y, this.z);
             this.forceMovement = this.teleportPosition;
-            this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_TELEPORT);
+            this.sendPosition(this, this.yaw, this.pitch, levelChange ? MovePlayerPacket.MODE_NORMAL : MovePlayerPacket.MODE_TELEPORT);
 
             this.checkTeleportPosition();
 
@@ -4421,11 +4394,36 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     //todo a lot on dimension
 
-    public void setDimension(int dimension) {
+    private void setDimension(int dimension) {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
-        pk.dimension = getLevel().getDimension();
-        this.dataPacket(pk);
+        pk.dimension = dimension;
+        this.directDataPacket(pk);
     }
+
+    @Override
+    public boolean switchLevel(Level level) {
+        Level oldLevel = this.level;
+        if (super.switchLevel(level)) {
+            // Remove old chunks
+            for (long index : new ArrayList<>(this.usedChunks.keySet())) {
+                int chunkX = Level.getHashX(index);
+                int chunkZ = Level.getHashZ(index);
+                this.unloadChunk(chunkX, chunkZ, oldLevel);
+            }
+
+            //TODO: Using the ChangeDimensionPacket causes stops the client from being able to move. This is because we do not know when the chunks will finish loading.
+
+            // Send empty chunks
+            forceSendEmptyChunks();
+
+            this.usedChunks.clear();
+
+            return true;
+        }
+
+        return false;
+    }
+
 
     public void setCheckMovement(boolean checkMovement) {
         this.checkMovement = checkMovement;
