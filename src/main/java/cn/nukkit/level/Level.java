@@ -1076,7 +1076,7 @@ public class Level implements ChunkManager, Metadatable {
             for (Entity entity : chunk.getEntities().values()) {
                 entity.scheduleUpdate();
             }
-            int tickSpeed = this.gameRules.getInt("randomTickSpeed");
+            int tickSpeed = 3;
 
             if (tickSpeed > 0) {
                 int blockId;
@@ -2398,9 +2398,6 @@ public class Level implements ChunkManager, Metadatable {
 
     public void requestChunk(int x, int z, Player player) {
         Long index = Level.chunkHash(x, z);
-        if (player.getGamemode() == Player.SPECTATOR && !this.gameRules.getBoolean("spectatorsGenerateChunks") && isChunkGenerated(x, z)) {
-            return;
-        }
 
         if (!this.chunkSendQueue.containsKey(index)) {
             this.chunkSendQueue.put(index, new HashMap<>());
