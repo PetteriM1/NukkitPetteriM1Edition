@@ -28,7 +28,7 @@ public class ItemSpawnEgg extends Item {
     }
 
     public ItemSpawnEgg(Integer meta, int count) {
-        super(SPAWN_EGG, meta, count, "Spawn EntityEgg");
+        super(SPAWN_EGG, meta, count, "Spawn Entity Egg");
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ItemSpawnEgg extends Item {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
+        /*FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
 
         if (chunk == null) {
             return false;
@@ -71,8 +71,9 @@ public class ItemSpawnEgg extends Item {
             }
             entity.spawnToAll();
             return true;
-        }
+        }*/
 
+        player.sendMessage("\u00A7cSpawn eggs are disabled on this server"); //TODO: Option to enable
         return false;
     }
 }
