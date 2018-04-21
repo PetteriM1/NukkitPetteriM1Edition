@@ -284,7 +284,7 @@ public abstract class BaseEntity extends EntityCreature {
             this.close();
         }
 
-        if (this.y < 5) {
+        if (this.y < 1) {
             this.close();
         }
 
