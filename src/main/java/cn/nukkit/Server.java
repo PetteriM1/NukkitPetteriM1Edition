@@ -293,6 +293,7 @@ public class Server {
                 put("xbox-auth", true);
                 put("bed-spawnpoints", true);
                 put("explosion-break-blocks", true);
+                put("weather", true);
             }
         });
 

@@ -706,7 +706,7 @@ public class Level implements ChunkManager, Metadatable {
 
         // Tick Weather
         this.rainTime--;
-        if (this.rainTime <= 0) {
+        if (this.rainTime <= 0 && this.getServer().getPropertyBoolean("weather", true)) {
             if (!this.setRaining(!this.raining)) {
                 if (this.raining) {
                     setRainTime(rand.nextInt(12000) + 12000);
@@ -717,7 +717,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.thunderTime--;
-        if (this.thunderTime <= 0) {
+        if (this.thunderTime <= 0 && this.getServer().getPropertyBoolean("weather", true)) {
             if (!this.setThundering(!this.thundering)) {
                 if (this.thundering) {
                     setThunderTime(rand.nextInt(12000) + 3600);
@@ -727,7 +727,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (this.isThundering()) {
+        if (this.isThundering() && this.getServer().getPropertyBoolean("weather", true)) {
             synchronized (this) {
                 for (Map.Entry<Long, BaseFullChunk> entry : this.chunks.entrySet()) {
                     long index = entry.getKey();
