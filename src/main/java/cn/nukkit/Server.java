@@ -291,6 +291,8 @@ public class Server {
                 put("auto-save", true);
                 put("force-resources", false);
                 put("xbox-auth", true);
+                put("bed-spawnpoints", true);
+                put("explosion-break-blocks", true);
             }
         });
 
@@ -728,35 +730,35 @@ public class Server {
                 this.rcon.close();
             }
 
-            this.getLogger().debug("Disabling all plugins");
+            this.getLogger().debug("Disabling all plugins...");
             this.pluginManager.disablePlugins();
 
             for (Player player : new ArrayList<>(this.players.values())) {
                 player.close(player.getLeaveMessage(), (String) this.getConfig("settings.shutdown-message", "Server closed"));
             }
 
-            this.getLogger().debug("Unloading all levels");
+            this.getLogger().debug("Unloading all levels...");
             for (Level level : new ArrayList<>(this.getLevels().values())) {
                 this.unloadLevel(level, true);
             }
 
-            this.getLogger().debug("Removing event handlers");
+            this.getLogger().debug("Removing event handlers...");
             HandlerList.unregisterAll();
 
-            this.getLogger().debug("Stopping all tasks");
+            this.getLogger().debug("Stopping all tasks...");
             this.scheduler.cancelAllTasks();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
-            this.getLogger().debug("Closing console");
+            this.getLogger().debug("Closing console...");
             this.console.interrupt();
 
-            this.getLogger().debug("Stopping network interfaces");
+            this.getLogger().debug("Stopping network interfaces...");
             for (SourceInterface interfaz : this.network.getInterfaces()) {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
             }
 
-            this.getLogger().debug("Disabling timings");
+            this.getLogger().debug("Disabling timings...");
             Timings.stopServer();
             //todo other things
         } catch (Exception e) {

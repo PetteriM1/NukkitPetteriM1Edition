@@ -1,5 +1,6 @@
 package cn.nukkit.level;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockTNT;
@@ -94,8 +95,10 @@ public class Explosion {
                             if (block.getId() != 0 && block.getId() != 7) {
                                 blastForce -= (block.getResistance() / 5 + 0.3d) * this.stepLen;
                                 if (blastForce > 0) {
-                                    if (!this.affectedBlocks.contains(block)) {
-                                        this.affectedBlocks.add(block);
+                                    if (level.getServer().getPropertyBoolean("explosion-break-blocks", true)) {
+                                        if (!this.affectedBlocks.contains(block)) {
+                                            this.affectedBlocks.add(block);
+                                        }
                                     }
                                 }
                             }
