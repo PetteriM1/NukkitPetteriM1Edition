@@ -2876,7 +2876,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void unloadChunks(boolean force) {
         if (!this.unloadQueue.isEmpty()) {
-            int maxUnload = 96;
+            int maxUnload = 100;
             long now = System.currentTimeMillis();
 
             for (Long index : new ArrayList<>(this.unloadQueue.keySet())) {
