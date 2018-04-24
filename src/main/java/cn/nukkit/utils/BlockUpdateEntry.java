@@ -53,5 +53,5 @@ public class BlockUpdateEntry implements Comparable<BlockUpdateEntry> {
     @Override
     public int hashCode() {
         return this.pos.hashCode();
-    }    
+    }
 }
