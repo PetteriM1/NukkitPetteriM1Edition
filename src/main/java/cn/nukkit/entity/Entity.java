@@ -131,7 +131,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_CONTROLLING_RIDER_SEAT_NUMBER = 73; //byte
     public static final int DATA_STRENGTH = 74; //int
     public static final int DATA_MAX_STRENGTH = 75; //int
-    
+
     /* 77 (int)
      * 78 (int) */
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -1880,13 +1880,13 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.ySize = 0;
 
-        this.setMotion(this.temporalVector.setComponents(0, 0, 0));
+        //this.setMotion(this.temporalVector.setComponents(0, 0, 0));
 
         if (this.setPositionAndRotation(to, yaw, pitch)) {
             this.resetFallDistance();
             this.onGround = true;
 
-            this.updateMovement();
+            //this.updateMovement();
 
             return true;
         }

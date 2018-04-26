@@ -3985,7 +3985,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.removeAllWindows();
 
             this.teleportPosition = new Vector3(this.x, this.y, this.z);
-            this.forceMovement = this.teleportPosition;
+            //this.forceMovement = this.teleportPosition;
             this.sendPosition(this, this.yaw, this.pitch, levelChange ? MovePlayerPacket.MODE_NORMAL : MovePlayerPacket.MODE_TELEPORT);
 
             this.checkTeleportPosition();
@@ -4416,7 +4416,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             //TODO: Using the ChangeDimensionPacket causes stops the client from being able to move. This is because we do not know when the chunks will finish loading.
 
             // Send empty chunks
-            forceSendEmptyChunks();
+            //forceSendEmptyChunks();
 
             this.usedChunks.clear();
 
