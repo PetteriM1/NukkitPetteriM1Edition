@@ -34,20 +34,7 @@ public class BlockMushroomRed extends BlockFlowable {
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!canStay()) {
-                getLevel().useBreakOn(this);
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-        return 0;
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-//        System.out.println("light: " + this.level.getFullLight(this));
 
         if (canStay()) {
             getLevel().setBlock(block, this, true, true);

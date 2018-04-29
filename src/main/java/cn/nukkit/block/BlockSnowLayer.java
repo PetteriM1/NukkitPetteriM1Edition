@@ -52,8 +52,6 @@ public class BlockSnowLayer extends BlockFlowable {
         return true;
     }
 
-    //TODO:雪片叠垒乐
-
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = this.down();
@@ -103,5 +101,3 @@ public class BlockSnowLayer extends BlockFlowable {
         return false;
     }
 }
-
-

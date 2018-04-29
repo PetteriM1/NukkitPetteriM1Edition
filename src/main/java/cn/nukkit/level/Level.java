@@ -200,17 +200,12 @@ public class Level implements ChunkManager, Metadatable {
             put(Block.GRASS, BlockGrass.class);
             put(Block.FARMLAND, BlockFarmland.class);
             put(Block.MYCELIUM, BlockMycelium.class);
-
             put(Block.SAPLING, BlockSapling.class);
-
             put(Block.LEAVES, BlockLeaves.class);
             put(Block.LEAVES2, BlockLeaves2.class);
-
             put(Block.SNOW_LAYER, BlockSnowLayer.class);
             put(Block.ICE, BlockIce.class);
             put(Block.LAVA, BlockLava.class);
-            put(Block.STILL_LAVA, BlockLavaStill.class);
-
             put(Block.CACTUS, BlockCactus.class);
             put(Block.BEETROOT_BLOCK, BlockBeetroot.class);
             put(Block.CARROT_BLOCK, BlockCarrot.class);
@@ -219,12 +214,8 @@ public class Level implements ChunkManager, Metadatable {
             put(Block.PUMPKIN_STEM, BlockStemPumpkin.class);
             put(Block.WHEAT_BLOCK, BlockWheat.class);
             put(Block.SUGARCANE_BLOCK, BlockSugarcane.class);
-            put(Block.RED_MUSHROOM, BlockMushroomRed.class);
-            put(Block.BROWN_MUSHROOM, BlockMushroomBrown.class);
             put(Block.NETHER_WART_BLOCK, BlockNetherWart.class);
-
             put(Block.FIRE, BlockFire.class);
-            put(Block.GLOWING_REDSTONE_ORE, BlockOreRedstoneGlowing.class);
             put(Block.COCOA_BLOCK, BlockCocoa.class);
         }
     };
