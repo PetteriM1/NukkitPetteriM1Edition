@@ -24,8 +24,8 @@ public class MovePlayerPacket extends DataPacket {
     public int mode = MODE_NORMAL;
     public boolean onGround;
     public long ridingEid;
-    public int int1 = 0;
-    public int int2 = 0;
+    public int teleportCause = 0;
+    public int teleportItem = 0;
 
     @Override
     public void decode() {
@@ -41,8 +41,8 @@ public class MovePlayerPacket extends DataPacket {
         this.onGround = this.getBoolean();
         this.ridingEid = this.getEntityRuntimeId();
         if (this.mode == MODE_TELEPORT) {
-            this.int1 = this.getLInt();
-            this.int2 = this.getLInt();
+            this.teleportCause = this.getLInt();
+            this.teleportItem = this.getLInt();
         }
     }
 
@@ -58,8 +58,8 @@ public class MovePlayerPacket extends DataPacket {
         this.putBoolean(this.onGround);
         this.putEntityRuntimeId(this.ridingEid);
         if (this.mode == MODE_TELEPORT) {
-            this.putLInt(this.int1);
-            this.putLInt(this.int2);
+            this.putLInt(this.teleportCause);
+            this.putLInt(this.teleportItem);
         }
     }
 

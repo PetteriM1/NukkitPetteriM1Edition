@@ -49,10 +49,10 @@ public class StartGamePacket extends DataPacket {
     public boolean broadcastToPlatform;
     public int platformBroadcastMode = 4;
     public boolean xblBroadcastIntent = true;
-    public String levelId = ""; //base64 string, usually the same as world folder name in vanilla    
+    public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
     public String premiumWorldTemplateId = "";
-    public boolean unknown = false;
+    public boolean isTrial = false;
     public long currentTick;
 
     public int enchantmentSeed;
@@ -102,7 +102,7 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
-        this.putBoolean(this.unknown);
+        this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
     }
