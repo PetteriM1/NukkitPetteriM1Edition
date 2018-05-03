@@ -2,6 +2,7 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityExpBottle;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.level.sound.LaunchSound;
@@ -51,6 +52,9 @@ public abstract class ProjectileItem extends Item {
                 player.getServer().getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {
                     projectile.kill();
+                } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle) {
+                    projectile.kill();
+                    player.sendMessage("\u00A7cXP bottles are disabled on creative");
                 } else {
                     projectile.spawnToAll();
                     player.getLevel().addSound(new LaunchSound(player), player.getViewers().values());

@@ -69,7 +69,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     private final boolean devs = false; // Avoid maintained features into production
 
     public abstract MinecartType getType();
-    
+
     public abstract boolean isRideable();
 
     public EntityMinecartAbstract(FullChunk chunk, CompoundTag nbt) {
@@ -231,7 +231,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
             if (!instantKill) performHurtAnimation((int) source.getFinalDamage());
 
-            if (instantKill || getDamage() > 40) {
+            if (instantKill) {
                 if (linkedEntity != null) {
                     mountEntity(linkedEntity);
                 }
@@ -377,7 +377,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 } else {
                     motionX -= motiveX;
                     motionZ -= motiveZ;
-                }                
+                }
             }
         }
     }

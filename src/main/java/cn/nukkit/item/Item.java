@@ -829,6 +829,10 @@ public class Item implements Cloneable {
             list[RECORD_STRAD] = ItemRecordStrad.class;
             list[RECORD_WAIT] = ItemRecordWait.class;
 
+            list[LADDER] = ItemLadder.class;
+            list[CACTUS] = ItemCactus.class;
+            list[RAIL] = ItemRail.class;
+
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
                     list[i] = Block.list[i];

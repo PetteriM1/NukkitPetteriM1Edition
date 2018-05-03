@@ -203,9 +203,9 @@ public class Level implements ChunkManager, Metadatable {
             put(Block.SAPLING, BlockSapling.class);
             put(Block.LEAVES, BlockLeaves.class);
             put(Block.LEAVES2, BlockLeaves2.class);
-            put(Block.SNOW_LAYER, BlockSnowLayer.class);
-            put(Block.ICE, BlockIce.class);
-            put(Block.LAVA, BlockLava.class);
+            //put(Block.SNOW_LAYER, BlockSnowLayer.class);
+            //put(Block.ICE, BlockIce.class);
+            //put(Block.LAVA, BlockLava.class);
             put(Block.CACTUS, BlockCactus.class);
             put(Block.BEETROOT_BLOCK, BlockBeetroot.class);
             put(Block.CARROT_BLOCK, BlockCarrot.class);
