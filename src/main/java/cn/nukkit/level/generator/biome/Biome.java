@@ -22,26 +22,16 @@ public abstract class Biome {
     public static final int TAIGA = 5;
     public static final int SWAMP = 6;
     public static final int RIVER = 7;
-    public static final int JUNGLE = 21;
-    public static final int SAVANNA = 35;
-    public static final int ROOFED_FOREST = 29;
-    public static final int ROOFED_FOREST_M = 157;
-    public static final int MUSHROOM_ISLAND = 14;
-
     public static final int HELL = 8;
-
     public static final int ICE_PLAINS = 12;
-
-
+    public static final int MUSHROOM_ISLAND = 14;
     public static final int BEACH = 16;
-
-
     public static final int SMALL_MOUNTAINS = 20;
-
-
+    public static final int JUNGLE = 21;
     public static final int BIRCH_FOREST = 27;
-
-
+    public static final int ROOFED_FOREST = 29;
+    public static final int SAVANNA = 35;
+    public static final int ROOFED_FOREST_M = 157;
     public static final int MAX_BIOMES = 256;
 
     private static final Biome[] biomes = new Biome[MAX_BIOMES];

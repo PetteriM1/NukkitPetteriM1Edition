@@ -231,19 +231,19 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
             if (!instantKill) performHurtAnimation((int) source.getFinalDamage());
 
-            if (instantKill) {
-                if (linkedEntity != null) {
-                    mountEntity(linkedEntity);
-                }
+            if (linkedEntity != null) {
+                mountEntity(linkedEntity);
+            }
 
                 if (instantKill && (!hasCustomName())) {
-                    kill();
-                } else {
-                    if (level.getGameRules().getBoolean("doEntityDrops")) {
-                        dropItem();
-                    }
-                    close();
+                close();
+                kill();
+            } else {
+                if (level.getGameRules().getBoolean("doEntityDrops")) {
+                    dropItem();
                 }
+                close();
+                kill();
             }
         }
 
