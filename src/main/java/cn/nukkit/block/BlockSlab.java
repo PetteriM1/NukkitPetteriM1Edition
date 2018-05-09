@@ -10,7 +10,7 @@ import cn.nukkit.math.BlockFace;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockSlab extends BlockTransparent {
+public abstract class BlockSlab extends BlockSolid {
 
     protected final int doubleSlab;
 
