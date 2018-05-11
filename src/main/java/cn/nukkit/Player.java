@@ -69,7 +69,8 @@ import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
-
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import java.awt.Color;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -121,8 +122,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected Map<Inventory, Integer> windows;
 
-    protected Map<Integer, Inventory> windowIndex = new HashMap<>();
-    protected Set<Integer> permanentWindows = new HashSet<>();
+    protected final Map<Integer, Inventory> windowIndex = new HashMap<>();
+    protected final Set<Integer> permanentWindows = new HashSet<>();
 
     protected int messageCounter = 2;
 
@@ -164,13 +165,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected float stepHeight = 0.6f;
 
-    public Map<Long, Boolean> usedChunks = new HashMap<>();
+    public final Map<Long, Boolean> usedChunks = new Long2ObjectOpenHashMap<>();
 
     protected int chunkLoadCount = 0;
     protected Map<Long, Integer> loadQueue = new HashMap<>();
     protected int nextChunkOrderRun = 1;
 
-    protected Map<UUID, Player> hiddenPlayers = new HashMap<>();
+    protected final Map<UUID, Player> hiddenPlayers = new HashMap<>();
 
     protected Vector3 newPosition = null;
 
@@ -188,9 +189,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected boolean checkMovement = true;
 
-    private final Map<Integer, Boolean> needACK = new HashMap<>();
+    private final Int2ObjectOpenHashMap<Boolean> needACK = new Int2ObjectOpenHashMap<>();
 
-    private Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
+    private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
 
     private PermissibleBase perm = null;
 
@@ -721,7 +722,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        this.usedChunks.put(Level.chunkHash(x, z), true);
+        this.usedChunks.put(Level.chunkHash(x, z), Boolean.TRUE);
         this.chunkLoadCount++;
 
         this.dataPacket(packet);
@@ -740,7 +741,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        this.usedChunks.put(Level.chunkHash(x, z), true);
+        this.usedChunks.put(Level.chunkHash(x, z), Boolean.TRUE);
         this.chunkLoadCount++;
 
         FullChunkDataPacket pk = new FullChunkDataPacket();
@@ -920,7 +921,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.nextChunkOrderRun = 200;
 
         loadQueue.clear();
-        Map<Long, Boolean> lastChunk = new HashMap<>(this.usedChunks);
+        Long2ObjectOpenHashMap<Boolean> lastChunk = new Long2ObjectOpenHashMap<>(this.usedChunks);
 
         int centerX = (int) this.x >> 4;
         int centerZ = (int) this.z >> 4;
@@ -998,7 +999,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             Integer identifier = this.interfaz.putPacket(this, packet, needACK, false);
 
             if (needACK && identifier != null) {
-                this.needACK.put(identifier, false);
+                this.needACK.put(identifier, Boolean.FALSE);
                 return identifier;
             }
         }
@@ -1029,7 +1030,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             Integer identifier = this.interfaz.putPacket(this, packet, needACK, true);
 
             if (needACK && identifier != null) {
-                this.needACK.put(identifier, false);
+                this.needACK.put(identifier, Boolean.FALSE);
                 return identifier;
             }
         }
@@ -1735,7 +1736,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (int channel : this.batchedPackets.keySet()) {
                 this.server.batchPackets(new Player[]{this}, batchedPackets.get(channel).stream().toArray(DataPacket[]::new), false);
             }
-            this.batchedPackets = new TreeMap<>();
+            this.batchedPackets.clear();
         }
 
         if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
@@ -3378,7 +3379,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            this.hiddenPlayers = new HashMap<>();
+            this.hiddenPlayers.clear();
 
             this.removeAllWindows(true);
 
@@ -3417,10 +3418,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     String.valueOf(this.port),
                     this.getServer().getLanguage().translateString(reason)));
             this.windows = new HashMap<>();
-            this.windowIndex = new HashMap<>();
-            this.usedChunks = new HashMap<>();
-            this.loadQueue = new HashMap<>();
-            this.hasSpawned = new HashMap<>();
+            this.windowIndex.clear();
+            this.usedChunks.clear();
+            this.loadQueue.clear();
+            this.hasSpawned.clear();
             this.spawnPosition = null;
 
             if (this.riding instanceof EntityRideable) {
@@ -4591,7 +4592,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param identification
      */
     public void notifyACK(int identification) {
-        needACK.put(identification, true);
+        needACK.put(identification, Boolean.TRUE);
     }
 
     public boolean isBreakingBlock() {

@@ -9,7 +9,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.utils.DyeColor;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -106,7 +105,7 @@ public class EntitySheep extends EntityAnimal {
         this.sheared = true;
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHEARED, true);
 
-        this.level.dropItem(this, Item.get(Item.WOOL, getColor(), this.level.rand.nextInt(2) + 1));
+        this.level.dropItem(this, Item.get(Item.WOOL, getColor(), ThreadLocalRandom.current().nextInt(2) + 1));
         return true;
     }
 

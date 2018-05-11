@@ -263,7 +263,7 @@ public class ItemFlintSteel extends ItemTool {
 
                 if (!e.isCancelled()) {
                     level.setBlock(fire, fire, true);
-                    level.scheduleUpdate(fire, fire.tickRate() + level.rand.nextInt(10));
+                    level.scheduleUpdate(fire, fire.tickRate() + ThreadLocalRandom.current().nextInt(10));
                 }
                 return true;
             }

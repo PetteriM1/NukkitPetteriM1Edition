@@ -26,9 +26,6 @@ public class QueryHandler {
 
     public QueryHandler() {
         this.server = Server.getInstance();
-        String ip = this.server.getIp();
-        String addr = (!ip.isEmpty()) ? ip : "0.0.0.0";
-        int port = this.server.getPort();
 
         this.regenerateToken();
         this.lastToken = this.token;

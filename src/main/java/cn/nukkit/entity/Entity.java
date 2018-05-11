@@ -191,7 +191,7 @@ public abstract class Entity extends Location implements Metadatable {
     private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();
     private static final Map<String, String> shortNames = new HashMap<>();
 
-    protected Map<Integer, Player> hasSpawned = new HashMap<>();
+    protected final Map<Integer, Player> hasSpawned = new HashMap<>();
 
     protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
 
@@ -1902,7 +1902,7 @@ public abstract class Entity extends Location implements Metadatable {
         for (Player player : this.hasSpawned.values()) {
             this.spawnTo(player);
         }
-        this.hasSpawned = new HashMap<>();
+        this.hasSpawned.clear();
     }
 
     public void spawnToAll() {

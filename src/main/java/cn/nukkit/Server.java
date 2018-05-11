@@ -157,6 +157,8 @@ public class Server {
     private boolean alwaysTickPlayers = false;
     private int baseTickRate = 1;
     private Boolean getAllowFlight = null;
+    private int difficulty = Integer.MAX_VALUE;
+    private int defaultGamemode = Integer.MAX_VALUE;
 
     private int autoSaveTicker = 0;
     private int autoSaveTicks = 6000;
@@ -680,7 +682,7 @@ public class Server {
         this.maxPlayers = this.getPropertyInt("max-players", 20);
 
         if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
-            this.setPropertyInt("difficulty", 3);
+            this.setPropertyInt("difficulty", difficulty = 3);
         }
 
         this.banByIP.load();
@@ -1284,7 +1286,10 @@ public class Server {
     }
 
     public int getDifficulty() {
-        return this.getPropertyInt("difficulty", 1);
+        if (this.difficulty == Integer.MAX_VALUE) {
+            this.difficulty = this.getPropertyInt("difficulty", 1);
+        }
+        return this.difficulty;
     }
 
     public boolean hasWhitelist() {
@@ -1307,7 +1312,10 @@ public class Server {
     }
 
     public int getDefaultGamemode() {
-        return this.getPropertyInt("gamemode", 0);
+        if (this.defaultGamemode == Integer.MAX_VALUE) {
+            this.defaultGamemode = this.getPropertyInt("gamemode", 0);
+        }
+        return this.defaultGamemode;
     }
 
     public String getMotd() {
