@@ -1880,13 +1880,13 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.ySize = 0;
 
-        //this.setMotion(this.temporalVector.setComponents(0, 0, 0));
+        this.setMotion(this.temporalVector.setComponents(0, 0, 0));
 
         if (this.setPositionAndRotation(to, yaw, pitch)) {
             this.resetFallDistance();
             this.onGround = true;
 
-            //this.updateMovement();
+            this.updateMovement();
 
             return true;
         }

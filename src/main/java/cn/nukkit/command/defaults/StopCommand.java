@@ -22,10 +22,10 @@ public class StopCommand extends VanillaCommand {
         if (!this.testPermission(sender)) {
             return true;
         }
-        
+
         if (sender instanceof Player) {
             Player p = (Player)sender;
-            p.sendMessage("Can't use this command in game");
+            p.sendMessage("\u00A7cCan't use this command in game");
             return true;
         }
 
