@@ -1,5 +1,6 @@
 package cn.nukkit.item;
 
+import cn.nukkit.Server;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityExpBottle;
@@ -52,7 +53,7 @@ public abstract class ProjectileItem extends Item {
                 player.getServer().getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {
                     projectile.kill();
-                } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle) {
+                } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle && !player.getServer().getPropertyBoolean("xp-bottles-on-creative", false)) {
                     projectile.kill();
                     player.sendMessage("\u00A7cXP bottles are disabled on creative");
                 } else {

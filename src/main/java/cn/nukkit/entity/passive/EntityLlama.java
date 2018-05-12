@@ -1,14 +1,19 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.passive.WalkingAnimal;
+import cn.nukkit.entity.Utils;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * @author PikyCZ
- */
-public class EntityLlama extends EntityAnimal {
+import java.util.ArrayList;
+import java.util.List;
+
+public class EntityLlama extends WalkingAnimal {
 
     public static final int NETWORK_ID = 29;
 
@@ -19,6 +24,11 @@ public class EntityLlama extends EntityAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public String getName() {
+        return "Llama";
     }
 
     @Override
@@ -46,9 +56,32 @@ public class EntityLlama extends EntityAnimal {
     }
 
     @Override
+    public boolean isBaby() {
+        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
         this.setMaxHealth(15);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            int leather = Utils.rand(1, 3);
+
+            for (int i = 0; i < leather; i++) {
+                drops.add(Item.get(Item.LEATHER, 0, 1));
+            }
+        }
+        return drops.toArray(new Item[drops.size()]);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return Utils.rand(1, 3);
     }
 
     @Override

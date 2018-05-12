@@ -1,21 +1,26 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.passive.WalkingAnimal;
+import cn.nukkit.entity.Utils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * Author: BeYkeRYkt
- * Nukkit Project
- */
-public class EntityOcelot extends EntityAnimal {
+public class EntityOcelot extends WalkingAnimal {
 
     public static final int NETWORK_ID = 22;
 
     public EntityOcelot(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 
     @Override
@@ -35,37 +40,36 @@ public class EntityOcelot extends EntityAnimal {
     }
 
     @Override
-    public float getEyeHeight() {
-        if (isBaby()) {
-            return 0.35f * getHeight(); // No have information
-        }
-        return 0.7f * getHeight();
+    public double getSpeed() {
+        return 1.4;
     }
 
     @Override
-    public String getName() {
-        return this.getNameTag();
+    public boolean isBaby() {
+        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[]{};
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public void initEntity() {
+    protected void initEntity() {
         super.initEntity();
-        setMaxHealth(8);
+        this.setMaxHealth(10);
     }
 
     @Override
-    public boolean isBreedingItem(Item item) {
-        return item.getId() == Item.RAW_FISH;
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.RAW_FISH && distance <= 40;
+        }
+        return false;
+    }
+
+    public Item[] getDrops() {
+        return new Item[0];
+    }
+
+    public int getKillExperience() {
+        return Utils.rand(1, 4);
     }
 
     @Override

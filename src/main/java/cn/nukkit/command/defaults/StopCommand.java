@@ -1,5 +1,6 @@
 package cn.nukkit.command.defaults;
 
+import cn.nukkit.Server;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
@@ -23,7 +24,7 @@ public class StopCommand extends VanillaCommand {
             return true;
         }
 
-        if (sender instanceof Player) {
+        if (sender instanceof Player && !(Server.getInstance().getPropertyBoolean("stop-in-game", false))) {
             Player p = (Player)sender;
             p.sendMessage("\u00A7cCan't use this command in game");
             return true;

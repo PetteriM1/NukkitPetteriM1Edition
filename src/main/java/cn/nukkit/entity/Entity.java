@@ -2066,4 +2066,21 @@ public abstract class Entity extends Location implements Metadatable {
         hash = (int) (29 * hash + this.getId());
         return hash;
     }
+
+    public static Entity create(Object type, Position source, Object... args) {
+        FullChunk chunk = source.getLevel().getChunk((int) source.x >> 4, (int) source.z >> 4, true);
+        if (!chunk.isGenerated()) {
+            chunk.setGenerated();
+        }
+        if (!chunk.isPopulated()) {
+            chunk.setPopulated();
+        }
+
+        CompoundTag nbt = new CompoundTag().putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", source.x)).add(new DoubleTag("", source.y)).add(new DoubleTag("", source.z)))
+                .putList(new ListTag<DoubleTag>("Motion").add(new DoubleTag("", 0)).add(new DoubleTag("", 0)).add(new DoubleTag("", 0)))
+                .putList(new ListTag<FloatTag>("Rotation").add(new FloatTag("", source instanceof Location ? (float) ((Location) source).yaw : 0))
+                        .add(new FloatTag("", source instanceof Location ? (float) ((Location) source).pitch : 0)));
+
+        return Entity.createEntity(type.toString(), chunk, nbt, args);
+    }
 }

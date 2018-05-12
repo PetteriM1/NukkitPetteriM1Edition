@@ -51,4 +51,12 @@ public class BlockMonsterEgg extends BlockSolid {
     public Item[] getDrops(Item item) {
         return new Item[0];
     }
+
+    /*@Override
+    public boolean onBreak(Item item) {
+        if (Server.getPropertyBoolean("silverfish-spawning", true)) {
+            //TODO: Spawn silverfish
+        }
+        return this.getLevel().setBlock(this, new BlockAir(), true);
+    }*/
 }

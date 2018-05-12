@@ -1,14 +1,14 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.FlyingMonster;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * @author PikyCZ
- */
-public class EntityEnderDragon extends EntityMob {
+public class EntityEnderDragon extends FlyingMonster {
 
     public static final int NETWORK_ID = 53;
 
@@ -34,7 +34,17 @@ public class EntityEnderDragon extends EntityMob {
     @Override
     public void initEntity() {
         super.initEntity();
-        this.setMaxHealth(100);
+        this.setMaxHealth(200);
+    }
+
+    @Override
+    public int getKillExperience () {
+        return 500;
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+        //TODO
     }
 
     @Override

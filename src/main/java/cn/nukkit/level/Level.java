@@ -291,13 +291,13 @@ public class Level implements ChunkManager, Metadatable {
         this.updateQueue = new BlockUpdateScheduler(this, levelCurrentTick);
 
         this.chunkTickRadius = Math.min(this.server.getViewDistance(),
-                Math.max(1, (Integer) this.server.getConfig("chunk-ticking.tick-radius", 4)));
-        this.chunksPerTicks = (int) this.server.getConfig("chunk-ticking.per-tick", 40);
-        this.chunkGenerationQueueSize = (int) this.server.getConfig("chunk-generation.queue-size", 8);
-        this.chunkPopulationQueueSize = (int) this.server.getConfig("chunk-generation.population-queue-size", 2);
+                Math.max(1, (Integer) this.server.getPropertyInt("chunk-ticking-radius", 4)));
+        this.chunksPerTicks = (int) this.server.getPropertyInt("chunk-ticking-per-tick", 40);
+        this.chunkGenerationQueueSize = (int) this.server.getPropertyInt("chunk-generation-queue-size", 8);
+        this.chunkPopulationQueueSize = (int) this.server.getPropertyInt("chunk-generation-population-queue-size", 8);
         this.chunkTickList.clear();
-        this.clearChunksOnTick = (boolean) this.server.getConfig("chunk-ticking.clear-tick-list", true);
-        this.cacheChunks = (boolean) this.server.getConfig("chunk-sending.cache-chunks", false);
+        this.clearChunksOnTick = (boolean) this.server.getPropertyBoolean("clear-chunk-tick-list", true);
+        this.cacheChunks = (boolean) this.server.getPropertyBoolean("cache-chunks", true);
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
@@ -2536,7 +2536,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (chunk == null) {
             if (generate) {
-                throw new IllegalStateException("Could not create new Chunk");
+                throw new IllegalStateException("Could not create new chunk");
             }
             return false;
         }
@@ -2553,7 +2553,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (!chunk.isLightPopulated() && chunk.isPopulated()
-                && (boolean) this.getServer().getConfig("chunk-ticking.light-updates", false)) {
+                && (boolean) this.getServer().getPropertyBoolean("light-updates", true)) {
             this.getServer().getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
         }
 

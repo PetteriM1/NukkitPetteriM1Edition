@@ -1,15 +1,18 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.passive.FlyingAnimal;
+import cn.nukkit.entity.Utils;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * @author PikyCZ
- */
-public class EntityParrot extends EntityAnimal {
+import java.util.ArrayList;
+import java.util.List;
+
+public class EntityParrot extends FlyingAnimal {
 
     public static final int NETWORK_ID = 105;
 
@@ -23,7 +26,7 @@ public class EntityParrot extends EntityAnimal {
     }
 
     public String getName() {
-        return "Bat";
+        return "Parrot";
     }
 
     @Override
@@ -44,7 +47,19 @@ public class EntityParrot extends EntityAnimal {
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.FEATHER)};
+         List<Item> drops = new ArrayList<>();
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            int featherDrop = Utils.rand(1, 3);
+            for (int i = 0; i < featherDrop; i++) {
+                drops.add(Item.get(Item.FEATHER, 0, 1));
+            }
+        }
+        return drops.toArray(new Item[drops.size()]);
+    }
+
+    @Override
+    public int getKillExperience() {
+        return Utils.rand(1, 4);
     }
 
     @Override

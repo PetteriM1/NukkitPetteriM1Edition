@@ -133,13 +133,7 @@ public class TimingsExport extends Thread {
 
         //Information on the users Config
         JsonObject config = new JsonObject();
-        if (!Timings.getIgnoredConfigSections().contains("all")) {
-            JsonObject nukkit = JsonUtil.toObject(Server.getInstance().getConfig().getRootSection());
-            Timings.getIgnoredConfigSections().forEach(nukkit::remove);
-            config.add("nukkit", nukkit);
-        } else {
-            config.add("nukkit", null);
-        }
+        config.add("nukkit", null);
         out.add("config", config);
 
         new TimingsExport(sender, out, history).start();

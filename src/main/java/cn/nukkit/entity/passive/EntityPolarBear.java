@@ -1,15 +1,15 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.passive.WalkingAnimal;
+import cn.nukkit.entity.Utils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-/**
- * @author PikyCZ
- */
-public class EntityPolarBear extends EntityAnimal {
+public class EntityPolarBear extends WalkingAnimal {
 
     public static final int NETWORK_ID = 28;
 
@@ -20,6 +20,11 @@ public class EntityPolarBear extends EntityAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public String getName() {
+        return "PolarBear";
     }
 
     @Override
@@ -47,6 +52,16 @@ public class EntityPolarBear extends EntityAnimal {
     }
 
     @Override
+    public double getSpeed() {
+        return 1.25;
+    }
+
+    @Override
+    public boolean isBaby() {
+        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
         this.setMaxHealth(30);
@@ -55,6 +70,11 @@ public class EntityPolarBear extends EntityAnimal {
     @Override
     public Item[] getDrops() {
         return new Item[]{Item.get(Item.RAW_FISH), Item.get(Item.RAW_SALMON)};
+    }
+
+    @Override
+    public int getKillExperience() {
+        return Utils.rand(1, 3);
     }
 
     @Override
