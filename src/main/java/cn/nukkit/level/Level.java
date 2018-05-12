@@ -536,7 +536,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addParticle(Particle particle, Collection<Player> players) {
-        this.addParticle(particle, players.stream().toArray(Player[]::new));
+        this.addParticle(particle, players.toArray(new Player[0]));
     }
 
     public boolean getAutoSave() {
@@ -597,7 +597,7 @@ public class Level implements ChunkManager, Metadatable {
     public ChunkLoader[] getChunkLoaders(int chunkX, int chunkZ) {
         long index = Level.chunkHash(chunkX, chunkZ);
         if (this.chunkLoaders.containsKey(index)) {
-            return this.chunkLoaders.get(index).values().stream().toArray(ChunkLoader[]::new);
+            return this.chunkLoaders.get(index).values().toArray(new ChunkLoader[0]);
         } else {
             return new ChunkLoader[0];
         }
@@ -686,7 +686,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void sendTime() {
-        sendTime(this.players.values().stream().toArray(Player[]::new));
+        sendTime(this.players.values().toArray(new Player[0]));
     }
 
     public GameRules getGameRules() {
@@ -815,7 +815,7 @@ public class Level implements ChunkManager, Metadatable {
                         }
                     } else {
                         Collection<Player> toSend = this.getChunkPlayers(chunkX, chunkZ).values();
-                        Player[] playerArray = toSend.toArray(new Player[toSend.size()]);
+                        Player[] playerArray = toSend.toArray(new Player[0]);
                         Vector3[] blocksArray = new Vector3[blocks.size()];
                         int i = 0;
                         for (short blockHash : blocks.keySet()) {
@@ -840,7 +840,7 @@ public class Level implements ChunkManager, Metadatable {
         for (long index : this.chunkPackets.keySet()) {
             int chunkX = Level.getHashX(index);
             int chunkZ = Level.getHashZ(index);
-            Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().stream().toArray(Player[]::new);
+            Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().toArray(new Player[0]);
             if (chunkPlayers.length > 0) {
                 for (DataPacket pk : this.chunkPackets.get(index)) {
                     Server.broadcastPacket(chunkPlayers, pk);
@@ -1312,7 +1312,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        return collides.stream().toArray(Block[]::new);
+        return collides.toArray(new Block[0]);
     }
 
     public boolean isFullBlock(Vector3 pos) {
@@ -1360,7 +1360,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        return collides.stream().toArray(AxisAlignedBB[]::new);
+        return collides.toArray(new AxisAlignedBB[0]);
     }
 
     public boolean hasCollision(Entity entity, AxisAlignedBB bb, boolean entities) {
@@ -1647,11 +1647,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private void addBlockChange(long index, int x, int y, int z) {
-        SoftReference<Map<Short, Object>> current = changedBlocks.computeIfAbsent(index, k -> new SoftReference(new HashMap<>()));
+        SoftReference<Map<Short, Object>> current = changedBlocks.computeIfAbsent(index, k -> new SoftReference<>(new HashMap<>()));
         Map<Short, Object> currentMap = current.get();
         if (currentMap != changeBlocksFullMap && currentMap != null) {
             if (currentMap.size() > MAX_BLOCK_CACHE) {
-                this.changedBlocks.put(index, new SoftReference(changeBlocksFullMap));
+                this.changedBlocks.put(index, new SoftReference<>(changeBlocksFullMap));
             } else {
                 currentMap.put(Level.localBlockHash(x, y, z), changeBlocksPresent);
             }
@@ -2057,7 +2057,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Entity[] getEntities() {
-        return entities.values().stream().toArray(Entity[]::new);
+        return entities.values().toArray(new Entity[0]);
     }
 
     public Entity[] getCollidingEntities(AxisAlignedBB bb) {
@@ -2085,7 +2085,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        return nearby.stream().toArray(Entity[]::new);
+        return nearby.toArray(new Entity[0]);
     }
 
     public Entity[] getNearbyEntities(AxisAlignedBB bb) {
@@ -2110,7 +2110,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        return nearby.stream().toArray(Entity[]::new);
+        return nearby.toArray(new Entity[0]);
     }
 
     public Map<Long, BlockEntity> getBlockEntities() {
@@ -2655,10 +2655,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isSpawnChunk(int X, int Z) {
-        int spawnX = (int) this.provider.getSpawn().getX() >> 3;
-        int spawnZ = (int) this.provider.getSpawn().getZ() >> 3;
+        Vector3 spawn = this.provider.getSpawn();
 
-        return Math.abs(X - spawnX) <= 1 && Math.abs(Z - spawnZ) <= 1;
+        return Math.abs(X - (spawn.getFloorX() >> 4)) <= 1 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 1;
     }
 
     public Position getSafeSpawn() {
@@ -3023,7 +3022,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void sendWeather(Player[] players) {
         if (players == null) {
-            players = this.getPlayers().values().stream().toArray(Player[]::new);
+            players = this.getPlayers().values().toArray(new Player[0]);
         }
 
         LevelEventPacket pk = new LevelEventPacket();
@@ -3057,7 +3056,7 @@ public class Level implements ChunkManager, Metadatable {
         if (players == null) {
             players = this.getPlayers().values();
         }
-        this.sendWeather(players.stream().toArray(Player[]::new));
+        this.sendWeather(players.toArray(new Player[0]));
     }
 
     public int getDimension() {
