@@ -23,6 +23,7 @@ public class BlockSapling extends BlockFlowable {
     public static final int JUNGLE = 3;
     public static final int ACACIA = 4;
     public static final int DARK_OAK = 5;
+    public static final int BIRCH_TALL = 8 | BIRCH;
 
     public BlockSapling() {
         this(0);

@@ -102,14 +102,14 @@ public class Level implements ChunkManager, Metadatable {
     static {
         randomTickBlocks[Block.GRASS] = true;
         randomTickBlocks[Block.FARMLAND] = true;
-        randomTickBlocks[Block.MYCELIUM] = true;
+        //randomTickBlocks[Block.MYCELIUM] = true;
         randomTickBlocks[Block.SAPLING] = true;
         randomTickBlocks[Block.LEAVES] = true;
-        randomTickBlocks[Block.LEAVES2] = true;
-        randomTickBlocks[Block.SNOW_LAYER] = true;
-        randomTickBlocks[Block.ICE] = true;
-        randomTickBlocks[Block.LAVA] = true;
-        randomTickBlocks[Block.STILL_LAVA] = true;
+        //randomTickBlocks[Block.LEAVES2] = true;
+        //randomTickBlocks[Block.SNOW_LAYER] = true;
+        //randomTickBlocks[Block.ICE] = true;
+        //randomTickBlocks[Block.LAVA] = true;
+        //randomTickBlocks[Block.STILL_LAVA] = true;
         randomTickBlocks[Block.CACTUS] = true;
         randomTickBlocks[Block.BEETROOT_BLOCK] = true;
         randomTickBlocks[Block.CARROT_BLOCK] = true;
@@ -118,11 +118,8 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.PUMPKIN_STEM] = true;
         randomTickBlocks[Block.WHEAT_BLOCK] = true;
         randomTickBlocks[Block.SUGARCANE_BLOCK] = true;
-        randomTickBlocks[Block.RED_MUSHROOM] = true;
-        randomTickBlocks[Block.BROWN_MUSHROOM] = true;
         randomTickBlocks[Block.NETHER_WART_BLOCK] = true;
-        randomTickBlocks[Block.FIRE] = true;
-        randomTickBlocks[Block.GLOWING_REDSTONE_ORE] = true;
+        //randomTickBlocks[Block.FIRE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
     }
 
@@ -1463,8 +1460,8 @@ public class Level implements ChunkManager, Metadatable {
         }
         Queue<Long> lightPropagationQueue = new ConcurrentLinkedQueue<>();
         Queue<Object[]> lightRemovalQueue = new ConcurrentLinkedQueue<>();
-        Long2ObjectOpenHashMap<Object> visited = new Long2ObjectOpenHashMap<Object>();
-        Long2ObjectOpenHashMap<Object> removalVisited = new Long2ObjectOpenHashMap<Object>();
+        Long2ObjectOpenHashMap<Object> visited = new Long2ObjectOpenHashMap<>();
+        Long2ObjectOpenHashMap<Object> removalVisited = new Long2ObjectOpenHashMap<>();
 
         Iterator<Map.Entry<Long, Map<Character, Object>>> iter = map.entrySet().iterator();
         while (iter.hasNext() && size-- > 0) {
@@ -1592,7 +1589,7 @@ public class Level implements ChunkManager, Metadatable {
     private Map<Long, Map<Character, Object>> lightQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public void addLightUpdate(int x, int y, int z) {
-        long index = chunkHash((int) x >> 4, (int) z >> 4);
+        long index = chunkHash(x >> 4, z >> 4);
         Map<Character, Object> currentMap = lightQueue.get(index);
         if (currentMap == null) {
             currentMap = new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -1637,7 +1634,7 @@ public class Level implements ChunkManager, Metadatable {
         int cz = z >> 4;
         long index = Level.chunkHash(cx, cz);
         if (direct) {
-            this.sendBlocks(this.getChunkPlayers(cx, cz).values().stream().toArray(Player[]::new), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+            this.sendBlocks(this.getChunkPlayers(cx, cz).values().toArray(new Player[0]), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
         } else {
             addBlockChange(index, x, y, z);
         }
@@ -1657,8 +1654,7 @@ public class Level implements ChunkManager, Metadatable {
                 }
                 block = ev.getBlock();
                 block.onUpdate(BLOCK_UPDATE_NORMAL);
-                Vector3 xyz = new Vector3(x, y, z);
-                this.updateAround(xyz);
+                this.updateAround(x, y, z);
             }
         }
         return true;
@@ -2115,25 +2111,48 @@ public class Level implements ChunkManager, Metadatable {
         return this.getNearbyEntities(bb, null);
     }
 
-    public Entity[] getNearbyEntities(AxisAlignedBB bb, Entity entity) {
-        List<Entity> nearby = new ArrayList<>();
+    private static Entity[] EMPTY_ENTITY_ARR = new Entity[0];
+    private static Entity[] ENTITY_BUFFER = new Entity[512];
 
-        int minX = NukkitMath.floorDouble((bb.minX - 2) / 16);
-        int maxX = NukkitMath.ceilDouble((bb.maxX + 2) / 16);
-        int minZ = NukkitMath.floorDouble((bb.minZ - 2) / 16);
-        int maxZ = NukkitMath.ceilDouble((bb.maxZ + 2) / 16);
+    public Entity[] getNearbyEntities(AxisAlignedBB bb, Entity entity) {
+        int index = 0;
+
+        int minX = NukkitMath.floorDouble((bb.minX - 2) * 0.0625);
+        int maxX = NukkitMath.ceilDouble((bb.maxX + 2) * 0.0625);
+        int minZ = NukkitMath.floorDouble((bb.minZ - 2) * 0.0625);
+        int maxZ = NukkitMath.ceilDouble((bb.maxZ + 2) * 0.0625);
+
+        ArrayList<Entity> overflow = null;
 
         for (int x = minX; x <= maxX; ++x) {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (Entity ent : this.getChunkEntities(x, z).values()) {
                     if (ent != entity && ent.boundingBox.intersectsWith(bb)) {
-                        nearby.add(ent);
+                        if (index < ENTITY_BUFFER.length) {
+                            ENTITY_BUFFER[index] = ent;
+                        } else {
+                            if (overflow == null) overflow = new ArrayList<>(1024);
+                            overflow.add(ent);
+                        }
+                        index++;
                     }
                 }
             }
         }
 
-        return nearby.toArray(new Entity[0]);
+        if (index == 0) return EMPTY_ENTITY_ARR;
+        Entity[] copy;
+        if (overflow == null) {
+            copy = Arrays.copyOfRange(ENTITY_BUFFER, 0, index);
+            Arrays.fill(ENTITY_BUFFER, 0, index, null);
+        } else {
+            copy = new Entity[ENTITY_BUFFER.length + overflow.size()];
+            System.arraycopy(ENTITY_BUFFER, 0, copy, 0, ENTITY_BUFFER.length);
+            for (int i = 0; i < overflow.size(); i++) {
+                copy[ENTITY_BUFFER.length + i] = overflow.get(i);
+            }
+        }
+        return copy;
     }
 
     public Map<Long, BlockEntity> getBlockEntities() {
@@ -2952,7 +2971,7 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                if (toRemove == null) toRemove = new PrimitiveList(long.class);
+                if (toRemove == null) toRemove = new PrimitiveList<>(long.class);
                 toRemove.add(index);
             }
 
@@ -3009,7 +3028,7 @@ public class Level implements ChunkManager, Metadatable {
                         continue;
                     }
                 }
-                if (toUnload == null) toUnload = new PrimitiveList(long.class);
+                if (toUnload == null) toUnload = new PrimitiveList<>(long.class);
                 toUnload.add(index);
             }
 

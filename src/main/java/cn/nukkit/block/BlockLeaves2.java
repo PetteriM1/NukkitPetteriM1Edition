@@ -1,15 +1,15 @@
 package cn.nukkit.block;
 
-/*import cn.nukkit.Server;
-import cn.nukkit.event.block.LeavesDecayEvent;*/
+//import cn.nukkit.Server;
+//import cn.nukkit.event.block.LeavesDecayEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemApple;
 import cn.nukkit.item.ItemBlock;
-/*import cn.nukkit.level.Level;
+//import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.Hash;
-import it.unimi.dsi.fastutil.longs.LongArraySet;
-import it.unimi.dsi.fastutil.longs.LongSet;*/
+//import it.unimi.dsi.fastutil.longs.LongArraySet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 
 /**
  * Created on 2015/12/1 by xtypr.
@@ -58,7 +58,7 @@ public class BlockLeaves2 extends BlockLeaves {
         }
         return new Item[0];
     }
-    /*private Boolean findLog(Block pos, LongSet visited, Integer distance, Integer check) {
+    private Boolean findLog(Block pos, LongSet visited, Integer distance, Integer check) {
         return findLog(pos, visited, distance, check, null);
     }
 
@@ -117,7 +117,8 @@ public class BlockLeaves2 extends BlockLeaves {
         }
         return false;
     }
-    @Override
+
+    /*@Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM && (getDamage() & 0b00001100) == 0x00) {
             setDamage(getDamage() | 0x08);

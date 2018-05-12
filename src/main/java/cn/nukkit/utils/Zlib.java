@@ -33,9 +33,6 @@ public abstract class Zlib {
             default:
                 throw new UnsupportedOperationException("Invalid provider: " + providerIndex);
         }
-        if (providerIndex != 2) {
-            MainLogger.getLogger().warning(" - This Zlib will negatively affect performance");
-        }
         provider = providers[providerIndex];
     }
 
