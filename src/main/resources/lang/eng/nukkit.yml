@@ -58,8 +58,6 @@ timings:
  ignore: []
 
 level-settings:
- #The default format that levels will use when created
- default-format: anvil
  #Automatically change levels tick rate to maintain 20 ticks per second
  auto-tick-rate: true
  #Set minium tick rate
