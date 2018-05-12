@@ -12,6 +12,28 @@ public class ZlibSingleThreadLowMem implements ZlibProvider {
     byte[] buffer = new byte[BUFFER_SIZE];
 
     @Override
+    public synchronized byte[] deflate(byte[][] datas, int level) throws Exception {
+        Deflater deflater = this.deflater;
+        if (deflater == null) throw new IllegalArgumentException("No deflate for level " + level + " !");
+        deflater.reset();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(datas.length);;
+        for (byte[] data : datas) {
+            deflater.setInput(data);
+            while (!deflater.needsInput()) {
+                int i = deflater.deflate(buffer);
+                bos.write(buffer, 0, i);
+            }
+        }
+        deflater.finish();
+        while (!deflater.finished()) {
+            int i = deflater.deflate(buffer);
+            bos.write(buffer, 0, i);
+        }
+        //Deflater::end is called the time when the process exits.
+        return bos.toByteArray();
+    }
+
+    @Override
     synchronized public byte[] deflate(byte[] data, int level) throws Exception {
         deflater.reset();
         deflater.setInput(data);

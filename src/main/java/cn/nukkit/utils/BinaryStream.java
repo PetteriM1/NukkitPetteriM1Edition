@@ -41,10 +41,11 @@ public class BinaryStream {
         this.count = buffer.length;
     }
 
-    public void reset() {
+    public BinaryStream reset() {
         this.buffer = new byte[32];
         this.offset = 0;
         this.count = 0;
+        return this;
     }
 
     public void setBuffer(byte[] buffer) {
@@ -315,7 +316,7 @@ public class BinaryStream {
         this.putVarInt(0); //TODO CanPlaceOn entry count
         this.putVarInt(0); //TODO CanDestroy entry count
     }
-    
+
     public void putSlot2(Item item) {
         if (item == null || item.getId() == 0) {
             this.putVarInt(0);

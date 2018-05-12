@@ -932,8 +932,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int radius = spawned ? this.chunkRadius : (int) Math.ceil(Math.sqrt(spawnThreshold));
         int radiusSqr = radius * radius;
 
-
-
         long index;
         for (int x = 0; x <= radius; x++) {
             int xx = x * x;
@@ -1793,6 +1791,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.loadQueue.isEmpty() || !this.spawned) {
             this.sendNextChunk();
+        }
+
+        if (!this.batchedPackets.isEmpty()) {
+          Player[] pArr = new Player[]{this};
+            Iterator<Entry<Integer, List<DataPacket>>> iter = this.batchedPackets.entrySet().iterator();
+            while (iter.hasNext()) {
+                Entry<Integer, List<DataPacket>> entry = iter.next();
+                List<DataPacket> packets = entry.getValue();
+                DataPacket[] arr = packets.toArray(new DataPacket[packets.size()]);
+                packets.clear();
+                this.server.batchPackets(pArr, arr, false);
+            }
+            this.batchedPackets.clear();
         }
 
     }

@@ -187,7 +187,25 @@ public class Server {
 
     private final Map<Integer, String> identifier = new HashMap<>();
 
-    private final Map<Integer, Level> levels = new HashMap<>();
+    private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
+        public Level put(Integer key, Level value) {
+            Level result = super.put(key, value);
+            levelArray = levels.values().toArray(new Level[levels.size()]);
+            return result;
+        }
+        public boolean remove(Object key, Object value) {
+            boolean result = super.remove(key, value);
+            levelArray = levels.values().toArray(new Level[levels.size()]);
+            return result;
+        }
+        public Level remove(Object key) {
+            Level result = super.remove(key);
+            levelArray = levels.values().toArray(new Level[levels.size()]);
+            return result;
+        }
+    };
+
+    private Level[] levelArray = new Level[0];
 
     private final ServiceManager serviceManager = new NKServiceManager();
 
@@ -677,7 +695,7 @@ public class Server {
 
         this.logger.info("Saving levels...");
 
-        for (Level level : this.levels.values()) {
+        for (Level level : this.levelArray) {
             level.save();
         }
 
@@ -749,7 +767,7 @@ public class Server {
             }
 
             this.getLogger().debug("Unloading all levels...");
-            for (Level level : new ArrayList<>(this.getLevels().values())) {
+            for (Level level : this.levelArray) {
                 this.unloadLevel(level, true);
             }
 
@@ -810,6 +828,8 @@ public class Server {
         }
     }
 
+    private int lastLevelGC;
+
     public void tickProcessor() {
         this.nextTick = System.currentTimeMillis();
         try {
@@ -821,7 +841,23 @@ public class Server {
                     long current = System.currentTimeMillis();
 
                     if (next - 0.1 > current) {
-                        Thread.sleep(next - current - 1, 900000);
+                      long allocated = next - current - 1;
+
+                        { // Instead of wasting time, do something potentially useful
+                            int offset = 0;
+                            for (int i = 0; i < levelArray.length; i++) {
+                                offset = (i + lastLevelGC) % levelArray.length;
+                                Level level = levelArray[offset];
+                                level.doGarbageCollection(allocated - 1);
+                                allocated = next - System.currentTimeMillis();
+                                if (allocated <= 0) break;
+                            }
+                            lastLevelGC = offset + 1;
+                        }
+
+                        if (allocated > 0) {
+                            Thread.sleep(allocated, 900000);
+                        }
                     }
                 } catch (RuntimeException e) {
                     this.getLogger().logException(e);
@@ -941,7 +977,7 @@ public class Server {
         }
 
         //Do level ticks
-        for (Level level : this.getLevels().values()) {
+        for (Level level : this.levelArray) {
             if (level.getTickRate() > this.baseTickRate && --level.tickRateCounter > 0) {
                 continue;
             }
@@ -993,7 +1029,7 @@ public class Server {
                 }
             }
 
-            for (Level level : this.getLevels().values()) {
+            for (Level level : this.levelArray) {
                 level.save();
             }
             Timings.levelSaveTimer.stopTiming();
@@ -1003,6 +1039,7 @@ public class Server {
     private boolean tick() {
         long tickTime = System.currentTimeMillis();
 
+        //TODO
         long sleepTime = tickTime - this.nextTick;
         if (sleepTime < -25) {
             try {
@@ -1066,12 +1103,10 @@ public class Server {
 
         if (this.sendUsageTicker > 0 && --this.sendUsageTicker == 0) {
             this.sendUsageTicker = 6000;
-            //todo sendUsage
         }
 
         if (this.tickCounter % 100 == 0) {
-            for (Level level : this.levels.values()) {
-                level.clearCache();
+            for (Level level : this.levelArray) {
                 level.doChunkGarbageCollection();
             }
         }
@@ -1202,7 +1237,7 @@ public class Server {
 
     public void setAutoSave(boolean autoSave) {
         this.autoSave = autoSave;
-        for (Level level : this.getLevels().values()) {
+        for (Level level : this.levelArray) {
             level.setAutoSave(this.autoSave);
         }
     }
@@ -1578,7 +1613,7 @@ public class Server {
     }
 
     public Level getLevelByName(String name) {
-        for (Level level : this.getLevels().values()) {
+        for (Level level : this.levelArray) {
             if (level.getFolderName().equals(name)) {
                 return level;
             }
