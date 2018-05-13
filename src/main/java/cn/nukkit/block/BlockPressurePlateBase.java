@@ -56,7 +56,7 @@ public abstract class BlockPressurePlateBase extends BlockFlowable {
     }
 
     public boolean isActivated() {
-        return this.meta == 0;
+        return this.getDamage() == 0;
     }
 
     @Override
@@ -162,11 +162,11 @@ public abstract class BlockPressurePlateBase extends BlockFlowable {
     }
 
     public int getRedstonePower() {
-        return this.meta;
+        return this.getDamage();
     }
 
     public void setRedstonePower(int power) {
-        this.meta = power;
+        this.setDamage(power);
     }
 
     protected void playOnSound() {

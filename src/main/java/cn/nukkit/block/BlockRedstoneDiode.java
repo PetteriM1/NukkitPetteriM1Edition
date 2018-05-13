@@ -39,7 +39,7 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
             return false;
         }
 
-        this.meta = player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0;
+        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
         this.level.setBlock(block, this, true, true);
 
         if (shouldBePowered()) {
@@ -111,7 +111,7 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
             return power;
         } else {
             Block block = this.level.getBlock(pos);
-            return Math.max(power, block.getId() == Block.REDSTONE_WIRE ? block.meta : 0);
+            return Math.max(power, block.getId() == Block.REDSTONE_WIRE ? block.getDamage() : 0);
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
 
     protected int getPowerOnSide(Vector3 pos, BlockFace side) {
         Block block = this.level.getBlock(pos);
-        return isAlternateInput(block) ? (block.getId() == Block.REDSTONE_BLOCK ? 15 : (block.getId() == Block.REDSTONE_WIRE ? block.meta : this.level.getStrongPower(pos, side))) : 0;
+        return isAlternateInput(block) ? (block.getId() == Block.REDSTONE_BLOCK ? 15 : (block.getId() == Block.REDSTONE_WIRE ? block.getDamage() : this.level.getStrongPower(pos, side))) : 0;
     }
 
     @Override

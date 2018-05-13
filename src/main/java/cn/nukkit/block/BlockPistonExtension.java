@@ -6,11 +6,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockPistonExtension extends BlockTransparent {
 
     public BlockPistonExtension() {
-        this(0);
-    }
-
-    public BlockPistonExtension(int meta) {
-        super(meta);
     }
 
     @Override

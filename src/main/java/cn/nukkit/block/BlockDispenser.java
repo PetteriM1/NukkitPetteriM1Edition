@@ -1,9 +1,12 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 
-public class BlockDispenser extends BlockSolid {
+/**
+ * Created by CreeperFace on 15.4.2017.
+ */
+public class BlockDispenser extends BlockSolidMeta {
 
     public BlockDispenser() {
         this(0);
@@ -14,8 +17,8 @@ public class BlockDispenser extends BlockSolid {
     }
 
     @Override
-    public int getId() {
-        return DISPENSER;
+    public boolean hasComparatorInputOverride() {
+        return true;
     }
 
     @Override
@@ -24,33 +27,50 @@ public class BlockDispenser extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 3.5;
+    public int getId() {
+        return DISPENSER;
     }
 
     @Override
-    public double getResistance() {
-        return 17.5;
+    public int getComparatorInputOverride() {
+        /*BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if(blockEntity instanceof BlockEntityDispenser) {
+            //return ContainerInventory.calculateRedstone(((BlockEntityDispenser) blockEntity).getInventory()); TODO: dispenser
+        }*/
+
+        return super.getComparatorInputOverride();
     }
 
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockFace getFacing() {
+        return BlockFace.fromIndex(this.getDamage() & 7);
     }
 
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
+    public boolean isTriggered() {
+        return (this.getDamage() & 8) > 0;
+    }
+
+    public void setTriggered(boolean value) {
+        int i = 0;
+        i |= getFacing().getIndex();
+
+        if (value) {
+            i |= 8;
         }
+
+        this.setDamage(i);
     }
 
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    public Vector3 getDispensePosition() {
+        BlockFace facing = getFacing();
+        double x = this.getX() + 0.7 * facing.getXOffset();
+        double y = this.getY() + 0.7 * facing.getYOffset();
+        double z = this.getZ() + 0.7 * facing.getZOffset();
+        return new Vector3(x, y, z);
     }
 }

@@ -11,11 +11,6 @@ import cn.nukkit.level.Level;
 public class BlockOreRedstoneGlowing extends BlockOreRedstone {
 
     public BlockOreRedstoneGlowing() {
-        this(0);
-    }
-
-    public BlockOreRedstoneGlowing(int meta) {
-        super(0);
     }
 
     @Override

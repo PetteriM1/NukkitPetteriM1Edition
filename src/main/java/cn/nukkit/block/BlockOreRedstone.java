@@ -16,11 +16,6 @@ import java.util.Random;
 public class BlockOreRedstone extends BlockSolid {
 
     public BlockOreRedstone() {
-        this(0);
-    }
-
-    public BlockOreRedstone(int meta) {
-        super(0);
     }
 
     @Override

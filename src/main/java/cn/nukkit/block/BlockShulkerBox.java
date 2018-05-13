@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-public class BlockShulkerBox extends BlockSolid {
+public class BlockShulkerBox extends BlockSolidMeta {
 
     public BlockShulkerBox() {
         this(0);

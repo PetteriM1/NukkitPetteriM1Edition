@@ -10,17 +10,22 @@ import cn.nukkit.utils.BlockColor;
 
 public class BlockMagma extends BlockSolid {
 
-    public BlockMagma() {
-        this(0);
-    }
-
-    public BlockMagma(int meta) {
-        super(meta);
+    public BlockMagma(){
     }
 
     @Override
     public int getId() {
         return MAGMA;
+    }
+
+    @Override
+    public String getName() {
+        return "Magma Block";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -30,17 +35,7 @@ public class BlockMagma extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 2.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Magma Block";
+        return 30;
     }
 
     @Override
@@ -60,11 +55,6 @@ public class BlockMagma extends BlockSolid {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
     public void onEntityCollide(Entity entity) {
         if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
             entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.LAVA, 1));
@@ -75,4 +65,10 @@ public class BlockMagma extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.BROWN_BLOCK_COLOR;
     }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
 }

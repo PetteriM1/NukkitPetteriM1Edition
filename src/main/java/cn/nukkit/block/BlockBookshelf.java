@@ -10,12 +10,7 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockBookshelf extends BlockSolid {
 
-    public BlockBookshelf(int meta) {
-        super(meta);
-    }
-
     public BlockBookshelf() {
-        this(0);
     }
 
     @Override

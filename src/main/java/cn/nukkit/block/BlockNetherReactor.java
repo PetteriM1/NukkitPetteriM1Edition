@@ -6,11 +6,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockNetherReactor extends BlockSolid {
 
     public BlockNetherReactor() {
-        this(0);
-    }
-
-    public BlockNetherReactor(int meta) {
-        super(meta);
     }
 
     @Override

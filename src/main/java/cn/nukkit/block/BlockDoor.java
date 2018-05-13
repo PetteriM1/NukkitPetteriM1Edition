@@ -13,7 +13,7 @@ import cn.nukkit.math.BlockFace;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockDoor extends BlockTransparent {
+public abstract class BlockDoor extends BlockTransparentMeta {
 
     protected BlockDoor(int meta) {
         super(meta);
@@ -28,11 +28,6 @@ public abstract class BlockDoor extends BlockTransparent {
     public boolean isSolid() {
         return false;
     }
-
-    /*@Override
-    public boolean canPassThrough() {
-        return true;
-    }*/
 
     private int getFullDamage() {
         int damage = this.getDamage();
@@ -304,7 +299,7 @@ public abstract class BlockDoor extends BlockTransparent {
             return false;
         }
 
-        if (isTop(this.meta)) { //Top
+        if (isTop(this.getDamage())) { //Top
             Block down = this.down();
             if (down.getId() != this.getId()) {
                 return false;
@@ -312,7 +307,7 @@ public abstract class BlockDoor extends BlockTransparent {
 
             this.getLevel().setBlock(down, Block.get(this.getId(), down.getDamage() ^ 0x04), true);
 
-            this.meta ^= 0x04;
+            this.setDamage(this.getDamage() ^ 0x04);
             this.getLevel().setBlock(this, this, true);
         } else { //Down
             Block up = this.up();
@@ -320,7 +315,7 @@ public abstract class BlockDoor extends BlockTransparent {
                 return false;
             }
 
-            this.meta ^= 0x04;
+            this.setDamage(this.getDamage() ^ 0x04);
             this.getLevel().setBlock(this, this, true);
         }
 
@@ -329,7 +324,7 @@ public abstract class BlockDoor extends BlockTransparent {
     }
 
     public boolean isOpen() {
-        return (this.meta & 0x04) > 0;
+        return (this.getDamage() & 0x04) > 0;
     }
 
     public boolean isTop(int meta) {

@@ -10,7 +10,7 @@ import cn.nukkit.math.BlockFace;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockSlab extends BlockSolid {
+public abstract class BlockSlab extends BlockSolidMeta {
 
     protected final int doubleSlab;
 
@@ -21,7 +21,7 @@ public abstract class BlockSlab extends BlockSolid {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        if ((this.meta & 0x08) > 0) {
+        if ((this.getDamage() & 0x08) > 0) {
             return new AxisAlignedBB(
                     this.x,
                     this.y + 0.5,
@@ -59,34 +59,34 @@ public abstract class BlockSlab extends BlockSolid {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.meta &= 0x07;
+        this.setDamage(this.getDamage() & 0x07);
         if (face == BlockFace.DOWN) {
-            if (target instanceof BlockSlab && (target.getDamage() & 0x08) == 0x08 && (target.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(target, Block.get(doubleSlab, this.meta), true);
+            if (target instanceof BlockSlab && (target.getDamage() & 0x08) == 0x08 && (target.getDamage() & 0x07) == (this.getDamage() & 0x07)) {
+                this.getLevel().setBlock(target, Block.get(doubleSlab, this.getDamage()), true);
 
                 return true;
-            } else if (block instanceof BlockSlab && (block.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(block, Block.get(doubleSlab, this.meta), true);
+            } else if (block instanceof BlockSlab && (block.getDamage() & 0x07) == (this.getDamage() & 0x07)) {
+                this.getLevel().setBlock(block, Block.get(doubleSlab, this.getDamage()), true);
 
                 return true;
             } else {
-                this.meta |= 0x08;
+                this.setDamage(this.getDamage() | 0x08);
             }
         } else if (face == BlockFace.UP) {
-            if (target instanceof BlockSlab && (target.getDamage() & 0x08) == 0 && (target.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(target, Block.get(doubleSlab, this.meta), true);
+            if (target instanceof BlockSlab && (target.getDamage() & 0x08) == 0 && (target.getDamage() & 0x07) == (this.getDamage() & 0x07)) {
+                this.getLevel().setBlock(target, Block.get(doubleSlab, this.getDamage()), true);
 
                 return true;
-            } else if (block instanceof BlockSlab && (block.getDamage() & 0x07) == (this.meta & 0x07)) {
-                this.getLevel().setBlock(block, Block.get(doubleSlab, this.meta), true);
+            } else if (block instanceof BlockSlab && (block.getDamage() & 0x07) == (this.getDamage() & 0x07)) {
+                this.getLevel().setBlock(block, Block.get(doubleSlab, this.getDamage()), true);
 
                 return true;
             }
             //TODO: check for collision
         } else {
             if (block instanceof BlockSlab) {
-                if ((block.getDamage() & 0x07) == (this.meta & 0x07)) {
-                    this.getLevel().setBlock(block, Block.get(doubleSlab, this.meta), true);
+                if ((block.getDamage() & 0x07) == (this.getDamage() & 0x07)) {
+                    this.getLevel().setBlock(block, Block.get(doubleSlab, this.getDamage()), true);
 
                     return true;
                 }
@@ -94,12 +94,12 @@ public abstract class BlockSlab extends BlockSolid {
                 return false;
             } else {
                 if (fy > 0.5) {
-                    this.meta |= 0x08;
+                    this.setDamage(this.getDamage() | 0x08);
                 }
             }
         }
 
-        if (block instanceof BlockSlab && (target.getDamage() & 0x07) != (this.meta & 0x07)) {
+        if (block instanceof BlockSlab && (target.getDamage() & 0x07) != (this.getDamage() & 0x07)) {
             return false;
         }
         this.getLevel().setBlock(block, this, true, true);

@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * Created by CreeperFace on 27. 10. 2016.
  */
-public class BlockCocoa extends BlockTransparent {
+public class BlockCocoa extends BlockTransparentMeta {
 
     protected static final AxisAlignedBB[] EAST = new AxisAlignedBB[]{new AxisAlignedBB(0.6875D, 0.4375D, 0.375D, 0.9375D, 0.75D, 0.625D), new AxisAlignedBB(0.5625D, 0.3125D, 0.3125D, 0.9375D, 0.75D, 0.6875D), new AxisAlignedBB(0.5625D, 0.3125D, 0.3125D, 0.9375D, 0.75D, 0.6875D)};
     protected static final AxisAlignedBB[] WEST = new AxisAlignedBB[]{new AxisAlignedBB(0.0625D, 0.4375D, 0.375D, 0.3125D, 0.75D, 0.625D), new AxisAlignedBB(0.0625D, 0.3125D, 0.3125D, 0.4375D, 0.75D, 0.6875D), new AxisAlignedBB(0.0625D, 0.3125D, 0.3125D, 0.4375D, 0.75D, 0.6875D)};
@@ -29,6 +29,11 @@ public class BlockCocoa extends BlockTransparent {
 
     public BlockCocoa(int meta) {
         super(meta);
+    }
+
+    @Override
+    public void setDamage(int meta) {
+        super.setDamage(meta);
     }
 
     @Override
@@ -54,11 +59,12 @@ public class BlockCocoa extends BlockTransparent {
     protected AxisAlignedBB recalculateBoundingBox() {
         AxisAlignedBB[] bbs;
 
-        if (this.meta > 11) {
-            this.meta = 11;
+        int damage = this.getDamage();
+        if (damage > 11) {
+            this.setDamage(damage = 11);
         }
 
-        switch (meta) {
+        switch (getDamage()) {
             case 0:
             case 4:
             case 8:
@@ -84,7 +90,7 @@ public class BlockCocoa extends BlockTransparent {
                 break;
         }
 
-        return bbs[this.meta / 4].getOffsetBoundingBox(x, y, z);
+        return bbs[damage] = bbs[this.getDamage() >> 2];
     }
 
     @Override
@@ -105,7 +111,7 @@ public class BlockCocoa extends BlockTransparent {
                         1,
                 };
 
-                this.meta = faces[face.getIndex()];
+                this.setDamage(faces[face.getIndex()]);
                 this.level.setBlock(block, this, true, true);
                 return true;
             }
@@ -120,7 +126,7 @@ public class BlockCocoa extends BlockTransparent {
                     3, 4, 2, 5, 3, 4, 2, 5, 3, 4, 2, 5
             };
 
-            Block side = this.getSide(BlockFace.fromIndex(faces[this.meta]));
+            Block side = this.getSide(BlockFace.fromIndex(faces[this.getDamage()]));
 
             if (side.getId() != Block.WOOD && side.getDamage() != BlockWood.JUNGLE) {
                 this.getLevel().useBreakOn(this);
@@ -128,9 +134,9 @@ public class BlockCocoa extends BlockTransparent {
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (new Random().nextInt(2) == 1) {
-                if (this.meta / 4 < 2) {
+                if (this.getDamage() / 4 < 2) {
                     BlockCocoa block = (BlockCocoa) this.clone();
-                    block.meta += 4;
+                    block.setDamage(block.getDamage() + 4);
                     BlockGrowEvent ev = new BlockGrowEvent(this, block);
                     Server.getInstance().getPluginManager().callEvent(ev);
 
@@ -157,8 +163,8 @@ public class BlockCocoa extends BlockTransparent {
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
             Block block = this.clone();
-            if (this.meta / 4 < 2) {
-                block.meta += 4;
+            if (this.getDamage() / 4 < 2) {
+                block.setDamage(block.getDamage() + 4);
                 BlockGrowEvent ev = new BlockGrowEvent(this, block);
                 Server.getInstance().getPluginManager().callEvent(ev);
 
@@ -193,7 +199,7 @@ public class BlockCocoa extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (this.meta >= 8) {
+        if (this.getDamage() >= 8) {
             return new Item[]{
                     new ItemDye(3, 3)
             };

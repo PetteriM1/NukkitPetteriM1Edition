@@ -11,7 +11,7 @@ import cn.nukkit.math.BlockFace;
  *
  * @author PikyCZ
  */
-public class BlockEndRod extends BlockTransparent {
+public class BlockEndRod extends BlockTransparentMeta {
 
     public BlockEndRod() {
         this(0);
@@ -70,7 +70,7 @@ public class BlockEndRod extends BlockTransparent {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         int[] faces = {0, 1, 3, 2, 5, 4};
-        this.meta = faces[player != null ? face.getIndex() : 0];
+        this.setDamage(faces[player != null ? face.getIndex() : 0]);
         this.getLevel().setBlock(block, this, true, true);
 
         return true;

@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class BlockEnderChest extends BlockTransparent {
+public class BlockEnderChest extends BlockTransparentMeta {
 
     private Set<Player> viewers = new HashSet<>();
 
@@ -78,7 +78,7 @@ public class BlockEnderChest extends BlockTransparent {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         int[] faces = {2, 5, 3, 4};
-        this.meta = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
 
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag("")

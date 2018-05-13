@@ -6,11 +6,6 @@ import cn.nukkit.utils.BlockColor;
 public class BlockNetherWartBlock extends BlockSolid {
 
     public BlockNetherWartBlock() {
-        this(0);
-    }
-
-    public BlockNetherWartBlock(int meta) {
-        super(meta);
     }
 
     @Override

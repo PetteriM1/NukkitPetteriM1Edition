@@ -6,11 +6,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockBricksRedNether extends BlockNetherBrick {
 
     public BlockBricksRedNether() {
-        this(0);
-    }
-
-    public BlockBricksRedNether(int meta) {
-        super(meta);
     }
 
     @Override
@@ -33,4 +28,5 @@ public class BlockBricksRedNether extends BlockNetherBrick {
             return new Item[0];
         }
     }
+
 }

@@ -6,11 +6,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockDropper extends BlockSolid {
 
     public BlockDropper() {
-        this(0);
-    }
-
-    public BlockDropper(int meta) {
-        super(meta);
     }
 
     @Override

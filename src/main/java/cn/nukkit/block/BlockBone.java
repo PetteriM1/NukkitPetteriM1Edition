@@ -10,11 +10,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockBone extends BlockSolid {
 
     public BlockBone() {
-        this(0);
-    }
-
-    public BlockBone(int meta) {
-        super(meta);
     }
 
     @Override

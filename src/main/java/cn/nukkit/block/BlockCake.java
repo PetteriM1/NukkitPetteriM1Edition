@@ -12,7 +12,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * @author Nukkit Project Team
  */
-public class BlockCake extends BlockTransparent {
+public class BlockCake extends BlockTransparentMeta {
 
     public BlockCake(int meta) {
         super(meta);
@@ -95,8 +95,8 @@ public class BlockCake extends BlockTransparent {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null && player.getFoodData().getLevel() < player.getFoodData().getMaxLevel()) {
-            if (meta <= 0x06) meta++;
-            if (meta >= 0x06) {
+            if (getDamage() <= 0x06) setDamage(getDamage() + 1);
+            if (getDamage() >= 0x06) {
                 getLevel().setBlock(this, new BlockAir(), true);
             } else {
                 Food.getByRelative(this).eatenBy(player);
@@ -113,7 +113,7 @@ public class BlockCake extends BlockTransparent {
     }
 
     public int getComparatorInputOverride() {
-        return (7 - this.meta) * 2;
+        return (7 - this.getDamage()) * 2;
     }
 
     public boolean hasComparatorInputOverride() {

@@ -35,7 +35,6 @@ public class BlockFlowerPot extends BlockFlowable {
             case BROWN_MUSHROOM:
             case CACTUS:
             case SUGARCANE_BLOCK:
-                // TODO: 2016/2/4 case NETHER_WART:
                 return true;
             default:
                 return false;
@@ -113,7 +112,7 @@ public class BlockFlowerPot extends BlockFlowable {
         blockEntity.namedTag.putShort("item", itemID);
         blockEntity.namedTag.putInt("data", itemMeta);
 
-        this.meta = 1;
+        this.setDamage(1);
         this.getLevel().setBlock(this, this, true);
         ((BlockEntityFlowerPot) blockEntity).spawnToAll();
 

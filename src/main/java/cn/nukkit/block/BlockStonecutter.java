@@ -6,11 +6,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockStonecutter extends BlockSolid {
 
     public BlockStonecutter() {
-        this(0);
-    }
-
-    public BlockStonecutter(int meta) {
-        super(meta);
     }
 
     @Override

@@ -15,7 +15,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * Created by Pub4Game on 26.12.2015.
  */
-public class BlockTrapdoor extends BlockTransparent {
+public class BlockTrapdoor extends BlockTransparentMeta {
 
     public BlockTrapdoor() {
         this(0);
@@ -152,10 +152,10 @@ public class BlockTrapdoor extends BlockTransparent {
         int[] faces = {2, 1, 3, 0};
         int faceBit = faces[facing.getHorizontalIndex()];
 
-        this.meta |= faceBit;
+        this.setDamage(this.getDamage() | faceBit);
 
         if (top) {
-            this.meta |= 0x04;
+            this.setDamage(this.getDamage() | 0x04);
         }
 
         this.getLevel().setBlock(block, this, true, true);
@@ -192,13 +192,13 @@ public class BlockTrapdoor extends BlockTransparent {
         }
 
 
-        int sideBit = this.meta & 0x07;
+        int sideBit = this.getDamage() & 0x07;
         boolean open = isOpen();
 
-        this.meta = sideBit;
+        this.setDamage(sideBit);
 
         if (open) {
-            this.meta |= 0x08;
+            this.setDamage(this.getDamage() | 0x08);
         }
 
         this.level.setBlock(this, this, false, false);
@@ -208,14 +208,14 @@ public class BlockTrapdoor extends BlockTransparent {
 
     public BlockFace getFacing() {
         int[] faces = {3, 1, 0, 2};
-        return BlockFace.fromHorizontalIndex(faces[this.meta & 0x03]);
+        return BlockFace.fromHorizontalIndex(faces[this.getDamage() & 0x03]);
     }
 
     public boolean isOpen() {
-        return (this.meta & 0x08) != 0;
+        return (this.getDamage() & 0x08) != 0;
     }
 
     public boolean isTop() {
-        return (this.meta & 0x04) != 0;
+        return (this.getDamage() & 0x04) != 0;
     }
 }

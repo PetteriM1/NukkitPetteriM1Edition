@@ -11,11 +11,6 @@ import cn.nukkit.utils.BlockColor;
 public class BlockGrassPath extends BlockGrass {
 
     public BlockGrassPath() {
-        this(0);
-    }
-
-    public BlockGrassPath(int meta) {
-        super(0);
     }
 
     @Override

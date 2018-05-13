@@ -14,7 +14,7 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/11/23 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockFenceGate extends BlockTransparent {
+public class BlockFenceGate extends BlockTransparentMeta {
 
     public BlockFenceGate() {
         this(0);
@@ -83,7 +83,7 @@ public class BlockFenceGate extends BlockTransparent {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.meta = player != null ? player.getDirection().getHorizontalIndex() : 0;
+        this.setDamage(player != null ? player.getDirection().getHorizontalIndex() : 0);
         this.getLevel().setBlock(block, this, true, true);
 
         return true;
@@ -162,7 +162,7 @@ public class BlockFenceGate extends BlockTransparent {
     }
 
     public boolean isOpen() {
-        return (this.meta & 0x04) > 0;
+        return (this.getDamage() & 0x04) > 0;
     }
 
     @Override

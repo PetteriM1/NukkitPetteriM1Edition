@@ -38,7 +38,7 @@ public class ItemFlintSteel extends ItemTool {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        if (block.getId() == AIR && (target instanceof BlockSolid)) {
+        if (block.getId() == AIR && (target instanceof BlockSolid || target instanceof BlockSolidMeta)) {
             PORTAL:
             if (target.getId() == OBSIDIAN) {
                 final int targX = target.getFloorX();

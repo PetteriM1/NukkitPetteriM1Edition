@@ -12,11 +12,6 @@ import cn.nukkit.utils.BlockColor;
 public class BlockRedstone extends BlockSolid {
 
     public BlockRedstone() {
-        this(0);
-    }
-
-    public BlockRedstone(int meta) {
-        super(0);
     }
 
     @Override

@@ -340,12 +340,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static boolean[] transparent = null;
     public AxisAlignedBB boundingBox = null;
     public AxisAlignedBB collisionBoundingBox = null;
-    protected int meta = 0;
-
+    /**
+    * if a block has can have variants
+    */
     public static boolean[] hasMeta = null;
 
-    protected Block(Integer meta) {
-        this.meta = (meta != null ? meta : 0);
+    protected Block() {
     }
 
     @SuppressWarnings("unchecked")
@@ -608,10 +608,17 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                     Block block;
                     try {
                         block = (Block) c.newInstance();
-                        Constructor constructor = c.getDeclaredConstructor(int.class);
-                        constructor.setAccessible(true);
-                        for (int data = 0; data < 16; ++data) {
-                            fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                        try {
+                            Constructor constructor = c.getDeclaredConstructor(int.class);
+                            constructor.setAccessible(true);
+                            for (int data = 0; data < 16; ++data) {
+                                fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                            }
+                            hasMeta[id] = true;
+                        } catch (NoSuchMethodException ignore) {
+                            for (int data = 0; data < 16; ++data) {
+                                fullList[(id << 4) | data] = block;
+                            }
                         }
                     } catch (Exception e) {
                         Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
@@ -819,12 +826,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     }
 
-    public final int getDamage() {
-        return this.meta;
+    public int getDamage() {
+        return 0;
+    }
+
+    public void setDamage(int meta) {
+        // Do nothing
     }
 
     public final void setDamage(Integer meta) {
-        this.meta = (meta == null ? 0 : meta & 0x0f);
+        setDamage((meta == null ? 0 : meta & 0x0f));
     }
 
     final public void position(Position v) {
@@ -1235,6 +1246,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public Item toItem() {
-        return new ItemBlock(this, this.meta, 1);
+        return new ItemBlock(this, this.getDamage(), 1);
     }
 }

@@ -14,7 +14,7 @@ import cn.nukkit.utils.BlockColor;
  * Created on 2015/12/8 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockLadder extends BlockTransparent {
+public class BlockLadder extends BlockTransparentMeta {
 
     public BlockLadder() {
         this(0);
@@ -69,7 +69,7 @@ public class BlockLadder extends BlockTransparent {
 
         double f = 0.1875;
 
-        if (this.meta == 2) {
+        if (this.getDamage() == 2) {
             return new AxisAlignedBB(
                     this.x,
                     this.y,
@@ -78,7 +78,7 @@ public class BlockLadder extends BlockTransparent {
                     this.y + 1,
                     this.z + 1
             );
-        } else if (this.meta == 3) {
+        } else if (this.getDamage() == 3) {
             return new AxisAlignedBB(
                     this.x,
                     this.y,
@@ -87,7 +87,7 @@ public class BlockLadder extends BlockTransparent {
                     this.y + 1,
                     this.z + f
             );
-        } else if (this.meta == 4) {
+        } else if (this.getDamage() == 4) {
             return new AxisAlignedBB(
                     this.x + 1 - f,
                     this.y,
@@ -96,7 +96,7 @@ public class BlockLadder extends BlockTransparent {
                     this.y + 1,
                     this.z + 1
             );
-        } else if (this.meta == 5) {
+        } else if (this.getDamage() == 5) {
             return new AxisAlignedBB(
                     this.x,
                     this.y,
@@ -118,7 +118,7 @@ public class BlockLadder extends BlockTransparent {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (!target.isTransparent()) {
             if (face.getIndex() >= 2 && face.getIndex() <= 5) {
-                this.meta = face.getIndex();
+                this.setDamage(face.getIndex());
                 this.getLevel().setBlock(block, this, true, true);
                 return true;
             }
@@ -137,7 +137,7 @@ public class BlockLadder extends BlockTransparent {
                     5,
                     4
             };
-            if (!this.getSide(BlockFace.fromIndex(faces[this.meta])).isSolid()) {
+            if (!this.getSide(BlockFace.fromIndex(faces[this.getDamage()])).isSolid()) {
                 this.getLevel().useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             }

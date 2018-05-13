@@ -10,7 +10,7 @@ import cn.nukkit.math.BlockFace;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockStairs extends BlockTransparent {
+public abstract class BlockStairs extends BlockTransparentMeta {
 
     protected BlockStairs(int meta) {
         super(meta);
@@ -47,9 +47,9 @@ public abstract class BlockStairs extends BlockTransparent {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         int[] faces = new int[]{2, 1, 3, 0};
-        this.meta = faces[player != null ? player.getDirection().getHorizontalIndex() : 0];
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
         if ((fy > 0.5 && face != BlockFace.UP) || face == BlockFace.DOWN) {
-            this.meta |= 0x04; //Upside-down stairs
+            this.setDamage(this.getDamage() | 0x04); //Upside-down stairs
         }
         this.getLevel().setBlock(block, this, true, true);
 

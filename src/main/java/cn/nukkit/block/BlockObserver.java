@@ -6,11 +6,6 @@ import cn.nukkit.item.ItemTool;
 public class BlockObserver extends BlockSolid {
 
     public BlockObserver() {
-        this(0);
-    }
-
-    public BlockObserver(int meta) {
-        super(meta);
     }
 
     @Override
