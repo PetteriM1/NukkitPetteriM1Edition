@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.mob.WalkingMonster;
 import cn.nukkit.entity.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -27,8 +26,6 @@ import java.util.List;
 public class EntityCreeper extends WalkingMonster {
 
   public static final int NETWORK_ID = 33;
-
-  public static final int DATA_POWERED = 19;
 
   private int bombTime = 0;
 
@@ -62,24 +59,7 @@ public class EntityCreeper extends WalkingMonster {
   public void initEntity() {
       super.initEntity();
 
-      if (this.namedTag.getBoolean("powered") || this.namedTag.getBoolean("IsPowered")) {
-          this.dataProperties.putBoolean(DATA_POWERED, true);
-      }
       setMaxHealth(20);
-  }
-
-  public boolean isPowered() {
-      return this.getDataPropertyBoolean(DATA_POWERED);
-  }
-
-  public void setPowered() {
-      this.namedTag.putBoolean("powered", true);
-      this.setDataProperty(new ByteEntityData(DATA_POWERED, 1));
-  }
-
-  public void setPowered(boolean powered) {
-      this.namedTag.putBoolean("powered", powered);
-      this.setDataProperty(new ByteEntityData(DATA_POWERED, powered ? 1 : 0));
   }
 
   public int getBombTime() {
@@ -147,6 +127,7 @@ public class EntityCreeper extends WalkingMonster {
               if (target instanceof EntityCreature) {
                   if (bombTime == 0) {
                       this.level.addSound(new TNTPrimeSound(this.add(0, getEyeHeight())));
+                      this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
                   }
                   this.bombTime += tickDiff;
                   if (this.bombTime >= 64) {
@@ -211,8 +192,6 @@ public class EntityCreeper extends WalkingMonster {
   @Override
   public Item[] getDrops() {
       List<Item> drops = new ArrayList<>();
-      if (this.exploded && this.isPowered()) {
-      }
       if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
           int gunPowder = Utils.rand(0, 3);
           for (int i = 0; i < gunPowder; i++) {
