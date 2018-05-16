@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityArrow;
@@ -61,29 +62,31 @@ public class EntitySkeleton extends WalkingMonster {
             double pitch = this.pitch + Utils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = Utils.create("Arrow", pos, this);
-            if (!(k instanceof EntityArrow)) {
-                return;
-            }
+            if(this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
+                Entity k = Utils.create("Arrow", pos, this);
+                if (!(k instanceof EntityArrow)) {
+                    return;
+                }
 
-            EntityArrow arrow = (EntityArrow) k;
-            arrow.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+                EntityArrow arrow = (EntityArrow) k;
+                arrow.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
-            EntityShootBowEvent ev = new EntityShootBowEvent(this, Item.get(Item.ARROW, 0, 1), arrow, f);
-            this.server.getPluginManager().callEvent(ev);
+                EntityShootBowEvent ev = new EntityShootBowEvent(this, Item.get(Item.ARROW, 0, 1), arrow, f);
+                this.server.getPluginManager().callEvent(ev);
 
-            EntityProjectile projectile = ev.getProjectile();
-            if (ev.isCancelled()) {
-                projectile.kill();
-            } else {
-                ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
-                this.server.getPluginManager().callEvent(launch);
-                if (launch.isCancelled()) {
+                EntityProjectile projectile = ev.getProjectile();
+                if (ev.isCancelled()) {
                     projectile.kill();
                 } else {
-                    projectile.spawnToAll();
-                    this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                    ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
+                    this.server.getPluginManager().callEvent(launch);
+                    if (launch.isCancelled()) {
+                        projectile.kill();
+                    } else {
+                        projectile.spawnToAll();
+                        this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                    }
                 }
             }
         }

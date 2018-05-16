@@ -105,7 +105,7 @@ public class EntitySpider extends WalkingMonster {
             double distance = Math.sqrt(Math.pow(this.x - target.x, 2) + Math.pow(this.z - target.z, 2));
             if (distance <= 2) {
                 if (target instanceof EntityCreature) {
-                    if (distance <= this.getWidth() && this.y - target.y > 1) {
+                    if (distance <= this.getWidth() && this.y - target.y > 1 && this.y - target.y < 3) {
                         this.motionY = -this.getGravity() * 4;
                         if (this.attackDelay < 20) {
                             this.motionX = this.getSpeed() * 0.23 * (x / diff);
