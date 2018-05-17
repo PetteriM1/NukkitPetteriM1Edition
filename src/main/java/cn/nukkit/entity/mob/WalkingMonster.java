@@ -5,7 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.entity.WalkingEntity;
 import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -45,7 +45,7 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster {
     }
 
     public int getDamage(Integer difficulty) {
-        return Utils.rand(this.getMinDamage(difficulty), this.getMaxDamage(difficulty));
+        return EntityUtils.rand(this.getMinDamage(difficulty), this.getMaxDamage(difficulty));
     }
 
     public int getMinDamage() {
@@ -185,7 +185,7 @@ public abstract class WalkingMonster extends WalkingEntity implements Monster {
         if (this instanceof EntityEnderman) {
             if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
                 this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-                this.move(Utils.rand(-20, 20), Utils.rand(-20, 20), Utils.rand(-20, 20));
+                this.move(EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20));
             }
         } else {
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isInsideOfWater()) {

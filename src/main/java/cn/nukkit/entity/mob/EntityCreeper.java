@@ -5,7 +5,7 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.WalkingMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.item.Item;
@@ -194,7 +194,7 @@ public class EntityCreeper extends WalkingMonster {
   public Item[] getDrops() {
       List<Item> drops = new ArrayList<>();
       if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-          int gunPowder = Utils.rand(0, 3);
+          int gunPowder = EntityUtils.rand(0, 3);
           for (int i = 0; i < gunPowder; i++) {
               drops.add(Item.get(Item.GUNPOWDER, 0, 1));
           }

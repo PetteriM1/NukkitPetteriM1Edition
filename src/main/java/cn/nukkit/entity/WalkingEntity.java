@@ -1,5 +1,7 @@
 package cn.nukkit.entity;
 
+import cn.nukkit.block.BlockStairs;
+import cn.nukkit.block.BlockSlab;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFence;
 import cn.nukkit.block.BlockFenceGate;
@@ -7,10 +9,9 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.Animal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
-import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
@@ -63,23 +64,23 @@ public abstract class WalkingEntity extends BaseEntity {
 
         int x, z;
         if (this.stayTime > 0) {
-            if (Utils.rand(1, 100) > 5) {
+            if (EntityUtils.rand(1, 100) > 5) {
                 return;
             }
-            x = Utils.rand(10, 30);
-            z = Utils.rand(10, 30);
-            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20, 20) / 10, Utils.rand() ? z : -z);
-        } else if (Utils.rand(1, 410) == 1) {
-            x = Utils.rand(10, 30);
-            z = Utils.rand(10, 30);
-            this.stayTime = Utils.rand(90, 400);
-            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20, 20) / 10, Utils.rand() ? z : -z);
+            x = EntityUtils.rand(10, 30);
+            z = EntityUtils.rand(10, 30);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
+        } else if (EntityUtils.rand(1, 410) == 1) {
+            x = EntityUtils.rand(10, 30);
+            z = EntityUtils.rand(10, 30);
+            this.stayTime = EntityUtils.rand(90, 400);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
-            x = Utils.rand(20, 100);
-            z = Utils.rand(20, 100);
+            x = EntityUtils.rand(20, 100);
+            z = EntityUtils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = Utils.rand(300, 1200);
-            this.target = this.add(Utils.rand() ? x : -x, 0, Utils.rand() ? z : -z);
+            this.moveTime = EntityUtils.rand(300, 1200);
+            this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
         }
     }
 
@@ -102,12 +103,16 @@ public abstract class WalkingEntity extends BaseEntity {
             return false;
         }
 
-        Block block = that.getSide(this.getDirection());
-        if (!block.canPassThrough() && block.getSide(BlockFace.UP).canPassThrough() && that.getSide(BlockFace.UP, 2).canPassThrough()) {
+        Block block = that.getSide(this.getHorizontalFacing());
+        if (!block.canPassThrough() && block.up().canPassThrough() && that.up(2).canPassThrough()) {
             if (block instanceof BlockFence || block instanceof BlockFenceGate) {
                 this.motionY = this.getGravity();
             } else if (this.motionY <= this.getGravity() * 4) {
                 this.motionY = this.getGravity() * 4;
+            } else if (block instanceof BlockSlab && block instanceof BlockStairs) {
+                this.motionY = this.getGravity() * 4;
+            } else if (this.motionY <= (this.getGravity() * 8)) {
+                this.motionY = this.getGravity() * 8;
             } else {
                 this.motionY += this.getGravity() * 0.25;
             }
@@ -142,7 +147,7 @@ public abstract class WalkingEntity extends BaseEntity {
                     if (this.isInsideOfWater()) {
                         this.motionX = this.getSpeed() * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.05 * (z / diff);
-                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0,2.0),Utils.rand(-0.5,0),Utils.rand(-2.0,2.0))));
+                        this.level.addParticle(new BubbleParticle(this.add(EntityUtils.rand(-2.0,2.0),EntityUtils.rand(-0.5,0),EntityUtils.rand(-2.0,2.0))));
                     } else {
                         this.motionX = this.getSpeed() * 0.1 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.1 * (z / diff);
@@ -168,7 +173,7 @@ public abstract class WalkingEntity extends BaseEntity {
                     if (this.isInsideOfWater()) {
                         this.motionX = this.getSpeed() * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.05 * (z / diff);
-                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0,2.0),Utils.rand(-0.5,0),Utils.rand(-2.0,2.0))));
+                        this.level.addParticle(new BubbleParticle(this.add(EntityUtils.rand(-2.0,2.0),EntityUtils.rand(-0.5,0),EntityUtils.rand(-2.0,2.0))));
                     } else {
                         this.motionX = this.getSpeed() * 0.15 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.15 * (z / diff);

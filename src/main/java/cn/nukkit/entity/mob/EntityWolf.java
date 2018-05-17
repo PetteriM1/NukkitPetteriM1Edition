@@ -6,7 +6,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.mob.TameableMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -96,7 +96,7 @@ public class EntityWolf extends TameableMonster {
       if(item.equals(Item.get(Item.BONE))){
           if(!this.hasOwner()) {
               player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
-              if (Utils.rand(0, 3) == 3) {
+              if (EntityUtils.rand(0, 3) == 3) {
                   EntityEventPacket packet = new EntityEventPacket();
                   packet.eid = player.getId();
                   packet.event = EntityEventPacket.TAME_SUCCESS;

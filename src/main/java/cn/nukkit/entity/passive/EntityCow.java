@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.WalkingAnimal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -91,8 +91,8 @@ public class EntityCow extends WalkingAnimal {
       List<Item> drops = new ArrayList<>();
       if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
 
-          int leatherDropCount = Utils.rand(0, 3);
-          int beefDrop = Utils.rand(1, 4);
+          int leatherDropCount = EntityUtils.rand(0, 3);
+          int beefDrop = EntityUtils.rand(1, 4);
 
           for (int i = 0; i < leatherDropCount; i++) {
               drops.add(Item.get(Item.LEATHER, 0, 1));
@@ -106,7 +106,7 @@ public class EntityCow extends WalkingAnimal {
 
   @Override
   public int getKillExperience() {
-      return Utils.rand(1, 4);
+      return EntityUtils.rand(1, 4);
   }
 
   @Override

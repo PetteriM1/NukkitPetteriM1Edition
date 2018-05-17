@@ -205,6 +205,7 @@ public class Normal extends Generator {
                 new OreType(new BlockDirt(), 10, 33, 0, 128),
                 new OreType(new BlockGravel(), 8, 33, 0, 128),
                 new OreType(new BlockClay(), 10, 10, 50, 70),
+                new OreType(new BlockMonsterEgg(), 1, 5, 0, 30),
                 new OreType(new BlockStone(BlockStone.GRANITE), 10, 33, 0, 80),
                 new OreType(new BlockStone(BlockStone.DIORITE), 10, 33, 0, 80),
                 new OreType(new BlockStone(BlockStone.ANDESITE), 10, 33, 0, 80)

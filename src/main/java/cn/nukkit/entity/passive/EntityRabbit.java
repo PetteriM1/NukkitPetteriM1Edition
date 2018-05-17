@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.WalkingAnimal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -74,9 +74,9 @@ public class EntityRabbit extends WalkingAnimal {
         }
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int rabbitHide = Utils.rand(0, 2);
-            int rawRabbit = Utils.rand(0, 2);
-            int rabbitfoot = Utils.rand(0, 101) <= 9 ? 1 : 0;
+            int rabbitHide = EntityUtils.rand(0, 2);
+            int rawRabbit = EntityUtils.rand(0, 2);
+            int rabbitfoot = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;
             for (int i = 0; i < rabbitHide; i++) {
                 drops.add(Item.get(Item.RABBIT_HIDE, 0, 1));
             }
@@ -92,7 +92,7 @@ public class EntityRabbit extends WalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return Utils.rand(1, 4);
+        return EntityUtils.rand(1, 4);
     }
 
     @Override

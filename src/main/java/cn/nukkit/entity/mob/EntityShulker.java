@@ -49,15 +49,15 @@ public class EntityShulker extends WalkingMonster {
 
     @Override
     public void attackEntity(Entity player) {
-    /*if (this.attackDelay > 23 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
+    /*if (this.attackDelay > 23 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
 
             double f = 1.2;
-            double yaw = this.yaw + Utils.rand(-220, 220) / 10;
-            double pitch = this.pitch + Utils.rand(-120, 120) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = Utils.create("ShulkerBullet", pos, this);
+            Entity k = EntityUtils.create("ShulkerBullet", pos, this);
             if (!(k instanceof ShulkerBullet)) {
                 return;
             }

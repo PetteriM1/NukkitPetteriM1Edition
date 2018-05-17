@@ -5,7 +5,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.passive.WalkingAnimal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -101,7 +101,7 @@ public class EntityPig extends WalkingAnimal {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int drop = Utils.rand(1, 4);
+            int drop = EntityUtils.rand(1, 4);
             for (int i = 0; i < drop; i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_PORKCHOP : Item.RAW_PORKCHOP, 0, 1));
             }
@@ -110,7 +110,7 @@ public class EntityPig extends WalkingAnimal {
     }
 
     public int getKillExperience() {
-        return Utils.rand(1, 4);
+        return EntityUtils.rand(1, 4);
     }
 
     public boolean mountEntity(Entity entity) {

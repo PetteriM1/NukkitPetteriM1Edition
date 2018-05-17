@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.FlyingMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -76,15 +76,15 @@ public class EntityWither extends FlyingMonster {
 
     @Override
     public void attackEntity(Entity player) {
-    /*if (this.attackDelay > 5 && Utils.rand(1, 5) < 6 && this.distance(player) <= 100) {
+    /*if (this.attackDelay > 5 && EntityUtils.rand(1, 5) < 6 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 2;
-            double yaw = this.yaw + Utils.rand(-220, 220) / 10;
-            double pitch = this.pitch + Utils.rand(-120, 120) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = Utils.create("BlueWitherSkull", pos, this);
+            Entity k = EntityUtils.create("BlueWitherSkull", pos, this);
             if (!(k instanceof BlueWitherSkull)) {
                 return;
             }
@@ -109,7 +109,7 @@ public class EntityWither extends FlyingMonster {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int netherstar = Utils.rand(0, 101) <= 3 ? 1 : 0;
+            int netherstar = EntityUtils.rand(0, 101) <= 3 ? 1 : 0;
             for (int i = 0; i < netherstar; i++) {
                 drops.add(Item.get(Item.NETHER_STAR, 0, 1));
             }

@@ -3,7 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.passive.WalkingAnimal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -74,7 +74,7 @@ public class EntityPolarBear extends WalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return Utils.rand(1, 3);
+        return EntityUtils.rand(1, 3);
     }
 
     @Override

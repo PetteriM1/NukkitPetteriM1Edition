@@ -5,7 +5,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.item.EntityPotion;
 import cn.nukkit.entity.mob.WalkingMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -77,18 +77,18 @@ public class EntityWitch extends WalkingMonster {
                 if (player.isAlive() && !player.closed) {
 
                     double f = 2;
-                    double yaw = this.yaw + Utils.rand(-220, 220) / 10;
-                    double pitch = this.pitch + Utils.rand(-120, 120) / 10;
+                    double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
+                    double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
                     Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                             this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 
-                    EntityPotion thrownPotion = (EntityPotion) Utils.create("ThrownPotion", pos, this);
+                    EntityPotion thrownPotion = (EntityPotion) EntityUtils.create("ThrownPotion", pos, this);
 
                     if (this.distance(player) <= 8 && !player.hasEffect(Effect.SLOWNESS)) {
                         thrownPotion.potionId = Potion.SLOWNESS;
                     } else if (player.getHealth() >= 8) {
                         thrownPotion.potionId = Potion.POISON;
-                    } else if (this.distance(player) <= 3 && !player.hasEffect(Effect.WEAKNESS) && Utils.rand(0, 4) == 0) {
+                    } else if (this.distance(player) <= 3 && !player.hasEffect(Effect.WEAKNESS) && EntityUtils.rand(0, 4) == 0) {
                         thrownPotion.potionId = Potion.WEAKNESS;
                     } else {
                         thrownPotion.potionId = Potion.HARMING;

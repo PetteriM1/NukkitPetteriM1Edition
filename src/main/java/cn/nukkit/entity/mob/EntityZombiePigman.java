@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.WalkingMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -159,9 +159,9 @@ public class EntityZombiePigman extends WalkingMonster {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int rottenFlesh = Utils.rand(0, 2);
-            int goldNuggets = Utils.rand(0, 101) <= 3 ? 1 : 0;
-            int goldSword = Utils.rand(0, 101) <= 9 ? 1 : 0;
+            int rottenFlesh = EntityUtils.rand(0, 2);
+            int goldNuggets = EntityUtils.rand(0, 101) <= 3 ? 1 : 0;
+            int goldSword = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;
             for (int i=0; i < rottenFlesh; i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }

@@ -9,7 +9,7 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import java.util.*;
 
-public class Utils {
+public class EntityUtils {
 
     private static final Random random = new Random(System.currentTimeMillis());
 

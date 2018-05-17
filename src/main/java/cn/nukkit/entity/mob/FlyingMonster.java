@@ -4,7 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.FlyingEntity;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -41,7 +41,7 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
     }
 
     public int getDamage(Integer difficulty) {
-        return Utils.rand(this.getMinDamage(difficulty), this.getMaxDamage(difficulty));
+        return EntityUtils.rand(this.getMinDamage(difficulty), this.getMaxDamage(difficulty));
     }
 
     public int getMinDamage() {

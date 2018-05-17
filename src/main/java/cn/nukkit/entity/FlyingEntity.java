@@ -3,7 +3,7 @@ package cn.nukkit.entity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.Animal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
@@ -52,39 +52,39 @@ public abstract class FlyingEntity extends BaseEntity {
         int x, y, z;
         int maxY = Math.max(this.getLevel().getHighestBlockAt((int) this.x, (int) this.z) + 15, 120);
         if (this.stayTime > 0) {
-            if (Utils.rand(1, 100) > 5) {
+            if (EntityUtils.rand(1, 100) > 5) {
                 return;
             }
 
-            x = Utils.rand(10, 30);
-            z = Utils.rand(10, 30);
+            x = EntityUtils.rand(10, 30);
+            z = EntityUtils.rand(10, 30);
             if (this.y > maxY) {
-                y = Utils.rand(-12, -4);
+                y = EntityUtils.rand(-12, -4);
             } else {
-                y = Utils.rand(-10, 10);
+                y = EntityUtils.rand(-10, 10);
             }
-            this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
-        } else if (Utils.rand(1, 410) == 1) {
-            x = Utils.rand(10, 30);
-            z = Utils.rand(10, 30);
+            this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
+        } else if (EntityUtils.rand(1, 410) == 1) {
+            x = EntityUtils.rand(10, 30);
+            z = EntityUtils.rand(10, 30);
             if (this.y > maxY) {
-                y = Utils.rand(-12, -4);
+                y = EntityUtils.rand(-12, -4);
             } else {
-                y = Utils.rand(-10, 10);
+                y = EntityUtils.rand(-10, 10);
             }
-            this.stayTime = Utils.rand(90, 400);
-            this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
+            this.stayTime = EntityUtils.rand(90, 400);
+            this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || !(this.target instanceof Vector3)) {
-            x = Utils.rand(20, 100);
-            z = Utils.rand(20, 100);
+            x = EntityUtils.rand(20, 100);
+            z = EntityUtils.rand(20, 100);
             if (this.y > maxY) {
-                y = Utils.rand(-12, -4);
+                y = EntityUtils.rand(-12, -4);
             } else {
-                y = Utils.rand(-10, 10);
+                y = EntityUtils.rand(-10, 10);
             }
             this.stayTime = 0;
-            this.moveTime = Utils.rand(300, 1200);
-            this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
+            this.moveTime = EntityUtils.rand(300, 1200);
+            this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
         }
     }
 

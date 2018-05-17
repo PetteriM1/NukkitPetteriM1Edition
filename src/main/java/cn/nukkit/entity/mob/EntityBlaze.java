@@ -10,7 +10,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.FlyingMonster;
 import cn.nukkit.entity.passive.Animal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.entity.projectile.EntityFireBall;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -103,23 +103,23 @@ public class EntityBlaze extends FlyingMonster {
 
         int x, z;
         if (this.stayTime > 0) {
-            if (Utils.rand(1, 100) > 5) {
+            if (EntityUtils.rand(1, 100) > 5) {
                 return;
             }
-            x = Utils.rand(10, 30);
-            z = Utils.rand(10, 30);
-            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20, 20) / 10, Utils.rand() ? z : -z);
-        } else if (Utils.rand(1, 410) == 1) {
-            x = Utils.rand(10, 30);
-            z = Utils.rand(10, 30);
-            this.stayTime = Utils.rand(90, 400);
-            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20, 20) / 10, Utils.rand() ? z : -z);
+            x = EntityUtils.rand(10, 30);
+            z = EntityUtils.rand(10, 30);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
+        } else if (EntityUtils.rand(1, 410) == 1) {
+            x = EntityUtils.rand(10, 30);
+            z = EntityUtils.rand(10, 30);
+            this.stayTime = EntityUtils.rand(90, 400);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
-            x = Utils.rand(20, 100);
-            z = Utils.rand(20, 100);
+            x = EntityUtils.rand(20, 100);
+            z = EntityUtils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = Utils.rand(300, 1200);
-            this.target = this.add(Utils.rand() ? x : -x, 0, Utils.rand() ? z : -z);
+            this.moveTime = EntityUtils.rand(300, 1200);
+            this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
         }
     }
 
@@ -246,15 +246,15 @@ public class EntityBlaze extends FlyingMonster {
     }
 
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 20 && Utils.rand(1, 32) < 4 && this.distance(player) <= 18) {
+        if (this.attackDelay > 20 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 18) {
             this.attackDelay = 0;
 
             double f = 1.2;
-            double yaw = this.yaw + Utils.rand(-150, 150) / 10;
-            double pitch = this.pitch + Utils.rand(-75, 75) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-150, 150) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-75, 75) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = Utils.create("FireBall", pos, this);
+            Entity k = EntityUtils.create("FireBall", pos, this);
             if (!(k instanceof EntityFireBall)) {
                 return;
             }
@@ -279,8 +279,8 @@ public class EntityBlaze extends FlyingMonster {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int blazeRod = Utils.rand(0, 2);
-            int glowStoneDust = Utils.rand(0, 3);
+            int blazeRod = EntityUtils.rand(0, 2);
+            int glowStoneDust = EntityUtils.rand(0, 3);
             for (int i=0; i < blazeRod; i++) {
                 drops.add(Item.get(Item.BLAZE_ROD, 0, 1));
             }

@@ -6,7 +6,7 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.WalkingMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -246,8 +246,8 @@ public class EntitySpider extends WalkingMonster {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int strings = Utils.rand(0, 3);
-            int spiderEye = Utils.rand(0, 3) == 0 ? 1 : 0;
+            int strings = EntityUtils.rand(0, 3);
+            int spiderEye = EntityUtils.rand(0, 3) == 0 ? 1 : 0;
             for (int i=0; i < strings; i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
             }

@@ -1,6 +1,10 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
+import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.entity.mob.EntitySilverfish;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.EntityEventPacket;
 
 public class BlockMonsterEgg extends BlockSolidMeta {
     public static final int STONE = 0;
@@ -52,11 +56,21 @@ public class BlockMonsterEgg extends BlockSolidMeta {
         return new Item[0];
     }
 
-    /*@Override
+    @Override
     public boolean onBreak(Item item) {
-        if (Server.getPropertyBoolean("silverfish-spawning", true)) {
-            //TODO: Spawn silverfish
+        if (Server.getInstance().getPropertyBoolean("spawn-mobs", true)) {
+            if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && EntityUtils.rand(1, 5) == 1) {
+
+                EntitySilverfish entity = (EntitySilverfish) EntityUtils.create("Silverfish", this.add(0.5, 0, 0.5));
+                if(entity != null){
+                    entity.spawnToAll();
+                    EntityEventPacket pk = new EntityEventPacket();
+                    pk.eid = entity.getId();
+                    pk.event = 27;
+                    entity.getLevel().addChunkPacket(entity.getChunkX() >> 4, entity.getChunkZ() >> 4,pk);
+                }
+            }
         }
         return this.getLevel().setBlock(this, new BlockAir(), true);
-    }*/
+    }
 }

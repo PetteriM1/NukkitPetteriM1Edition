@@ -3,7 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.entity.WalkingEntity;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -54,7 +54,7 @@ public abstract class WalkingAnimal extends WalkingEntity implements Animal {
             this.inLoveTicks -= tickDiff;
             if (this.age % 20 == 0) {
                 for (int i = 0; i < 3; i++) {
-                    this.level.addParticle(new HeartParticle(this.add(Utils.rand(-1.0,1.0),this.getMountedYOffset()+ Utils.rand(-1.0,1.0),Utils.rand(-1.0,1.0))));
+                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0,1.0),this.getMountedYOffset()+ EntityUtils.rand(-1.0,1.0),EntityUtils.rand(-1.0,1.0))));
                 }
             }
         }

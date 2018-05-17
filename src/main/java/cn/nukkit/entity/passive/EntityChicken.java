@@ -3,7 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.WalkingAnimal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -113,19 +113,19 @@ public class EntityChicken extends WalkingAnimal {
   public boolean onInteract(Player player, Item item) {
       if((item.equals(Item.get(Item.SEEDS,0))) && !this.isBaby()){
           player.getInventory().removeItem(Item.get(Item.SEEDS,0,1));
-          this.level.addParticle(new ItemBreakParticle(this.add(Utils.rand(-0.5,0.5),this.getMountedYOffset(),Utils.rand(-0.5,0.5)),Item.get(Item.SEEDS)));
+          this.level.addParticle(new ItemBreakParticle(this.add(EntityUtils.rand(-0.5,0.5),this.getMountedYOffset(),EntityUtils.rand(-0.5,0.5)),Item.get(Item.SEEDS)));
           this.setInLove();
       }else if((item.equals(Item.get(Item.BEETROOT_SEEDS,0))) && !this.isBaby()){
           player.getInventory().removeItem(Item.get(Item.BEETROOT_SEEDS,0,1));
-          this.level.addParticle(new ItemBreakParticle(this.add(Utils.rand(-0.5,0.5),this.getMountedYOffset(),Utils.rand(-0.5,0.5)),Item.get(Item.BEETROOT_SEEDS)));
+          this.level.addParticle(new ItemBreakParticle(this.add(EntityUtils.rand(-0.5,0.5),this.getMountedYOffset(),EntityUtils.rand(-0.5,0.5)),Item.get(Item.BEETROOT_SEEDS)));
           this.setInLove();
       }else if((item.equals(Item.get(Item.MELON_SEEDS,0))) && !this.isBaby()){
           player.getInventory().removeItem(Item.get(Item.MELON_SEEDS,0,1));
-          this.level.addParticle(new ItemBreakParticle(this.add(Utils.rand(-0.5,0.5),this.getMountedYOffset(),Utils.rand(-0.5,0.5)),Item.get(Item.MELON_SEEDS)));
+          this.level.addParticle(new ItemBreakParticle(this.add(EntityUtils.rand(-0.5,0.5),this.getMountedYOffset(),EntityUtils.rand(-0.5,0.5)),Item.get(Item.MELON_SEEDS)));
           this.setInLove();
       }else if((item.equals(Item.get(Item.PUMPKIN_SEEDS,0))) && !this.isBaby()){
           player.getInventory().removeItem(Item.get(Item.PUMPKIN_SEEDS,0,1));
-          this.level.addParticle(new ItemBreakParticle(this.add(Utils.rand(-0.5,0.5),this.getMountedYOffset(),Utils.rand(-0.5,0.5)),Item.get(Item.PUMPKIN_SEEDS)));
+          this.level.addParticle(new ItemBreakParticle(this.add(EntityUtils.rand(-0.5,0.5),this.getMountedYOffset(),EntityUtils.rand(-0.5,0.5)),Item.get(Item.PUMPKIN_SEEDS)));
           this.setInLove();
       }
       return false;
@@ -141,7 +141,7 @@ public class EntityChicken extends WalkingAnimal {
   public Item[] getDrops() {
       List<Item> drops = new ArrayList<>();
       if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-          int featherDrop = Utils.rand(0, 3);
+          int featherDrop = EntityUtils.rand(0, 3);
           for (int i = 0; i < featherDrop; i++) {
               drops.add(Item.get(Item.FEATHER, 0, 1));
           }
@@ -151,7 +151,7 @@ public class EntityChicken extends WalkingAnimal {
   }
 
   public int getRandomEggLayTime(){
-      return Utils.rand(6000,12000);
+      return EntityUtils.rand(6000,12000);
   }
 
   public boolean isChickenJockey() {
@@ -164,7 +164,7 @@ public class EntityChicken extends WalkingAnimal {
 
   @Override
   public int getKillExperience() {
-      return Utils.rand(1, 4);
+      return EntityUtils.rand(1, 4);
   }
 
   @Override

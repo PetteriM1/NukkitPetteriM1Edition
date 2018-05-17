@@ -3,7 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.WalkingMonster;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -105,7 +105,7 @@ public class EntitySlime extends WalkingMonster {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int slimeBalls = Utils.rand(0, 3);
+            int slimeBalls = EntityUtils.rand(0, 3);
             for (int i = 0; i < slimeBalls; i++) {
                 drops.add(Item.get(Item.SLIMEBALL, 0, 1));
             }

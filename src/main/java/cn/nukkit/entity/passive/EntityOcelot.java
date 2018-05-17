@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.WalkingAnimal;
-import cn.nukkit.entity.Utils;
+import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -69,7 +69,7 @@ public class EntityOcelot extends WalkingAnimal {
     }
 
     public int getKillExperience() {
-        return Utils.rand(1, 4);
+        return EntityUtils.rand(1, 4);
     }
 
     @Override
