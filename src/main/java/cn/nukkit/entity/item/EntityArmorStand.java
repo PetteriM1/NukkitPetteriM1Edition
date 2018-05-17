@@ -75,7 +75,7 @@ public class EntityArmorStand extends Entity {
         this.close();
 		this.kill();
 
-		Player[] players = this.getViewers().values().toArray(new Player[0]);
+		Player[] players = this.getLevel().getPlayers().values().toArray(new Player[0]);
 		RemoveEntityPacket pk = new RemoveEntityPacket();
 		pk.eid = this.getId();
 		Server.broadcastPacket(players, pk);
