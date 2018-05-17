@@ -11,8 +11,8 @@ public interface ProtocolInfo {
      */
     int CURRENT_PROTOCOL = Integer.valueOf("261");
 
-    String MINECRAFT_VERSION = "v1.4";
-    String MINECRAFT_VERSION_NETWORK = "1.4";
+    String MINECRAFT_VERSION = "v1.4.0";
+    String MINECRAFT_VERSION_NETWORK = "1.4.0";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
