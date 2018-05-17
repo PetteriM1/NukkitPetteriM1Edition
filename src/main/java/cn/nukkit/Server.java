@@ -214,9 +214,7 @@ public class Server {
     private Thread currentThread;
 
     private Watchdog watchdog;
-
     //private Spawner spawner;
-
     //private Despawner despawner;
 
     Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
@@ -280,7 +278,6 @@ public class Server {
                 put("mob-ai", true);
                 put("entity-auto-spawn-task", true);
                 put("entity-despawn-task", true);
-                put("silverfish-spawning", true);
                 put("language", "eng");
                 put("force-language", false);
                 put("shutdown-message", "§cServer closed");
@@ -2060,6 +2057,8 @@ public class Server {
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         // TODO: 2016/1/30 all finds of minecart
         Entity.registerEntity("Boat", EntityBoat.class);
+
+        Entity.registerEntity("ArmorStand", EntityArmorStand.class);
 
         //Entity.registerEntity("Lightning", EntityLightning.class); lightning shouldn't be saved as entity
     }

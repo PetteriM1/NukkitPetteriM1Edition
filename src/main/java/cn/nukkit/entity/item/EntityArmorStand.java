@@ -12,7 +12,6 @@ import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
-import java.util.Map;
 
 /**
  * Created by PetteriM1

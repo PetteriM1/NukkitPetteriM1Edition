@@ -528,7 +528,7 @@ public class Item implements Cloneable {
     public static final int PRISMARINE_CRYSTALS = 422;
     public static final int RAW_MUTTON = 423;
     public static final int COOKED_MUTTON = 424;
-
+    public static final int ARMOR_STAND = 425;
     public static final int END_CRYSTAL = 426;
     public static final int SPRUCE_DOOR = 427;
     public static final int BIRCH_DOOR = 428;
@@ -789,7 +789,7 @@ public class Item implements Cloneable {
             list[PRISMARINE_CRYSTALS] = ItemPrismarineCrystals.class; //422
             list[RAW_MUTTON] = ItemMuttonRaw.class; //423
             list[COOKED_MUTTON] = ItemMuttonCooked.class; //424
-
+            list[ARMOR_STAND] = ItemArmorStand.class; //425
             list[END_CRYSTAL] = ItemEndCrystal.class; //426
             list[SPRUCE_DOOR] = ItemDoorSpruce.class; //427
             list[BIRCH_DOOR] = ItemDoorBirch.class; //428
