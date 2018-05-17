@@ -43,6 +43,7 @@ public class StartGamePacket extends DataPacket {
     public boolean isTexturePacksRequired = false;
     public RuleData[] ruleDatas = new RuleData[0];
     public boolean bonusChest = false;
+    public boolean hasStartWithMapEnabled = false;
     public boolean trustPlayers = false;
     public int permissionLevel = 1;
     public int gamePublish = 4;
@@ -98,11 +99,12 @@ public class StartGamePacket extends DataPacket {
         }
         this.putBoolean(this.bonusChest);
         this.putBoolean(this.trustPlayers);
+        this.putBoolean(this.hasStartWithMapEnabled);
         this.putVarInt(this.permissionLevel);
         this.putVarInt(this.gamePublish);
         this.putLInt(this.serverChunkTickRange);
         this.putBoolean(this.broadcastToPlatform);
-        this.putUnsignedVarInt(this.platformBroadcastMode);
+        this.putVarInt(this.platformBroadcastMode);
         this.putBoolean(this.xblBroadcastIntent);
         this.putBoolean(this.hasLockedBehaviorPack);
         this.putBoolean(this.hasLockedResourcePack);
