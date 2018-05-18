@@ -75,8 +75,8 @@ public class ClientboundMapItemDataPacket extends DataPacket { //TODO: update to
             this.putUnsignedVarInt(decorators.length);
 
             for (MapDecorator decorator : decorators) {
-                this.putByte(decorator.rotation);
                 this.putByte(decorator.icon);
+                this.putByte(decorator.rotation);
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);

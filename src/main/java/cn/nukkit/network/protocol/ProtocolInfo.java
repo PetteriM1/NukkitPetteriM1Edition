@@ -119,5 +119,10 @@ public interface ProtocolInfo {
     byte SERVER_SETTINGS_RESPONSE_PACKET = 0x67;
     byte SHOW_PROFILE_PACKET = 0x68;
     byte SET_DEFAULT_GAME_TYPE_PACKET = 0x69;
+    byte REMOVE_OBJECTIVE_PACKET = 0x6a;
+    byte SET_DISPLAY_OBJECTIVE_PACKET = 0x6b;
+    byte SET_SCORE_PACKET = 0x6c;
+    byte LAB_TABLE_PACKET = 0x6d;
+    byte UPDATE_BLOCK_SYNCED_PACKET = 0x6e;
     byte BATCH_PACKET = (byte) 0xff;
 }
