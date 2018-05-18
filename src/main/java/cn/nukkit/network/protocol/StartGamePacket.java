@@ -98,8 +98,8 @@ public class StartGamePacket extends DataPacket {
             this.putRuleData(rule);
         }
         this.putBoolean(this.bonusChest);
-        this.putBoolean(this.trustPlayers);
         this.putBoolean(this.hasStartWithMapEnabled);
+        this.putBoolean(this.trustPlayers);
         this.putVarInt(this.permissionLevel);
         this.putVarInt(this.gamePublish);
         this.putLInt(this.serverChunkTickRange);
