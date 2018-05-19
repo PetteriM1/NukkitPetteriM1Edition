@@ -218,7 +218,7 @@ public class Item implements Cloneable {
     public static final int BIRCH_WOODEN_STAIRS = 135;
     public static final int JUNGLE_WOOD_STAIRS = 136;
     public static final int JUNGLE_WOODEN_STAIRS = 136;
-
+    public static final int COMMAND_BLOCK = 137;
     public static final int BEACON = 138;
     public static final int COBBLE_WALL = 139;
     public static final int STONE_WALL = 139;

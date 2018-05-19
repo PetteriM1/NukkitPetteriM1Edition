@@ -211,7 +211,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int BIRCH_WOODEN_STAIRS = 135;
     public static final int JUNGLE_WOOD_STAIRS = 136;
     public static final int JUNGLE_WOODEN_STAIRS = 136;
-
+    public static final int COMMAND_BLOCK = 137;
     public static final int BEACON = 138;
     public static final int COBBLE_WALL = 139;
     public static final int STONE_WALL = 139;
@@ -496,7 +496,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[SPRUCE_WOOD_STAIRS] = BlockStairsSpruce.class; //134
             list[BIRCH_WOOD_STAIRS] = BlockStairsBirch.class; //135
             list[JUNGLE_WOOD_STAIRS] = BlockStairsJungle.class; //136
-
+            list[COMMAND_BLOCK] = BlockCommandBlock.class; //137
             list[BEACON] = BlockBeacon.class; //138
             list[STONE_WALL] = BlockWall.class; //139
             list[FLOWER_POT_BLOCK] = BlockFlowerPot.class; //140
