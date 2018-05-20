@@ -1,5 +1,6 @@
 package cn.nukkit.item;
 
+import cn.nukkit.Server;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
@@ -10,7 +11,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-
 import java.util.Random;
 
 /**
@@ -37,6 +37,10 @@ public class ItemArmorStand extends Item {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
+        if (!Server.getInstance().getPropertyBoolean("spawn-eggs", true)) {
+            player.sendMessage("\u00A7cArmor stands are disabled due to high lag with them");
+            return false;
+        }
         FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
 
         if (chunk == null) {

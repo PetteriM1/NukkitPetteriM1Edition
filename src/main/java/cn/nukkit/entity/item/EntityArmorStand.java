@@ -33,8 +33,8 @@ public class EntityArmorStand extends Entity {
     protected void initEntity() {
         super.initEntity();
 
-		this.setHealth(4);
-        this.setMaxHealth(4);
+		this.setHealth(6);
+        this.setMaxHealth(6);
     }
 
 	@Override
@@ -51,6 +51,8 @@ public class EntityArmorStand extends Entity {
         pk.speedZ = (float) this.motionZ;
 		pk.metadata = new EntityMetadata();
 		player.dataPacket(pk);
+
+		super.spawnTo(player);
 	}
 
 	@Override

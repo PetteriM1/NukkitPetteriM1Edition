@@ -2059,8 +2059,7 @@ public class Server {
         Entity.registerEntity("Boat", EntityBoat.class);
 
         Entity.registerEntity("ArmorStand", EntityArmorStand.class);
-
-        //Entity.registerEntity("Lightning", EntityLightning.class); lightning shouldn't be saved as entity
+        Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
     }
 
     private void registerBlockEntities() {
