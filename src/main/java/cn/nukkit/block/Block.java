@@ -127,7 +127,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int STONE_PRESSURE_PLATE = 70;
     public static final int IRON_DOOR_BLOCK = 71;
     public static final int WOODEN_PRESSURE_PLATE = 72;
-
     public static final int REDSTONE_ORE = 73;
     public static final int GLOWING_REDSTONE_ORE = 74;
     public static final int LIT_REDSTONE_ORE = 74;
@@ -328,7 +327,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int NETHER_REACTOR = 247;
 
     public static final int PISTON_EXTENSION = 250;
-
     public static final int OBSERVER = 251;
 
     public static Class[] list = null;
@@ -520,7 +518,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[WOOD_SLAB] = BlockSlabWood.class; //158
             list[STAINED_TERRACOTTA] = BlockTerracottaStained.class; //159
             list[STAINED_GLASS_PANE] = BlockGlassPaneStained.class; //160
-
             list[LEAVES2] = BlockLeaves2.class; //161
             list[WOOD2] = BlockWood2.class; //162
             list[ACACIA_WOOD_STAIRS] = BlockStairsAcacia.class; //163
@@ -599,7 +596,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
             list[NETHER_REACTOR] = BlockNetherReactor.class; //247
 
             list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
-
             list[OBSERVER] = BlockObserver.class; //251
 
             for (int id = 0; id < 256; id++) {

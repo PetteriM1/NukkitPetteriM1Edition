@@ -38,7 +38,7 @@ public class ItemArmorStand extends Item {
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
         if (!Server.getInstance().getPropertyBoolean("spawn-eggs", true)) {
-            player.sendMessage("\u00A7cArmor stands are disabled due to high lag with them");
+            player.sendMessage("\u00A7cArmor stands are disabled on this server");
             return false;
         }
         FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);

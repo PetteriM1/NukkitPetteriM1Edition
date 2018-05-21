@@ -2458,6 +2458,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.addParticle(new PunchBlockParticle(pos, block, face));
                             }
                             break;
+                        case PlayerActionPacket.ACTION_START_SWIMMING:
+                            setSwimming(true);
+                            break;
+                        case PlayerActionPacket.ACTION_STOP_SWIMMING:
+                            setSwimming(false);
+                            break;
                     }
 
                     this.startAction = -1;

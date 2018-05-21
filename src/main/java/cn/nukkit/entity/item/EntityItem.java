@@ -22,6 +22,7 @@ public class EntityItem extends Entity {
 
     public EntityItem(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true);
     }
 
     @Override
