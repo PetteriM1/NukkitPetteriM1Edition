@@ -741,10 +741,6 @@ public class Server {
         }
 
         try {
-            if (!this.isRunning) {
-                //todo sendUsage
-            }
-
             // clean shutdown of console thread asap
             this.console.shutdown();
 
@@ -802,8 +798,6 @@ public class Server {
         for (BanEntry entry : this.getIPBans().getEntires().values()) {
             this.network.blockAddress(entry.getName(), -1);
         }
-
-        //todo send usage setting
 
         this.tickCounter = 0;
 
@@ -1154,8 +1148,7 @@ public class Server {
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
         double max = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
         String usage = Math.round(used / max * 100) + "%";
-        String title = (char) 0x1b + "]0;" + this.getName() + " " +
-                this.getNukkitVersion() +
+        String title = (char) 0x1b + "]0;Nukkit Server " +
                 " | Online " + this.players.size() + "/" + this.getMaxPlayers() +
                 " | Memory " + usage;
         if (!Nukkit.shortTitle) {

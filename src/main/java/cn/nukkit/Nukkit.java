@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
  */
 public class Nukkit {
 
-    public final static String VERSION = "1.5";
+    public final static String VERSION = "";
     public final static String API_VERSION = "1.0.0";
-    public final static String CODENAME = "PetteriM1 Edition";
+    public final static String CODENAME = "";
     public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
     public final static String MINECRAFT_VERSION_NETWORK = ProtocolInfo.MINECRAFT_VERSION_NETWORK;
 
@@ -106,7 +106,7 @@ public class Nukkit {
             if (!(thread instanceof InterruptibleThread)) {
                 continue;
             }
-            logger.debug("Stopping " + thread.getClass().getSimpleName() + " thread");
+            logger.debug("Stopping " + thread.getClass().getSimpleName() + " thread...");
             if (thread.isAlive()) {
                 thread.interrupt();
             }
