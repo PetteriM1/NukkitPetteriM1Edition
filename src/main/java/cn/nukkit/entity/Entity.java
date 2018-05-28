@@ -1512,6 +1512,17 @@ public abstract class Entity extends Location implements Metadatable {
         return false;
     }
 
+    public boolean isWater() {
+        Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
+
+        if (block instanceof BlockWater) {
+            double f = (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.5);
+            return this.y < f;
+        }
+
+        return false;
+    }
+
     public boolean isInsideOfSolid() {
         double y = this.y + this.getEyeHeight();
         Block block = this.level.getBlock(

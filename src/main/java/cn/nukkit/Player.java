@@ -1443,8 +1443,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
                 if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {
-                    // Some say: I cant move my head when riding because the server
-                    // blocked my movement
+                    // Someone said: I cant move my head when riding because the server blocked my movement
                     if (!this.isSleeping() && this.riding == null) {
                         double diffHorizontalSqr = (diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff));
                         if (diffHorizontalSqr > 0.125) {
@@ -1454,7 +1453,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 revert = ev.isRevert();
 
                                 if (revert) {
-                                    this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));
+                                    //this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidMove", this.getName()));
                                 }
                             }
                         }

@@ -253,7 +253,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int DARK_OAK_WOOD_STAIRS = 164;
     public static final int DARK_OAK_WOODEN_STAIRS = 164;
     public static final int SLIME_BLOCK = 165;
-
+    public static final int GLOW_STICK = 166;
     public static final int IRON_TRAPDOOR = 167;
     public static final int PRISMARINE = 168;
     public static final int SEA_LANTERN = 169;
@@ -263,7 +263,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int COAL_BLOCK = 173;
     public static final int PACKED_ICE = 174;
     public static final int DOUBLE_PLANT = 175;
-
+    public static final int STANDING_BANNER = 176;
+    public static final int WALL_BANNER = 177;
     public static final int DAYLIGHT_DETECTOR_INVERTED = 178;
     public static final int RED_SANDSTONE = 179;
     public static final int RED_SANDSTONE_STAIRS = 180;
@@ -274,7 +275,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int FENCE_GATE_JUNGLE = 185;
     public static final int FENCE_GATE_DARK_OAK = 186;
     public static final int FENCE_GATE_ACACIA = 187;
-
+    public static final int REPEATING_COMMAND_BLOCK = 188;
+    public static final int CHAIN_COMMAND_BLOCK = 189;
+    public static final int HARD_GLASS_PANE = 190;
+    public static final int HARD_STAINED_GLASS_PANE = 191;
+    public static final int CHEMICAL_HEAT = 192;
     public static final int SPRUCE_DOOR_BLOCK = 193;
     public static final int BIRCH_DOOR_BLOCK = 194;
     public static final int JUNGLE_DOOR_BLOCK = 195;
@@ -284,7 +289,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int ITEM_FRAME_BLOCK = 199;
     public static final int CHORUS_FLOWER = 200;
     public static final int PURPUR_BLOCK = 201;
-
+    public static final int COLORED_TORCH_RG = 202;
     public static final int PURPUR_STAIRS = 203;
     public static final int DOUBLE_PURPUR_SLAB = 204;
     public static final int PURPUR_SLAB = 205;
@@ -292,12 +297,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int ICE_FROSTED = 207;
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
-
+    //210-212 not yet in Minecraft
     public static final int MAGMA = 213;
     public static final int BLOCK_NETHER_WART_BLOCK = 214;
     public static final int RED_NETHER_BRICK = 215;
     public static final int BONE_BLOCK = 216;
-
+    //217 not yet in Minecraft
     public static final int SHULKER_BOX = 218;
     public static final int PURPLE_GLAZED_TERRACOTTA = 219;
     public static final int WHITE_GLAZED_TERRACOTTA = 220;
@@ -317,7 +322,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int BLACK_GLAZED_TERRACOTTA = 235;
     public static final int CONCRETE = 236;
     public static final int CONCRETE_POWDER = 237;
-
+    public static final int CHEMISTRY_TABLE = 238;
+    public static final int UNDERWATER_TORCH = 239;
     public static final int CHORUS_PLANT = 240;
     public static final int STAINED_GLASS = 241;
     public static final int PODZOL = 243;
@@ -325,9 +331,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int STONECUTTER = 245;
     public static final int GLOWING_OBSIDIAN = 246;
     public static final int NETHER_REACTOR = 247;
-
+    public static final int INFO_UPDATE = 248;
+    public static final int INFO_UPDATE2 = 248;
     public static final int PISTON_EXTENSION = 250;
     public static final int OBSERVER = 251;
+    public static final int STRUCTURE_BLOCK = 252;
 
     public static Class[] list = null;
     public static Block[] fullList = null;
@@ -597,6 +605,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
             list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
             list[OBSERVER] = BlockObserver.class; //251
+            list[STRUCTURE_BLOCK] = BlockStructureBlock.class; //252
 
             for (int id = 0; id < 256; id++) {
                 Class c = list[id];

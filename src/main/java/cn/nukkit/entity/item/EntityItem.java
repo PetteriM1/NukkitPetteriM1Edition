@@ -134,6 +134,10 @@ public class EntityItem extends Entity {
 
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
+        if (isInsideOfFire()) {
+            this.kill();
+        }
+
         if (this.isAlive()) {
             if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
@@ -150,7 +154,11 @@ public class EntityItem extends Entity {
                 }
             }
 
-            this.motionY -= this.getGravity();
+            if (this.isWater()) {
+                this.motionY -= this.getGravity() * -0.02;
+            } else {
+                this.motionY -= this.getGravity();
+            }
 
             if (this.checkObstruction(this.x, this.y, this.z)) {
                 hasUpdate = true;

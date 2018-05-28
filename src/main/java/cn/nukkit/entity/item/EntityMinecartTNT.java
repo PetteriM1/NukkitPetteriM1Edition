@@ -1,6 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.Server;
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
@@ -64,9 +63,8 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
             fuse -= tickDiff;
 
             if (isAlive() && fuse <= 0) {
-                //if (level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) {
-                    explode(new Random().nextInt(5));
-                //}
+                // Todo: Make gamerule for this
+                explode(new Random().nextInt(5));
                 kill();
             }
         }
