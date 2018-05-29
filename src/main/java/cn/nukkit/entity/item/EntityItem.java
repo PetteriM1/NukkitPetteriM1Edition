@@ -154,7 +154,7 @@ public class EntityItem extends Entity {
                 }
             }
 
-            if (this.isWater()) {
+            if (this.isInsideOfWater()) {
                 this.motionY -= this.getGravity() * -0.02;
             } else {
                 this.motionY -= this.getGravity();

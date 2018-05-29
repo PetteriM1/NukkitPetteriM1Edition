@@ -1,10 +1,14 @@
 package cn.nukkit.entity.projectile;
 
+import cn.nukkit.Server;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.entity.passive.EntityChicken;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.network.protocol.EntityEventPacket;
 
 /**
  * author: MagicDroidX
@@ -59,8 +63,25 @@ public class EntityEgg extends EntityProjectile {
 
         boolean hasUpdate = super.onUpdate(currentTick);
 
-        if (this.age > 1200 || this.isCollided) {
+        if (this.age > 1200) {
             this.kill();
+            hasUpdate = true;
+        } else if (this.isCollided) {
+            this.kill();
+
+            if (Server.getInstance().getPropertyBoolean("spawn-animals", true)) {
+                if (EntityUtils.rand(1, 20) == 5) {
+                    EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 0.5, 0.5));
+                    if(entity != null){
+                        entity.spawnToAll();
+                        EntityEventPacket pk = new EntityEventPacket();
+                        pk.eid = entity.getId();
+                        pk.event = 27;
+                        entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
+                    }
+                }
+            }
+
             hasUpdate = true;
         }
 

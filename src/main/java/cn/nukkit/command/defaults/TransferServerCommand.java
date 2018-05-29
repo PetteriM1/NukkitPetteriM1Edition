@@ -25,7 +25,7 @@ public class TransferServerCommand extends VanillaCommand {
         }
 
         if(!(sender instanceof Player)) {
-            sender.sendMessage("This command must be executed as a player");
+            sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
 
             return false;
         }

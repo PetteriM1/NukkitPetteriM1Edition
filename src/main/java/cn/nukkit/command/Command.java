@@ -250,9 +250,6 @@ public abstract class Command {
     }
 
     public static final CommandData generateDefaultData() {
-        if (defaultDataTemplate == null) {
-            //defaultDataTemplate = new Gson().fromJson(new InputStreamReader(Server.class.getClassLoader().getResourceAsStream("command_default.json")));
-        }
         return defaultDataTemplate.clone();
     }
 

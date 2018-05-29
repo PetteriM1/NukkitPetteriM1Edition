@@ -128,7 +128,11 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
         if (isAlive()) {
 
-            motionY -= getGravity();
+            if (isOnGround()) {
+                this.motionY = getGravity();
+            } else {
+                this.motionY -= getGravity();
+            }
 
             move(motionX, motionY, motionZ);
 

@@ -67,7 +67,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
                     EntityEventPacket pk = new EntityEventPacket();
                     pk.eid = entity.getId();
                     pk.event = 27;
-                    entity.getLevel().addChunkPacket(entity.getChunkX() >> 4, entity.getChunkZ() >> 4,pk);
+                    entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
                 }
             }
         }
