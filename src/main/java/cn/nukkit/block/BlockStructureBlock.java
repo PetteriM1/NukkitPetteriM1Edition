@@ -1,10 +1,10 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
 /**
  * Created by PetteriM1
+ * For SuomiCraft PE
  */
 public class BlockStructureBlock extends BlockSolid {
 
@@ -18,12 +18,12 @@ public class BlockStructureBlock extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return -1;
+        return 2;
     }
 
     @Override
     public double getResistance() {
-        return 18000000;
+        return 30;
     }
 
     @Override
@@ -33,21 +33,6 @@ public class BlockStructureBlock extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Structure Block";
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
-        return false;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
+        return "Protection Block";
     }
 }
