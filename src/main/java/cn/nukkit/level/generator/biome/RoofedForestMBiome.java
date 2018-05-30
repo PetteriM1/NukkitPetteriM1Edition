@@ -28,8 +28,8 @@ public class RoofedForestMBiome extends GrassyBiome {
         this.addPopulator(mushroom);
 
         this.setElevation(63, 127);
-        this.temperature = 0.7f;
-        this.rainfall = 0.8f;
+        this.temperature = 0.7;
+        this.rainfall = 0.8;
     }
 
     @Override

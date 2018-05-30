@@ -10,7 +10,6 @@ public class SmallMountainsBiome extends MountainsBiome {
         super();
 
         this.setElevation(63, 97);
-
     }
 
     @Override

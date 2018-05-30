@@ -12,11 +12,12 @@ public class MushroomIsland extends NormalBiome implements CaveBiome {
 
         MushroomPopulator mushroomPopulator = new MushroomPopulator();
         mushroomPopulator.setBaseAmount(1);
+        mushroomPopulator.setRandomAmount(2);
 
         addPopulator(mushroomPopulator);
         setElevation(60, 70);
-        temperature = 0.9f;
-        rainfall = 1.0f;
+        temperature = 0.9;
+        rainfall = 1;
     }
 
     @Override

@@ -332,7 +332,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int GLOWING_OBSIDIAN = 246;
     public static final int NETHER_REACTOR = 247;
     public static final int INFO_UPDATE = 248;
-    public static final int INFO_UPDATE2 = 248;
+    public static final int INFO_UPDATE2 = 249;
     public static final int PISTON_EXTENSION = 250;
     public static final int OBSERVER = 251;
     public static final int STRUCTURE_BLOCK = 252;
