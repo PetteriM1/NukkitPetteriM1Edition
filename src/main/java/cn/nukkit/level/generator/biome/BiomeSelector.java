@@ -40,6 +40,8 @@ public class BiomeSelector {
             return Biome.ROOFED_FOREST;
         } else if (rainfall < 0.70) {
             return Biome.BIRCH_FOREST;
+        } else if (rainfall < 0.75) {
+            return Biome.PLAINS;
         } else if (rainfall < 0.80) {
             if (temperature < 0.25) {
                 return Biome.TAIGA;
