@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.mob.WalkingMonster;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,7 +24,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityCreeper extends WalkingMonster {
+public class EntityCreeper extends WalkingMonster implements EntityExplosive {
 
   public static final int NETWORK_ID = 33;
 

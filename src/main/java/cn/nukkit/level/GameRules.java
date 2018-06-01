@@ -31,6 +31,7 @@ public class GameRules {
         this.addGameRule("showcoordinates", "true", ValueType.BOOLEAN_VALUE);
         this.addGameRule("pvp", "true", ValueType.BOOLEAN_VALUE);
         this.addGameRule("tntexplodes", "true", ValueType.BOOLEAN_VALUE);
+        this.addGameRule("showDeathMessages", "true", ValueType.BOOLEAN_VALUE);
     }
 
     public void addGameRule(String key, String value, ValueType type) {
