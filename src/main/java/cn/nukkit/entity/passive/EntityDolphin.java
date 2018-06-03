@@ -4,20 +4,18 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDye;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
-import cn.nukkit.utils.DyeColor;
+import java.util.ArrayList;
+import java.util.List;
 
-public class EntitySquid extends SwimmingAnimal {
+public class EntityDolphin extends SwimmingAnimal {
 
-    public static final int NETWORK_ID = 17;
+    public static final int NETWORK_ID = 31;
 
-    public EntitySquid(FullChunk chunk, CompoundTag nbt) {
+    public EntityDolphin(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -28,17 +26,12 @@ public class EntitySquid extends SwimmingAnimal {
 
     @Override
     public float getWidth() {
-        return 0.8f;
+        return 0.9f;
     }
 
     @Override
     public float getHeight() {
-        return 0.8f;
-    }
-
-    @Override
-    public float getEyeHeight() {
-        return 0.7f;
+        return 0.6f;
     }
 
     @Override
@@ -54,30 +47,19 @@ public class EntitySquid extends SwimmingAnimal {
 
     @Override
     public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            return new Item[]{new ItemDye(DyeColor.BLACK.getDyeData())};
-        } else {
-            return new Item[0];
+            int fish = EntityUtils.rand(0, 2);
+            for (int i = 0; i < fish; i++) {
+                drops.add(Item.get(Item.RAW_FISH, 0, 1));
+            }
         }
+        return drops.toArray(new Item[drops.size()]);
     }
 
     @Override
     public int getKillExperience() {
-        return EntityUtils.rand(1, 4);
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        boolean att =  super.attack(source);
-        if(source.isCancelled()){
-            return att;
-        }
-
-        EntityEventPacket pk0 = new EntityEventPacket();
-        pk0.eid = this.getId();
-        pk0.event = EntityEventPacket.SQUID_INK_CLOUD;
-        this.level.addChunkPacket(this.getChunkX() >> 4,this.getChunkZ() >> 4,pk0);
-        return att;
+        return 0;
     }
 
     @Override

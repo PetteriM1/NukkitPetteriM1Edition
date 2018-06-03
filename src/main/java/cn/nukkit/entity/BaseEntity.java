@@ -219,7 +219,7 @@ public abstract class BaseEntity extends EntityCreature {
     @Override
     protected void checkBlockCollision() {
         Vector3 vector = new Vector3(0.0D, 0.0D, 0.0D);
-        Iterator d = this.getBlocksAround().iterator();
+        Iterator<Block> d = this.getBlocksAround().iterator();
 
         inWater = false;
         inLava = false;

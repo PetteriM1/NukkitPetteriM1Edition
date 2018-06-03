@@ -2024,6 +2024,7 @@ public class Server {
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Chicken", EntityChicken.class);
         Entity.registerEntity("Cow", EntityCow.class);
+        Entity.registerEntity("Dolphin", EntityDolphin.class);
         Entity.registerEntity("Donkey", EntityDonkey.class);
         Entity.registerEntity("Horse", EntityHorse.class);
         Entity.registerEntity("Llama", EntityLlama.class);
