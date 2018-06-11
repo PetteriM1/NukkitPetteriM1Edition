@@ -312,6 +312,7 @@ public class Server {
                 put("ticks-per-entity-despawns", 12000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
+                put("nether", true);
             }
         });
 

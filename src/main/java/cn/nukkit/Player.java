@@ -122,6 +122,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean loggedIn = false;
     public int gamemode;
     public long lastBreak;
+    private BlockVector3 lastBreakPosition = new BlockVector3();
 
     protected int windowCnt = 4;
 
@@ -588,7 +589,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.windows = new HashMap<>();
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
-        this.lastBreak = Long.MAX_VALUE;
+        this.lastBreak = -1;
         this.ip = ip;
         this.port = port;
         this.clientID = clientID;
@@ -1376,7 +1377,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             this.inPortalTicks = 0;
         }
-        if (inPortalTicks == 40) {
+        if (inPortalTicks == 40 && Server.getInstance().getPropertyBoolean("nether", true)) {
             Player player = this.getPlayer();
             this.getServer().dispatchCommand(player, "unitp nether"); //This needs plugin called "Universal" and world called "nether"
         }
@@ -2286,7 +2287,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     switch (playerActionPacket.action) {
                         case PlayerActionPacket.ACTION_START_BREAK:
-                            if (this.lastBreak != Long.MAX_VALUE || pos.distanceSquared(this) > 100) {
+                        long currentBreak = System.currentTimeMillis();
+                            BlockVector3 currentBreakPosition = new BlockVector3(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
+                            // HACK: Client spams multiple left clicks so we need to skip them.
+                            if ((lastBreakPosition.equals(currentBreakPosition) && (currentBreak - this.lastBreak) < 10) || pos.distanceSquared(this) > 100) {
                                 break;
                             }
                             Block target = this.level.getBlock(pos);
@@ -2321,12 +2325,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
 
                             this.breakingBlock = target;
-                            this.lastBreak = System.currentTimeMillis();
+                            this.lastBreak = currentBreak;
+                            this.lastBreakPosition = currentBreakPosition;
                             break;
 
                         case PlayerActionPacket.ACTION_ABORT_BREAK:
-                            this.lastBreak = Long.MAX_VALUE;
-                            this.breakingBlock = null;
                         case PlayerActionPacket.ACTION_STOP_BREAK:
                             LevelEventPacket pk = new LevelEventPacket();
                             pk.evid = LevelEventPacket.EVENT_BLOCK_STOP_BREAK;
@@ -2362,7 +2365,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             Position respawnPos = playerRespawnEvent.getRespawnPosition();
 
-                            this.teleport(respawnPos, null);
+                            this.teleport(respawnPos, TeleportCause.UNKNOWN);
 
                             RespawnPacket respawnPacket = new RespawnPacket();
                             respawnPacket.x = (float) respawnPos.x;
