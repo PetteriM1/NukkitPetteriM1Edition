@@ -245,7 +245,7 @@ public final class Timings {
     }
 
     public static Timing getReceiveDataPacketTiming(DataPacket pk) {
-      if (!isTimingsEnabled()) return playerNetworkReceiveTimer;
+        if (!isTimingsEnabled()) return playerNetworkReceiveTimer;
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Receive Packet: " + pk.getClass().getSimpleName(), playerNetworkReceiveTimer);
     }
 
