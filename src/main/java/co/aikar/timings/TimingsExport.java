@@ -75,7 +75,7 @@ public class TimingsExport extends Thread {
         if (!Timings.isPrivacy()) {
             out.addProperty("server", Server.getInstance().getName());
             out.addProperty("motd", Server.getInstance().getMotd());
-            out.addProperty("online-mode", false); //In MCPE we have permanent offline mode.
+            out.addProperty("online-mode", Server.getInstance().getPropertyBoolean("xbox-auth"));
             out.addProperty("icon", ""); //"data:image/png;base64,"
         }
 
@@ -126,14 +126,14 @@ public class TimingsExport extends Thread {
         out.add("plugins", JsonUtil.mapToObject(Server.getInstance().getPluginManager().getPlugins().values(), (plugin) -> {
             JsonObject jsonPlugin = new JsonObject();
             jsonPlugin.addProperty("version", plugin.getDescription().getVersion());
-            jsonPlugin.addProperty("description", plugin.getDescription().getDescription());// Sounds legit
+            jsonPlugin.addProperty("description", plugin.getDescription().getDescription());
             jsonPlugin.addProperty("website", plugin.getDescription().getWebsite());
             jsonPlugin.addProperty("authors", String.join(", ", plugin.getDescription().getAuthors()));
             return new JsonUtil.JSONPair(plugin.getName(), jsonPlugin);
         }));
 
-        //Information on the users Config
-        JsonObject config = new JsonObject();
+        //Information on the users Config (currently unworking)
+        /*JsonObject config = new JsonObject();
         if (!Timings.getIgnoredConfigSections().contains("all")) {
             JsonObject nukkit = JsonUtil.toObject(Server.getInstance().getConfig().getRootSection());
             Timings.getIgnoredConfigSections().forEach(nukkit::remove);
@@ -141,7 +141,7 @@ public class TimingsExport extends Thread {
         } else {
             config.add("nukkit", null);
         }
-        out.add("config", config);
+        out.add("config", config);*/
 
         new TimingsExport(sender, out, history).start();
     }
