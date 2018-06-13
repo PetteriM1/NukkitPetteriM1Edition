@@ -1,8 +1,8 @@
 package cn.nukkit.item;
 
-import cn.nukkit.Server;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.projectile.EntityEgg;
 import cn.nukkit.entity.item.EntityExpBottle;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -56,6 +56,9 @@ public abstract class ProjectileItem extends Item {
                 } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle && !player.getServer().getPropertyBoolean("xp-bottles-on-creative", false)) {
                     projectile.kill();
                     player.sendMessage("\u00A7cXP bottles are disabled on creative");
+                } else if (player.getGamemode() == 1 && projectile instanceof EntityEgg && !player.getServer().getPropertyBoolean("spawn-eggs", false)) {
+                    projectile.kill();
+                    player.sendMessage("\u00A7cEggs are disabled on creative");
                 } else {
                     projectile.spawnToAll();
                     player.getLevel().addSound(new LaunchSound(player), player.getViewers().values());

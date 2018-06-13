@@ -108,7 +108,7 @@ public class Level implements ChunkManager, Metadatable {
         //randomTickBlocks[Block.MYCELIUM] = true;
         randomTickBlocks[Block.SAPLING] = true;
         randomTickBlocks[Block.LEAVES] = true;
-        //randomTickBlocks[Block.LEAVES2] = true;
+        randomTickBlocks[Block.LEAVES2] = true;
         //randomTickBlocks[Block.SNOW_LAYER] = true;
         //randomTickBlocks[Block.ICE] = true;
         //randomTickBlocks[Block.LAVA] = true;
@@ -125,6 +125,9 @@ public class Level implements ChunkManager, Metadatable {
         //randomTickBlocks[Block.FIRE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
     }
+
+    // Disable random block ticking in these worlds if SuomiCraft PE mode is enabled
+    private static final List<String> doNotTickWorlds = Arrays.asList("lobby", "pvp", "parkour", "dropper", "elytra", "plotcreative", "freebuild", "mcbg", "bedwars", "nether"); //TODO config for this
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
 
@@ -1062,7 +1065,9 @@ public class Level implements ChunkManager, Metadatable {
                                     int blockId = fullId >> 4;
                                     if (randomTickBlocks[blockId]) {
                                         Block block = Block.get(fullId, this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
-                                        block.onUpdate(BLOCK_UPDATE_RANDOM);
+                                        if (!doNotTickWorlds.contains(block.getLevel().getName()) || !Server.getInstance().suomiCraftPEMode()) {
+                                            block.onUpdate(BLOCK_UPDATE_RANDOM);
+                                        }
                                     }
                                 }
                             }
@@ -1082,7 +1087,9 @@ public class Level implements ChunkManager, Metadatable {
                                 blockTest |= fullId;
                                 if (randomTickBlocks[blockId]) {
                                     Block block = Block.get(fullId, this, x, y + (Y << 4), z);
-                                    block.onUpdate(BLOCK_UPDATE_RANDOM);
+                                    if (!doNotTickWorlds.contains(block.getLevel().getName()) || !Server.getInstance().suomiCraftPEMode()) {
+                                        block.onUpdate(BLOCK_UPDATE_RANDOM);
+                                    }
                                 }
                             }
                         }

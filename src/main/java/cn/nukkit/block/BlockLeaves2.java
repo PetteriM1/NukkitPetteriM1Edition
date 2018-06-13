@@ -1,14 +1,14 @@
 package cn.nukkit.block;
 
-//import cn.nukkit.Server;
-//import cn.nukkit.event.block.LeavesDecayEvent;
+import cn.nukkit.Server;
+import cn.nukkit.event.block.LeavesDecayEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemApple;
 import cn.nukkit.item.ItemBlock;
-//import cn.nukkit.level.Level;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.Hash;
-//import it.unimi.dsi.fastutil.longs.LongArraySet;
+import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
 /**
@@ -67,7 +67,7 @@ public class BlockLeaves2 extends BlockLeaves {
         long index = Hash.hashBlock((int) pos.x, (int) pos.y, (int) pos.z);
         if (visited.contains(index)) return false;
         if (pos.getId() == Block.WOOD2) return true;
-        if (pos.getId() == Block.LEAVES2 && distance < 4) {
+        if (pos.getId() == Block.LEAVES2 && distance < 6) {
             visited.add(index);
             Integer down = pos.down().getId();
             if (down == Item.WOOD2) {
@@ -118,7 +118,7 @@ public class BlockLeaves2 extends BlockLeaves {
         return false;
     }
 
-    /*@Override
+    @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM && (getDamage() & 0b00001100) == 0x00) {
             setDamage(getDamage() | 0x08);
@@ -140,5 +140,5 @@ public class BlockLeaves2 extends BlockLeaves {
             }
         }
         return 0;
-    }*/
+    }
 }

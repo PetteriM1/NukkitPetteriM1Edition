@@ -136,7 +136,7 @@ public class BlockLeaves extends BlockTransparentMeta {
         long index = Hash.hashBlock((int) pos.x, (int) pos.y, (int) pos.z);
         if (visited.contains(index)) return false;
         if (pos.getId() == Block.WOOD) return true;
-        if (pos.getId() == Block.LEAVES && distance < 4) {
+        if (pos.getId() == Block.LEAVES && distance < 6) {
             visited.add(index);
             Integer down = pos.down().getId();
             if (down == Item.WOOD) {

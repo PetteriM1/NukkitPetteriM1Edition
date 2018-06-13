@@ -1,6 +1,5 @@
 package cn.nukkit;
 
-import cn.nukkit.event.Listener;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.GlobalBlockPalette;
 import cn.nukkit.blockentity.*;
@@ -312,7 +311,8 @@ public class Server {
                 put("ticks-per-entity-despawns", 12000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
-                put("nether", true);
+                put("nether", false);
+                put("suomicraft-mode", false);
             }
         });
 
@@ -2078,6 +2078,10 @@ public class Server {
 
     public static Server getInstance() {
         return instance;
+    }
+
+    public boolean suomiCraftPEMode() {
+        return this.getPropertyBoolean("suomicraft-mode", false);
     }
 
 }
