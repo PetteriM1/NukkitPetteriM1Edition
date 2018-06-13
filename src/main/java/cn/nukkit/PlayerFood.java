@@ -144,7 +144,6 @@ public class PlayerFood {
                     if (this.getPlayer().getHealth() < this.getPlayer().getMaxHealth()) {
                         EntityRegainHealthEvent ev = new EntityRegainHealthEvent(this.getPlayer(), 1, EntityRegainHealthEvent.CAUSE_EATING);
                         this.getPlayer().heal(ev);
-                        //this.updateFoodExpLevel(3);
                     }
                     this.foodTickTimer = 0;
                 }
@@ -181,18 +180,10 @@ public class PlayerFood {
         }
     }
 
-    /**
-     * @deprecated use {@link #setLevel(int)} instead
-     **/
-    @Deprecated
     public void setFoodLevel(int foodLevel) {
         setLevel(foodLevel);
     }
 
-    /**
-     * @deprecated use {@link #setLevel(int, float)} instead
-     **/
-    @Deprecated
     public void setFoodLevel(int foodLevel, float saturationLevel) {
         setLevel(foodLevel, saturationLevel);
     }

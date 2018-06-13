@@ -8,7 +8,6 @@ import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.network.protocol.*;
 
 import java.awt.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * DummyBossBar

@@ -26,7 +26,7 @@ public class ResourcePackManager {
             try {
                 ResourcePack resourcePack = null;
 
-                if (!pack.isDirectory()) { //directory resource packs temporarily unsupported
+                if (!pack.isDirectory()) {
                     switch (Files.getFileExtension(pack.getName())) {
                         case "zip":
                         case "mcpack":

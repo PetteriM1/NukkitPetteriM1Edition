@@ -33,9 +33,8 @@ public class Watchdog extends Thread {
                 if (diff > time) {
                     if (responding) {
                         MainLogger logger = this.server.getLogger();
-                        logger.emergency("--------- Server stopped responding --------- (" + (diff / 1000d) + "s)");
-                        logger.emergency("Please report this to Nukkit:");
-                        logger.emergency(" - https://github.com/NukkitX/Nukkit/issues/new");
+                        logger.emergency("--------- Server stopped responding ---------");
+                        logger.emergency(diff / 1000d + "s");
                         logger.emergency("---------------- Main thread ----------------");
 
                         dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger);
@@ -65,7 +64,7 @@ public class Watchdog extends Thread {
     private static void dumpThread(ThreadInfo thread, Logger logger) {
         logger.emergency("Current Thread: " + thread.getThreadName());
         logger.emergency("\tPID: " + thread.getThreadId() + " | Suspended: " + thread.isSuspended() + " | Native: " + thread.isInNative() + " | State: " + thread.getThreadState());
-        // Monitors
+
         if (thread.getLockedMonitors().length != 0) {
             logger.emergency("\tThread is waiting on monitor(s):");
             for (MonitorInfo monitor : thread.getLockedMonitors()) {

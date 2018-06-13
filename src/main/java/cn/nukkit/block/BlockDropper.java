@@ -3,9 +3,14 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-public class BlockDropper extends BlockSolid {
+public class BlockDropper extends BlockSolidMeta {
 
     public BlockDropper() {
+        this(0);
+    }
+
+    public BlockDropper(int meta) {
+        super(meta);
     }
 
     @Override
