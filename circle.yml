@@ -1,7 +1,6 @@
 checkout:
   post:
-    - mvn clean
-    - mvn package
+    - mvn clean package
     - cp -R ./target/Nukkit-SuomiCraftPE.jar $CIRCLE_ARTIFACTS
 
 machine:

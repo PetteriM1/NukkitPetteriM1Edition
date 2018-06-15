@@ -213,8 +213,8 @@ public class Server {
     private Thread currentThread;
 
     private Watchdog watchdog;
+
     //private Spawner spawner;
-    //private Despawner despawner;
 
     Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -307,8 +307,8 @@ public class Server {
                 put("chunk-generation-queue-size", 8);
                 put("chunk-generation-population-queue-size", 8);
                 put("ticks-per-autosave", 6000);
-                put("ticks-per-entity-spawns", 300);
-                put("ticks-per-entity-despawns", 12000);
+                put("ticks-per-entity-spawns", 200);
+                put("ticks-per-entity-despawns", 8000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
                 put("nether", false);
@@ -487,13 +487,8 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            //this.spawner = new Spawner(this, this.getPropertyInt("ticks-per-entity-spawns", 300));
+            //this.spawner = new Spawner(this, this.getPropertyInt("ticks-per-entity-spawns", 200));
             //this.spawner.start();
-        }
-
-        if (this.getPropertyBoolean("entity-despawn-task", true)) {
-            //this.despawner = new Despawner(this, this.getPropertyInt("ticks-per-entity-despawns", 12000));
-            //this.despawner.start();
         }
 
         this.start();

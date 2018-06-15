@@ -1,6 +1,7 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
@@ -256,6 +257,11 @@ public abstract class BaseEntity extends EntityCreature {
     public boolean entityBaseTick(int tickDiff) {
 
         Timings.entityBaseTickTimer.startTiming();
+
+        if (Server.getInstance().getPropertyBoolean("entity-despawn-task", true) && this.age > Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 8000)) {
+            this.close();
+            return true;
+        }
 
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, !this.isInsideOfWater());
 
