@@ -205,7 +205,7 @@ public class CraftingManager {
     }
 
     private static int getFullItemHash(Item item) {
-        return getItemHash(item) | item.getCount() << 16;
+        return getItemHash(item) + item.getCount() << 10;
     }
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe) {
@@ -218,12 +218,16 @@ public class CraftingManager {
     }
 
     private static int getItemHash(int id, int meta) {
-        return (id << 2) | meta;
+        return id + (meta << 8);
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
         int resultHash = getItemHash(recipe.getResult());
-        Map<UUID, ShapedRecipe> map = shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+        Map<UUID, ShapedRecipe> map = shapedRecipes.get(resultHash);
+        if (map == null) {
+            map = new HashMap<>();
+            shapedRecipes.put(resultHash, map);
+        }
         map.put(getMultiItemHash(recipe.getIngredientList()), recipe);
     }
 
