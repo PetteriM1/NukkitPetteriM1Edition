@@ -2365,7 +2365,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             Position respawnPos = playerRespawnEvent.getRespawnPosition();
 
-                            this.teleport(respawnPos, TeleportCause.UNKNOWN);
+                            this.teleport(respawnPos, null);
 
                             RespawnPacket respawnPacket = new RespawnPacket();
                             respawnPacket.x = (float) respawnPos.x;
@@ -3718,6 +3718,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.x = (float) pos.x;
         pk.y = (float) pos.y;
         pk.z = (float) pos.z;
+
+        //Hack to fix chunk loading when respawning
+        if (this.level != pos.level) {
+            this.teleportImmediate(new Location(pos.x, -100, pos.z, pos.level), null);
+            this.teleportImmediate(new Location(pos.x, pos.y, pos.z, pos.level), null);
+        }
 
         this.dataPacket(pk);
     }

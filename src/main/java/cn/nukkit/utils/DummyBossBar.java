@@ -1,11 +1,13 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.network.protocol.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import java.awt.*;
 
@@ -43,7 +45,11 @@ public class DummyBossBar {
 
         public Builder(Player player) {
             this.player = player;
-            this.bossBarId = 1095216660480L; //This is hack to get one thing work, if you have problems with boss bar or you need more than one use original code: this.bossBarId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
+            if (Server.getInstance().suomiCraftPEMode()) {
+                this.bossBarId = 1095216660480L; //This is hack to get one thing work
+            } else {
+                this.bossBarId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
+            }
         }
 
         public Builder text(String text) {
