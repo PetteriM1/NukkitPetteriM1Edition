@@ -2136,7 +2136,7 @@ public class Level implements ChunkManager, Metadatable {
 
         for (int x = minX; x <= maxX; ++x) {
             for (int z = minZ; z <= maxZ; ++z) {
-                for (Entity ent : this.getChunkEntities(x, z).values()) {
+                for (Entity ent : this.getChunkEntities(x, z, false).values()) {
                     if (ent != entity && ent.boundingBox.intersectsWith(bb)) {
                         if (index < ENTITY_BUFFER.length) {
                             ENTITY_BUFFER[index] = ent;
@@ -2192,8 +2192,12 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Map<Long, Entity> getChunkEntities(int X, int Z) {
-        FullChunk chunk;
-        return (chunk = this.getChunk(X, Z)) != null ? chunk.getEntities() : Collections.emptyMap();
+        return getChunkEntities(X, Z, true);
+    }
+
+    public Map<Long, Entity> getChunkEntities(int X, int Z, boolean loadChunks) {
+        FullChunk chunk = loadChunks ? this.getChunk(X, Z) : this.getChunkIfLoaded(X, Z);
+        return chunk != null ? chunk.getEntities() : Collections.emptyMap();
     }
 
     public Map<Long, BlockEntity> getChunkBlockEntities(int X, int Z) {
@@ -2297,6 +2301,11 @@ public class Level implements ChunkManager, Metadatable {
             chunk = this.forceLoadChunk(index, chunkX, chunkZ, create);
         }
         return chunk;
+    }
+
+    public BaseFullChunk getChunkIfLoaded(int chunkX, int chunkZ) {
+        long index = Level.chunkHash(chunkX, chunkZ);
+        return this.provider.getLoadedChunk(index);
     }
 
     public void generateChunkCallback(int x, int z, BaseFullChunk chunk) {
