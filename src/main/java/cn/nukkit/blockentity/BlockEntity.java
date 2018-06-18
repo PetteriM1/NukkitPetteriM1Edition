@@ -38,6 +38,7 @@ public abstract class BlockEntity extends Position {
     public static final String HOPPER = "Hopper";
     public static final String BED = "Bed";
     public static final String JUKEBOX = "Jukebox";
+    public static final String SHULKER_BOX = "ShulkerBox";
 
 
     public static long count = 1;
@@ -76,11 +77,11 @@ public abstract class BlockEntity extends Position {
         this.movable = this.namedTag.getBoolean("isMovable");
 
         this.initBlockEntity();
-        
+
         this.chunk.addBlockEntity(this);
-        this.getLevel().addBlockEntity(this);  
+        this.getLevel().addBlockEntity(this);
     }
-    
+
     protected void initBlockEntity() {
 
     }

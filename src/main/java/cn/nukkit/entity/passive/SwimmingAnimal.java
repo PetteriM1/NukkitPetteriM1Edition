@@ -2,14 +2,14 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.entity.WalkingEntity;
+import cn.nukkit.entity.SwimmingEntity;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import co.aikar.timings.Timings;
 
-public abstract class SwimmingAnimal extends WalkingEntity implements Animal {
+public abstract class SwimmingAnimal extends SwimmingEntity implements Animal {
 
     protected int inLoveTicks = 0;
     protected int spawnBabyDelay = 0;

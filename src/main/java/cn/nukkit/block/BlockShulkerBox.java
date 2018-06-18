@@ -1,9 +1,17 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.Tag;
+import java.util.Map;
 
-public class BlockShulkerBox extends BlockSolidMeta {
+public class BlockShulkerBox extends BlockTransparentMeta {
 
     public BlockShulkerBox() {
         this(0);
@@ -11,6 +19,11 @@ public class BlockShulkerBox extends BlockSolidMeta {
 
     public BlockShulkerBox(int meta) {
         super(meta);
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -50,7 +63,95 @@ public class BlockShulkerBox extends BlockSolidMeta {
     }
 
     @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        BlockEntityShulkerBox box = null;
+
+        for (int side = 2; side <= 5; ++side) {
+            if ((this.getDamage() == 4 || this.getDamage() == 5) && (side == 4 || side == 5)) {
+                continue;
+            } else if ((this.getDamage() == 3 || this.getDamage() == 2) && (side == 2 || side == 3)) {
+                continue;
+            }
+            Block c = this.getSide(BlockFace.fromIndex(side));
+            if (c instanceof BlockShulkerBox && c.getDamage() == this.getDamage()) {
+                BlockEntity blockEntity = this.getLevel().getBlockEntity(c);
+                if (blockEntity instanceof BlockEntityShulkerBox && !((BlockEntityShulkerBox) blockEntity).isPaired()) {
+                    box = (BlockEntityShulkerBox) blockEntity;
+                    break;
+                }
+            }
+        }
+
+        this.getLevel().setBlock(block, this, true, true);
+        CompoundTag nbt = new CompoundTag("")
+                .putList(new ListTag<>("Items"))
+                .putString("id", BlockEntity.SHULKER_BOX)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+
+        if (item.hasCustomName()) {
+            nbt.putString("CustomName", item.getCustomName());
+        }
+
+        if (item.hasCustomBlockData()) {
+            Map<String, Tag> customData = item.getCustomBlockData().getTags();
+            for (Map.Entry<String, Tag> tag : customData.entrySet()) {
+                nbt.put(tag.getKey(), tag.getValue());
+            }
+        }
+
+        BlockEntity blockEntity = new BlockEntityShulkerBox(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+
+        if (box != null) {
+            box.pairWith(((BlockEntityShulkerBox) blockEntity));
+            ((BlockEntityShulkerBox) blockEntity).pairWith(box);
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        BlockEntity t = this.getLevel().getBlockEntity(this);
+        if (t instanceof BlockEntityShulkerBox) {
+            ((BlockEntityShulkerBox) t).unpair();
+        }
+        this.getLevel().setBlock(this, new BlockAir(), true, true);
+
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            Block top = up();
+            if (!top.isTransparent()) {
+                return true;
+            }
+
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            BlockEntityShulkerBox box;
+            if (t instanceof BlockEntityShulkerBox) {
+                box = (BlockEntityShulkerBox) t;
+            } else {
+                CompoundTag nbt = new CompoundTag("")
+                        .putList(new ListTag<>("Items"))
+                        .putString("id", BlockEntity.SHULKER_BOX)
+                        .putInt("x", (int) this.x)
+                        .putInt("y", (int) this.y)
+                        .putInt("z", (int) this.z);
+                box = new BlockEntityShulkerBox(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+            }
+
+            player.addWindow(box.getInventory());
+        }
+
+        return true;
     }
 }

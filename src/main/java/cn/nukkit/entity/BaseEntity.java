@@ -258,7 +258,7 @@ public abstract class BaseEntity extends EntityCreature {
 
         Timings.entityBaseTickTimer.startTiming();
 
-        if (Server.getInstance().getPropertyBoolean("entity-despawn-task", true) && this.age > Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 8000)) {
+        if (Server.getInstance().getPropertyBoolean("entity-despawn-task", true) && this.age > Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000)) {
             this.close();
             return true;
         }
