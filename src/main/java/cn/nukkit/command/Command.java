@@ -2,10 +2,7 @@ package cn.nukkit.command;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.command.data.CommandData;
-import cn.nukkit.command.data.CommandDataVersions;
-import cn.nukkit.command.data.CommandOverload;
-import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.command.data.*;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.permission.Permissible;
@@ -13,9 +10,7 @@ import cn.nukkit.utils.TextFormat;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * author: MagicDroidX
@@ -113,9 +108,7 @@ public abstract class Command {
         }
 
         CommandData customData = this.commandData.clone();
-        customData.aliases = this.getAliases();
         customData.description = player.getServer().getLanguage().translateString(this.getDescription());
-        customData.permission = player.hasPermission(this.getPermission()) ? "any" : "false";
         this.commandParameters.forEach((key, par) -> {
             CommandOverload overload = new CommandOverload();
             overload.input.parameters = par;

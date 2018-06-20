@@ -720,6 +720,20 @@ public class Server {
         Timings.reset();
     }
 
+    public void reloadPlugins() {
+        this.logger.info("Reloading plugins...");
+
+        this.pluginManager.disablePlugins();
+        this.pluginManager.clearPlugins();
+        this.commandMap.clearCommands();
+
+        this.pluginManager.registerInterface(JavaPluginLoader.class);
+        this.pluginManager.loadPlugins(this.pluginPath);
+        this.enablePlugins(PluginLoadOrder.STARTUP);
+        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        Timings.reset();
+    }
+
     public void shutdown() {
         if (this.watchdog != null) {
             this.watchdog.kill();
