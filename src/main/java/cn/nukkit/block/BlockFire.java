@@ -98,12 +98,6 @@ public class BlockFire extends BlockFlowable {
 
             ThreadLocalRandom random = ThreadLocalRandom.current();
 
-            //TODO: END
-
-            if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
-                this.getLevel().setBlock(this, new BlockAir(), true);
-            }
-
             if (!forever && this.getLevel().isRaining() &&
                     (this.getLevel().canBlockSeeSky(this) ||
                             this.getLevel().canBlockSeeSky(this.east()) ||

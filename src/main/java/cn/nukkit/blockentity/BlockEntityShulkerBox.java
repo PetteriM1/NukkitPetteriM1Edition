@@ -5,7 +5,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.inventory.BaseInventory;
 import cn.nukkit.inventory.ShulkerBoxInventory;
-import cn.nukkit.inventory.DoubleChestInventory;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -20,8 +19,6 @@ import java.util.HashSet;
 public class BlockEntityShulkerBox extends BlockEntitySpawnable implements InventoryHolder, BlockEntityContainer, BlockEntityNameable {
 
     protected final ShulkerBoxInventory inventory;
-
-    protected DoubleChestInventory doubleInventory = null;
 
     public BlockEntityShulkerBox(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -111,11 +108,9 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
     @Override
     public BaseInventory getInventory() {
-        if (this.doubleInventory == null && this.isPaired()) {
-            this.checkPairing();
-        }
+        this.checkPairing();
 
-        return this.doubleInventory != null ? this.doubleInventory : this.inventory;
+        return this.inventory;
     }
 
     public ShulkerBoxInventory getRealInventory() {
@@ -130,7 +125,6 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
                 pair.checkPairing();
             }
 
-            this.doubleInventory = null;
             this.namedTag.remove("pairx");
             this.namedTag.remove("pairz");
         }
