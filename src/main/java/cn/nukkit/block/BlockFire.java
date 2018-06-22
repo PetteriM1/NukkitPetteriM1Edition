@@ -94,9 +94,16 @@ public class BlockFire extends BlockFlowable {
 
             return Level.BLOCK_UPDATE_NORMAL;
         } else if (type == Level.BLOCK_UPDATE_SCHEDULED && this.level.gameRules.getBoolean("doFireTick")) {
+            if (Server.getInstance().suomiCraftPEMode()) return 0;
             boolean forever = this.down().getId() == Block.NETHERRACK;
 
             ThreadLocalRandom random = ThreadLocalRandom.current();
+            
+            //TODO: END
+
+            if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
+                this.getLevel().setBlock(this, new BlockAir(), true);
+            }
 
             if (!forever && this.getLevel().isRaining() &&
                     (this.getLevel().canBlockSeeSky(this) ||
