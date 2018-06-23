@@ -238,7 +238,7 @@ public class Server {
 
         this.console.start();
 
-        this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
+        this.logger.info("Loading server properties...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
             {
                 put("motd", "Minecraft Server");

@@ -117,7 +117,7 @@ public class CraftingManager {
         this.registerBrewing();
         this.rebuildPacket();
 
-        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes.");
+        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
     }
 
     protected void registerBrewing() {

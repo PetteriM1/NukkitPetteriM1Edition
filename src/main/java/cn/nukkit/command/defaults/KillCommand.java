@@ -6,6 +6,7 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.level.Level;
@@ -55,7 +56,7 @@ public class KillCommand extends VanillaCommand {
             } else if (args[0].equals("@e")) {
                 for (Level level : Server.getInstance().getLevels().values()) {
                     for (Entity entity : level.getEntities()) {
-                        if (!(entity instanceof Player)) {
+                        if (!(entity instanceof EntityHuman)) {
                             entity.close();
                         }
                     }
