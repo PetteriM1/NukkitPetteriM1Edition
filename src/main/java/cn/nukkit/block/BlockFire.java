@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockFire extends BlockFlowable {
 
+    boolean remove = false;
+
     public BlockFire() {
         this(0);
     }
@@ -94,16 +96,10 @@ public class BlockFire extends BlockFlowable {
 
             return Level.BLOCK_UPDATE_NORMAL;
         } else if (type == Level.BLOCK_UPDATE_SCHEDULED && this.level.gameRules.getBoolean("doFireTick")) {
-            if (Server.getInstance().suomiCraftPEMode()) return 0;
+    
             boolean forever = this.down().getId() == Block.NETHERRACK;
-
-            ThreadLocalRandom random = ThreadLocalRandom.current();
             
-            //TODO: END
-
-            if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
-                this.getLevel().setBlock(this, new BlockAir(), true);
-            }
+            ThreadLocalRandom random = ThreadLocalRandom.current();
 
             if (!forever && this.getLevel().isRaining() &&
                     (this.getLevel().canBlockSeeSky(this) ||
@@ -112,67 +108,81 @@ public class BlockFire extends BlockFlowable {
                             this.getLevel().canBlockSeeSky(this.south()) ||
                             this.getLevel().canBlockSeeSky(this.north()))
                     ) {
+            
+                this.getLevel().setBlock(this, new BlockAir(), true);
+            }
+
+            if (Server.getInstance().suomiCraftPEMode()) {
+                if (forever) return 0;
+                if (!remove) this.getLevel().scheduleUpdate(this, random.nextInt(150, 250));
+                if (remove) this.getLevel().setBlock(this, new BlockAir(), true);
+                this.remove = true;
+                return 0;
+            }
+
+            if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
+                this.getLevel().setBlock(this, new BlockAir(), true);
+                return 0;
+            }
+
+            int meta = this.getDamage();
+
+            if (meta < 15) {
+                this.setDamage(meta + random.nextInt(3));
+                this.getLevel().setBlock(this, this, true);
+            }
+
+            this.getLevel().scheduleUpdate(this, this.tickRate() + random.nextInt(10));
+
+            if (!forever && !this.canNeighborBurn()) {
+                if (!this.isBlockTopFacingSurfaceSolid(this.down()) || meta > 3) {
+                    this.getLevel().setBlock(this, new BlockAir(), true);
+                }
+            } else if (!forever && !(this.down().getBurnAbility() > 0) && meta == 15 && random.nextInt(4) == 0) {
                 this.getLevel().setBlock(this, new BlockAir(), true);
             } else {
-                int meta = this.getDamage();
+                int o = 0;
 
-                if (meta < 15) {
-                    this.setDamage(meta + random.nextInt(3));
-                    this.getLevel().setBlock(this, this, true);
-                }
+                //TODO: decrease the o if the rainfall values are high
 
-                this.getLevel().scheduleUpdate(this, this.tickRate() + random.nextInt(10));
+                this.tryToCatchBlockOnFire(this.east(), 300 + o, meta);
+                this.tryToCatchBlockOnFire(this.west(), 300 + o, meta);
+                this.tryToCatchBlockOnFire(this.down(), 250 + o, meta);
+                this.tryToCatchBlockOnFire(this.up(), 250 + o, meta);
+                this.tryToCatchBlockOnFire(this.south(), 300 + o, meta);
+                this.tryToCatchBlockOnFire(this.north(), 300 + o, meta);
 
-                if (!forever && !this.canNeighborBurn()) {
-                    if (!this.isBlockTopFacingSurfaceSolid(this.down()) || meta > 3) {
-                        this.getLevel().setBlock(this, new BlockAir(), true);
-                    }
-                } else if (!forever && !(this.down().getBurnAbility() > 0) && meta == 15 && random.nextInt(4) == 0) {
-                    this.getLevel().setBlock(this, new BlockAir(), true);
-                } else {
-                    int o = 0;
+                for (int x = (int) (this.x - 1); x <= (int) (this.x + 1); ++x) {
+                    for (int z = (int) (this.z - 1); z <= (int) (this.z + 1); ++z) {
+                        for (int y = (int) (this.y - 1); y <= (int) (this.y + 4); ++y) {
+                            if (x != (int) this.x || y != (int) this.y || z != (int) this.z) {
+                                int k = 100;
 
-                    //TODO: decrease the o if the rainfall values are high
+                                if (y > this.y + 1) {
+                                    k += (y - (this.y + 1)) * 100;
+                                }
 
-                    this.tryToCatchBlockOnFire(this.east(), 300 + o, meta);
-                    this.tryToCatchBlockOnFire(this.west(), 300 + o, meta);
-                    this.tryToCatchBlockOnFire(this.down(), 250 + o, meta);
-                    this.tryToCatchBlockOnFire(this.up(), 250 + o, meta);
-                    this.tryToCatchBlockOnFire(this.south(), 300 + o, meta);
-                    this.tryToCatchBlockOnFire(this.north(), 300 + o, meta);
+                                Block block = this.getLevel().getBlock(new Vector3(x, y, z));
+                                int chance = this.getChanceOfNeighborsEncouragingFire(block);
 
-                    for (int x = (int) (this.x - 1); x <= (int) (this.x + 1); ++x) {
-                        for (int z = (int) (this.z - 1); z <= (int) (this.z + 1); ++z) {
-                            for (int y = (int) (this.y - 1); y <= (int) (this.y + 4); ++y) {
-                                if (x != (int) this.x || y != (int) this.y || z != (int) this.z) {
-                                    int k = 100;
+                                if (chance > 0) {
+                                    int t = (chance + 40 + this.getLevel().getServer().getDifficulty() * 7) / (meta + 30);
 
-                                    if (y > this.y + 1) {
-                                        k += (y - (this.y + 1)) * 100;
-                                    }
+                                    //TODO: decrease the t if the rainfall values are high
 
-                                    Block block = this.getLevel().getBlock(new Vector3(x, y, z));
-                                    int chance = this.getChanceOfNeighborsEncouragingFire(block);
+                                    if (t > 0 && random.nextInt(k) <= t) {
+                                        int damage = meta + random.nextInt(5) / 4;
 
-                                    if (chance > 0) {
-                                        int t = (chance + 40 + this.getLevel().getServer().getDifficulty() * 7) / (meta + 30);
+                                        if (damage > 15) {
+                                            damage = 15;
+                                        }
 
-                                        //TODO: decrease the t if the rainfall values are high
+                                        BlockIgniteEvent e = new BlockIgniteEvent(block, this, null, BlockIgniteEvent.BlockIgniteCause.SPREAD);
+                                        this.level.getServer().getPluginManager().callEvent(e);
 
-                                        if (t > 0 && random.nextInt(k) <= t) {
-                                            int damage = meta + random.nextInt(5) / 4;
-
-                                            if (damage > 15) {
-                                                damage = 15;
-                                            }
-
-                                            BlockIgniteEvent e = new BlockIgniteEvent(block, this, null, BlockIgniteEvent.BlockIgniteCause.SPREAD);
-                                            this.level.getServer().getPluginManager().callEvent(e);
-
-                                            if (!e.isCancelled()) {
-                                                this.getLevel().setBlock(block, new BlockFire(damage), true);
-                                                this.getLevel().scheduleUpdate(block, this.tickRate());
-                                            }
+                                        if (!e.isCancelled()) {
+                                            this.getLevel().setBlock(block, new BlockFire(damage), true);
+                                            this.getLevel().scheduleUpdate(block, this.tickRate());
                                         }
                                     }
                                 }

@@ -55,7 +55,7 @@ public class BlockUpdateScheduler {
                         Block block = level.getBlock(entry.pos);
 
                         if (Block.equals(block, entry.block, false)) {
-                            block.onUpdate(level.BLOCK_UPDATE_SCHEDULED);
+                            block.onUpdate(Level.BLOCK_UPDATE_SCHEDULED);
                         }
                     } else {
                         level.scheduleUpdate(entry.block, entry.pos, 0);

@@ -916,6 +916,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (food.getLevel() != food.getMaxLevel()) {
             food.sendFoodLevel();
         }
+        
+        this.getServer().sendFullPlayerListData(this); //Trying to fix laggy player list
     }
 
     protected boolean orderChunks() {
