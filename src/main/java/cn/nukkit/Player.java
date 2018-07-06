@@ -3723,8 +3723,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         //Hack to fix chunk loading when respawning
         if (this.level != pos.level) {
-            this.teleportImmediate(new Location(pos.x, -100, pos.z, pos.level), null);
-            this.teleportImmediate(new Location(pos.x, pos.y, pos.z, pos.level), null);
+            this.teleport(new Location(pos.x, -100, pos.z, pos.level), null);
+            this.teleport(new Location(pos.x, pos.y, pos.z, pos.level), null);
         }
 
         this.dataPacket(pk);
