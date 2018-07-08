@@ -109,7 +109,7 @@ public class EntityEnderman extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 5;
     }
 

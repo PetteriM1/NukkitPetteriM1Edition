@@ -162,13 +162,13 @@ public class EntityZombiePigman extends WalkingMonster {
             int rottenFlesh = EntityUtils.rand(0, 2);
             int goldNuggets = EntityUtils.rand(0, 101) <= 3 ? 1 : 0;
             int goldSword = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;
-            for (int i=0; i < rottenFlesh; i++) {
+            for (int i = 0; i < rottenFlesh; i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
-            for (int i=0; i < goldNuggets; i++) {
+            for (int i = 0; i < goldNuggets; i++) {
                 drops.add(Item.get(Item.GOLD_NUGGET, 0, 1));
             }
-            for (int i=0; i < goldSword; i++) {
+            for (int i = 0; i < goldSword; i++) {
                 drops.add(Item.get(Item.GOLD_SWORD, 0, 1));
             }
         }
@@ -176,7 +176,7 @@ public class EntityZombiePigman extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 5;
     }
 }

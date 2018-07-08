@@ -25,6 +25,8 @@ import java.util.List;
 public class EntitySpider extends WalkingMonster {
 
     public static final int NETWORK_ID = 35;
+    
+    private boolean angry = false;
 
     public EntitySpider(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -197,7 +199,7 @@ public class EntitySpider extends WalkingMonster {
     public void attackEntity(Entity player) {
         int time = player.getLevel().getTime() % Level.TIME_FULL;
         if (!this.isFriendly() || !(player instanceof Player)) {
-            if (time > 13184 && time < 22800) { //TODO: better fix
+            if ((time > 13184 && time < 22800) || angry) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -241,6 +243,16 @@ public class EntitySpider extends WalkingMonster {
             }
         }
     }
+    
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
+
+        if (!ev.isCancelled()) {
+            this.angry = true;
+        }
+        return true;
+    }
 
     @Override
     public Item[] getDrops() {
@@ -248,10 +260,10 @@ public class EntitySpider extends WalkingMonster {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int strings = EntityUtils.rand(0, 3);
             int spiderEye = EntityUtils.rand(0, 3) == 0 ? 1 : 0;
-            for (int i=0; i < strings; i++) {
+            for (int i = 0; i < strings; i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
             }
-            for (int i=0; i < spiderEye; i++) {
+            for (int i = 0; i < spiderEye; i++) {
                 drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
             }
         }
@@ -259,7 +271,7 @@ public class EntitySpider extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 5;
     }
 

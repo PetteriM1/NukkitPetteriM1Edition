@@ -99,10 +99,10 @@ public class EntityGhast extends FlyingMonster {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int gunPowder = EntityUtils.rand(0, 3);
             int ghastTears = EntityUtils.rand(0, 2);
-            for (int i=0; i < gunPowder; i++) {
+            for (int i = 0; i < gunPowder; i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
             }
-            for (int i=0; i < ghastTears; i++) {
+            for (int i = 0; i < ghastTears; i++) {
                 drops.add(Item.get(Item.GHAST_TEAR, 0, 1));
             }
         }
@@ -110,7 +110,7 @@ public class EntityGhast extends FlyingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 5;
     }
 

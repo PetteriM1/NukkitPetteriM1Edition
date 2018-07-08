@@ -281,10 +281,10 @@ public class EntityBlaze extends FlyingMonster {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int blazeRod = EntityUtils.rand(0, 2);
             int glowStoneDust = EntityUtils.rand(0, 3);
-            for (int i=0; i < blazeRod; i++) {
+            for (int i = 0; i < blazeRod; i++) {
                 drops.add(Item.get(Item.BLAZE_ROD, 0, 1));
             }
-            for (int i=0; i < glowStoneDust; i++) {
+            for (int i = 0; i < glowStoneDust; i++) {
                 drops.add(Item.get(Item.GLOWSTONE_DUST, 0, 1));
             }
         }
@@ -292,7 +292,7 @@ public class EntityBlaze extends FlyingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 10;
     }
 

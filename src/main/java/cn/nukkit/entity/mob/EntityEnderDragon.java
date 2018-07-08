@@ -37,7 +37,7 @@ public class EntityEnderDragon extends FlyingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 500;
     }
 

@@ -108,10 +108,10 @@ public class EntityIronGolem extends WalkingMonster {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int ironIngots = EntityUtils.rand(3, 6);
             int poppies = EntityUtils.rand(0, 3);
-            for (int i=0; i < ironIngots; i++) {
+            for (int i = 0; i < ironIngots; i++) {
                 drops.add(Item.get(Item.IRON_INGOT, 0, 1));
             }
-            for (int i=0; i < poppies; i++) {
+            for (int i = 0; i < poppies; i++) {
                 drops.add(Item.get(Item.POPPY, 0, 1));
             }
         }
@@ -119,7 +119,7 @@ public class EntityIronGolem extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 0;
     }
 

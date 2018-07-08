@@ -148,7 +148,7 @@ public class EntityZombie extends WalkingMonster {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int rottenFlesh = EntityUtils.rand(0, 3);
-            for (int i=0; i < rottenFlesh; i++) {
+            for (int i = 0; i < rottenFlesh; i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
         }
@@ -156,7 +156,7 @@ public class EntityZombie extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 5;
     }
 

@@ -132,7 +132,7 @@ public class EntityEvoker extends WalkingMonster {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int emerald = EntityUtils.rand(0, 2);
-            for (int i=0; i < emerald; i++) {
+            for (int i = 0; i < emerald; i++) {
                 drops.add(Item.get(Item.EMERALD, 0, 1));
             }
         }
@@ -140,7 +140,7 @@ public class EntityEvoker extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 10;
     }
 

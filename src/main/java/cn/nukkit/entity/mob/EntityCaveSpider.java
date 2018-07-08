@@ -104,10 +104,10 @@ public class EntityCaveSpider extends WalkingMonster {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             int strings = EntityUtils.rand(0, 3);
             int spiderEye = EntityUtils.rand(0, 3) == 0 ? 1 : 0;
-            for (int i=0; i < strings; i++) {
+            for (int i = 0; i < strings; i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
             }
-            for (int i=0; i < spiderEye; i++) {
+            for (int i = 0; i < spiderEye; i++) {
                 drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
             }
         }
@@ -115,7 +115,7 @@ public class EntityCaveSpider extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 5;
     }
 

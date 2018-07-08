@@ -57,7 +57,7 @@ public class EntityElderGuardian extends SwimmingMonster {
       List<Item> drops = new ArrayList<>();
       if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
           int prismarineShard = EntityUtils.rand(0, 3);
-          for (int i=0; i < prismarineShard; i++) {
+          for (int i = 0; i < prismarineShard; i++) {
               drops.add(Item.get(Item.PRISMARINE_SHARD, 0, 1));
           }
       }

@@ -40,12 +40,6 @@ public abstract class BaseEntity extends EntityCreature {
 
     protected Entity followTarget = null;
 
-    public boolean inWater = false;
-
-    public boolean inLava = false;
-
-    public boolean onClimbable = false;
-
     protected boolean fireProof = false;
 
     private boolean movement = true;
@@ -222,25 +216,12 @@ public abstract class BaseEntity extends EntityCreature {
         Vector3 vector = new Vector3(0.0D, 0.0D, 0.0D);
         Iterator<Block> d = this.getBlocksAround().iterator();
 
-        inWater = false;
-        inLava = false;
-        onClimbable = false;
-
         while (d.hasNext()) {
             Block block = (Block) d.next();
 
             if (block.hasEntityCollision()) {
                 block.onEntityCollide(this);
                 block.addVelocityToEntity(this, vector);
-            }
-
-            if (block.getId() == Block.WATER || block.getId() == Block.STILL_WATER) {
-                inWater = true;
-            } else if (block.getId() == Block.LAVA || block.getId() == Block.STILL_LAVA) {
-                inLava = true;
-                this.close();
-            } else if (block.getId() == Block.LADDER || block.getId() == Block.VINE) {
-                onClimbable = true;
             }
         }
 
@@ -263,8 +244,6 @@ public abstract class BaseEntity extends EntityCreature {
             return true;
         }
 
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, !this.isInsideOfWater());
-
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
         this.blocksAround = null;
@@ -286,30 +265,11 @@ public abstract class BaseEntity extends EntityCreature {
         this.checkBlockCollision();
 
         if (this.isInsideOfSolid()) {
-            this.close();
+            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 1));
         }
 
         if (this.y < 1) {
             this.close();
-        }
-
-        if (this.fireTicks > 0) {
-            if (this.fireProof) {
-                this.fireTicks -= 4 * tickDiff;
-            } else {
-                if (!this.hasEffect(Effect.FIRE_RESISTANCE) && (this.fireTicks % 20) == 0 || tickDiff > 20) {
-                    EntityDamageEvent ev = new EntityDamageEvent(this, EntityDamageEvent.DamageCause.FIRE_TICK, 1);
-                    this.attack(ev);
-                }
-                this.fireTicks -= tickDiff;
-            }
-
-            if (this.fireTicks <= 0) {
-                this.extinguish();
-            } else {
-                this.setDataFlag(DATA_FLAGS, DATA_FLAG_ONFIRE, true);
-                hasUpdate = true;
-            }
         }
 
         if (this.moveTime > 0) {
@@ -351,7 +311,6 @@ public abstract class BaseEntity extends EntityCreature {
         super.attack(source);
 
         this.target = null;
-        this.attackTime = 7;
         return true;
     }
 

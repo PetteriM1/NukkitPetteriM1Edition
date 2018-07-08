@@ -101,7 +101,7 @@ public class EntityEndermite extends WalkingMonster {
     }
 
     @Override
-    public int getKillExperience () {
+    public int getKillExperience() {
         return 3;
     }
 
