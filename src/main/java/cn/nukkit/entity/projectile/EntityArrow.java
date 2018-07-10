@@ -23,7 +23,7 @@ public class EntityArrow extends EntityProjectile {
 
     @Override
     public float getWidth() {
-        return 0.5f;
+        return 0.05f;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class EntityArrow extends EntityProjectile {
 
     @Override
     public float getHeight() {
-        return 0.5f;
+        return 0.05f;
     }
 
     @Override

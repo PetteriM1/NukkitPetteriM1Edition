@@ -59,7 +59,6 @@ public class StartGamePacket extends DataPacket {
     public String premiumWorldTemplateId = "";
     public boolean isTrial = false;
     public long currentTick;
-
     public int enchantmentSeed;
 
     @Override
