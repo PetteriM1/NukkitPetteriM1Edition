@@ -10,7 +10,7 @@ import cn.nukkit.math.BlockFace;
  * author: MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockStairs extends BlockTransparentMeta {
+public abstract class BlockStairs extends BlockSolidMeta {
 
     protected BlockStairs(int meta) {
         super(meta);

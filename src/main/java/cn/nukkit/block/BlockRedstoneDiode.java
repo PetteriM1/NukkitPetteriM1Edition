@@ -35,7 +35,7 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (block.getSide(BlockFace.DOWN).isTransparent()) {
+        if (block.getSide(BlockFace.DOWN).isTransparent() && !(this.down() instanceof BlockSlab)) {
             return false;
         }
 
@@ -69,7 +69,7 @@ public abstract class BlockRedstoneDiode extends BlockFlowable {
                 }
             }
         } else if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) {
-            if (type == Level.BLOCK_UPDATE_NORMAL && this.getSide(BlockFace.DOWN).isTransparent()) {
+            if (type == Level.BLOCK_UPDATE_NORMAL && this.getSide(BlockFace.DOWN).isTransparent() && !(this.down() instanceof BlockSlab)) {
                 this.level.useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             } else {
