@@ -157,7 +157,6 @@ public class Timing implements AutoCloseable {
         return this.id;
     }
 
-    //For try-with-resources
     @Override
     public void close() {
         this.stopTiming();

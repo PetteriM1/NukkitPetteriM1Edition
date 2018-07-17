@@ -59,7 +59,6 @@ class TimingIdentifier {
         }
 
         TimingIdentifier that = (TimingIdentifier) o;
-        //Using intern() method on strings makes possible faster string comparison with ==
         return this.group == that.group && this.name == that.name;
     }
 

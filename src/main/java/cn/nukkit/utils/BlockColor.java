@@ -76,7 +76,6 @@ public class BlockColor extends java.awt.Color {
         super(r, g, b);
     }
 
-    @Deprecated
     public static BlockColor getDyeColor(int dyeColorMeta) {
         return DyeColor.getByDyeData(dyeColorMeta).getColor();
     }

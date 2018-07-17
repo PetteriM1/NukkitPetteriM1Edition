@@ -46,10 +46,6 @@ public class ServerScheduler {
         return addTask(task, 0, 0, false);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleTask(Plugin, Runnable)
-     */
-    @Deprecated
     public TaskHandler scheduleTask(Runnable task) {
         return addTask(null, task, 0, 0, false);
     }
@@ -58,10 +54,6 @@ public class ServerScheduler {
         return addTask(plugin, task, 0, 0, false);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleTask(Plugin, Runnable, boolean)
-     */
-    @Deprecated
     public TaskHandler scheduleTask(Runnable task, boolean asynchronous) {
         return addTask(null, task, 0, 0, asynchronous);
     }
@@ -70,10 +62,6 @@ public class ServerScheduler {
         return addTask(plugin, task, 0, 0, asynchronous);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleAsyncTask(Plugin, AsyncTask)
-     */
-    @Deprecated
     public TaskHandler scheduleAsyncTask(AsyncTask task) {
         return addTask(null, task, 0, 0, true);
     }
@@ -82,7 +70,6 @@ public class ServerScheduler {
         return addTask(plugin, task, 0, 0, true);
     }
 
-    @Deprecated
     public void scheduleAsyncTaskToWorker(AsyncTask task, int worker) {
         scheduleAsyncTask(task);
     }
@@ -103,10 +90,6 @@ public class ServerScheduler {
         return this.addTask(task, delay, 0, asynchronous);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleDelayedTask(Plugin, Runnable, int)
-     */
-    @Deprecated
     public TaskHandler scheduleDelayedTask(Runnable task, int delay) {
         return addTask(null, task, delay, 0, false);
     }
@@ -115,10 +98,6 @@ public class ServerScheduler {
         return addTask(plugin, task, delay, 0, false);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleDelayedTask(Plugin, Runnable, int, boolean)
-     */
-    @Deprecated
     public TaskHandler scheduleDelayedTask(Runnable task, int delay, boolean asynchronous) {
         return addTask(null, task, delay, 0, asynchronous);
     }
@@ -127,10 +106,6 @@ public class ServerScheduler {
         return addTask(plugin, task, delay, 0, asynchronous);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleRepeatingTask(Plugin, Runnable, int)
-     */
-    @Deprecated
     public TaskHandler scheduleRepeatingTask(Runnable task, int period) {
         return addTask(null, task, 0, period, false);
     }
@@ -139,10 +114,6 @@ public class ServerScheduler {
         return addTask(plugin, task, 0, period, false);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleRepeatingTask(Plugin, Runnable, int, boolean)
-     */
-    @Deprecated
     public TaskHandler scheduleRepeatingTask(Runnable task, int period, boolean asynchronous) {
         return addTask(null, task, 0, period, asynchronous);
     }
@@ -167,10 +138,6 @@ public class ServerScheduler {
         return addTask(task, delay, period, asynchronous);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleDelayedRepeatingTask(Plugin, Runnable, int, int)
-     */
-    @Deprecated
     public TaskHandler scheduleDelayedRepeatingTask(Runnable task, int delay, int period) {
         return addTask(null, task, delay, period, false);
     }
@@ -179,10 +146,6 @@ public class ServerScheduler {
         return addTask(plugin, task, delay, period, false);
     }
 
-    /**
-     * @deprecated Use {@link #scheduleDelayedRepeatingTask(Plugin, Runnable, int, int, boolean)
-     */
-    @Deprecated
     public TaskHandler scheduleDelayedRepeatingTask(Runnable task, int delay, int period, boolean asynchronous) {
         return addTask(null, task, delay, period, asynchronous);
     }
@@ -207,8 +170,6 @@ public class ServerScheduler {
         }
         for (Map.Entry<Integer, TaskHandler> entry : taskMap.entrySet()) {
             TaskHandler taskHandler = entry.getValue();
-            // TODO: Remove the "taskHandler.getPlugin() == null" check
-            // It is only there for backwards compatibility!
             if (taskHandler.getPlugin() == null || plugin.equals(taskHandler.getPlugin())) {
                 try {
                     taskHandler.cancel(); /* It will remove from task map automatic in next main heartbeat. */

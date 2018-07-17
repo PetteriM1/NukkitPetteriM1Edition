@@ -1558,17 +1558,14 @@ public class Item implements Cloneable {
         return this.equals(other, true, true) && this.count == other.count;
     }
 
-    @Deprecated
     public final boolean deepEquals(Item item) {
         return equals(item, true);
     }
 
-    @Deprecated
     public final boolean deepEquals(Item item, boolean checkDamage) {
         return equals(item, checkDamage, true);
     }
 
-    @Deprecated
     public final boolean deepEquals(Item item, boolean checkDamage, boolean checkCompound) {
         return equals(item, checkDamage, checkCompound);
     }

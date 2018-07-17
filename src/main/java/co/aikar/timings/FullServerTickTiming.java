@@ -81,7 +81,6 @@ public class FullServerTickTiming extends Timing {
 
         CURRENT = Timings.timingsTickTimer;
         Timings.timingsTickTimer.addDiff(diff);
-        //addDiff for timingsTickTimer incremented this, bring it back down to 1 per tick.
         this.record.curTickCount--;
         this.minuteData.curTickTotal = this.record.curTickTotal;
         this.minuteData.curTickCount = 1;

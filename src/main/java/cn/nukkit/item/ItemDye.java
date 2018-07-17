@@ -10,37 +10,21 @@ import cn.nukkit.utils.DyeColor;
  */
 public class ItemDye extends Item {
 
-    @Deprecated
     public static final int WHITE = DyeColor.WHITE.getDyeData();
-    @Deprecated
     public static final int ORANGE = DyeColor.ORANGE.getDyeData();
-    @Deprecated
     public static final int MAGENTA = DyeColor.MAGENTA.getDyeData();
-    @Deprecated
     public static final int LIGHT_BLUE = DyeColor.LIGHT_BLUE.getDyeData();
-    @Deprecated
     public static final int YELLOW = DyeColor.YELLOW.getDyeData();
-    @Deprecated
     public static final int LIME = DyeColor.LIME.getDyeData();
-    @Deprecated
     public static final int PINK = DyeColor.PINK.getDyeData();
-    @Deprecated
     public static final int GRAY = DyeColor.GRAY.getDyeData();
-    @Deprecated
     public static final int LIGHT_GRAY = DyeColor.LIGHT_GRAY.getDyeData();
-    @Deprecated
     public static final int CYAN = DyeColor.CYAN.getDyeData();
-    @Deprecated
     public static final int PURPLE = DyeColor.PURPLE.getDyeData();
-    @Deprecated
     public static final int BLUE = DyeColor.BLUE.getDyeData();
-    @Deprecated
     public static final int BROWN = DyeColor.BROWN.getDyeData();
-    @Deprecated
     public static final int GREEN = DyeColor.GREEN.getDyeData();
-    @Deprecated
     public static final int RED = DyeColor.RED.getDyeData();
-    @Deprecated
     public static final int BLACK = DyeColor.BLACK.getDyeData();
 
     public ItemDye() {
@@ -67,7 +51,6 @@ public class ItemDye extends Item {
         }
     }
 
-    @Deprecated
     public static BlockColor getColor(int meta) {
         return DyeColor.getByDyeData(meta).getColor();
     }
@@ -76,7 +59,6 @@ public class ItemDye extends Item {
         return DyeColor.getByDyeData(meta);
     }
 
-    @Deprecated
     public static String getColorName(int meta) {
         return DyeColor.getByDyeData(meta).getName();
     }

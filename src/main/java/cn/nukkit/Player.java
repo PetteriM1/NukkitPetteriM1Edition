@@ -280,7 +280,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * This might disappear in the future.
      * Please use getUniqueId() instead (IP + clientId + name combo, in the future it'll change to real UUID for online auth)
      */
-    @Deprecated
     public Long getClientId() {
         return randomClientId;
     }
@@ -347,13 +346,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.inAirTicks = 0;
     }
 
-    @Deprecated
     public void setAllowFlight(boolean value) {
         this.getAdventureSettings().set(Type.ALLOW_FLIGHT, value);
         this.getAdventureSettings().update();
     }
 
-    @Deprecated
     public boolean getAllowFlight() {
         return this.getAdventureSettings().get(Type.ALLOW_FLIGHT);
     }
@@ -376,13 +373,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.getAdventureSettings().update();
     }
 
-    @Deprecated
     public void setAutoJump(boolean value) {
         this.getAdventureSettings().set(Type.AUTO_JUMP, value);
         this.getAdventureSettings().update();
     }
 
-    @Deprecated
     public boolean hasAutoJump() {
         return this.getAdventureSettings().get(Type.AUTO_JUMP);
     }
@@ -1278,7 +1273,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
-    @Deprecated
     public void sendSettings() {
         this.getAdventureSettings().update();
     }

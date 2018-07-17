@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockFire extends BlockFlowable {
 
-    boolean remove = false;
+    private boolean remove = false;
 
     public BlockFire() {
         this(0);
@@ -115,8 +115,8 @@ public class BlockFire extends BlockFlowable {
             if (Server.getInstance().suomiCraftPEMode()) {
                 if (forever) return 0;
                 if (!remove) this.getLevel().scheduleUpdate(this, random.nextInt(150, 250));
-                if (remove) this.getLevel().setBlock(this, new BlockAir(), true);
                 this.remove = true;
+                if (remove) this.getLevel().setBlock(this, new BlockAir(), true);        
                 return 0;
             }
 

@@ -55,7 +55,6 @@ public class TimingsManager {
 
             for (Timing timing : TIMINGS) {
                 if (timing.isSpecial()) {
-                    // Called manually
                     continue;
                 }
 
@@ -77,8 +76,6 @@ public class TimingsManager {
 
     static void resetTimings() {
         if (needsFullReset) {
-            // Full resets need to re-check every handlers enabled state
-            // Timing map can be modified from async so we must sync on it.
             synchronized (TIMING_MAP) {
                 for (Timing timing : TIMING_MAP.values()) {
                     timing.reset(true);
@@ -90,8 +87,6 @@ public class TimingsManager {
             needsRecheckEnabled = false;
             timingStart = System.currentTimeMillis();
         } else {
-            // Soft resets only need to act on timings that have done something
-            // Handlers can only be modified on main thread.
             for (Timing timing : TIMINGS) {
                 timing.reset(false);
             }

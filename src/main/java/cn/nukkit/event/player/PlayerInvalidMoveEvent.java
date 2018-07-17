@@ -29,10 +29,6 @@ public class PlayerInvalidMoveEvent extends PlayerEvent implements Cancellable {
         return this.revert;
     }
 
-    /**
-     * @deprecated If you just simply want to disable the movement check, please use {@link Player#setCheckMovement(boolean)} instead.
-     */
-    @Deprecated
     public void setRevert(boolean revert) {
         this.revert = revert;
     }

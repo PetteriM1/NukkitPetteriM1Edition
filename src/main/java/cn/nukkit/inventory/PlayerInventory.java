@@ -79,12 +79,10 @@ public class PlayerInventory extends BaseInventory {
         return slot >= 0 && slot <= this.getHotbarSize();
     }
 
-    @Deprecated
     public int getHotbarSlotIndex(int index) {
         return index;
     }
 
-    @Deprecated
     public void setHotbarSlotIndex(int index, int slot) {
 
     }
@@ -122,7 +120,6 @@ public class PlayerInventory extends BaseInventory {
         return this.setItem(this.getHeldItemIndex(), item);
     }
 
-    @Deprecated
     public int getHeldItemSlot() {
         return this.itemInHandIndex;
     }

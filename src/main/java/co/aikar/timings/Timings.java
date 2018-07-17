@@ -160,7 +160,6 @@ public final class Timings {
 
     public static void setHistoryInterval(int interval) {
         historyInterval = Math.max(20 * 60, interval);
-        //Recheck the history length with the new Interval
         if (historyLength != -1) {
             setHistoryLength(historyLength);
         }
@@ -171,11 +170,7 @@ public final class Timings {
     }
 
     public static void setHistoryLength(int length) {
-        //Cap at 12 History Frames, 1 hour at 5 minute frames.
         int maxLength = historyInterval * MAX_HISTORY_FRAMES;
-        //For special cases of servers with special permission to bypass the max.
-        //This max helps keep data file sizes reasonable for processing on Aikar's Timing parser side.
-        //Setting this will not help you bypass the max unless Aikar has added an exception on the API side.
         if (Server.getInstance().getPropertyBoolean("timings-bypass-max", false)) {
             maxLength = Integer.MAX_VALUE;
         }

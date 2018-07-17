@@ -76,7 +76,7 @@ public class TimingsExport extends Thread {
             out.addProperty("server", Server.getInstance().getName());
             out.addProperty("motd", Server.getInstance().getMotd());
             out.addProperty("online-mode", Server.getInstance().getPropertyBoolean("xbox-auth"));
-            out.addProperty("icon", ""); //"data:image/png;base64,"
+            out.addProperty("icon", "");
         }
 
         final Runtime runtime = Runtime.getRuntime();
@@ -97,7 +97,7 @@ public class TimingsExport extends Thread {
         out.add("system", system);
 
         TimingsHistory[] history = HISTORY.toArray(new TimingsHistory[HISTORY.size() + 1]);
-        history[HISTORY.size()] = new TimingsHistory(); //Current snapshot
+        history[HISTORY.size()] = new TimingsHistory();
 
         JsonObject timings = new JsonObject();
         for (TimingIdentifier.TimingGroup group : TimingIdentifier.GROUP_MAP.values()) {
@@ -122,7 +122,6 @@ public class TimingsExport extends Thread {
                 new JsonUtil.JSONPair(entry.getKey(), entry.getValue())));
         out.add("idmap", idmap);
 
-        //Information about loaded plugins
         out.add("plugins", JsonUtil.mapToObject(Server.getInstance().getPluginManager().getPlugins().values(), (plugin) -> {
             JsonObject jsonPlugin = new JsonObject();
             jsonPlugin.addProperty("version", plugin.getDescription().getVersion());
@@ -131,17 +130,6 @@ public class TimingsExport extends Thread {
             jsonPlugin.addProperty("authors", String.join(", ", plugin.getDescription().getAuthors()));
             return new JsonUtil.JSONPair(plugin.getName(), jsonPlugin);
         }));
-
-        //Information on the users Config (currently unworking)
-        /*JsonObject config = new JsonObject();
-        if (!Timings.getIgnoredConfigSections().contains("all")) {
-            JsonObject nukkit = JsonUtil.toObject(Server.getInstance().getConfig().getRootSection());
-            Timings.getIgnoredConfigSections().forEach(nukkit::remove);
-            config.add("nukkit", nukkit);
-        } else {
-            config.add("nukkit", null);
-        }
-        out.add("config", config);*/
 
         new TimingsExport(sender, out, history).start();
     }

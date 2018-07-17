@@ -59,7 +59,6 @@ public class TimingsHistory {
     private final long endTime;
     private final long startTime;
     private final long totalTicks;
-    // Represents all time spent running the server this history
     private final long totalTime;
     private final MinuteReport[] minuteReports;
 
@@ -94,14 +93,12 @@ public class TimingsHistory {
         final Map<Integer, AtomicInteger> entityCounts = new HashMap<>();
         final Map<Integer, AtomicInteger> blockEntityCounts = new HashMap<>();
         final Gson GSON = new Gson();
-        // Information about all loaded entities/block entities
         for (Level level : Server.getInstance().getLevels().values()) {
             JsonArray jsonLevel = new JsonArray();
             for (FullChunk chunk : level.getChunks().values()) {
                 entityCounts.clear();
                 blockEntityCounts.clear();
 
-                //count entities
                 for (Entity entity : chunk.getEntities().values()) {
                     if (!entityCounts.containsKey(entity.getNetworkId()))
                         entityCounts.put(entity.getNetworkId(), new AtomicInteger(0));
@@ -109,7 +106,6 @@ public class TimingsHistory {
                     entityMap.put(entity.getNetworkId(), entity.getClass().getSimpleName());
                 }
 
-                //count block entities
                 for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
                     if (!blockEntityCounts.containsKey(blockEntity.getBlock().getId()))
                         blockEntityCounts.put(blockEntity.getBlock().getId(), new AtomicInteger(0));

@@ -309,6 +309,7 @@ public class Server {
                 put("thread-watchdog-tick", 50000);
                 put("nether", false);
                 put("suomicraft-mode", false);
+                put("do-not-tick-worlds", "");
             }
         });
 
@@ -641,7 +642,6 @@ public class Server {
         }
 
         if (type == PluginLoadOrder.POSTWORLD) {
-            //this.commandMap.registerServerAliases();
             DefaultPermissions.registerCorePermissions();
         }
     }
@@ -674,7 +674,6 @@ public class Server {
         return false;
     }
 
-    //todo: use ticker to check console
     public ConsoleCommandSender getConsoleSender() {
         return consoleSender;
     }
@@ -1143,7 +1142,6 @@ public class Server {
         return nextTick;
     }
 
-    // TODO: Fix title tick
     public void titleTick() {
         if (!Nukkit.ANSI) {
             return;
@@ -2060,7 +2058,6 @@ public class Server {
         Entity.registerEntity("Human", EntityHuman.class, true);
 
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
-        // TODO: 2016/1/30 all finds of minecart
         Entity.registerEntity("Boat", EntityBoat.class);
 
         Entity.registerEntity("ArmorStand", EntityArmorStand.class);

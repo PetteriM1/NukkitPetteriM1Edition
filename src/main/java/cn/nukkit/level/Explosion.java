@@ -47,7 +47,6 @@ public class Explosion {
 
     /**
      * @return bool
-     * @deprecated
      */
     public boolean explode() {
         if (explodeA()) {

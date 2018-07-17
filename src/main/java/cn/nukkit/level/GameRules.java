@@ -116,7 +116,6 @@ public class GameRules {
             try {
                 this.valueInteger = Integer.parseInt(value);
             } catch (NumberFormatException ex) {
-                //ignore
             }
         }
 

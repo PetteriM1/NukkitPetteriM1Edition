@@ -88,7 +88,6 @@ public class TaskHandler {
         this.cancelled = true;
     }
 
-    @Deprecated
     public void remove() {
         this.cancelled = true;
     }
@@ -102,7 +101,6 @@ public class TaskHandler {
         }
     }
 
-    @Deprecated
     public String getTaskName() {
         return "Unknown";
     }

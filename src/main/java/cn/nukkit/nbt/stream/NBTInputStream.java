@@ -132,7 +132,6 @@ public class NBTInputStream implements DataInput, AutoCloseable {
     }
 
     @Override
-    @Deprecated
     public String readLine() throws IOException {
         return this.stream.readLine();
     }

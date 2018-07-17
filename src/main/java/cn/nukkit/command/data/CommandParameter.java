@@ -30,7 +30,6 @@ public class CommandParameter {
     public CommandEnum enumData;
     public String postFix;
 
-    @Deprecated
     public CommandParameter(String name, String type, boolean optional) {
         this(name, fromString(type), optional);
     }

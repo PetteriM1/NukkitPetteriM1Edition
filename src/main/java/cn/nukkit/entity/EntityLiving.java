@@ -265,7 +265,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return this.getLineOfSight(maxDistance, maxLength, new Integer[]{});
     }
 
-    @Deprecated
     public Block[] getLineOfSight(int maxDistance, int maxLength, Map<Integer, Object> transparent) {
         return this.getLineOfSight(maxDistance, maxLength, transparent.keySet().stream().toArray(Integer[]::new));
     }
@@ -311,7 +310,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return getTargetBlock(maxDistance, new Integer[]{});
     }
 
-    @Deprecated
     public Block getTargetBlock(int maxDistance, Map<Integer, Object> transparent) {
         return getTargetBlock(maxDistance, transparent.keySet().stream().toArray(Integer[]::new));
     }

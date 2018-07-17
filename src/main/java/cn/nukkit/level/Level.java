@@ -127,7 +127,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     // Disable random block ticking in these worlds if SuomiCraft PE mode is enabled
-    private static final List<String> doNotTickWorlds = Arrays.asList("lobby", "pvp", "parkour", "dropper", "elytra", "plotcreative", "freebuild", "mcbg", "bedwars", "nether"); //TODO config for this
+    private static final String doNotTickWorlds = Server.getInstance().getPropertyString("do-not-tick-worlds", "");
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
 
@@ -166,8 +166,6 @@ public class Level implements ChunkManager, Metadatable {
 
     private String folderName;
 
-    private Vector3 mutableBlock;
-
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
     private Long2ObjectOpenHashMap<SoftReference<Map<Character, Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
     // Storing the vector is redundant
@@ -182,9 +180,9 @@ public class Level implements ChunkManager, Metadatable {
 
 
     private final BlockUpdateScheduler updateQueue;
-//    private final TreeSet<BlockUpdateEntry> updateQueue = new TreeSet<>();
-//    private final List<BlockUpdateEntry> nextTickUpdates = Lists.newArrayList();
-//    private final Map<BlockVector3, Integer> updateQueueIndex = new HashMap<>();
+    //private final TreeSet<BlockUpdateEntry> updateQueue = new TreeSet<>();
+    //private final List<BlockUpdateEntry> nextTickUpdates = Lists.newArrayList();
+    //private final Map<BlockVector3, Integer> updateQueueIndex = new HashMap<>();
 
     private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue = new ConcurrentHashMap<>();
     private final LongSet chunkSendTasks = new LongOpenHashSet();
@@ -648,12 +646,6 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void sendTime(Player... players) {
-        /*if (this.stopTime) { //TODO
-            SetTimePacket pk0 = new SetTimePacket();
-            pk0.time = (int) this.time;
-            player.dataPacket(pk0);
-        }*/
-
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time;
 
@@ -1063,7 +1055,7 @@ public class Level implements ChunkManager, Metadatable {
                                     int blockId = fullId >> 4;
                                     if (randomTickBlocks[blockId]) {
                                         Block block = Block.get(fullId, this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
-                                        if (!doNotTickWorlds.contains(block.getLevel().getName()) || !Server.getInstance().suomiCraftPEMode()) {
+                                        if (!doNotTickWorlds.contains(block.getLevel().getName())) {
                                             block.onUpdate(BLOCK_UPDATE_RANDOM);
                                         }
                                     }
@@ -1085,7 +1077,7 @@ public class Level implements ChunkManager, Metadatable {
                                 blockTest |= fullId;
                                 if (randomTickBlocks[blockId]) {
                                     Block block = Block.get(fullId, this, x, y + (Y << 4), z);
-                                    if (!doNotTickWorlds.contains(block.getLevel().getName()) || !Server.getInstance().suomiCraftPEMode()) {
+                                    if (!doNotTickWorlds.contains(block.getLevel().getName())) {
                                         block.onUpdate(BLOCK_UPDATE_RANDOM);
                                     }
                                 }
@@ -1132,10 +1124,6 @@ public class Level implements ChunkManager, Metadatable {
 
     public void updateAroundRedstone(Vector3 pos, BlockFace face) {
         for (BlockFace side : BlockFace.values()) {
-            /*if(face != null && side == face) {
-                continue;
-            }*/
-
             this.getBlock(pos.getSide(side)).onUpdate(BLOCK_UPDATE_REDSTONE);
         }
     }
@@ -2693,8 +2681,6 @@ public class Level implements ChunkManager, Metadatable {
 
         this.timings.doChunkUnload.startTiming();
 
-        long index = Level.chunkHash(x, z);
-
         BaseFullChunk chunk = this.getChunk(x, z);
 
         if (chunk != null && chunk.getProvider() != null) {
@@ -2916,7 +2902,6 @@ public class Level implements ChunkManager, Metadatable {
     public void doChunkGarbageCollection() {
         this.timings.doChunkGC.startTiming();
         // remove all invaild block entities.
-        List<BlockEntity> toClose = new ArrayList<>();
         if (!blockEntities.isEmpty()) {
             Iterator<Map.Entry<Long, BlockEntity>> iter = blockEntities.entrySet().iterator();
             while (iter.hasNext()) {
