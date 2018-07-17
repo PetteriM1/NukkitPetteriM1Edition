@@ -100,8 +100,6 @@ public class Server {
 
     private PluginManager pluginManager = null;
 
-    private int profilingTickrate = 20;
-
     private ServerScheduler scheduler = null;
 
     private int tickCounter;
@@ -117,8 +115,6 @@ public class Server {
     private float maxUse = 0;
 
     private int sendUsageTicker = 0;
-
-    private boolean dispatchSignals = false;
 
     private final MainLogger logger;
 
@@ -1040,7 +1036,6 @@ public class Server {
     private boolean tick() {
         long tickTime = System.currentTimeMillis();
 
-        //TODO
         long sleepTime = tickTime - this.nextTick;
         if (sleepTime < -25) {
             try {
@@ -2005,6 +2000,7 @@ public class Server {
         Entity.registerEntity("Blaze", EntityBlaze.class);
         Entity.registerEntity("Creeper", EntityCreeper.class);
         Entity.registerEntity("CaveSpider", EntityCaveSpider.class);
+        Entity.registerEntity("Drowned", EntityDrowned.class);
         Entity.registerEntity("ElderGuardian", EntityElderGuardian.class);
         Entity.registerEntity("EnderDragon", EntityEnderDragon.class);
         Entity.registerEntity("Enderman", EntityEnderman.class);
@@ -2033,6 +2029,7 @@ public class Server {
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Chicken", EntityChicken.class);
+        Entity.registerEntity("Cod", EntityCod.class);
         Entity.registerEntity("Cow", EntityCow.class);
         Entity.registerEntity("Dolphin", EntityDolphin.class);
         Entity.registerEntity("Donkey", EntityDonkey.class);
@@ -2043,9 +2040,13 @@ public class Server {
         Entity.registerEntity("Parrot", EntityParrot.class);
         Entity.registerEntity("PolarBear", EntityPolarBear.class);
         Entity.registerEntity("Pig", EntityPig.class);
+        Entity.registerEntity("Pufferfish", EntityPufferfish.class);
         Entity.registerEntity("Rabbit", EntityRabbit.class);
+        Entity.registerEntity("Salmon", EntitySalmon.class);
         Entity.registerEntity("Sheep", EntitySheep.class);
         Entity.registerEntity("Squid", EntitySquid.class);
+        Entity.registerEntity("TropicalFish", EntityTropicalFish.class);
+        Entity.registerEntity("Turtle", EntityTurtle.class);
         Entity.registerEntity("Wolf", EntityWolf.class);
         Entity.registerEntity("Ocelot", EntityOcelot.class);
         Entity.registerEntity("Villager", EntityVillager.class);

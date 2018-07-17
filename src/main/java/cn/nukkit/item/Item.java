@@ -543,6 +543,8 @@ public class Item implements Cloneable {
     public static final int ELYTRA = 444;
 
     public static final int SHULKER_SHELL = 445;
+    
+    public static final int TRIDENT = 455;
 
     public static final int BEETROOT = 457;
     public static final int BEETROOT_SEEDS = 458;

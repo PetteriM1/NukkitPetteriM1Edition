@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 public class EntitySheep extends WalkingAnimal {
 
     public static final int NETWORK_ID = 13;
