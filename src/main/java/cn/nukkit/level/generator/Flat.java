@@ -1,7 +1,6 @@
 package cn.nukkit.level.generator;
 
 import cn.nukkit.Server;
-import cn.nukkit.block.*;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.biome.Biome;
@@ -80,7 +79,6 @@ public class Flat extends Generator {
         try {
             this.preset = preset;
             String[] presetArray = preset.split(";");
-            int version = Integer.valueOf(presetArray[0]);
             String blocks = presetArray.length > 1 ? presetArray[1] : "";
             this.biome = presetArray.length > 2 ? Integer.valueOf(presetArray[2]) : 1;
             String options = presetArray.length > 3 ? presetArray[1] : "";
@@ -169,8 +167,6 @@ public class Flat extends Generator {
                 chunk.setBiomeId(X, Z, biome);
                 chunk.setBiomeColor(X, Z, R, G, B);
                 for (int y = 0; y < 256; ++y) {
-                    int k = this.structure[y][0];
-                    int l = this.structure[y][1];
                     chunk.setBlock(X, y, Z, this.structure[y][0], this.structure[y][1]);
                 }
             }

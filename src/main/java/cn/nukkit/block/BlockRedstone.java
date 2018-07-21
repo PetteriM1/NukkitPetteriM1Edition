@@ -39,8 +39,6 @@ public class BlockRedstone extends BlockSolid {
         return "Redstone Block";
     }
 
-    //TODO: redstone
-
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {

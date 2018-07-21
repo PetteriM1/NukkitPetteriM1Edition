@@ -10,7 +10,7 @@ import cn.nukkit.utils.BlockColor;
 
 public class BlockMagma extends BlockSolid {
 
-    public BlockMagma(){
+    public BlockMagma() {
     }
 
     @Override
@@ -70,5 +70,9 @@ public class BlockMagma extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
-
+    
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
 }

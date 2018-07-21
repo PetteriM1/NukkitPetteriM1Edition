@@ -11,7 +11,7 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.FlyingMonster;
 import cn.nukkit.entity.passive.Animal;
 import cn.nukkit.entity.EntityUtils;
-import cn.nukkit.entity.projectile.EntityFireBall;
+import cn.nukkit.entity.projectile.EntityBlazeFireBall;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -255,11 +255,11 @@ public class EntityBlaze extends FlyingMonster {
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             Entity k = EntityUtils.create("FireBall", pos, this);
-            if (!(k instanceof EntityFireBall)) {
+            if (!(k instanceof EntityBlazeFireBall)) {
                 return;
             }
 
-            EntityFireBall fireball = (EntityFireBall) k;
+            EntityBlazeFireBall fireball = (EntityBlazeFireBall) k;
             fireball.setExplode(true);
             fireball.setMotion(new Vector3(-Math.sin(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f, -Math.sin(Math.toDegrees(pitch)) * f * f,
                     Math.cos(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f));

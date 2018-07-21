@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -31,11 +32,17 @@ public class BlockDaylightDetector extends BlockTransparent {
         return BlockColor.WOOD_BLOCK_COLOR;
     }
 
-    //这个函数提供一个结构的建议，可重命名也可删
     protected boolean invertDetect() {
         return false;
     }
-
-    //todo redstone
-
+    
+    @Override
+    public boolean isPowerSource() {
+        return true;
+    }
+    
+    @Override
+    public int getWeakPower(BlockFace face) {
+        return 15;
+    }
 }

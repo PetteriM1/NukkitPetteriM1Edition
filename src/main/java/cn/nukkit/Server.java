@@ -308,6 +308,7 @@ public class Server {
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
                 put("nether", false);
+                put("end", false);
                 put("suomicraft-mode", false);
                 put("do-not-tick-worlds", "");
             }
@@ -1943,30 +1944,6 @@ public class Server {
         return serviceManager;
     }
 
-    /*public Map<String, List<String>> getCommandAliases() {
-        Object section = this.getConfig("aliases");
-        Map<String, List<String>> result = new LinkedHashMap<>();
-        if (section instanceof Map) {
-            for (Map.Entry entry : (Set<Map.Entry>) ((Map) section).entrySet()) {
-                List<String> commands = new ArrayList<>();
-                String key = (String) entry.getKey();
-                Object value = entry.getValue();
-                if (value instanceof List) {
-                    for (String string : (List<String>) value) {
-                        commands.add(string);
-                    }
-                } else {
-                    commands.add((String) value);
-                }
-
-                result.put(key, commands);
-            }
-        }
-
-        return result;
-
-    }*/
-
     public boolean shouldSavePlayerData() { //NOTICE: Remember to create folder called "players" if you enable this.
         return (Boolean) this.getPropertyBoolean("save-player-data", false);
     }
@@ -1987,13 +1964,24 @@ public class Server {
     }
 
     private void registerEntities() {
-        Entity.registerEntity("Arrow", EntityArrow.class);
+        //Items    
         Entity.registerEntity("Item", EntityItem.class);
+        Entity.registerEntity("Painting", EntityPainting.class);
+        Entity.registerEntity("XpOrb", EntityXPOrb.class);
+        Entity.registerEntity("ArmorStand", EntityArmorStand.class);
+        Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
         Entity.registerEntity("FallingSand", EntityFallingBlock.class);
         Entity.registerEntity("PrimedTnt", EntityPrimedTNT.class);
+        Entity.registerEntity("Firework", EntityFirework.class);
+        //Projectiles
+        Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Snowball", EntitySnowball.class);
         Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
-        Entity.registerEntity("Painting", EntityPainting.class);
+        Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
+        Entity.registerEntity("ThrownPotion", EntityPotion.class);
+        Entity.registerEntity("Egg", EntityEgg.class);
+        Entity.registerEntity("BlazeFireBall", EntityBlazeFireBall.class);
+        Entity.registerEntity("GhastFireBall", EntityGhastFireBall.class);
         //Monsters
         Entity.registerEntity("Blaze", EntityBlaze.class);
         Entity.registerEntity("Creeper", EntityCreeper.class);
@@ -2004,7 +1992,6 @@ public class Server {
         Entity.registerEntity("Enderman", EntityEnderman.class);
         Entity.registerEntity("Endermite", EntityEndermite.class);
         Entity.registerEntity("Evoker", EntityEvoker.class);
-        Entity.registerEntity("Firework", EntityFirework.class);
         Entity.registerEntity("Ghast", EntityGhast.class);
         Entity.registerEntity("Guardian", EntityGuardian.class);
         Entity.registerEntity("Husk", EntityHusk.class);
@@ -2032,6 +2019,7 @@ public class Server {
         Entity.registerEntity("Dolphin", EntityDolphin.class);
         Entity.registerEntity("Donkey", EntityDonkey.class);
         Entity.registerEntity("Horse", EntityHorse.class);
+        Entity.registerEntity("IronGolem", EntityIronGolem.class);
         Entity.registerEntity("Llama", EntityLlama.class);
         Entity.registerEntity("Mooshroom", EntityMooshroom.class);
         Entity.registerEntity("Mule", EntityMule.class);
@@ -2043,25 +2031,18 @@ public class Server {
         Entity.registerEntity("Salmon", EntitySalmon.class);
         Entity.registerEntity("Sheep", EntitySheep.class);
         Entity.registerEntity("Squid", EntitySquid.class);
+        Entity.registerEntity("SnowGolem", EntitySnowGolem.class);
         Entity.registerEntity("TropicalFish", EntityTropicalFish.class);
         Entity.registerEntity("Turtle", EntityTurtle.class);
         Entity.registerEntity("Wolf", EntityWolf.class);
         Entity.registerEntity("Ocelot", EntityOcelot.class);
         Entity.registerEntity("Villager", EntityVillager.class);
         Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
-
-        Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
-        Entity.registerEntity("XpOrb", EntityXPOrb.class);
-        Entity.registerEntity("ThrownPotion", EntityPotion.class);
-        Entity.registerEntity("Egg", EntityEgg.class);
-
-        Entity.registerEntity("Human", EntityHuman.class, true);
-
+        //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("Boat", EntityBoat.class);
-
-        Entity.registerEntity("ArmorStand", EntityArmorStand.class);
-        Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
+        //Others
+        Entity.registerEntity("Human", EntityHuman.class, true);
     }
 
     private void registerBlockEntities() {
