@@ -268,6 +268,7 @@ public class Server {
                 put("explosion-break-blocks", true);
                 put("weather", true);
                 put("stop-in-game", false);
+                put("op-in-game", false);
                 put("xp-bottles-on-creative", false);
                 put("spawn-eggs", true);
                 put("mob-ai", true);
