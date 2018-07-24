@@ -257,7 +257,7 @@ public class Server {
                 put("generator-settings", "");
                 put("level-name", "world");
                 put("level-seed", "");
-                put("level-type", "DEFAULT");
+                put("level-type", "default");
                 put("enable-query", true);
                 put("enable-rcon", false);
                 put("rcon.password", Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(3, 13));
@@ -312,6 +312,7 @@ public class Server {
                 put("end", false);
                 put("suomicraft-mode", false);
                 put("do-not-tick-worlds", "");
+                put("load-all-worlds", true);
             }
         });
 
@@ -416,32 +417,7 @@ public class Server {
         Generator.addGenerator(Normal.class, "normal", Generator.TYPE_INFINITE);
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         Generator.addGenerator(Nether.class, "nether", Generator.TYPE_NETHER);
-
-        /*for (String name : ((Map<String, Object>) this.getConfig("worlds", new HashMap<>())).keySet()) {
-            if (!this.loadLevel(name)) {
-                long seed;
-                try {
-                    seed = ((Integer) this.getConfig("worlds." + name + ".seed")).longValue();
-                } catch (Exception e) {
-                    seed = System.currentTimeMillis();
-                }
-
-                Map<String, Object> options = new HashMap<>();
-                String[] opts = ((String) this.getConfig("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
-                Class<? extends Generator> generator = Generator.getGenerator(opts[0]);
-                if (opts.length > 1) {
-                    String preset = "";
-                    for (int i = 1; i < opts.length; i++) {
-                        preset += opts[i] + ":";
-                    }
-                    preset = preset.substring(0, preset.length() - 1);
-
-                    options.put("preset", preset);
-                }
-
-                this.generateLevel(name, seed, generator, options);
-            }
-        }*/
+        //Generator.addGenerator(End.class, "end", Generator.TYPE_END);
 
         if (this.getDefaultLevel() == null) {
             String defaultName = this.getPropertyString("level-name", "world");
@@ -476,6 +452,26 @@ public class Server {
 
         if ((int) this.getPropertyInt("ticks-per-autosave", 6000) > 0) {
             this.autoSaveTicks = (int) this.getPropertyInt("ticks-per-autosave", 6000);
+        }
+        
+        // Load levels
+        if (this.getPropertyBoolean("load-all-worlds", true)) {
+            String dir2 = null;
+            Level level = this.getDefaultLevel();
+            level.getFolderName();
+            File directory = new File("");
+            try {
+                String f = directory.getCanonicalPath();
+                dir2 = f + "/worlds/";
+            } catch (Exception localException) {}
+            File var11 = new File(dir2);
+            File[] fa = var11.listFiles();
+            for (int i = 0; i < fa.length; i++) {
+                File fs = fa[i];
+                if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
+                    this.loadLevel(fs.getName());
+                }
+            }
         }
 
         this.enablePlugins(PluginLoadOrder.POSTWORLD);
@@ -748,7 +744,6 @@ public class Server {
         }
 
         try {
-            // clean shutdown of console thread asap
             this.console.shutdown();
 
             this.hasStopped = true;
@@ -763,7 +758,7 @@ public class Server {
             this.pluginManager.disablePlugins();
 
             for (Player player : new ArrayList<>(this.players.values())) {
-                player.close(player.getLeaveMessage(), (String) this.getPropertyString("shutdown-message", "Server closed"));
+                player.close(player.getLeaveMessage(), this.getPropertyString("shutdown-message", "§cServer closed"));
             }
 
             this.getLogger().debug("Unloading all levels...");
@@ -789,9 +784,8 @@ public class Server {
 
             this.getLogger().debug("Disabling timings...");
             Timings.stopServer();
-            //todo other things
         } catch (Exception e) {
-            this.logger.logException(e); //todo remove this?
+            this.logger.logException(e);
             this.logger.emergency("Exception happened while shutting down, exit the process");
             System.exit(1);
         }
@@ -1238,7 +1232,7 @@ public class Server {
     }
 
     public String getLevelType() {
-        return this.getPropertyString("level-type", "DEFAULT");
+        return this.getPropertyString("level-type", "default");
     }
 
     public boolean getGenerateStructures() {

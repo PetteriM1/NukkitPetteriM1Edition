@@ -18,6 +18,7 @@ public abstract class Generator {
     public static final int TYPE_INFINITE = 1;
     public static final int TYPE_FLAT = 2;
     public static final int TYPE_NETHER = 3;
+    public static final int TYPE_END = 4;
 
     public abstract int getId();
 
