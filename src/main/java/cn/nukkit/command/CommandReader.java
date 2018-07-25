@@ -122,5 +122,4 @@ public class CommandReader extends Thread implements InterruptibleThread {
             e.printStackTrace();
         }
     }
-
 }

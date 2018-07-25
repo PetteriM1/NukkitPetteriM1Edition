@@ -489,6 +489,4 @@ public class Binary {
         }
         return buffer.array();
     }
-
-
 }

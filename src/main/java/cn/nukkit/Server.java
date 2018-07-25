@@ -222,10 +222,6 @@ public class Server {
         if (!new File(dataPath + "worlds/").exists()) {
             new File(dataPath + "worlds/").mkdirs();
         }
-        
-        if (!new File(dataPath + "players/").exists() && this.getPropertyBoolean("save-player-data", true)) {
-            new File(dataPath + "players/").mkdirs();
-        }
 
         if (!new File(pluginPath).exists()) {
             new File(pluginPath).mkdirs();
@@ -320,6 +316,12 @@ public class Server {
                 put("ansi-title", true);
             }
         });
+        
+        if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
+        
+        if (!new File(dataPath + "players/").exists() && this.getPropertyBoolean("save-player-data", true)) {
+            new File(dataPath + "players/").mkdirs();
+        }
 
         this.forceLanguage = (Boolean) this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang((String) this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
@@ -1130,7 +1132,7 @@ public class Server {
     }
 
     public void titleTick() {
-        if (!this.getPropertyBoolean("ansi-title", true)) return;
+        if (!Nukkit.TITLE) return;
 
         Runtime runtime = Runtime.getRuntime();
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
