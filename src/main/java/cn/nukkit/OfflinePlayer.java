@@ -137,5 +137,4 @@ public class OfflinePlayer implements IPlayer {
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
         this.server.getPlayerMetadata().removeMetadata(this, metadataKey, owningPlugin);
     }
-
 }

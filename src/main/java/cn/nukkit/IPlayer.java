@@ -133,5 +133,4 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     boolean hasPlayedBefore();
-
 }

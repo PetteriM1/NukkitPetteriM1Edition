@@ -123,6 +123,4 @@ public class Nukkit {
         }
         System.exit(0);
     }
-
-
 }

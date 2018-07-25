@@ -222,6 +222,10 @@ public class Server {
         if (!new File(dataPath + "worlds/").exists()) {
             new File(dataPath + "worlds/").mkdirs();
         }
+        
+        if (!new File(dataPath + "players/").exists() && this.getPropertyBoolean("save-player-data", true)) {
+            new File(dataPath + "players/").mkdirs();
+        }
 
         if (!new File(pluginPath).exists()) {
             new File(pluginPath).mkdirs();
@@ -277,7 +281,7 @@ public class Server {
                 put("language", "eng");
                 put("force-language", false);
                 put("shutdown-message", "§cServer closed");
-                put("save-player-data", false);
+                put("save-player-data", true);
                 put("query-plugins", false);
                 put("debug-level", 1);
                 put("async-workers", "auto");
@@ -313,6 +317,7 @@ public class Server {
                 put("suomicraft-mode", false);
                 put("do-not-tick-worlds", "");
                 put("load-all-worlds", true);
+                put("ansi-title", true);
             }
         });
 
@@ -705,20 +710,6 @@ public class Server {
         for (BanEntry entry : this.getIPBans().getEntires().values()) {
             this.getNetwork().blockAddress(entry.getName(), -1);
         }
-
-        this.pluginManager.registerInterface(JavaPluginLoader.class);
-        this.pluginManager.loadPlugins(this.pluginPath);
-        this.enablePlugins(PluginLoadOrder.STARTUP);
-        this.enablePlugins(PluginLoadOrder.POSTWORLD);
-        Timings.reset();
-    }
-
-    public void reloadPlugins() {
-        this.logger.info("Reloading plugins...");
-
-        this.pluginManager.disablePlugins();
-        this.pluginManager.clearPlugins();
-        this.commandMap.clearCommands();
 
         this.pluginManager.registerInterface(JavaPluginLoader.class);
         this.pluginManager.loadPlugins(this.pluginPath);
@@ -1139,9 +1130,7 @@ public class Server {
     }
 
     public void titleTick() {
-        if (!Nukkit.ANSI) {
-            return;
-        }
+        if (!this.getPropertyBoolean("ansi-title", true)) return;
 
         Runtime runtime = Runtime.getRuntime();
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
@@ -2067,5 +2056,4 @@ public class Server {
     public boolean suomiCraftPEMode() {
         return this.getPropertyBoolean("suomicraft-mode", false);
     }
-
 }
