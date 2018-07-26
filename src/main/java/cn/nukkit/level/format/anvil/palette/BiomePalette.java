@@ -76,8 +76,6 @@ public final class BiomePalette {
                     raw[i] = palette.getKey(raw[i]);
                 }
 
-                int oldRaw = raw[4];
-
                 raw[index] = value;
 
                 palette.add(value);

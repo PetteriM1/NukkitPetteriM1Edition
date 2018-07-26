@@ -101,7 +101,6 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission(ROOT + ".command.reload", "Allows the user to reload the server settings", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.version", "Allows the user to view the version of the server", Permission.DEFAULT_TRUE), commands);
         registerPermission(new Permission(ROOT + ".command.defaultgamemode", "Allows the user to change the default gamemode", Permission.DEFAULT_OP), commands);
-        registerPermission(new Permission(ROOT + ".command.seed", "Allows the user to view the seed of the world", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.status", "Allows the user to view the server performance", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.gc", "Allows the user to fire garbage collection tasks", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.timings", "Allows the user to records timings for all plugin events", Permission.DEFAULT_OP), commands);
@@ -110,7 +109,10 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission(ROOT + ".command.setworldspawn", "Allows the user to change the world spawn", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.weather", "Allows the user to change the weather", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.xp", "Allows the user to give experience", Permission.DEFAULT_OP), commands);
-        registerPermission(new Permission(ROOT + ".command.transferserver", "Allows the user to use /transferserver command", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission(ROOT + ".command.transferserver", "Allows the user to transfer to other server", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission(ROOT + ".command.summon", "Allows the user to summon entities", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission(ROOT + ".command.world", "Allows the user to switch world", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission(ROOT + ".command.generateworld", "Allows the user to generate new world", Permission.DEFAULT_OP), commands);
 
         commands.recalculatePermissibles();
 

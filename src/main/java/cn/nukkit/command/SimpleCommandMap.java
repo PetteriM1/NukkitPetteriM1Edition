@@ -31,7 +31,6 @@ public class SimpleCommandMap implements CommandMap {
     private void setDefaultCommands() {
         this.register("nukkit", new VersionCommand("version"));
         this.register("nukkit", new PluginsCommand("plugins"));
-        this.register("nukkit", new SeedCommand("seed"));
         this.register("nukkit", new HelpCommand("help"));
         this.register("nukkit", new StopCommand("stop"));
         this.register("nukkit", new TellCommand("tell"));
@@ -71,6 +70,8 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new StatusCommand("status"));
         this.register("nukkit", new GarbageCollectorCommand("gc"));
         this.register("nukkit", new SummonCommand("summon"));
+        this.register("nukkit", new WorldCommand("world"));
+        this.register("nukkit", new GenerateWorldCommand("genworld"));
     }
 
     @Override

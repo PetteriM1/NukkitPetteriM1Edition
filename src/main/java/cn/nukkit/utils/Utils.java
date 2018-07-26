@@ -121,6 +121,7 @@ public class Utils {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
+        printWriter.flush();
         return stringWriter.toString();
     }
 

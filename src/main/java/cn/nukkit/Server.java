@@ -751,7 +751,7 @@ public class Server {
             this.pluginManager.disablePlugins();
 
             for (Player player : new ArrayList<>(this.players.values())) {
-                player.close(player.getLeaveMessage(), this.getPropertyString("shutdown-message", "§cServer closed"));
+                player.close(player.getLeaveMessage(), this.getPropertyString("shutdown-message", "§cServer closed").replace("§n", "\n"));
             }
 
             this.getLogger().debug("Unloading all levels...");
@@ -2049,6 +2049,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.BED, BlockEntityBed.class);
         BlockEntity.registerBlockEntity(BlockEntity.JUKEBOX, BlockEntityJukebox.class);
         BlockEntity.registerBlockEntity(BlockEntity.SHULKER_BOX, BlockEntityShulkerBox.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BANNER, BlockEntityBanner.class);
     }
 
     public static Server getInstance() {

@@ -46,6 +46,8 @@ public class Nukkit {
 
     public static void main(String[] args) {
 
+        System.setProperty("java.net.preferIPv4Stack" , "true");
+
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("windows")) {
             if (osName.contains("windows 8") || osName.contains("2012")) {

@@ -18,31 +18,37 @@ import java.util.List;
 /**
  * @author CreeperFace
  */
-public class ItemFireworks extends Item {
+public class ItemFirework extends Item {
 
-    public ItemFireworks() {
+    public ItemFirework() {
         this(0);
     }
 
-    public ItemFireworks(Integer meta) {
+    public ItemFirework(Integer meta) {
         this(meta, 1);
     }
 
-    public ItemFireworks(Integer meta, int count) {
+    public ItemFirework(Integer meta, int count) {
         super(FIREWORKS, meta, count, "Fireworks");
 
         if (!hasCompoundTag() || !this.getNamedTag().contains("Fireworks")) {
             CompoundTag tag = getNamedTag();
             if (tag == null) {
                 tag = new CompoundTag();
+
+                CompoundTag ex = new CompoundTag()
+                        .putByteArray("FireworkColor", new byte[]{(byte) DyeColor.BLACK.getDyeData()})
+                        .putByteArray("FireworkFade", new byte[]{})
+                        .putBoolean("FireworkFlicker", false)
+                        .putBoolean("FireworkTrail", false)
+                        .putByte("FireworkType", FireworkExplosion.ExplosionType.CREEPER_SHAPED.ordinal());
+
+                tag.putCompound("Fireworks", new CompoundTag("Fireworks")
+                        .putList(new ListTag<CompoundTag>("Explosions").add(ex))
+                        .putByte("Flight", 1)
+                );
+                this.setNamedTag(tag);
             }
-
-            tag.putCompound("Fireworks", new CompoundTag("Fireworks")
-                    .putList(new ListTag<CompoundTag>("Explosions"))
-                    .putByte("Flight", 1)
-            );
-
-            this.setNamedTag(tag);
         }
     }
 
@@ -104,38 +110,37 @@ public class ItemFireworks extends Item {
                 .putByte("FireworkType", explosion.type.ordinal());
 
         explosions.add(tag);
-        encodeCompoundTag();
     }
 
     public void clearExplosions() {
         this.getNamedTag().getCompound("Fireworks")
                 .putList(new ListTag<CompoundTag>("Explosions"));
-
-        encodeCompoundTag();
     }
 
     public static class FireworkExplosion {
 
         private List<DyeColor> colors = new ArrayList<>();
-        public List<DyeColor> getColors(){
+        private List<DyeColor> fades = new ArrayList<>();
+        private boolean flicker = false;
+        private boolean trail = false;
+        private ExplosionType type = ExplosionType.CREEPER_SHAPED;
+
+        public List<DyeColor> getColors() {
             return this.colors;
         }
 
-        private List<DyeColor> fades = new ArrayList<>();
         public List<DyeColor> getFades() {
             return this.fades;
         }
 
-        private boolean flicker;
         public boolean hasFlicker() {
             return this.flicker;
         }
 
-        private boolean trail;
         public boolean hasTrail() {
             return this.trail;
         }
-        private ExplosionType type;
+
         public ExplosionType getType() {
             return this.type;
         }
@@ -172,7 +177,5 @@ public class ItemFireworks extends Item {
             CREEPER_SHAPED,
             BURST
         }
-
     }
-
 }

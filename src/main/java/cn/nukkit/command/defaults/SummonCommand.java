@@ -22,7 +22,7 @@ public class SummonCommand extends Command {
         }
 
         if (args.length == 0) {
-            return true;
+            return false;
         }
 
         String mob = args[0];

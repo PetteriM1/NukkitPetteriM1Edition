@@ -4,21 +4,21 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ByteEntityData;
-import cn.nukkit.entity.data.LongEntityData;
+import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.data.SlotEntityData;
-import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemFireworks;
+import cn.nukkit.item.ItemFirework;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.PlaySoundPacket;
+
+import java.util.Random;
 
 /**
  * @author CreeperFace
@@ -35,22 +35,22 @@ public class EntityFirework extends Entity {
         super(chunk, nbt);
 
         this.fireworkAge = 0;
-        this.lifetime = 30 + this.level.rand.nextInt(6) + this.level.rand.nextInt(7);
+        Random rand = new Random();
+        this.lifetime = 30 + rand.nextInt(6) + rand.nextInt(7);
 
-        this.motionX = this.level.rand.nextGaussian() * 0.001D;
-        this.motionZ = this.level.rand.nextGaussian() * 0.001D;
+        this.motionX = rand.nextGaussian() * 0.001D;
+        this.motionZ = rand.nextGaussian() * 0.001D;
         this.motionY = 0.05D;
 
         if (nbt.contains("FireworkItem")) {
             firework = NBTIO.getItemHelper(nbt.getCompound("FireworkItem"));
         } else {
-            firework = new ItemFireworks();
+            firework = new ItemFirework();
         }
 
-        this.setDataProperty(new SlotEntityData(16, firework));
-        this.setDataProperty(new Vector3fEntityData(17, new Vector3f(0, 1, 0)));
-        this.setDataProperty(new LongEntityData(18, -1));
-        this.setDataProperty(new ByteEntityData(22, 0));
+        this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, firework));
+        this.setDataProperty(new IntEntityData(Entity.DATA_DISPLAY_OFFSET, 1));
+        this.setDataProperty(new ByteEntityData(Entity.DATA_HAS_DISPLAY, 1));
     }
 
     @Override
@@ -78,9 +78,6 @@ public class EntityFirework extends Entity {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-            if (this.checkObstruction(this.x, this.y, this.z)) {
-                hasUpdate = true;
-            }
 
             this.motionX *= 1.15D;
             this.motionZ *= 1.15D;
@@ -89,12 +86,12 @@ public class EntityFirework extends Entity {
 
             this.updateMovement();
 
+
             float f = (float) Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
             this.yaw = (float) (Math.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
 
-            for (this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (180D / Math.PI)); this.pitch - this.lastPitch < -180.0F; this.lastPitch -= 360.0F) {
-                ;
-            }
+            this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (180D / Math.PI));
+
 
             if (this.fireworkAge == 0) {
                 PlaySoundPacket pk = new PlaySoundPacket();
@@ -149,7 +146,7 @@ public class EntityFirework extends Entity {
 
     public void setFirework(Item item) {
         this.firework = item;
-        this.setDataProperty(new SlotEntityData(16, item));
+        this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, item));
     }
 
     @Override

@@ -57,6 +57,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_TYPE_POS = 6;
     public static final int DATA_TYPE_LONG = 7;
     public static final int DATA_TYPE_VECTOR3F = 8;
+
     public static final int DATA_FLAGS = 0;
     public static final int DATA_HEALTH = 1; //int (minecart/boat)
     public static final int DATA_VARIANT = 2; //int
@@ -74,9 +75,9 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_PADDLE_TIME_RIGHT = 14; //float
     public static final int DATA_EXPERIENCE_VALUE = 15; //int (xp orb)
     public static final int DATA_FIREWORK_ITEM = 16; //int (id | (data << 16))
-    public static final int DATA_MINECART_DISPLAY_BLOCK = 16; //int (id | (data << 16))
-    public static final int DATA_MINECART_DISPLAY_OFFSET = 17; //int
-    public static final int DATA_MINECART_HAS_DISPLAY = 18; //byte (must be 1 for minecart to show block inside)
+    public static final int DATA_DISPLAY_ITEM = 16; //int (id | (data << 16))
+    public static final int DATA_DISPLAY_OFFSET = 17; //int
+    public static final int DATA_HAS_DISPLAY = 18; //byte (must be 1 for minecart to show block inside)
     //TODO: add more properties
     public static final int DATA_ENDERMAN_HELD_RUNTIME_ID = 23; //short
     public static final int DATA_ENTITY_AGE = 24; //short
@@ -192,7 +193,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_FIRE_IMMUNE = 48;
     public static final int DATA_FLAG_DANCING = 49;
     public static final int DATA_FLAG_ENCHANTED = 50;
-    // 51 trident flag
+    public static final int DATA_FLAG_SHOW_TRIDENT_ROPE = 51;
     public static final int DATA_FLAG_CONTAINER_PRIVATE = 52; //disable content drop when killed
     // 53 TransformationComponent
     public static final int DATA_FLAG_SPIN_ATTACK = 54;
