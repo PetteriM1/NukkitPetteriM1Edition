@@ -6,7 +6,6 @@ import cn.nukkit.blockentity.BlockEntityDropper;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.Map;
@@ -97,25 +96,21 @@ public class BlockDropper extends BlockSolidMeta {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            Block top = this.up();
-            if (!top.isTransparent()) {
-                return true;
-            }
 
             BlockEntity t = this.getLevel().getBlockEntity(this);
-            BlockEntityDropper chest;
+            BlockEntityDropper inv;
             if (t instanceof BlockEntityDropper) {
-                chest = (BlockEntityDropper) t;
+                inv = (BlockEntityDropper) t;
             } else {
                 CompoundTag nbt = new CompoundTag("")
                         .putString("id", BlockEntity.DROPPER)
                         .putInt("x", (int) this.x)
                         .putInt("y", (int) this.y)
                         .putInt("z", (int) this.z);
-                chest = new BlockEntityDropper(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+                inv = new BlockEntityDropper(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
             }
 
-            player.addWindow(chest.getInventory());
+            player.addWindow(inv.getInventory());
         }
 
         return true;

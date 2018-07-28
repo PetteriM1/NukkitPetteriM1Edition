@@ -6,7 +6,6 @@ import cn.nukkit.blockentity.BlockEntityDispenser;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.Map;
@@ -41,12 +40,6 @@ public class BlockDispenser extends BlockSolidMeta {
 
     @Override
     public int getComparatorInputOverride() {
-        /*BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if(blockEntity instanceof BlockEntityDispenser) {
-            //return ContainerInventory.calculateRedstone(((BlockEntityDispenser) blockEntity).getInventory()); TODO: dispenser
-        }*/
-
         return super.getComparatorInputOverride();
     }
 
@@ -117,25 +110,21 @@ public class BlockDispenser extends BlockSolidMeta {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            Block top = this.up();
-            if (!top.isTransparent()) {
-                return true;
-            }
 
             BlockEntity t = this.getLevel().getBlockEntity(this);
-            BlockEntityDispenser chest;
+            BlockEntityDispenser inv;
             if (t instanceof BlockEntityDispenser) {
-                chest = (BlockEntityDispenser) t;
+                inv = (BlockEntityDispenser) t;
             } else {
                 CompoundTag nbt = new CompoundTag("")
                         .putString("id", BlockEntity.DISPENSER)
                         .putInt("x", (int) this.x)
                         .putInt("y", (int) this.y)
                         .putInt("z", (int) this.z);
-                chest = new BlockEntityDispenser(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+                inv = new BlockEntityDispenser(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
             }
 
-            player.addWindow(chest.getInventory());
+            player.addWindow(inv.getInventory());
         }
 
         return true;
