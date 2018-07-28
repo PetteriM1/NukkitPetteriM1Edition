@@ -40,6 +40,8 @@ public abstract class BlockEntity extends Position {
     public static final String JUKEBOX = "Jukebox";
     public static final String SHULKER_BOX = "ShulkerBox";
     public static final String BANNER = "Banner";
+    public static final String DROPPER = "Dropper";
+    public static final String DISPENSER = "Dispenser";
 
 
     public static long count = 1;
@@ -61,7 +63,7 @@ public abstract class BlockEntity extends Position {
 
     public BlockEntity(FullChunk chunk, CompoundTag nbt) {
         if (chunk == null || chunk.getProvider() == null) {
-            throw new ChunkException("Invalid garbage Chunk given to Block Entity");
+            throw new ChunkException("Invalid garbage chunk given to block entity");
         }
 
         this.timing = Timings.getBlockEntityTiming(this);
@@ -88,7 +90,7 @@ public abstract class BlockEntity extends Position {
     }
 
     public static BlockEntity createBlockEntity(String type, FullChunk chunk, CompoundTag nbt, Object... args) {
-        type = type.replaceFirst("BlockEntity", ""); //TODO: Remove this after the first release
+        type = type.replaceFirst("BlockEntity", "");
         BlockEntity blockEntity = null;
 
         if (knownBlockEntities.containsKey(type)) {
@@ -120,7 +122,6 @@ public abstract class BlockEntity extends Position {
 
                     }
                 } catch (Exception e) {
-                    //ignore
                 }
 
             }

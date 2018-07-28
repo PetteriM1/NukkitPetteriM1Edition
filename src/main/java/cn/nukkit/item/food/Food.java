@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.player.PlayerEatFoodEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 
@@ -68,7 +69,6 @@ public abstract class Food {
             .addEffect(Effect.getEffect(Effect.POISON).setDuration(4 * 20))
             .addRelative(Item.SPIDER_EYE));
     public static final Food steak = registerDefaultFood(new FoodNormal(8, 12.8F).addRelative(Item.COOKED_BEEF));
-    //different kinds of fishes
     public static final Food clownfish = registerDefaultFood(new FoodNormal(1, 0.2F).addRelative(Item.CLOWNFISH));
     public static final Food fish_cooked = registerDefaultFood(new FoodNormal(5, 6F).addRelative(Item.COOKED_FISH));
     public static final Food fish_raw = registerDefaultFood(new FoodNormal(2, 0.4F).addRelative(Item.RAW_FISH));
@@ -80,7 +80,6 @@ public abstract class Food {
             .addEffect(Effect.getEffect(Effect.POISON).setAmplifier(4).setDuration(60 * 20))
             .addRelative(Item.PUFFERFISH));
 
-    //Opened API for plugins
     public static Food registerFood(Food food, Plugin plugin) {
         Objects.requireNonNull(food);
         Objects.requireNonNull(plugin);
@@ -128,6 +127,14 @@ public abstract class Food {
     }
 
     protected boolean onEatenBy(Player player) {
+        LevelSoundEventPacket pk = new LevelSoundEventPacket();
+        pk.sound = LevelSoundEventPacket.SOUND_EAT;
+        pk.extraData = -1;
+        pk.pitch = -1;
+        pk.x = (float) player.getX();
+        pk.y = (float) player.getY();
+        pk.z = (float) player.getZ();
+        player.dataPacket(pk);
         player.getFoodData().addFoodLevel(this);
         return true;
     }

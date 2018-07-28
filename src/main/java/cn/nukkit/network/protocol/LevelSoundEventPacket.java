@@ -189,8 +189,8 @@ public class LevelSoundEventPacket extends DataPacket {
     public float x;
     public float y;
     public float z;
-    public int extraData = -1; //TODO: Check name
-    public int pitch = 1; //TODO: Check name
+    public int extraData = -1;
+    public int pitch = 1;
     public boolean isBabyMob;
     public boolean isGlobal;
 

@@ -56,7 +56,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
 
     @Override
     public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Furnace";
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Hopper";
     }
 
     @Override
@@ -154,7 +154,6 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             boolean pickup = this.pickupDroppedItems();
 
             if (transfer || pickup) {
-                //this.setTransferCooldown(8); TODO: maybe we should update hopper every tick if nothing happens?
                 this.chunk.setChanged(true);
             }
 
@@ -195,6 +194,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
 
             if (items[0].getCount() != originalCount) {
                 update = true;
+                item.setCount(items[0].getCount());
             }
         }
 
