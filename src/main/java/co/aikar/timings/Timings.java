@@ -35,12 +35,12 @@ import cn.nukkit.plugin.MethodEventExecutor;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.scheduler.PluginTask;
 import cn.nukkit.scheduler.TaskHandler;
+
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
 import static co.aikar.timings.TimingIdentifier.DEFAULT_GROUP;
-
 
 public final class Timings {
     private static boolean timingsEnabled = false;
@@ -197,12 +197,10 @@ public final class Timings {
 
 
     public static Timing getCommandTiming(Command command) {
-        if (!isTimingsEnabled()) return commandTimer;
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "Command: " + command.getLabel(), commandTimer);
     }
 
     public static Timing getTaskTiming(TaskHandler handler, long period) {
-        if (!isTimingsEnabled()) return schedulerSyncTimer;
         String repeating = " ";
         if (period > 0) {
             repeating += "(interval:" + period + ")";
@@ -221,7 +219,6 @@ public final class Timings {
     }
 
     public static Timing getPluginEventTiming(Class<? extends Event> event, Listener listener, EventExecutor executor, Plugin plugin) {
-        if (!isTimingsEnabled()) return pluginEventTimer;
         Timing group = TimingsManager.getTiming(plugin.getName(), "Combined Total", pluginEventTimer);
 
         return TimingsManager.getTiming(plugin.getName(), "Event: " + listener.getClass().getName() + "."
@@ -230,22 +227,18 @@ public final class Timings {
     }
 
     public static Timing getEntityTiming(Entity entity) {
-        if (!isTimingsEnabled()) return tickEntityTimer;
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Entity Tick: " + entity.getClass().getSimpleName(), tickEntityTimer);
     }
 
     public static Timing getBlockEntityTiming(BlockEntity blockEntity) {
-        if (!isTimingsEnabled()) return tickBlockEntityTimer;
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "## BlockEntity Tick: " + blockEntity.getClass().getSimpleName(), tickBlockEntityTimer);
     }
 
     public static Timing getReceiveDataPacketTiming(DataPacket pk) {
-        if (!isTimingsEnabled()) return playerNetworkReceiveTimer;
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Receive Packet: " + pk.getClass().getSimpleName(), playerNetworkReceiveTimer);
     }
 
     public static Timing getSendDataPacketTiming(DataPacket pk) {
-        if (!isTimingsEnabled()) return playerNetworkSendTimer;
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Send Packet: " + pk.getClass().getSimpleName(), playerNetworkSendTimer);
     }
 

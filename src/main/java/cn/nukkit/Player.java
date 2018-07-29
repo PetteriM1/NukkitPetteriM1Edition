@@ -1358,10 +1358,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Override
     protected void checkBlockCollision() {
         boolean portal = false;
+        boolean endPortal = false;
 
         for (Block block : this.getCollisionBlocks()) {
             if (block.getId() == Block.NETHER_PORTAL) {
                 portal = true;
+                continue;
+            } else if (block.getId() == Block.END_PORTAL) {
+                endPortal = true;
                 continue;
             }
 
@@ -1373,11 +1377,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             this.inPortalTicks = 0;
         }
-        if (inPortalTicks == 40 && Server.getInstance().getPropertyBoolean("nether", true)) {
-            Player player = this.getPlayer();
-            this.getServer().dispatchCommand(player, "unitp nether"); //This needs plugin called "Universal" and world called "nether"
+        
+        if (endPortal && Server.getInstance().getPropertyBoolean("end", true)) {
+            if (this.getServer().getLevelByName("end") != null) {
+                this.getPlayer().teleport(this.getServer().getLevelByName("end").getSafeSpawn());
+            }
         }
-}
+
+        if (inPortalTicks == 40 && Server.getInstance().getPropertyBoolean("nether", true)) {
+            if (this.getServer().getLevelByName("nether") != null) {
+                this.getPlayer().teleport(this.getServer().getLevelByName("nether").getSafeSpawn());
+            }
+        }
+    }
 
     protected void checkNearEntities() {
         for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this)) {
@@ -4458,8 +4470,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public PlayerFood getFoodData() {
         return this.foodData;
     }
-
-    //todo a lot on dimension
 
     private void setDimension(int dimension) {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
