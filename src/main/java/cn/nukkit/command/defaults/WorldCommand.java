@@ -28,6 +28,10 @@ public class WorldCommand extends Command {
                 sender.sendMessage("\u00A7cUnknown player");
                 return true;
             }
+            if (Server.getInstance().getLevelByName(args[0]) == null) {
+                sender.sendMessage("\u00A7cUnknown level");
+                return true;
+            }
             Server.getInstance().getPlayer(args[1]).teleport(Server.getInstance().getLevelByName(args[0]).getSafeSpawn());
             return true;
         }
