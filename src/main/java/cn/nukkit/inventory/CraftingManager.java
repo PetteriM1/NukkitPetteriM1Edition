@@ -65,13 +65,11 @@ public class CraftingManager {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
                     case 0:
-                        // TODO: handle multiple result items
                         Map<String, Object> first = ((List<Map>) recipe.get("output")).get(0);
                         List<Item> sorted = new ArrayList<>();
                         for (Map<String, Object> ingredient : ((List<Map>) recipe.get("input"))) {
                             sorted.add(Item.fromJson(ingredient));
                         }
-                        // Bake sorted list
                         sorted.sort(recipeComparator);
 
                         ShapelessRecipe result = new ShapelessRecipe(Item.fromJson(first), sorted);
@@ -117,7 +115,7 @@ public class CraftingManager {
         this.registerBrewing();
         this.rebuildPacket();
 
-        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
+        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes.");
     }
 
     protected void registerBrewing() {
@@ -205,7 +203,7 @@ public class CraftingManager {
     }
 
     private static int getFullItemHash(Item item) {
-        return getItemHash(item) + item.getCount() << 10;
+        return 31 * getItemHash(item) + item.getCount();
     }
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe) {
@@ -218,16 +216,12 @@ public class CraftingManager {
     }
 
     private static int getItemHash(int id, int meta) {
-        return id + (meta << 8);
+        return (id << 4) | (meta & 0xf);
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
         int resultHash = getItemHash(recipe.getResult());
-        Map<UUID, ShapedRecipe> map = shapedRecipes.get(resultHash);
-        if (map == null) {
-            map = new HashMap<>();
-            shapedRecipes.put(resultHash, map);
-        }
+        Map<UUID, ShapedRecipe> map = shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
         map.put(getMultiItemHash(recipe.getIngredientList()), recipe);
     }
 
@@ -286,8 +280,6 @@ public class CraftingManager {
     }
 
     public CraftingRecipe matchRecipe(Item[][] inputMap, Item primaryOutput, Item[][] extraOutputMap) {
-        //TODO: try to match special recipes before anything else (first they need to be implemented!)
-
         int outputHash = getItemHash(primaryOutput);
         if (this.shapedRecipes.containsKey(outputHash)) {
             List<Item> itemCol = new ArrayList<>();

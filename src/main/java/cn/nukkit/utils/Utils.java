@@ -6,7 +6,9 @@ import java.lang.management.ThreadInfo;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * author: MagicDroidX
@@ -188,20 +190,19 @@ public class Utils {
         return arrays;
     }
 
-    public static void reverseArray(Object[] data) {
+    public static <T> void reverseArray(T[] data) {
         reverseArray(data, false);
     }
 
-    public static Object[] reverseArray(Object[] array, boolean copy) {
-        Object[] data = array;
+    public static <T> T[] reverseArray(T[] array, boolean copy) {
+        T[] data = array;
+
         if (copy) {
-            data = new Object[array.length];
-            System.arraycopy(array, 0, data, 0, data.length);
+            data = Arrays.copyOf(array, array.length);
         }
 
         for (int left = 0, right = data.length - 1; left < right; left++, right--) {
-            // swap the values at the left and right indices
-            Object temp = data[left];
+            T temp = data[left];
             data[left] = data[right];
             data[right] = temp;
         }
@@ -209,18 +210,43 @@ public class Utils {
         return data;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T[][] clone2dArray(T[][] array) {
-        T[][] newArray = (T[][]) new Object[array.length][];
-        for (int i = 0; i < newArray.length; i++) {
-            T[] old = array[i];
-            T[] n = (T[]) new Object[old.length];
+        T[][] newArray = Arrays.copyOf(array, array.length);
 
-            System.arraycopy(old, 0, n, 0, n.length);
-            newArray[i] = n;
+        for (int i = 0; i < array.length; i++) {
+            newArray[i] = Arrays.copyOf(array[i], array[i].length);
         }
 
         return newArray;
+    }
+
+    public static <T,U,V> Map<U,V> getOrCreate(Map<T, Map<U, V>> map, T key) {
+        Map<U, V> existing = map.get(key);
+        if (existing == null) {
+            ConcurrentHashMap<U, V> toPut = new ConcurrentHashMap<U, V>();
+            existing = map.putIfAbsent(key, toPut);
+            if (existing == null) {
+                existing = toPut;
+            }
+        }
+        return existing;
+    }
+
+    public static <T, U, V extends U> U getOrCreate(Map<T, U> map, Class<V> clazz, T key) {
+        U existing = map.get(key);
+        if (existing != null) {
+            return existing;
+        }
+        try {
+            U toPut = clazz.newInstance();
+            existing = map.putIfAbsent(key, toPut);
+            if (existing == null) {
+                return toPut;
+            }
+            return existing;
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static int toInt(Object number) {
@@ -234,7 +260,6 @@ public class Utils {
     public static byte[] parseHexBinary(String s) {
         final int len = s.length();
 
-        // "111" is not a valid hex encoding.
         if(len % 2 != 0)
             throw new IllegalArgumentException("hexBinary needs to be even-length: " + s);
 
