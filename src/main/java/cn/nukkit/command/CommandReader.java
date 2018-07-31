@@ -103,7 +103,6 @@ public class CommandReader extends Thread implements InterruptibleThread {
             reader.getOutput().write("\u001b[1G\u001b[K");
             reader.flush();
         } catch (IOException e) {
-            // ignore
         }
     }
 
@@ -111,7 +110,6 @@ public class CommandReader extends Thread implements InterruptibleThread {
         try {
             reader.resetPromptLine("> ", this.stashed.toString(), this.stashed.cursor);
         } catch (IOException e) {
-            // ignore
         }
     }
 

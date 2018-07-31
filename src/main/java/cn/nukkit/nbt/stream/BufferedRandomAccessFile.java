@@ -44,8 +44,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile
      * This implementation is based on the buffer implementation in Modula-3's
      * "Rd", "Wr", "RdClass", and "WrClass" interfaces.
      */
-    private boolean dirty_; // true iff unflushed bytes exist
-    private boolean closed_; // true iff the file is closed
+    private boolean dirty_; // true if unflushed bytes exist
+    private boolean closed_; // true if the file is closed
     private long curr_; // current position in file
     private long lo_, hi_; // bounds on characters in "buff"
     private byte[] buff_; // local buffer
@@ -200,7 +200,6 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         }
         if ( (cnt < 0) && (this.hitEOF_ = (cnt < this.buff_.length)) )
         {
-            // make sure buffer that wasn't read is initialized with -1
             Arrays.fill(this.buff_, cnt, this.buff_.length, (byte) 0xff);
         }
         this.diskPos_ += cnt;
@@ -221,9 +220,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile
     {
         if (pos >= this.hi_ || pos < this.lo_)
         {
-            // seeking outside of current buffer -- flush and read
             this.flushBuffer();
-            this.lo_ = pos & BuffMask_; // start at BuffSz boundary
+            this.lo_ = pos & BuffMask_;
             this.maxHi_ = this.lo_ + (long) this.buff_.length;
             if (this.diskPos_ != this.lo_)
             {
@@ -235,10 +233,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         }
         else
         {
-            // seeking inside current buffer -- no read required
             if (pos < this.curr_)
             {
-                // if seeking backwards, we must flush to maintain V4
                 this.flushBuffer();
             }
         }
@@ -255,9 +251,8 @@ public class BufferedRandomAccessFile extends RandomAccessFile
     {
         if (pos >= this.hi_ || pos < this.lo_)
         {
-            // seeking outside of current buffer -- flush and read
             this.flushBuffer();
-            this.lo_ = pos & BuffMask_; // start at BuffSz boundary
+            this.lo_ = pos & BuffMask_;
             this.maxHi_ = this.lo_ + (long) this.buff_.length;
             if (this.diskPos_ != this.lo_)
             {
@@ -287,30 +282,24 @@ public class BufferedRandomAccessFile extends RandomAccessFile
     {
         if (this.curr_ >= this.hi_)
         {
-            // test for EOF
-            // if (this.hi < this.maxHi) return -1;
             if (this.hitEOF_)
                 return -1;
 
-            // slow path -- read another buffer
             this.seek(this.curr_);
             if (this.curr_ == this.hi_)
                 return -1;
         }
         byte res = this.buff_[(int) (this.curr_ - this.lo_)];
         this.curr_++;
-        return ((int) res) & 0xFF; // convert byte -> int
+        return ((int) res) & 0xFF;
     }
 
     public byte read1() throws IOException {
         if (this.curr_ >= this.hi_)
         {
-            // test for EOF
-            // if (this.hi < this.maxHi) return -1;
             if (this.hitEOF_)
                 return -1;
 
-            // slow path -- read another buffer
             this.seek(this.curr_);
             if (this.curr_ == this.hi_)
                 return -1;
@@ -330,12 +319,9 @@ public class BufferedRandomAccessFile extends RandomAccessFile
     {
         if (this.curr_ >= this.hi_)
         {
-            // test for EOF
-            // if (this.hi < this.maxHi) return -1;
             if (this.hitEOF_)
                 return -1;
 
-            // slow path -- read another buffer
             this.seek(this.curr_);
             if (this.curr_ == this.hi_)
                 return -1;
@@ -350,12 +336,9 @@ public class BufferedRandomAccessFile extends RandomAccessFile
     public byte readCurrent() throws IOException {
         if (this.curr_ >= this.hi_)
         {
-            // test for EOF
-            // if (this.hi < this.maxHi) return -1;
             if (this.hitEOF_)
                 return -1;
 
-            // slow path -- read another buffer
             this.seek(this.curr_);
             if (this.curr_ == this.hi_)
                 return -1;
@@ -369,16 +352,13 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         {
             if (this.hitEOF_ && this.hi_ < this.maxHi_)
             {
-                // at EOF -- bump "hi"
                 this.hi_++;
             }
             else
             {
-                // slow path -- write current buffer; read next one
                 this.seek(this.curr_);
                 if (this.curr_ == this.hi_)
                 {
-                    // appending to EOF -- bump "hi"
                     this.hi_++;
                 }
             }
@@ -394,16 +374,13 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         {
             if (this.hitEOF_ && this.hi_ < this.maxHi_)
             {
-                // at EOF -- bump "hi"
                 this.hi_++;
             }
             else
             {
-                // slow path -- write current buffer; read next one
                 this.seek(this.curr_);
                 if (this.curr_ == this.hi_)
                 {
-                    // appending to EOF -- bump "hi"
                     this.hi_++;
                 }
             }
@@ -441,16 +418,13 @@ public class BufferedRandomAccessFile extends RandomAccessFile
         {
             if (this.hitEOF_ && this.hi_ < this.maxHi_)
             {
-                // at EOF -- bump "hi"
                 this.hi_ = this.maxHi_;
             }
             else
             {
-                // slow path -- write current buffer; read next one
                 this.seek(this.curr_);
                 if (this.curr_ == this.hi_)
                 {
-                    // appending to EOF -- bump "hi"
                     this.hi_ = this.maxHi_;
                 }
             }

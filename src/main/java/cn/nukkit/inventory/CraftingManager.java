@@ -65,13 +65,11 @@ public class CraftingManager {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
                     case 0:
-                        // TODO: handle multiple result items
                         Map<String, Object> first = ((List<Map>) recipe.get("output")).get(0);
                         List<Item> sorted = new ArrayList<>();
                         for (Map<String, Object> ingredient : ((List<Map>) recipe.get("input"))) {
                             sorted.add(Item.fromJson(ingredient));
                         }
-                        // Bake sorted list
                         sorted.sort(recipeComparator);
 
                         ShapelessRecipe result = new ShapelessRecipe(Item.fromJson(first), sorted);
@@ -286,8 +284,6 @@ public class CraftingManager {
     }
 
     public CraftingRecipe matchRecipe(Item[][] inputMap, Item primaryOutput, Item[][] extraOutputMap) {
-        //TODO: try to match special recipes before anything else (first they need to be implemented!)
-
         int outputHash = getItemHash(primaryOutput);
         if (this.shapedRecipes.containsKey(outputHash)) {
             List<Item> itemCol = new ArrayList<>();

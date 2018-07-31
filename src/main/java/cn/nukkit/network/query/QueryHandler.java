@@ -62,7 +62,7 @@ public class QueryHandler {
     }
 
     public void handle(String address, int port, byte[] packet) {
-        int offset = 2; //skip MAGIC
+        int offset = 2;
         byte packetType = packet[offset++];
         int sessionID = Binary.readInt(Binary.subBytes(packet, offset, 4));
         offset += 4;

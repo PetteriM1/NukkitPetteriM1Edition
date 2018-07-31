@@ -51,7 +51,7 @@ public class MathHelper {
     public static int log2nlz( int bits )
     {
         if( bits == 0 )
-            return 0; // or throw exception
+            return 0;
         return 31 - Integer.numberOfLeadingZeros( bits );
     }    
 

@@ -27,8 +27,6 @@ public abstract class Enchantment implements Cloneable {
 
     protected static Enchantment[] enchantments;
 
-    //http://minecraft.gamepedia.com/Enchanting#Aqua_Affinity
-
     public static final int ID_PROTECTION_ALL = 0;
     public static final int ID_PROTECTION_FIRE = 1;
     public static final int ID_PROTECTION_FALL = 2;

@@ -46,8 +46,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     private final ServerHandler handler;
 
-    private int[] channelCounts = new int[256];
-
     public RakNetInterface(Server server) {
         this.server = server;
 

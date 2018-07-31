@@ -140,7 +140,6 @@ public class JavaPluginLoader implements PluginLoader {
                 try {
                     cachedClass = loader.findClass(name, false);
                 } catch (ClassNotFoundException e) {
-                    //ignore
                 }
                 if (cachedClass != null) {
                     return cachedClass;

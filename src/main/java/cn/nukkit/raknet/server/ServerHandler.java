@@ -94,13 +94,11 @@ public class ServerHandler {
             try {
                 this.wait(20);
             } catch (InterruptedException e) {
-                //ignore
             }
         }
         try {
             this.server.join();
         } catch (InterruptedException e) {
-            //ignore
         }
     }
 

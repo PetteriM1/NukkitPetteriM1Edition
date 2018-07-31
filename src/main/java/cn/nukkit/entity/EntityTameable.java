@@ -4,11 +4,11 @@ import cn.nukkit.Player;
 
 public interface EntityTameable {
 
-    public static final String NAMED_TAG_OWNER      = "Owner";
+    public static final String NAMED_TAG_OWNER = "Owner";
 
     public static final String NAMED_TAG_OWNER_UUID = "OwnerUUID";
 
-    public static final String NAMED_TAG_SITTING    = "Sitting";
+    public static final String NAMED_TAG_SITTING = "Sitting";
 
     Player getOwner();
 
@@ -21,5 +21,4 @@ public interface EntityTameable {
     boolean isSitting();
 
     void setSitting(boolean sitting);
-
 }

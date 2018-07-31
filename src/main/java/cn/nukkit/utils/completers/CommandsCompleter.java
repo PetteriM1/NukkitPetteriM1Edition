@@ -2,7 +2,6 @@ package cn.nukkit.utils.completers;
 
 import cn.nukkit.Server;
 import jline.console.completer.Completer;
-
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -13,7 +12,6 @@ public class CommandsCompleter implements Completer {
 
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {
-        // buffer could be null
         checkNotNull(candidates);
 
         if (buffer == null) {
@@ -32,5 +30,4 @@ public class CommandsCompleter implements Completer {
 
         return candidates.isEmpty() ? -1 : 0;
     }
-
 }

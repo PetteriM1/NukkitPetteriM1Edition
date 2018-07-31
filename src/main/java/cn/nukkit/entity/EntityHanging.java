@@ -87,5 +87,4 @@ public abstract class EntityHanging extends Entity {
     protected boolean isSurfaceValid() {
         return true;
     }
-
 }

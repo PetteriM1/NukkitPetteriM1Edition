@@ -159,7 +159,7 @@ public class InventoryTransaction {
             int hash = entry.getKey();
             List<SlotChangeAction> list = entry.getValue();
 
-            if (list.size() == 1) { //No need to compact inventorySlot changes if there is only one on this inventorySlot
+            if (list.size() == 1) {
                 slotChanges.remove(hash);
                 continue;
             }
@@ -181,7 +181,7 @@ public class InventoryTransaction {
             }
 
             if (originalAction == null) {
-                return false; //Couldn't find any actions that had a source-item matching the current inventory inventorySlot
+                return false;
             }
 
             int sortedThisLoop;
@@ -205,7 +205,7 @@ public class InventoryTransaction {
                 }
             } while (sortedThisLoop > 0);
 
-            if (list.size() > 0) { //couldn't chain all the actions together
+            if (list.size() > 0) {
                 MainLogger.getLogger().debug("Failed to compact " + originalList.size() + " actions for " + this.source.getName());
                 return false;
             }

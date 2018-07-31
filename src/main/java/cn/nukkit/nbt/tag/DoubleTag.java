@@ -60,5 +60,4 @@ public class DoubleTag extends NumberTag<Double> {
         }
         return false;
     }
-
 }

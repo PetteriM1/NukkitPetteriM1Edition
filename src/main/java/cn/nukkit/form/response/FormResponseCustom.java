@@ -50,5 +50,4 @@ public class FormResponseCustom extends FormResponse {
     public boolean getToggleResponse(int id) {
         return toggleResponses.get(id);
     }
-
 }

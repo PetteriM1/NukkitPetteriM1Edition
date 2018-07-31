@@ -60,5 +60,4 @@ public class ShortTag extends NumberTag<Integer> {
         }
         return false;
     }
-
 }

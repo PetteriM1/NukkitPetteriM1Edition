@@ -21,5 +21,4 @@ public class FoodInBowl extends Food {
         player.getInventory().setItem(slot, new ItemBowl());
         return true;
     }
-
 }

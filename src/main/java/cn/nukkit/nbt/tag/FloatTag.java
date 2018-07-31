@@ -60,5 +60,4 @@ public class FloatTag extends NumberTag<Float> {
         }
         return false;
     }
-
 }

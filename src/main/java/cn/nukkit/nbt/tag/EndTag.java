@@ -33,5 +33,4 @@ public class EndTag extends Tag {
     public Tag copy() {
         return new EndTag();
     }
-
 }

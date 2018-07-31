@@ -229,7 +229,6 @@ public class NetworkInventoryAction {
                             break;
                         case SOURCE_TYPE_ENCHANT_OUTPUT:
                             enchant.sendSlot(0, player);
-                            //ignore?
                             return null;
                     }
 

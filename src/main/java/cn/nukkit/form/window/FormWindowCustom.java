@@ -12,7 +12,7 @@ import java.util.List;
 
 public class FormWindowCustom extends FormWindow {
 
-    private final String type = "custom_form"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "custom_form"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
     private String title = "";
     private ElementButtonImageData icon;
     private List<Element> content;
@@ -59,7 +59,7 @@ public class FormWindowCustom extends FormWindow {
 
     public String getJSONData() {
         String toModify = new Gson().toJson(this);
-        //We need to replace this due to Java not supporting declaring class field 'default'
+        // We need to replace this due to Java not supporting declaring class field 'default'
         return toModify.replace("defaultOptionIndex", "default")
                 .replace("defaultText", "default")
                 .replace("defaultValue", "default")
@@ -78,7 +78,6 @@ public class FormWindowCustom extends FormWindow {
 
         List<String> elementResponses = new Gson().fromJson(data, new TypeToken<List<String>>() {
         }.getType());
-        //elementResponses.remove(elementResponses.size() - 1); //submit button //maybe mojang removed that?
 
         int i = 0;
 
@@ -151,5 +150,4 @@ public class FormWindowCustom extends FormWindow {
             });
         }
     }
-
 }

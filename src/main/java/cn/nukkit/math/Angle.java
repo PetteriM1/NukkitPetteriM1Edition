@@ -94,8 +94,6 @@ public final class Angle implements Comparable<Angle> {
         return a.compareTo(b);
     }
 
-  /* -- Override -- */
-
     @Override
     public String toString() {
         return String.format(Locale.ROOT,
@@ -129,8 +127,6 @@ public final class Angle implements Comparable<Angle> {
         return hash;
     }
 
-  /* -- Internal Part -- */
-
     private final float floatValue;
     private final double doubleValue;
     private final boolean isDegree, isOriginDouble;
@@ -148,5 +144,4 @@ public final class Angle implements Comparable<Angle> {
         this.doubleValue = doubleValue;
         this.isDegree = isDegree;
     }
-
 }

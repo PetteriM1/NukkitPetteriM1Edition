@@ -51,5 +51,4 @@ public class StringTag extends Tag {
         }
         return false;
     }
-
 }

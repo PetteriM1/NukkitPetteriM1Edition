@@ -116,5 +116,4 @@ public abstract class RakNet {
      * Leaves everything as-is and halts, other Threads can be in a post-crash condition.
      */
     public static final byte PACKET_EMERGENCY_SHUTDOWN = 0x7f;
-
 }

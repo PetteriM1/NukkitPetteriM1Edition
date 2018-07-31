@@ -189,5 +189,4 @@ public abstract class Food {
             this.plugin = plugin;
         }
     }
-
 }

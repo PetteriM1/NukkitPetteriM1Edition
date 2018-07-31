@@ -25,12 +25,8 @@ public class PGZIPOutputStream extends FilterOutputStream {
         return EXECUTOR;
     }
 
-
-    // private static final Logger LOG = LoggerFactory.getLogger(PGZIPOutputStream.class);
     private final static int GZIP_MAGIC = 0x8b1f;
 
-    // todo: remove after block guessing is implemented
-    // array list that contains the block sizes
     ArrayList<Integer> blockSizes = new ArrayList<Integer>();
 
     private int level = Deflater.BEST_SPEED;
@@ -54,7 +50,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
         return new DeflaterOutputStream(out, deflater, 512, true);
     }
 
-    // TODO: Share, daemonize.
     private final ExecutorService executor;
     private final int nthreads;
     private final CRC32 crc = new CRC32();
@@ -185,7 +180,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
     private void emitUntil(int taskCountAllowed) throws IOException {
         try {
             while (emitQueue.size() > taskCountAllowed) {
-                // LOG.info("Waiting for taskCount=" + emitQueue.size() + " -> " + taskCountAllowed);
                 Future<byte[]> future = emitQueue.remove(); // Valid because emitQueue.size() > 0
                 byte[] toWrite = future.get();  // Blocks until this task is done.
                 blockSizes.add(toWrite.length);  // todo: remove after block guessing is implemented
@@ -204,7 +198,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
     // Master thread only
     @Override
     public void flush() throws IOException {
-        // LOG.info("Flush: " + block);
         if (block.in_length > 0)
             submit();
         emitUntil(0);
@@ -214,7 +207,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
     // Master thread only
     @Override
     public void close() throws IOException {
-        // LOG.info("Closing: bytesWritten=" + bytesWritten);
         if (bytesWritten >= 0) {
             flush();
 
@@ -222,18 +214,14 @@ public class PGZIPOutputStream extends FilterOutputStream {
 
             ByteBuffer buf = ByteBuffer.allocate(8);
             buf.order(ByteOrder.LITTLE_ENDIAN);
-            // LOG.info("CRC is " + crc.getValue());
             buf.putInt((int) crc.getValue());
             buf.putInt(bytesWritten);
-            out.write(buf.array()); // allocate() guarantees a backing array.
-            // LOG.info("trailer is " + Arrays.toString(buf.array()));
+            out.write(buf.array());
 
             out.flush();
             out.close();
 
             bytesWritten = Integer.MIN_VALUE;
-            // } else {
-            // LOG.warn("Already closed.");
         }
     }
 }

@@ -9,7 +9,6 @@ import cn.nukkit.item.Item;
  */
 public abstract class InventoryAction {
 
-
     private long creationTime;
 
     protected Item sourceItem;
@@ -60,7 +59,6 @@ public abstract class InventoryAction {
      * Called when the action is added to the specified InventoryTransaction.
      */
     public void onAddToTransaction(InventoryTransaction transaction) {
-
     }
 
     /**

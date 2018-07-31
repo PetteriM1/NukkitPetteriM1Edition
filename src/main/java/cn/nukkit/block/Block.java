@@ -674,7 +674,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static Block get(int id, Integer meta, Position pos) {
         Block block = fullList[(id << 4) | (meta == null ? 0 : meta)].clone();
         if (pos != null) {
@@ -707,8 +706,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return this.getLevel().setBlock(this, this, true, true);
     }
 
-    //http://minecraft.gamepedia.com/Breaking
-    public boolean canHarvestWithHand() {  //used for calculating breaking time
+    public boolean canHarvestWithHand() {
         return true;
     }
 
@@ -837,7 +835,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public void setDamage(int meta) {
-        // Do nothing
     }
 
     public final void setDamage(Integer meta) {
@@ -853,7 +850,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     }
 
     public Item[] getDrops(Item item) {
-        if (this.getId() < 0 || this.getId() > list.length) { //Unknown blocks
+        if (this.getId() < 0 || this.getId() > list.length) {
             return new Item[0];
         } else {
             return new Item[]{
@@ -910,7 +907,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
                 blockToolType == ItemTool.TYPE_NONE;
     }
 
-    //http://minecraft.gamepedia.com/Breaking
     private static double breakTime0(double blockHardness, boolean correctTool, boolean canHarvestWithHand,
                                      int blockId, int toolType, int toolTier, int efficiencyLoreLevel, int hasteEffectLevel,
                                      boolean insideOfWaterWithoutAquaAffinity, boolean outOfWaterButNotOnGround) {

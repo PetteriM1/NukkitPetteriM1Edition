@@ -47,6 +47,4 @@ public class EntityUtils {
 
         return Entity.createEntity(type.toString(), chunk, nbt, args);
     }
-
-
 }

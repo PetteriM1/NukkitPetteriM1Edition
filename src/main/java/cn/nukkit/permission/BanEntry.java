@@ -111,5 +111,4 @@ public class BanEntry {
         banEntry.setReason(map.get("reason"));
         return banEntry;
     }
-
 }

@@ -65,5 +65,4 @@ public class NukkitMath {
 
         return d0 > d1 ? d0 : d1;
     }
-
 }

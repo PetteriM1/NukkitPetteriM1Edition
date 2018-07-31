@@ -15,5 +15,4 @@ public abstract class FormWindow {
     public boolean wasClosed() {
         return closed;
     }
-
 }
