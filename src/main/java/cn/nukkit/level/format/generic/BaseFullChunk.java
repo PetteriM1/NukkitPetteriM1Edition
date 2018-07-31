@@ -145,7 +145,6 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                     Entity entity = Entity.createEntity(nbt.getString("id"), this, nbt);
                     if (entity != null) {
                         changed = true;
-                        continue;
                     }
                 }
                 this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.stopTiming();
@@ -167,7 +166,6 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                         BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id"), this, nbt);
                         if (blockEntity == null) {
                             changed = true;
-                            continue;
                         }
                     }
                 }
@@ -370,7 +368,9 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
         this.tiles.put(blockEntity.getId(), blockEntity);
         int index = ((blockEntity.getFloorZ() & 0x0f) << 12) | ((blockEntity.getFloorX() & 0x0f) << 8) | (blockEntity.getFloorY() & 0xff);
         if (this.tileList.containsKey(index) && !this.tileList.get(index).equals(blockEntity)) {
-            this.tileList.get(index).close();
+            BlockEntity entity = this.tileList.get(index);
+            this.tiles.remove(entity.getId());
+            entity.close();
         }
         this.tileList.put(index, blockEntity);
         if (this.isInit) {
