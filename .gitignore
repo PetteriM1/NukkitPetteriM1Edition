@@ -36,3 +36,4 @@ players/*
 resource_packs
 resource_packs/*
 *.md
+.DS_Store
