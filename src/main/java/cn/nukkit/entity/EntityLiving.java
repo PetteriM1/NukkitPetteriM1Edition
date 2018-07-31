@@ -207,7 +207,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof EntityWaterAnimal) {
+                if (this instanceof SwimmingEntity) {
                     this.setDataProperty(new ShortEntityData(DATA_AIR, 400));
                 } else {
                     hasUpdate = true;
@@ -221,7 +221,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
                 }
             } else {
-                if (this instanceof EntityWaterAnimal) {
+                if (this instanceof SwimmingEntity) {
                     hasUpdate = true;
                     int airTicks = this.getDataPropertyInt(DATA_AIR) - tickDiff;
 
