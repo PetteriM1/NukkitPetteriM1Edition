@@ -60,5 +60,4 @@ public class LongTag extends NumberTag<Long> {
         }
         return false;
     }
-
 }

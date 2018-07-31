@@ -30,5 +30,4 @@ public class EnchantmentEfficiency extends Enchantment {
     public boolean canEnchant(Item item) {
         return item.isShears() || super.canEnchant(item);
     }
-
 }

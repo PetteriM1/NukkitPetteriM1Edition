@@ -40,7 +40,6 @@ public class CompressBatchedTask extends AsyncTask {
             this.finalData = Zlib.deflate(this.data, this.level);
             this.data = null;
         } catch (Exception e) {
-            //ignore
         }
     }
 

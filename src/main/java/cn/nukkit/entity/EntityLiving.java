@@ -16,7 +16,6 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
 import co.aikar.timings.Timings;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,11 +82,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public boolean hasLineOfSight(Entity entity) {
-        //todo
         return true;
     }
 
-    public void collidingWith(Entity ent) { // can override (IronGolem|Bats)
+    public void collidingWith(Entity ent) {
         ent.applyEntityCollision(this);
     }
 

@@ -29,5 +29,4 @@ public interface Permissible extends ServerOperator {
     void recalculatePermissions();
 
     Map<String, PermissionAttachmentInfo> getEffectivePermissions();
-
 }

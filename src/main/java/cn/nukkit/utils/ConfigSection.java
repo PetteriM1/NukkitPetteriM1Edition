@@ -420,7 +420,6 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
                 try {
                     result.add(Integer.valueOf((String) object));
                 } catch (Exception ex) {
-                    //ignore
                 }
             } else if (object instanceof Character) {
                 result.add((int) (Character) object);
@@ -476,7 +475,6 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
                 try {
                     result.add(Double.valueOf((String) object));
                 } catch (Exception ex) {
-                    //ignore
                 }
             } else if (object instanceof Character) {
                 result.add((double) (Character) object);
@@ -506,7 +504,6 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
                 try {
                     result.add(Float.valueOf((String) object));
                 } catch (Exception ex) {
-                    //ignore
                 }
             } else if (object instanceof Character) {
                 result.add((float) (Character) object);
@@ -536,7 +533,6 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
                 try {
                     result.add(Long.valueOf((String) object));
                 } catch (Exception ex) {
-                    //ignore
                 }
             } else if (object instanceof Character) {
                 result.add((long) (Character) object);
@@ -569,7 +565,6 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
                 try {
                     result.add(Byte.valueOf((String) object));
                 } catch (Exception ex) {
-                    //ignore
                 }
             } else if (object instanceof Character) {
                 result.add((byte) ((Character) object).charValue());
@@ -635,7 +630,6 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
                 try {
                     result.add(Short.valueOf((String) object));
                 } catch (Exception ex) {
-                    //ignore
                 }
             } else if (object instanceof Character) {
                 result.add((short) ((Character) object).charValue());

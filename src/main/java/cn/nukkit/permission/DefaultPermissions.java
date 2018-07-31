@@ -118,5 +118,4 @@ public abstract class DefaultPermissions {
 
         parent.recalculatePermissibles();
     }
-
 }

@@ -45,8 +45,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             ListTag<CompoundTag> inventoryList = this.namedTag.getList("Inventory", CompoundTag.class);
             for (CompoundTag item : inventoryList.getAll()) {
                 int slot = item.getByte("Slot");
-                if (slot >= 0 && slot < 9) { //hotbar
-                    //Old hotbar saving stuff, remove it (useless now)
+                if (slot >= 0 && slot < 9) {
                     inventoryList.remove(item);
                 } else if (slot >= 100 && slot < 104) {
                     this.inventory.setItem(this.inventory.getSize() + slot - 100, NBTIO.getItemHelper(item));
@@ -139,7 +138,6 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             float finalDamage = (float) (originalDamage * (1 - Math.max(points / 5, points - originalDamage / (2 + toughness / 4)) / 25) * (1 - /*0.75 */ epf * 0.04));
 
             source.setDamage(finalDamage - originalDamage, DamageModifier.ARMOR);
-            //source.setDamage(source.getDamage(DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25)), DamageModifier.ARMOR_ENCHANTMENTS);
         }
 
         if (super.attack(source)) {

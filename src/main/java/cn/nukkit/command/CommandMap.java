@@ -21,5 +21,4 @@ public interface CommandMap {
     void clearCommands();
 
     Command getCommand(String name);
-
 }

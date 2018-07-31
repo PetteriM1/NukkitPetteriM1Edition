@@ -158,5 +158,4 @@ public abstract class Tag {
     }
 
     public abstract Tag copy();
-
 }

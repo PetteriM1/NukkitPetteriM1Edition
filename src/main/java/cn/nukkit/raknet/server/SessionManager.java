@@ -95,7 +95,6 @@ public class SessionManager {
                 try {
                     Thread.sleep(50 - time);
                 } catch (InterruptedException e) {
-                    //ignore
                 }
             }
             this.tick();

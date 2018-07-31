@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ElementDropdown extends Element {
 
-    private final String type = "dropdown"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "dropdown"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
     private String text = "";
     private List<String> options;
     private int defaultOptionIndex = 0;
@@ -53,5 +53,4 @@ public class ElementDropdown extends Element {
         options.add(option);
         if (isDefault) this.defaultOptionIndex = options.size() - 1;
     }
-
 }

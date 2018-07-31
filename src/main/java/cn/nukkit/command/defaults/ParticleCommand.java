@@ -78,7 +78,6 @@ public class ParticleCommand extends VanillaCommand {
                 double c = Double.valueOf(args[7]);
                 count = (int) c;
             } catch (Exception e) {
-                //ignore
             }
         }
         count = Math.max(1, count);
@@ -89,7 +88,6 @@ public class ParticleCommand extends VanillaCommand {
                 double d = Double.valueOf(args[8]);
                 data = (int) d;
             } catch (Exception e) {
-                //ignore
             }
         }
 

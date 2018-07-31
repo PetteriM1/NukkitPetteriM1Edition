@@ -190,5 +190,4 @@ public class Permission {
 
         return new Permission(name, desc, defaultValue, children);
     }
-
 }

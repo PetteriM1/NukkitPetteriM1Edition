@@ -14,5 +14,4 @@ public class UseItemOnEntityData implements TransactionData {
     public Item itemInHand;
     public Vector3 vector1;
     public Vector3 vector2;
-
 }

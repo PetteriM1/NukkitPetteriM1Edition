@@ -123,7 +123,6 @@ public class MainLogger extends ThreadedLogger {
                 try {
                     wait(1000);
                 } catch (InterruptedException e) {
-                    // Ignore exception and treat it as we're done
                     return;
                 }
             }

@@ -255,7 +255,6 @@ public class AxisAlignedBB implements Cloneable {
 
         Vector3 vector = null;
 
-        //if (v1 != null && (vector == null || pos1.distanceSquared(v1) < pos1.distanceSquared(vector))) {
         if (v1 != null) {
             vector = v1;
         }

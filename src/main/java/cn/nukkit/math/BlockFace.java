@@ -25,7 +25,6 @@ public enum BlockFace {
     private static final BlockFace[] HORIZONTALS = new BlockFace[4];
 
     static {
-        //Circular dependency
         DOWN.axis = Axis.Y;
         UP.axis = Axis.Y;
         NORTH.axis = Axis.Z;
@@ -244,7 +243,6 @@ public enum BlockFace {
         private Plane plane;
 
         static {
-            //Circular dependency
             X.plane = Plane.HORIZONTAL;
             Y.plane = Plane.VERTICAL;
             Z.plane = Plane.HORIZONTAL;
@@ -305,14 +303,13 @@ public enum BlockFace {
         VERTICAL;
 
         static {
-            //Circular dependency
             HORIZONTAL.faces = new BlockFace[]{NORTH, EAST, SOUTH, WEST};
             VERTICAL.faces = new BlockFace[]{UP, DOWN};
         }
 
         private BlockFace[] faces;
 
-        public BlockFace random(NukkitRandom rand) { //todo Default Random?
+        public BlockFace random(NukkitRandom rand) {
             return faces[rand.nextBoundedInt(faces.length)];
         }
 

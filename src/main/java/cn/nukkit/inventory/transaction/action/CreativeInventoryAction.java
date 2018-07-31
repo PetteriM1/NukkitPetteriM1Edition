@@ -45,10 +45,8 @@ public class CreativeInventoryAction extends InventoryAction {
     }
 
     public void onExecuteSuccess(Player source) {
-
     }
 
     public void onExecuteFail(Player source) {
-
     }
 }

@@ -23,5 +23,4 @@ public abstract class MetadataValue {
     public abstract Object value();
 
     public abstract void invalidate();
-
 }

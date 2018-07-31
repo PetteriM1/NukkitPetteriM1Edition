@@ -23,5 +23,4 @@ public class EnchantmentLure extends Enchantment {
     public int getMaxLevel() {
         return 3;
     }
-
 }

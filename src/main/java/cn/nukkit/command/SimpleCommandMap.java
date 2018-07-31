@@ -165,15 +165,15 @@ public class SimpleCommandMap implements CommandMap {
             return false;
         }
 
-        //if you're registering a name (alias or label) which is identical to another command who's primary name is the same
-        //so basically we can't override the main name of a command, but we can override aliases if we're not an alias
+        // If you're registering a name (alias or label) which is identical to another command who's primary name is the same
+        // So basically we can't override the main name of a command, but we can override aliases if we're not an alias
 
-        //added the last statement which will allow us to override a VanillaCommand unconditionally
+        // Added the last statement which will allow us to override a VanillaCommand unconditionally
         if (alreadyRegistered && existingCommand.getLabel() != null && existingCommand.getLabel().equals(label) && existingCommandIsNotVanilla) {
             return false;
         }
 
-        //you can now assume that the command is either uniquely named, or overriding another command's alias (and is not itself, an alias)
+        // You can now assume that the command is either uniquely named, or overriding another command's alias (and is not itself, an alias)
 
         if (!isAlias) {
             command.setLabel(label);

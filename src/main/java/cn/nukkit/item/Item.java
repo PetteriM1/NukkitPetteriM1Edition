@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  */
 public class Item implements Cloneable {
 
-    //All Block IDs are here too
+    // All Block IDs are here too
     public static final int AIR = 0;
     public static final int STONE = 1;
     public static final int GRASS = 2;
@@ -335,7 +335,7 @@ public class Item implements Cloneable {
     public static final int PISTON_EXTENSION = 250;
     public static final int OBSERVER = 251;
 
-    //Normal Item IDs
+    // Normal Item IDs
     public static final int IRON_SHOVEL = 256;
     public static final int IRON_PICKAXE = 257;
     public static final int IRON_AXE = 258;
@@ -800,7 +800,6 @@ public class Item implements Cloneable {
             list[LINGERING_POTION] = ItemPotionLingering.class; //441
 
             list[ELYTRA] = ItemElytra.class; //444
-
             list[SHULKER_SHELL] = ItemShulkerShell.class; //445
 
             list[BEETROOT] = ItemBeetroot.class; //457
