@@ -63,7 +63,7 @@ public class BlockOreRedstone extends BlockSolid {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_TOUCH) { //type == Level.BLOCK_UPDATE_NORMAL ||
+        if (type == Level.BLOCK_UPDATE_TOUCH) {
             this.getLevel().setBlock(this, new BlockOreRedstoneGlowing(), false, false);
 
             return Level.BLOCK_UPDATE_WEAK;
@@ -80,5 +80,10 @@ public class BlockOreRedstone extends BlockSolid {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
     }
 }

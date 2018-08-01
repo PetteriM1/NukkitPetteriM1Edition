@@ -53,7 +53,6 @@ public class BlockMycelium extends BlockSolid {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
-            //TODO: light levels
             NukkitRandom random = new NukkitRandom();
             x = random.nextRange((int) x - 1, (int) x + 1);
             y = random.nextRange((int) y - 1, (int) y + 1);
@@ -75,5 +74,10 @@ public class BlockMycelium extends BlockSolid {
     @Override
     public BlockColor getColor() {
         return BlockColor.GRASS_BLOCK_COLOR;
+    }
+    
+    @Override
+    public boolean canSilkTouch() {
+        return true;
     }
 }

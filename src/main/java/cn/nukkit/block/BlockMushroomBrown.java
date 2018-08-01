@@ -87,4 +87,9 @@ public class BlockMushroomBrown extends BlockFlowable {
     public BlockColor getColor() {
         return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
+    
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
 }

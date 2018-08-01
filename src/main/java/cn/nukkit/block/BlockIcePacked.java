@@ -45,11 +45,16 @@ public class BlockIcePacked extends BlockIce {
 
     @Override
     public int onUpdate(int type) {
-        return 0; //not being melted
+        return 0;
     }
 
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+    
+    @Override
+    public boolean canSilkTouch() {
+        return true;
     }
 }

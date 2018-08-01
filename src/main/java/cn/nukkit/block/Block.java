@@ -986,6 +986,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
         return this.getHardness() != -1;
     }
 
+    public boolean canSilkTouch() {
+        return false;
+    }
+
     public Block getSide(BlockFace face) {
         return this.getSide(face, 1);
     }
