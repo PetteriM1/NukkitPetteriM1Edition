@@ -205,7 +205,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof SwimmingEntity) {
+                if (this instanceof SwimmingEntity || (this instanceof Player && ((Player) this).getGamemode() == 1)) {
                     this.setDataProperty(new ShortEntityData(DATA_AIR, 400));
                 } else {
                     hasUpdate = true;

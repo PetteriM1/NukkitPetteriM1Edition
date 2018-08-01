@@ -8,6 +8,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.InstantSpellParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.particle.SpellParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.potion.Effect;
@@ -127,6 +128,8 @@ public class EntityPotion extends EntityProjectile {
         }
 
         this.getLevel().addParticle(particle);
+        this.getLevel().addSound(new Vector3(x, y, z), "random.glass");
+
         Entity[] entities = this.getLevel().getNearbyEntities(this.getBoundingBox().grow(8.25, 4.24, 8.25));
         for (Entity anEntity : entities) {
             double distance = anEntity.distanceSquared(this);
@@ -152,7 +155,6 @@ public class EntityPotion extends EntityProjectile {
 
         this.timing.startTiming();
 
-        int tickDiff = currentTick - this.lastUpdate;
         boolean hasUpdate = super.onUpdate(currentTick);
 
         if (this.age > 1200) {

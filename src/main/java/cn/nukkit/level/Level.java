@@ -427,6 +427,18 @@ public class Level implements ChunkManager, Metadatable {
         this.temporalPosition = null;
         this.server.getLevels().remove(this.levelId);
     }
+    
+    public void addSound(Vector3 pos, String sound) {
+        PlaySoundPacket packet = new PlaySoundPacket();
+        packet.name = sound;
+        packet.volume = 1;
+        packet.pitch = 1;
+        packet.x = pos.getFloorX();
+        packet.y = pos.getFloorY();
+        packet.z = pos.getFloorZ();
+        
+        addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, packet);
+    }
 
     public void addSound(Sound sound) {
         this.addSound(sound, (Player[]) null);
@@ -1915,7 +1927,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz, Player player) {
-        return this.useItemOn(vector, item, face, fx, fy, fz, player, false);
+        return this.useItemOn(vector, item, face, fx, fy, fz, player, true);
     }
 
 
@@ -2060,7 +2072,9 @@ public class Level implements ChunkManager, Metadatable {
         }
 
 
-        this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), hand, false);
+        if (playSound) {
+            this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), hand, false);
+        }
 
         if (item.getCount() <= 0) {
             item = new ItemBlock(new BlockAir(), 0, 0);
