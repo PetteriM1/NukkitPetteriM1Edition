@@ -165,4 +165,9 @@ public class BlockEnderChest extends BlockTransparentMeta {
     public boolean canHarvestWithHand() {
         return false;
     }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
 }

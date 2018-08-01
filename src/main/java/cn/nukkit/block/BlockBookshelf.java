@@ -60,4 +60,8 @@ public class BlockBookshelf extends BlockSolid {
         return BlockColor.WOOD_BLOCK_COLOR;
     }
 
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
 }

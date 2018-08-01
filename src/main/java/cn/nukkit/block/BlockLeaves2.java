@@ -141,4 +141,9 @@ public class BlockLeaves2 extends BlockLeaves {
         }
         return 0;
     }
+    
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
 }
