@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.entity.passive.EntityWaterAnimal;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -205,7 +204,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof SwimmingEntity || (this instanceof Player && ((Player) this).getGamemode() == 1)) {
+                if (this instanceof SwimmingEntity || (this instanceof Player && ((Player) this).isCreative())) {
                     this.setDataProperty(new ShortEntityData(DATA_AIR, 400));
                 } else {
                     hasUpdate = true;

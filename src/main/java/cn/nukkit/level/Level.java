@@ -678,6 +678,10 @@ public class Level implements ChunkManager, Metadatable {
 
         updateBlockLight(lightQueue);
         this.checkTime();
+        
+        if (stopTime) {
+            this.sendTime();
+        }
 
         // Tick Weather
         if (this.getServer().getPropertyBoolean("weather", true)) {
