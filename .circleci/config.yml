@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    
+    working_directory: ~/Nukkit-SuomiCraftPE
+
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+
+    steps:
+
+      - checkout
+
+      - restore_cache:
+          key: Nukkit-SuomiCraftPE-{{ checksum "pom.xml" }}
+      
+      - run: mvn dependency:go-offline
+      
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: Nukkit-SuomiCraftPE-{{ checksum "pom.xml" }}
+      
+      - run: mvn clean package
+
+      - store_artifacts:
+          path: target/Nukkit-SuomiCraftPE.jar
