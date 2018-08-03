@@ -1,9 +1,9 @@
 package cn.nukkit.level.generator.biome;
 
-import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockWaterStill;
+import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.*;
 
 /**
