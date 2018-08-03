@@ -23,7 +23,6 @@ public class OceanBiome extends WateryBiome {
 
         this.temperature = 0.5;
         this.rainfall = 0.5;
-
     }
 
     @Override

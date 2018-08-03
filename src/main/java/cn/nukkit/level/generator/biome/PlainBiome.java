@@ -22,6 +22,8 @@ public class PlainBiome extends GrassyBiome {
         tallGrass.setBaseAmount(7);
         PopulatorSunflower sunflower = new PopulatorSunflower();
         sunflower.setBaseAmount(6);
+        PopulatorPumpkin pumpkins = new PopulatorPumpkin();
+        pumpkins.setBaseAmount(1);
         PopulatorFlower flower = new PopulatorFlower();
         flower.setBaseAmount(10);
         flower.addType(Block.DANDELION, 0);
@@ -39,7 +41,6 @@ public class PlainBiome extends GrassyBiome {
         this.addPopulator(tallGrass);
         this.addPopulator(sunflower);
         this.addPopulator(flower);
-
 
         this.setElevation(63, 74);
 

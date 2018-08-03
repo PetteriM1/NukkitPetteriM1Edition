@@ -12,8 +12,5 @@ public class PopulatorMineshaft extends Populator {
 
     @Override
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
-        // TODO Auto-generated method stub
-
     }
-
 }

@@ -39,5 +39,4 @@ public class MushroomIsland extends NormalBiome implements CaveBiome {
     public int getStoneBlock() {
         return Block.STONE;
     }
-
 }
