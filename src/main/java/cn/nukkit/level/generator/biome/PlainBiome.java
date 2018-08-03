@@ -3,7 +3,6 @@ package cn.nukkit.level.generator.biome;
 import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
-import cn.nukkit.block.BlockLavaStill;
 import cn.nukkit.block.BlockWaterStill;
 import cn.nukkit.level.generator.populator.*;
 
@@ -40,8 +39,7 @@ public class PlainBiome extends GrassyBiome {
 
         PopulatorLake lakes = new PopulatorLake();
         lakes.setOreTypes(new OreType[]{
-                new OreType(new BlockWaterStill(), 2, 40, 63, 65),
-                new OreType(new BlockLavaStill(), 1, 40, 63, 65)
+                new OreType(new BlockWaterStill(), 1, 40, 62, 65)
         });
 
         this.addPopulator(lakes);

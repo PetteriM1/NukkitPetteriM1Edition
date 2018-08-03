@@ -13,18 +13,10 @@ public class ObjectLake {
 
     private final NukkitRandom random;
     public final OreType type;
-    private int replaceId;
-    private int replaceId2;
 
     public ObjectLake(NukkitRandom random, OreType type) {
-        this(random, type, Block.GRASS, Block.DIRT);
-    }
-
-    public ObjectLake(NukkitRandom random, OreType type, int replaceId, int replaceId2) {
         this.type = type;
         this.random = random;
-        this.replaceId = replaceId;
-        this.replaceId2 = replaceId2;
     }
 
     public OreType getType() {
@@ -32,7 +24,10 @@ public class ObjectLake {
     }
 
     public boolean canPlaceObject(ChunkManager level, int x, int y, int z) {
-        return (level.getBlockIdAt(x, y, z) == replaceId || level.getBlockIdAt(x, y, z) == replaceId2);
+        if (level.getBlockIdAt(x, y - 1, z) == Block.AIR || level.getBlockIdAt(x, y + 1, z) != Block.AIR) return false;
+        if (level.getBlockIdAt(x - 1, y, z) == Block.AIR || level.getBlockIdAt(x + 1, y, z) == Block.AIR) return false;
+        if (level.getBlockIdAt(x, y, z - 1) == Block.AIR || level.getBlockIdAt(x, y, z + 1) == Block.AIR) return false;
+        return (level.getBlockIdAt(x, y, z) == Block.GRASS || level.getBlockIdAt(x, y, z) == Block.DIRT || level.getBlockIdAt(x, y, z) == Block.STONE);
     }
 
     public void placeObject(ChunkManager level, int x, int y, int z) {
@@ -72,7 +67,7 @@ public class ObjectLake {
                                 double sizeZ = (z + 0.5 - seedZ) / size;
                                 sizeZ *= sizeZ;
 
-                                if ((sizeX + sizeY + sizeZ) < 1 && (level.getBlockIdAt(x, y, z) == replaceId || level.getBlockIdAt(x, y, z) == replaceId2)) {
+                                if ((sizeX + sizeY + sizeZ) < 1 && (level.getBlockIdAt(x, y, z) == Block.GRASS || level.getBlockIdAt(x, y, z) == Block.DIRT || level.getBlockIdAt(x, y, z) == Block.STONE)) {
                                     level.setBlockIdAt(x, y, z, this.type.material.getId());
                                     if (this.type.material.getDamage() != 0) {
                                         level.setBlockDataAt(x, y, z, this.type.material.getDamage());
