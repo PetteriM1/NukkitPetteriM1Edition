@@ -99,7 +99,6 @@ public class Normal extends Generator {
     private final int landHeightRange = 18;
     private final int mountainHeight = 13;
     private final int basegroundHeight = 3;
-    private int waterColor = 16777215;
 
     protected float rainfall = 0.5F;
     protected float temperature = 0.5F;
@@ -110,7 +109,6 @@ public class Normal extends Generator {
     }
 
     public Normal(Map<String, Object> options) {
-        //Nothing here. Just used for future update.
     }
 
     @Override

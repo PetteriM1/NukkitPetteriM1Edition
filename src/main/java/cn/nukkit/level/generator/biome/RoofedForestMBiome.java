@@ -34,6 +34,6 @@ public class RoofedForestMBiome extends GrassyBiome {
 
     @Override
     public String getName() {
-        return "Roofed ForestM";
+        return "Roofed Forest M";
     }
 }

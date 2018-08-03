@@ -5,6 +5,9 @@ import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
+/**
+ * Created by PetteriM1
+ */
 public class PopulatorSunflower extends Populator {
     private ChunkManager level;
     private int randomAmount;
