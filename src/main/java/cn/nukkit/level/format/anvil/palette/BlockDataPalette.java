@@ -3,7 +3,6 @@ package cn.nukkit.level.format.anvil.palette;
 import cn.nukkit.Server;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.utils.ThreadCache;
-import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
 
@@ -24,7 +23,6 @@ public final class BlockDataPalette implements Cloneable {
     }
 
     public BlockDataPalette(char[] rawData) {
-        Preconditions.checkArgument(rawData.length == 4096, "Data is not 4096");
         this.rawData = rawData;
     }
 
@@ -37,25 +35,27 @@ public final class BlockDataPalette implements Cloneable {
         return rawData;
     }
 
-    public synchronized char[] getRaw() {
-        CharPalette palette = this.palette;
-        BitArray4096 encodedData = this.encodedData;
-        this.encodedData = null;
-        this.palette = null;
+    public char[] getRaw() {
+        synchronized (this) {
+            CharPalette palette = this.palette;
+            BitArray4096 encodedData = this.encodedData;
+            this.encodedData = null;
+            this.palette = null;
 
-        char[] raw = rawData;
-        if (raw == null && palette != null) {
-            if (encodedData != null) {
-                raw = encodedData.toRaw();
-            } else {
-                raw = new char[4096];
+            char[] raw = rawData;
+            if (raw == null) {
+                if (encodedData != null) {
+                    raw = encodedData.toRaw();
+                } else {
+                    raw = new char[4096];
+                }
+                for (int i = 0; i < 4096; i++) {
+                    raw[i] = palette.getKey(raw[i]);
+                }
             }
-            for (int i = 0; i < 4096; i++) {
-                raw[i] = palette.getKey(raw[i]);
-            }
+            rawData = raw;
+            return rawData;
         }
-        rawData = raw;
-        return rawData;
     }
 
     private int getIndex(int x, int y, int z) {
@@ -74,7 +74,7 @@ public final class BlockDataPalette implements Cloneable {
         setFullBlock(x, y, z, (char) (id << 4));
     }
 
-    public synchronized void setBlockData(int x, int y, int z, int data) {
+    public void setBlockData(int x, int y, int z, int data) {
         int index = getIndex(x, y, z);
         char[] raw = getCachedRaw();
         if (raw != null) {
@@ -89,7 +89,9 @@ public final class BlockDataPalette implements Cloneable {
                     setPaletteFullBlock(index, (char) ((fullId & 0xFFF0) | data));
                 }
             } else {
-                setBlockData(x, y, z, data);
+                synchronized (this) {
+                    setBlockData(x, y, z, data);
+                }
             }
         }
 
