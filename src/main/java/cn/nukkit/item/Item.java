@@ -836,6 +836,9 @@ public class Item implements Cloneable {
             list[COOKED_SALMON] = ItemSalmonCooked.class; //463
 
             list[GOLDEN_APPLE_ENCHANTED] = ItemAppleGoldEnchanted.class; //466
+
+            list[TURTLE_SHELL] = ItemTurtleShell.class; //469
+
             list[RECORD_11] = ItemRecord11.class;
             list[RECORD_CAT] = ItemRecordCat.class;
             list[RECORD_13] = ItemRecord13.class;
