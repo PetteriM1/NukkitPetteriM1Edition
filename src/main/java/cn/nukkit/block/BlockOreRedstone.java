@@ -65,6 +65,7 @@ public class BlockOreRedstone extends BlockSolid {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_TOUCH) {
             this.getLevel().setBlock(this, new BlockOreRedstoneGlowing(), false, false);
+            this.getLevel().scheduleUpdate(this, 600);
 
             return Level.BLOCK_UPDATE_WEAK;
         }

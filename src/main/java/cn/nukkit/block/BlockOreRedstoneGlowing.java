@@ -2,8 +2,6 @@ package cn.nukkit.block;
 
 import cn.nukkit.level.Level;
 
-//和pm源码有点出入，这里参考了wiki
-
 /**
  * Created on 2015/12/6 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
