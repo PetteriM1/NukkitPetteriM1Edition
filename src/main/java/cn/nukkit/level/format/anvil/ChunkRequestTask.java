@@ -65,8 +65,6 @@ public class ChunkRequestTask extends AsyncTask {
 
         ByteBuffer orderedIds = ByteBuffer.allocate(16 * 16 * 128);
         ByteBuffer orderedData = ByteBuffer.allocate(16 * 16 * 64);
-        ByteBuffer orderedSkyLight = ByteBuffer.allocate(16 * 16 * 64);
-        ByteBuffer orderedLight = ByteBuffer.allocate(16 * 16 * 64);
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {

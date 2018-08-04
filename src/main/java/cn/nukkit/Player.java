@@ -4446,7 +4446,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean switchLevel(Level level) {
         Level oldLevel = this.level;
         if (super.switchLevel(level)) {
-          SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
+            SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
             spawnPosition.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
             Position spawn = level.getSpawnLocation();
             spawnPosition.x = spawn.getFloorX();
@@ -4621,7 +4621,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Notifies an ACK response from the client
      *
-     * @param identification
+     * @param identification packet identity
      */
     public void notifyACK(int identification) {
         needACK.put(identification, Boolean.TRUE);

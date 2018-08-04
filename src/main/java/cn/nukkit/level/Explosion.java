@@ -28,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Explosion {
 
-    private final int rays = 16; //Rays
+    private final int rays = 16;
     private final Level level;
     private final Position source;
     private final double size;
@@ -165,9 +165,7 @@ public class Explosion {
 
         ItemBlock air = new ItemBlock(new BlockAir());
 
-        //Iterator iter = this.affectedBlocks.entrySet().iterator();
         for (Block block : this.affectedBlocks) {
-            //Block block = (Block) ((HashMap.Entry) iter.next()).getValue();
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(new NukkitRandom().nextRange(10, 30), this.what instanceof Entity ? (Entity) this.what : null);
             } else if (Math.random() * 100 < yield) {
@@ -176,7 +174,7 @@ public class Explosion {
                 }
             }
 
-            this.level.setBlockIdAt((int) block.x, (int) block.y, (int) block.z, 0);
+            this.level.setBlockFullIdAt((int) block.x, (int) block.y, (int) block.z, 0);
 
             Vector3 pos = new Vector3(block.x, block.y, block.z);
 
@@ -200,7 +198,7 @@ public class Explosion {
         pk.y = (float) this.source.y;
         pk.z = (float) this.source.z;
         pk.radius = (float) this.size;
-        pk.records = send.stream().toArray(Vector3[]::new);
+        pk.records = send.toArray(new Vector3[0]);
 
         this.level.addChunkPacket((int) source.x >> 4, (int) source.z >> 4, pk);
         this.level.addParticle(new HugeExplodeSeedParticle(this.source));

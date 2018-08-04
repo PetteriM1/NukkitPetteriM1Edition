@@ -187,7 +187,6 @@ public class Anvil extends BaseLevelProvider {
             BaseFullChunk chunk = iter.next();
             if (chunk == null) continue;
             if (chunk.isGenerated() && chunk.isPopulated() && chunk instanceof Chunk) {
-                Chunk anvilChunk = (Chunk) chunk;
                 chunk.compress();
                 if (System.currentTimeMillis() - start >= time) break;
             }

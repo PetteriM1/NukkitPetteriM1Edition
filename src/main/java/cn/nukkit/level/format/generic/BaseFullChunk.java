@@ -558,6 +558,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
         return 0;
     }
 
+    @Override
     public void setBlockFullIdAt(int x, int y, int z, int fullId) {
         if (x >> 4 == getX() && z >> 4 == getZ()) {
             setFullBlockId(x & 15, y, z & 15, fullId);
