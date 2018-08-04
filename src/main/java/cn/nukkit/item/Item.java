@@ -260,7 +260,7 @@ public class Item implements Cloneable {
     public static final int DARK_OAK_WOOD_STAIRS = 164;
     public static final int DARK_OAK_WOODEN_STAIRS = 164;
     public static final int SLIME_BLOCK = 165;
-
+    public static final int GLOW_STICK = 166;
     public static final int IRON_TRAPDOOR = 167;
     public static final int PRISMARINE = 168;
     public static final int SEA_LANTERN = 169;
@@ -270,7 +270,8 @@ public class Item implements Cloneable {
     public static final int COAL_BLOCK = 173;
     public static final int PACKED_ICE = 174;
     public static final int DOUBLE_PLANT = 175;
-
+    public static final int STANDING_BANNER = 176;
+    public static final int WALL_BANNER = 177;
     public static final int DAYLIGHT_DETECTOR_INVERTED = 178;
     public static final int RED_SANDSTONE = 179;
     public static final int RED_SANDSTONE_STAIRS = 180;
@@ -281,7 +282,11 @@ public class Item implements Cloneable {
     public static final int FENCE_GATE_JUNGLE = 185;
     public static final int FENCE_GATE_DARK_OAK = 186;
     public static final int FENCE_GATE_ACACIA = 187;
-
+    public static final int REPEATING_COMMAND_BLOCK = 188;
+    public static final int CHAIN_COMMAND_BLOCK = 189;
+    public static final int HARD_GLASS_PANE = 190;
+    public static final int HARD_STAINED_GLASS_PANE = 191;
+    public static final int CHEMICAL_HEAT = 192;
     public static final int SPRUCE_DOOR_BLOCK = 193;
     public static final int BIRCH_DOOR_BLOCK = 194;
     public static final int JUNGLE_DOOR_BLOCK = 195;
@@ -291,19 +296,20 @@ public class Item implements Cloneable {
     public static final int ITEM_FRAME_BLOCK = 199;
     public static final int CHORUS_FLOWER = 200;
     public static final int PURPUR_BLOCK = 201;
-
+    public static final int COLORED_TORCH_LG = 202;
     public static final int PURPUR_STAIRS = 203;
-
+    public static final int COLORED_TORCH_BP = 204;
+    public static final int UNDYED_SHULKER_BOX = 205;
     public static final int END_BRICKS = 206;
-
+    public static final int FROSTED_ICE = 207;
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
-
+    // 210 - 212 not yet in Minecraft
     public static final int MAGMA = 213;
     public static final int BLOCK_NETHER_WART_BLOCK = 214;
     public static final int RED_NETHER_BRICK = 215;
     public static final int BONE_BLOCK = 216;
-
+    // 217 not yet in Minecraft
     public static final int SHULKER_BOX = 218;
     public static final int PURPLE_GLAZED_TERRACOTTA = 219;
     public static final int WHITE_GLAZED_TERRACOTTA = 220;
@@ -323,7 +329,8 @@ public class Item implements Cloneable {
     public static final int BLACK_GLAZED_TERRACOTTA = 235;
     public static final int CONCRETE = 236;
     public static final int CONCRETE_POWDER = 237;
-
+    public static final int CHEMISTRY_TABLE = 238;
+    public static final int UNDERWATER_TORCH = 239;
     public static final int CHORUS_PLANT = 240;
     public static final int STAINED_GLASS = 241;
     public static final int PODZOL = 243;
@@ -331,10 +338,14 @@ public class Item implements Cloneable {
     public static final int STONECUTTER = 245;
     public static final int GLOWING_OBSIDIAN = 246;
     public static final int NETHER_REACTOR = 247;
-
+    public static final int INFO_UPDATE = 248;
+    public static final int INFO_UPDATE2 = 249;
     public static final int PISTON_EXTENSION = 250;
     public static final int OBSERVER = 251;
-
+    public static final int STRUCTURE_BLOCK = 252;
+    public static final int HARD_GLASS = 253;
+    public static final int HARD_STAINED_GLASS = 254;
+    public static final int RESERVED6 = 255;
     // Normal Item IDs
     public static final int IRON_SHOVEL = 256;
     public static final int IRON_PICKAXE = 257;
@@ -414,7 +425,7 @@ public class Item implements Cloneable {
     public static final int SIGN = 323;
     public static final int WOODEN_DOOR = 324;
     public static final int BUCKET = 325;
-
+    // 326 - 327 not yet in Minecraft
     public static final int MINECART = 328;
     public static final int SADDLE = 329;
     public static final int IRON_DOOR = 330;
@@ -423,7 +434,7 @@ public class Item implements Cloneable {
     public static final int SNOWBALL = 332;
     public static final int BOAT = 333;
     public static final int LEATHER = 334;
-
+    public static final int KELP = 335;
     public static final int BRICK = 336;
     public static final int CLAY = 337;
     public static final int SUGARCANE = 338;
@@ -433,7 +444,7 @@ public class Item implements Cloneable {
     public static final int BOOK = 340;
     public static final int SLIMEBALL = 341;
     public static final int MINECART_WITH_CHEST = 342;
-
+    // 343 not yet in Minecraft
     public static final int EGG = 344;
     public static final int COMPASS = 345;
     public static final int FISHING_ROD = 346;
@@ -500,7 +511,7 @@ public class Item implements Cloneable {
     public static final int NETHER_STAR = 399;
     public static final int PUMPKIN_PIE = 400;
     public static final int FIREWORKS = 401;
-
+    public static final int FIREWORKSCHARGE = 402;
     public static final int ENCHANTED_BOOK = 403;
     public static final int ENCHANT_BOOK = 403;
     public static final int COMPARATOR = 404;
@@ -534,18 +545,26 @@ public class Item implements Cloneable {
     public static final int DARK_OAK_DOOR = 431;
     public static final int CHORUS_FRUIT = 432;
     public static final int POPPED_CHORUS_FRUIT = 433;
-
+    // 434 - 436 not yet in Minecraft
     public static final int DRAGON_BREATH = 437;
     public static final int SPLASH_POTION = 438;
-
+    // 439 - 440 not yet in Minecraft
     public static final int LINGERING_POTION = 441;
-
+    public static final int SPARKLER = 442;
+    public static final int COMMAND_BLOCK_MINECART = 443;
     public static final int ELYTRA = 444;
-
     public static final int SHULKER_SHELL = 445;
-    
+    public static final int BANNER = 446;
+    public static final int EYE_DROP = 447;
+    public static final int BALLOON = 448;
+    public static final int SUPER_FERTILIZER = 449;
+    public static final int TOTEM = 450;
+    public static final int BLEACH = 451;
+    public static final int IRON_NUGGET = 452;
+    public static final int ICE_BOMB = 453;
+    // 454 not yet in Minecraft
     public static final int TRIDENT = 455;
-
+    // 456 not yet in Minecraft
     public static final int BEETROOT = 457;
     public static final int BEETROOT_SEEDS = 458;
     public static final int BEETROOT_SEED = 458;
@@ -554,9 +573,15 @@ public class Item implements Cloneable {
     public static final int CLOWNFISH = 461;
     public static final int PUFFERFISH = 462;
     public static final int COOKED_SALMON = 463;
-
+    public static final int DRIED_KELP = 464;
+    public static final int NAUTILUS_SHELL = 465;
     public static final int GOLDEN_APPLE_ENCHANTED = 466;
-
+    public static final int HEART_OF_THE_SEA = 467;
+    public static final int SCUTE = 468;
+    public static final int TURTLE_SHELL = 469;
+    public static final int PHANTOM_MEMBRANE = 470;
+    // 471 - 498 not yet in Minecraft
+    public static final int COMPOUND = 499;
     public static final int RECORD_13 = 500;
     public static final int RECORD_CAT = 501;
     public static final int RECORD_BLOCKS = 502;

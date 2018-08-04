@@ -297,12 +297,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int ICE_FROSTED = 207;
     public static final int END_ROD = 208;
     public static final int END_GATEWAY = 209;
-    //210-212 not yet in Minecraft
+    // 210 - 212 not yet in Minecraft
     public static final int MAGMA = 213;
     public static final int BLOCK_NETHER_WART_BLOCK = 214;
     public static final int RED_NETHER_BRICK = 215;
     public static final int BONE_BLOCK = 216;
-    //217 not yet in Minecraft
+    // 217 not yet in Minecraft
     public static final int SHULKER_BOX = 218;
     public static final int PURPLE_GLAZED_TERRACOTTA = 219;
     public static final int WHITE_GLAZED_TERRACOTTA = 220;
@@ -336,6 +336,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
     public static final int PISTON_EXTENSION = 250;
     public static final int OBSERVER = 251;
     public static final int STRUCTURE_BLOCK = 252;
+    public static final int HARD_GLASS = 253;
+    public static final int HARD_STAINED_GLASS = 254;
+    public static final int RESERVED6 = 255;
 
     public static Class[] list = null;
     public static Block[] fullList = null;
