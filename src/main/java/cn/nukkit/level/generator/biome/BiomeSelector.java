@@ -40,8 +40,6 @@ public class BiomeSelector {
             } else {
                 return Biome.SAVANNA;
             }
-        } else if (rainfall < 0.60) {
-            return Biome.ROOFED_FOREST_M;
         } else if (rainfall < 0.65) {
             return Biome.ROOFED_FOREST;
         } else if (rainfall < 0.70) {

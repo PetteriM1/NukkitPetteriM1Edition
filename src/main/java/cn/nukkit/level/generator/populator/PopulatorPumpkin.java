@@ -32,13 +32,13 @@ public class PopulatorPumpkin extends Populator {
             int x = random.nextRange(0, 15);
             int z = random.nextRange(0, 15);
             int y = this.getHighestWorkableBlock(chunk, x, z);
-            if (y != -1 && this.canMelonStay(chunk, x, y, z)) {
+            if (y != -1 && this.canPumpkinStay(chunk, x, y, z)) {
                 chunk.setBlock(x, y, z, Block.PUMPKIN);
             }
         }
     }
 
-    private boolean canMelonStay(FullChunk chunk, int x, int y, int z) {
+    private boolean canPumpkinStay(FullChunk chunk, int x, int y, int z) {
         int b = chunk.getBlockId(x, y, z);
         return (b == Block.AIR) && chunk.getBlockId(x, y - 1, z) == Block.GRASS;
     }

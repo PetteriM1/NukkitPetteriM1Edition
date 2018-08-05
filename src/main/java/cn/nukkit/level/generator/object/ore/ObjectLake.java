@@ -24,9 +24,12 @@ public class ObjectLake {
     }
 
     public boolean canPlaceObject(ChunkManager level, int x, int y, int z) {
-        if (level.getBlockIdAt(x, y - 1, z) == Block.AIR || level.getBlockIdAt(x, y + 1, z) != Block.AIR) return false;
-        if (level.getBlockIdAt(x - 1, y, z) == Block.AIR || level.getBlockIdAt(x + 1, y, z) == Block.AIR) return false;
-        if (level.getBlockIdAt(x, y, z - 1) == Block.AIR || level.getBlockIdAt(x, y, z + 1) == Block.AIR) return false;
+        if (level.getBlockIdAt(x, y - 1, z) == Block.AIR) return false;
+        if (level.getBlockIdAt(x, y + 1, z) != Block.AIR) return false;
+        if (level.getBlockIdAt(x - 1, y, z) == Block.AIR) return false;
+        if (level.getBlockIdAt(x + 1, y, z) == Block.AIR) return false;
+        if (level.getBlockIdAt(x, y, z - 1) == Block.AIR) return false;
+        if (level.getBlockIdAt(x, y, z + 1) == Block.AIR) return false;
         return (level.getBlockIdAt(x, y, z) == Block.GRASS || level.getBlockIdAt(x, y, z) == Block.DIRT || level.getBlockIdAt(x, y, z) == Block.STONE);
     }
 

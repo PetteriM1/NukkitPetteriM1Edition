@@ -2,8 +2,6 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
-import cn.nukkit.block.BlockWaterStill;
-import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.*;
 
 /**
@@ -25,7 +23,7 @@ public class PlainBiome extends GrassyBiome {
         PopulatorSunflower sunflower = new PopulatorSunflower();
         sunflower.setBaseAmount(6);
         PopulatorPumpkin pumpkins = new PopulatorPumpkin();
-        pumpkins.setBaseAmount(2);
+        pumpkins.setBaseAmount(1);
         PopulatorFlower flower = new PopulatorFlower();
         flower.setBaseAmount(10);
         flower.addType(Block.DANDELION, 0);
@@ -37,17 +35,12 @@ public class PlainBiome extends GrassyBiome {
         flower.addType(Block.RED_FLOWER, BlockFlower.TYPE_PINK_TULIP);
         flower.addType(Block.RED_FLOWER, BlockFlower.TYPE_OXEYE_DAISY);
 
-        PopulatorLake lakes = new PopulatorLake();
-        lakes.setOreTypes(new OreType[]{
-                new OreType(new BlockWaterStill(), 1, 40, 62, 65)
-        });
-
-        this.addPopulator(lakes);
         this.addPopulator(sugarcane);
         this.addPopulator(tallSugarcane);
         this.addPopulator(grass);
         this.addPopulator(tallGrass);
         this.addPopulator(sunflower);
+        this.addPopulator(pumpkins);
         this.addPopulator(flower);
 
         this.setElevation(63, 74);

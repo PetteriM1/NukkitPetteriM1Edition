@@ -10,7 +10,7 @@ public class RoofedForestBiome extends GrassyBiome {
     public RoofedForestBiome() {
         super();
         DarkOakTreePopulator tree = new DarkOakTreePopulator();
-        tree.setBaseAmount(30);
+        tree.setBaseAmount(31);
 
         PopulatorGrass grass = new PopulatorGrass();
         grass.setBaseAmount(10);
