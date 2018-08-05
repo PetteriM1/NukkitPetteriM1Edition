@@ -934,6 +934,10 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean isAlive() {
         return this.health > 0;
     }
+    
+    public boolean isClosed() {
+        return closed;
+    }
 
     public void setHealth(float health) {
         if (this.health == health) {
@@ -1958,8 +1962,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void close() {
         if (!this.closed) {
-            this.server.getPluginManager().callEvent(new EntityDespawnEvent(this));
             this.closed = true;
+            this.server.getPluginManager().callEvent(new EntityDespawnEvent(this));
             this.despawnFromAll();
             if (this.chunk != null) {
                 this.chunk.removeEntity(this);
