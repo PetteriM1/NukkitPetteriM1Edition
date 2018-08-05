@@ -52,7 +52,7 @@ public class MushroomPopulator extends Populator {
         int y;
         for (y = 127; y > 0; --y) {
             int b = this.level.getBlockIdAt(x, y, z);
-            if (b == Block.DIRT || b == Block.GRASS) {
+            if (b == Block.DIRT || b == Block.GRASS || b == Block.MYCELIUM) {
                 break;
             } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
                 return -1;

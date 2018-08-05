@@ -31,7 +31,6 @@ public abstract class Biome {
     public static final int BIRCH_FOREST = 27;
     public static final int ROOFED_FOREST = 29;
     public static final int SAVANNA = 35;
-    public static final int ROOFED_FOREST_M = 157;
     public static final int MAX_BIOMES = 256;
 
     private static final Biome[] biomes = new Biome[MAX_BIOMES];
@@ -68,15 +67,11 @@ public abstract class Biome {
         register(ICE_PLAINS, new IcePlainsBiome());
         register(SMALL_MOUNTAINS, new SmallMountainsBiome());
         register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
-
         register(JUNGLE, new JungleBiome());
         register(ROOFED_FOREST, new RoofedForestBiome());
-        register(ROOFED_FOREST_M, new RoofedForestMBiome());
         register(MUSHROOM_ISLAND, new MushroomIsland());
         register(SAVANNA, new SavannaBiome());
-
         register(BEACH, new BeachBiome());
-
         register(HELL, new HellBiome());
     }
 

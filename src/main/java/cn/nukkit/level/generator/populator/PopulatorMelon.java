@@ -6,6 +6,9 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.NukkitRandom;
 
+/**
+ * Created by PetteriM1
+ */
 public class PopulatorMelon extends Populator {
 
     private ChunkManager level;

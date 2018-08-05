@@ -40,6 +40,7 @@ public class PlainBiome extends GrassyBiome {
         this.addPopulator(grass);
         this.addPopulator(tallGrass);
         this.addPopulator(sunflower);
+        this.addPopulator(pumpkins);
         this.addPopulator(flower);
 
         this.setElevation(63, 74);

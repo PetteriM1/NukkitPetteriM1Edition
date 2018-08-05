@@ -27,11 +27,9 @@ import java.util.*;
  * SavannaTreePopulator.java
  * SwampTreePopulator.java
  * BasicPopulator.java
- * MesaBiome.java
  * JungleBiome.java
  * SavannaBiome.java
  * RoofedForestBiome.java
- * RoofedForestMBiome.java
  * MushroomIsland.java
  * TreeGenerator.java
  * HugeTreesGenerator.java
@@ -60,7 +58,6 @@ public class Normal extends Generator {
      public static final int BIRCH_FOREST = 27;
      public static final int ROOFED_FOREST = 29;
      public static final int SAVANNA = 35;
-     public static final int ROOFED_FOREST_M = 157;
      public static final int MAX_BIOMES = 256;
 
     @Override
@@ -99,7 +96,6 @@ public class Normal extends Generator {
     private final int landHeightRange = 18;
     private final int mountainHeight = 13;
     private final int basegroundHeight = 3;
-    private int waterColor = 16777215;
 
     protected float rainfall = 0.5F;
     protected float temperature = 0.5F;
@@ -110,7 +106,6 @@ public class Normal extends Generator {
     }
 
     public Normal(Map<String, Object> options) {
-        //Nothing here. Just used for future update.
     }
 
     @Override
@@ -175,7 +170,6 @@ public class Normal extends Generator {
         this.selector.addBiome(Biome.getBiome(BIRCH_FOREST));
         this.selector.addBiome(Biome.getBiome(ROOFED_FOREST));
         this.selector.addBiome(Biome.getBiome(SAVANNA));
-        this.selector.addBiome(Biome.getBiome(ROOFED_FOREST_M));
 
         this.selector.recalculate();
 

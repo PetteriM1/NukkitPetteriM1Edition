@@ -11,15 +11,16 @@ public class JungleBiome extends GrassyBiome {
     public JungleBiome() {
         super();
         JungleTreePopulator trees = new JungleTreePopulator();
-        trees.setBaseAmount(10);
+        trees.setBaseAmount(11);
         JungleBigTreePopulator bigTrees = new JungleBigTreePopulator();
-        bigTrees.setBaseAmount(6);
+        bigTrees.setBaseAmount(7);
         PopulatorTallGrass tallGrass = new PopulatorTallGrass();
-        tallGrass.setBaseAmount(2);
+        tallGrass.setBaseAmount(3);
         PopulatorGrass grass = new PopulatorGrass();
-        grass.setBaseAmount(20);
+        grass.setBaseAmount(21);
         PopulatorMelon melons = new PopulatorMelon();
         melons.setBaseAmount(1);
+        this.addPopulator(melons);
         this.addPopulator(grass);
         this.addPopulator(tallGrass);
         this.addPopulator(bigTrees);

@@ -11,8 +11,8 @@ public class MushroomIsland extends NormalBiome implements CaveBiome {
         this.setGroundCover(new Block[]{new BlockMycelium(), new BlockDirt(), new BlockDirt(), new BlockDirt(), new BlockDirt()});
 
         MushroomPopulator mushroomPopulator = new MushroomPopulator();
-        mushroomPopulator.setBaseAmount(1);
-        mushroomPopulator.setRandomAmount(2);
+        mushroomPopulator.setBaseAmount(0);
+        mushroomPopulator.setRandomAmount(1);
 
         addPopulator(mushroomPopulator);
         setElevation(60, 70);

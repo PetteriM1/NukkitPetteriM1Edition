@@ -28,9 +28,11 @@ public class BiomeSelector {
     public int lookup(double temperature, double rainfall) {
         if (rainfall < 0.10) {
             return Biome.MUSHROOM_ISLAND;
-        } else if (rainfall < 0.25) {
+        } else if (rainfall < 0.20) {
             return Biome.SWAMP;
-        } else if (rainfall < 0.60) {
+        } else if (rainfall < 0.25) {
+            return Biome.PLAINS;
+        } else if (rainfall < 0.55) {
             if (temperature < 0.25) {
                 return Biome.ICE_PLAINS;
             } else if (temperature < 0.75) {
@@ -50,10 +52,8 @@ public class BiomeSelector {
             } else {
                 return Biome.FOREST;
             }
-        } else {
-            if (rainfall < 1.0) {
-                return Biome.JUNGLE;
-            }
+        } else if (rainfall < 1.0) {
+            return Biome.JUNGLE;
         }
         return Biome.PLAINS;
     }
