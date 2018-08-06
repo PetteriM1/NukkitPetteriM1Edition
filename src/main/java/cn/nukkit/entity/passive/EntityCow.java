@@ -65,14 +65,14 @@ public class EntityCow extends WalkingAnimal {
 
   @Override
   public boolean onInteract(Player player, Item item) {
-      if (item.equals(Item.get(Item.BUCKET,0),true)) {
-          player.getInventory().removeItem(Item.get(Item.BUCKET,0,1));
-          player.getInventory().addItem(Item.get(Item.BUCKET,1,1));
+      if (item.equals(Item.get(Item.BUCKET, 0), true)) {
+          player.getInventory().removeItem(Item.get(Item.BUCKET, 0, 1));
+          player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
           this.level.addSound(new CowMilkSound(this), this.getViewers().values());
           return true;
-      }else if(item.equals(Item.get(Item.WHEAT,0)) && !this.isBaby()){
-          player.getInventory().removeItem(Item.get(Item.WHEAT,0,1));
-          this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.WHEAT)));
+      } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
+          player.getInventory().removeItem(Item.get(Item.WHEAT, 0, 1));
+          this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0),Item.get(Item.WHEAT)));
           this.setInLove();
       }
       return false;

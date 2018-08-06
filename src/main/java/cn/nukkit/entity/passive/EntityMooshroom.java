@@ -1,5 +1,6 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
@@ -80,6 +81,20 @@ public class EntityMooshroom extends WalkingAnimal {
     @Override
     public int getKillExperience() {
         return EntityUtils.rand(1, 4);
+    }
+    
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        if (item.equals(Item.get(Item.BOWL, 0), true)) {
+            player.getInventory().removeItem(Item.get(Item.BOWL, 0, 1));
+            player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
+            return true;
+        } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
+            player.getInventory().removeItem(Item.get(Item.WHEAT, 0, 1));
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
+            this.setInLove();
+        }
+        return false;
     }
 
     @Override

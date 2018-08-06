@@ -54,6 +54,7 @@ public class ItemFireCharge extends Item {
                     item.setCount(item.getCount() - 1);
                     player.getInventory().setItemInHand(item);
                 }
+                level.addSound(block, "mob.ghast.fireball");
                 return true;
             }
         }
