@@ -71,6 +71,7 @@ public class EntityPig extends WalkingAnimal {
             return player.spawned && player.isAlive() && !player.closed
                     && (player.getInventory().getItemInHand().getId() == Item.CARROT
                     || player.getInventory().getItemInHand().getId() == Item.POTATO
+                    || player.getInventory().getItemInHand().getId() == Item.CARROT_ON_A_STICK
                     || player.getInventory().getItemInHand().getId() == Item.BEETROOT)
                     && distance <= 40;
         }
