@@ -74,6 +74,7 @@ import com.google.common.base.Preconditions;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author MagicDroidX
@@ -478,6 +479,10 @@ public class Server {
                 if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
                     this.loadLevel(fs.getName());
                 }
+            }
+            if (this.getLevelByName("nether") == null && this.getPropertyBoolean("nether", false)) {
+                this.generateLevel("nether", 666 + ThreadLocalRandom.current().nextLong(10, 100), Generator.getGenerator(Generator.TYPE_NETHER));
+                this.loadLevel("nether");
             }
         }
 
