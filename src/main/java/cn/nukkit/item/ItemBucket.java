@@ -92,6 +92,7 @@ public class ItemBucket extends Item {
                         player.getInventory().setItemInHand(clone);
                         player.getInventory().addItem(ev.getItem());
                     }
+                    level.addSound(block, "bucket.empty_water");
                     return true;
                 } else {
                     player.getInventory().sendContents(player);
@@ -109,6 +110,7 @@ public class ItemBucket extends Item {
                     player.getInventory().setItemInHand(clone);
                     player.getInventory().addItem(ev.getItem());
                 }
+                level.addSound(block, "bucket.fill_water");
                 return true;
             } else {
                 player.getInventory().sendContents(player);

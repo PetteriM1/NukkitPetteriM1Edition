@@ -151,6 +151,7 @@ public abstract class BaseEntity extends EntityCreature {
             pk.speedX = pk.speedY = pk.speedZ = 0;
             pk.yaw = (float) this.yaw;
             pk.pitch = (float) this.pitch;
+            pk.headYaw = (float) this.yaw;
             pk.metadata = this.dataProperties;
             player.dataPacket(pk);
 

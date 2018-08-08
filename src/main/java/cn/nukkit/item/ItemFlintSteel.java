@@ -265,6 +265,7 @@ public class ItemFlintSteel extends ItemTool {
                     level.setBlock(fire, fire, true);
                     level.scheduleUpdate(fire, fire.tickRate() + ThreadLocalRandom.current().nextInt(10));
                 }
+                level.addSound(block, "fire.ignite");
                 return true;
             }
 

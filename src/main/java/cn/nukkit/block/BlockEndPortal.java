@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockEndPortal extends BlockFlowable {
@@ -66,5 +67,17 @@ public class BlockEndPortal extends BlockFlowable {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+    
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return new AxisAlignedBB(
+                this.x,
+                this.y,
+                this.z,
+                this.x + 1,
+                this.y + 1,
+                this.z + 1
+        );
     }
 }

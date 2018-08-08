@@ -1379,8 +1379,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         
         if (endPortal && Server.getInstance().getPropertyBoolean("end", true)) {
-            if (this.getServer().getLevelByName("end") != null) {
-                this.getPlayer().teleport(this.getServer().getLevelByName("end").getSafeSpawn());
+            if (!this.getLevel().getName().equals("end")) {
+                if (this.getServer().getLevelByName("end") != null) {
+                    this.getPlayer().teleport(this.getServer().getLevelByName("end").getSafeSpawn());
+                }
+            } else {
+                this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
             }
         }
 

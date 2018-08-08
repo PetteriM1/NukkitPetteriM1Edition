@@ -63,4 +63,12 @@ public class EntityEndCrystal extends Entity {
 	public boolean canCollideWith(Entity entity) {
 		return false;
 	}
+    
+    public boolean showBase() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE);
+    }
+
+    public void setShowBase(boolean value) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE, value);
+    }
 }

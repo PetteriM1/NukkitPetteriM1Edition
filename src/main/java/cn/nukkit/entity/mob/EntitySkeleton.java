@@ -57,7 +57,7 @@ public class EntitySkeleton extends WalkingMonster {
         if (this.attackDelay > 30 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
 
-            double f = 1.2;
+            double f = 1.3;
             double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
             double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
