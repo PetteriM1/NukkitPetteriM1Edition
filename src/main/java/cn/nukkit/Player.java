@@ -1384,7 +1384,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inEndPortalTicks = 0;
         }
         
-        if (inEndPortalTicks == 1 && Server.getInstance().getPropertyBoolean("end", true)) {
+        if (inEndPortalTicks == 1 && Server.getInstance().getPropertyBoolean("end", false)) {
             if (!this.getLevel().getName().equals("end")) {
                 if (this.getServer().getLevelByName("end") != null) {
                     this.teleport(this.getServer().getLevelByName("end").getSafeSpawn());
@@ -1394,7 +1394,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (inPortalTicks == 40 && Server.getInstance().getPropertyBoolean("nether", true)) {
+        if (inPortalTicks == 40 && Server.getInstance().getPropertyBoolean("nether", false)) {
             if (this.getServer().getLevelByName("nether") != null) {
                 this.teleport(this.getServer().getLevelByName("nether").getSafeSpawn());
             }

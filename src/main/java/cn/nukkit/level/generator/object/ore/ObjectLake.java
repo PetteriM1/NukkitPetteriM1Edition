@@ -29,7 +29,7 @@ public class ObjectLake {
         if (level.getBlockIdAt(x + 1, y, z) == Block.AIR) return false;
         if (level.getBlockIdAt(x, y, z - 1) == Block.AIR) return false;
         if (level.getBlockIdAt(x, y, z + 1) == Block.AIR) return false;
-        return (level.getBlockIdAt(x, y, z) == Block.GRASS || level.getBlockIdAt(x, y, z) == Block.DIRT || level.getBlockIdAt(x, y, z) == Block.STONE);
+        return (level.getBlockIdAt(x, y, z) == Block.GRASS || level.getBlockIdAt(x, y, z) == Block.DIRT || level.getBlockIdAt(x, y, z) == Block.STONE || level.getBlockIdAt(x, y, z) == Block.SAND  || level.getBlockIdAt(x, y, z) == Block.SANDSTONE);
     }
 
     public void placeObject(ChunkManager level, int x, int y, int z) {

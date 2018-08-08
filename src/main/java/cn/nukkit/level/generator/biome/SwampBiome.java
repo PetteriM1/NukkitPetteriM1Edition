@@ -20,7 +20,7 @@ public class SwampBiome extends GrassyBiome {
 
         PopulatorLake lakes = new PopulatorLake();
         lakes.setOreTypes(new OreType[]{
-                new OreType(new BlockWaterStill(), 1, 35, 62, 65)
+                new OreType(new BlockWaterStill(), 1, 33, 62, 64)
         });
 
         PopulatorLilyPad lilypad = new PopulatorLilyPad();

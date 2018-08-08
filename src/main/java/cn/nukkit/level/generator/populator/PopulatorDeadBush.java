@@ -34,7 +34,6 @@ public class PopulatorDeadBush extends Populator {
 
             if (y != -1 && this.canDeadBushStay(x, y, z)) {
                 this.level.setBlockIdAt(x, y, z, Block.DEAD_BUSH);
-                this.level.setBlockDataAt(x, y, z, 1);
             }
         }
     }
