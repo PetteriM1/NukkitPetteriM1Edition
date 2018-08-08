@@ -69,7 +69,7 @@ public class ObjectLake {
                                 double sizeZ = (z + 0.5 - seedZ) / size;
                                 sizeZ *= sizeZ;
 
-                                if ((sizeX + sizeY + sizeZ) < 1 && (level.getBlockIdAt(x, y, z) == Block.GRASS || level.getBlockIdAt(x, y, z) == Block.DIRT || level.getBlockIdAt(x, y, z) == Block.STONE)) {
+                                if ((sizeX + sizeY + sizeZ) < 1 && canPlaceObject(level, x, y, z)) {
                                     level.setBlockIdAt(x, y, z, this.type.material.getId());
                                     if (this.type.material.getDamage() != 0) {
                                         level.setBlockDataAt(x, y, z, this.type.material.getDamage());
