@@ -2,7 +2,9 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.entity.mob.EntityWalkingMob;
+import cn.nukkit.entity.projectile.EntityShulkerBullet;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
@@ -11,7 +13,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-public class EntityShulker extends WalkingMonster {
+public class EntityShulker extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 54;
 
@@ -38,6 +40,11 @@ public class EntityShulker extends WalkingMonster {
     public float getHeight() {
         return 1f;
     }
+    
+    @Override
+    public double getSpeed() {
+        return 0;
+    }
 
     @Override
     protected void initEntity() {
@@ -49,7 +56,7 @@ public class EntityShulker extends WalkingMonster {
 
     @Override
     public void attackEntity(Entity player) {
-    /*if (this.attackDelay > 23 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
+    if (this.attackDelay > 23 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
 
             double f = 1.2;
@@ -58,11 +65,11 @@ public class EntityShulker extends WalkingMonster {
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             Entity k = EntityUtils.create("ShulkerBullet", pos, this);
-            if (!(k instanceof ShulkerBullet)) {
+            if (!(k instanceof EntityShulkerBullet)) {
                 return;
             }
 
-            ShulkerBullet arrow = (ShulkerBullet) k;
+            EntityShulkerBullet arrow = (EntityShulkerBullet) k;
             arrow.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                     Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
@@ -70,7 +77,7 @@ public class EntityShulker extends WalkingMonster {
             this.server.getPluginManager().callEvent(launch);
             arrow.spawnToAll();
             this.level.addSound(new LaunchSound(this), this.getViewers().values());
-        }*/
+        }
     }
 
     @Override

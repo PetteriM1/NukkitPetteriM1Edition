@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityAgeable;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -17,7 +17,7 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityHusk extends WalkingMonster {
+public class EntityHusk extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 47;
 

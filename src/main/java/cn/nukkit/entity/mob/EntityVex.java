@@ -2,7 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.FlyingMonster;
+import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -15,7 +15,7 @@ import cn.nukkit.network.protocol.MobEquipmentPacket;
 
 import java.util.HashMap;
 
-public class EntityVex extends FlyingMonster {
+public class EntityVex extends EntityFlyingMob {
 
     public static final int NETWORK_ID = 105;
 

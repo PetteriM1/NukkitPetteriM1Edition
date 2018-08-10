@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.EntityUtils;
-import cn.nukkit.entity.WalkingEntity;
+import cn.nukkit.entity.EntityWalking;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -14,12 +14,12 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
-public abstract class WalkingAnimal extends WalkingEntity implements Animal {
+public abstract class EntityWalkingAnimal extends EntityWalking implements EntityAnimal {
 
     protected int inLoveTicks = 0;
     protected int spawnBabyDelay = 0;
 
-    public WalkingAnimal(FullChunk chunk, CompoundTag nbt) {
+    public EntityWalkingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 

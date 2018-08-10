@@ -4469,7 +4469,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(spawnPosition);
             
             int dimensionId = level.getDimension();
-            if (oldLevel.getDimension() != dimensionId) {
+            if (oldLevel.getDimension() != dimensionId && !getServer().suomiCraftPEMode()) {
                 this.setDimension(dimensionId);
             }
 

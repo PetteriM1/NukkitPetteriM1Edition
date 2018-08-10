@@ -2,17 +2,21 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.EntityUtils;
-import cn.nukkit.entity.WalkingEntity;
+import cn.nukkit.entity.EntityWalking;
+import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
-public abstract class SwimmingMonster extends WalkingEntity implements Monster {
+public abstract class EntityWalkingMob extends EntityWalking implements EntityMob {
 
     private int[]   minDamage;
 
@@ -22,7 +26,7 @@ public abstract class SwimmingMonster extends WalkingEntity implements Monster {
 
     private boolean canAttack   = true;
 
-    public SwimmingMonster(FullChunk chunk, CompoundTag nbt) {
+    public EntityWalkingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -170,28 +174,33 @@ public abstract class SwimmingMonster extends WalkingEntity implements Monster {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-
         boolean hasUpdate = false;
-
+        
         Timings.entityBaseTickTimer.startTiming();
-
+        
         hasUpdate = super.entityBaseTick(tickDiff);
 
         this.attackDelay += tickDiff;
-        if (this.isOnGround()) {
-            hasUpdate = true;
-            int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
-            if (airTicks <= -20) {
-                airTicks = 0;
+        if (this instanceof EntityEnderman) {
+            if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
                 this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
+                this.move(EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20));
             }
-            this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
         } else {
-            this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
+            if (!this.hasEffect(Effect.WATER_BREATHING) && this.isInsideOfWater()) {
+                hasUpdate = true;
+                int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
+                if (airTicks <= -20) {
+                    airTicks = 0;
+                    this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
+                }
+                this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
+            } else {
+                this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
+            }
         }
 
         Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
-
 }

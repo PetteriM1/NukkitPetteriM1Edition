@@ -9,7 +9,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-public class EntityTurtle extends SwimmingAnimal {
+public class EntityTurtle extends EntityWaterAnimal {
 
     public static final int NETWORK_ID = 74;
 

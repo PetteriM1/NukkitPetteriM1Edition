@@ -7,7 +7,7 @@ import cn.nukkit.entity.EntityTameable;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public abstract class TameableMonster extends WalkingMonster implements EntityTameable {
+public abstract class EntityTameableMob extends EntityWalkingMob implements EntityTameable {
 
     private Server          server          = null;
 
@@ -17,7 +17,7 @@ public abstract class TameableMonster extends WalkingMonster implements EntityTa
 
     private boolean         sitting         = false;
 
-    public TameableMonster(FullChunk chunk, CompoundTag nbt) {
+    public EntityTameableMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         this.server = Server.getInstance();
     }

@@ -1,7 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.passive.FlyingAnimal;
+import cn.nukkit.entity.passive.EntityFlyingAnimal;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
@@ -12,7 +12,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityParrot extends FlyingAnimal {
+public class EntityParrot extends EntityFlyingAnimal {
 
     public static final int NETWORK_ID = 105;
 

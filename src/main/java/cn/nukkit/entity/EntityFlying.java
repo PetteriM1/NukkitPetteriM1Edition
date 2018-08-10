@@ -2,16 +2,16 @@ package cn.nukkit.entity;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.Animal;
+import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public abstract class FlyingEntity extends BaseEntity {
+public abstract class EntityFlying extends BaseEntity {
 
-    public FlyingEntity(FullChunk chunk, CompoundTag nbt) {
+    public EntityFlying(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -25,7 +25,7 @@ public abstract class FlyingEntity extends BaseEntity {
             double near = Integer.MAX_VALUE;
 
             for (Entity entity : this.getLevel().getEntities()) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof Animal) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
                     continue;
                 }
 

@@ -1973,6 +1973,7 @@ public class Server {
         Entity.registerEntity("Egg", EntityEgg.class);
         Entity.registerEntity("BlazeFireBall", EntityBlazeFireBall.class);
         Entity.registerEntity("GhastFireBall", EntityGhastFireBall.class);
+        Entity.registerEntity("ShulkerBullet", EntityShulkerBullet.class);
         //Monsters
         Entity.registerEntity("Blaze", EntityBlaze.class);
         Entity.registerEntity("Creeper", EntityCreeper.class);

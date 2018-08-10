@@ -2,7 +2,7 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
-import cn.nukkit.block.BlockWaterStill;
+import cn.nukkit.block.BlockWater;
 import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.PopulatorLake;
 import cn.nukkit.level.generator.populator.PopulatorFlower;
@@ -20,7 +20,7 @@ public class SwampBiome extends GrassyBiome {
 
         PopulatorLake lakes = new PopulatorLake();
         lakes.setOreTypes(new OreType[]{
-                new OreType(new BlockWaterStill(), 1, 33, 62, 64)
+                new OreType(new BlockWater(), 1, 35, 62, 64)
         });
 
         PopulatorLilyPad lilypad = new PopulatorLilyPad();

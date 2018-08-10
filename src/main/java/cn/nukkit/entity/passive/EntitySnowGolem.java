@@ -1,7 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.entity.EntityUtils;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
@@ -18,7 +18,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntitySnowGolem extends WalkingMonster {
+public class EntitySnowGolem extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 21;
 

@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -12,7 +12,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 
 import java.util.HashMap;
 
-public class EntityEndermite extends WalkingMonster {
+public class EntityEndermite extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 55;
 

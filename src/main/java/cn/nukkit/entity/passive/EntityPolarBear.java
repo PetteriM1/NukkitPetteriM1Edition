@@ -1,7 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.Player;
@@ -13,7 +13,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.HashMap;
 
-public class EntityPolarBear extends WalkingMonster {
+public class EntityPolarBear extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 28;
     int                     angry      = 0;

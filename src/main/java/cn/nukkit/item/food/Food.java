@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.player.PlayerEatFoodEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
@@ -123,10 +125,6 @@ public abstract class Food {
         PlayerEatFoodEvent event = new PlayerEatFoodEvent(player, this);
         player.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) return false;
-        return event.getFood().onEatenBy(player);
-    }
-
-    protected boolean onEatenBy(Player player) {
         LevelSoundEventPacket pk = new LevelSoundEventPacket();
         pk.sound = LevelSoundEventPacket.SOUND_EAT;
         pk.extraData = -1;
@@ -135,6 +133,15 @@ public abstract class Food {
         pk.y = (float) player.getY();
         pk.z = (float) player.getZ();
         player.dataPacket(pk);
+        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
+        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
+        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
+        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
+        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
+        return event.getFood().onEatenBy(player);
+    }
+
+    protected boolean onEatenBy(Player player) {
         player.getFoodData().addFoodLevel(this);
         return true;
     }

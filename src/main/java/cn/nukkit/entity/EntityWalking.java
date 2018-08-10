@@ -8,7 +8,7 @@ import cn.nukkit.block.BlockFenceGate;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.Animal;
+import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
@@ -17,9 +17,9 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public abstract class WalkingEntity extends BaseEntity {
+public abstract class EntityWalking extends BaseEntity {
 
-    public WalkingEntity(FullChunk chunk, CompoundTag nbt) {
+    public EntityWalking(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -37,7 +37,7 @@ public abstract class WalkingEntity extends BaseEntity {
             double near = Integer.MAX_VALUE;
 
             for (Entity entity : this.getLevel().getEntities()) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof Animal) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
                     continue;
                 }
 

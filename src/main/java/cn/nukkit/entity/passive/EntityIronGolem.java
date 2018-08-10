@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityUtils;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class EntityIronGolem extends WalkingMonster {
+public class EntityIronGolem extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 20;
 

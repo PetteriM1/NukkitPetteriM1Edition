@@ -3,7 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.WalkingAnimal;
+import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
@@ -14,7 +14,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityRabbit extends WalkingAnimal {
+public class EntityRabbit extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 18;
 

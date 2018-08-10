@@ -2,7 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.entity.Entity;
 
-public interface Monster {
+public interface EntityMob {
 
     void attackEntity(Entity player);
 
@@ -35,5 +35,4 @@ public interface Monster {
     void setMaxDamage(int[] damage);
 
     void setMaxDamage(int damage, int difficulty);
-
 }

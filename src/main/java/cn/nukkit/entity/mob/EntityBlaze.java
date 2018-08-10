@@ -8,8 +8,8 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.FlyingMonster;
-import cn.nukkit.entity.passive.Animal;
+import cn.nukkit.entity.mob.EntityFlyingMob;
+import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.entity.projectile.EntityBlazeFireBall;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -28,7 +28,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityBlaze extends FlyingMonster {
+public class EntityBlaze extends EntityFlyingMob {
 
     public static final int NETWORK_ID = 43;
 
@@ -77,7 +77,7 @@ public class EntityBlaze extends FlyingMonster {
             double near = Integer.MAX_VALUE;
 
             for (Entity entity : this.getLevel().getEntities()) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof Animal) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
                     continue;
                 }
 

@@ -114,7 +114,7 @@ public class BlockFire extends BlockFlowable {
 
             if (Server.getInstance().suomiCraftPEMode()) {
                 if (forever) return 0;
-                if (!remove) this.getLevel().scheduleUpdate(this, random.nextInt(150, 250));
+                if (!remove) this.getLevel().scheduleUpdate(this, random.nextInt(250, 300));
                 this.remove = true;
                 if (remove) this.getLevel().setBlock(this, new BlockAir(), true);        
                 return 0;

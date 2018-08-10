@@ -13,7 +13,7 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.utils.DyeColor;
 
-public class EntitySquid extends SwimmingAnimal {
+public class EntitySquid extends EntityWaterAnimal {
 
     public static final int NETWORK_ID = 17;
 

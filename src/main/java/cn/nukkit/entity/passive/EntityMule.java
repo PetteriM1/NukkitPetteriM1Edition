@@ -13,7 +13,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityMule extends WalkingAnimal {
+public class EntityMule extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 25;
 

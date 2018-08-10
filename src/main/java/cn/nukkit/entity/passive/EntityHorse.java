@@ -13,7 +13,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityHorse extends TameableAnimal {
+public class EntityHorse extends EntityTameableAnimal {
 
     public static final int NETWORK_ID = 23;
 

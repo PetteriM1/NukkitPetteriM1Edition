@@ -11,7 +11,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityDolphin extends SwimmingAnimal {
+public class EntityDolphin extends EntityWaterAnimal {
 
     public static final int NETWORK_ID = 31;
 

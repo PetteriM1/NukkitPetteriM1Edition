@@ -2,13 +2,13 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.FlyingAnimal;
+import cn.nukkit.entity.passive.EntityFlyingAnimal;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 
-public class EntityBat extends FlyingAnimal {
+public class EntityBat extends EntityFlyingAnimal {
 
   public static final int NETWORK_ID = 19;
 

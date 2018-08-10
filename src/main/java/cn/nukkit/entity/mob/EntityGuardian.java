@@ -13,7 +13,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityGuardian extends SwimmingMonster {
+public class EntityGuardian extends EntitySwimmingMob {
 
     public static final int NETWORK_ID = 49;
 

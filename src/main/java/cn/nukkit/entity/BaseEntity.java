@@ -9,7 +9,7 @@ import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityMotionEvent;
-import cn.nukkit.entity.mob.Monster;
+import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
@@ -175,7 +175,7 @@ public abstract class BaseEntity extends EntityCreature {
     }
 
     public boolean targetOption(EntityCreature creature, double distance) {
-        if (this instanceof Monster) {
+        if (this instanceof EntityMob) {
             if (creature instanceof Player) {
                 Player player = (Player) creature;
                 return !player.closed && player.spawned && player.isAlive() && player.isSurvival() && distance <= 80;

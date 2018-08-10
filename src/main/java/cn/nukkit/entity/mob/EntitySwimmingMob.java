@@ -1,28 +1,28 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.entity.FlyingEntity;
 import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.entity.EntityWalking;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
-public abstract class FlyingMonster extends FlyingEntity implements Monster {
+public abstract class EntitySwimmingMob extends EntityWalking implements EntityMob {
 
-    protected int[]   minDamage;
+    private int[]   minDamage;
 
-    protected int[]   maxDamage;
+    private int[]   maxDamage;
 
-    protected int     attackDelay = 0;
+    protected int   attackDelay = 0;
 
-    protected boolean canAttack   = true;
+    private boolean canAttack   = true;
 
-    public FlyingMonster(FullChunk chunk, CompoundTag nbt) {
+    public EntitySwimmingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
@@ -78,8 +78,9 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
     }
 
     public void setDamage(int[] damage) {
-        if (damage.length < 4)
+        if (damage.length < 4) {
             return;
+        }
 
         if (minDamage == null || minDamage.length < 4) {
             minDamage = new int[] { 0, 0, 0, 0 };
@@ -101,12 +102,12 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
         }
 
         for (int i = 0; i < 4; i++) {
-            this.setDamage(Math.min(damage[i], this.getMaxDamage(i)), i);
+            this.setMinDamage(Math.min(damage[i], this.getMaxDamage(i)), i);
         }
     }
 
     public void setMinDamage(int damage) {
-        this.setDamage(damage, Server.getInstance().getDifficulty());
+        this.setMinDamage(damage, Server.getInstance().getDifficulty());
     }
 
     public void setMinDamage(int damage, int difficulty) {
@@ -116,9 +117,8 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
     }
 
     public void setMaxDamage(int[] damage) {
-        if (damage.length < 4) {
+        if (damage.length < 4)
             return;
-        }
 
         for (int i = 0; i < 4; i++) {
             this.setMaxDamage(Math.max(damage[i], this.getMinDamage(i)), i);
@@ -135,8 +135,11 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
         }
     }
 
-    @Override
     public boolean onUpdate(int currentTick) {
+        if (this.closed) {
+            return false;
+        }
+
         if (this.server.getDifficulty() < 1) {
             this.close();
             return false;
@@ -155,7 +158,7 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
         this.entityBaseTick(tickDiff);
 
         Vector3 target = this.updateMove(tickDiff);
-        if (target instanceof Entity) {
+        if ((!this.isFriendly() || !(target instanceof Player)) && target instanceof Entity) {
             if (target != this.followTarget || this.canAttack) {
                 this.attackEntity((Entity) target);
             }
@@ -165,18 +168,19 @@ public abstract class FlyingMonster extends FlyingEntity implements Monster {
         return true;
     }
 
+    @Override
     public boolean entityBaseTick(int tickDiff) {
 
-        Timings.entityBaseTickTimer.startTiming();
-
         boolean hasUpdate = false;
+
+        Timings.entityBaseTickTimer.startTiming();
 
         hasUpdate = super.entityBaseTick(tickDiff);
 
         this.attackDelay += tickDiff;
-        if (!this.hasEffect(Effect.WATER_BREATHING) && this.isInsideOfWater()) {
+        if (this.isOnGround()) {
             hasUpdate = true;
-            int airTicks = this.getDataPropertyInt(DATA_AIR) - tickDiff;
+            int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
             if (airTicks <= -20) {
                 airTicks = 0;
                 this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));

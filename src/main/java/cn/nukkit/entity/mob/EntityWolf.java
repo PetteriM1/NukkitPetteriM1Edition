@@ -5,7 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
-import cn.nukkit.entity.mob.TameableMonster;
+import cn.nukkit.entity.mob.EntityTameableMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -19,7 +19,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 
 import java.util.HashMap;
 
-public class EntityWolf extends TameableMonster {
+public class EntityWolf extends EntityTameableMob {
 
   public static final int     NETWORK_ID           = 14;
 

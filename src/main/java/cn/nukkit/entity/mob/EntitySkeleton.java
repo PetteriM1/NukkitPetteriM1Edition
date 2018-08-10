@@ -5,7 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.entity.mob.WalkingMonster;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
@@ -23,7 +23,7 @@ import cn.nukkit.network.protocol.MobEquipmentPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntitySkeleton extends WalkingMonster {
+public class EntitySkeleton extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 34;
 
