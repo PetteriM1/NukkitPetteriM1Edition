@@ -118,7 +118,7 @@ public class ItemBow extends ItemTool {
                     entityShootBowEvent.getProjectile().kill();
                 } else {
                     entityShootBowEvent.getProjectile().spawnToAll();
-                    player.level.addSound(new LaunchSound(player), player.getViewers().values());
+                    player.getLevel().addSound(player, "random.bow");
                 }
             } else {
                 entityShootBowEvent.getProjectile().spawnToAll();

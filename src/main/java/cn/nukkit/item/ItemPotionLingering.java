@@ -28,7 +28,7 @@ public class ItemPotionLingering extends ProjectileItem {
 
     @Override
     public String getProjectileEntityType() {
-        return "ThrownPotion";
+        return "ThrownLinearingPotion";
     }
 
     @Override

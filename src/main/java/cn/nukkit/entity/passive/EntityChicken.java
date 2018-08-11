@@ -7,7 +7,6 @@ import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.sound.ChickenPlopSound;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -89,7 +88,7 @@ public class EntityChicken extends EntityWalkingAnimal {
           EggLayTime-=tickDiff;
       }else{
           this.level.dropItem(this,Item.get(Item.EGG,0,1));
-          this.level.addSound(new ChickenPlopSound(this), this.getViewers().values());
+          this.level.addSound(this, "mob.chicken.plop");
           this.EggLayTime = this.getRandomEggLayTime();
       }
       return hasUpdate;

@@ -24,7 +24,7 @@ public class SwampBiome extends GrassyBiome {
         });
 
         PopulatorLilyPad lilypad = new PopulatorLilyPad();
-        lilypad.setBaseAmount(4);
+        lilypad.setBaseAmount(5);
 
         SwampTreePopulator trees = new SwampTreePopulator();
         trees.setBaseAmount(2);

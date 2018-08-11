@@ -8,11 +8,11 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * Created by PetteriM1
  */
-public class EntityArrow extends EntityProjectile {
-    public static final int NETWORK_ID = 80;
+public class EntityThrownTrident extends EntityProjectile {
+
+    public static final int NETWORK_ID = 73;
 
     public static final int DATA_SOURCE_ID = 17;
 
@@ -38,7 +38,7 @@ public class EntityArrow extends EntityProjectile {
 
     @Override
     public float getGravity() {
-        return 0.03f;
+        return 0.04f;
     }
 
     @Override
@@ -46,18 +46,18 @@ public class EntityArrow extends EntityProjectile {
         return 0.01f;
     }
 
-    protected float gravity = 0.03f;
+    protected float gravity = 0.04f;
     protected float drag = 0.01f;
 
-    public EntityArrow(FullChunk chunk, CompoundTag nbt) {
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
 
-    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
         this(chunk, nbt, shootingEntity, false);
     }
 
-    public EntityArrow(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
         super(chunk, nbt, shootingEntity);
         this.setCritical(critical);
     }
@@ -124,7 +124,7 @@ public class EntityArrow extends EntityProjectile {
     @Override
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();
-        pk.type = EntityArrow.NETWORK_ID;
+        pk.type = EntityThrownTrident.NETWORK_ID;
         pk.entityUniqueId = this.getId();
         pk.entityRuntimeId = this.getId();
         pk.x = (float) this.x;

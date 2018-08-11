@@ -61,7 +61,7 @@ public abstract class ProjectileItem extends Item {
                     player.sendMessage("\u00A7cEggs are disabled on creative");
                 } else {
                     projectile.spawnToAll();
-                    player.getLevel().addSound(new LaunchSound(player), player.getViewers().values());
+                    player.getLevel().addSound(player, "random.bow");
                 }
             } else {
                 projectile.spawnToAll();
@@ -73,6 +73,5 @@ public abstract class ProjectileItem extends Item {
     }
 
     protected void correctNBT(CompoundTag nbt) {
-
     }
 }

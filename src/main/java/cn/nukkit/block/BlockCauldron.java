@@ -94,7 +94,7 @@ public class BlockCauldron extends BlockSolidMeta {
                         this.setDamage(0);//empty
                         this.level.setBlock(this, this, true);
                         cauldron.clearCustomColor();
-                        this.getLevel().addSound(new SplashSound(this.add(0.5, 1, 0.5)));
+                        this.getLevel().addSound(this, "cauldron.fillwater");
                     }
                 } else if (item.getDamage() == 8) {//water bucket
 
@@ -117,12 +117,12 @@ public class BlockCauldron extends BlockSolidMeta {
                             cauldron.setSplashPotion(false);
                             cauldron.clearCustomColor();
                             this.level.setBlock(this, this, true);
-                            this.level.addSound(new ExplodeSound(this.add(0.5, 0, 0.5)));
+                            this.level.addSound(this, "cauldron.explode");
                         } else {
                             this.setDamage(6);//fill
                             cauldron.clearCustomColor();
                             this.level.setBlock(this, this, true);
-                            this.level.addSound(new SplashSound(this.add(0.5, 1, 0.5)));
+                            this.getLevel().addSound(this, "cauldron.fillwater");
                         }
                         //this.update();
                     }
@@ -157,7 +157,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     }
                 }
 
-                this.level.addSound(new SplashSound(this.add(0.5, 0.5, 0.5)));
+                this.getLevel().addSound(this, "cauldron.fillpotion");
                 break;
             case Item.GLASS_BOTTLE:
                 if (isEmpty()) {
@@ -182,7 +182,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     }
                 }
 
-                this.level.addSound(new SplashSound(this.add(0.5, 0.5, 0.5)));
+                this.getLevel().addSound(this, "cauldron.takepotion");
                 break;
             default:
                 return true;

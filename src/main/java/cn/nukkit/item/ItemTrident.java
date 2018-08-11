@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.entity.EntityShootBowEvent;
-import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.level.sound.LaunchSound;
@@ -62,7 +62,7 @@ public class ItemTrident extends ItemTool {
         double p = (double) diff / 20;
 
         double f = Math.min((p * p + p * 2) / 3, 1) * 2;
-        EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, f == 2), f);
+        EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityThrownTrident(player.chunk, nbt, player, f == 2), f);
 
         if (f < 0.1 || diff < 5) {
             entityShootBowEvent.setCancelled();
@@ -80,7 +80,7 @@ public class ItemTrident extends ItemTool {
                     entityShootBowEvent.getProjectile().kill();
                 } else {
                     entityShootBowEvent.getProjectile().spawnToAll();
-                    player.level.addSound(new LaunchSound(player), player.getViewers().values());
+                    player.getLevel().addSound(player, "random.bow");
                 }
             } else {
                 entityShootBowEvent.getProjectile().spawnToAll();
