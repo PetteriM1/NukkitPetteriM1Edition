@@ -8,6 +8,7 @@ import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.block.GlobalBlockPalette;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.collection.PrimitiveList;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
@@ -133,7 +134,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public final Long2ObjectOpenHashMap<Entity> updateEntities = new Long2ObjectOpenHashMap<>();
 
-    public final Long2ObjectOpenHashMap<BlockEntity> updateBlockEntities = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<BlockEntity> updateBlockEntities = new Long2ObjectOpenHashMap<>();
 
     private boolean cacheChunks = false;
 
@@ -746,10 +747,11 @@ public class Level implements ChunkManager, Metadatable {
 
         TimingsHistory.tileEntityTicks += this.updateBlockEntities.size();
         this.timings.blockEntityTick.startTiming();
-        if (!this.updateBlockEntities.isEmpty()) {
-            for (long id : new ArrayList<>(this.updateBlockEntities.keySet())) {
-                if (!this.updateBlockEntities.get(id).onUpdate()) {
-                    this.updateBlockEntities.remove(id);
+        synchronized (updateBlockEntities) {
+            ObjectIterator<Long2ObjectMap.Entry<BlockEntity>> iterator = updateBlockEntities.long2ObjectEntrySet().fastIterator();
+            while (iterator.hasNext()) {
+                if (!iterator.next().getValue().onUpdate()) {
+                    iterator.remove();
                 }
             }
         }
@@ -1460,7 +1462,6 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void updateBlockSkyLight(int x, int y, int z) {
-        // todo
     }
 
     public void updateBlockLight(Map<Long, Map<Character, Object>> map) {
@@ -1539,8 +1540,8 @@ public class Level implements ChunkManager, Metadatable {
             int y = Hash.hashBlockY(node);
             int z = Hash.hashBlockZ(node);
 
-            int lightLevel = this.getBlockLightAt((int) x, (int) y, (int) z)
-                    - Block.lightFilter[this.getBlockIdAt((int) x, (int) y, (int) z)];
+            int lightLevel = this.getBlockLightAt(x, y, z)
+                    - Block.lightFilter[this.getBlockIdAt(x, y, z)];
 
             if (lightLevel >= 1) {
                 this.computeSpreadBlockLight( x - 1, y, z, lightLevel,
@@ -1757,6 +1758,8 @@ public class Level implements ChunkManager, Metadatable {
             item = new ItemBlock(new BlockAir(), 0, 0);
         }
 
+        boolean isSilkTouch = item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null;
+
         if (player != null) {
             double breakTime = target.getBreakTime(item, player);
             // this in
@@ -1786,7 +1789,7 @@ public class Level implements ChunkManager, Metadatable {
             Item[] eventDrops;
             if (!player.isSurvival()) {
                 eventDrops = new Item[0];
-            } else if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null && target.canSilkTouch()) {
+            } else if (isSilkTouch && target.canSilkTouch()) {
                 eventDrops = new Item[]{target.toItem()};
             } else {
                 eventDrops = target.getDrops(item);
@@ -1860,17 +1863,18 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        target.onBreak(item);
-
         BlockEntity blockEntity = this.getBlockEntity(target);
         if (blockEntity != null) {
-            if (blockEntity instanceof InventoryHolder) {
-                if (blockEntity instanceof BlockEntityChest) {
-                    ((BlockEntityChest) blockEntity).unpair();
-                }
+            // Fix shulker boxes dropping contents
+            if (!(blockEntity instanceof BlockEntityShulkerBox)) {
+                if (blockEntity instanceof InventoryHolder) {
+                    if (blockEntity instanceof BlockEntityChest) {
+                        ((BlockEntityChest) blockEntity).unpair();
+                    }
 
-                for (Item chestItem : ((InventoryHolder) blockEntity).getInventory().getContents().values()) {
-                    this.dropItem(target, chestItem);
+                    for (Item chestItem : ((InventoryHolder) blockEntity).getInventory().getContents().values()) {
+                        this.dropItem(target, chestItem);
+                    }
                 }
             }
 
@@ -1878,6 +1882,8 @@ public class Level implements ChunkManager, Metadatable {
 
             this.updateComparatorOutputLevel(target);
         }
+        
+        target.onBreak(item);
 
         item.useOn(target);
         if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
@@ -1886,7 +1892,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (this.gameRules.getBoolean("doTileDrops")) {
             int dropExp = target.getDropExp();
-            if (player != null) {
+            if (!isSilkTouch && player != null) {
                 player.addExperience(dropExp);
                 if (player.isSurvival()) {
                     for (int ii = 1; ii <= dropExp; ii++) {
@@ -2585,17 +2591,27 @@ public class Level implements ChunkManager, Metadatable {
 
     public void addBlockEntity(BlockEntity blockEntity) {
         if (blockEntity.getLevel() != this) {
-            throw new LevelException("Invalid Block Entity level");
+            throw new LevelException("Invalid BlockEntity level");
         }
         blockEntities.put(blockEntity.getId(), blockEntity);
+    }
+    
+    public void scheduleBlockEntityUpdate(BlockEntity entity) {
+        Preconditions.checkNotNull(entity, "entity");
+        Preconditions.checkArgument(entity.getLevel() == this, "BlockEntity is not in this level");
+        synchronized (updateBlockEntities) {
+            updateBlockEntities.put(entity.getId(), entity);
+        }
     }
 
     public void removeBlockEntity(BlockEntity blockEntity) {
         if (blockEntity.getLevel() != this) {
-            throw new LevelException("Invalid Block Entity level");
+            throw new LevelException("Invalid BlockEntity level");
         }
         blockEntities.remove(blockEntity.getId());
-        updateBlockEntities.remove(blockEntity.getId());
+        synchronized (updateBlockEntities) {
+            updateBlockEntities.remove(blockEntity.getId());
+        }
     }
 
     public boolean isChunkInUse(int x, int z) {
@@ -2768,7 +2784,7 @@ public class Level implements ChunkManager, Metadatable {
             int x = (int) v.x & 0x0f;
             int z = (int) v.z & 0x0f;
             if (chunk != null) {
-                int y = (int) Math.min(254, v.y);
+                int y = (int) NukkitMath.clamp(v.y, 0, 254);
                 boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
                 for (; y > 0; --y) {
                     int b = chunk.getFullBlock(x, y, z);

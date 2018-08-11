@@ -9,6 +9,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.ChunkException;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,7 @@ public abstract class BlockEntity extends Position {
 
     public BlockEntity(FullChunk chunk, CompoundTag nbt) {
         if (chunk == null || chunk.getProvider() == null) {
-            throw new ChunkException("Invalid garbage chunk given to block entity");
+            throw new ChunkException("Invalid garbage chunk given to BlockEntity");
         }
 
         this.timing = Timings.getBlockEntityTiming(this);
@@ -180,13 +181,12 @@ public abstract class BlockEntity extends Position {
     }
 
     public final void scheduleUpdate() {
-        this.level.updateBlockEntities.put(this.id, this);
+        this.level.scheduleBlockEntityUpdate(this);
     }
 
     public void close() {
         if (!this.closed) {
             this.closed = true;
-            this.level.updateBlockEntities.remove(this.id);
             if (this.chunk != null) {
                 this.chunk.removeBlockEntity(this);
             }

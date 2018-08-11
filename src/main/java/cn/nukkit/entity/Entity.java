@@ -74,7 +74,6 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_PADDLE_TIME_LEFT = 13; //float
     public static final int DATA_PADDLE_TIME_RIGHT = 14; //float
     public static final int DATA_EXPERIENCE_VALUE = 15; //int (xp orb)
-    public static final int DATA_FIREWORK_ITEM = 16; //int (id | (data << 16))
     public static final int DATA_DISPLAY_ITEM = 16; //int (id | (data << 16))
     public static final int DATA_DISPLAY_OFFSET = 17; //int
     public static final int DATA_HAS_DISPLAY = 18; //byte (must be 1 for minecart to show block inside)
@@ -746,6 +745,22 @@ public abstract class Entity extends Location implements Metadatable {
         knownEntities.put(name, clazz);
         shortNames.put(clazz.getSimpleName(), name);
         return true;
+    }
+    
+    public static CompoundTag getDefaultNBT(Vector3 pos) {
+        Location loc = pos instanceof Location ? (Location) pos : null;
+        return new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", pos.x))
+                        .add(new DoubleTag("", pos.y))
+                        .add(new DoubleTag("", pos.z)))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", 0))
+                        .add(new DoubleTag("", 0))
+                        .add(new DoubleTag("", 0)))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", (float) (loc != null ? loc.getYaw() : 0)))
+                        .add(new FloatTag("", (float) (loc != null ? loc.getPitch() : 0))));
     }
 
     public void saveNBT() {

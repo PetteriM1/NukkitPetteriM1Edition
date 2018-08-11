@@ -172,7 +172,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
         boolean update = false;
 
         for (Entity entity : this.level.getCollidingEntities(this.pickupArea)) {
-            if (!(entity instanceof EntityItem)) {
+            if (!entity.isClosed() && !(entity instanceof EntityItem)) {
                 continue;
             }
 
@@ -260,7 +260,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
                             continue;
                         }
 
-                        inventory.sendContents(inventory.getViewers()); //whats wrong?
+                        inventory.sendContents(inventory.getViewers());
                         item.count--;
                         this.inventory.setItem(i, item);
                         return true;
