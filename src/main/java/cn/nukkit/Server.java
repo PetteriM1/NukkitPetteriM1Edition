@@ -28,6 +28,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
 import cn.nukkit.level.format.anvil.Anvil;
+import cn.nukkit.level.generator.End;
 import cn.nukkit.level.generator.Flat;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.Nether;
@@ -425,7 +426,7 @@ public class Server {
         Generator.addGenerator(Normal.class, "normal", Generator.TYPE_INFINITE);
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         Generator.addGenerator(Nether.class, "nether", Generator.TYPE_NETHER);
-        //Generator.addGenerator(End.class, "end", Generator.TYPE_END);
+        Generator.addGenerator(End.class, "end", Generator.TYPE_END);
 
         if (this.getDefaultLevel() == null) {
             String defaultName = this.getPropertyString("level-name", "world");
@@ -483,6 +484,10 @@ public class Server {
             if (this.getLevelByName("nether") == null && this.getPropertyBoolean("nether", false)) {
                 this.generateLevel("nether", 666 + ThreadLocalRandom.current().nextLong(10, 100), Generator.getGenerator(Generator.TYPE_NETHER));
                 this.loadLevel("nether");
+            }
+            if (this.getLevelByName("end") == null && this.getPropertyBoolean("end", false)) {
+                this.generateLevel("end", 666 + ThreadLocalRandom.current().nextLong(10, 100), Generator.getGenerator(Generator.TYPE_END));
+                this.loadLevel("end");
             }
         }
 
