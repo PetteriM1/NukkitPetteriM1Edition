@@ -89,6 +89,11 @@ public class EntityMooshroom extends EntityWalkingAnimal {
             player.getInventory().removeItem(Item.get(Item.BOWL, 0, 1));
             player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
             return true;
+        } else if (item.equals(Item.get(Item.BUCKET, 0), true)) {
+            player.getInventory().removeItem(Item.get(Item.BUCKET, 0, 1));
+            player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
+            this.level.addSound(this, "mob.cow.milk");
+            return true;
         } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.WHEAT, 0, 1));
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));

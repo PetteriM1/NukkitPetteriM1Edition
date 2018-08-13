@@ -12,6 +12,7 @@ import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -1185,8 +1186,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Returns a client-friendly gamemode of the specified real gamemode
      * This function takes care of handling gamemodes known to MCPE (as of 1.1.0.3, that includes Survival, Creative and Adventure)
-     * <p>
-     * TODO: remove this when Spectator Mode gets added properly to MCPE
      */
     private static int getClientFriendlyGamemode(int gamemode) {
         gamemode &= 0x03;
@@ -3673,12 +3672,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             message = "";
             params.clear();
         }
+        
+        PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel());
+        
+        if (!ev.isCancelled()) {
+            if (this.getInventory().getItemInHand() instanceof ItemTotem) {
+                this.getInventory().remove(Item.get(Item.TOTEM, 0, 1));
+                this.getLevel().addSound(this, "random.totem");
+                this.extinguish();
+                this.setHealth(1);
+
+                Effect regeneration = Effect.getEffect(Effect.REGENERATION);
+                regeneration.setDuration(20 * 40);
+                regeneration.setAmplifier(2);
+                this.addEffect(regeneration);
+                
+                Effect absorption = Effect.getEffect(Effect.ABSORPTION);
+                absorption.setDuration(20 * 5);
+                absorption.setAmplifier(2);
+                this.addEffect(absorption);
+
+                ev.setCancelled(true);
+                return;
+            }
+        }
 
         this.health = 0;
-        this.fireTicks = 0;
+        this.extinguish();
         this.scheduleUpdate();
-
-        PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel());
 
         ev.setKeepExperience(this.level.gameRules.getBoolean("keepInventory"));
         ev.setKeepInventory(ev.getKeepExperience());
@@ -4552,6 +4573,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 InventoryPickupArrowEvent ev;
                 this.server.getPluginManager().callEvent(ev = new InventoryPickupArrowEvent(this.inventory, (EntityArrow) entity));
                 if (ev.isCancelled()) {
+                    return false;
+                }
+
+                TakeItemEntityPacket pk = new TakeItemEntityPacket();
+                pk.entityId = this.getId();
+                pk.target = entity.getId();
+                Server.broadcastPacket(entity.getViewers().values(), pk);
+                this.dataPacket(pk);
+
+                this.inventory.addItem(item.clone());
+                entity.kill();
+                return true;
+            } else if (entity instanceof EntityThrownTrident && ((EntityThrownTrident) entity).hadCollision) {
+                ItemTrident item = new ItemTrident();
+                if (this.isSurvival() && !this.inventory.canAddItem(item)) {
                     return false;
                 }
 

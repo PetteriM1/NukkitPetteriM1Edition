@@ -124,5 +124,4 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
     public boolean isBreedingItem(Item item) {
         return item != null && item.getId() == Item.WHEAT;
     }
-
 }

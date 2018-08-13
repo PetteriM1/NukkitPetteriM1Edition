@@ -87,5 +87,4 @@ public abstract class EntityWaterAnimal extends EntitySwimming implements Entity
         }
         return true;
     }
-
 }

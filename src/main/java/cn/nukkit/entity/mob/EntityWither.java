@@ -5,12 +5,12 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.sound.LaunchSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
@@ -76,7 +76,7 @@ public class EntityWither extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-    /*if (this.attackDelay > 5 && EntityUtils.rand(1, 5) < 6 && this.distance(player) <= 100) {
+    if (this.attackDelay > 5 && EntityUtils.rand(1, 5) < 6 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 2;
@@ -85,11 +85,11 @@ public class EntityWither extends EntityFlyingMob {
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             Entity k = EntityUtils.create("BlueWitherSkull", pos, this);
-            if (!(k instanceof BlueWitherSkull)) {
+            if (!(k instanceof EntityBlueWitherSkull)) {
                 return;
             }
 
-            BlueWitherSkull blueskull = (BlueWitherSkull) k;
+            EntityBlueWitherSkull blueskull = (EntityBlueWitherSkull) k;
             blueskull.setExplode(true);
             blueskull.setMotion(new Vector3(-Math.sin(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f, -Math.sin(Math.toDegrees(pitch)) * f * f,
                     Math.cos(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f));
@@ -100,9 +100,9 @@ public class EntityWither extends EntityFlyingMob {
                 blueskull.kill();
             } else {
                 blueskull.spawnToAll();
-                this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                this.level.addSound(this, "mob.wither.shoot");
             }
-        }*/
+        }
     }
 
     @Override

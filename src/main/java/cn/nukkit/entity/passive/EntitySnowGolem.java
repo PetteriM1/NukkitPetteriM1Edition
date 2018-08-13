@@ -110,5 +110,4 @@ public class EntitySnowGolem extends EntityWalkingMob {
     public int getKillExperience() {
         return 0;
     }
-
 }

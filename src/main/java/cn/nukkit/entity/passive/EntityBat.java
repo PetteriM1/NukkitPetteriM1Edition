@@ -70,5 +70,4 @@ public class EntityBat extends EntityFlyingAnimal {
 
       super.spawnTo(player);
   }
-
 }

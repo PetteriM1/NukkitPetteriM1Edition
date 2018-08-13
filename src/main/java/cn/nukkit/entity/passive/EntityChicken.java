@@ -182,5 +182,4 @@ public class EntityChicken extends EntityWalkingAnimal {
 
       super.spawnTo(player);
   }
-
 }

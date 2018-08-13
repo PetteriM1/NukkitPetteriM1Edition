@@ -17,7 +17,6 @@ import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.sound.LaunchSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
@@ -254,7 +253,7 @@ public class EntityBlaze extends EntityFlyingMob {
             double pitch = this.pitch + EntityUtils.rand(-75, 75) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("FireBall", pos, this);
+            Entity k = EntityUtils.create("BlazeFireBall", pos, this);
             if (!(k instanceof EntityBlazeFireBall)) {
                 return;
             }
@@ -270,7 +269,7 @@ public class EntityBlaze extends EntityFlyingMob {
                 fireball.kill();
             } else {
                 fireball.spawnToAll();
-                this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                this.level.addSound(this, "mob.blaze.shoot");
             }
         }
     }

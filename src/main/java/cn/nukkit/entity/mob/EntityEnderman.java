@@ -130,5 +130,4 @@ public class EntityEnderman extends EntityWalkingMob {
 
         super.spawnTo(player);
     }
-
 }

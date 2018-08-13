@@ -11,7 +11,6 @@ import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.sound.LaunchSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
@@ -102,7 +101,7 @@ public class EntityWitch extends EntityWalkingMob {
                         thrownPotion.kill();
                     } else {
                         thrownPotion.spawnToAll();
-                        this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                        this.level.addSound(this, "mob.witch.throw");
                     }
                 }
             } else {

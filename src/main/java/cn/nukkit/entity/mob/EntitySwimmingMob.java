@@ -193,5 +193,4 @@ public abstract class EntitySwimmingMob extends EntityWalking implements EntityM
         Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
-
 }

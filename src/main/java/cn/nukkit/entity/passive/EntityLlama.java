@@ -101,5 +101,4 @@ public class EntityLlama extends EntityWalkingAnimal {
 
         super.spawnTo(player);
     }
-
 }

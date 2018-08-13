@@ -3,18 +3,12 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSwordStone;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class EntityWitherSkeleton extends EntityWalkingMob {
 

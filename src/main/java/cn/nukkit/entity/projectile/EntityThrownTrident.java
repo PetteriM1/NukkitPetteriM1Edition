@@ -66,7 +66,7 @@ public class EntityThrownTrident extends EntityProjectile {
     protected void initEntity() {
         super.initEntity();
 
-        this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 2;
+        this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 8;
     }
 
     public void setCritical() {
@@ -94,7 +94,7 @@ public class EntityThrownTrident extends EntityProjectile {
 
     @Override
     protected double getBaseDamage() {
-        return 2;
+        return 8;
     }
 
     @Override

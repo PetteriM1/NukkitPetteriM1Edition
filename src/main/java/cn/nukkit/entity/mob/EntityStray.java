@@ -15,7 +15,6 @@ import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.sound.LaunchSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -115,7 +114,7 @@ public class EntityStray extends EntityWalkingMob {
                         projectile.kill();
                     } else {
                         projectile.spawnToAll();
-                        this.level.addSound(new LaunchSound(this), this.getViewers().values());
+                        this.level.addSound(this, "random.bow");
                     }
                 }
             }

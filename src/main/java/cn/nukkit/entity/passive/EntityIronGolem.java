@@ -122,6 +122,4 @@ public class EntityIronGolem extends EntityWalkingMob {
     public int getKillExperience() {
         return 0;
     }
-
-
 }

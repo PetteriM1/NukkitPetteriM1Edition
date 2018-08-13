@@ -6,7 +6,7 @@ import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.level.sound.LaunchSound;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -41,7 +41,7 @@ public class ItemTrident extends ItemTool {
     
     @Override
     public int getAttackDamage() {
-        return 8;
+        return 9;
     }
     
     public boolean onReleaseUsing(Player player) {
@@ -74,16 +74,17 @@ public class ItemTrident extends ItemTool {
         } else {
             entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
             if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
-                ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
-                Server.getInstance().getPluginManager().callEvent(projectev);
-                if (projectev.isCancelled()) {
+                ProjectileLaunchEvent ev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
+                Server.getInstance().getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
                     entityShootBowEvent.getProjectile().kill();
                 } else {
                     entityShootBowEvent.getProjectile().spawnToAll();
-                    player.getLevel().addSound(player, "random.bow");
+                    player.getLevel().addLevelSoundEvent(183, 1, -1, new Vector3(player.x, player.y, player.z));
+                    if (!player.isCreative()) {
+                        player.getInventory().removeItem(this);
+                    }
                 }
-            } else {
-                entityShootBowEvent.getProjectile().spawnToAll();
             }
         }
 

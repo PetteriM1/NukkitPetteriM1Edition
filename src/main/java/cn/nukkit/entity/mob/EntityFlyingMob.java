@@ -189,5 +189,4 @@ public abstract class EntityFlyingMob extends EntityFlying implements EntityMob 
         Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
-
 }

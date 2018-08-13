@@ -85,5 +85,4 @@ public abstract class EntityFlyingAnimal extends EntityFlying implements EntityA
         }
         return true;
     }
-
 }

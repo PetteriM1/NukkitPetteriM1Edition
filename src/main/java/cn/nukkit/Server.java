@@ -270,8 +270,8 @@ public class Server {
                 put("explosion-break-blocks", true);
                 put("weather", true);
                 put("stop-in-game", false);
-                put("op-in-game", false);
-                put("xp-bottles-on-creative", false);
+                put("op-in-game", true);
+                put("xp-bottles-on-creative", true);
                 put("spawn-eggs", true);
                 put("mob-ai", true);
                 put("entity-auto-spawn-task", true);
@@ -310,7 +310,7 @@ public class Server {
                 put("ticks-per-entity-despawns", 10000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
-                put("nether", false);
+                put("nether", true);
                 put("end", false);
                 put("suomicraft-mode", false);
                 put("do-not-tick-worlds", "");
@@ -1943,6 +1943,7 @@ public class Server {
         Entity.registerEntity("ShulkerBullet", EntityShulkerBullet.class);
         Entity.registerEntity("ThrownLinearingPotion", EntityPotionLinearing.class);
         Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
+        Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);
         //Monsters
         Entity.registerEntity("Blaze", EntityBlaze.class);
         Entity.registerEntity("Creeper", EntityCreeper.class);

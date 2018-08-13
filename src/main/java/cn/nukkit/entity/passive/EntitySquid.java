@@ -97,5 +97,4 @@ public class EntitySquid extends EntityWaterAnimal {
 
         super.spawnTo(player);
     }
-
 }

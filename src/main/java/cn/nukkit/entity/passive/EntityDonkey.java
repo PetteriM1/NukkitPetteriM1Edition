@@ -111,5 +111,4 @@ public class EntityDonkey extends EntityWalkingAnimal {
 
       super.spawnTo(player);
   }
-
 }

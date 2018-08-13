@@ -125,5 +125,4 @@ public class EntityCow extends EntityWalkingAnimal {
 
       super.spawnTo(player);
   }
-
 }

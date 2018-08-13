@@ -79,5 +79,4 @@ public class EntityDolphin extends EntityWaterAnimal {
 
         super.spawnTo(player);
     }
-
 }
