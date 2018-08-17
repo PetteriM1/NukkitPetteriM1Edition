@@ -4505,6 +4505,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
             }
             this.usedChunks.clear();
+            this.loadQueue.clear();
 
             SetTimePacket setTime = new SetTimePacket();
             setTime.time = level.getTime();
