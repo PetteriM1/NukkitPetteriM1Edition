@@ -8,10 +8,12 @@ import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,6 +125,22 @@ public class EntityDrowned extends EntityWalkingMob {
             pk.event = 4;
             Server.broadcastPacket(this.getViewers().values(), pk);
         }
+    }
+    
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        boolean hasUpdate = false;
+        Timings.entityBaseTickTimer.startTiming();
+
+        hasUpdate = super.entityBaseTick(tickDiff);
+
+        int time = this.getLevel().getTime() % Level.TIME_FULL;
+        if (!this.isOnFire() && !this.level.isRaining() && (time < 12567 || time > 23450) && !this.isInsideOfWater()) {
+            this.setOnFire(100);
+        }
+
+        Timings.entityBaseTickTimer.stopTiming();
+        return hasUpdate;
     }
 
     @Override

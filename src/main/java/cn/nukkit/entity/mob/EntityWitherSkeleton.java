@@ -32,6 +32,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
     protected void initEntity() {
         super.initEntity();
         this.setDamage(new int[] { 0, 5, 8, 12 });
+        this.fireProof = true;
     }
 
     @Override
