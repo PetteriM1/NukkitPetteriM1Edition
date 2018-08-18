@@ -59,6 +59,7 @@ public class EntityBlaze extends EntityFlyingMob {
         super.initEntity();
 
         this.fireProof = true;
+        this.setMaxHealth(20);
         this.setDamage(new int[] { 0, 0, 0, 0 });
     }
 
