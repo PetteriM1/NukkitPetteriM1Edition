@@ -82,7 +82,7 @@ public class ItemTrident extends ItemTool {
                     entityShootBowEvent.getProjectile().spawnToAll();
                     player.getLevel().addLevelSoundEvent(183, 1, -1, new Vector3(player.x, player.y, player.z));
                     if (!player.isCreative()) {
-                        player.getInventory().removeItem(this);
+                        player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                     }
                 }
             }
