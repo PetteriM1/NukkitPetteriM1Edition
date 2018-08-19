@@ -1,6 +1,7 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.Explosion;
@@ -95,6 +96,11 @@ public class EntityBlazeFireBall extends EntityProjectile {
         this.timing.startTiming();
 
         return hasUpdate;
+    }
+    
+    @Override
+    public void onCollideWithEntity(Entity entity) {
+        this.isCollided = true;
     }
 
     public void spawnTo(Player player) {

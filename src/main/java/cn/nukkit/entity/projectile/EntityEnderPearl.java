@@ -76,6 +76,16 @@ public class EntityEnderPearl extends EntityProjectile {
 
         return hasUpdate;
     }
+    
+    @Override
+    public void onCollideWithEntity(Entity entity) {
+        if (this.shootingEntity instanceof Player) {
+            this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
+            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
+            this.level.addSound(new EndermanTeleportSound(this));
+            this.kill();
+        }
+    }
 
     @Override
     public void spawnTo(Player player) {

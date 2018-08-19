@@ -103,6 +103,11 @@ public class EntityGhastFireBall extends EntityProjectile {
 
         return hasUpdate;
     }
+    
+    @Override
+    public void onCollideWithEntity(Entity entity) {
+        this.isCollided = true;
+    }
 
     public void spawnTo(Player player) {
         AddEntityPacket pk = new AddEntityPacket();

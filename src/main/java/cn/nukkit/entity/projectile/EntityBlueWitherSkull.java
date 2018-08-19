@@ -98,7 +98,6 @@ public class EntityBlueWitherSkull extends EntityProjectile {
         this.timing.startTiming();
 
         return hasUpdate;
-
     }
 
     public void spawnTo(Player player) {
