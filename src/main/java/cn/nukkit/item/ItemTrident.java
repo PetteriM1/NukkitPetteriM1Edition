@@ -11,6 +11,7 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.scheduler.NukkitRunnable;
 
 /**
  * Created by PetteriM1
@@ -82,7 +83,11 @@ public class ItemTrident extends ItemTool {
                     entityShootBowEvent.getProjectile().spawnToAll();
                     player.getLevel().addLevelSoundEvent(183, 1, -1, new Vector3(player.x, player.y, player.z));
                     if (!player.isCreative()) {
-                        player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                        new NukkitRunnable() {
+                            public void run() {
+                                player.getInventory().remove(Item.get(Item.TRIDENT, 0, 1));
+                            }
+                        }.runTaskLater(null, 2);
                     }
                 }
             }
