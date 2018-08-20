@@ -11,6 +11,6 @@ public class ItemChorusFruitPopped extends Item {
     }
 
     public ItemChorusFruitPopped(Integer meta, int count) {
-        super(POPPED_CHORUS_FRUIT, 0, count, "Popped Chrus Fruit");
+        super(POPPED_CHORUS_FRUIT, 0, count, "Popped Chorus Fruit");
     }
 }

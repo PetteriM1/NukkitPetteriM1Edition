@@ -39,5 +39,13 @@ public class ItemBlock extends Item {
     public Block getBlock() {
         return this.block;
     }
-
+    
+    @Override
+    public int getMaxStackSize() {
+        if (this.getBlock().getId() == Block.SHULKER_BOX) {
+            return 1;
+        }
+        
+        return super.getMaxStackSize();
+    }
 }

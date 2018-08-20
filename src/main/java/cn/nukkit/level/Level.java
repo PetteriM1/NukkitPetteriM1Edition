@@ -102,14 +102,14 @@ public class Level implements ChunkManager, Metadatable {
     static {
         randomTickBlocks[Block.GRASS] = true;
         randomTickBlocks[Block.FARMLAND] = true;
-        //randomTickBlocks[Block.MYCELIUM] = true;
+        randomTickBlocks[Block.MYCELIUM] = true;
         randomTickBlocks[Block.SAPLING] = true;
         randomTickBlocks[Block.LEAVES] = true;
         randomTickBlocks[Block.LEAVES2] = true;
-        //randomTickBlocks[Block.SNOW_LAYER] = true;
+        randomTickBlocks[Block.SNOW_LAYER] = true;
         randomTickBlocks[Block.ICE] = true;
-        //randomTickBlocks[Block.LAVA] = true;
-        //randomTickBlocks[Block.STILL_LAVA] = true;
+        if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.LAVA] = true;
+        if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.STILL_LAVA] = true;
         randomTickBlocks[Block.CACTUS] = true;
         randomTickBlocks[Block.BEETROOT_BLOCK] = true;
         randomTickBlocks[Block.CARROT_BLOCK] = true;
@@ -119,7 +119,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.WHEAT_BLOCK] = true;
         randomTickBlocks[Block.SUGARCANE_BLOCK] = true;
         randomTickBlocks[Block.NETHER_WART_BLOCK] = true;
-        //randomTickBlocks[Block.FIRE] = true;
+        if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.FIRE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
     }
 
@@ -1965,7 +1965,7 @@ public class Level implements ChunkManager, Metadatable {
             PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face,
                     target.getId() == 0 ? Action.RIGHT_CLICK_AIR : Action.RIGHT_CLICK_BLOCK);
 
-            if (player.getGamemode() > 2) {
+            if (player.getGamemode() > 1 && !Server.getInstance().suomiCraftPEMode()) {
                 ev.setCancelled();
             }
 
