@@ -87,23 +87,6 @@ public class EntityEgg extends EntityProjectile {
 
         return hasUpdate;
     }
-    
-    @Override
-    public void onCollideWithEntity(Entity entity) {
-        if (Server.getInstance().getPropertyBoolean("spawn-animals", true)) {
-            if (EntityUtils.rand(1, 20) == 5) {
-                EntityChicken entityChicken = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 0.5, 0.5));
-                if (entity != null) {
-                    entity.spawnToAll();
-                    EntityEventPacket pk = new EntityEventPacket();
-                    pk.eid = entityChicken.getId();
-                    pk.event = 27;
-                    entityChicken.getLevel().addChunkPacket(entityChicken.getChunkX() >> 2, entityChicken.getChunkZ() >> 2, pk);
-                    this.kill();
-                }
-            }
-        }
-    }
 
     @Override
     public void spawnTo(Player player) {
