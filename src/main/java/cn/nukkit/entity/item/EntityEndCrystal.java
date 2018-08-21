@@ -1,6 +1,6 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.level.Position;
+import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.Player;
@@ -34,8 +34,10 @@ public class EntityEndCrystal extends Entity {
         if (this.closed) return false;
         close();
         kill();
-		Position pos = this.getPosition();
-		Explosion explode = new Explosion(pos, 6, this);
+        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
+        this.server.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) return true;
+		Explosion explode = new Explosion(this, (float) ev.getForce(), this);
 		explode.explodeA();
 		explode.explodeB();
         return true;

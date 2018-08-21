@@ -1,6 +1,5 @@
 package cn.nukkit.item;
 
-
 /**
  * Created by lion on 21.03.17.
  */
@@ -17,5 +16,4 @@ public class ItemBlazeRod extends Item {
     public ItemBlazeRod(Integer meta, int count) {
         super(BLAZE_ROD, meta, count, "Blaze Rod");
     }
-
 }

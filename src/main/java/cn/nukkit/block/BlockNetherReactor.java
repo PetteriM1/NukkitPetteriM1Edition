@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDiamond;
+import cn.nukkit.item.ItemIngotIron;
 import cn.nukkit.item.ItemTool;
 
 public class BlockNetherReactor extends BlockSolid {
@@ -15,7 +17,7 @@ public class BlockNetherReactor extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Nether Reactor";
+        return "Nether Reactor Core";
     }
 
     @Override
@@ -35,7 +37,9 @@ public class BlockNetherReactor extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[0];
+        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_IRON) {
+            return new Item[]{new ItemDiamond(0, 3), new ItemIngotIron(0, 6)};
+        } else return new Item[]{};
     }
 
     @Override

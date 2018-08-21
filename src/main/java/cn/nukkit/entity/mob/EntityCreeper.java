@@ -12,8 +12,6 @@ import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.HugeExplodeSeedParticle;
-import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.level.sound.TNTPrimeSound;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
@@ -68,7 +66,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
   }
 
   public void explode() {
-      ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 2.8);
+      ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 3);
       this.server.getPluginManager().callEvent(ev);
 
       if (!ev.isCancelled()) {
@@ -77,8 +75,6 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
               explosion.explodeA();
           }
           explosion.explodeB();
-          this.level.addParticle(new HugeExplodeSeedParticle(this));
-          this.level.addSound(new ExplodeSound(new Vector3(this.x, this.y, this.z)));
           this.exploded = true;
       }
       this.close();

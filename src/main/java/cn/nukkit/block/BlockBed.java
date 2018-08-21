@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBed;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBed;
 import cn.nukkit.lang.TranslationContainer;
@@ -11,6 +13,9 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 
@@ -72,6 +77,26 @@ public class BlockBed extends BlockTransparentMeta {
 
     @Override
     public boolean onActivate(Item item, Player player) {
+        if (this.level.getDimension() == Level.DIMENSION_NETHER) {
+            this.level.useBreakOn(this);
+            CompoundTag nbt = new CompoundTag()
+                    .putList(new ListTag<DoubleTag>("Pos")
+                            .add(new DoubleTag("", x))
+                            .add(new DoubleTag("", y))
+                            .add(new DoubleTag("", z)))
+                    .putList(new ListTag<DoubleTag>("Motion")
+                            .add(new DoubleTag("", 0))
+                            .add(new DoubleTag("", 0))
+                            .add(new DoubleTag("", 0)))
+                    .putList(new ListTag<FloatTag>("Rotation")
+                            .add(new FloatTag("", 0))
+                            .add(new FloatTag("", 0)))
+                    .putShort("Fuse", 0);
+            Entity explosion = new EntityPrimedTNT(this.level.getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4), nbt);
+            explosion.spawnToAll();
+            return true;
+        }
+
         int time = this.getLevel().getTime() % Level.TIME_FULL;
 
         boolean isNight = (time >= Level.TIME_NIGHT && time < Level.TIME_SUNRISE);
@@ -110,7 +135,6 @@ public class BlockBed extends BlockTransparentMeta {
         if (player != null && !player.sleepOn(b)) {
             player.sendMessage(new TranslationContainer("tile.bed.occupied"));
         }
-
 
         return true;
     }
