@@ -85,7 +85,7 @@ public class ItemTrident extends ItemTool {
                     if (!player.isCreative()) {
                         new NukkitRunnable() {
                             public void run() {
-                                player.getInventory().remove(Item.get(Item.TRIDENT, 0, 1));
+                                player.getInventory().removeItem(Item.get(Item.TRIDENT, 0, 1));
                             }
                         }.runTaskLater(null, 2);
                     }
