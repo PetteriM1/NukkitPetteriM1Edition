@@ -56,5 +56,4 @@ public class ItemPotion extends Item {
     public int getMaxStackSize() {
         return 1;
     }
-
 }
