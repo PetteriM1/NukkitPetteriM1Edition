@@ -62,7 +62,7 @@ public class ItemTrident extends ItemTool {
         int diff = (Server.getInstance().getTick() - player.getStartActionTick());
         double p = (double) diff / 20;
 
-        double f = Math.min((p * p + p * 2) / 3, 1) * 2;
+        double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
         EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityThrownTrident(player.chunk, nbt, player, f == 2), f);
 
         if (f < 0.1 || diff < 5) {

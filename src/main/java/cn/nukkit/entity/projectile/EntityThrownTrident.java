@@ -38,7 +38,7 @@ public class EntityThrownTrident extends EntityProjectile {
 
     @Override
     public float getGravity() {
-        return 0.04f;
+        return 0.05f;
     }
 
     @Override
