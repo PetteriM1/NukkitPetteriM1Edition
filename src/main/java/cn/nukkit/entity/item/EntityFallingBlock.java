@@ -141,6 +141,7 @@ public class EntityFallingBlock extends Entity {
                     server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
                         getLevel().setBlock(pos, event.getTo(), true);
+                        getLevel().scheduleUpdate(getLevel().getBlock(pos), 1);
 
                         if (event.getTo().getId() == Item.ANVIL) {
                             getLevel().addSound(new AnvilFallSound(pos));

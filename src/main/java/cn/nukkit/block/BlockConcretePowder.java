@@ -97,7 +97,17 @@ public class BlockConcretePowder extends BlockFallable {
             }
 
             return Level.BLOCK_UPDATE_NORMAL;
+        } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            for (int side = 1; side < 6; ++side) {
+                Block blockSide = this.getSide(BlockFace.fromIndex(side));
+                if (blockSide instanceof BlockWater || blockSide instanceof BlockLava || blockSide instanceof BlockWaterStill || blockSide instanceof BlockLavaStill) {
+                    this.getLevel().setBlock(this, Block.get(Block.CONCRETE, this.meta), true, true);
+                }
+            }
+            
+            return Level.BLOCK_UPDATE_SCHEDULED;
         }
+
         return 0;
     }
 }
