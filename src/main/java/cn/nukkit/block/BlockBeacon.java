@@ -54,7 +54,6 @@ public class BlockBeacon extends BlockTransparent {
     @Override
     public boolean onActivate(Item item, Player player) {
         // TODO handle GUI
-        //Server.getInstance().getLogger().info("BlockBeacon.onActivate called");
         return true;
     }
 

@@ -10,18 +10,14 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityMotionEvent;
 import cn.nukkit.entity.mob.EntityMob;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
-import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class BaseEntity extends EntityCreature {
@@ -139,27 +135,6 @@ public abstract class BaseEntity extends EntityCreature {
     }
 
     @Override
-    public void spawnTo(Player player) {
-        if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
-            AddEntityPacket pk = new AddEntityPacket();
-            pk.entityRuntimeId = this.getId();
-            pk.entityUniqueId = this.getId();
-            pk.type = this.getNetworkId();
-            pk.x = (float) this.x;
-            pk.y = (float) this.y;
-            pk.z = (float) this.z;
-            pk.speedX = pk.speedY = pk.speedZ = 0;
-            pk.yaw = (float) this.yaw;
-            pk.pitch = (float) this.pitch;
-            pk.headYaw = (float) this.yaw;
-            pk.metadata = this.dataProperties;
-            player.dataPacket(pk);
-
-            this.hasSpawned.put(player.getLoaderId(), player);
-        }
-    }
-
-    @Override
     protected void updateMovement() {
         if (this.getServer().getMobAiEnabled()) {
             if (this.lastX != this.x || this.lastY != this.y || this.lastZ != this.z || this.lastYaw != this.yaw || this.lastPitch != this.pitch) {
@@ -183,56 +158,6 @@ public abstract class BaseEntity extends EntityCreature {
             return creature.isAlive() && !creature.closed && distance <= 80;
         }
         return false;
-    }
-
-    @Override
-    public List<Block> getBlocksAround() {
-        if (this.blocksAround == null) {
-            int minX = NukkitMath.floorDouble(this.boundingBox.minX);
-            int minY = NukkitMath.floorDouble(this.boundingBox.minY);
-            int minZ = NukkitMath.floorDouble(this.boundingBox.minZ);
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.maxX);
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.maxY);
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.maxZ);
-
-            this.blocksAround = new ArrayList<>();
-
-            for (int z = minZ; z <= maxZ; ++z) {
-                for (int x = minX; x <= maxX; ++x) {
-                    for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
-                        if (block.hasEntityCollision()) {
-                            this.blocksAround.add(block);
-                        }
-                    }
-                }
-            }
-        }
-
-        return this.blocksAround;
-    }
-
-    @Override
-    protected void checkBlockCollision() {
-        Vector3 vector = new Vector3(0.0D, 0.0D, 0.0D);
-        Iterator<Block> d = this.getBlocksAround().iterator();
-
-        while (d.hasNext()) {
-            Block block = (Block) d.next();
-
-            if (block.hasEntityCollision()) {
-                block.onEntityCollide(this);
-                block.addVelocityToEntity(this, vector);
-            }
-        }
-
-        if (vector.lengthSquared() > 0.0D) {
-            vector = vector.normalize();
-            double d1 = 0.014D;
-            this.motionX += vector.x * d1;
-            this.motionY += vector.y * d1;
-            this.motionZ += vector.z * d1;
-        }
     }
 
     @Override
@@ -297,13 +222,6 @@ public abstract class BaseEntity extends EntityCreature {
     }
 
     @Override
-    public boolean isInsideOfSolid() {
-        Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y + this.getHeight() - 0.18f), NukkitMath.floorDouble(this.z)));
-        AxisAlignedBB bb = block.getBoundingBox();
-        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.getBoundingBox());
-    }
-
-    @Override
     public boolean attack(EntityDamageEvent source) {
         if (this.isKnockback() && source instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) source).getDamager() instanceof Player) {
             return false;
@@ -313,10 +231,6 @@ public abstract class BaseEntity extends EntityCreature {
 
         this.target = null;
         return true;
-    }
-
-    public List<Block> getCollisionBlocks() {
-        return collisionBlocks;
     }
 
     public int getMaxFallHeight() {
@@ -389,5 +303,4 @@ public abstract class BaseEntity extends EntityCreature {
         }
         return true;
     }
-
 }
