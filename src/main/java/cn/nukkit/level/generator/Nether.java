@@ -88,12 +88,16 @@ public class Nether extends Generator {
         this.populators.add(new PopulatorGlowStone());
         PopulatorGroundFire groundFire = new PopulatorGroundFire();
         groundFire.setBaseAmount(1);
-        groundFire.setRandomAmount(1);
+        groundFire.setRandomAmount(2);
         this.populators.add(groundFire);
         PopulatorLava lava = new PopulatorLava();
         lava.setBaseAmount(0);
         lava.setRandomAmount(2);
         this.populators.add(lava);
+        PopulatorNetherWart netherWart = new PopulatorNetherWart();
+        netherWart.setBaseAmount(5);
+        netherWart.setRandomAmount(8);
+        this.populators.add(netherWart);
     }
 
     @Override

@@ -777,6 +777,7 @@ public class Item implements Cloneable {
             list[ITEM_FRAME] = ItemItemFrame.class; //389
             list[FLOWER_POT] = ItemFlowerPot.class; //390
             list[CARROT] = ItemCarrot.class; //391
+            list[POTATO] = ItemPotato.class; //392
             list[BAKED_POTATO] = ItemPotatoBaked.class; //393
             list[POISONOUS_POTATO] = ItemPotatoPoisonous.class; //394
             list[EMPTY_MAP] = ItemEmptyMap.class; //395
