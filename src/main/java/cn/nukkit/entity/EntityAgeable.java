@@ -5,5 +5,6 @@ package cn.nukkit.entity;
  * Nukkit Project
  */
 public interface EntityAgeable {
+
     boolean isBaby();
 }

@@ -229,7 +229,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
                     this.setAirTicks(airTicks);
                 } else {
-                    this.setAirTicks(getAirTicks() + tickDiff * 5);
+                    int airTicks = getAirTicks();
+                    if (airTicks < 400) {
+                        setAirTicks(Math.min(400, airTicks + tickDiff * 5));
+                    }
                 }
             }
         }
