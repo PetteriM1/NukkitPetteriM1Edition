@@ -3,14 +3,12 @@ package cn.nukkit.entity.item;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.ItemArmorStand;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 
 /**
@@ -36,24 +34,6 @@ public class EntityArmorStand extends Entity {
 		this.setHealth(6);
         this.setMaxHealth(6);
     }
-
-	@Override
-	public void spawnTo(Player player) {
-		AddEntityPacket pk = new AddEntityPacket();
-		pk.type = EntityArmorStand.NETWORK_ID;
-		pk.entityUniqueId = this.getId();
-        pk.entityRuntimeId = getId();
-		pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-		pk.speedX = (float) this.motionX;
-        pk.speedY = (float) this.motionY;
-        pk.speedZ = (float) this.motionZ;
-		pk.metadata = new EntityMetadata();
-		player.dataPacket(pk);
-
-		super.spawnTo(player);
-	}
 
 	@Override
     public boolean attack(EntityDamageEvent source) {

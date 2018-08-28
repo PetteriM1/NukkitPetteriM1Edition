@@ -1,6 +1,5 @@
 package cn.nukkit.entity.weather;
 
-import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.entity.Entity;
@@ -9,7 +8,6 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -77,28 +75,7 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
     }
 
     @Override
-    public void spawnTo(Player player) {
-        AddEntityPacket pk = new AddEntityPacket();
-        pk.entityUniqueId = this.getId();
-        pk.entityRuntimeId = this.getId();
-        pk.type = EntityLightning.NETWORK_ID;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.speedX = 0;
-        pk.speedY = 0;
-        pk.speedZ = 0;
-        pk.yaw = (float) this.yaw;
-        pk.pitch = (float) this.pitch;
-        pk.metadata = this.dataProperties;
-        player.dataPacket(pk);
-
-        super.spawnTo(player);
-    }
-
-    @Override
     public boolean attack(EntityDamageEvent source) {
-        //false?
         source.setDamage(0);
         return super.attack(source);
     }
@@ -164,6 +141,4 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
 
         return true;
     }
-
-
 }

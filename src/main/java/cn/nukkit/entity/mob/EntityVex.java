@@ -9,7 +9,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSwordIron;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 
 import java.util.HashMap;
@@ -103,25 +102,12 @@ public class EntityVex extends EntityFlyingMob {
 
     @Override
     public void spawnTo(Player player) {
-        AddEntityPacket pk = new AddEntityPacket();
-        pk.type = this.getNetworkId();
-        pk.entityUniqueId = this.getId();
-        pk.entityRuntimeId = this.getId();
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.speedX = (float) this.motionX;
-        pk.speedY = (float) this.motionY;
-        pk.speedZ = (float) this.motionZ;
-        pk.metadata = this.dataProperties;
-        player.dataPacket(pk);
-
-        MobEquipmentPacket pk1 = new MobEquipmentPacket();
-        pk1.eid = this.getId();
-        pk1.item = new ItemSwordIron();
-        pk1.hotbarSlot = 10;
-        player.dataPacket(pk1);
-
         super.spawnTo(player);
+
+        MobEquipmentPacket pk = new MobEquipmentPacket();
+        pk.eid = this.getId();
+        pk.item = new ItemSwordIron();
+        pk.hotbarSlot = 10;
+        player.dataPacket(pk);
     }
 }

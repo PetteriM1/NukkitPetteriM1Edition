@@ -53,12 +53,14 @@ public class TimingsManager {
         if (Timings.isTimingsEnabled()) {
             boolean violated = Timings.fullServerTickTimer.isViolated();
 
-            for (Timing timing : TIMINGS) {
-                if (timing.isSpecial()) {
-                    continue;
-                }
+            synchronized (TIMINGS) {
+                for (Timing timing : TIMINGS) {
+                    if (timing.isSpecial()) {
+                        continue;
+                    }
 
-                timing.tick(violated);
+                    timing.tick(violated);
+                }
             }
 
             TimingsHistory.playerTicks += Server.getInstance().getOnlinePlayers().size();

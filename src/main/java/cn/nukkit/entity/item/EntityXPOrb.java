@@ -2,12 +2,10 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
  * Created on 2015/12/26 by xtypr.
@@ -75,8 +73,6 @@ public class EntityXPOrb extends Entity {
         if (namedTag.contains("PickupDelay")) {
             this.pickupDelay = namedTag.getInt("PickupDelay");
         }
-
-        //call event item spawn event
     }
 
     @Override
@@ -103,7 +99,7 @@ public class EntityXPOrb extends Entity {
         boolean hasUpdate = entityBaseTick(tickDiff);
         if (this.isAlive()) {
 
-            if (this.pickupDelay > 0 && this.pickupDelay < 32767) { //Infinite delay
+            if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
@@ -207,24 +203,5 @@ public class EntityXPOrb extends Entity {
 
     public void setPickupDelay(int pickupDelay) {
         this.pickupDelay = pickupDelay;
-    }
-
-    @Override
-    public void spawnTo(Player player) {
-        AddEntityPacket packet = new AddEntityPacket();
-        packet.type = getNetworkId();
-        packet.entityUniqueId = this.getId();
-        packet.entityRuntimeId = getId();
-        packet.x = (float) this.x;
-        packet.y = (float) this.y;
-        packet.z = (float) this.z;
-        packet.speedX = (float) this.motionX;
-        packet.speedY = (float) this.motionY;
-        packet.speedZ = (float) this.motionZ;
-        packet.metadata = new EntityMetadata();
-        player.dataPacket(packet);
-        //this.sendData(player);
-
-        super.spawnTo(player);
     }
 }

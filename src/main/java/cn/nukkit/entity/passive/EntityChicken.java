@@ -9,7 +9,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.AddEntityPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,23 +162,5 @@ public class EntityChicken extends EntityWalkingAnimal {
   @Override
   public int getKillExperience() {
       return EntityUtils.rand(1, 4);
-  }
-
-  @Override
-  public void spawnTo(Player player) {
-      AddEntityPacket pk = new AddEntityPacket();
-      pk.type = this.getNetworkId();
-      pk.entityUniqueId = this.getId();
-      pk.entityRuntimeId = this.getId();
-      pk.x = (float) this.x;
-      pk.y = (float) this.y;
-      pk.z = (float) this.z;
-      pk.speedX = (float) this.motionX;
-      pk.speedY = (float) this.motionY;
-      pk.speedZ = (float) this.motionZ;
-      pk.metadata = this.dataProperties;
-      player.dataPacket(pk);
-
-      super.spawnTo(player);
   }
 }

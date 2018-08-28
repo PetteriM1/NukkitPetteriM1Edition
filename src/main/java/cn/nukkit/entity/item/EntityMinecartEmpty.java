@@ -37,8 +37,6 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
             if (this.riding != null) {
                 mountEntity(riding);
             }
-            // looks like MCPE and MCPC not same XD
-            // removed rolling feature from here because of MCPE logic?
         }
     }
 }
