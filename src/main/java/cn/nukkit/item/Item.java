@@ -827,6 +827,7 @@ public class Item implements Cloneable {
 
             list[ELYTRA] = ItemElytra.class; //444
             list[SHULKER_SHELL] = ItemShulkerShell.class; //445
+            list[BANNER] = ItemBanner.class; //446
 
             list[TOTEM] = ItemTotem.class; //450
 
