@@ -155,10 +155,16 @@ public abstract class EntityFlying extends BaseEntity {
                     this.moveTime -= 90 * tickDiff;
                 }
             }
+
+            if (this.isOnGround()) {
+                this.motionY = EntityUtils.rand(0.1, 0.15);
+            } else {
+                this.motionY = EntityUtils.rand(-0.15, 0.15);
+            }
+
             this.updateMovement();
             return target;
         }
         return null;
     }
-
 }

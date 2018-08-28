@@ -1,9 +1,5 @@
 package cn.nukkit.entity.mob;
 
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockFence;
-import cn.nukkit.block.BlockFenceGate;
-import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
@@ -16,9 +12,6 @@ import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.BlockFace;
-import cn.nukkit.math.NukkitMath;
-import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -121,39 +114,6 @@ public class EntityBlaze extends EntityFlyingMob {
         }
     }
 
-    protected boolean checkJump(double dx, double dz) {
-        if (this.motionY == this.getGravity() * 2) {
-            return this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockLiquid;
-        } else {
-            if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z))) instanceof BlockLiquid) {
-                this.motionY = this.getGravity() * 2;
-                return true;
-            }
-        }
-
-        if (!this.onGround || this.stayTime > 0) {
-            return false;
-        }
-
-        Block that = this.getLevel().getBlock(new Vector3(NukkitMath.floorDouble(this.x + dx), (int) this.y, NukkitMath.floorDouble(this.z + dz)));
-        if (this.getDirection() == null) {
-            return false;
-        }
-
-        Block block = that.getSide(this.getDirection());
-        if (!block.canPassThrough() && block.getSide(BlockFace.UP).canPassThrough() && that.getSide(BlockFace.UP, 2).canPassThrough()) {
-            if (block instanceof BlockFence || block instanceof BlockFenceGate) {
-                this.motionY = this.getGravity();
-            } else if (this.motionY <= this.getGravity() * 4) {
-                this.motionY = this.getGravity() * 4;
-            } else {
-                this.motionY += this.getGravity() * 0.25;
-            }
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public Vector3 updateMove(int tickDiff) {
         if (!this.isMovement()) {
@@ -216,29 +176,13 @@ public class EntityBlaze extends EntityFlyingMob {
 
         double dx = this.motionX * tickDiff;
         double dz = this.motionZ * tickDiff;
-        boolean isJump = this.checkJump(dx, dz);
         if (this.stayTime > 0) {
             this.stayTime -= tickDiff;
             this.move(0, this.motionY * tickDiff, 0);
         } else {
-            Vector2 be = new Vector2(this.x + dx, this.z + dz);
             this.move(dx, this.motionY * tickDiff, dz);
-            Vector2 af = new Vector2(this.x, this.z);
-
-            if ((be.x != af.x || be.y != af.y) && !isJump) {
-                this.moveTime -= 90 * tickDiff;
-            }
         }
 
-        if (!isJump) {
-            if (this.onGround) {
-                this.motionY = 0;
-            } else if (this.motionY > -this.getGravity() * 4) {
-                this.motionY = -this.getGravity() * 4;
-            } else {
-                this.motionY -= this.getGravity() * tickDiff;
-            }
-        }
         this.updateMovement();
         return this.target;
     }

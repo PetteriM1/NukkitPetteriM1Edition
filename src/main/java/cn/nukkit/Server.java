@@ -213,6 +213,8 @@ public class Server {
     private Watchdog watchdog;
 
     //private Spawner spawner;
+    
+    public boolean suomicraftMode;
 
     Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -502,6 +504,8 @@ public class Server {
             //this.spawner = new Spawner(this, this.getPropertyInt("ticks-per-entity-spawns", 200));
             //this.spawner.start();
         }
+        
+        suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
 
         this.start();
     }
@@ -2032,6 +2036,6 @@ public class Server {
     }
 
     public boolean suomiCraftPEMode() {
-        return this.getPropertyBoolean("suomicraft-mode", false);
+        return suomicraftMode;
     }
 }
