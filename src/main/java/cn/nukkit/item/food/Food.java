@@ -125,19 +125,6 @@ public abstract class Food {
         PlayerEatFoodEvent event = new PlayerEatFoodEvent(player, this);
         player.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) return false;
-        LevelSoundEventPacket pk = new LevelSoundEventPacket();
-        pk.sound = LevelSoundEventPacket.SOUND_EAT;
-        pk.extraData = -1;
-        pk.pitch = -1;
-        pk.x = (float) player.getX();
-        pk.y = (float) player.getY();
-        pk.z = (float) player.getZ();
-        player.dataPacket(pk);
-        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
-        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
-        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
-        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
-        player.getLevel().addParticle(new ItemBreakParticle(new Vector3(player.x, player.y + 1.25, player.z), Item.get(player.getInventory().getItemInHand().getId())));
         return event.getFood().onEatenBy(player);
     }
 
