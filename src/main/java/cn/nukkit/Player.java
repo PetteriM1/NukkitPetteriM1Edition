@@ -4507,7 +4507,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 int chunkZ = Level.getHashZ(index);
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
             }
-            this.usedChunks.clear();
+            //this.usedChunks.clear(); // HACK: keep disabled so game don't crash when switching world
             this.loadQueue.clear();
 
             SetTimePacket setTime = new SetTimePacket();
