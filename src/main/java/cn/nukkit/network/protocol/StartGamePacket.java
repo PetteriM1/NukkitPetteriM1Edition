@@ -1,10 +1,8 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.utils.RuleData;
+import cn.nukkit.level.GlobalBlockPalette;
 
-/**
- * Created on 15-10-13.
- */
 public class StartGamePacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.START_GAME_PACKET;
@@ -60,10 +58,10 @@ public class StartGamePacket extends DataPacket {
     public boolean isTrial = false;
     public long currentTick;
     public int enchantmentSeed;
+    public String multiplayerCorrelationId = "";
 
     @Override
     public void decode() {
-
     }
 
     @Override
@@ -114,6 +112,7 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
+        this.put(GlobalBlockPalette.getCompiledTable());
+        this.putString(this.multiplayerCorrelationId);
     }
-
 }

@@ -20,8 +20,8 @@ public class EntityUtils {
         return min + random.nextInt(max - min);
     }
 
-    public static double rand(double min, double max){
-        if(min == max){
+    public static double rand(double min, double max) {
+        if (min == max) {
             return max;
         }
         return min + Math.random() * (max-min);
@@ -33,9 +33,11 @@ public class EntityUtils {
 
     public static Entity create(Object type, Position source, Object... args) {
         FullChunk chunk = source.getLevel().getChunk((int) source.x >> 4, (int) source.z >> 4, true);
+
         if (!chunk.isGenerated()) {
             chunk.setGenerated();
         }
+
         if (!chunk.isPopulated()) {
             chunk.setPopulated();
         }

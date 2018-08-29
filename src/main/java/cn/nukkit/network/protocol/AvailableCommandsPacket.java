@@ -13,6 +13,7 @@ public class AvailableCommandsPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
     public Map<String, CommandDataVersions> commands;
+    public final Map<String, List<String>> softEnums = new HashMap<>();
 
     public static final int ARG_FLAG_VALID = 0x100000;
 
@@ -253,5 +254,12 @@ public class AvailableCommandsPacket extends DataPacket {
                 }
             }
         });
+
+        this.putUnsignedVarInt(softEnums.size());
+        softEnums.forEach((name, values) -> {
+           this.putString(name);
+           this.putUnsignedVarInt(values.size());
+           values.forEach(this::putString);
+       });
     }
 }

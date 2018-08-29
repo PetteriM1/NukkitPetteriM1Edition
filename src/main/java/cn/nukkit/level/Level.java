@@ -5,7 +5,6 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockRedstoneDiode;
-import cn.nukkit.block.GlobalBlockPalette;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.blockentity.BlockEntityShulkerBox;
@@ -1808,7 +1807,7 @@ public class Level implements ChunkManager, Metadatable {
                 Vector2 t = new Vector2(target.x, target.z);
                 Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
                 if (!this.server.getOps().getAll().isEmpty() && t.distance(s) <= distance) {
-                    ev.setCancelled();
+                    if (!this.server.suomiCraftPEMode()) ev.setCancelled();
                 }
             }
 
@@ -2069,7 +2068,7 @@ public class Level implements ChunkManager, Metadatable {
                 Vector2 t = new Vector2(target.x, target.z);
                 Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
                 if (!this.server.getOps().getAll().isEmpty() && t.distance(s) <= distance) {
-                    event.setCancelled();
+                    if (!this.server.suomiCraftPEMode()) event.setCancelled();
                 }
             }
 

@@ -1,7 +1,6 @@
 package cn.nukkit;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.GlobalBlockPalette;
 import cn.nukkit.blockentity.*;
 import cn.nukkit.command.*;
 import cn.nukkit.entity.Attribute;
@@ -23,6 +22,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.LevelProvider;

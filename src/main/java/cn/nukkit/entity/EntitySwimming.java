@@ -164,10 +164,11 @@ public abstract class EntitySwimming extends BaseEntity {
                     this.motionY -= this.getGravity() * tickDiff;
                 }
             }
+
             this.updateMovement();
             return this.target;
         }
+
         return null;
     }
-
 }

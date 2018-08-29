@@ -172,6 +172,20 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         super.kill();
         EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
         this.server.getPluginManager().callEvent(ev);
+        
+        if (ev.getEntity() instanceof BaseEntity) {
+            BaseEntity baseEntity = (BaseEntity) ev.getEntity();
+            if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
+                if (damager instanceof Player) {
+                    Player player = (Player) damager;
+                    int killExperience = baseEntity.getKillExperience();
+                    if (killExperience > 0 && player != null && player.isSurvival()) {
+                        player.addExperience(killExperience);
+                    }
+                }
+            }
+        }
 
         if (this.level.getGameRules().getBoolean("doEntityDrops")) {
             for (cn.nukkit.item.Item item : ev.getDrops()) {
