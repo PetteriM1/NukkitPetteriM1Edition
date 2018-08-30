@@ -2767,7 +2767,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isSpawnChunk(int X, int Z) {
-        Vector3 spawn = this.provider.getSpawn();
+        Vector3 spawn = this.getSpawnLocation();
 
         return Math.abs(X - (spawn.getFloorX() >> 4)) <= 1 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 1;
     }
@@ -2990,7 +2990,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void unloadChunks(boolean force) {
-        unloadChunks(100, force);
+        this.unloadChunks(100, force);
     }
 
     public void unloadChunks(int maxUnload, boolean force) {
