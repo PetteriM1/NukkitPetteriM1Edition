@@ -28,12 +28,12 @@ public class EntityPhantom extends EntityFlyingMob {
 
     @Override
     public float getWidth() {
-        return (float) 0.9;
+        return 0.9f;
     }
 
     @Override
     public float getHeight() {
-        return (float) 0.5;
+        return 0.5f;
     }
 
     @Override

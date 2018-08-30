@@ -78,6 +78,8 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
@@ -2760,6 +2762,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(this, mapItem));
 
                         if (!event.isCancelled()) {
+                            BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
+				            try {
+					            Graphics2D graphics = image.createGraphics();
+					            for (int x = 0; x != 128; x++) {
+						            for (int y = 0; y != 128; y++) {
+							            graphics.setColor(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y));
+							            graphics.fillRect(x, y, x, y);
+						            }
+                                }
+				            } catch(Exception ex) {}
+                            ((ItemMap) mapItem).setImage(image);
                             ((ItemMap) mapItem).sendImage(this);
                         }
                     }
