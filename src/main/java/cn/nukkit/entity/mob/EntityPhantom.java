@@ -15,7 +15,7 @@ import java.util.List;
 
 public class EntityPhantom extends EntityFlyingMob {
 
-    public static final int NETWORK_ID = 59;
+    public static final int NETWORK_ID = 58;
 
     public EntityPhantom(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
