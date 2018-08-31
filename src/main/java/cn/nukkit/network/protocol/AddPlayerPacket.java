@@ -35,12 +35,10 @@ public class AddPlayerPacket extends DataPacket {
     public float yaw;
     public Item item;
     public EntityMetadata metadata = new EntityMetadata();
-    //public EntityLink links = new EntityLink[0];
     public String deviceId = "";
 
     @Override
     public void decode() {
-
     }
 
     @Override
@@ -56,17 +54,17 @@ public class AddPlayerPacket extends DataPacket {
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
-        this.putLFloat(this.yaw); //TODO headrot
+        this.putLFloat(this.yaw);
         this.putLFloat(this.yaw);
         this.putSlot(this.item);
         this.put(Binary.writeMetadata(this.metadata));
-        this.putUnsignedVarInt(0); //TODO: Adventure settings
+        this.putUnsignedVarInt(0);
         this.putUnsignedVarInt(0);
         this.putUnsignedVarInt(0);
         this.putUnsignedVarInt(0);
         this.putUnsignedVarInt(0);
         this.putLLong(entityUniqueId);
-        this.putUnsignedVarInt(0); //TODO: Entity links
+        this.putUnsignedVarInt(0);
         this.putString(deviceId);
     }
 }

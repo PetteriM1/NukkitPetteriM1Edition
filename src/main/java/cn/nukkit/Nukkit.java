@@ -6,7 +6,10 @@ import cn.nukkit.utils.LogLevel;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.ServerKiller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,12 +32,12 @@ import java.util.stream.Collectors;
  */
 public class Nukkit {
 
-    public final static String VERSION = "";
+    public final static Properties GIT_INFO = getGitInfo();
+    public final static String VERSION = getVersion();
     public final static String API_VERSION = "1.0.0";
     public final static String CODENAME = "";
     public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
     public final static String MINECRAFT_VERSION_NETWORK = ProtocolInfo.MINECRAFT_VERSION_NETWORK;
-
     public final static String PATH = System.getProperty("user.dir") + "/";
     public final static String DATA_PATH = System.getProperty("user.dir") + "/";
     public final static String PLUGIN_PATH = DATA_PATH + "plugins";
@@ -125,5 +128,29 @@ public class Nukkit {
             System.out.print((char) 0x1b + "]0;Server Stopped" + (char) 0x07);
         }
         System.exit(0);
+    }
+
+    private static Properties getGitInfo() {
+        InputStream gitFileStream = Nukkit.class.getClassLoader().getResourceAsStream("git.properties");
+        if (gitFileStream == null) {
+            return null;
+        }
+        Properties properties = new Properties();
+        try {
+            properties.load(gitFileStream);
+        } catch (IOException e) {
+            return null;
+        }
+        return properties;
+    }
+
+    private static String getVersion() {
+        StringBuilder version = new StringBuilder();
+        version.append("git-");
+        String commitId;
+        if (GIT_INFO == null || (commitId = GIT_INFO.getProperty("git.commit.id.abbrev")) == null) {
+            return version.append("null").toString();
+        }
+        return version.append(commitId).toString();
     }
 }
