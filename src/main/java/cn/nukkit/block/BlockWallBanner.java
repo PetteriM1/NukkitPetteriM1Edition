@@ -11,9 +11,14 @@ import cn.nukkit.nbt.tag.CompoundTag;
 /**
  * Created by PetteriM1
  */
-public class BlockWallBanner extends BlockTransparent {
+public class BlockWallBanner extends BlockTransparentMeta {
 
     public BlockWallBanner() {
+        this(0);
+    }
+
+    public BlockWallBanner(int meta) {
+        super(meta);
     }
 
     @Override

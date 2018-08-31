@@ -5,15 +5,21 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBanner;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
  * Created by PetteriM1
  */
-public class BlockBanner extends BlockTransparent {
+public class BlockBanner extends BlockTransparentMeta {
 
     public BlockBanner() {
+        this(0);
+    }
+
+    public BlockBanner(int meta) {
+        super(meta);
     }
 
     @Override
@@ -55,5 +61,18 @@ public class BlockBanner extends BlockTransparent {
         }
 
         return blockSuccess;
+    }
+    
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().getId() == Block.AIR) {
+                this.getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 }
