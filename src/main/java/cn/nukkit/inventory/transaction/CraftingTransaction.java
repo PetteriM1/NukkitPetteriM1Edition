@@ -1,6 +1,7 @@
 package cn.nukkit.inventory.transaction;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.inventory.BigCraftingGrid;
 import cn.nukkit.inventory.CraftingRecipe;
@@ -54,7 +55,7 @@ public class CraftingTransaction extends InventoryTransaction {
         if (this.inputs[y][x].isNull()) {
             inputs[y][x] = item.clone();
         } else if (!inputs[y][x].equals(item)) {
-            throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ")");
+            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ")");
         }
     }
 
@@ -69,7 +70,7 @@ public class CraftingTransaction extends InventoryTransaction {
         if (secondaryOutputs[y][x].isNull()) {
             secondaryOutputs[y][x] = item.clone();
         } else if (!secondaryOutputs[y][x].equals(item)) {
-            throw new RuntimeException("Output " + index + " has already been set and does not match the current item (expected " + secondaryOutputs[y][x] + ", got " + item + ")");
+            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Output " + index + " has already been set and does not match the current item (expected " + secondaryOutputs[y][x] + ", got " + item + ")");
         }
     }
 
@@ -81,7 +82,7 @@ public class CraftingTransaction extends InventoryTransaction {
         if (primaryOutput == null) {
             primaryOutput = item.clone();
         } else if (!primaryOutput.equals(item)) {
-            throw new RuntimeException("Primary result item has already been set and does not match the current item (expected " + primaryOutput + ", got " + item + ")");
+            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Primary result item has already been set and does not match the current item (expected " + primaryOutput + ", got " + item + ")");
         }
     }
 
