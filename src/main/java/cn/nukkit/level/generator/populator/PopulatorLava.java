@@ -29,8 +29,6 @@ public class PopulatorLava extends Populator {
             BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
             int bx = chunkX << 4;
             int bz = chunkZ << 4;
-            int tx = bx + 15;
-            int tz = bz + 15;
             for (int i = 0; i < amount; ++i) {
                 int x = random.nextRange(0, 15);
                 int z = random.nextRange(0, 15);
@@ -82,10 +80,9 @@ public class PopulatorLava extends Populator {
             if (k != decay) {
                 decay = k;
                 if (decay < 0) {
-                    this.level.setBlockIdAt(x, y, z, 0);
+                    this.level.setBlockAt(x, y, z, 0);
                 } else {
-                    this.level.setBlockIdAt(x, y, z, Block.LAVA);
-                    this.level.setBlockDataAt(x, y, z, decay);
+                    this.level.setBlockAt(x, y, z, Block.LAVA, decay);
                     this.lavaSpread(x, y, z);
                     return;
                 }
@@ -123,8 +120,7 @@ public class PopulatorLava extends Populator {
 
     private void flowIntoBlock(int x, int y, int z, int newFlowDecay) {
         if (this.level.getBlockIdAt(x, y, z) == Block.AIR) {
-            this.level.setBlockIdAt(x, y, z, Block.LAVA);
-            this.level.setBlockDataAt(x, y, z, newFlowDecay);
+            this.level.setBlockAt(x, y, z, Block.LAVA, newFlowDecay);
             this.lavaSpread(x, y, z);
         }
     }

@@ -72,6 +72,7 @@ public class EntityBlueWitherSkull extends EntityProjectile {
         this.canExplode = bool;
     }
 
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
@@ -81,17 +82,13 @@ public class EntityBlueWitherSkull extends EntityProjectile {
 
         boolean hasUpdate = super.onUpdate(currentTick);
 
-        if (!this.isCollided) {
-            this.level.addParticle(new SmokeParticle(
-                    this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
-        } else if (this.onGround) {
-            return false;
+        if (this.age > 1200 || this.isCollided) {
+            this.kill();
+        } else {
+            this.level.addParticle(new SmokeParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
         }
 
-        if (this.age > 1200 && this.isCollided) {
-            this.kill();
-            hasUpdate = true;
-        }
+        hasUpdate = true;
 
         this.timing.startTiming();
 

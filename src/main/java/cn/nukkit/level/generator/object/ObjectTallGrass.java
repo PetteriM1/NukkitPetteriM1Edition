@@ -27,8 +27,7 @@ public class ObjectTallGrass {
 
             if (level.getBlockIdAt(x, (int) (pos.y + 1), z) == Block.AIR && level.getBlockIdAt(x, (int) (pos.y), z) == Block.GRASS) {
                 int[] t = arr[random.nextRange(0, arrC)];
-                level.setBlockIdAt(x, (int) (pos.y + 1), z, t[0]);
-                level.setBlockDataAt(x, (int) (pos.y + 1), z, t[1]);
+                level.setBlockAt(x, (int) (pos.y + 1), z, t[0], t[1]);
             }
         }
     }

@@ -42,6 +42,7 @@ public class EntityEnderCharge extends EntityProjectile {
         return 0.01f;
     }
 
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
@@ -51,7 +52,7 @@ public class EntityEnderCharge extends EntityProjectile {
 
         boolean hasUpdate = super.onUpdate(currentTick);
 
-        if (this.age > 1200 && this.isCollided) {
+        if (this.age > 1200 || this.isCollided) {
             this.kill();
             hasUpdate = true;
         }
@@ -59,6 +60,5 @@ public class EntityEnderCharge extends EntityProjectile {
         this.timing.startTiming();
 
         return hasUpdate;
-
     }
 }

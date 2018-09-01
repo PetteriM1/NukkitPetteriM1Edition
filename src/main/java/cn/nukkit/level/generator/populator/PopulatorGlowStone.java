@@ -20,8 +20,6 @@ public class PopulatorGlowStone extends Populator {
         BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
         int bx = chunkX << 4;
         int bz = chunkZ << 4;
-        int tx = bx + 15;
-        int tz = bz + 15;
         ObjectOre ore = new ObjectOre(random, type, Block.AIR);
         for (int i = 0; i < ore.type.clusterCount; ++i) {
             int x = random.nextRange(0, 15);

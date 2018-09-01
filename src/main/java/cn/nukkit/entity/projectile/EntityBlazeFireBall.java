@@ -59,6 +59,7 @@ public class EntityBlazeFireBall extends EntityProjectile {
         this.canExplode = bool;
     }
 
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;

@@ -174,7 +174,7 @@ public class Explosion {
                 }
             }
 
-            this.level.setBlockFullIdAt((int) block.x, (int) block.y, (int) block.z, 0);
+            this.level.setBlockAt((int) block.x, (int) block.y, (int) block.z, Block.AIR);
 
             Vector3 pos = new Vector3(block.x, block.y, block.z);
 

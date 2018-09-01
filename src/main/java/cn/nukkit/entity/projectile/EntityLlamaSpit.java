@@ -53,6 +53,7 @@ public class EntityLlamaSpit extends EntityProjectile {
         this.critical = critical;
     }
 
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;

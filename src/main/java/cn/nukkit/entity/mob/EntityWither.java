@@ -3,12 +3,15 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Explosion;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -17,7 +20,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityWither extends EntityFlyingMob {
+public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
     public static final int NETWORK_ID = 52;
 
@@ -55,7 +58,7 @@ public class EntityWither extends EntityFlyingMob {
         super.initEntity();
 
         this.fireProof = true;
-        this.setMaxHealth(300);
+        this.setMaxHealth(600);
         this.setDamage(new int[]{0, 2, 4, 6});
     }
 
@@ -75,10 +78,10 @@ public class EntityWither extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 5 && EntityUtils.rand(1, 5) < 6 && this.distance(player) <= 100) {
+    if (this.attackDelay > 10 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
-            double f = 2;
+            double f = 1;
             double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
             double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
@@ -114,5 +117,26 @@ public class EntityWither extends EntityFlyingMob {
             }
         }
         return drops.toArray(new Item[drops.size()]);
+    }
+
+    @Override
+    public boolean onUpdate(int currentTick) {
+        boolean hasUpdate = super.onUpdate(currentTick);
+        if (this.health < 1) this.explode();
+        return hasUpdate;
+    }
+
+    public void explode() {
+        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
+        this.server.getPluginManager().callEvent(ev);
+    
+        if (!ev.isCancelled()) {
+            Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
+            if (ev.isBlockBreaking()) {
+                explosion.explodeA();
+            }
+            explosion.explodeB();
+        }
+        this.close();
     }
 }

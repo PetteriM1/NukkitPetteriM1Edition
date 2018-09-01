@@ -13,6 +13,11 @@ public interface ChunkManager {
     void setBlockFullIdAt(int x, int y, int z, int fullId);
 
     void setBlockIdAt(int x, int y, int z, int id);
+    
+    default void setBlockAt(int x, int y, int z, int id) {
+        setBlockAt(x, y, z, id, 0);
+    }
+     void setBlockAt(int x, int y, int z, int id, int data);
 
     int getBlockDataAt(int x, int y, int z);
 

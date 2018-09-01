@@ -54,7 +54,6 @@ public class GlobalBlockPalette {
     public static int getOrCreateRuntimeId(int legacyId) {
         int runtimeId = legacyToRuntimeId.get(legacyId);
         if (runtimeId == -1) {
-            //runtimeId = registerMapping(runtimeIdAllocator.incrementAndGet(), legacyId);
             throw new RuntimeException("Unmapped block registered");
         }
         return runtimeId;

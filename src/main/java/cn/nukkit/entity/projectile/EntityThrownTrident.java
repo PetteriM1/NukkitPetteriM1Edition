@@ -14,6 +14,8 @@ public class EntityThrownTrident extends EntityProjectile {
 
     public static final int DATA_SOURCE_ID = 17;
 
+    public boolean firstTickOnGround = true;
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -107,6 +109,10 @@ public class EntityThrownTrident extends EntityProjectile {
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
+            if (firstTickOnGround) {
+                this.level.addLevelSoundEvent(178, 1, -1, this);
+                this.firstTickOnGround = false;
+            }
         }
 
         if (this.age > 1200) {

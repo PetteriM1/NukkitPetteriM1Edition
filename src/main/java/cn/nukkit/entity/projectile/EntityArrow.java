@@ -14,6 +14,8 @@ public class EntityArrow extends EntityProjectile {
 
     public static final int DATA_SOURCE_ID = 17;
 
+    public boolean firstTickOnGround = true;
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -107,6 +109,10 @@ public class EntityArrow extends EntityProjectile {
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
+            if (firstTickOnGround) {
+                this.level.addSound(this, "random.bowhit");
+                this.firstTickOnGround = false;
+            }
         }
 
         if (this.age > 1200) {
