@@ -14,6 +14,10 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
 
     public BlockEntityCauldron(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    protected void initBlockEntity() {
 
         if (!namedTag.contains("PotionId")) {
             namedTag.putShort("PotionId", 0xffff);
@@ -22,6 +26,8 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
         if (!namedTag.contains("SplashPotion")) {
             namedTag.putByte("SplashPotion", 0);
         }
+
+        super.initBlockEntity();
     }
 
     public int getPotionId() {
