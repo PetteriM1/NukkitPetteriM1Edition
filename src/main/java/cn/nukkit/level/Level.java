@@ -33,6 +33,7 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.generator.Generator;
+import cn.nukkit.level.generator.PopChunkManager;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
@@ -214,8 +215,26 @@ public class Level implements ChunkManager, Metadatable {
     public int tickRateTime = 0;
     public int tickRateCounter = 0;
 
-    private Class<? extends Generator> generator;
-    private Generator generatorInstance;
+    private Class<? extends Generator> generatorClass;
+    private IterableThreadLocal<Generator> generators = new IterableThreadLocal<Generator>() {
+
+       @Override
+       public Generator init() {
+           try {
+               Generator generator = generatorClass.getConstructor(Map.class).newInstance(provider.getGeneratorOptions());
+               NukkitRandom rand = new NukkitRandom(getSeed());
+               ChunkManager manager;
+               if (Server.getInstance().isPrimaryThread()) {
+                   generator.init(Level.this, rand);
+               }
+               generator.init(new PopChunkManager(getSeed()), rand);
+               return generator;
+           } catch (Throwable e) {
+               e.printStackTrace();
+               return null;
+           }
+       }
+   };
 
     public final java.util.Random rand = new java.util.Random();
 
@@ -250,7 +269,7 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.level.preparing",
                 TextFormat.GREEN + this.provider.getName() + TextFormat.WHITE));
 
-        this.generator = Generator.getGenerator(this.provider.getGenerator());
+        this.generatorClass = Generator.getGenerator(this.provider.getGenerator());
 
         try {
             this.useSections = (boolean) provider.getMethod("usesChunkSection").invoke(null);
@@ -362,32 +381,13 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void initLevel() {
-        try {
-            this.generatorInstance = this.generator.getConstructor(Map.class)
-                    .newInstance(this.provider.getGeneratorOptions());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        this.generatorInstance.init(this, new NukkitRandom(this.getSeed()));
-        this.dimension = this.generatorInstance.getDimension();
+        Generator generator = generators.get();
+        this.dimension = generator.getDimension();
         this.gameRules = this.provider.getGamerules();
-
-
-        this.registerGenerator();
     }
 
-    public void registerGenerator() {
-        int size = this.server.getScheduler().getAsyncTaskPoolSize();
-        for (int i = 0; i < size; ++i) {
-            this.server.getScheduler().scheduleAsyncTask(new GeneratorRegisterTask(this, this.generatorInstance));
-        }
-    }
-
-    public void unregisterGenerator() {
-        int size = this.server.getScheduler().getAsyncTaskPoolSize();
-        for (int i = 0; i < size; ++i) {
-            this.server.getScheduler().scheduleAsyncTask(new GeneratorUnregisterTask(this));
-        }
+    public Generator getGenerator() {
+        return generators.get();
     }
 
     public BlockMetadataStore getBlockMetadata() {
@@ -411,13 +411,12 @@ public class Level implements ChunkManager, Metadatable {
             this.save();
         }
 
-        this.unregisterGenerator();
-
         this.provider.close();
         this.provider = null;
         this.blockMetadata = null;
         this.temporalPosition = null;
         this.server.getLevels().remove(this.levelId);
+        this.generators.clean();
     }
     
     public void addSound(Vector3 pos, String sound) {

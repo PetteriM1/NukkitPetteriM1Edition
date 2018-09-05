@@ -223,7 +223,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public int getBiomeId(int x, int z) {
-        return this.biomes.get(x, z) >> 24;
+        return (this.biomes.get(x, z) >> 24) & 0xFF;
     }
 
     @Override
@@ -299,7 +299,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public void populateSkyLight() {
-        for (int z = 0; z < 16; ++z) {
+        /*for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
                 int top = this.getHeightMap(x, z);
                 for (int y = 255; y > top; --y) {
@@ -313,7 +313,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                 }
                 this.setHeightMap(x, z, this.getHighestBlockAt(x, z, false));
             }
-        }
+        }*/
     }
 
     @Override

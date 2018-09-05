@@ -44,7 +44,7 @@ public class PopulatorGroundCover extends Populator {
                             break;
                         }
                         if (b.getDamage() == 0) {
-                            chunk.setBlockId(x, y, z, b.getId());
+                            chunk.setBlock(x, y, z, b.getId());
                         } else {
                             chunk.setBlock(x, y, z, b.getId(), b.getDamage());
                         }

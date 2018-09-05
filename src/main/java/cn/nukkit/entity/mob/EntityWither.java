@@ -7,7 +7,6 @@ import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -16,9 +15,6 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
@@ -109,14 +105,7 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            int netherstar = EntityUtils.rand(0, 101) <= 3 ? 1 : 0;
-            for (int i = 0; i < netherstar; i++) {
-                drops.add(Item.get(Item.NETHER_STAR, 0, 1));
-            }
-        }
-        return drops.toArray(new Item[drops.size()]);
+        return new Item[]{Item.get(Item.NETHER_STAR, 0, 1)};
     }
 
     @Override

@@ -33,7 +33,7 @@ public class PopulatorDeadBush extends Populator {
             int y = this.getHighestWorkableBlock(x, z);
 
             if (y != -1 && this.canDeadBushStay(x, y, z)) {
-                this.level.setBlockIdAt(x, y, z, Block.DEAD_BUSH);
+                this.level.setBlockAt(x, y, z, Block.DEAD_BUSH);
             }
         }
     }

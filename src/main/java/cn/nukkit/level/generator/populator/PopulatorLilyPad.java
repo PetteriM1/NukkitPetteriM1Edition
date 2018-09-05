@@ -33,8 +33,7 @@ public class PopulatorLilyPad extends Populator {
             int y = this.getHighestWorkableBlock(x, z);
 
             if (y != -1 && this.canLilyPadStay(x, y, z)) {
-                this.level.setBlockIdAt(x, y, z, Block.WATER_LILY);
-                this.level.setBlockDataAt(x, y, z, 1);
+                this.level.setBlockAt(x, y, z, Block.WATER_LILY, 1);
             }
         }
     }

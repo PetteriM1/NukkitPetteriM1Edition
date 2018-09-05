@@ -33,8 +33,7 @@ public class PopulatorTallSugarcane extends Populator {
             int y = this.getHighestWorkableBlock(x, z);
 
             if (y != -1 && this.canSugarcaneStay(x, y, z)) {
-                this.level.setBlockIdAt(x, y, z, Block.SUGARCANE_BLOCK);
-                this.level.setBlockDataAt(x, y, z, 1);
+                this.level.setBlockAt(x, y, z, Block.SUGARCANE_BLOCK, 1);
             }
         }
     }

@@ -72,7 +72,7 @@ public class ObjectOre {
                                 sizeZ *= sizeZ;
 
                                 if ((sizeX + sizeY + sizeZ) < 1 && level.getBlockIdAt(x, y, z) == replaceId) {
-                                    level.setBlockIdAt(x, y, z, this.type.material.getId());
+                                    level.setBlockAt(x, y, z, this.type.material.getId());
                                     if (this.type.material.getDamage() != 0) {
                                         level.setBlockDataAt(x, y, z, this.type.material.getDamage());
                                     }

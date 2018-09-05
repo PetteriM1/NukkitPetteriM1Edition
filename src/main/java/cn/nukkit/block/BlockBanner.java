@@ -49,6 +49,7 @@ public class BlockBanner extends BlockTransparentMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.down().getId() == Block.AIR) return false;
         boolean blockSuccess = super.place(item, block, target, face, fx, fy, fz, player);
 
         if (blockSuccess) {

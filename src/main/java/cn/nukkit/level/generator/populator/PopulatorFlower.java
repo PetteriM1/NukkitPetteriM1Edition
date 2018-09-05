@@ -63,8 +63,7 @@ public class PopulatorFlower extends Populator {
 
             if (y != -1 && this.canFlowerStay(x, y, z)) {
                 int[] type = this.flowerTypes.get(random.nextRange(0, endNum - 1));
-                this.level.setBlockIdAt(x, y, z, type[0]);
-                this.level.setBlockDataAt(x, y, z, type[1]);
+                this.level.setBlockAt(x, y, z, type[0], type[1]);
             }
         }
     }

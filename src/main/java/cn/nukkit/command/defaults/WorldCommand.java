@@ -42,7 +42,11 @@ public class WorldCommand extends Command {
         }
 
         if (args.length == 1) {
-            ((Player) sender).teleport(Server.getInstance().getLevelByName(args[0]).getSafeSpawn());
+            if (Server.getInstance().getLevelByName(args[0]) != null) {
+                ((Player) sender).teleport(Server.getInstance().getLevelByName(args[0]).getSafeSpawn());
+            } else {
+                sender.sendMessage("\u00A7cUnknown level");
+            }
             return true;
         }
 

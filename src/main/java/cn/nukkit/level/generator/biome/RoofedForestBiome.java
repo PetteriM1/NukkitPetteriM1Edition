@@ -1,5 +1,7 @@
 package cn.nukkit.level.generator.biome;
 
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockFlower;
 import cn.nukkit.level.generator.populator.MushroomPopulator;
 import cn.nukkit.level.generator.populator.PopulatorFlower;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
@@ -16,7 +18,9 @@ public class RoofedForestBiome extends GrassyBiome {
         grass.setBaseAmount(10);
 
         PopulatorFlower flower = new PopulatorFlower();
-        flower.setBaseAmount(2);
+        flower.setBaseAmount(3);
+        flower.addType(Block.DANDELION, 0);
+        flower.addType(Block.RED_FLOWER, BlockFlower.TYPE_POPPY);
 
         MushroomPopulator mushroom = new MushroomPopulator();
         mushroom.setBaseAmount(0);

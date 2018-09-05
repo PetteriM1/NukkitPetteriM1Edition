@@ -33,8 +33,7 @@ public class PopulatorCactus extends Populator {
             int y = this.getHighestWorkableBlock(x, z);
 
             if (y != -1 && this.canCactusStay(x, y, z)) {
-                this.level.setBlockIdAt(x, y, z, Block.CACTUS);
-                this.level.setBlockDataAt(x, y, z, 1);
+                this.level.setBlockAt(x, y, z, Block.CACTUS, 1);
             }
         }
     }

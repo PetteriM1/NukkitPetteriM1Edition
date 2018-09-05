@@ -70,7 +70,7 @@ public class ObjectLake {
                                 sizeZ *= sizeZ;
 
                                 if ((sizeX + sizeY + sizeZ) < 1 && canPlaceObject(level, x, y, z)) {
-                                    level.setBlockIdAt(x, y, z, this.type.material.getId());
+                                    level.setBlockAt(x, y, z, this.type.material.getId());
                                     if (this.type.material.getDamage() != 0) {
                                         level.setBlockDataAt(x, y, z, this.type.material.getDamage());
                                     }

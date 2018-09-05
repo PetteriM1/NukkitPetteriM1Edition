@@ -22,7 +22,6 @@ public abstract class BasicPopulator {
     }
 
     protected void setBlock(ChunkManager level, Vector3 v, Block b) {
-        level.setBlockIdAt((int) v.x, (int) v.y, (int) v.z, b.getId());
-        level.setBlockDataAt((int) v.x, (int) v.y, (int) v.z, b.getDamage());
+        level.setBlockAt((int) v.x, (int) v.y, (int) v.z, b.getId(), b.getDamage());
     }
 }

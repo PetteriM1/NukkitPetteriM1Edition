@@ -106,6 +106,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int CRAFTING_BIG = 1;
     public static final int CRAFTING_ANVIL = 2;
     public static final int CRAFTING_ENCHANT = 3;
+    public static final int CRAFTING_BEACON = 4;
 
     public static final float DEFAULT_SPEED = 0.1f;
     public static final float MAXIMUM_SPEED = 0.5f;
@@ -117,6 +118,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public static final int ANVIL_WINDOW_ID = 2;
     public static final int ENCHANT_WINDOW_ID = 3;
+    public static final int BEACON_WINDOW_ID = 4;
 
     protected final SourceInterface interfaz;
 
@@ -2040,8 +2042,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     LoginPacket loginPacket = (LoginPacket) packet;
 
                     String message;
-                    if ((loginPacket.getProtocol()) < ProtocolInfo.CURRENT_PROTOCOL) {
-                        message = "disconnectionScreen.outdatedClient";
+                    if (loginPacket.getProtocol() != ProtocolInfo.CURRENT_PROTOCOL) {
+                        message = "disconnectionScreen.unsupportedVersion";
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
 
                     if (((LoginPacket) packet).protocol < 137) {
@@ -3476,7 +3478,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.loggedIn = false;
 
             if (ev != null && !Objects.equals(this.username, "") && this.spawned && !Objects.equals(ev.getQuitMessage().toString(), "")) {
-                this.server.broadcastMessage(ev.getQuitMessage());
+                if (!ev.getQuitMessage().toString().contains("Transferred to")) this.server.broadcastMessage(ev.getQuitMessage());
             }
 
             this.server.getPluginManager().unsubscribeFromPermission(Server.BROADCAST_CHANNEL_USERS, this);

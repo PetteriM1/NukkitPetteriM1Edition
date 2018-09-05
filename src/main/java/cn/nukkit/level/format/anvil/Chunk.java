@@ -32,8 +32,7 @@ public class Chunk extends BaseChunk {
 
     @Override
     public Chunk clone() {
-        Chunk chunk = (Chunk) super.clone();
-        return chunk;
+        return (Chunk) super.clone();
     }
 
     public Chunk(LevelProvider level) {
@@ -489,7 +488,6 @@ public class Chunk extends BaseChunk {
             chunk.inhabitedTime = 0;
             chunk.terrainGenerated = false;
             chunk.terrainPopulated = false;
-//            chunk.lightPopulated = false;
             return chunk;
         } catch (Exception e) {
             return null;

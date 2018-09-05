@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
@@ -204,5 +205,15 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
   public int getMaxFallHeight() {
       return this.followTarget == null ? 3 : 3 + (int) (this.getHealth() - 1.0F);
+  }
+  
+  @Override
+  public boolean onInteract(Player player, Item item) {
+      if (item.getId() == Item.FLINT_AND_STEEL) {
+          this.level.addSound(this, "fire.ignite");
+          this.explode();
+          return true;
+      }
+      return false;
   }
 }

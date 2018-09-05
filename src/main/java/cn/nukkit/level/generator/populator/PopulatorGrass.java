@@ -32,8 +32,7 @@ public class PopulatorGrass extends Populator {
             int y = this.getHighestWorkableBlock(x, z);
 
             if (y != -1 && this.canGrassStay(x, y, z)) {
-                this.level.setBlockIdAt(x, y, z, Block.TALL_GRASS);
-                this.level.setBlockDataAt(x, y, z, 0);
+                this.level.setBlockAt(x, y, z, Block.TALL_GRASS, 0);
             }
         }
     }

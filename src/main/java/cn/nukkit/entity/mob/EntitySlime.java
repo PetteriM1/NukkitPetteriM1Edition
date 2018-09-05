@@ -2,7 +2,6 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class EntitySlime extends EntityWalkingMob {
+public class EntitySlime extends EntityJumpingMob {
 
     public static final int NETWORK_ID = 37;
 
@@ -29,12 +28,12 @@ public class EntitySlime extends EntityWalkingMob {
 
     @Override
     public float getWidth() {
-        return 2.04f;
+        return 0.51f;
     }
 
     @Override
     public float getHeight() {
-        return 2.04f;
+        return 0.51f;
     }
 
     @Override

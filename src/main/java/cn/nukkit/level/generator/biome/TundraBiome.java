@@ -2,32 +2,25 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
-import cn.nukkit.level.generator.populator.PopulatorTallGrass;
 import cn.nukkit.level.generator.populator.PopulatorTree;
 
 /**
- * author: MagicDroidX
- * Nukkit Project
+ * Created by PetteriM1
  */
-public class IcePlainsBiome extends SnowyBiome {
+public class TundraBiome extends SnowyBiome {
 
-    public IcePlainsBiome() {
+    public TundraBiome() {
         super();
 
         PopulatorGrass grass = new PopulatorGrass();
-        grass.setBaseAmount(6);
+        grass.setRandomAmount(2);
         this.addPopulator(grass);
 
         PopulatorTree trees = new PopulatorTree(BlockSapling.SPRUCE);
-        trees.setBaseAmount(10);
+        trees.setRandomAmount(1);
         this.addPopulator(trees);
 
-        PopulatorTallGrass tallGrass = new PopulatorTallGrass();
-        tallGrass.setBaseAmount(1);
-
-        this.addPopulator(tallGrass);
-
-        this.setElevation(63, 81);
+        this.setElevation(63, 74);
 
         this.temperature = 0.25;
         this.rainfall = 0.8;
@@ -35,6 +28,6 @@ public class IcePlainsBiome extends SnowyBiome {
 
     @Override
     public String getName() {
-        return "Taiga";
+        return "Tundra";
     }
 }

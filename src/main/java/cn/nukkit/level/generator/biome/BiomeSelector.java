@@ -3,9 +3,6 @@ package cn.nukkit.level.generator.biome;
 import cn.nukkit.level.generator.noise.Simplex;
 import cn.nukkit.math.NukkitRandom;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * author: MagicDroidX
  * Nukkit Project
@@ -15,7 +12,7 @@ public class BiomeSelector {
     private final Simplex temperature;
     private final Simplex rainfall;
 
-    private final Map<Integer, Biome> biomes = new HashMap<>();
+    private final boolean[] biomes = new boolean[256];
 
     private int[] map = new int[64 * 64];
 
@@ -28,27 +25,31 @@ public class BiomeSelector {
     public int lookup(double temperature, double rainfall) {
         if (rainfall < 0.10) {
             return Biome.MUSHROOM_ISLAND;
-        } else if (rainfall < 0.20) {
+        } else if (rainfall < 0.18) {
             return Biome.SWAMP;
         } else if (rainfall < 0.25) {
             return Biome.PLAINS;
         } else if (rainfall < 0.55) {
-            if (temperature < 0.25) {
-                return Biome.ICE_PLAINS;
+            if (temperature < 0.30) {
+                return Biome.TAIGA;
             } else if (temperature < 0.75) {
                 return Biome.DESERT;
             } else {
                 return Biome.SAVANNA;
             }
+        } else if (rainfall < 0.60) {
+            return Biome.FLOWER_FOREST;
         } else if (rainfall < 0.65) {
             return Biome.ROOFED_FOREST;
         } else if (rainfall < 0.70) {
             return Biome.BIRCH_FOREST;
         } else if (rainfall < 0.75) {
             return Biome.PLAINS;
-        } else if (rainfall < 0.80) {
-            if (temperature < 0.25) {
-                return Biome.TAIGA;
+        } else if (rainfall < 0.82) {
+            if (temperature < 0.20) {
+                return Biome.ICE_PLAINS;
+            } else if (temperature < 0.30) {
+                return Biome.TUNDRA;
             } else {
                 return Biome.FOREST;
             }
@@ -68,7 +69,7 @@ public class BiomeSelector {
     }
 
     public void addBiome(Biome biome) {
-        this.biomes.put(Integer.valueOf(biome.getId()), biome);
+        this.biomes[biome.getId()] = true;
     }
 
     public double getTemperature(double x, double z) {
@@ -84,6 +85,10 @@ public class BiomeSelector {
         int rainfall = (int) (this.getRainfall(x, z) * 63);
 
         int biomeId = this.map[temperature + (rainfall << 6)];
-        return this.biomes.containsKey(biomeId) ? this.biomes.get(biomeId) : this.fallback;
+        if (this.biomes[biomeId]) {
+            return Biome.getBiome(biomeId);
+        } else {
+            return this.fallback;
+        }
     }
 }

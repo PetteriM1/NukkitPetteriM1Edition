@@ -13,7 +13,6 @@ import java.util.ArrayList;
  */
 public abstract class Biome {
 
-
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
     public static final int DESERT = 2;
@@ -30,13 +29,13 @@ public abstract class Biome {
     public static final int JUNGLE = 21;
     public static final int BIRCH_FOREST = 27;
     public static final int ROOFED_FOREST = 29;
+    public static final int TUNDRA = 30;
     public static final int SAVANNA = 35;
-    public static final int MAX_BIOMES = 256;
+    public static final int FLOWER_FOREST = 132;
 
-    private static final Biome[] biomes = new Biome[MAX_BIOMES];
+    private static final Biome[] biomes = new Biome[256];
 
     private int id;
-    private boolean registered = false;
 
     private final ArrayList<Populator> populators = new ArrayList<>();
 
@@ -72,6 +71,8 @@ public abstract class Biome {
         register(MUSHROOM_ISLAND, new MushroomIsland());
         register(SAVANNA, new SavannaBiome());
         register(BEACH, new BeachBiome());
+        register(TUNDRA, new TundraBiome());
+        register(FLOWER_FOREST, new FlowerForestBiome());
         register(HELL, new HellBiome());
     }
 
