@@ -74,7 +74,7 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 10 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+    if (this.attackDelay > 20 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;

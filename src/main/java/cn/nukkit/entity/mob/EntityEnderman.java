@@ -96,6 +96,24 @@ public class EntityEnderman extends EntityWalkingMob {
     }
 
     @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
+
+        if (!ev.isCancelled()) {
+            if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                this.level.addSound(this, "mob.endermen.portal");
+                this.move(EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10));
+                this.level.addSound(this, "mob.endermen.portal");
+            } else if (EntityUtils.rand(1, 15) == 5) {
+                this.level.addSound(this, "mob.endermen.portal");
+                this.move(EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10));
+                this.level.addSound(this, "mob.endermen.portal");
+            }
+        }
+        return true;
+    }
+
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
