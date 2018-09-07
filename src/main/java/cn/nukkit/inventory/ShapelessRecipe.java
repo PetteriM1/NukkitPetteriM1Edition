@@ -107,7 +107,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
 
     private boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
-        haveItems.removeIf(Item::isNull);
+        haveItems.removeif (Item::isNull);
 
         if (haveItems.size() != needItems.size()) {
             return false;

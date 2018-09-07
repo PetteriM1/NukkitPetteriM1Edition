@@ -15,12 +15,12 @@ import cn.nukkit.plugin.Plugin;
  * <p>下面是一个插件创建任务的例子：<br>An example for plugin create a task:
  * <pre>
  *     public class ExampleTask extends PluginTask&lt;ExamplePlugin&gt;{
- *         public ExampleTask(ExamplePlugin plugin){
+ *         public ExampleTask(ExamplePlugin plugin) {
  *             super(plugin);
  *         }
  *
  *        {@code @Override}
- *         public void onRun(int currentTick){
+ *         public void onRun(int currentTick) {
  *             getOwner().getLogger().info("Task is executed in tick "+currentTick);
  *         }
  *     }

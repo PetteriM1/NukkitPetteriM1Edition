@@ -61,7 +61,7 @@ public class EntitySkeleton extends EntityWalkingMob {
             double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            if(this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
+            if (this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
                 Entity k = EntityUtils.create("Arrow", pos, this);
                 if (!(k instanceof EntityArrow)) {
                     return;

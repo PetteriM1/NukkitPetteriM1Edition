@@ -35,7 +35,7 @@ public class BlockIcePacked extends BlockIce {
 
     @Override
     public Item[] getDrops(Item item) {
-        if(item.hasEnchantment(Enchantment.ID_SILK_TOUCH)==true) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)==true) {
             return new Item[]{
                     this.toItem()
             };

@@ -58,18 +58,18 @@ public class EntityHorse extends EntityTameableAnimal {
     public void initEntity() {
         super.initEntity();
         this.setMaxHealth(15);
-        /*if(this instanceof EntityDonkey){
+        /*if (this instanceof EntityDonkey) {
                 this.Type = 1;
-            }else if(this instanceof EntityMule){
+            }else if (this instanceof EntityMule) {
                 this.Type = 2;
-            }else if(this instanceof EntityZombieHorse){
+            }else if (this instanceof EntityZombieHorse) {
                 this.Type = 3;
-            }else if(this instanceof EntitySkeletonHorse){
+            }else if (this instanceof EntitySkeletonHorse) {
                 this.Type = 4;
             }else{
                 this.Type = 0;
             }
-            if(this.namedTag.contains("Variant")){
+            if (this.namedTag.contains("Variant")) {
                 this.Variant = this.namedTag.getInt("Variant");
             }else{
                 this.Variant = this.getRandomVariant();
@@ -139,7 +139,7 @@ public class EntityHorse extends EntityTameableAnimal {
         Variant = variant;
     }
 
-    private int getRandomVariant(){
+    private int getRandomVariant() {
         int VariantList[] = {
                 0,1,2,3,4,5,6,
                 256,257,258,259,260,261,262,

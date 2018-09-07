@@ -55,7 +55,7 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
         return owner;
     }
 
-    public boolean hasOwner(){
+    public boolean hasOwner() {
         return owner!=null;
     }
 

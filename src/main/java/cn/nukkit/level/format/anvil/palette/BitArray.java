@@ -26,7 +26,7 @@ public final class BitArray {
         int localBitIndexStart = bitIndexStart & 63;
         this.data[longIndexStart] = this.data[longIndexStart] & ~((long) maxEntryValue << localBitIndexStart) | ((long) value) << localBitIndexStart;
 
-        if(localBitIndexStart > maxSeqLocIndex) {
+        if (localBitIndexStart > maxSeqLocIndex) {
             int longIndexEnd = longIndexStart + 1;
             int localShiftStart = 64 - localBitIndexStart;
             int localShiftEnd = bitsPerEntry - localShiftStart;
@@ -40,7 +40,7 @@ public final class BitArray {
         int longIndexStart = bitIndexStart >> 6;
 
         int localBitIndexStart = bitIndexStart & 63;
-        if(localBitIndexStart <= maxSeqLocIndex) {
+        if (localBitIndexStart <= maxSeqLocIndex) {
             return (int)(this.data[longIndexStart] >>> localBitIndexStart & maxEntryValue);
         } else {
             int localShift = 64 - localBitIndexStart;

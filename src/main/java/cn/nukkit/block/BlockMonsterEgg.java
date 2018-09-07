@@ -62,7 +62,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
             if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && EntityUtils.rand(1, 5) == 1) {
 
                 EntitySilverfish entity = (EntitySilverfish) EntityUtils.create("Silverfish", this.add(0.5, 0, 0.5));
-                if(entity != null){
+                if (entity != null) {
                     entity.spawnToAll();
                     EntityEventPacket pk = new EntityEventPacket();
                     pk.eid = entity.getId();

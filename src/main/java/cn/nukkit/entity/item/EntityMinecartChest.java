@@ -27,7 +27,7 @@ public class EntityMinecartChest extends EntityMinecartAbstract {
     }
     
     @Override
-    public boolean isRideable(){
+    public boolean isRideable() {
         return false;
     }
 

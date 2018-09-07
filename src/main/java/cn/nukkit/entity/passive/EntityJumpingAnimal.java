@@ -24,7 +24,6 @@ public abstract class EntityJumpingAnimal extends EntityJumping implements Entit
         if (this.getDataFlag(DATA_FLAG_BABY, 0)) {
             this.setDataFlag(DATA_FLAG_BABY, DATA_TYPE_BYTE);
         }
-
     }
 
     @Override

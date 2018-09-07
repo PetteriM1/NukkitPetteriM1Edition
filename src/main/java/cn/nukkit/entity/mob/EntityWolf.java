@@ -92,8 +92,8 @@ public class EntityWolf extends EntityTameableMob {
 
   @Override
   public boolean onInteract(Player player, Item item) {
-      if(item.equals(Item.get(Item.BONE))){
-          if(!this.hasOwner()) {
+      if (item.equals(Item.get(Item.BONE))) {
+          if (!this.hasOwner()) {
               player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
               if (EntityUtils.rand(0, 3) == 3) {
                   EntityEventPacket packet = new EntityEventPacket();
@@ -110,8 +110,8 @@ public class EntityWolf extends EntityTameableMob {
                   Server.broadcastPacket(new Player[]{player}, packet);
               }
           }
-      }else if(item.equals(Item.get(Item.DYE),false)){
-          if(this.hasOwner() && player.equals(this.getOwner())){
+      }else if (item.equals(Item.get(Item.DYE),false)) {
+          if (this.hasOwner() && player.equals(this.getOwner())) {
               this.setCollarColor(((ItemDye)item).getDyeColor());
               return true;
           }

@@ -105,7 +105,7 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
                     clean(threadLocal);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             // We will tolerate an exception here and just log it
             throw new IllegalStateException(e);
         }

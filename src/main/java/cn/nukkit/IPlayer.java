@@ -131,7 +131,7 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * <p>
      * <p>如果想得到这个玩家是不是第一次玩，可以使用：<br>
      * If you want to know if this player is the first time playing in this server, you can use:<br>
-     * <pre>if(!player.hasPlayerBefore()) {...}</pre></p>
+     * <pre>if (!player.hasPlayerBefore()) {...}</pre></p>
      *
      * @return 这个玩家以前是不是玩过游戏。<br>If this player has played in this server before.
      * @since Nukkit 1.0 | Nukkit API 1.0.0

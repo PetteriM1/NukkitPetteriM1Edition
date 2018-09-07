@@ -50,7 +50,7 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
 
         hasUpdate = super.entityBaseTick(tickDiff);
 
-        if(this.isInLove()) {
+        if (this.isInLove()) {
             this.inLoveTicks -= tickDiff;
             if (this.age % 20 == 0) {
                 for (int i = 0; i < 3; i++) {
@@ -117,7 +117,7 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
     }
 
-    public boolean isInLove(){
+    public boolean isInLove() {
         return inLoveTicks > 0;
     }
 

@@ -115,7 +115,7 @@ public class BlockTripWire extends BlockFlowable {
                         hook.calculateState(false, true, i, this);
                     }
 
-                    /*if(scheduleUpdate) {
+                    /*if (scheduleUpdate) {
                         this.level.scheduleUpdate(hook, 10);
                     }*/
                     break;

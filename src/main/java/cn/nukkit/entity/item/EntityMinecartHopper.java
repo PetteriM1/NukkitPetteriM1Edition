@@ -24,7 +24,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract {
 
     
     @Override
-    public boolean isRideable(){
+    public boolean isRideable() {
         return false;
     }
 

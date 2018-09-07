@@ -24,7 +24,7 @@ public class TransferServerCommand extends VanillaCommand {
             return true;
         }
 
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
 
             return false;

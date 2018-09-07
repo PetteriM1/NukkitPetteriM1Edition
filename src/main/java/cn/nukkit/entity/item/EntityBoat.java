@@ -30,7 +30,7 @@ public class EntityBoat extends EntityVehicle {
     }
 
     
-    public boolean isRideable(){
+    public boolean isRideable() {
         return true;
     }
 

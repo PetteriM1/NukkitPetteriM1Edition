@@ -56,7 +56,7 @@ public interface CommandSender extends Permissible {
      * If it is a console, will return {@code "CONSOLE"}.</p>
      * <p>当你需要判断命令的执行者是不是控制台时，可以用这个：<br>
      * When you need to determine if the sender is a console, use this:<br>
-     * {@code if(sender instanceof ConsoleCommandSender) .....;}</p>
+     * {@code if (sender instanceof ConsoleCommandSender) .....;}</p>
      *
      * @return 命令发送者的名称。<br>the name of the command sender.
      * @see cn.nukkit.Player#getName()

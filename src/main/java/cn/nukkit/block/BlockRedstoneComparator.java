@@ -63,7 +63,7 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
             int power = blockEntity instanceof BlockEntityComparator ? ((BlockEntityComparator) blockEntity).getOutputSignal() : 0;
 
             if (output != power || this.isPowered() != this.shouldBePowered()) {
-                /*if(isFacingTowardsRepeater()) {
+                /*if (isFacingTowardsRepeater()) {
                     this.level.scheduleUpdate(this, this, 2, -1);
                 } else {
                     this.level.scheduleUpdate(this, this, 2, 0);

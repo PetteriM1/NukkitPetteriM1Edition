@@ -41,7 +41,7 @@ public class EntityPotion extends EntityProjectile {
 
         /*Effect effect = Potion.getEffect(potionId, true); TODO: potion color
 
-        if(effect != null) {
+        if (effect != null) {
             int count = 0;
             int[] c = effect.getColor();
             count += effect.getAmplifier() + 1;

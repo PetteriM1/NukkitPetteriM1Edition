@@ -28,7 +28,7 @@ public class EntityEndCrystal extends Entity {
         super.initEntity();
     }
 
-    public boolean attack(EntityDamageEvent source){
+    public boolean attack(EntityDamageEvent source) {
         if (this.closed) return false;
         close();
         kill();
