@@ -102,11 +102,11 @@ public class EntityEnderman extends EntityWalkingMob {
         if (!ev.isCancelled()) {
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
                 this.level.addSound(this, "mob.endermen.portal");
-                this.move(EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10));
+                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
                 this.level.addSound(this, "mob.endermen.portal");
             } else if (EntityUtils.rand(1, 15) == 5) {
                 this.level.addSound(this, "mob.endermen.portal");
-                this.move(EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10), EntityUtils.rand(-10, 10));
+                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
                 this.level.addSound(this, "mob.endermen.portal");
             }
         }
