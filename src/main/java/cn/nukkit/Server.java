@@ -247,7 +247,7 @@ public class Server {
                 put("server-ip", "0.0.0.0");
                 put("view-distance", 10);
                 put("white-list", false);
-                put("achievements", false);
+                put("achievements", true);
                 put("announce-player-achievements", false);
                 put("spawn-protection", 10);
                 put("max-players", 50);

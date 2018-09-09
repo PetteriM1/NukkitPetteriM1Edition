@@ -223,7 +223,6 @@ public class Level implements ChunkManager, Metadatable {
            try {
                Generator generator = generatorClass.getConstructor(Map.class).newInstance(provider.getGeneratorOptions());
                NukkitRandom rand = new NukkitRandom(getSeed());
-               ChunkManager manager;
                if (Server.getInstance().isPrimaryThread()) {
                    generator.init(Level.this, rand);
                }
@@ -1634,12 +1633,10 @@ public class Level implements ChunkManager, Metadatable {
         }
         BaseFullChunk chunk = this.getChunk(x >> 4, z >> 4, true);
         Block blockPrevious;
-//        synchronized (chunk) {
         blockPrevious = chunk.getAndSetBlock(x & 0xF, y, z & 0xF, block);
         if (blockPrevious.getFullId() == block.getFullId()) {
             return false;
         }
-//        }
         block.x = x;
         block.y = y;
         block.z = z;
@@ -1764,9 +1761,6 @@ public class Level implements ChunkManager, Metadatable {
 
         if (player != null) {
             double breakTime = target.getBreakTime(item, player);
-            // this in
-            // block
-            // class
 
             if (player.isCreative() && breakTime > 0.15) {
                 breakTime = 0.15;
@@ -1963,7 +1957,7 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (player != null) {
+        if (player != null && !player.hasInteracted.get()) {
             PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face,
                     target.getId() == 0 ? Action.RIGHT_CLICK_AIR : Action.RIGHT_CLICK_BLOCK);
 
@@ -1982,8 +1976,13 @@ public class Level implements ChunkManager, Metadatable {
 
             this.server.getPluginManager().callEvent(ev);
             if (!ev.isCancelled()) {
+                player.hasInteracted.set(true);
+                server.getScheduler().scheduleDelayedTask(() -> player.hasInteracted.compareAndSet(true, false), 3);
                 target.onUpdate(BLOCK_UPDATE_TOUCH);
                 if ((!player.isSneaking() || player.getInventory().getItemInHand().isNull()) && target.canBeActivated() && target.onActivate(item, player)) {
+                    if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
+                        item = new ItemBlock(new BlockAir(), 0, 0);
+                    }
                     return item;
                 }
 
@@ -1996,8 +1995,11 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 return null;
             }
-
+        
         } else if (target.canBeActivated() && target.onActivate(item, null)) {
+            if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
+                item = new ItemBlock(new BlockAir(), 0, 0);
+            }
             return item;
         }
         Block hand;

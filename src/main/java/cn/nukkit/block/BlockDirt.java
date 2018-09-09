@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
-import cn.nukkit.scheduler.NukkitRunnable;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -62,11 +61,6 @@ public class BlockDirt extends BlockSolidMeta {
         if (this.getDamage() != 0) return false;
         if (item.isHoe()) {
             item.useOn(this);
-            new NukkitRunnable() {
-                public void run() {
-                    if (item.getDamage() >= item.getMaxDurability()) player.getInventory().removeItem(item);
-                }
-            }.runTaskLater(null, 1);
             this.getLevel().setBlock(this, new BlockFarmland(), true);
 
             return true;

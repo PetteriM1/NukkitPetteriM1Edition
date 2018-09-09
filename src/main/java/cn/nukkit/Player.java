@@ -85,6 +85,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -239,6 +240,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private AsyncTask preLoginEventTask = null;
     protected boolean shouldLogin = false;
+
+    public AtomicBoolean hasInteracted = new AtomicBoolean();
 
     public int getStartActionTick() {
         return startAction;
@@ -3634,6 +3637,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 case LAVA:
+                    Block block = this.level.getBlock(new Vector3(this.x, this.y - 1, this.z));
+                    if (block.getId() == Block.MAGMA) {
+                        message = "death.attack.lava.magma";
+                        break;
+                    }
                     message = "death.attack.lava";
                     break;
 
