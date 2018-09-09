@@ -235,6 +235,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int formWindowCount = 0;
     protected Map<Integer, FormWindow> formWindows = new Int2ObjectOpenHashMap<>();
     protected Map<Integer, FormWindow> serverSettings = new Int2ObjectOpenHashMap<>();
+    protected List<String> forms = new ArrayList<>();
 
     protected Map<Long, DummyBossBar> dummyBossBars = new Long2ObjectLinkedOpenHashMap<>();
 
@@ -2500,6 +2501,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    this.forms.remove(this.getName());
+
                     ModalFormResponsePacket modalFormPacket = (ModalFormResponsePacket) packet;
 
                     if (formWindows.containsKey(modalFormPacket.formId)) {
@@ -4185,10 +4188,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * You can find out FormWindow result by listening to PlayerFormRespondedEvent
      */
     public int showFormWindow(FormWindow window, int id) {
+        if (this.forms.contains(this.getName())) return 0;
         ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.formId = id;
         packet.data = window.getJSONData();
         this.formWindows.put(packet.formId, window);
+        this.forms.add(this.getName());
 
         this.dataPacket(packet);
         return id;
