@@ -20,5 +20,4 @@ public abstract class ItemEdible extends Item {
     public ItemEdible(int id, Integer meta, int count) {
         super(id, meta, count);
     }
-
 }
