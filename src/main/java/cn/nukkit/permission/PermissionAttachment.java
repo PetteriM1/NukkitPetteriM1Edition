@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PermissionAttachment {

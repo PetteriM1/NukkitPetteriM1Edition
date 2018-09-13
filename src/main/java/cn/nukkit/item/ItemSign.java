@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockSignPost;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemSign extends Item {

@@ -17,7 +17,7 @@ import cn.nukkit.utils.BlockColor;
 import java.util.Map;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockChest extends BlockTransparentMeta {

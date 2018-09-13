@@ -7,7 +7,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.VectorMath;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ObjectOre {

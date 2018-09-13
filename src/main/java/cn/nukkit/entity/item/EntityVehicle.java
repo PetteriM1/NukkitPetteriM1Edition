@@ -17,7 +17,7 @@ import java.util.Objects;
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.*;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class EntityVehicle extends Entity implements EntityRideable, EntityInteractable {

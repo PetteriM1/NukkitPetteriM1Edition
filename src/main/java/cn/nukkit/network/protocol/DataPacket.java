@@ -7,7 +7,7 @@ import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Zlib;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {

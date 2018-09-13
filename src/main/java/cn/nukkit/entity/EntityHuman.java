@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EntityHuman extends EntityHumanType {

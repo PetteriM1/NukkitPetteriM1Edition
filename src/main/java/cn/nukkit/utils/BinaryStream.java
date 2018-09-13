@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BinaryStream {

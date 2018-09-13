@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface Inventory {

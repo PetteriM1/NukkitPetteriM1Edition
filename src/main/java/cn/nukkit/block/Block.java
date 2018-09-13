@@ -25,7 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class Block extends Position implements Metadatable, Cloneable {
@@ -823,7 +823,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable {
 
     /**
      * The full id is a combination of the id and data.
-     * @return
+     * @return full id
      */
     public int getFullId() {
         return (getId() << 4);

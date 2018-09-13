@@ -12,7 +12,7 @@ import cn.nukkit.network.protocol.AddPaintingPacket;
 import cn.nukkit.network.protocol.DataPacket;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EntityPainting extends EntityHanging {

@@ -388,7 +388,7 @@ public class Server {
         this.network.setName(this.getMotd());
         this.network.setSubName(this.getSubMotd());
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
+        this.logger.info("-- Nukkit PetteriM1 Edition --");
 
 
         this.consoleSender = new ConsoleCommandSender();
@@ -709,7 +709,6 @@ public class Server {
             level.save();
         }
 
-        this.pluginManager.disablePlugins();
         this.pluginManager.clearPlugins();
         this.commandMap.clearCommands();
 
@@ -1909,7 +1908,7 @@ public class Server {
 
     /**
      * Checks the current thread against the expected primary thread for the server.
-     * <p>
+     * 
      * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
      *
      * @return true if the current thread matches the expected primary thread, false otherwise

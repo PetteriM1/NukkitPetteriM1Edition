@@ -74,6 +74,8 @@ public class InventoryTransaction {
     /**
      * This method should not be used by plugins, it's used to add tracked inventories for InventoryActions
      * involving inventories.
+     *
+     * @param inventory to add
      */
     public void addInventory(Inventory inventory) {
         if (!this.inventories.contains(inventory)) {
@@ -128,14 +130,14 @@ public class InventoryTransaction {
     /**
      * Iterates over SlotChangeActions in this transaction and compacts any which refer to the same inventorySlot in the same
      * inventory so they can be correctly handled.
-     * <p>
+     * 
      * Under normal circumstances, the same inventorySlot would never be changed more than once in a single transaction. However,
      * due to the way things like the crafting grid are "implemented" in MCPE 1.2 (a.k.a. hacked-in), we may get
      * multiple inventorySlot changes referring to the same inventorySlot in a single transaction. These multiples are not even guaranteed
      * to be in the correct order (inventorySlot splitting in the crafting grid for example, causes the actions to be sent in the
      * wrong order), so this method also tries to chain them into order.
      *
-     * @return bool
+     * @return successful
      */
     protected boolean squashDuplicateSlotChanges() {
         Map<Integer, List<SlotChangeAction>> slotChanges = new HashMap<>();

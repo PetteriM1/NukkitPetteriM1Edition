@@ -1,7 +1,7 @@
 package cn.nukkit.network.protocol;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ShowProfilePacket extends DataPacket {

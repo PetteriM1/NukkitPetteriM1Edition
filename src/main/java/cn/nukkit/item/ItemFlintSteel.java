@@ -9,7 +9,7 @@ import cn.nukkit.math.Vector3;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemFlintSteel extends ItemTool {

@@ -10,7 +10,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EntityDamageEvent extends EntityEvent implements Cancellable {

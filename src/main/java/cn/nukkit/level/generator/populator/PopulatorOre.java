@@ -8,7 +8,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PopulatorOre extends Populator {

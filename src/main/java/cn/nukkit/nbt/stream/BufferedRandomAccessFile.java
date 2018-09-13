@@ -25,13 +25,12 @@ import java.util.Arrays;
  * A <code>BufferedRandomAccessFile</code> is like a
  * <code>RandomAccessFile</code>, but it uses a private buffer so that most
  * operations do not require a disk access.
- * <P>
  *
  * Note: The operations on this class are unmonitored. Also, the correct
  * functioning of the <code>RandomAccessFile</code> methods that are not
  * overridden here relies on the implementation of those methods in the
  * superclass.
- * Author : Avinash Lakshman ( alakshman@facebook.com) & Prashant Malik ( pmalik@facebook.com )
+ * Author : Avinash Lakshman ( alakshman@facebook.com) &amp; Prashant Malik ( pmalik@facebook.com )
  */
 
 public class BufferedRandomAccessFile extends RandomAccessFile
@@ -209,7 +208,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile
     /*
      * This method positions <code>this.curr</code> at position <code>pos</code>.
      * If <code>pos</code> does not fall in the current buffer, it flushes the
-     * current buffer and loads the correct one.<p>
+     * current buffer and loads the correct one.
      *
      * On exit from this routine <code>this.curr == this.hi</code> iff <code>pos</code>
      * is at or past the end-of-file, which can only happen if the file was

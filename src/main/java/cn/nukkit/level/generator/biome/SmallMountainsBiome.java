@@ -1,7 +1,7 @@
 package cn.nukkit.level.generator.biome;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SmallMountainsBiome extends MountainsBiome {

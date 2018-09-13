@@ -4,7 +4,7 @@ import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.utils.Binary;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SetEntityDataPacket extends DataPacket {

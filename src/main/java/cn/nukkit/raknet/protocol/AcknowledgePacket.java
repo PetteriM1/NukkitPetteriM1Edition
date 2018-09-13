@@ -6,7 +6,7 @@ import cn.nukkit.utils.BinaryStream;
 import java.util.TreeMap;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class AcknowledgePacket extends Packet {

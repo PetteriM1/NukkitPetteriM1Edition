@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockRedstoneWire extends BlockFlowable {

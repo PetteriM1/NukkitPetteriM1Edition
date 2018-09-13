@@ -6,7 +6,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class PopulatorGrass extends Populator {

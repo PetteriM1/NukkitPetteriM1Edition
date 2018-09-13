@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class Packet implements Cloneable {

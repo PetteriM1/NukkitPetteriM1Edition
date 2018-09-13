@@ -5,7 +5,7 @@ import java.nio.ByteOrder;
 import java.util.zip.CRC32;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class NukkitRandom {

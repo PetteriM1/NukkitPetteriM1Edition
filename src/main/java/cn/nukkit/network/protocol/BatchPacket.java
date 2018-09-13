@@ -3,7 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.network.CacheEncapsulatedPacket;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BatchPacket extends DataPacket {

@@ -7,7 +7,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockWater extends BlockLiquid {

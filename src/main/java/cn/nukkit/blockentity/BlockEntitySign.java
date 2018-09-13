@@ -10,7 +10,7 @@ import cn.nukkit.utils.TextFormat;
 import java.util.Objects;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockEntitySign extends BlockEntitySpawnable {

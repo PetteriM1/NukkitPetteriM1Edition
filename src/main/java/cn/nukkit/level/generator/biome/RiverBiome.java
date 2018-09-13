@@ -6,7 +6,7 @@ import cn.nukkit.level.generator.populator.PopulatorTallGrass;
 import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class RiverBiome extends WateryBiome {

@@ -8,7 +8,7 @@ import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.lang.TranslationContainer;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BanCommand extends VanillaCommand {

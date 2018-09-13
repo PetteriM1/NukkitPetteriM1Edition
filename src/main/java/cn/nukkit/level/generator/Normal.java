@@ -15,10 +15,10 @@ import java.util.*;
 
 /**
  * This generator was written by Creeperface and Nycuro
- * <p>
+ * 
  * The following classes are theirs and are intended for NUKKIT USAGE and should not be copied/translated to other software
  * such as BukkitPE, ClearSky, Genisys , Pocketmine-MP
- * <p>
+ * 
  * Normal.java
  * MushroomPopulator.java
  * DarkOakTreePopulator.java
@@ -33,7 +33,7 @@ import java.util.*;
  * MushroomIsland.java
  * TreeGenerator.java
  * HugeTreesGenerator.java
- * <p>
+ * 
  * Created by CreeperFace on 26. 10. 2016.
  */
 public class Normal extends Generator {
@@ -180,11 +180,11 @@ public class Normal extends Generator {
         PopulatorCaves caves = new PopulatorCaves();
         this.populators.add(caves);
 
-        PopulatorRavines ravines = new PopulatorRavines();
-        this.populators.add(ravines);
+        //PopulatorRavines ravines = new PopulatorRavines();
+        //this.populators.add(ravines); //FIXME
 
-//        PopulatorDungeon dungeons = new PopulatorDungeon();
-//        this.populators.add(dungeons);
+        //PopulatorDungeon dungeons = new PopulatorDungeon();
+        //this.populators.add(dungeons);
 
         PopulatorGroundCover cover = new PopulatorGroundCover();
         this.generationPopulators.add(cover);
@@ -330,7 +330,6 @@ public class Normal extends Generator {
         for (Populator populator : this.generationPopulators) {
             populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom);
         }
-
     }
 
     @Override

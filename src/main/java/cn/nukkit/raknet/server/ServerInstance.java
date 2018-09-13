@@ -3,7 +3,7 @@ package cn.nukkit.raknet.server;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface ServerInstance {

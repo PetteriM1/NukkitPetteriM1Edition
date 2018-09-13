@@ -7,7 +7,7 @@ import cn.nukkit.network.protocol.BlockEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ChestInventory extends ContainerInventory {

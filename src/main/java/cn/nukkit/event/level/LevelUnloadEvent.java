@@ -5,7 +5,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.level.Level;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class LevelUnloadEvent extends LevelEvent implements Cancellable {

@@ -6,7 +6,7 @@ import cn.nukkit.block.BlockGrass;
 import cn.nukkit.block.BlockSnowLayer;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class SnowyBiome extends NormalBiome {

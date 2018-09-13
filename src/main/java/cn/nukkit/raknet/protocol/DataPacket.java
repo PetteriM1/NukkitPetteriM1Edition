@@ -5,7 +5,7 @@ import cn.nukkit.utils.Binary;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class DataPacket extends Packet {

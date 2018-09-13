@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class BaseFullChunk implements FullChunk, ChunkManager {

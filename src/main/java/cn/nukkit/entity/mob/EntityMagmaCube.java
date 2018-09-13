@@ -115,4 +115,9 @@ public class EntityMagmaCube extends EntityJumpingMob {
     public int getKillExperience() {
         return 4;
     }
+
+    @Override
+    public String getName() {
+        return "Magma Cube";
+    }
 }

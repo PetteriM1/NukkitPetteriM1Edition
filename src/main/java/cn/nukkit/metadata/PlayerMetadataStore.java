@@ -3,7 +3,7 @@ package cn.nukkit.metadata;
 import cn.nukkit.IPlayer;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PlayerMetadataStore extends MetadataStore {

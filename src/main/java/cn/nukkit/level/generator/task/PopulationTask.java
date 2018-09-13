@@ -8,7 +8,7 @@ import cn.nukkit.level.generator.SimpleChunkManager;
 import cn.nukkit.scheduler.AsyncTask;
 
 /**
-* author: MagicDroidX
+* @author MagicDroidX
 * Nukkit Project
 */
 public class PopulationTask extends AsyncTask {

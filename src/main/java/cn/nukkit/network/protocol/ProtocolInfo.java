@@ -1,7 +1,7 @@
 package cn.nukkit.network.protocol;
 
 /**
- * author: MagicDroidX & iNevet
+ * @author MagicDroidX &amp; iNevet
  * Nukkit Project
  */
 public interface ProtocolInfo {

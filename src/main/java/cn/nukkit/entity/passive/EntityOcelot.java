@@ -63,10 +63,6 @@ public class EntityOcelot extends EntityWalkingAnimal {
         return false;
     }
 
-    public Item[] getDrops() {
-        return new Item[0];
-    }
-
     public int getKillExperience() {
         return EntityUtils.rand(1, 4);
     }

@@ -16,7 +16,7 @@ import cn.nukkit.nbt.tag.Tag;
 import java.util.Map;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockFurnaceBurning extends BlockSolidMeta {

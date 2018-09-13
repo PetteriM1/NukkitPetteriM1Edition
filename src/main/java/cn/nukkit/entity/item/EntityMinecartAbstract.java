@@ -34,7 +34,7 @@ import java.util.Objects;
 
 /**
  * Created by: larryTheCoder on 2017/6/26.
- * <p>
+ * 
  * Nukkit Project,
  * Minecart and Riding Project,
  * Package cn.nukkit.entity.item in project Nukkit.

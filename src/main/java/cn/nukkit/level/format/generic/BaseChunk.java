@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 

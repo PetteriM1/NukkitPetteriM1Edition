@@ -13,7 +13,7 @@ import co.aikar.timings.Timings;
 import java.util.*;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class Command {
@@ -100,6 +100,7 @@ public abstract class Command {
      * Generates modified command data for the specified player
      * for AvailableCommandsPacket.
      *
+     * @param player player
      * @return CommandData|null
      */
     public CommandDataVersions generateCustomCommandData(Player player) {
@@ -242,7 +243,7 @@ public abstract class Command {
         this.usageMessage = usageMessage;
     }
 
-    public static final CommandData generateDefaultData() {
+    public static CommandData generateDefaultData() {
         return defaultDataTemplate.clone();
     }
 
@@ -253,9 +254,9 @@ public abstract class Command {
     public static void broadcastCommandMessage(CommandSender source, String message, boolean sendToSource) {
         Set<Permissible> users = source.getServer().getPluginManager().getPermissionSubscriptions(Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
 
-        TranslationContainer result = new TranslationContainer("chat.type.admin", new String[]{source.getName(), message});
+        TranslationContainer result = new TranslationContainer("chat.type.admin", source.getName(), message);
 
-        TranslationContainer colored = new TranslationContainer(TextFormat.GRAY + "" + TextFormat.ITALIC + "%chat.type.admin", new String[]{source.getName(), message});
+        TranslationContainer colored = new TranslationContainer(TextFormat.GRAY + "" + TextFormat.ITALIC + "%chat.type.admin", source.getName(), message);
 
         if (sendToSource && !(source instanceof ConsoleCommandSender)) {
             source.sendMessage(message);

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface FullChunk extends Cloneable {

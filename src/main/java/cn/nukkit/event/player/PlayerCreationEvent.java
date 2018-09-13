@@ -6,7 +6,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.network.SourceInterface;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PlayerCreationEvent extends Event {

@@ -4,7 +4,7 @@ import cn.nukkit.blockentity.BlockEntityFurnace;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class FurnaceInventory extends ContainerInventory {

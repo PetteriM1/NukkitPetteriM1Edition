@@ -6,7 +6,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockRedstoneTorch extends BlockTorch {

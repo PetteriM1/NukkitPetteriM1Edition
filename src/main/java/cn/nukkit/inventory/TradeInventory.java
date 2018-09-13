@@ -6,7 +6,7 @@ import cn.nukkit.item.Item;
 import java.util.Map;
 
 /**
- * author: NycuRO
+ * @author NycuRO
  * NukkitX Project
  */
 public class TradeInventory extends ContainerInventory {

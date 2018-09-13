@@ -24,11 +24,6 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "WitherSkeleton";
-    }
-
-    @Override
     protected void initEntity() {
         super.initEntity();
 
@@ -69,5 +64,10 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return 5;
+    }
+
+    @Override
+    public String getName() {
+        return "Wither Skeleton";
     }
 }

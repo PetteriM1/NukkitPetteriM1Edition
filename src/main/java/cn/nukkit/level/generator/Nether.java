@@ -38,7 +38,6 @@ public class Nether extends Generator {
     }
 
     public Nether(Map<String, Object> options) {
-        //Nothing here. Just used for future update.
     }
 
     @Override

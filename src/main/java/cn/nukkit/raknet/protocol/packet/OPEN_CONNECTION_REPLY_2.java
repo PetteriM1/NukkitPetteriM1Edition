@@ -6,7 +6,7 @@ import cn.nukkit.raknet.protocol.Packet;
 import java.net.InetSocketAddress;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class OPEN_CONNECTION_REPLY_2 extends Packet {

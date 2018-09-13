@@ -30,11 +30,6 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
     }
 
     @Override
-    public String getName() {
-        return "Wither";
-    }
-
-    @Override
     public float getWidth() {
         return 0.9f;
     }

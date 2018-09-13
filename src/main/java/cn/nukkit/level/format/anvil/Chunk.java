@@ -21,7 +21,7 @@ import java.nio.ByteOrder;
 import java.util.*;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Chunk extends BaseChunk {

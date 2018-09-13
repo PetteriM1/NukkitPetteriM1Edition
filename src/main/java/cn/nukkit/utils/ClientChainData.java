@@ -20,14 +20,14 @@ import java.util.*;
 
 /**
  * ClientChainData is a container of chain data sent from clients.
- * <p>
+ * 
  * Device information such as client UUID, xuid and serverAddress, can be
  * read from instances of this object.
- * <p>
+ * 
  * To get chain data, you can use player.getLoginChainData() or read(loginPacket)
- * <p>
+ * 
  * ===============
- * author: boybook
+ * @author boybook
  * Nukkit Project
  * ===============
  */

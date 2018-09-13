@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockDoorWood;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemDoorWood extends Item {

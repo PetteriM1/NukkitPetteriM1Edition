@@ -8,7 +8,7 @@ import cn.nukkit.math.NukkitRandom;
 public class PopulatorLilyPad extends Populator {
 
     /**
-     * Author: Niall Lindsay <Niall7459>
+     * @author Niall Lindsay (Niall7459)
      */
 
     private ChunkManager level;

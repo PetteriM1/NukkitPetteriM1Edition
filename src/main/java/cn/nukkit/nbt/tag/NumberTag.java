@@ -1,7 +1,7 @@
 package cn.nukkit.nbt.tag;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class NumberTag<T extends Number> extends Tag {

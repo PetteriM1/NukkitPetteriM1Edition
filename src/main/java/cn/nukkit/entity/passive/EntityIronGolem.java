@@ -122,4 +122,9 @@ public class EntityIronGolem extends EntityWalkingMob {
     public int getKillExperience() {
         return 0;
     }
+
+    @Override
+    public String getName() {
+        return "Iron Golem";
+    }
 }

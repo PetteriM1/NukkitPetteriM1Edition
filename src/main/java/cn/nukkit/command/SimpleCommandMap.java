@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SimpleCommandMap implements CommandMap {

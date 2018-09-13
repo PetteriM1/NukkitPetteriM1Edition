@@ -14,7 +14,7 @@ import cn.nukkit.potion.Effect;
 import java.util.Map;
 
 /**
- * author: Rover656
+ * @author Rover656
  */
 public class BlockEntityBeacon extends BlockEntitySpawnable implements InventoryHolder {
 

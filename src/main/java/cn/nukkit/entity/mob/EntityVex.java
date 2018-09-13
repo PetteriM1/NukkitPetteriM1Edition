@@ -44,11 +44,6 @@ public class EntityVex extends EntityFlyingMob {
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[0];
-    }
-
-    @Override
     public int getKillExperience() {
         return 3;
     }

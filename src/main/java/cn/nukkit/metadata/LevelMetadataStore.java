@@ -3,7 +3,7 @@ package cn.nukkit.metadata;
 import cn.nukkit.level.Level;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class LevelMetadataStore extends MetadataStore {

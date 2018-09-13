@@ -2,7 +2,7 @@ package cn.nukkit.level.generator.biome;
 
 /**
  * Nukkit Project
- * Author: MagicDroidX
+ * @author MagicDroidX
  */
 public interface CaveBiome {
     int getStoneBlock();

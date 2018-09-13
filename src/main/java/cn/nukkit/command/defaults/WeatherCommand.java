@@ -8,7 +8,7 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class WeatherCommand extends VanillaCommand {

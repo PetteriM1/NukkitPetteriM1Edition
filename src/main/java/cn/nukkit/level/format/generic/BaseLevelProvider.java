@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class BaseLevelProvider implements LevelProvider {

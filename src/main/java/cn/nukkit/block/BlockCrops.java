@@ -12,7 +12,7 @@ import cn.nukkit.utils.BlockColor;
 import java.util.Random;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class BlockCrops extends BlockFlowable {

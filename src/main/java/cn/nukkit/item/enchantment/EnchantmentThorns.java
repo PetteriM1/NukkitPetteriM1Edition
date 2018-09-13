@@ -9,7 +9,7 @@ import cn.nukkit.item.Item;
 import java.util.Random;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EnchantmentThorns extends Enchantment {

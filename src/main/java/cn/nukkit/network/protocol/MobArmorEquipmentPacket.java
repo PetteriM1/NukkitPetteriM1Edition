@@ -3,7 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class MobArmorEquipmentPacket extends DataPacket {

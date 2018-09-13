@@ -7,7 +7,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.awt.*;
 
 /**
- * author: CreeperFace
+ * @author CreeperFace
  * Nukkit Project
  */
 public class BlockEntityCauldron extends BlockEntitySpawnable {

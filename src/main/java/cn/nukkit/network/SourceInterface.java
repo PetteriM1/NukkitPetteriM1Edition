@@ -5,7 +5,7 @@ import cn.nukkit.network.protocol.DataPacket;
 
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface SourceInterface {

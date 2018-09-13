@@ -3,7 +3,7 @@ package cn.nukkit.entity.data;
 import java.util.Objects;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class EntityData<T> {

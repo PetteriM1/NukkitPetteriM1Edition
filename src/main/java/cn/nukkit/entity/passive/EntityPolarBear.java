@@ -27,11 +27,6 @@ public class EntityPolarBear extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "PolarBear";
-    }
-
-    @Override
     public float getWidth() {
         if (this.isBaby()) {
             return 0.65f;
@@ -161,5 +156,10 @@ public class EntityPolarBear extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return EntityUtils.rand(1, 3);
+    }
+
+    @Override
+    public String getName() {
+        return "Polar Bear";
     }
 }

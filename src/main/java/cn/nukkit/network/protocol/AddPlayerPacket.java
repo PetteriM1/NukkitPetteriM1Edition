@@ -7,7 +7,7 @@ import cn.nukkit.utils.Binary;
 import java.util.UUID;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class AddPlayerPacket extends DataPacket {

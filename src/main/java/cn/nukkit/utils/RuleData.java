@@ -1,7 +1,7 @@
 package cn.nukkit.utils;
 
 /**
- * author: boybook
+ * @author boybook
  * Nukkit Project
  */
 public class RuleData {

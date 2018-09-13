@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockPotato;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemPotato extends ItemEdible {

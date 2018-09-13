@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 /**
  * @author Tee7even
- *         <p>
+ *         
  *         Various methods for more compact JSON object constructing
  */
 @SuppressWarnings("unchecked")

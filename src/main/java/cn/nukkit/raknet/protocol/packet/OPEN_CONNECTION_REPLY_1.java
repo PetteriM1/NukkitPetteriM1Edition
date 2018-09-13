@@ -4,7 +4,7 @@ import cn.nukkit.raknet.RakNet;
 import cn.nukkit.raknet.protocol.Packet;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class OPEN_CONNECTION_REPLY_1 extends Packet {

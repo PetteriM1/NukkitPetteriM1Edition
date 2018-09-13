@@ -10,7 +10,7 @@ import cn.nukkit.event.potion.PotionApplyEvent;
 import cn.nukkit.utils.ServerException;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Potion implements Cloneable {

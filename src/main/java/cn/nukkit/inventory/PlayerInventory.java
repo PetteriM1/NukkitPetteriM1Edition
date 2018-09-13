@@ -19,7 +19,7 @@ import cn.nukkit.network.protocol.types.ContainerIds;
 import java.util.Collection;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PlayerInventory extends BaseInventory {

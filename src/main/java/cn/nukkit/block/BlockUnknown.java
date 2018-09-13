@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockUnknown extends BlockMeta {

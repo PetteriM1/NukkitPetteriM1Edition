@@ -133,6 +133,7 @@ public class EntityEvoker extends EntityWalkingMob {
             for (int i = 0; i < emerald; i++) {
                 drops.add(Item.get(Item.EMERALD, 0, 1));
             }
+            drops.add(Item.get(Item.TOTEM, 0, 1));
         }
         return drops.toArray(new Item[drops.size()]);
     }

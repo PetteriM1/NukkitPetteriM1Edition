@@ -3,7 +3,7 @@ package cn.nukkit.level.format;
 import cn.nukkit.block.Block;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface ChunkSection {

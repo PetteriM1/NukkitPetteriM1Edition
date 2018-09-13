@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class AvailableCommandsPacket extends DataPacket {

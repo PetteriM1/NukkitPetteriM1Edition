@@ -2,7 +2,7 @@ package cn.nukkit.network.protocol;
 
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class UpdateBlockPacket extends DataPacket {

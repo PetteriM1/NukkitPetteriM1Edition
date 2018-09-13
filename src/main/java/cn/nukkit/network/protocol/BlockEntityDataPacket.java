@@ -3,7 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.math.BlockVector3;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockEntityDataPacket extends DataPacket {

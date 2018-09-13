@@ -43,4 +43,9 @@ public class EntityEnderDragon extends EntityFlyingMob {
     public void attackEntity(Entity player) {
         //TODO
     }
+
+    @Override
+    public String getName() {
+        return "Ender Dragon";
+    }
 }

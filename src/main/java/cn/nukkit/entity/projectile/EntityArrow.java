@@ -6,7 +6,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EntityArrow extends EntityProjectile {

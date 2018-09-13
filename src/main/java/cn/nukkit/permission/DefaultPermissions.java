@@ -3,7 +3,7 @@ package cn.nukkit.permission;
 import cn.nukkit.Server;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class DefaultPermissions {

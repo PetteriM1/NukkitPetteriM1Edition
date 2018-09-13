@@ -6,7 +6,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.level.MovingObjectPosition;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ProjectileHitEvent extends EntityEvent implements Cancellable {

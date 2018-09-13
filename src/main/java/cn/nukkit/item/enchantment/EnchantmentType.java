@@ -6,7 +6,7 @@ import cn.nukkit.item.ItemBow;
 import cn.nukkit.item.ItemFishingRod;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public enum EnchantmentType {

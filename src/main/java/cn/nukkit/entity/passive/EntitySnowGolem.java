@@ -110,4 +110,9 @@ public class EntitySnowGolem extends EntityWalkingMob {
     public int getKillExperience() {
         return 0;
     }
+
+    @Override
+    public String getName() {
+        return "Snow Golem";
+    }
 }

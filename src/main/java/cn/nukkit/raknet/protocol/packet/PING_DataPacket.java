@@ -3,7 +3,7 @@ package cn.nukkit.raknet.protocol.packet;
 import cn.nukkit.raknet.protocol.Packet;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PING_DataPacket extends Packet {

@@ -179,4 +179,9 @@ public class EntityZombiePigman extends EntityWalkingMob {
     public int getKillExperience() {
         return 5;
     }
+
+    @Override
+    public String getName() {
+        return "Zombie Pigman";
+    }
 }

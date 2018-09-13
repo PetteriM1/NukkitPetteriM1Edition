@@ -3,7 +3,7 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.utils.RuleData;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class GameRulesChangedPacket extends DataPacket {

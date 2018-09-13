@@ -1,7 +1,7 @@
 package cn.nukkit.utils;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EventException extends RuntimeException {

@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class Enchantment implements Cloneable {
@@ -53,6 +53,13 @@ public abstract class Enchantment implements Cloneable {
     public static final int ID_FORTUNE_FISHING = 23;
     public static final int ID_LURE = 24;
     public static final int ID_MENDING = 26;
+    public static final int ID_BINDING_CURSE = 27;
+    public static final int ID_VANISHING_CURSE = 28;
+    public static final int ID_IMPALING = 29;
+    public static final int ID_RIPTIDE = 30;
+    public static final int ID_LOYALTY = 31;
+    public static final int ID_CHANNELING = 32;
+    public static final int ID_SWEEPING = 33;
 
     public static void init() {
         enchantments = new Enchantment[256];

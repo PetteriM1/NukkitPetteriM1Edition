@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit
  */
 public class Config {

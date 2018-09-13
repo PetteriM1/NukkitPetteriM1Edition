@@ -9,7 +9,7 @@ import cn.nukkit.math.NukkitRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockOreCoal extends BlockSolid {

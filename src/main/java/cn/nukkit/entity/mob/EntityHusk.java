@@ -30,11 +30,6 @@ public class EntityHusk extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "Husk";
-    }
-
-    @Override
     public float getWidth() {
         return 0.6f;
     }

@@ -7,7 +7,7 @@ import cn.nukkit.level.generator.populator.PopulatorSugarcane;
 import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 
 /**
- * Author: PeratX
+ * @author PeratX
  * Nukkit Project
  */
 public class BeachBiome extends SandyBiome {

@@ -25,11 +25,6 @@ public class EntityVillager extends EntityWalkingAnimal {
     }
 
     @Override
-    public String getName() {
-        return "Villager";
-    }
-
-    @Override
     public float getWidth() {
         if (this.isBaby()) {
             return 0.3f;

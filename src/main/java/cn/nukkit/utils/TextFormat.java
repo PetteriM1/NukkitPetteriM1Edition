@@ -187,7 +187,7 @@ public enum TextFormat {
      * character. The alternate format code character will only be replaced if
      * it is immediately followed by 0-9, A-F, a-f, K-O, k-o, R or r.
      *
-     * @param altFormatChar   The alternate format code character to replace. Ex: &amp;
+     * @param altFormatChar   The alternate format code character to replace. Ex: &amp;amp;
      * @param textToTranslate Text containing the alternate format code character.
      * @return Text containing the TextFormat.ESCAPE format code character.
      */

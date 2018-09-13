@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class AnvilInventory extends ContainerInventory {

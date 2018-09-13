@@ -3,7 +3,7 @@ package cn.nukkit.level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface ChunkManager {

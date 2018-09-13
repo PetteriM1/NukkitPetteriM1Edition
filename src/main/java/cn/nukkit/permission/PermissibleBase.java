@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PermissibleBase implements Permissible {

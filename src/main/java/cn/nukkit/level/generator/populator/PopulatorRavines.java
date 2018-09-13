@@ -16,7 +16,7 @@ public class PopulatorRavines extends Populator {
     private long worldLong1;
     private long worldLong2;
 
-    private int ravineRarity = 1;//2
+    private int ravineRarity = 1;
     private int ravineMinAltitude = 20;
     private int ravineMaxAltitude = 67;
     private int ravineMinLength = 84;
@@ -37,18 +37,18 @@ public class PopulatorRavines extends Populator {
 
         int i = this.checkAreaSize;
 
-        for (int x = chunkX - i; x <= chunkX + i; x++)
+        for (int x = chunkX - i; x <= chunkX + i; x++) {
             for (int z = chunkZ - i; z <= chunkZ + i; z++) {
                 long l3 = x * worldLong1;
                 long l4 = z * worldLong2;
                 this.random.setSeed(l3 ^ l4 ^ level.getSeed());
                 generateChunk(chunkX, chunkZ, level.getChunk(chunkX, chunkZ));
             }
+        }
     }
 
     protected void generateChunk(int chunkX, int chunkZ, FullChunk generatingChunkBuffer) {
-        if (this.random.nextInt(300) >= this.ravineRarity)
-            return;
+        if (this.random.nextInt(300) >= this.ravineRarity) return;
         double d1 = (chunkX * 16) + this.random.nextInt(16);
         double d2 = numberInRange(random, this.ravineMinAltitude, this.ravineMaxAltitude);
         double d3 = (chunkZ * 16) + this.random.nextInt(16);
@@ -66,8 +66,7 @@ public class PopulatorRavines extends Populator {
         }
     }
 
-    protected void createRavine(long paramLong, FullChunk generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3,
-                                float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4) {
+    protected void createRavine(long paramLong, FullChunk generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4) {
         Random localRandom = new Random(paramLong);
 
         int chunkX = generatingChunkBuffer.getX();
@@ -83,8 +82,7 @@ public class PopulatorRavines extends Populator {
 
         float f3 = 1.0F;
         for (int j = 0; ; j++) {
-            if (j >= worldHeightCap)
-                break;
+            if (j >= worldHeightCap) break;
             if ((j == 0) || (localRandom.nextInt(3) == 0)) {
                 f3 = 1.0F + localRandom.nextFloat() * localRandom.nextFloat() * 1.0F;
             }
@@ -114,19 +112,14 @@ public class PopulatorRavines extends Populator {
             f2 += (localRandom.nextFloat() - localRandom.nextFloat()) * localRandom.nextFloat() * 2.0F;
             f1 += (localRandom.nextFloat() - localRandom.nextFloat()) * localRandom.nextFloat() * 4.0F;
 
-            if ((i == 0) && (localRandom.nextInt(4) == 0)) {
-                continue;
-            }
+            if ((i == 0) && (localRandom.nextInt(4) == 0)) continue;
             double d5 = paramDouble1 - d1;
             double d6 = paramDouble3 - d2;
             double d7 = size - stepCount;
             double d8 = paramFloat1 + 2.0F + 16.0F;
-            if (d5 * d5 + d6 * d6 - d7 * d7 > d8 * d8) {
-                return;
-            }
+            if (d5 * d5 + d6 * d6 - d7 * d7 > d8 * d8) return;
 
-            if ((paramDouble1 < d1 - 16.0D - d3 * 2.0D) || (paramDouble3 < d2 - 16.0D - d3 * 2.0D) || (paramDouble1 > d1 + 16.0D + d3 * 2.0D) || (paramDouble3 > d2 + 16.0D + d3 * 2.0D))
-                continue;
+            if ((paramDouble1 < d1 - 16.0D - d3 * 2.0D) || (paramDouble3 < d2 - 16.0D - d3 * 2.0D) || (paramDouble1 > d1 + 16.0D + d3 * 2.0D) || (paramDouble3 > d2 + 16.0D + d3 * 2.0D)) continue;
             int k = MathHelper.floor(paramDouble1 - d3) - (chunkX * 16) - 1;
             int m = MathHelper.floor(paramDouble1 + d3) - (chunkZ * 16) + 1;
 
@@ -136,42 +129,29 @@ public class PopulatorRavines extends Populator {
             int i2 = MathHelper.floor(paramDouble3 - d3) - (chunkX * 16) - 1;
             int i3 = MathHelper.floor(paramDouble3 + d3) - (chunkZ * 16) + 1;
 
-            if (k < 0)
-                k = 0;
-            if (m > 16)
-                m = 16;
+            if (k < 0) k = 0;
+            if (m > 16) m = 16;
 
-            if (maxY < 1)
-                maxY = 1;
-            if (minY > this.worldHeightCap - 8)
-                minY = this.worldHeightCap - 8;
+            if (maxY < 1) maxY = 1;
+            if (minY > this.worldHeightCap - 8) minY = this.worldHeightCap - 8;
 
-            if (i2 < 0)
-                i2 = 0;
-            if (i3 > 16)
-                i3 = 16;
+            if (i2 < 0) i2 = 0;
+            if (i3 > 16) i3 = 16;
 
             int i4 = 0;
             for (int localX = k; (i4 == 0) && (localX < m); localX++) {
                 for (int localZ = i2; (i4 == 0) && (localZ < i3); localZ++) {
                     for (int localY = minY + 1; (i4 == 0) && (localY >= maxY - 1); localY--) {
-                        if (localY < 0)
-                            continue;
+                        if (localY < 0) continue;
                         if (localY < this.worldHeightCap) {
                             int materialAtPosition = generatingChunkBuffer.getBlockId(localX, localY, localZ);
-                            if (materialAtPosition == Block.WATER
-                                    || materialAtPosition == Block.STILL_WATER) {
-                                i4 = 1;
-                            }
-                            if ((localY != maxY - 1) && (localX != k) && (localX != m - 1) && (localZ != i2) && (localZ != i3 - 1))
-                                localY = maxY;
+                            if (materialAtPosition == Block.WATER || materialAtPosition == Block.STILL_WATER) i4 = 1;
+                            if ((localY != maxY - 1) && (localX != k) && (localX != m - 1) && (localZ != i2) && (localZ != i3 - 1)) localY = maxY;
                         }
                     }
                 }
             }
-            if (i4 != 0) {
-                continue;
-            }
+            if (i4 != 0) continue;
             for (int localX = k; localX < m; localX++) {
                 double d9 = (localX + (chunkX * 16) + 0.5D - paramDouble1) / d3;
                 for (int localZ = i2; localZ < i3; localZ++) {
@@ -180,21 +160,17 @@ public class PopulatorRavines extends Populator {
                         for (int localY = minY; localY >= maxY; localY--) {
                             double d11 = ((localY - 1) + 0.5D - paramDouble2) / d4;
                             if ((d9 * d9 + d10 * d10) * this.a[localY - 1] + d11 * d11 / 6.0D < 1.0D) {
-                                int material = generatingChunkBuffer.getBlockId(localX, localY, localZ);
-                                if (material == Block.GRASS) {
-                                    if (localY - 1 < 10) {
-                                        generatingChunkBuffer.setBlock(localX, localY, localZ, Block.LAVA);
-                                    } else {
-                                        generatingChunkBuffer.setBlock(localX, localY, localZ, Block.AIR);
-                                    }
+                                if (localY - 1 < 10) {
+                                    generatingChunkBuffer.setBlock(localX, localY, localZ, Block.LAVA);
+                                } else {
+                                    generatingChunkBuffer.setBlock(localX, localY, localZ, Block.AIR);
                                 }
                             }
                         }
                     }
                 }
             }
-            if (i != 0)
-                break;
+            if (i != 0) break;
         }
     }
 

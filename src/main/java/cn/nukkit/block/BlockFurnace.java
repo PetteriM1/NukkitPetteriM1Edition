@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockFurnace extends BlockFurnaceBurning {

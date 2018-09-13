@@ -10,7 +10,7 @@ import cn.nukkit.level.generator.populator.PopulatorLilyPad;
 import cn.nukkit.level.generator.populator.tree.SwampTreePopulator;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SwampBiome extends GrassyBiome {

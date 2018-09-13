@@ -8,7 +8,7 @@ import cn.nukkit.utils.BlockColor;
 import java.util.Random;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockGravel extends BlockFallable {

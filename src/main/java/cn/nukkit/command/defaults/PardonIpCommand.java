@@ -8,7 +8,7 @@ import cn.nukkit.lang.TranslationContainer;
 import java.util.regex.Pattern;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PardonIpCommand extends VanillaCommand {

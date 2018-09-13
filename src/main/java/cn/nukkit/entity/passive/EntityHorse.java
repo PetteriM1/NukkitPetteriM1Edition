@@ -58,34 +58,18 @@ public class EntityHorse extends EntityTameableAnimal {
     public void initEntity() {
         super.initEntity();
         this.setMaxHealth(15);
-        /*if (this instanceof EntityDonkey) {
-                this.Type = 1;
-            }else if (this instanceof EntityMule) {
-                this.Type = 2;
-            }else if (this instanceof EntityZombieHorse) {
-                this.Type = 3;
-            }else if (this instanceof EntitySkeletonHorse) {
-                this.Type = 4;
-            }else{
-                this.Type = 0;
-            }
-            if (this.namedTag.contains("Variant")) {
-                this.Variant = this.namedTag.getInt("Variant");
-            }else{
-                this.Variant = this.getRandomVariant();
-            }*/ //TODO: Fix this
+    }
 
-        }
-        @Override
-        public void saveNBT() {
-            super.saveNBT();
-            this.namedTag.putByte("Type", this.Type);
-            this.namedTag.putInt("Variant", this.Variant);
-        }
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putByte("Type", this.Type);
+        this.namedTag.putInt("Variant", this.Variant);
+    }
 
-        @Override
-        public boolean onInteract(Player player, Item item) {
-            return false;
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        return false;
     }
 
     @Override
@@ -94,12 +78,12 @@ public class EntityHorse extends EntityTameableAnimal {
             Player player = (Player) creature;
             return player.spawned && player.isAlive() && !player.closed
                     && (player.getInventory().getItemInHand().getId() == Item.WHEAT
-                    || player.getInventory().getItemInHand().getId() == Item.APPLE
-                    || player.getInventory().getItemInHand().getId() == Item.HAY_BALE
-                    || player.getInventory().getItemInHand().getId() == Item.GOLDEN_APPLE
-                    || player.getInventory().getItemInHand().getId() == Item.SUGAR
-                    || player.getInventory().getItemInHand().getId() == Item.BREAD
-                    || player.getInventory().getItemInHand().getId() == Item.GOLDEN_CARROT)
+                            || player.getInventory().getItemInHand().getId() == Item.APPLE
+                            || player.getInventory().getItemInHand().getId() == Item.HAY_BALE
+                            || player.getInventory().getItemInHand().getId() == Item.GOLDEN_APPLE
+                            || player.getInventory().getItemInHand().getId() == Item.SUGAR
+                            || player.getInventory().getItemInHand().getId() == Item.BREAD
+                            || player.getInventory().getItemInHand().getId() == Item.GOLDEN_CARROT)
                     && distance <= 40;
         }
         return false;
@@ -140,13 +124,8 @@ public class EntityHorse extends EntityTameableAnimal {
     }
 
     private int getRandomVariant() {
-        int VariantList[] = {
-                0,1,2,3,4,5,6,
-                256,257,258,259,260,261,262,
-                512,513,514,515,516,517,518,
-                768,769,770,771,772,773,774,
-                1024,1025,1026,1027,1028,1029,1030
-        };
-        return VariantList[EntityUtils.rand(0,VariantList.length)];
+        int VariantList[] = { 0, 1, 2, 3, 4, 5, 6, 256, 257, 258, 259, 260, 261, 262, 512, 513, 514, 515, 516, 517, 518,
+                768, 769, 770, 771, 772, 773, 774, 1024, 1025, 1026, 1027, 1028, 1029, 1030 };
+        return VariantList[EntityUtils.rand(0, VariantList.length)];
     }
 }

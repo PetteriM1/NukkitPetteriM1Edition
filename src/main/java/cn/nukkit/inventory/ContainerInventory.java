@@ -10,7 +10,7 @@ import cn.nukkit.network.protocol.ContainerOpenPacket;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class ContainerInventory extends BaseInventory {

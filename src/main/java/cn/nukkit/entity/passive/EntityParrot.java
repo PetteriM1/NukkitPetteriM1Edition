@@ -23,10 +23,6 @@ public class EntityParrot extends EntityFlyingAnimal {
         return NETWORK_ID;
     }
 
-    public String getName() {
-        return "Parrot";
-    }
-
     @Override
     public float getWidth() {
         return 0.5f;

@@ -7,7 +7,7 @@ import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.math.NukkitRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PopulatorGroundCover extends Populator {

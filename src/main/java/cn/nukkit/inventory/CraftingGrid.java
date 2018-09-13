@@ -7,7 +7,7 @@ import cn.nukkit.utils.MainLogger;
 import java.util.HashMap;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class CraftingGrid extends BaseInventory {

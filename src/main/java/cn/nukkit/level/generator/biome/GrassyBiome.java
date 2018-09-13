@@ -5,7 +5,7 @@ import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockGrass;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class GrassyBiome extends NormalBiome implements CaveBiome {

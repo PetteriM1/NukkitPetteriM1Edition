@@ -5,9 +5,9 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * author: Box
+ * @author Box
  * Nukkit Project
- * <p>
+ * 
  * Called when a entity decides to explode
  */
 public class ExplosionPrimeEvent extends EntityEvent implements Cancellable {

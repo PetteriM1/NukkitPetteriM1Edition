@@ -7,7 +7,7 @@ import cn.nukkit.utils.Binary;
 import java.nio.charset.StandardCharsets;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ServerHandler {

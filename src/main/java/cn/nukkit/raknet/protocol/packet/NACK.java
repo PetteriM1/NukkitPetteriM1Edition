@@ -4,7 +4,7 @@ import cn.nukkit.raknet.protocol.AcknowledgePacket;
 import cn.nukkit.raknet.protocol.Packet;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class NACK extends AcknowledgePacket {

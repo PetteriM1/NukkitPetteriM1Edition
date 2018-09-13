@@ -14,7 +14,7 @@ import java.awt.*;
 /**
  * DummyBossBar
  * ===============
- * author: boybook
+ * @author boybook
  * Nukkit Project
  * ===============
  */

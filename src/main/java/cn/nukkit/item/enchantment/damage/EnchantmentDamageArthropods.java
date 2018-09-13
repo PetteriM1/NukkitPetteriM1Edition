@@ -7,7 +7,7 @@ import cn.nukkit.potion.Effect;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EnchantmentDamageArthropods extends EnchantmentDamage {

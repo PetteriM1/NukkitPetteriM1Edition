@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -40,12 +39,12 @@ public class EntityTropicalFish extends EntityFish {
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[0];
+    public int getKillExperience() {
+        return 0;
     }
 
     @Override
-    public int getKillExperience() {
-        return 0;
+    public String getName() {
+        return "Tropical Fish";
     }
 }

@@ -7,7 +7,7 @@ import io.netty.util.collection.CharObjectHashMap;
 import java.util.*;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ShapedRecipe implements CraftingRecipe {
@@ -24,16 +24,16 @@ public class ShapedRecipe implements CraftingRecipe {
     /**
      * Constructs a ShapedRecipe instance.
      *
-     * @param primaryResult
+     * @param primaryResult    Primary result of the recipe
      * @param shape<br>        Array of 1, 2, or 3 strings representing the rows of the recipe.
      *                         This accepts an array of 1, 2 or 3 strings. Each string should be of the same length and must be at most 3
      *                         characters long. Each character represents a unique type of ingredient. Spaces are interpreted as air.
-     * @param ingredients<br>  Char => Item map of items to be set into the shape.
+     * @param ingredients<br>  Char =&gt; Item map of items to be set into the shape.
      *                         This accepts an array of Items, indexed by character. Every unique character (except space) in the shape
      *                         array MUST have a corresponding item in this list. Space character is automatically treated as air.
      * @param extraResults<br> List of additional result items to leave in the crafting grid afterwards. Used for things like cake recipe
      *                         empty buckets.
-     *                         <p>
+     *                         
      *                         Note: Recipes **do not** need to be square. Do NOT add padding for empty rows/columns.
      */
     public ShapedRecipe(Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {

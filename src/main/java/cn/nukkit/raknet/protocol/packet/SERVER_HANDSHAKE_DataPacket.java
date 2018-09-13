@@ -5,7 +5,7 @@ import cn.nukkit.raknet.protocol.Packet;
 import java.net.InetSocketAddress;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SERVER_HANDSHAKE_DataPacket extends Packet {

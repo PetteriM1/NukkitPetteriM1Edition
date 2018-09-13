@@ -2,7 +2,6 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.EntityFlyingAnimal;
-import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -39,11 +38,6 @@ public class EntityBat extends EntityFlyingAnimal {
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
         return false;
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[0];
     }
 
     @Override

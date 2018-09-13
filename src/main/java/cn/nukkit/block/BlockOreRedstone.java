@@ -10,7 +10,7 @@ import cn.nukkit.math.NukkitRandom;
 import java.util.Random;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockOreRedstone extends BlockSolid {

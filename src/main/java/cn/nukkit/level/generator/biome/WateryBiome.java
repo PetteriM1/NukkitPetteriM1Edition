@@ -4,7 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDirt;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public abstract class WateryBiome extends NormalBiome implements CaveBiome {

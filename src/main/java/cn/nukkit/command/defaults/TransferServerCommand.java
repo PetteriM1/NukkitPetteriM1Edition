@@ -7,7 +7,7 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 
 /**
- * author: akkz
+ * @author akkz
  */
 public class TransferServerCommand extends VanillaCommand {
 

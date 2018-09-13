@@ -89,7 +89,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * author: MagicDroidX & Box
+ * @author MagicDroidX &amp; Box
  * Nukkit Project
  */
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
@@ -288,6 +288,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * This might disappear in the future.
      * Please use getUniqueId() instead (IP + clientId + name combo, in the future it'll change to real UUID for online auth)
+     * @return random client id
      */
     public Long getClientId() {
         return randomClientId;
@@ -1023,6 +1024,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * 0 is true
      * -1 is false
      * other is identifer
+     * @param packet packet to send
+     * @return packet successfully sent
      */
     public boolean dataPacket(DataPacket packet) {
         return this.dataPacket(packet, false) != -1;
@@ -1054,6 +1057,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * 0 is true
      * -1 is false
      * other is identifer
+     * @param packet packet to send
+     * @return packet successfully sent
      */
     public boolean directDataPacket(DataPacket packet) {
         return this.directDataPacket(packet, false) != -1;
@@ -3177,6 +3182,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Sends a chat message as this player. If the message begins with a / (forward-slash) it will be treated
      * as a command.
+     * @param message message to send
+     * @return successful
      */
     public boolean chat(String message) {
         if (!this.spawned || !this.isAlive()) {
@@ -3642,7 +3649,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case LAVA:
                     Block block = this.level.getBlock(new Vector3(this.x, this.y - 1, this.z));
                     if (block.getId() == Block.MAGMA) {
-                        message = "death.attack.lava.magma";
+                        message = "death.attack.magma";
                         break;
                     }
                     message = "death.attack.lava";
@@ -3953,6 +3960,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Drops an item on the ground in front of the player. Returns if the item drop was successful.
      *
+     * @param item to drop
      * @return bool if the item was dropped or if the item was null
      */
     public boolean dropItem(Item item) {
@@ -4178,6 +4186,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Shows a new FormWindow to the player
      * You can find out FormWindow result by listening to PlayerFormRespondedEvent
+     *
+     * @param window to show
+     * @return form id to use in {@link PlayerFormRespondedEvent}
      */
     public int showFormWindow(FormWindow window) {
         return showFormWindow(window, this.formWindowCount++);
@@ -4186,6 +4197,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Shows a new FormWindow to the player
      * You can find out FormWindow result by listening to PlayerFormRespondedEvent
+     *
+     * @param window to show
+     * @param id form id
+     * @return form id to use in {@link PlayerFormRespondedEvent}
      */
     public int showFormWindow(FormWindow window, int id) {
         if (this.forms.contains(this.getName())) return 0;
@@ -4202,6 +4217,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Shows a new setting page in game settings
      * You can find out settings result by listening to PlayerFormRespondedEvent
+     *
+     * @param window to show on settings page
+     * @return form id to use in {@link PlayerFormRespondedEvent}
      */
     public int addServerSettings(FormWindow window) {
         int id = this.formWindowCount++;

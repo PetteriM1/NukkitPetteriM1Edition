@@ -7,7 +7,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockBreakEvent extends BlockEvent implements Cancellable {

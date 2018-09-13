@@ -10,10 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * author: Angelic47
- * contributer: Niall Lindsay <Niall7459>
- * <p>
- * Nukkit Project
+ * @author Angelic47, Niall Lindsay (Niall7459)
  */
 
 public class PopulatorFlower extends Populator {

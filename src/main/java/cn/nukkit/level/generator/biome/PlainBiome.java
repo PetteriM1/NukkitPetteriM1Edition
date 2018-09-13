@@ -7,7 +7,7 @@ import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.*;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class PlainBiome extends GrassyBiome {

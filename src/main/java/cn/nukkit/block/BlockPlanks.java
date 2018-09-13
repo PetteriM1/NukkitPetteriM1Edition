@@ -4,7 +4,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockPlanks extends BlockSolidMeta {

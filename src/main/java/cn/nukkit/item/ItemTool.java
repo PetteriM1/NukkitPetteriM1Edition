@@ -9,7 +9,7 @@ import cn.nukkit.nbt.tag.Tag;
 import java.util.Random;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class ItemTool extends Item {

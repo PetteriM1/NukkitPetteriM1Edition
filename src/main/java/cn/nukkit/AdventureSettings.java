@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Nukkit Project
- * Author: MagicDroidX
+ * @author MagicDroidX
  */
 public class AdventureSettings implements Cloneable {
 

@@ -3,7 +3,7 @@ package cn.nukkit.raknet.protocol.packet;
 import cn.nukkit.raknet.protocol.Packet;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class CLIENT_DISCONNECT_DataPacket extends Packet {

@@ -4,7 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SlotEntityData extends EntityData<Item> {

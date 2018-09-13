@@ -22,11 +22,11 @@ public class NetworkInventoryAction {
 
     /**
      * Fake window IDs for the SOURCE_TODO type (99999)
-     * <p>
+     * 
      * These identifiers are used for inventory source types which are not currently implemented server-side in MCPE.
      * As a general rule of thumb, anything that doesn't have a permanent inventory is client-side. These types are
      * to allow servers to track what is going on in client-side windows.
-     * <p>
+     * 
      * Expect these to change in the future.
      */
     public static final int SOURCE_TYPE_CRAFTING_ADD_INGREDIENT = -2;

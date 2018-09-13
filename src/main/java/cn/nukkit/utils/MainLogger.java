@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit
  */
 public class MainLogger extends ThreadedLogger {

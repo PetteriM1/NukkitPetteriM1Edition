@@ -5,7 +5,7 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.enchantment.Enchantment;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EnchantmentProtectionAll extends EnchantmentProtection {

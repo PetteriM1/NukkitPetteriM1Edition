@@ -4,7 +4,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockAir extends BlockTransparent {

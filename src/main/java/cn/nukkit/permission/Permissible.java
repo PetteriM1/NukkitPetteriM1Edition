@@ -5,7 +5,7 @@ import cn.nukkit.plugin.Plugin;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface Permissible extends ServerOperator {

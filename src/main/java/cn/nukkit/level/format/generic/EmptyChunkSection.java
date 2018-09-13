@@ -7,7 +7,7 @@ import cn.nukkit.utils.ChunkException;
 import java.util.Arrays;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EmptyChunkSection implements ChunkSection {

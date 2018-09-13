@@ -20,7 +20,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class UDPServerSocket extends ChannelInboundHandlerAdapter {

@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Flat extends Generator {

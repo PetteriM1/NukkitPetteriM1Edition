@@ -15,7 +15,7 @@ import cn.nukkit.nbt.tag.Tag;
 import java.util.Map;
 
 /**
- * author: CreeperFace
+ * @author CreeperFace
  * Nukkit Project
  */
 public class BlockCauldron extends BlockSolidMeta {

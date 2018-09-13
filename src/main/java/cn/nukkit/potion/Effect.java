@@ -9,7 +9,7 @@ import cn.nukkit.network.protocol.MobEffectPacket;
 import cn.nukkit.utils.ServerException;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Effect implements Cloneable {

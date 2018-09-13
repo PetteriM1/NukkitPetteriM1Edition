@@ -9,7 +9,7 @@ import cn.nukkit.level.generator.populator.PopulatorTallGrass;
 import cn.nukkit.level.generator.populator.PopulatorTree;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ForestBiome extends GrassyBiome {

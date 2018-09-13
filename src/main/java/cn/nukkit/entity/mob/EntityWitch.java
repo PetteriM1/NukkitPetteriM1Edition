@@ -110,11 +110,6 @@ public class EntityWitch extends EntityWalkingMob {
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[0];
-    }
-
-    @Override
     public int getKillExperience() {
         return 5;
     }

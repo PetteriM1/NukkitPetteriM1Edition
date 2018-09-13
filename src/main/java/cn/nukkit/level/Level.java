@@ -65,7 +65,7 @@ import java.util.concurrent.*;
 
 
 /**
- * author: MagicDroidX Nukkit Project
+ * @author MagicDroidX Nukkit Project
  */
 public class Level implements ChunkManager, Metadatable {
 
@@ -461,6 +461,14 @@ public class Level implements ChunkManager, Metadatable {
         this.addSound(sound, players.stream().toArray(Player[]::new));
     }
 
+    /**
+     * Broadcasts sound to players
+     *
+     * @param type ID of the sound from cn.nukkit.network.protocol.LevelSoundEventPacket
+     * @param pitch pitch of sound
+     * @param data generic data that can affect sound
+     * @param pos  position where sound should be played
+     */
     public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos) {
         this.addLevelSoundEvent(type, pitch, data, pos, false);
     }

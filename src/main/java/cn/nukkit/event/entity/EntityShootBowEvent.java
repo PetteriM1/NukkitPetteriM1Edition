@@ -8,7 +8,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.item.Item;
 
 /**
- * author: Box
+ * @author Box
  * Nukkit Project
  */
 public class EntityShootBowEvent extends EntityEvent implements Cancellable {

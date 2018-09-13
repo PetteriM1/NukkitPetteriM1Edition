@@ -6,7 +6,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.LevelException;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Position extends Vector3 {

@@ -11,7 +11,7 @@ import static cn.nukkit.api.API.Usage.EXPERIMENTAL;
 
 /**
  * Tool class for VarInt or VarLong operations.
- * <p>
+ * 
  * Some code from http://wiki.vg/Protocol.
  *
  * @author MagicDroidX

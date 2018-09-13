@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockStemPumpkin;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemSeedsPumpkin extends Item {

@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.utils.BlockColor;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockSponge extends BlockSolidMeta {

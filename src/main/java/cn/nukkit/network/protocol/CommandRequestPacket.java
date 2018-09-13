@@ -5,7 +5,7 @@ import cn.nukkit.network.protocol.types.CommandOriginData;
 import java.util.UUID;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class CommandRequestPacket extends DataPacket {

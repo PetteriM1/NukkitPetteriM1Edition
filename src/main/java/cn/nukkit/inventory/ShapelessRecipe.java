@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import java.util.*;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ShapelessRecipe implements CraftingRecipe {

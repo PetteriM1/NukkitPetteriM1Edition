@@ -3,7 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockCauldron;
 
 /**
- * author: CreeperFace
+ * @author CreeperFace
  * Nukkit Project
  */
 public class ItemCauldron extends Item {

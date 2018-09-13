@@ -13,7 +13,7 @@ import cn.nukkit.utils.BlockColor;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockSapling extends BlockFlowable {

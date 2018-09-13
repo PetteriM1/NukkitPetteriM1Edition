@@ -12,7 +12,7 @@ import jline.console.CursorBuffer;
 import java.io.IOException;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit
  */
 public class CommandReader extends Thread implements InterruptibleThread {

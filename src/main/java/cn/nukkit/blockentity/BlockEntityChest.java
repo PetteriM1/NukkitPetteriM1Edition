@@ -18,7 +18,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import java.util.HashSet;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockEntityChest extends BlockEntitySpawnable implements InventoryHolder, BlockEntityContainer, BlockEntityNameable {

@@ -11,7 +11,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockGrass extends BlockDirt {

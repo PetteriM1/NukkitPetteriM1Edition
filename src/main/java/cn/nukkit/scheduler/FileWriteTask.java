@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class FileWriteTask extends AsyncTask {

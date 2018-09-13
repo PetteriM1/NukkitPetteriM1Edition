@@ -10,7 +10,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
- * author: Angelic47 Nukkit Project
+ * @author Angelic47 Nukkit Project
  */
 public class BlockBeacon extends BlockTransparent {
 

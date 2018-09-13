@@ -3,7 +3,7 @@ package cn.nukkit.item.enchantment;
 import cn.nukkit.item.Item;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EnchantmentEfficiency extends Enchantment {

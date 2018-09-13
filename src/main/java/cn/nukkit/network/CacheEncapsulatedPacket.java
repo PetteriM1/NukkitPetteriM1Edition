@@ -3,7 +3,7 @@ package cn.nukkit.network;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class CacheEncapsulatedPacket extends EncapsulatedPacket {

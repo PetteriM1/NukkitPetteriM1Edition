@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.level.Position;
 
 /**
- * author: Rover656
+ * @author Rover656
  */
 public class BeaconInventory extends ContainerInventory {
 

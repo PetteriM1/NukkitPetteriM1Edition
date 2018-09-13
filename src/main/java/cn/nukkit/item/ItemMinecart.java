@@ -13,7 +13,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.Rail;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemMinecart extends Item {

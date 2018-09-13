@@ -4,7 +4,7 @@ import cn.nukkit.raknet.protocol.DataPacket;
 import cn.nukkit.raknet.protocol.Packet;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class DATA_PACKET_8 extends DataPacket {

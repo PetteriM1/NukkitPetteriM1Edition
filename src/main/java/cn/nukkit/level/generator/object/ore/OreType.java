@@ -3,7 +3,7 @@ package cn.nukkit.level.generator.object.ore;
 import cn.nukkit.block.Block;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class OreType {

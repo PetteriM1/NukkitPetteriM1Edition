@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Network {

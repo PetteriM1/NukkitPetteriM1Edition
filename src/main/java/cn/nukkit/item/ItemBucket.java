@@ -12,7 +12,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemBucket extends Item {

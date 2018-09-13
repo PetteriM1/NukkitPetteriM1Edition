@@ -78,4 +78,9 @@ public class EntityZombieHorse extends EntityWalkingAnimal {
     public int getKillExperience() {
         return EntityUtils.rand(1, 4);
     }
+
+    @Override
+    public String getName() {
+        return "Zombie Horse";
+    }
 }

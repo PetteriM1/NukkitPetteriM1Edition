@@ -7,7 +7,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * AMAZING COARSE DIRT added by kvetinac97
  * Nukkit Project
  */

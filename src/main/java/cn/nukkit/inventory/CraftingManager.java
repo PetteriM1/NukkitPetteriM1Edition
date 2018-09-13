@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.zip.Deflater;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class CraftingManager {

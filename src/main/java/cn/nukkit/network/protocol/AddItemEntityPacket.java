@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.utils.Binary;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class AddItemEntityPacket extends DataPacket {

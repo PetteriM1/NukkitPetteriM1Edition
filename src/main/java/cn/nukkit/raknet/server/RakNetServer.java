@@ -6,7 +6,7 @@ import cn.nukkit.utils.ThreadedLogger;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class RakNetServer extends Thread {

@@ -1,7 +1,7 @@
 package cn.nukkit.level.generator.noise;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class Noise {

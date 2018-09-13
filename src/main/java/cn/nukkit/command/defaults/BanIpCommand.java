@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BanIpCommand extends VanillaCommand {

@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 abstract public class ItemArmor extends Item {

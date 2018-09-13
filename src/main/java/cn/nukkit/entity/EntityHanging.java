@@ -5,7 +5,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class EntityHanging extends Entity {
@@ -32,7 +32,6 @@ public abstract class EntityHanging extends Entity {
                 this.direction = 2;
             }
         }
-
     }
 
     @Override

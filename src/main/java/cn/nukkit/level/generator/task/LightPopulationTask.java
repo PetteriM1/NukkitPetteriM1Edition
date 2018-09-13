@@ -6,7 +6,7 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.scheduler.AsyncTask;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class LightPopulationTask extends AsyncTask {

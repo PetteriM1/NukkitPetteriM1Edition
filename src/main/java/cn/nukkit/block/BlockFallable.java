@@ -9,7 +9,7 @@ import cn.nukkit.nbt.tag.ListTag;
 
 
 /**
- * author: rcsuperman
+ * @author rcsuperman
  * Nukkit Project
  */
 public abstract class BlockFallable extends BlockSolid {

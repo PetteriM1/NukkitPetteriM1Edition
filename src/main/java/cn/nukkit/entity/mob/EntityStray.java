@@ -43,11 +43,6 @@ public class EntityStray extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "Stray";
-    }
-
-    @Override
     public float getWidth() {
         return 0.6f;
     }

@@ -6,7 +6,7 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
 /**
- * author: ItsLucas
+ * @author ItsLucas
  * Nukkit Project
  */
 

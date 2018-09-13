@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ChunkSection implements cn.nukkit.level.format.ChunkSection {

@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Item implements Cloneable {
@@ -1547,6 +1547,10 @@ public class Item implements Cloneable {
     /**
      * Called when a player uses the item on air, for example throwing a projectile.
      * Returns whether the item was changed, for example count decrease or durability change.
+     *
+     * @param player player
+     * @param directionVector direction
+     * @return item changed
      */
     public boolean onClickAir(Player player, Vector3 directionVector) {
         return false;
@@ -1555,6 +1559,9 @@ public class Item implements Cloneable {
     /**
      * Called when a player is using this item and releases it. Used to handle bow shoot actions.
      * Returns whether the item was changed, for example count decrease or durability change.
+     *
+     * @param player player
+     * @return item changed
      */
     public boolean onReleaseUsing(Player player) {
         return false;
@@ -1587,6 +1594,9 @@ public class Item implements Cloneable {
 
     /**
      * Returns whether the specified item stack has the same ID, damage, NBT and count as this item stack.
+     *
+     * @param other item
+     * @return equal
      */
     public final boolean equalsExact(Item other) {
         return this.equals(other, true, true) && this.count == other.count;

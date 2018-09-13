@@ -1,7 +1,7 @@
 package cn.nukkit.math;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 

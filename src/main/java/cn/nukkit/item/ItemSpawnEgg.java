@@ -15,7 +15,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import java.util.Random;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemSpawnEgg extends Item {

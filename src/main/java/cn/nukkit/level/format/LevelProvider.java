@@ -9,7 +9,7 @@ import cn.nukkit.scheduler.AsyncTask;
 import java.util.Map;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface LevelProvider {

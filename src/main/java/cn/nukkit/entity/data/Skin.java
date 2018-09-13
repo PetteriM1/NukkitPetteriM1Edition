@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.Base64;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Skin {

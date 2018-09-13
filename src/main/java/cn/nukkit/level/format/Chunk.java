@@ -1,7 +1,7 @@
 package cn.nukkit.level.format;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface Chunk extends FullChunk {

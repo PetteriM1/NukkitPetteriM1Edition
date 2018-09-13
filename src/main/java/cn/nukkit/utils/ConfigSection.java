@@ -160,7 +160,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      *  a3: true
      *  a4: "hello"
      *  a5: 100
-     * <p>
+     * 
      * getSections() will return new ConfigSection, that contains sections a1 and a2 only.
      *
      * @return

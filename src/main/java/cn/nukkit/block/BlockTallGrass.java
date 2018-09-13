@@ -11,7 +11,7 @@ import cn.nukkit.utils.BlockColor;
 import java.util.Random;
 
 /**
- * author: Angelic47
+ * @author Angelic47
  * Nukkit Project
  */
 public class BlockTallGrass extends BlockFlowable {

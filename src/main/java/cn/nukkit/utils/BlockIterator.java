@@ -8,7 +8,7 @@ import cn.nukkit.math.Vector3;
 import java.util.Iterator;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockIterator implements Iterator<Block> {

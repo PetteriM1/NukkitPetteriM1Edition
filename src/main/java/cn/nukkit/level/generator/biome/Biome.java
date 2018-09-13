@@ -8,7 +8,7 @@ import cn.nukkit.math.NukkitRandom;
 import java.util.ArrayList;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class Biome {

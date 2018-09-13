@@ -30,7 +30,7 @@ public abstract class HugeTreesGenerator extends TreeGenerator {
     }
 
     /**
-     * calculates the height based on this trees base height and its extra random height
+     * Calculates the height based on this trees base height and its extra random height
      */
     protected int getHeight(NukkitRandom rand) {
         int i = rand.nextBoundedInt(3) + this.baseHeight;

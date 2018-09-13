@@ -28,10 +28,10 @@ import java.util.Arrays;
 
 /** Simple, fast byte-array output stream that exposes the backing array.
  *
- * <P>{@link java.io.ByteArrayOutputStream} is nice, but to get its content you
+ * {@link java.io.ByteArrayOutputStream} is nice, but to get its content you
  * must generate each time a new object. This doesn't happen here.
  *
- * <P>This class will automatically enlarge the backing array, doubling its
+ * This class will automatically enlarge the backing array, doubling its
  * size whenever new space is needed. The {@link #reset()} method will
  * mark the content as empty, but will not decrease the capacity
  *

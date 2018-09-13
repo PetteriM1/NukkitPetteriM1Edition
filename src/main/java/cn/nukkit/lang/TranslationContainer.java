@@ -1,7 +1,7 @@
 package cn.nukkit.lang;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class TranslationContainer extends TextContainer implements Cloneable {
@@ -17,7 +17,7 @@ public class TranslationContainer extends TextContainer implements Cloneable {
         this.setParameters(new String[]{params});
     }
 
-    public TranslationContainer(String text, String[] params) {
+    public TranslationContainer(String text, String... params) {
         super(text);
         this.setParameters(params);
     }

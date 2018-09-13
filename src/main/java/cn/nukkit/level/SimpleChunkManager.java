@@ -5,7 +5,7 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class SimpleChunkManager implements ChunkManager {

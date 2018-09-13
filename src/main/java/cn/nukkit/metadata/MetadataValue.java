@@ -5,7 +5,7 @@ import cn.nukkit.plugin.Plugin;
 import java.lang.ref.WeakReference;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public abstract class MetadataValue {

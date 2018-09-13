@@ -7,7 +7,8 @@ import cn.nukkit.math.NukkitRandom;
 
 /**
  * Nukkit Minecraft PE Server Software
- * This class was written by Niall Lindsay <Niall7459>
+ * This class was written by Niall Lindsay
+ * @author Niall7459
  **/
 
 public class PopulatorTallSugarcane extends Populator {

@@ -1,7 +1,7 @@
 package cn.nukkit.item.enchantment;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EnchantmentWaterWorker extends Enchantment {

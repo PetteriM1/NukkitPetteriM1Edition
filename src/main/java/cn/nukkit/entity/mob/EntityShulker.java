@@ -24,11 +24,6 @@ public class EntityShulker extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "Shulker";
-    }
-
-    @Override
     public float getWidth() {
         return 1f;
     }

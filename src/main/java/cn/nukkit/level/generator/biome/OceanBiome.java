@@ -5,7 +5,7 @@ import cn.nukkit.level.generator.populator.PopulatorSugarcane;
 import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class OceanBiome extends WateryBiome {

@@ -4,7 +4,7 @@ import cn.nukkit.block.BlockBed;
 import cn.nukkit.utils.DyeColor;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemBed extends Item {

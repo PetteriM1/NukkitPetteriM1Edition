@@ -6,7 +6,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.level.Location;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class EntityTeleportEvent extends EntityEvent implements Cancellable {

@@ -13,8 +13,8 @@ import cn.nukkit.utils.MinecartType;
 import java.util.Random;
 
 /**
- * Author: Adam Matthew [larryTheCoder]
- * <p>
+ * @author Adam Matthew [larryTheCoder]
+ * 
  * Nukkit Project.
  */
 public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityExplosive {
