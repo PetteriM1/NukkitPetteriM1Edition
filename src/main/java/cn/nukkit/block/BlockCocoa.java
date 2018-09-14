@@ -90,7 +90,7 @@ public class BlockCocoa extends BlockTransparentMeta {
                 break;
         }
 
-        return bbs[damage] = bbs[this.getDamage() >> 2];
+        return bbs[this.getDamage() / 4].getOffsetBoundingBox(x, y, z);
     }
 
     @Override
