@@ -215,5 +215,4 @@ public abstract class EntityWalking extends BaseEntity {
         }
         return null;
     }
-
 }

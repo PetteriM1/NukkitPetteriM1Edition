@@ -72,10 +72,6 @@ public class EntityEgg extends EntityProjectile {
                     EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 0.5, 0.5));
                     if (entity != null) {
                         entity.spawnToAll();
-                        EntityEventPacket pk = new EntityEventPacket();
-                        pk.eid = entity.getId();
-                        pk.event = 27;
-                        entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
                     }
                 }
             }

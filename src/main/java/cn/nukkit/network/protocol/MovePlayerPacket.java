@@ -67,5 +67,4 @@ public class MovePlayerPacket extends DataPacket {
     public byte pid() {
         return NETWORK_ID;
     }
-
 }

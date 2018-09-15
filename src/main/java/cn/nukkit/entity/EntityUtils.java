@@ -1,7 +1,6 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.level.Position;
-import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -32,20 +31,24 @@ public class EntityUtils {
     }
 
     public static Entity create(Object type, Position source, Object... args) {
-        FullChunk chunk = source.getLevel().getChunk((int) source.x >> 4, (int) source.z >> 4, true);
+        FullChunk chunk = source.getLevel().getChunk((int) source.x >> 4, (int) source.z >> 4);
 
-        if (!chunk.isGenerated()) {
-            chunk.setGenerated();
+        if (chunk == null) {
+            return null;
         }
 
-        if (!chunk.isPopulated()) {
-            chunk.setPopulated();
-        }
-
-        CompoundTag nbt = new CompoundTag().putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", source.x)).add(new DoubleTag("", source.y)).add(new DoubleTag("", source.z)))
-                .putList(new ListTag<DoubleTag>("Motion").add(new DoubleTag("", 0)).add(new DoubleTag("", 0)).add(new DoubleTag("", 0)))
-                .putList(new ListTag<FloatTag>("Rotation").add(new FloatTag("", source instanceof Location ? (float) ((Location) source).yaw : 0))
-                        .add(new FloatTag("", source instanceof Location ? (float) ((Location) source).pitch : 0)));
+        CompoundTag nbt = new CompoundTag()
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", source.x + 0.5))
+                        .add(new DoubleTag("", source.y))
+                        .add(new DoubleTag("", source.z + 0.5)))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", 0))
+                        .add(new DoubleTag("", 0))
+                        .add(new DoubleTag("", 0)))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", new Random().nextFloat() * 360))
+                        .add(new FloatTag("", 0)));
 
         return Entity.createEntity(type.toString(), chunk, nbt, args);
     }

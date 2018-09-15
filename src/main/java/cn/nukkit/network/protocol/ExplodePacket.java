@@ -44,5 +44,4 @@ public class ExplodePacket extends DataPacket {
             }
         }
     }
-
 }

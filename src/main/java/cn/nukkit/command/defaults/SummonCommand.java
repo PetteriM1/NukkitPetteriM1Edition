@@ -35,7 +35,7 @@ public class SummonCommand extends Command {
             if (playerThatSpawns != null) {
             Position pos = playerThatSpawns.getPosition();
             Entity ent;
-                if ((ent = EntityUtils.create(mob, pos)) != null) {
+            if ((ent = EntityUtils.create(mob, pos)) != null) {
                 ent.spawnToAll();
                 sender.sendMessage("\u00A76Spawned " + mob + " to " + playerThatSpawns.getName());
             } else {

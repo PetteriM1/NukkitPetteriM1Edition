@@ -66,7 +66,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
                     entity.spawnToAll();
                     EntityEventPacket pk = new EntityEventPacket();
                     pk.eid = entity.getId();
-                    pk.event = 27;
+                    pk.event = EntityEventPacket.SILVERFISH_SPAWN_ANIMATION;
                     entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
                 }
             }

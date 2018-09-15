@@ -18,7 +18,11 @@ public class ChangeDimensionPacket extends DataPacket {
 
     @Override
     public void decode() {
-
+        this.dimension = this.getVarInt();
+        this.x = this.getVector3f().x;
+        this.y = this.getVector3f().y;
+        this.z = this.getVector3f().z;
+        this.respawn = this.getBoolean();
     }
 
     @Override

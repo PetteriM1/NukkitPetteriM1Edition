@@ -1658,13 +1658,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.entityBaseTick(tickDiff);
 
             if (this.getServer().getDifficulty() == 0 && this.level.getGameRules().getBoolean("naturalRegeneration")) {
-                if (this.getHealth() < this.getMaxHealth() && this.ticksLived % 20 == 0) {
+                if (this.getHealth() < this.getMaxHealth() && this.age % 20 == 0) {
                     this.heal(1);
                 }
 
                 PlayerFood foodData = this.getFoodData();
 
-                if (foodData.getLevel() < 20 && this.ticksLived % 10 == 0) {
+                if (foodData.getLevel() < 20 && this.age % 10 == 0) {
                     foodData.addFoodLevel(1, 0);
                 }
             }
@@ -3034,7 +3034,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     } else if (target instanceof Player) {
                                         if ((((Player) target).getGamemode() & 0x01) > 0) {
                                             break;
-                                        } else if (!this.server.getPropertyBoolean("pvp") || this.server.getDifficulty() == 0) {
+                                        } else if (!this.server.getPropertyBoolean("pvp")) {
                                             break;
                                         }
                                     }

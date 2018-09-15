@@ -102,7 +102,6 @@ public abstract class BaseEntity extends EntityCreature {
 
     public void setTarget(Entity target) {
         this.followTarget = target;
-
         this.moveTime = 0;
         this.stayTime = 0;
         this.target = null;
@@ -143,7 +142,6 @@ public abstract class BaseEntity extends EntityCreature {
                 this.lastZ = this.z;
                 this.lastYaw = this.yaw;
                 this.lastPitch = this.pitch;
-
                 this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
             }
         }
@@ -162,7 +160,6 @@ public abstract class BaseEntity extends EntityCreature {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-
         Timings.entityBaseTickTimer.startTiming();
 
         if (Server.getInstance().getPropertyBoolean("entity-despawn-task", true) && this.age > Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000)) {
@@ -214,7 +211,6 @@ public abstract class BaseEntity extends EntityCreature {
         }
 
         this.age += tickDiff;
-        this.ticksLived += tickDiff;
 
         Timings.entityBaseTickTimer.stopTiming();
 
@@ -233,21 +229,6 @@ public abstract class BaseEntity extends EntityCreature {
         return true;
     }
 
-    public int getMaxFallHeight() {
-        if (!(this.target instanceof Entity)) {
-            return 3;
-        } else {
-            int i = (int) (this.getHealth() - this.getMaxHealth() * 0.33F);
-            i = i - (3 - this.getServer().getDifficulty()) * 4;
-
-            if (i < 0) {
-                i = 0;
-            }
-
-            return i + 3;
-        }
-    }
-
     @Override
     public boolean setMotion(Vector3 motion) {
         if (this.getServer().getMobAiEnabled()) {
@@ -258,7 +239,6 @@ public abstract class BaseEntity extends EntityCreature {
                     return false;
                 }
             }
-
             this.motionX = motion.x;
             this.motionY = motion.y;
             this.motionZ = motion.z;
@@ -269,14 +249,13 @@ public abstract class BaseEntity extends EntityCreature {
     @Override
     public boolean move(double dx, double dy, double dz) {
         if (this.getServer().getMobAiEnabled()) {
-
             Timings.entityMoveTimer.startTiming();
 
             double movX = dx * moveMultifier;
             double movY = dy;
             double movZ = dz * moveMultifier;
 
-            AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.level.getTickRate() > 1 ? this.boundingBox.getOffsetBoundingBox(dx, dy, dz) : this.boundingBox.addCoord(dx, dy, dz));
+            AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.getOffsetBoundingBox(dx, dy, dz));
             if (this.isWallCheck()) {
                 for (AxisAlignedBB bb : list) {
                     dx = bb.calculateXOffset(this.boundingBox, dx);

@@ -37,5 +37,4 @@ public class UpdateTradePacket extends DataPacket {
         this.putString(displayName);
         this.put(this.offers);
     }
-
 }

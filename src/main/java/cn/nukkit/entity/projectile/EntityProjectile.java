@@ -130,7 +130,7 @@ public abstract class EntityProjectile extends Entity {
 
             for (Entity entity : list) {
                 if (/*!entity.canCollideWith(this) or */
-                        (entity == this.shootingEntity && this.ticksLived < 5)
+                        (entity == this.shootingEntity && this.age < 5)
                         ) {
                     continue;
                 }
@@ -184,7 +184,6 @@ public abstract class EntityProjectile extends Entity {
             }
 
             this.updateMovement();
-
         }
 
         return hasUpdate;

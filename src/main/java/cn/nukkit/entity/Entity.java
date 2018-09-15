@@ -268,7 +268,6 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean keepMovement = false;
 
     public float fallDistance = 0;
-    public int ticksLived = 0;
     public int lastUpdate;
     public int maxFireTicks;
     public int fireTicks = 0;
@@ -1193,7 +1192,6 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         this.age += tickDiff;
-        this.ticksLived += tickDiff;
         TimingsHistory.activatedEntityTicks++;
 
         Timings.entityBaseTickTimer.stopTiming();

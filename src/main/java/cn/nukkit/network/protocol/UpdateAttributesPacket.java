@@ -39,5 +39,4 @@ public class UpdateAttributesPacket extends DataPacket {
             }
         }
     }
-
 }

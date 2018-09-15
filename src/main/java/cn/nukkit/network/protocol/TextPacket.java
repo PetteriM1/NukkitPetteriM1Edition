@@ -87,5 +87,4 @@ public class TextPacket extends DataPacket {
         }
         this.putString(this.platformChatId);
     }
-
 }
