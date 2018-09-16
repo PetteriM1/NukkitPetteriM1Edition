@@ -84,8 +84,8 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
             EntityBlueWitherSkull blueskull = (EntityBlueWitherSkull) k;
             blueskull.setExplode(true);
-            blueskull.setMotion(new Vector3(-Math.sin(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f, -Math.sin(Math.toDegrees(pitch)) * f * f,
-                    Math.cos(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f));
+            blueskull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(blueskull);
             this.server.getPluginManager().callEvent(launch);

@@ -8,7 +8,6 @@ import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
-import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -70,11 +69,11 @@ public class EntityWitch extends EntityWalkingMob {
     @Override
     public void attackEntity(Entity player) {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > ATTACK_TICKS && this.distanceSquared(player) <= 8) {
+            if (this.attackDelay > ATTACK_TICKS && this.distanceSquared(player) <= 12) {
                 this.attackDelay = 0;
                 if (player.isAlive() && !player.closed) {
 
-                    double f = 2;
+                    double f = 1.2;
                     double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
                     double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
                     Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
@@ -92,8 +91,8 @@ public class EntityWitch extends EntityWalkingMob {
                         thrownPotion.potionId = Potion.HARMING;
                     }
 
-                    thrownPotion.setMotion(new Vector3(-Math.sin(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f, -Math.sin(Math.toDegrees(pitch)) * f * f,
-                            Math.cos(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f));
+                    thrownPotion.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                            Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
                     ProjectileLaunchEvent launch = new ProjectileLaunchEvent(thrownPotion);
                     this.server.getPluginManager().callEvent(launch);
                     if (launch.isCancelled()) {

@@ -65,7 +65,7 @@ public class EntityGhast extends EntityFlyingMob {
         if (this.attackDelay > 30 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
-            double f = 2;
+            double f = 1.2;
             double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
             double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
@@ -77,8 +77,8 @@ public class EntityGhast extends EntityFlyingMob {
 
             EntityGhastFireBall fireball = (EntityGhastFireBall) k;
             fireball.setExplode(true);
-            fireball.setMotion(new Vector3(-Math.sin(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f, -Math.sin(Math.toDegrees(pitch)) * f * f,
-                    Math.cos(Math.toDegrees(yaw)) * Math.cos(Math.toDegrees(pitch)) * f * f));
+            fireball.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(fireball);
             this.server.getPluginManager().callEvent(launch);

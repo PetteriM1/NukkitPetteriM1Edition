@@ -8,13 +8,11 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityMotionEvent;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -25,28 +23,24 @@ public abstract class BaseEntity extends EntityCreature {
     EntityDamageEvent source;
 
     protected int stayTime = 0;
-
     protected int moveTime = 0;
 
     public float maxJumpHeight = 1.2f;
-
     public double moveMultifier = 1.0d;
 
     protected Vector3 target = null;
-
     protected Entity followTarget = null;
 
     protected boolean fireProof = false;
-
     private boolean movement = true;
-
     private boolean friendly = false;
-
     private boolean wallcheck = true;
 
     protected List<Block> blocksAround = new ArrayList<>();
-
     protected List<Block> collisionBlocks = new ArrayList<>();
+
+    private boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
+    private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000);
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -136,14 +130,7 @@ public abstract class BaseEntity extends EntityCreature {
     @Override
     protected void updateMovement() {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.lastX != this.x || this.lastY != this.y || this.lastZ != this.z || this.lastYaw != this.yaw || this.lastPitch != this.pitch) {
-                this.lastX = this.x;
-                this.lastY = this.y;
-                this.lastZ = this.z;
-                this.lastYaw = this.yaw;
-                this.lastPitch = this.pitch;
-                this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
-            }
+            super.updateMovement();
         }
     }
 
@@ -162,55 +149,16 @@ public abstract class BaseEntity extends EntityCreature {
     public boolean entityBaseTick(int tickDiff) {
         Timings.entityBaseTickTimer.startTiming();
 
-        if (Server.getInstance().getPropertyBoolean("entity-despawn-task", true) && this.age > Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000)) {
+        if (this.despawn && this.age > this.despawnTicks) {
             this.close();
             return true;
         }
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        this.blocksAround = null;
-        this.justCreated = false;
-
-        if (!this.effects.isEmpty()) {
-            for (Effect effect : this.effects.values()) {
-                if (effect.canTick()) {
-                    effect.applyEffect(this);
-                }
-                effect.setDuration(effect.getDuration() - tickDiff);
-
-                if (effect.getDuration() <= 0) {
-                    this.removeEffect(effect.getId());
-                }
-            }
-        }
-
-        this.checkBlockCollision();
-
-        if (this.isInsideOfSolid()) {
-            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 1));
-        }
-
-        if (this.y < 1) {
-            this.close();
-        }
-
         if (this.moveTime > 0) {
             this.moveTime -= tickDiff;
         }
-
-        if (this.attackTime > 0) {
-            this.attackTime -= tickDiff;
-        }
-
-        if (this.noDamageTicks > 0) {
-            this.noDamageTicks -= tickDiff;
-            if (this.noDamageTicks < 0) {
-                this.noDamageTicks = 0;
-            }
-        }
-
-        this.age += tickDiff;
 
         Timings.entityBaseTickTimer.stopTiming();
 
@@ -232,16 +180,7 @@ public abstract class BaseEntity extends EntityCreature {
     @Override
     public boolean setMotion(Vector3 motion) {
         if (this.getServer().getMobAiEnabled()) {
-            if (!this.justCreated) {
-                EntityMotionEvent ev = new EntityMotionEvent(this, motion);
-                this.server.getPluginManager().callEvent(ev);
-                if (ev.isCancelled()) {
-                    return false;
-                }
-            }
-            this.motionX = motion.x;
-            this.motionY = motion.y;
-            this.motionZ = motion.z;
+            super.setMotion(motion);
         }
         return true;
     }
