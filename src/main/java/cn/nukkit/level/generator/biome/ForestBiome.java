@@ -2,8 +2,9 @@ package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockFlower;
-import cn.nukkit.level.generator.populator.PopulatorFlower;
 import cn.nukkit.block.BlockSapling;
+import cn.nukkit.level.generator.populator.PopulatorFallenTree;
+import cn.nukkit.level.generator.populator.PopulatorFlower;
 import cn.nukkit.level.generator.populator.PopulatorGrass;
 import cn.nukkit.level.generator.populator.PopulatorTallGrass;
 import cn.nukkit.level.generator.populator.PopulatorTree;
@@ -26,6 +27,10 @@ public class ForestBiome extends GrassyBiome {
         super();
 
         this.type = type;
+        
+        PopulatorFallenTree fallenTree = new PopulatorFallenTree();
+        fallenTree.setType(type);
+        this.addPopulator(fallenTree);
 
         PopulatorTree trees = new PopulatorTree(type == TYPE_BIRCH ? BlockSapling.BIRCH : BlockSapling.OAK);
         trees.setBaseAmount(5);
