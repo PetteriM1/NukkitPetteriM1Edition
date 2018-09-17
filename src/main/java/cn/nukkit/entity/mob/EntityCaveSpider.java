@@ -117,4 +117,9 @@ public class EntityCaveSpider extends EntityWalkingMob {
     public int getKillExperience() {
         return 5;
     }
+
+    @Override
+    public String getName() {
+        return "Cave Spider";
+    }
 }
