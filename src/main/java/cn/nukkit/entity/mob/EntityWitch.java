@@ -69,11 +69,11 @@ public class EntityWitch extends EntityWalkingMob {
     @Override
     public void attackEntity(Entity player) {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > ATTACK_TICKS && this.distanceSquared(player) <= 12) {
+            if (this.attackDelay > ATTACK_TICKS && this.distanceSquared(player) <= 20) {
                 this.attackDelay = 0;
                 if (player.isAlive() && !player.closed) {
 
-                    double f = 1.2;
+                    double f = 1;
                     double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
                     double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
                     Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),

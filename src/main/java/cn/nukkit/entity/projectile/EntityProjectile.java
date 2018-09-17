@@ -118,7 +118,11 @@ public abstract class EntityProjectile extends Entity {
             MovingObjectPosition movingObjectPosition = null;
 
             if (!this.isCollided) {
-                this.motionY -= this.getGravity();
+                if (this.isInsideOfWater()) {
+                    this.motionY -= this.getGravity() - (this.getGravity() / 2);
+                } else {
+                    this.motionY -= this.getGravity();
+                }
             }
 
             Vector3 moveVector = new Vector3(this.x + this.motionX, this.y + this.motionY, this.z + this.motionZ);

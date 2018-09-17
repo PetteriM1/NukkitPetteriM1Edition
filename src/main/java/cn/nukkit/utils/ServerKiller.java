@@ -25,5 +25,4 @@ public class ServerKiller extends Thread {
         System.out.println("\nTook too long to stop, server was killed forcefully!\n");
         System.exit(1);
     }
-
 }

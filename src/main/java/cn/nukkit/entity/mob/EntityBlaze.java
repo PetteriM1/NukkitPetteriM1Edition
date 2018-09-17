@@ -188,10 +188,10 @@ public class EntityBlaze extends EntityFlyingMob {
     }
 
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 20 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 18) {
+        if (this.attackDelay > 20 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
-            double f = 1.2;
+            double f = 1.1;
             double yaw = this.yaw + EntityUtils.rand(-150, 150) / 10;
             double pitch = this.pitch + EntityUtils.rand(-75, 75) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),

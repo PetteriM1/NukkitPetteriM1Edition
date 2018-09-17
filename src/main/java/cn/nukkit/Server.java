@@ -748,6 +748,10 @@ public class Server {
     }
 
     public void forceShutdown() {
+        this.forceShutdown(this.getPropertyString("shutdown-message", "§cServer closed").replace("§n", "\n"));
+    }
+
+    public void forceShutdown(String reason) {
         if (this.hasStopped) {
             return;
         }
@@ -767,7 +771,7 @@ public class Server {
             this.pluginManager.disablePlugins();
 
             for (Player player : new ArrayList<>(this.players.values())) {
-                player.close(player.getLeaveMessage(), this.getPropertyString("shutdown-message", "§cServer closed").replace("§n", "\n"));
+                player.close(player.getLeaveMessage(), reason);
             }
 
             this.getLogger().debug("Unloading all levels...");

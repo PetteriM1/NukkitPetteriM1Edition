@@ -41,7 +41,7 @@ public class EntityBlueWitherSkull extends EntityProjectile {
 
     @Override
     public float getGravity() {
-        return 0.03f;
+        return 0.01f;
     }
 
     @Override

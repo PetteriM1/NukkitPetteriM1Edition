@@ -47,7 +47,7 @@ public class Watchdog extends Thread {
                         }
                         logger.emergency("---------------------------------------------");
                         responding = false;
-                        this.server.forceShutdown();
+                        this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + diff / 1000d + " seconds");
                     }
                 } else {
                     responding = true;

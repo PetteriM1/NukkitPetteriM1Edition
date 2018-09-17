@@ -35,7 +35,7 @@ public class EntityGhastFireBall extends EntityProjectile {
 
     @Override
     public float getGravity() {
-        return 0.05f;
+        return 0.01f;
     }
 
     @Override
