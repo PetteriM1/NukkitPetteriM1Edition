@@ -5,7 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.Position;
 
 public class SummonCommand extends Command {

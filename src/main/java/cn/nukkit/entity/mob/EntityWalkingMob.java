@@ -5,7 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
 import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.event.entity.EntityDamageEvent;

@@ -154,7 +154,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private Long2ObjectOpenHashMap<List<DataPacket>> chunkPackets = new Long2ObjectOpenHashMap<>();
 
-    private final Long2LongMap unloadQueue = new Long2LongOpenHashMap();
+    private final Long2LongMap unloadQueue = Long2LongMaps.synchronize(new Long2LongOpenHashMap());
 
     private float time;
     public boolean stopTime;
@@ -2048,7 +2048,7 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (realCount > 0) {
-                return null; // Entity in block
+                return null;
             }
         }
 
@@ -2084,6 +2084,39 @@ public class Level implements ChunkManager, Metadatable {
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return null;
+            }
+
+            if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
+                if (getServer().getPropertyBoolean("block-listener", true)) {
+                    if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
+                        Entity entity = EntityUtils.create("SnowGolem", target.add(0.5, -2, 0.5));
+                        if (entity != null) {
+                            entity.spawnToAll();
+                        }
+                        block.getLevel().setBlock(target, new BlockAir());
+                        block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
+                        return null;
+                    } else if (block.getSide(BlockFace.DOWN).getId() == Item.IRON_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.IRON_BLOCK) {
+                        block = block.getSide(BlockFace.DOWN);
+                        Block first, second = null;
+                        if ((first = block.getSide(BlockFace.EAST)).getId() == Item.IRON_BLOCK && (second = block.getSide(BlockFace.WEST)).getId() == Item.IRON_BLOCK) {
+                            block.getLevel().setBlock(first, new BlockAir());
+                            block.getLevel().setBlock(second, new BlockAir());
+                        } else if ((first = block.getSide(BlockFace.NORTH)).getId() == Item.IRON_BLOCK && (second = block.getSide(BlockFace.SOUTH)).getId() == Item.IRON_BLOCK) {
+                            block.getLevel().setBlock(first, new BlockAir());
+                            block.getLevel().setBlock(second, new BlockAir());
+                        }
+                        if (second != null) {
+                            Entity entity = EntityUtils.create("IronGolem", block.add(0.5, -1, 0.5));
+                            if (entity != null) {
+                                entity.spawnToAll();
+                            }
+                            block.getLevel().setBlock(block, new BlockAir());
+                            block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+                            return null;
+                        }
+                    }
+                }
             }
         }
 
@@ -2657,7 +2690,7 @@ public class Level implements ChunkManager, Metadatable {
         return forceLoadChunk(index, x, z, generate) != null;
     }
 
-    private BaseFullChunk forceLoadChunk(long index, int x, int z, boolean generate) {
+    private synchronized BaseFullChunk forceLoadChunk(long index, int x, int z, boolean generate) {
         this.timings.syncChunkLoadTimer.startTiming();
 
         BaseFullChunk chunk = this.provider.getChunk(x, z, generate);
@@ -2732,7 +2765,7 @@ public class Level implements ChunkManager, Metadatable {
         return this.unloadChunk(x, z, safe, true);
     }
 
-    public boolean unloadChunk(int x, int z, boolean safe, boolean trySave) {
+    public synchronized boolean unloadChunk(int x, int z, boolean safe, boolean trySave) {
         if (safe && this.isChunkInUse(x, z)) {
             return false;
         }

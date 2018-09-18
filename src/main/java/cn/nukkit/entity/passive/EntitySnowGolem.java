@@ -1,6 +1,6 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;

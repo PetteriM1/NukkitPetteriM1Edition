@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityFlyingMob;
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.projectile.EntityGhastFireBall;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;

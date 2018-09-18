@@ -212,7 +212,7 @@ public class Server {
 
     private Watchdog watchdog;
 
-    //private Spawner spawner;
+    private Spawner spawner;
     
     public boolean suomicraftMode;
 
@@ -318,6 +318,8 @@ public class Server {
                 put("do-not-tick-worlds", "");
                 put("load-all-worlds", true);
                 put("ansi-title", true);
+                put("worlds-entity-spawning-disabled", "");
+                put("block-listener", true);
             }
         });
         
@@ -501,8 +503,7 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            //this.spawner = new Spawner(this, this.getPropertyInt("ticks-per-entity-spawns", 200));
-            //this.spawner.start();
+            this.getScheduler().scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
         
         suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);

@@ -5,7 +5,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.item.EntityPotion;
 import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.level.Location;

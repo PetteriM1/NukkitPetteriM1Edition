@@ -2,7 +2,7 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.block.BlockCobblestone;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.Explosion;

@@ -1,0 +1,52 @@
+package cn.nukkit.utils.spawners;
+
+import cn.nukkit.Player;
+import cn.nukkit.block.Block;
+import cn.nukkit.entity.passive.EntityMooshroom;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
+import cn.nukkit.level.generator.biome.Biome;
+import cn.nukkit.utils.AbstractEntitySpawner;
+import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnResult;
+
+public class MCowSpawner extends AbstractEntitySpawner {
+
+    public MCowSpawner(Spawner spawnTask) {
+        super(spawnTask);
+    }
+
+    public SpawnResult spawn(Player player, Position pos, Level level) {
+        SpawnResult result = SpawnResult.OK;
+
+        if (EntityUtils.rand(0, 3) == 1) {
+            return SpawnResult.SPAWN_DENIED;
+        }
+
+        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+
+        if (biomeId != Biome.MUSHROOM_ISLAND) {
+            result = SpawnResult.WRONG_BLOCK;
+        } else if (blockId != Block.MYCELIUM) {
+            result = SpawnResult.WRONG_BLOCK;
+        } else if (pos.y > 127 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {
+            result = SpawnResult.POSITION_MISMATCH;
+        } else {
+            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1.9, 0));
+        }
+
+        return result;
+    }
+
+    @Override
+    public int getEntityNetworkId() {
+        return EntityMooshroom.NETWORK_ID;
+    }
+
+    @Override
+    public String getEntityName() {
+        return "Mooshroom";
+    }
+}

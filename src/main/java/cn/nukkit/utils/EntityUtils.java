@@ -1,5 +1,6 @@
-package cn.nukkit.entity;
+package cn.nukkit.utils;
 
+import cn.nukkit.entity.Entity;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;

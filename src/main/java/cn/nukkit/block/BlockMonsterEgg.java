@@ -1,7 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Server;
-import cn.nukkit.entity.EntityUtils;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.mob.EntitySilverfish;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.EntityEventPacket;
@@ -58,7 +58,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        if (Server.getInstance().getPropertyBoolean("spawn-mobs", true)) {
+        if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
             if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && EntityUtils.rand(1, 5) == 1) {
 
                 EntitySilverfish entity = (EntitySilverfish) EntityUtils.create("Silverfish", this.add(0.5, 0, 0.5));
