@@ -216,7 +216,7 @@ public class MainLogger extends ThreadedLogger {
         }
     }
 
-    private void flushBuffer(File logFile) {
+    private synchronized void flushBuffer(File logFile) {
         Writer writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile, true), StandardCharsets.UTF_8), 1024);
@@ -292,5 +292,4 @@ public class MainLogger extends ThreadedLogger {
     public void log(LogLevel level, String message, Throwable t) {
         this.log(level, message + "\r\n" + Utils.getExceptionMessage(t));
     }
-
 }
