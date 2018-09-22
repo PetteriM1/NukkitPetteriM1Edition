@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 public class AvailableCommandsPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
-    public Map<String, CommandDataVersions> commands;
-    public final Map<String, List<String>> softEnums = new HashMap<>();
 
     public static final int ARG_FLAG_VALID = 0x100000;
 
@@ -32,6 +30,9 @@ public class AvailableCommandsPacket extends DataPacket {
 
     public static final int ARG_FLAG_ENUM = 0x200000;
     public static final int ARG_FLAG_POSTFIX = 0x1000000;
+
+    public Map<String, CommandDataVersions> commands;
+    public final Map<String, List<String>> softEnums = new HashMap<>();
 
     @Override
     public byte pid() {

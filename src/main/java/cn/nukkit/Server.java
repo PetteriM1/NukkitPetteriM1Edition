@@ -2034,6 +2034,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.BANNER, BlockEntityBanner.class);
         BlockEntity.registerBlockEntity(BlockEntity.DROPPER, BlockEntityDropper.class);
         BlockEntity.registerBlockEntity(BlockEntity.DISPENSER, BlockEntityDispenser.class);
+        BlockEntity.registerBlockEntity(BlockEntity.MOB_SPAWNER, BlockEntitySpawner.class);
     }
 
     public static Server getInstance() {

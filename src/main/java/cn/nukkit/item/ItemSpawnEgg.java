@@ -3,6 +3,9 @@ package cn.nukkit.item;
 import cn.nukkit.Server;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockMobSpawner;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntitySpawner;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
@@ -43,6 +46,26 @@ public class ItemSpawnEgg extends Item {
             player.sendMessage("\u00A7cSpawn eggs are disabled on this server");
             return false;
         }
+
+        if (target instanceof BlockMobSpawner) {
+            BlockEntity blockEntity = level.getBlockEntity(target);
+            if (blockEntity != null && blockEntity instanceof BlockEntitySpawner) {
+                ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
+            } else {
+                if (blockEntity != null) {
+                    blockEntity.close();
+                }
+                CompoundTag nbt = new CompoundTag()
+                        .putString("id", BlockEntity.MOB_SPAWNER)
+                        .putInt("EntityId", this.getDamage())
+                        .putInt("x", (int) target.x)
+                        .putInt("y", (int) target.y)
+                        .putInt("z", (int) target.z);
+                new BlockEntitySpawner(level.getChunk((int) target.x >> 4, (int) target.z >> 4), nbt);
+            }
+            return true;
+        }
+
         FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
 
         if (chunk == null) {
