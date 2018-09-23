@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.item.EntityPainting;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.sound.ItemFramePlacedSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -47,7 +48,7 @@ public class ItemPainting extends Item {
         }
 
         if (!target.isTransparent() && face.getIndex() > 1 && !block.isSolid()) {
-            int[] direction = {2, 0, 1, 3};
+            int[] direction = {3, 0, 2, 1};
             int[] right = {4, 5, 3, 2};
 
             List<EntityPainting.Motive> validMotives = new ArrayList<>();
@@ -69,8 +70,11 @@ public class ItemPainting extends Item {
                 }
             }
 
+            int rot = direction[face.getHorizontalIndex()] * 90;
+            if (direction[face.getHorizontalIndex()] * 90 == 0) rot = 360;
+
             CompoundTag nbt = new CompoundTag()
-                    .putByte("Direction", direction[face.getIndex() - 2])
+                    .putByte("Direction", direction[face.getHorizontalIndex()])
                     .putString("Motive", validMotives.get(ThreadLocalRandom.current().nextInt(validMotives.size())).title)
                     .putList(new ListTag<DoubleTag>("Pos")
                             .add(new DoubleTag("0", target.x))
@@ -81,7 +85,7 @@ public class ItemPainting extends Item {
                             .add(new DoubleTag("1", 0))
                             .add(new DoubleTag("2", 0)))
                     .putList(new ListTag<FloatTag>("Rotation")
-                            .add(new FloatTag("0", direction[face.getIndex() - 2] * 90))
+                            .add(new FloatTag("0", rot))
                             .add(new FloatTag("1", 0)));
 
             EntityPainting entity = new EntityPainting(chunk, nbt);
@@ -92,6 +96,7 @@ public class ItemPainting extends Item {
                 player.getInventory().setItemInHand(item);
             }
             entity.spawnToAll();
+            entity.getLevel().addSound(new ItemFramePlacedSound(entity));
 
             return true;
         }

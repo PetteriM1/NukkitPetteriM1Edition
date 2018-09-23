@@ -1,8 +1,16 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
+import cn.nukkit.event.entity.ProjectileHitEvent;
+import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -123,5 +131,23 @@ public class EntityThrownTrident extends EntityProjectile {
         this.timing.stopTiming();
 
         return hasUpdate;
+    }
+
+    @Override
+    public void onCollideWithEntity(Entity entity) {
+        this.server.getPluginManager().callEvent(new ProjectileHitEvent(this, MovingObjectPosition.fromEntity(entity)));
+        float damage = this.getResultDamage();
+
+        EntityDamageEvent ev;
+        if (this.shootingEntity == null) {
+            ev = new EntityDamageByEntityEvent(this, entity, DamageCause.PROJECTILE, damage);
+        } else {
+            ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, entity, DamageCause.PROJECTILE, damage);
+        }
+        entity.attack(ev);
+        this.hadCollision = true;
+        this.close();
+        Entity newTrident = EntityUtils.create("ThrownTrident", this);
+        newTrident.spawnToAll();
     }
 }
