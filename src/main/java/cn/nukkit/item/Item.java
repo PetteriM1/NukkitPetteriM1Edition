@@ -889,10 +889,6 @@ public class Item implements Cloneable, BlockID, ItemID {
         return false;
     }
 
-   public boolean isFlintAndSteal() {
-        return false;
-    }
-
     public int getMaxDurability() {
         return -1;
     }

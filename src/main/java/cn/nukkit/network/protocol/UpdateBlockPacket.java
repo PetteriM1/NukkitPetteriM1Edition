@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol;
 
-
 /**
  * @author MagicDroidX
  * Nukkit Project
