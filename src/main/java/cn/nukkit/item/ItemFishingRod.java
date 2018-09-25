@@ -1,9 +1,8 @@
 package cn.nukkit.item;
 
-/**
- * Created by Snake1999 on 2016/1/14.
- * Package cn.nukkit.item in project nukkit.
- */
+import cn.nukkit.Player;
+import cn.nukkit.math.Vector3;
+
 public class ItemFishingRod extends ItemTool {
 
     public ItemFishingRod() {
@@ -26,6 +25,21 @@ public class ItemFishingRod extends ItemTool {
     @Override
     public int getMaxStackSize() {
         return 1;
+    }
+
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        if (player.fishing != null) {
+			player.stopFishing();
+		} else {
+			player.startFishing();
+        }
+        return true;
+    }
+
+    @Override
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_FISHING_ROD;
     }
 }
 

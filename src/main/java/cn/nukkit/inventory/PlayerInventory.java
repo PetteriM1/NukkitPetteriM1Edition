@@ -67,6 +67,7 @@ public class PlayerInventory extends BaseInventory {
 
             if (ev.isCancelled()) {
                 this.sendContents(this.getViewers());
+                ((Player) this.getHolder()).stopFishing();
                 return false;
             }
         }

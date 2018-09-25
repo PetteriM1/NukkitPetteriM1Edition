@@ -1907,7 +1907,7 @@ public class Server {
         return serviceManager;
     }
 
-    public boolean shouldSavePlayerData() { //NOTICE: Remember to create folder called "players" if you enable this.
+    public boolean shouldSavePlayerData() {
         return (Boolean) this.getPropertyBoolean("save-player-data", false);
     }
 
@@ -1936,6 +1936,7 @@ public class Server {
         Entity.registerEntity("FallingSand", EntityFallingBlock.class);
         Entity.registerEntity("PrimedTnt", EntityPrimedTNT.class);
         Entity.registerEntity("Firework", EntityFirework.class);
+        Entity.registerEntity("FishingHook", EntityFishingHook.class);
         //Projectiles
         Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Snowball", EntitySnowball.class);

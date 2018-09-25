@@ -19,6 +19,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
 import cn.nukkit.event.inventory.InventoryPickupItemEvent;
@@ -243,6 +244,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean shouldLogin = false;
 
     public AtomicBoolean hasInteracted = new AtomicBoolean();
+    
+    public EntityFishingHook fishing = null;
 
     public int getStartActionTick() {
         return startAction;
@@ -3455,6 +3458,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (this.loggedIn && ev.getAutoSave()) {
                     this.save();
                 }
+                if (this.fishing != null) {
+                    this.stopFishing();
+                }
             }
 
             for (Player player : new ArrayList<>(this.server.getOnlinePlayers().values())) {
@@ -4770,5 +4776,38 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         ShowProfilePacket pk = new ShowProfilePacket();
         pk.xuid = xuid;
         this.dataPacket(pk);
+    }
+
+    public void startFishing() {
+        this.getInventory().getItemInHand().setDamage(this.getInventory().getItemInHand().getDamage() + 1);
+        CompoundTag nbt = new CompoundTag()
+				.putList(new ListTag<DoubleTag>("Pos")
+						.add(new DoubleTag("", x))
+						.add(new DoubleTag("", y + this.getEyeHeight()))
+						.add(new DoubleTag("", z)))
+				.putList(new ListTag<DoubleTag>("Motion")
+						.add(new DoubleTag("", -Math.sin(yaw / 180 + Math.PI) * Math.cos(pitch / 180 * Math.PI)))
+						.add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
+						.add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
+				.putList(new ListTag<FloatTag>("Rotation")
+						.add(new FloatTag("", (float) yaw))
+						.add(new FloatTag("", (float) pitch)));
+		double f = 0.9;
+		EntityFishingHook fishingHook = new EntityFishingHook(chunk, nbt, this);
+		fishingHook.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+		ProjectileLaunchEvent ev = new ProjectileLaunchEvent(fishingHook);
+		this.getServer().getPluginManager().callEvent(ev);
+		if (ev.isCancelled()) {
+			fishingHook.kill();
+		} else {
+			fishingHook.spawnToAll();
+            this.fishing = fishingHook;
+		}
+    }
+
+    public void stopFishing() {
+        fishing.kill();
+        this.fishing = null;
     }
 }
