@@ -918,8 +918,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             food.sendFoodLevel();
         }
 
-        // Trying to fix laggy player list
+        // HACK: fix laggy player list
         this.getServer().sendFullPlayerListData(this);
+
+        // HACK: fix speed bug
+        this.setMovementSpeed(this.getMovementSpeed());
     }
 
     protected boolean orderChunks() {

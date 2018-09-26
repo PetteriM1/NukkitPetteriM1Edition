@@ -5,6 +5,7 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityJukebox;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemRecord;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -25,6 +26,21 @@ public class BlockJukebox extends BlockSolid {
     @Override
     public int getId() {
         return JUKEBOX;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override

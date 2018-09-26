@@ -46,7 +46,7 @@ public class ItemMap extends Item {
         try {
             BufferedImage image = img;
 
-            if (img.getHeight() != 128 || img.getWidth() != 128) { //resize
+            if (img.getHeight() != 128 || img.getWidth() != 128) {
                 image = new BufferedImage(128, 128, img.getType());
                 Graphics2D g = image.createGraphics();
                 g.drawImage(img, 0, 0, 128, 128, null);

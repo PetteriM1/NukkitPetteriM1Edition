@@ -11,7 +11,6 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
-
 public class JungleBigTreePopulator extends Populator {
     private ChunkManager level;
     private int randomAmount;

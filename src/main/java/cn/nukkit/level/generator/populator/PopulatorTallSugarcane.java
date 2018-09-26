@@ -10,7 +10,6 @@ import cn.nukkit.math.NukkitRandom;
  * This class was written by Niall Lindsay
  * @author Niall7459
  **/
-
 public class PopulatorTallSugarcane extends Populator {
     private ChunkManager level;
     private int randomAmount;

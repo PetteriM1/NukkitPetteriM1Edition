@@ -42,5 +42,26 @@ public abstract class Fuel {
         duration.put(Item.BUCKET, (short) 20000);
         duration.put(Item.SIGN, (short) 200);
         duration.put(Item.LADDER, (short) 300);
+        duration.put(Item.BLAZE_ROD, (short) 2400);
+        duration.put(Item.BOAT, (short) 1200);
+        duration.put(Item.WOODEN_PRESSURE_PLATE, (short) 300);
+        duration.put(Item.TRAPPED_CHEST, (short) 300);
+        duration.put(Item.DAYLIGHT_DETECTOR, (short) 300);
+        duration.put(Item.JUKEBOX, (short) 300);
+        duration.put(Item.NOTEBLOCK, (short) 300);
+        duration.put(Item.BANNER, (short) 300);
+        duration.put(Item.WOODEN_SLAB, (short) 300);
+        duration.put(Item.FISHING_ROD, (short) 300);
+        duration.put(Item.WOODEN_DOOR, (short) 200);
+        duration.put(Item.BIRCH_DOOR, (short) 200);
+        duration.put(Item.DARK_OAK_DOOR, (short) 200);
+        duration.put(Item.JUNGLE_DOOR, (short) 200);
+        duration.put(Item.SPRUCE_DOOR, (short) 200);
+        duration.put(Item.ACACIA_DOOR, (short) 200);
+        duration.put(Item.WOODEN_BUTTON, (short) 100);
+        duration.put(Item.BOWL, (short) 200);
+        duration.put(Item.BOW, (short) 200);
+        duration.put(Item.WOOL, (short) 200);
+        duration.put(Item.CARPET, (short) 67);
     }
 }

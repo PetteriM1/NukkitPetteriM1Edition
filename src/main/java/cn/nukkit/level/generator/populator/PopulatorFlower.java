@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * @author Angelic47, Niall Lindsay (Niall7459)
  */
-
 public class PopulatorFlower extends Populator {
 
     private ChunkManager level;

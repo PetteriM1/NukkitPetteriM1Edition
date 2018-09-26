@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityDispenser;
+import cn.nukkit.dispenser.DispenseBehavior;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * Created by CreeperFace on 15.4.2017.
  */
-public class BlockDispenser extends BlockSolidMeta {
+public class BlockDispenser extends BlockSolidMeta implements DispenseBehavior {
 
     public BlockDispenser() {
         this(0);
@@ -128,5 +129,10 @@ public class BlockDispenser extends BlockSolidMeta {
         }
 
         return true;
+    }
+
+    @Override
+    public void dispense(BlockDispenser block, Item item) {
+        //TODO
     }
 }
