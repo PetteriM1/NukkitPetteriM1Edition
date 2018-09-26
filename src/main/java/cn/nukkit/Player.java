@@ -4779,7 +4779,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void startFishing() {
-        this.getInventory().getItemInHand().setDamage(this.getInventory().getItemInHand().getDamage() + 1);
         CompoundTag nbt = new CompoundTag()
 				.putList(new ListTag<DoubleTag>("Pos")
 						.add(new DoubleTag("", x))
@@ -4807,7 +4806,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void stopFishing() {
-        fishing.kill();
+        fishing.reelLine();
         this.fishing = null;
     }
 }

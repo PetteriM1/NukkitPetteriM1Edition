@@ -75,21 +75,17 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 
         int randomNumber = EntityUtils.rand(0, 4);
 
-        switch (getCurrentDifficulty()) {
-            case PEACEFUL:
+        switch (Server.getInstance().getDifficulty()) {
+            case 0:
                 return randomNumber == 0;
-            case EASY:
+            case 1:
                 return randomNumber <= 1;
-            case NORMAL:
+            case 2:
                 return randomNumber <= 2;
-            case HARD:
+            case 3:
                 return true;
             default:
                 return true;
         }
-    }
-
-    protected Difficulty getCurrentDifficulty() {
-        return Difficulty.getByDiffculty(Server.getInstance().getDifficulty());
     }
 }

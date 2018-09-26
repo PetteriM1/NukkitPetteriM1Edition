@@ -18,6 +18,7 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.FishSelector;
 
 import java.util.Random;
@@ -222,7 +223,7 @@ public class EntityFishingHook extends EntityProjectile {
 		if (this.shootingEntity instanceof Player && this.coughted) {
 			String code = FishSelector.select();
 			Item item = FishSelector.getFish(code);
-			int experience = FishSelector.getExperience(code);
+			int experience = EntityUtils.rand(1, 3);
 
 			Random random = new Random();
 			Vector3 motion = this.shootingEntity == null ? new Vector3(0, 0, 0) : new Vector3(this.shootingEntity.x - this.x, this.shootingEntity.y - this.y, this.shootingEntity.z - this.z).multiply(0.08);

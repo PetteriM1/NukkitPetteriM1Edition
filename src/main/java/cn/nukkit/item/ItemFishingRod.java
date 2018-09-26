@@ -33,6 +33,7 @@ public class ItemFishingRod extends ItemTool {
 			player.stopFishing();
 		} else {
 			player.startFishing();
+            this.meta++;
         }
         return true;
     }
@@ -42,4 +43,3 @@ public class ItemFishingRod extends ItemTool {
         return ItemTool.DURABILITY_FISHING_ROD;
     }
 }
-
