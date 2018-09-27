@@ -9,6 +9,7 @@ import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.entity.mob.EntityMob;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
@@ -41,6 +42,7 @@ public abstract class BaseEntity extends EntityCreature {
 
     private boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
     private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000);
+    public boolean canDespawn = true;
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -149,7 +151,7 @@ public abstract class BaseEntity extends EntityCreature {
     public boolean entityBaseTick(int tickDiff) {
         Timings.entityBaseTickTimer.startTiming();
 
-        if (this.despawn && this.age > this.despawnTicks) {
+        if (this.despawn && this.age > this.despawnTicks && this.canDespawn) {
             this.close();
             return true;
         }
@@ -220,5 +222,19 @@ public abstract class BaseEntity extends EntityCreature {
             Timings.entityMoveTimer.stopTiming();
         }
         return true;
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        if (item.getId() == Item.NAME_TAG) {
+            if (item.hasCustomName()) {
+                this.setNameTag(item.getCustomName());
+                this.setNameTagVisible(true);
+                player.getInventory().removeItem(item);
+                this.canDespawn = false;
+                return true;
+            }
+        }
+        return false;
     }
 }

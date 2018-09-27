@@ -92,6 +92,7 @@ public class EntityWolf extends EntityTameableMob {
 
     @Override
     public boolean onInteract(Player player, Item item) {
+        super.onInteract(player, item);
         if (item.equals(Item.get(Item.BONE))) {
             if (!this.hasOwner()) {
                 player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));

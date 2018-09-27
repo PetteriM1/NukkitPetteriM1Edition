@@ -90,6 +90,7 @@ public class EntitySheep extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item) {
+        super.onInteract(player, item);
         if (item.getId() == Item.DYE) {
             this.setColor(((ItemDye) item).getDyeColor().getWoolData());
             return true;

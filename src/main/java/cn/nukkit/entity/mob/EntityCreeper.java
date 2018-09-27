@@ -206,6 +206,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     @Override
     public boolean onInteract(Player player, Item item) {
+        super.onInteract(player, item);
         if (item.getId() == Item.FLINT_AND_STEEL) {
             this.level.addSound(this, "fire.ignite");
             this.explode();

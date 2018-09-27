@@ -78,6 +78,7 @@ public class EntityPig extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item) {
+        super.onInteract(player, item);
         if (item.equals(Item.get(Item.CARROT,0)) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.CARROT,0,1));
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));

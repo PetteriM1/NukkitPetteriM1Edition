@@ -63,6 +63,7 @@ public class EntityCow extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item) {
+        super.onInteract(player, item);
         if (item.equals(Item.get(Item.BUCKET, 0), true)) {
             player.getInventory().removeItem(Item.get(Item.BUCKET, 0, 1));
             player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
