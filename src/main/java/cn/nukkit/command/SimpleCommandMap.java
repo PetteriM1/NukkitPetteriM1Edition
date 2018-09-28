@@ -34,16 +34,16 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new HelpCommand("help"));
         this.register("nukkit", new StopCommand("stop"));
         this.register("nukkit", new TellCommand("tell"));
-        this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
         this.register("nukkit", new BanCommand("ban"));
         this.register("nukkit", new BanIpCommand("ban-ip"));
         this.register("nukkit", new BanListCommand("banlist"));
         this.register("nukkit", new PardonCommand("pardon"));
         this.register("nukkit", new PardonIpCommand("pardon-ip"));
         this.register("nukkit", new SayCommand("say"));
-        this.register("nukkit", new MeCommand("me"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new MeCommand("me"));
         this.register("nukkit", new ListCommand("list"));
-        this.register("nukkit", new DifficultyCommand("difficulty"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new DifficultyCommand("difficulty"));
         this.register("nukkit", new KickCommand("kick"));
         this.register("nukkit", new OpCommand("op"));
         this.register("nukkit", new DeopCommand("deop"));
@@ -54,24 +54,25 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new GiveCommand("give"));
         this.register("nukkit", new EffectCommand("effect"));
         this.register("nukkit", new EnchantCommand("enchant"));
-        this.register("nukkit", new ParticleCommand("particle"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new ParticleCommand("particle"));
         this.register("nukkit", new GamemodeCommand("gamemode"));
         this.register("nukkit", new KillCommand("kill"));
-        this.register("nukkit", new SpawnpointCommand("spawnpoint"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new SpawnpointCommand("spawnpoint"));
         this.register("nukkit", new SetWorldSpawnCommand("setworldspawn"));
         this.register("nukkit", new TeleportCommand("tp"));
         this.register("nukkit", new TimeCommand("time"));
         this.register("nukkit", new TimingsCommand("timings"));
-        this.register("nukkit", new TitleCommand("title"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new TitleCommand("title"));
         this.register("nukkit", new ReloadCommand("reload"));
         this.register("nukkit", new WeatherCommand("weather"));
         this.register("nukkit", new XpCommand("xp"));
-        this.register("nukkit", new TransferServerCommand("transfer"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new TransferServerCommand("transfer"));
         this.register("nukkit", new StatusCommand("status"));
         this.register("nukkit", new GarbageCollectorCommand("gc"));
         this.register("nukkit", new SummonCommand("summon"));
         this.register("nukkit", new WorldCommand("world"));
         this.register("nukkit", new GenerateWorldCommand("genworld"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new SeedCommand("seed"));
     }
 
     @Override

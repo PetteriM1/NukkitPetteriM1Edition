@@ -113,6 +113,7 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission(ROOT + ".command.summon", "Allows the user to summon entities", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.world", "Allows the user to switch world", Permission.DEFAULT_TRUE), commands);
         registerPermission(new Permission(ROOT + ".command.generateworld", "Allows the user to generate new world", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission(ROOT + ".command.seed", "Allows the user to see world's seed", Permission.DEFAULT_OP), commands);
 
         registerPermission(new Permission(ROOT + ".textcolor", "Allows the user to write colored text", Permission.DEFAULT_OP), commands);
 

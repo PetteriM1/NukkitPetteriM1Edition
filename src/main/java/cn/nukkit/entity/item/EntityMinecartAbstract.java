@@ -65,7 +65,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     private double flyingY = 0.95;
     private double flyingZ = 0.95;
     private double maxSpeed = 0.4D;
-    private final boolean devs = false; // Avoid maintained features into production
 
     public abstract MinecartType getType();
 
@@ -215,6 +214,11 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
                 linkedEntity = null;
             }
+            
+            // Used to check for detector rails
+            Block b = this.level.getBlock((int) x, (int) y - 1, (int) z);
+            if (b.getId() == Block.DETECTOR_RAIL) b.onEntityCollide(this);
+
             // No need to onGround or Motion diff! This always have an update
             return true;
         }
@@ -285,9 +289,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                     && linkedEntity == null
                     && entity.riding == null
                     && blockInside == null) {
-                if (riding == null && devs) {
-                    mountEntity(entity);// TODO: rewrite (weird riding)
-                }
             }
 
             double motiveX = entity.x - x;

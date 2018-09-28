@@ -57,7 +57,7 @@ public class ItemArmorStand extends Item {
                         .add(new DoubleTag("", 0))
                         .add(new DoubleTag("", 0)))
                 .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", new Random().nextFloat() * 360))
+                        .add(new FloatTag("", (float) player.yaw + 180))
                         .add(new FloatTag("", 0)));
 
         if (this.hasCustomName()) {

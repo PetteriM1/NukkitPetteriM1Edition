@@ -252,7 +252,6 @@ public class Server {
                 put("spawn-protection", 10);
                 put("max-players", 50);
                 put("spawn-animals", true);
-                put("spawn-mobs", true);
                 put("gamemode", 0);
                 put("force-gamemode", true);
                 put("hardcore", false);

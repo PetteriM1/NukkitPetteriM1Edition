@@ -749,7 +749,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public void onEntityCollide(Entity entity) {
-
     }
 
     public AxisAlignedBB getBoundingBox() {

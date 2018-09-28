@@ -120,8 +120,9 @@ public class BlockNoteblock extends BlockSolidMeta {
 
     @Override
     public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) {
-            //TODO: redstone
+        if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            this.emitSound();
+            return Level.BLOCK_UPDATE_REDSTONE;
         }
 
         return 0;
