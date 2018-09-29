@@ -65,5 +65,4 @@ public class BlockTerracottaStained extends BlockSolidMeta {
     public DyeColor getDyeColor() {
         return DyeColor.getByWoolData(getDamage());
     }
-
 }

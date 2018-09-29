@@ -55,5 +55,4 @@ public class BlockEndGateway extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.AIR_BLOCK_COLOR;
     }
-
 }

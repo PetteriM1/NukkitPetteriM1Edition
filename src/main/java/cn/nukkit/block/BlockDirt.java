@@ -78,5 +78,4 @@ public class BlockDirt extends BlockSolidMeta {
     public BlockColor getColor() {
         return BlockColor.DIRT_BLOCK_COLOR;
     }
-
 }

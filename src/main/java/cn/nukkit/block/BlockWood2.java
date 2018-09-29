@@ -32,5 +32,4 @@ public class BlockWood2 extends BlockWood {
 
         return names[this.getDamage() & 0x03];
     }
-
 }

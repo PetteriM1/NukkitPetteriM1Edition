@@ -6,7 +6,6 @@ import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.passive.EntityChicken;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.EntityEventPacket;
 
 /**
  * @author MagicDroidX

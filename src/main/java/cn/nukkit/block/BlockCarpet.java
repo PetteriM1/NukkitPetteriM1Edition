@@ -99,5 +99,4 @@ public class BlockCarpet extends BlockFlowable {
     public DyeColor getDyeColor() {
         return DyeColor.getByWoolData(getDamage());
     }
-
 }

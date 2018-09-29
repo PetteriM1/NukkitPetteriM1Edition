@@ -27,5 +27,4 @@ public class BlockPumpkinLit extends BlockPumpkin {
     public int getLightLevel() {
         return 15;
     }
-
 }

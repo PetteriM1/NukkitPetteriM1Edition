@@ -8,7 +8,7 @@ import cn.nukkit.lang.TranslationContainer;
 
 public class WorldCommand extends Command {
     public WorldCommand(String name) {
-        super(name, "nukkit.command.world.description", "nukkit.command.world.usage");
+        super(name, "%nukkit.command.world.description", "%nukkit.command.world.usage");
         this.setPermission("nukkit.command.world");
         this.commandParameters.clear();
     }

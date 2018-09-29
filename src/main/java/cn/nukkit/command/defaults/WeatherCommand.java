@@ -13,8 +13,6 @@ import cn.nukkit.level.Level;
  */
 public class WeatherCommand extends VanillaCommand {
 
-    private java.util.Random rand = new java.util.Random();
-
     public WeatherCommand(String name) {
         super(name, "%nukkit.command.weather.description", "%commands.weather.usage");
         this.setPermission("nukkit.command.weather");
@@ -81,6 +79,5 @@ public class WeatherCommand extends VanillaCommand {
                 sender.sendMessage(new TranslationContainer("commands.weather.usage", this.usageMessage));
                 return false;
         }
-
     }
 }

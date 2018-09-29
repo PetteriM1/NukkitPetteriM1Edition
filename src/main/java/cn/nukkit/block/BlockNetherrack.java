@@ -58,5 +58,4 @@ public class BlockNetherrack extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
-
 }

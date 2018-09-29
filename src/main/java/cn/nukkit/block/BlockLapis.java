@@ -59,5 +59,4 @@ public class BlockLapis extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
-
 }

@@ -59,5 +59,4 @@ public class BlockGravel extends BlockFallable {
     public BlockColor getColor() {
         return BlockColor.SAND_BLOCK_COLOR;
     }
-
 }

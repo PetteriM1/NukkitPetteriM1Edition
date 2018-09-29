@@ -7,7 +7,7 @@ import cn.nukkit.level.generator.Generator;
 
 public class GenerateWorldCommand extends Command {
     public GenerateWorldCommand(String name) {
-        super(name, "nukkit.command.generateworld.description", "nukkit.command.generateworld.usage");
+        super(name, "%nukkit.command.generateworld.description", "%nukkit.command.generateworld.usage");
         this.setPermission("nukkit.command.generateworld");
         this.commandParameters.clear();
     }

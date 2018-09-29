@@ -178,5 +178,4 @@ public class BlockRailPowered extends BlockRail {
                 && base != Rail.Orientation.ASCENDING_WEST)
                 && (level.isBlockPowered(pos) || checkSurrounding(pos, relative, power + 1));
     }
-
 }

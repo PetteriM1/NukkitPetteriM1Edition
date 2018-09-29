@@ -12,8 +12,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Angelic47
@@ -22,7 +20,6 @@ import java.util.Set;
 public class BlockRedstoneWire extends BlockFlowable {
 
     private boolean canProvidePower = true;
-    private final Set<Vector3> blocksNeedingUpdate = new HashSet<>();
 
     public BlockRedstoneWire() {
         this(0);

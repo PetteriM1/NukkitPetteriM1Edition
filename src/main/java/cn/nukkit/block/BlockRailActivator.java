@@ -164,5 +164,4 @@ public class BlockRailActivator extends BlockRail {
                 && base != Rail.Orientation.ASCENDING_WEST)
                 && (level.isBlockPowered(pos) || checkSurrounding(pos, relative, power + 1));
     }
-
 }

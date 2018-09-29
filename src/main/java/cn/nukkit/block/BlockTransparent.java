@@ -17,5 +17,4 @@ public abstract class BlockTransparent extends Block {
     public BlockColor getColor() {
         return BlockColor.TRANSPARENT_BLOCK_COLOR;
     }
-
 }

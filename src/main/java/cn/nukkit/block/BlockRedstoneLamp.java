@@ -75,5 +75,4 @@ public class BlockRedstoneLamp extends BlockSolid {
                 new ItemBlock(new BlockRedstoneLamp())
         };
     }
-
 }

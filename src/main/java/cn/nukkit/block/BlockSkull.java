@@ -111,5 +111,4 @@ public class BlockSkull extends BlockTransparentMeta {
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
-
 }

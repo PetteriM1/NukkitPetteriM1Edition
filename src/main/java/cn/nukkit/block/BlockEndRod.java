@@ -75,5 +75,4 @@ public class BlockEndRod extends BlockTransparentMeta {
 
         return true;
     }
-
 }

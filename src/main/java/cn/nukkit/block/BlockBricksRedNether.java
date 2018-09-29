@@ -28,5 +28,4 @@ public class BlockBricksRedNether extends BlockNetherBrick {
             return new Item[0];
         }
     }
-
 }

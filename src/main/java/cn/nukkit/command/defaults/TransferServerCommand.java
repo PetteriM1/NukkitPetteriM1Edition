@@ -12,7 +12,7 @@ import cn.nukkit.lang.TranslationContainer;
 public class TransferServerCommand extends VanillaCommand {
 
     public TransferServerCommand(String name) {
-        super(name, "nukkit.command.transferserver.description", "commands.transferserver.usage");
+        super(name, "%nukkit.command.transferserver.description", "%commands.transferserver.usage");
         this.setPermission("nukkit.command.transferserver");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{new CommandParameter("server address", CommandParameter.ARG_TYPE_STRING, false)});

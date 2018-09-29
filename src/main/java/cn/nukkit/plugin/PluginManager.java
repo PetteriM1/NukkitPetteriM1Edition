@@ -171,37 +171,6 @@ public class PluginManager {
                                 continue;
                             }
 
-                            boolean compatible = false;
-
-                            for (String version : description.getCompatibleAPIs()) {
-
-                                //Check the format: majorVersion.minorVersion.patch
-                                if (!Pattern.matches("[0-9]\\.[0-9]\\.[0-9]", version)) {
-                                    this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "Wrong API format"}));
-                                    continue;
-                                }
-
-                                String[] versionArray = version.split("\\.");
-                                String[] apiVersion = this.server.getApiVersion().split("\\.");
-
-                                //Completely different API version
-                                if (!Objects.equals(Integer.valueOf(versionArray[0]), Integer.valueOf(apiVersion[0]))) {
-                                    continue;
-                                }
-
-                                //If the plugin requires new API features, being backwards compatible
-                                if (Integer.valueOf(versionArray[1]) > Integer.valueOf(apiVersion[1])) {
-                                    continue;
-                                }
-
-                                compatible = true;
-                                break;
-                            }
-
-                            if (!compatible) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.incompatibleAPI"}));
-                            }
-
                             plugins.put(name, file);
 
                             softDependencies.put(name, description.getSoftDepend());
