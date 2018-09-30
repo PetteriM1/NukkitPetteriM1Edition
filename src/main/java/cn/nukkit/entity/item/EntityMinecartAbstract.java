@@ -272,11 +272,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public boolean onInteract(Player p, Item item) {
-        if (linkedEntity != null && isRideable()) {
-            return false;
-        }
-
-        // Simple
+        if (linkedEntity != null && isRideable()) return false;        
+        if (!(this instanceof EntityMinecartEmpty)) return false;
         return blockInside == null && mountEntity(p);
     }
 

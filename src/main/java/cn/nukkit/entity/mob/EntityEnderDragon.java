@@ -29,6 +29,11 @@ public class EntityEnderDragon extends EntityFlyingMob {
     }
 
     @Override
+    public double getSpeed() {
+        return 2;
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
         this.setMaxHealth(200);
@@ -36,7 +41,11 @@ public class EntityEnderDragon extends EntityFlyingMob {
 
     @Override
     public int getKillExperience() {
-        return 500;
+        for (int i = 0; i < 167;) {
+            this.level.dropExpOrb(this, 3);
+            i++;
+        }
+        return 0;
     }
 
     @Override

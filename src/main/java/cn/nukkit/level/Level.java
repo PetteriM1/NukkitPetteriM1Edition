@@ -1951,7 +1951,6 @@ public class Level implements ChunkManager, Metadatable {
         xpOrb.saveNBT();
 
         xpOrb.spawnToAll();
-
     }
 
     public Item useItemOn(Vector3 vector, Item item, BlockFace face, float fx, float fy, float fz) {

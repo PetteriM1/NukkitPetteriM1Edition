@@ -69,7 +69,7 @@ public class BlockSponge extends BlockSolidMeta {
                             double pointerX = this.x;
                             double pointerY = this.y;
                             double pointerZ = this.z;
-                            for (double rand = 2.8 * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; rand > 0; rand -= 0.3d * 0.75d) {
+                            for (double rand = 3 * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; rand > 0; rand -= 0.3d * 0.75d) {
                                 int x = (int) pointerX;
                                 int y = (int) pointerY;
                                 int z = (int) pointerZ;

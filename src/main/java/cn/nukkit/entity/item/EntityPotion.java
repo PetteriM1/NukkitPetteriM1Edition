@@ -1,6 +1,7 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.potion.PotionCollideEvent;
 import cn.nukkit.level.format.FullChunk;
@@ -39,7 +40,7 @@ public class EntityPotion extends EntityProjectile {
 
         this.dataProperties.putShort(DATA_POTION_ID, this.potionId);
 
-        /*Effect effect = Potion.getEffect(potionId, true); TODO: potion color
+        Effect effect = Potion.getEffect(potionId, true);
 
         if (effect != null) {
             int count = 0;
@@ -50,8 +51,8 @@ public class EntityPotion extends EntityProjectile {
             int g = ((c[1] * (effect.getAmplifier() + 1)) / count) & 0xff;
             int b = ((c[2] * (effect.getAmplifier() + 1)) / count) & 0xff;
 
-            this.setDataProperty(new IntEntityData(Entity.DATA_UNKNOWN, (r << 16) + (g << 8) + b));
-        }*/
+            this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, (r << 16) + (g << 8) + b));
+        }
     }
 
     @Override

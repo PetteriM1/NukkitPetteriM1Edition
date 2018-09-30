@@ -68,7 +68,7 @@ public class EntityEgg extends EntityProjectile {
 
             if (Server.getInstance().getPropertyBoolean("spawn-animals", true)) {
                 if (EntityUtils.rand(1, 20) == 5) {
-                    EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 0.5, 0.5));
+                    EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 1, 0.5));
                     if (entity != null) {
                         entity.spawnToAll();
                     }
