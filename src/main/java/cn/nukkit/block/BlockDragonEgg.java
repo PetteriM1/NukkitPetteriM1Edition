@@ -1,6 +1,11 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
+import cn.nukkit.item.Item;
+import cn.nukkit.level.particle.PortalParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.EntityUtils;
 
 public class BlockDragonEgg extends BlockFallable {
 
@@ -39,6 +44,27 @@ public class BlockDragonEgg extends BlockFallable {
 
     @Override
     public boolean isTransparent() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        int x = EntityUtils.rand((int) this.x - 8, (int) this.x + 8);
+        int z = EntityUtils.rand((int) this.z - 8, (int) this.z + 8);
+        Vector3 loc = new Vector3(x, this.level.getHeightMap(x, z) + 1, z);
+        this.getLevel().setBlock(this, Block.get(AIR), true, true);
+        this.getLevel().addParticle(new PortalParticle(this));
+        this.getLevel().addParticle(new PortalParticle(this));
+        this.getLevel().addParticle(new PortalParticle(this));
+        this.getLevel().setBlock(loc, Block.get(DRAGON_EGG), true, true);
+        this.getLevel().addParticle(new PortalParticle(loc));
+        this.getLevel().addParticle(new PortalParticle(loc));
+        this.getLevel().addParticle(new PortalParticle(loc));
         return true;
     }
 }

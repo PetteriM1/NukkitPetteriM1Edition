@@ -93,8 +93,10 @@ public class BlockSponge extends BlockSolidMeta {
                     }
                 }
             }
+            this.level.setBlock(this, Block.get(Block.SPONGE, 1), true, true);
+        } else {
+            this.level.setBlock(this, Block.get(Block.SPONGE, 0), true, true);
         }
-        this.level.setBlock(this, Block.get(Block.SPONGE, this.getDamage()), true, true);
         return true;
     }
 }
