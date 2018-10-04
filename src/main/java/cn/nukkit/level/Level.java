@@ -124,7 +124,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     // Disable random block ticking in these worlds if SuomiCraft PE mode is enabled
-    private static final String doNotTickWorlds = Server.getInstance().getPropertyString("do-not-tick-worlds", "");
+    public final String doNotTickWorlds = Server.getInstance().getPropertyString("do-not-tick-worlds", "");
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
 
