@@ -220,7 +220,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[ACACIA_WOOD_STAIRS] = BlockStairsAcacia.class; //163
             list[DARK_OAK_WOOD_STAIRS] = BlockStairsDarkOak.class; //164
             list[SLIME_BLOCK] = BlockSlime.class; //165
-
+            list[GLOW_STICK] = BlockGlowStick.class; //166
             list[IRON_TRAPDOOR] = BlockTrapdoorIron.class; //167
             list[PRISMARINE] = BlockPrismarine.class; //168
             list[SEA_LANTERN] = BlockSeaLantern.class; //169
@@ -242,7 +242,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[FENCE_GATE_JUNGLE] = BlockFenceGateJungle.class; //185
             list[FENCE_GATE_DARK_OAK] = BlockFenceGateDarkOak.class; //186
             list[FENCE_GATE_ACACIA] = BlockFenceGateAcacia.class; //187
-
+            list[REPEATING_COMMAND_BLOCK] = BlockCommandBlockRepeating.class; //188
+            list[CHAIN_COMMAND_BLOCK] = BlockCommandBlockChain.class; //189
+            list[HARD_GLASS_PANE] = BlockHardGlassPane.class; //190
+            list[HARD_STAINED_GLASS_PANE] = BlockHardGlassPaneStained.class; //191
+            list[CHEMICAL_HEAT] = BlockChemicalHeat.class; //192
             list[SPRUCE_DOOR_BLOCK] = BlockDoorSpruce.class; //193
             list[BIRCH_DOOR_BLOCK] = BlockDoorBirch.class; //194
             list[JUNGLE_DOOR_BLOCK] = BlockDoorJungle.class; //195
@@ -252,18 +256,21 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[ITEM_FRAME_BLOCK] = BlockItemFrame.class; //199
             list[CHORUS_FLOWER] = BlockChorusFlower.class; //200
             list[PURPUR_BLOCK] = BlockPurpur.class; //201
-
+            list[COLORED_TORCH_RG] = BlockColoredTorchRG.class; //202
             list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
-
+            list[COLORED_TORCH_BP] = BlockColoredTorchBP.class; //204
+            list[UNDYED_SHULKER_BOX] = BlockShulkerBox.class; //205
             list[END_BRICKS] = BlockBricksEndStone.class; //206
-
+            list[FROSTED_ICE] = BlockIceFrosted.class; //207
             list[END_ROD] = BlockEndRod.class; //208
             list[END_GATEWAY] = BlockEndGateway.class; //209
-
+            // 210 Allow in Education Edition
+            // 211 Deny in Education Edition
+            // 212 Border in Education Edition
             list[MAGMA] = BlockMagma.class; //213
             list[BLOCK_NETHER_WART_BLOCK] = BlockNetherWartBlock.class; //214
             list[BONE_BLOCK] = BlockBone.class; //216
-
+            // 217 not yet in Minecraft
             list[SHULKER_BOX] = BlockShulkerBox.class; //218
             list[PURPLE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedPurple.class; //219
             list[WHITE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedWhite.class; //220
@@ -276,7 +283,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[GRAY_GLAZED_TERRACOTTA] = BlockTerracottaGlazedGray.class; //227
             list[SILVER_GLAZED_TERRACOTTA] = BlockTerracottaGlazedSilver.class; //228
             list[CYAN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedCyan.class; //229
-
+            // 230 Chalkboard in Education Edition
             list[BLUE_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlue.class; //231
             list[BROWN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBrown.class; //232
             list[GREEN_GLAZED_TERRACOTTA] = BlockTerracottaGlazedGreen.class; //233
@@ -284,18 +291,24 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[BLACK_GLAZED_TERRACOTTA] = BlockTerracottaGlazedBlack.class; //235
             list[CONCRETE] = BlockConcrete.class; //236
             list[CONCRETE_POWDER] = BlockConcretePowder.class; //237
-
+            list[CHEMISTRY_TABLE] = BlockChemistryTable.class; //238
+            list[UNDERWATER_TORCH] = BlockUnderwaterTorch.class; //239
             list[CHORUS_PLANT] = BlockChorusPlant.class; //240
             list[STAINED_GLASS] = BlockGlassStained.class; //241
+            // 242 Camera in Education Edition
             list[PODZOL] = BlockPodzol.class; //243
             list[BEETROOT_BLOCK] = BlockBeetroot.class; //244
             list[STONECUTTER] = BlockStonecutter.class; //244
             list[GLOWING_OBSIDIAN] = BlockObsidianGlowing.class; //246
             list[NETHER_REACTOR] = BlockNetherReactor.class; //247
-
+            list[INFO_UPDATE] = BlockInfoUpdate.class; //248
+            list[INFO_UPDATE2] = BlockInfoUpdate2.class; //249
             list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
             list[OBSERVER] = BlockObserver.class; //251
             list[STRUCTURE_BLOCK] = BlockStructureBlock.class; //252
+            list[HARD_GLASS] = BlockHardGlass.class; //253
+            list[HARD_STAINED_GLASS] = BlockHardGlassStained.class; //254
+            list[RESERVED6] = BlockReserved6.class; //255
 
             for (int id = 0; id < 256; id++) {
                 Class c = list[id];

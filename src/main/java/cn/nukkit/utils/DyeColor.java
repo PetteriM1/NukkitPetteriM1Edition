@@ -2,7 +2,6 @@ package cn.nukkit.utils;
 
 public enum DyeColor {
 
-
     BLACK(0, 15, "Black", "Ink Sack", BlockColor.BLACK_BLOCK_COLOR),
     RED(1, 14, "Red", "Rose Red", BlockColor.RED_BLOCK_COLOR),
     GREEN(2, 13, "Green", "Cactus Green", BlockColor.GREEN_BLOCK_COLOR),
@@ -20,13 +19,11 @@ public enum DyeColor {
     ORANGE(14, 1, "Orange", BlockColor.ORANGE_BLOCK_COLOR),
     WHITE(15, 0, "White", "Bone Meal", BlockColor.WHITE_BLOCK_COLOR);
 
-
     private int dyeColorMeta;
     private int woolColorMeta;
     private String colorName;
     private String dyeName;
     private BlockColor blockColor;
-
 
     private final static DyeColor[] BY_WOOL_DATA;
     private final static DyeColor[] BY_DYE_DATA;

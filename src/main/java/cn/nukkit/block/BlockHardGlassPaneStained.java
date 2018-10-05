@@ -4,17 +4,17 @@ import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 
 /**
- * Created by CreeperFace on 7.8.2017.
+ * Created by PetteriM1
  */
-public class BlockGlassPaneStained extends BlockGlassPane {
+public class BlockHardGlassPaneStained extends BlockHardGlassPane {
 
     private int meta;
 
-    public BlockGlassPaneStained() {
+    public BlockHardGlassPaneStained() {
         this(0);
     }
 
-    public BlockGlassPaneStained(int meta) {
+    public BlockHardGlassPaneStained(int meta) {
         this.meta = meta;
     }
 
@@ -25,12 +25,12 @@ public class BlockGlassPaneStained extends BlockGlassPane {
 
     @Override
     public int getId() {
-        return STAINED_GLASS_PANE;
+        return HARD_STAINED_GLASS_PANE;
     }
 
     @Override
     public String getName() {
-        return getDyeColor().getName() + " Stained Glass Pane";
+        return getDyeColor().getName() + " Hardened Stained Glass Pane";
     }
 
     @Override

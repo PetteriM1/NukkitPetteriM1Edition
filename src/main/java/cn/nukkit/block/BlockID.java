@@ -263,13 +263,15 @@ public interface BlockID {
     int PURPUR_BLOCK = 201;
     int COLORED_TORCH_RG = 202;
     int PURPUR_STAIRS = 203;
-    int DOUBLE_PURPUR_SLAB = 204;
-    int PURPUR_SLAB = 205;
+    int COLORED_TORCH_BP = 204;
+    int UNDYED_SHULKER_BOX = 205;
     int END_BRICKS = 206;
-    int ICE_FROSTED = 207;
+    int FROSTED_ICE = 207;
     int END_ROD = 208;
     int END_GATEWAY = 209;
-    // 210 - 212 not yet in Minecraft
+    // 210 Allow in Education Edition
+    // 211 Deny in Education Edition
+    // 212 Border in Education Edition
     int MAGMA = 213;
     int BLOCK_NETHER_WART_BLOCK = 214;
     int RED_NETHER_BRICK = 215;
@@ -287,6 +289,7 @@ public interface BlockID {
     int GRAY_GLAZED_TERRACOTTA = 227;
     int SILVER_GLAZED_TERRACOTTA = 228;
     int CYAN_GLAZED_TERRACOTTA = 229;
+    // 230 Chalkboard in Education Edition
     int BLUE_GLAZED_TERRACOTTA = 231;
     int BROWN_GLAZED_TERRACOTTA = 232;
     int GREEN_GLAZED_TERRACOTTA = 233;
@@ -298,6 +301,7 @@ public interface BlockID {
     int UNDERWATER_TORCH = 239;
     int CHORUS_PLANT = 240;
     int STAINED_GLASS = 241;
+    // 242 Camera in Education Edition
     int PODZOL = 243;
     int BEETROOT_BLOCK = 244;
     int STONECUTTER = 245;

@@ -1,7 +1,7 @@
 package cn.nukkit.entity.mob;
 
-import cn.nukkit.block.Block;
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
@@ -11,12 +11,14 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 
 import java.util.ArrayList;
@@ -100,6 +102,13 @@ public class EntitySkeleton extends EntityWalkingMob {
         pk.item = new ItemBow();
         pk.hotbarSlot = 0;
         player.dataPacket(pk);
+
+        if (java.time.LocalDate.now().toString().contains("-10-31")) {
+            MobArmorEquipmentPacket pk2 = new MobArmorEquipmentPacket();
+            pk2.eid = this.getId();
+            pk2.slots[0] = new ItemBlock(Block.get(Block.PUMPKIN));
+            player.dataPacket(pk2);
+        }
     }
 
     @Override

@@ -2,16 +2,19 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -157,5 +160,17 @@ public class EntityZombie extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return 5;
+    }
+
+    @Override
+    public void spawnTo(Player player) {
+        super.spawnTo(player);
+
+        if (java.time.LocalDate.now().toString().contains("-10-31")) {
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getId();
+            pk.slots[0] = new ItemBlock(Block.get(Block.PUMPKIN));
+            player.dataPacket(pk);
+        }
     }
 }
