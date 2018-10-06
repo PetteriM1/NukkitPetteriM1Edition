@@ -92,7 +92,7 @@ public class BlockTNT extends BlockSolid {
 
     @Override
     public int onUpdate(int type) {
-        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && this.level.isBlockPowered(this)) {
+        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && this.level.isBlockPowered(this.getLocation())) {
             this.prime();
         }
 
@@ -106,12 +106,14 @@ public class BlockTNT extends BlockSolid {
             this.prime(80, player);
             return true;
         }
+
         if (item.getId() == Item.FIRE_CHARGE) {
             if (!player.isCreative()) player.getInventory().removeItem(Item.get(Item.FIRE_CHARGE, 0, 1));
             this.level.addSound(player, "mob.ghast.fireball");
             this.prime(80, player);
             return true;
         }
+
         return false;
     }
 
