@@ -50,6 +50,7 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
         this.fireProof = true;
         this.setMaxHealth(600);
+        this.setHealth(600);
         this.setDamage(new int[]{0, 2, 4, 6});
     }
 
