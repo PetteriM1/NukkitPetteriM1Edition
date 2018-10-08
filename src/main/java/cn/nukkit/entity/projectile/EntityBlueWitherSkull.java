@@ -1,11 +1,11 @@
 package cn.nukkit.entity.projectile;
 
-import cn.nukkit.potion.Effect;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.EntityUtils;
 
 public class EntityBlueWitherSkull extends EntityProjectile {
@@ -102,7 +102,7 @@ public class EntityBlueWitherSkull extends EntityProjectile {
         
         Effect wither = Effect.getEffect(Effect.WITHER);
         wither.setAmplifier(1);
-        wither.setDuration(140);
+        wither.setDuration(200);
         entity.addEffect(wither);
     }
 }
