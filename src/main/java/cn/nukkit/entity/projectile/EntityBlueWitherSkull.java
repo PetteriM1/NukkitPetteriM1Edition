@@ -1,5 +1,6 @@
 package cn.nukkit.entity.projectile;
 
+import cn.nukkit.potion.Effect;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.level.format.FullChunk;
@@ -93,5 +94,15 @@ public class EntityBlueWitherSkull extends EntityProjectile {
         this.timing.startTiming();
 
         return hasUpdate;
+    }
+
+    @Override
+    public void onCollideWithEntity(Entity entity) {
+        super.onCollideWithEntity(entity);
+        
+        Effect wither = Effect.getEffect(Effect.WITHER);
+        wither.setAmplifier(1);
+        wither.setDuration(140);
+        entity.addEffect(wither);
     }
 }

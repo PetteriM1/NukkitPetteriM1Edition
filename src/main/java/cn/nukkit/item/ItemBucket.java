@@ -33,6 +33,11 @@ public class ItemBucket extends Item {
         switch (meta) {
             case 1:
                 return "Milk";
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                return "Fish Bucket";
             case 8:
                 return "Water Bucket";
             case 10:
@@ -44,6 +49,10 @@ public class ItemBucket extends Item {
 
     protected int getDamageByTarget(int target) {
         switch (target) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
             case 8:
             case 9:
                 return 8;

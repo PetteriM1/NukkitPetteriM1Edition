@@ -179,11 +179,6 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         return true;
     }
 
-    @Override
-    public Vector3 updateMove(int tickDiff) {
-        return null;
-    }
-
     public void attackEntity(Entity player) {
     }
 
