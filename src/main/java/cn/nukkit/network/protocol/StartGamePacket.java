@@ -52,6 +52,7 @@ public class StartGamePacket extends DataPacket {
     public boolean hasLockedBehaviorPack = false;
     public boolean hasLockedResourcePack = false;
     public boolean isFromLockedWorldTemplate = false;
+    public boolean isUsingMsaGamertagsOnly = false;
     public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public String worldName;
     public String premiumWorldTemplateId = "";
@@ -109,6 +110,7 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
+        this.putBoolean(this.isUsingMsaGamertagsOnly);
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
