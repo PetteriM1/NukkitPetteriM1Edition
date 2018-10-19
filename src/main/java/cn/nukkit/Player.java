@@ -4550,11 +4550,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             spawnPosition.y = spawn.getFloorY();
             spawnPosition.z = spawn.getFloorZ();
             this.dataPacket(spawnPosition);
-            
-            int dimensionId = level.getDimension();
-            if (oldLevel.getDimension() != dimensionId) {
-                this.setDimension(dimensionId);
-            }
 
             // Remove old chunks
             for (long index : new ArrayList<>(this.usedChunks.keySet())) {
