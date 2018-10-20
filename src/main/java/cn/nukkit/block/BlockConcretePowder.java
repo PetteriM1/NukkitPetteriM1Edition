@@ -8,6 +8,7 @@ import cn.nukkit.math.BlockFace;
  * Created by CreeperFace on 2.6.2017.
  */
 public class BlockConcretePowder extends BlockFallable {
+
     private int meta;
 
     public BlockConcretePowder() {
@@ -66,7 +67,7 @@ public class BlockConcretePowder extends BlockFallable {
             for (int side = 1; side <= 5; side++) {
                 Block block = this.getSide(BlockFace.fromIndex(side));
                 if (block.getId() == Block.WATER || block.getId() == Block.STILL_WATER || block.getId() == Block.LAVA || block.getId() == Block.STILL_LAVA) {
-                    this.level.setBlock(this, Block.get(Block.CONCRETE, this.meta));
+                    this.level.setBlock(this, Block.get(Block.CONCRETE, this.meta), true, true);
                 }
             }
             return Level.BLOCK_UPDATE_NORMAL;

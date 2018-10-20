@@ -138,7 +138,7 @@ public class EntityFallingBlock extends Entity {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(getBlock(), getDamage()));
                     server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
-                        getLevel().setBlock(pos, event.getTo(), true);
+                        getLevel().setBlock(pos, event.getTo(), true, true);
                         getLevel().scheduleUpdate(getLevel().getBlock(pos), 1);
 
                         if (event.getTo().getId() == Item.ANVIL) {

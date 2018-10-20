@@ -92,7 +92,7 @@ public class BlockCactus extends BlockTransparentMeta {
                             BlockGrowEvent event = new BlockGrowEvent(b, new BlockCactus());
                             Server.getInstance().getPluginManager().callEvent(event);
                             if (!event.isCancelled()) {
-                                this.getLevel().setBlock(b, event.getNewState(), true);
+                                this.getLevel().setBlock(b, event.getNewState(), true, true);
                             }
                         }
                     }
