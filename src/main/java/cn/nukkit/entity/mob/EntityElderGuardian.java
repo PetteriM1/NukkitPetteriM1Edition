@@ -49,6 +49,7 @@ public class EntityElderGuardian extends EntitySwimmingMob {
 
     @Override
     public void attackEntity(Entity player) {
+        //TODO
     }
 
     @Override

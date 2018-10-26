@@ -6,7 +6,6 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.item.EntityPotion;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
@@ -18,8 +17,6 @@ import cn.nukkit.potion.Potion;
 public class EntityWitch extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 45;
-
-    private static final int ATTACK_TICKS = 20;
 
     public EntityWitch(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -61,15 +58,9 @@ public class EntityWitch extends EntityWalkingMob {
     }
 
     @Override
-    public boolean attack(EntityDamageEvent ev) {
-        super.attack(ev);
-        return true;
-    }
-
-    @Override
     public void attackEntity(Entity player) {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > ATTACK_TICKS && this.distanceSquared(player) <= 20) {
+            if (this.attackDelay > 60 && this.distanceSquared(player) <= 20) {
                 this.attackDelay = 0;
                 if (player.isAlive() && !player.closed) {
 

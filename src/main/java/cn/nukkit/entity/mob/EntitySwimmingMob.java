@@ -5,22 +5,22 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.entity.EntityWalking;
+import cn.nukkit.entity.EntitySwimming;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import co.aikar.timings.Timings;
 
-public abstract class EntitySwimmingMob extends EntityWalking implements EntityMob {
+public abstract class EntitySwimmingMob extends EntitySwimming implements EntityMob {
 
-    private int[]   minDamage;
+    private int[] minDamage;
 
-    private int[]   maxDamage;
+    private int[] maxDamage;
 
-    protected int   attackDelay = 0;
+    protected int attackDelay = 0;
 
-    private boolean canAttack   = true;
+    private boolean canAttack = true;
 
     public EntitySwimmingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

@@ -46,6 +46,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected float movementSpeed = 0.1f;
 
+    protected float lastKnockback = 0;
+
     @Override
     protected void initEntity() {
         super.initEntity();
@@ -137,10 +139,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z) {
-        this.knockBack(attacker, damage, x, z, 0.4);
+        this.knockBack(attacker, damage, x, z, 0.3);
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {
+        if (System.currentTimeMillis() < this.lastKnockback + 1000) return;
+
         double f = Math.sqrt(x * x + z * z);
         if (f <= 0) {
             return;
@@ -162,6 +166,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         this.setMotion(motion);
+        this.lastKnockback = System.currentTimeMillis();
     }
 
     @Override

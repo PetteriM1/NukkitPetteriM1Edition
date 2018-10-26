@@ -115,17 +115,6 @@ public class EntityVindicator extends EntityWalkingMob {
     }
 
     @Override
-    public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = false;
-        Timings.entityBaseTickTimer.startTiming();
-
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        Timings.entityBaseTickTimer.stopTiming();
-        return hasUpdate;
-    }
-
-    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {

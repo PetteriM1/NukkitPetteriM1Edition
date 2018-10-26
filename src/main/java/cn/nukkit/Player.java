@@ -907,9 +907,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         // Weather
-        if (this.level.isRaining() || this.level.isThundering()) {
-            this.getLevel().sendWeather(this);
-        }
         this.getLevel().sendWeather(this);
 
         // FoodLevel

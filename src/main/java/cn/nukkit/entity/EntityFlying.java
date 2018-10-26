@@ -72,7 +72,7 @@ public abstract class EntityFlying extends BaseEntity {
             } else {
                 y = EntityUtils.rand(-10, 10);
             }
-            this.stayTime = EntityUtils.rand(90, 400);
+            this.stayTime = EntityUtils.rand(100, 400);
             this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || !(this.target instanceof Vector3)) {
             x = EntityUtils.rand(20, 100);
@@ -83,7 +83,7 @@ public abstract class EntityFlying extends BaseEntity {
                 y = EntityUtils.rand(-10, 10);
             }
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(300, 1200);
+            this.moveTime = EntityUtils.rand(200, 1000);
             this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
         }
     }

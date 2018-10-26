@@ -129,13 +129,6 @@ public abstract class BaseEntity extends EntityCreature {
         this.namedTag.putShort("Age", this.age);
     }
 
-    @Override
-    protected void updateMovement() {
-        if (this.getServer().getMobAiEnabled()) {
-            super.updateMovement();
-        }
-    }
-
     public boolean targetOption(EntityCreature creature, double distance) {
         if (this instanceof EntityMob) {
             if (creature instanceof Player) {

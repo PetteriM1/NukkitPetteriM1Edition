@@ -9,17 +9,14 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class EntityTameableMob extends EntityWalkingMob implements EntityTameable {
 
-    private Server          server          = null;
+    private Player owner = null;
 
-    private Player          owner           = null;
+    private String ownerUUID = "";
 
-    private String          ownerUUID       = "";
-
-    private boolean         sitting         = false;
+    private boolean sitting = false;
 
     public EntityTameableMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-        this.server = Server.getInstance();
     }
 
     @Override
@@ -29,7 +26,7 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
         if (this.namedTag != null) {
             String ownerName = namedTag.getString(NAMED_TAG_OWNER);
             if (ownerName != null && ownerName.length() > 0) {
-                Player player = server.getPlayer(ownerName);
+                Player player = Server.getInstance().getPlayer(ownerName);
                 this.setOwner(player);
                 this.setSitting(namedTag.getBoolean(NAMED_TAG_SITTING));
             }

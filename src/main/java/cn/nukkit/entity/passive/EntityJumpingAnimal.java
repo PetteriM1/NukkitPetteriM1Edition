@@ -32,32 +32,6 @@ public abstract class EntityJumpingAnimal extends EntityJumping implements Entit
     }
 
     @Override
-    public boolean entityBaseTick(int tickDiff) {
-
-        boolean hasUpdate = false;
-
-        Timings.entityBaseTickTimer.startTiming();
-
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (!this.hasEffect(Effect.WATER_BREATHING) && this.isInsideOfWater()) {
-            hasUpdate = true;
-            int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
-            if (airTicks <= -20) {
-                airTicks = 0;
-                this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            }
-            this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
-        } else {
-            this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
-        }
-
-        Timings.entityBaseTickTimer.stopTiming();
-
-        return hasUpdate;
-    }
-
-    @Override
     public boolean onUpdate(int currentTick) {
         if (!this.isAlive()) {
             if (++this.deadTicks >= 23) {

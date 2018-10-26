@@ -31,10 +31,14 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
             if (blockId == Block.NETHERRACK) {
                 this.spawnTask.createEntity("WitherSkeleton", pos.add(0, 2.8, 0));
             }
+        } else if (biomeId == Biome.ICE_PLAINS || biomeId == Biome.TUNDRA) {
+            if (time > 13184 && time < 22800) {
+                this.spawnTask.createEntity("Stray", pos.add(0, 2.8, 0));
+            }
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
         } else if (level.getName().equals("end")) {
-            result = SpawnResult.WRONG_BLOCK;
+            result = SpawnResult.WRONG_BIOME;
         } else if (light > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (time > 13184 && time < 22800) {

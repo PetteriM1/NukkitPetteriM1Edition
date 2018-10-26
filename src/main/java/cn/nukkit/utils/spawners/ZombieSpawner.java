@@ -7,6 +7,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
@@ -36,9 +37,13 @@ public class ZombieSpawner extends AbstractEntitySpawner {
                 this.spawnTask.createEntity("Husk", pos.add(0, 2.8, 0));
             }
         } else if (biomeId == Biome.HELL || level.getName().equals("end")) {
-            result = SpawnResult.WRONG_BLOCK;
+            result = SpawnResult.WRONG_BIOME;
         } else if (time > 13184 && time < 22800) {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+            if (EntityUtils.rand(1, 40) == 30) {
+                this.spawnTask.createEntity("ZombieVillager", pos.add(0, 2.8, 0));
+            } else {
+                this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+            }
         }
 
         return result;

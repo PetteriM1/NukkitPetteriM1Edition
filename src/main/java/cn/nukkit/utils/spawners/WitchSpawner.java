@@ -2,18 +2,17 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.passive.EntityPolarBear;
+import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
-public class PolarBearSpawner extends AbstractEntitySpawner {
+public class WitchSpawner extends AbstractEntitySpawner {
 
-    public PolarBearSpawner(Spawner spawnTask) {
+    public WitchSpawner(Spawner spawnTask) {
         super(spawnTask);
     }
 
@@ -21,21 +20,21 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (EntityUtils.rand(0, 3) == 1) {
-            return SpawnResult.SPAWN_DENIED;
-        }
-
-        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+        int time = level.getTime() % Level.TIME_FULL;
+        int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (biomeId != Biome.ICE_PLAINS) {
+        if (blockId != Block.GRASS) {
+            result = SpawnResult.WRONG_BLOCK;
+        } else if (biomeId != Biome.SWAMP) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (Block.transparent[blockId]) {
-            result = SpawnResult.WRONG_BLOCK;
-        } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.3, 0));
+        } else if (light > 7) {
+            result = SpawnResult.WRONG_LIGHTLEVEL;
+        } else if (time > 13184 && time < 22800) {
+            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
         }
 
         return result;
@@ -43,11 +42,11 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
 
     @Override
     public int getEntityNetworkId() {
-        return EntityPolarBear.NETWORK_ID;
+        return EntityWitch.NETWORK_ID;
     }
 
     @Override
     public String getEntityName() {
-        return "PolarBear";
+        return "Witch";
     }
 }

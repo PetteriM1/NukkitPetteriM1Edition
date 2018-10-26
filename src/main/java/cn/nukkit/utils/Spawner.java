@@ -57,6 +57,7 @@ public class Spawner extends Thread {
         entitySpawners.add(new SkeletonSpawner(this));
         entitySpawners.add(new SpiderSpawner(this));
         entitySpawners.add(new ZombieSpawner(this));
+        entitySpawners.add(new WitchSpawner(this));
     }
 
     private void prepareMaxSpawns() {
@@ -74,6 +75,7 @@ public class Spawner extends Thread {
         maxSpawns.put(EntitySkeleton.NETWORK_ID, 1);
         maxSpawns.put(EntitySpider.NETWORK_ID, 1);
         maxSpawns.put(EntityZombie.NETWORK_ID, 1);
+        maxSpawns.put(EntityWitch.NETWORK_ID, 1);
     }
 
     public boolean entitySpawnAllowed(Level level, int networkId, String entityName) {

@@ -34,29 +34,6 @@ public abstract class EntityWaterAnimal extends EntitySwimming implements Entity
     }
 
     @Override
-    public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate;
-        Timings.entityBaseTickTimer.startTiming();
-
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (this.isOnGround()) {
-            hasUpdate = true;
-            int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
-            if (airTicks <= -20) {
-                airTicks = 0;
-                this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            }
-            this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
-        } else {
-            this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
-        }
-
-        Timings.entityBaseTickTimer.stopTiming();
-        return hasUpdate;
-    }
-
-    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;

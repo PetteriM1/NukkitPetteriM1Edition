@@ -20,12 +20,12 @@ public class EntityLlamaSpit extends EntityProjectile {
 
     @Override
     public float getWidth() {
-        return 0.3125f;
+        return 0.3f;
     }
 
     @Override
     public float getHeight() {
-        return 0.3125f;
+        return 0.3f;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class EntityLlamaSpit extends EntityProjectile {
 
     @Override
     protected double getDamage() {
-        return 4;
+        return 1;
     }
 
     public EntityLlamaSpit(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
@@ -69,7 +69,7 @@ public class EntityLlamaSpit extends EntityProjectile {
             this.critical = false;
         }
 
-        if (this.age > 1200 || this.isCollided) {
+        if (this.age > 100 || this.isCollided) {
             this.kill();
             hasUpdate = true;
         }

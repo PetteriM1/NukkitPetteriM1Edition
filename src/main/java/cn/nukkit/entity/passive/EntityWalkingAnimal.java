@@ -54,21 +54,9 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
             this.inLoveTicks -= tickDiff;
             if (this.age % 20 == 0) {
                 for (int i = 0; i < 3; i++) {
-                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0,1.0),this.getMountedYOffset()+ EntityUtils.rand(-1.0,1.0),EntityUtils.rand(-1.0,1.0))));
+                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0, 1.0), this.getMountedYOffset() + EntityUtils.rand(-1.0, 1.0), EntityUtils.rand(-1.0, 1.0))));
                 }
             }
-        }
-
-        if (!this.hasEffect(Effect.WATER_BREATHING) && this.isInsideOfWater()) {
-            hasUpdate = true;
-            int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
-            if (airTicks <= -20) {
-                airTicks = 0;
-                this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            }
-            this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
-        } else {
-            this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
         }
 
         Timings.entityBaseTickTimer.stopTiming();

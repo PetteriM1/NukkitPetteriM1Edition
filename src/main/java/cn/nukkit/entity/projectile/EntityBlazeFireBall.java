@@ -3,7 +3,7 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
-import cn.nukkit.level.Explosion;
+import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -78,10 +78,10 @@ public class EntityBlazeFireBall extends EntityProjectile {
 
         if (this.age > 1200 || this.isCollided) {
             if (this.isCollided && this.canExplode) {
-                ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 2.8);
+                ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1.8);
                 this.server.getPluginManager().callEvent(ev);
                 if (!ev.isCancelled()) {
-                    Explosion explosion = new Explosion(this, (float) ev.getForce(), this.shootingEntity);
+                    SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);
                     if (ev.isBlockBreaking()) {
                         explosion.explodeA();
                     }

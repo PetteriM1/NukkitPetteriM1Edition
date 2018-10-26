@@ -103,7 +103,7 @@ public class EntityBlaze extends EntityFlyingMob {
         } else if (EntityUtils.rand(1, 410) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.stayTime = EntityUtils.rand(90, 400);
+            this.stayTime = EntityUtils.rand(100, 400);
             this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
