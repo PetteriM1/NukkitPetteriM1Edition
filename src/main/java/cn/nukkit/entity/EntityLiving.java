@@ -46,8 +46,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected float movementSpeed = 0.1f;
 
-    protected float lastKnockback = 0;
-
     @Override
     protected void initEntity() {
         super.initEntity();
@@ -143,8 +141,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {
-        if (System.currentTimeMillis() < this.lastKnockback + 1000) return;
-
         double f = Math.sqrt(x * x + z * z);
         if (f <= 0) {
             return;
@@ -166,7 +162,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         this.setMotion(motion);
-        this.lastKnockback = System.currentTimeMillis();
     }
 
     @Override
@@ -267,9 +262,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        // Used to check collisions with magma blocks
+        // Used to check collisions with blocks
         Block block = this.level.getBlock((int) x, (int) y - 1, (int) z);
-        if (block.getId() == Block.MAGMA) block.onEntityCollide(this);
+        int id = block.getId();
+        if (id == Block.MAGMA || id == Block.CACTUS) block.onEntityCollide(this);
 
         Timings.livingEntityBaseTickTimer.stopTiming();
 

@@ -1,10 +1,10 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.entity.projectile.EntityLlamaSpit;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
+import cn.nukkit.entity.projectile.EntityLlamaSpit;
 import cn.nukkit.level.Location;
+import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.utils.EntityUtils;
@@ -71,34 +71,41 @@ public class EntityLlama extends EntityWalkingAnimal {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (!(ev instanceof EntityDamageByEntityEvent)) return true;
-        if (!(((EntityDamageByEntityEvent) ev).getDamager() instanceof Player)) return true;
+        if (ev instanceof EntityDamageByEntityEvent) {
+            Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
+            if (damager instanceof Player) {
+                this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
+                    if (this.isAlive()) {
+                        if (this.distance(damager) < 10) {
+                            this.moveTime = 0;
+                            this.stayTime = 100;
 
-        if (System.currentTimeMillis() < this.lastSplit + 3000) return true;
-        this.lastSplit = System.currentTimeMillis();
+                            double f = 2;
+                            double yaw = this.yaw;
+                            double pitch = this.pitch;
+                            Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
+                                    this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+                            Entity k = EntityUtils.create("LlamaSplit", pos, this);
+                            if (!(k instanceof EntityLlamaSpit)) return;
+                            
+                            EntityLlamaSpit split = (EntityLlamaSpit) k;
+                            split.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
-        double f = 1.2;
-        double yaw = this.yaw + EntityUtils.rand(-150, 150) / 10;
-        double pitch = this.pitch + EntityUtils.rand(-75, 75) / 10;
-        Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
-                this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-        Entity k = EntityUtils.create("LlamaSplit", pos, this);
-        if (!(k instanceof EntityLlamaSpit)) {
-            return true;
+                            ProjectileLaunchEvent launch = new ProjectileLaunchEvent(split);
+                            this.server.getPluginManager().callEvent(launch);
+                            if (launch.isCancelled()) {
+                                split.kill();
+                            } else {
+                                split.spawnToAll();
+                                this.level.addSound(this, "mob.llama.spit");
+                            }
+                        }
+                    }
+                }, 30);
+            }
         }
 
-        EntityLlamaSpit split = (EntityLlamaSpit) k;
-        split.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
-        ProjectileLaunchEvent launch = new ProjectileLaunchEvent(split);
-        this.server.getPluginManager().callEvent(launch);
-        if (launch.isCancelled()) {
-            split.kill();
-        } else {
-            split.spawnToAll();
-            this.level.addSound(this, "mob.llama.spit");
-        }
         return true;
     }
 

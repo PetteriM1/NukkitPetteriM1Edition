@@ -1950,6 +1950,8 @@ public class Server {
         Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
         Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);
         Entity.registerEntity("LlamaSplit", EntityLlamaSpit.class);
+        Entity.registerEntity("EvocationFangs", EntityEvocationFangs.class);
+        Entity.registerEntity("EnderCharge", EntityEnderCharge.class);
         //Monsters
         Entity.registerEntity("Blaze", EntityBlaze.class);
         Entity.registerEntity("Creeper", EntityCreeper.class);
