@@ -29,6 +29,8 @@ public class MCowSpawner extends AbstractEntitySpawner {
 
         if (biomeId != Biome.MUSHROOM_ISLAND) {
             result = SpawnResult.WRONG_BIOME;
+        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+            result = SpawnResult.WRONG_BIOME;
         } else if (blockId != Block.MYCELIUM) {
             result = SpawnResult.WRONG_BLOCK;
         } else if (pos.y > 127 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {

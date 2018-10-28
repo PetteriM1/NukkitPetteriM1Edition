@@ -38,7 +38,7 @@ public class ZombieSpawner extends AbstractEntitySpawner {
             } else if (time > 13184 && time < 22800) {
                 this.spawnTask.createEntity("Husk", pos.add(0, 2.8, 0));
             }
-        } else if (biomeId == Biome.HELL || level.getName().equals("end")) {
+        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else if (time > 13184 && time < 22800) {
             if (EntityUtils.rand(1, 40) == 30) {

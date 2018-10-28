@@ -5,7 +5,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntityZombiePigman;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
@@ -21,9 +20,8 @@ public class PigZombieSpawner extends AbstractEntitySpawner {
         SpawnResult result = SpawnResult.OK;
 
         int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (biomeId != Biome.HELL) {
+        if (!level.getName().equals("nether")) {
             result = SpawnResult.WRONG_BIOME;
         } else if (blockId != Block.NETHERRACK) {
             result = SpawnResult.WRONG_BLOCK;
