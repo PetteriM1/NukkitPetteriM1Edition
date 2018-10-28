@@ -29,6 +29,8 @@ public class OcelotSpawner extends AbstractEntitySpawner {
 
         if (biomeId != Biome.JUNGLE) {
             result = SpawnResult.WRONG_BIOME;
+        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+            result = SpawnResult.WRONG_BIOME;
         } else if (blockId != Block.GRASS && blockId != Block.LEAVES) {
             result = SpawnResult.WRONG_BLOCK;
         } else if (pos.y > 127 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {
