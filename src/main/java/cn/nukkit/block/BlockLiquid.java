@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.level.sound.FizzSound;
@@ -408,5 +409,10 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
 
     protected boolean canFlowInto(Block block) {
         return block.canBeFlowedInto() && !(block instanceof BlockLiquid && block.getDamage() == 0);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(new BlockAir());
     }
 }

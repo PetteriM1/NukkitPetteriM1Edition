@@ -89,10 +89,15 @@ public class BlockSnowLayer extends BlockFallable {
     }
 
     @Override
+    public Item toItem() {
+        return new ItemSnowball();
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
         if (item.isShovel() && item.getTier() >= ItemTool.TIER_WOODEN) {
             return new Item[]{
-                    new ItemSnowball()
+                    this.toItem()
             };
         } else {
             return new Item[0];
