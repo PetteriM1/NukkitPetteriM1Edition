@@ -79,7 +79,7 @@ public class ServerScheduler {
     }
 
     public void increaseAsyncTaskPoolSize(int newSize) {
-        throw new UnsupportedOperationException("Cannot increase a working pool size."); //wtf?
+        throw new UnsupportedOperationException("Cannot increase a working pool size.");
     }
 
     public TaskHandler scheduleDelayedTask(Task task, int delay) {
@@ -172,7 +172,7 @@ public class ServerScheduler {
             TaskHandler taskHandler = entry.getValue();
             if (taskHandler.getPlugin() == null || plugin.equals(taskHandler.getPlugin())) {
                 try {
-                    taskHandler.cancel(); /* It will remove from task map automatic in next main heartbeat. */
+                    taskHandler.cancel(); // It will remove from task map automatic in next main heartbeat
                 } catch (RuntimeException ex) {
                     Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
                 }
@@ -226,11 +226,11 @@ public class ServerScheduler {
 
     public void mainThreadHeartbeat(int currentTick) {
         this.currentTick = currentTick;
-        // Accepts pending.
+        // Accepts pending
         while (!pending.isEmpty()) {
             queue.offer(pending.poll());
         }
-        // Main heart beat.
+        // Main heart beat
         while (isReady(currentTick)) {
             TaskHandler taskHandler = queue.poll();
             if (taskHandler.isCancelled()) {
@@ -273,5 +273,4 @@ public class ServerScheduler {
     private int nextTaskId() {
         return currentTaskId.incrementAndGet();
     }
-
 }

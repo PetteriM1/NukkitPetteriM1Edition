@@ -121,6 +121,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.NETHER_WART_BLOCK] = true;
         if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.FIRE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
+        randomTickBlocks[Block.FROSTED_ICE] = true;
     }
 
     // Disable random block ticking in these worlds if SuomiCraft PE mode is enabled

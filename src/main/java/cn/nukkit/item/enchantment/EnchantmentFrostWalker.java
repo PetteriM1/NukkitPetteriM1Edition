@@ -1,26 +1,24 @@
 package cn.nukkit.item.enchantment;
 
-/**
- * @author Rover656
- */
-public class EnchantmentMending extends Enchantment {
-    protected EnchantmentMending() {
-        super(ID_MENDING, "mending", 2, EnchantmentType.ALL);
+public class EnchantmentFrostWalker extends Enchantment {
+
+    protected EnchantmentFrostWalker() {
+        super(ID_FROST_WALKER, "frostWalker", 2, EnchantmentType.ARMOR_FEET);
     }
 
     @Override
     public int getMinEnchantAbility(int level) {
-        return level * 25;
+        return level * 10;
     }
 
     @Override
     public int getMaxEnchantAbility(int level) {
-        return this.getMinEnchantAbility(level) + 50;
+        return this.getMinEnchantAbility(level) + 15;
     }
 
     @Override
     public int getMaxLevel() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -30,6 +28,6 @@ public class EnchantmentMending extends Enchantment {
 
     @Override
     public boolean isCompatibleWith(Enchantment enchantment) {
-        return super.isCompatibleWith(enchantment) && enchantment.id != ID_BOW_INFINITY;
+        return super.isCompatibleWith(enchantment) && enchantment.id != ID_WATER_WALKER;
     }
 }

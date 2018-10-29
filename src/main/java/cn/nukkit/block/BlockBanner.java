@@ -6,7 +6,9 @@ import cn.nukkit.blockentity.BlockEntityBanner;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
@@ -48,20 +50,32 @@ public class BlockBanner extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.down().getId() == Block.AIR) return false;
-        boolean blockSuccess = super.place(item, block, target, face, fx, fy, fz, player);
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return null;
+    }
 
-        if (blockSuccess) {
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (face != BlockFace.DOWN) {
+            if (face == BlockFace.UP) {
+                this.setDamage(NukkitMath.floorDouble(((player.yaw + 180) * 16 / 360) + 0.5) & 0x0f);
+                this.getLevel().setBlock(block, this, true);
+            } else {
+                this.setDamage(face.getIndex());
+                this.getLevel().setBlock(block, new BlockWallBanner(this.getDamage()), true);
+            }
+
             CompoundTag nbt = new CompoundTag("")
                     .putString("id", BlockEntity.BANNER)
                     .putInt("x", (int) this.x)
                     .putInt("y", (int) this.y)
-                    .putInt("z", (int) this.z);
+                    .putInt("z", (int) this.z)
+                    .putInt("Base", item.getDamage() & 0x0f);
             new BlockEntityBanner(this.level.getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
-        }
 
-        return blockSuccess;
+            return true;
+        }
+        return false;
     }
     
     @Override

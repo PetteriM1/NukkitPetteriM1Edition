@@ -1,9 +1,7 @@
 package cn.nukkit.item.enchantment;
 
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArmor;
-import cn.nukkit.item.ItemBow;
-import cn.nukkit.item.ItemFishingRod;
+import cn.nukkit.block.BlockPumpkin;
+import cn.nukkit.item.*;
 
 /**
  * @author MagicDroidX
@@ -20,7 +18,9 @@ public enum EnchantmentType {
     DIGGER,
     FISHING_ROD,
     BREAKABLE,
-    BOW;
+    BOW,
+    WEARABLE,
+    TRIDENT;
 
     public boolean canEnchantItem(Item item) {
         if (this == ALL) {
@@ -43,6 +43,10 @@ public enum EnchantmentType {
                     return item.isLeggings();
                 case ARMOR_FEET:
                     return item.isBoots();
+                case WEARABLE:
+                    return item instanceof ItemArmor || item instanceof ItemElytra || item instanceof ItemSkull || item.getBlock() instanceof BlockPumpkin;
+                case TRIDENT:
+                    return item instanceof ItemTrident;
                 default:
                     return false;
             }

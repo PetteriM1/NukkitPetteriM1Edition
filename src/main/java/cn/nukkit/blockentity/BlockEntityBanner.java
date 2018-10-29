@@ -20,12 +20,21 @@ public class BlockEntityBanner extends BlockEntitySpawnable {
         return "Banner";
     }
 
+    public int getBaseColor() {
+        return this.namedTag.getInt("Base");
+    }
+
+    public void setBaseColor(int color) {
+        this.namedTag.putInt("Base", color & 0x0f);
+    }
+
     @Override
     public CompoundTag getSpawnCompound() {
         return new CompoundTag()
                 .putString("id", BlockEntity.BANNER)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
+                .putInt("z", (int) this.z)
+                .putInt("Base", getBaseColor());
     }
 }

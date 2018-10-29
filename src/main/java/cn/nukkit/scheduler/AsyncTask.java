@@ -89,5 +89,4 @@ public abstract class AsyncTask implements Runnable {
         }
         Timings.schedulerAsyncTimer.stopTiming();
     }
-
 }

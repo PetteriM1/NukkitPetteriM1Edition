@@ -53,5 +53,4 @@ public class FileWriteTask extends AsyncTask {
             Server.getInstance().getLogger().logException(e);
         }
     }
-
 }

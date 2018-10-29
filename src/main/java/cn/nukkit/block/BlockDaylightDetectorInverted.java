@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 
@@ -20,6 +21,12 @@ public class BlockDaylightDetectorInverted extends BlockDaylightDetector {
     @Override
     public String getName() {
         return "Daylight Detector Inverted";
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        this.getLevel().setBlock(this, new BlockDaylightDetector());
+        return true;
     }
 
     @Override

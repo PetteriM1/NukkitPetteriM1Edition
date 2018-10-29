@@ -58,5 +58,4 @@ public abstract class PluginTask<T extends Plugin> extends Task {
     public final T getOwner() {
         return this.owner;
     }
-
 }

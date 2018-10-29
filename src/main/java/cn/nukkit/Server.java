@@ -1025,7 +1025,9 @@ public class Server {
             }
 
             for (Level level : this.levelArray) {
-                level.save();
+                this.getScheduler().scheduleTask(null, () -> {
+                    level.save();
+                }, true);
             }
             Timings.levelSaveTimer.stopTiming();
         }

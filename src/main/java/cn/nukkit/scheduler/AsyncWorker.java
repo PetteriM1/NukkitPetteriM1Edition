@@ -47,5 +47,4 @@ public class AsyncWorker extends Thread implements InterruptibleThread {
             } catch (InterruptedException e) {}
         }
     }
-
 }
