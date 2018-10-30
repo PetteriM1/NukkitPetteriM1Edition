@@ -906,6 +906,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.spawnToAll();
         }
 
+        // Time
+        this.getLevel().sendTime(this);
+
         // Weather
         this.getLevel().sendWeather(this);
 
@@ -2026,8 +2029,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(startGamePacket);
 
         this.loggedIn = true;
-
-        this.level.sendTime(this);
 
         this.setMovementSpeed(DEFAULT_SPEED);
         this.sendAttributes();

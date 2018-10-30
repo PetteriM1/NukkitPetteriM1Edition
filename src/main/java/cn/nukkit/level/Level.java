@@ -685,7 +685,6 @@ public class Level implements ChunkManager, Metadatable {
     public void sendTime(Player... players) {
         SetTimePacket pk = new SetTimePacket();
         pk.time = (int) this.time;
-        if (java.time.LocalDate.now().toString().contains("-10-04")) pk.time = 0;
 
         Server.broadcastPacket(players, pk);
     }
