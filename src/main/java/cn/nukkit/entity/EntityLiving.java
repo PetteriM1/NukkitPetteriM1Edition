@@ -8,6 +8,7 @@ import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -151,7 +152,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         Vector3 motion = new Vector3(this.motionX, this.motionY, this.motionZ);
 
         motion.x /= 2d;
-        motion.y /= 2d;
+        motion.y /= 1.9d;
         motion.z /= 2d;
         motion.x += x * f * base;
         motion.y += base;
@@ -262,10 +263,18 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        // Used to check collisions with blocks
+        // Check collisions with blocks
         Block block = this.level.getBlock((int) x, (int) y - 1, (int) z);
         int id = block.getId();
-        if (id == Block.MAGMA || id == Block.CACTUS) block.onEntityCollide(this);
+        if (id == Block.MAGMA || id == Block.CACTUS) {
+            block.onEntityCollide(this);
+        }
+        if (id == Block.MAGMA && this.isInsideOfWater()) {
+            this.setMotion(new Vector3(0, -0.5, 0));
+        }
+        if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
+            this.setMotion(new Vector3(0, 0.5, 0));
+        }
 
         Timings.livingEntityBaseTickTimer.stopTiming();
 

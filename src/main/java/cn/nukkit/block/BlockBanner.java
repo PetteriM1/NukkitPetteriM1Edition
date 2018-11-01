@@ -55,6 +55,11 @@ public class BlockBanner extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (face != BlockFace.DOWN) {
             if (face == BlockFace.UP) {

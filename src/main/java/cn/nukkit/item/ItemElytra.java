@@ -32,5 +32,4 @@ public class ItemElytra extends ItemTool {
     public boolean isChestplate() {
         return true;
     }
-
 }

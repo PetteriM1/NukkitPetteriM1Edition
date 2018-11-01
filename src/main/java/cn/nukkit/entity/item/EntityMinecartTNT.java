@@ -1,9 +1,12 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.Player;
+
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemMinecartTNT;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.format.FullChunk;
@@ -123,5 +126,17 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         super.saveNBT();
 
         super.namedTag.putInt("TNTFuse", this.fuse);
+    }
+    
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        boolean interact = super.onInteract(player, item);
+        if (item.getId() == Item.FLINT_AND_STEEL) {
+            this.level.addSound(this, "fire.ignite");
+            this.explode();
+            return true;
+        }
+
+        return interact;
     }
 }

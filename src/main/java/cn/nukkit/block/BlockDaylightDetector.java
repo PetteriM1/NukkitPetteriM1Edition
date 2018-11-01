@@ -50,10 +50,6 @@ public class BlockDaylightDetector extends BlockTransparent {
     public Item toItem() {
         return new ItemBlock(this, 0);
     }
-
-    protected boolean invertDetect() {
-        return false;
-    }
     
     @Override
     public boolean isPowerSource() {
@@ -63,5 +59,10 @@ public class BlockDaylightDetector extends BlockTransparent {
     @Override
     public int getWeakPower(BlockFace face) {
         return 15;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
     }
 }

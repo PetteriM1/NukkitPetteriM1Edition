@@ -18,7 +18,7 @@ public class ItemEmptyMap extends Item {
     }
 
     public ItemEmptyMap(Integer meta, int count) {
-        super(EMPTY_MAP, 0, count, "Empty Map");
+        super(EMPTY_MAP, meta, count, "Empty Map");
     }
 
     @Override

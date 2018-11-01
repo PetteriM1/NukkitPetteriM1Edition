@@ -34,7 +34,8 @@ public class BlockDaylightDetectorInverted extends BlockDaylightDetector {
         return new ItemBlock(new BlockDaylightDetector(), 0);
     }
 
-    protected boolean invertDetect() {
-        return true;
+    @Override
+    public boolean canBePushed() {
+        return false;
     }
 }

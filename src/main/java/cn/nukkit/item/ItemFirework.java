@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.item.EntityFirework;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -80,6 +81,13 @@ public class ItemFirework extends Item {
 
             if (!player.isCreative()) {
                 player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            }
+            
+            if (player.getInventory().getChestplate() instanceof ItemElytra && player.getLevel().getBlockIdAt((int) player.x, (int) player.y - 2, (int) player.z) == 0) {
+                player.setMotion(new Vector3(
+                        -Math.sin(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 3,
+                        -Math.sin(Math.toRadians(player.pitch)) * 3,
+                        Math.cos(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 3));
             }
 
             return true;
