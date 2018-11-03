@@ -8,7 +8,6 @@ import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -138,7 +137,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z) {
-        this.knockBack(attacker, damage, x, z, 0.3);
+        this.knockBack(attacker, damage, x, z, 0.25);
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {
@@ -152,7 +151,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         Vector3 motion = new Vector3(this.motionX, this.motionY, this.motionZ);
 
         motion.x /= 2d;
-        motion.y /= 1.9d;
+        motion.y /= 2d;
         motion.z /= 2d;
         motion.x += x * f * base;
         motion.y += base;
@@ -207,7 +206,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         if (this instanceof Player && ((Player) this).isCreative()) {
             isBreathing = true;
         }
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
+
+        if (this instanceof Player && ((Player) this).protocol <= 282) {
+            this.setDataFlag(DATA_FLAGS, 34, isBreathing);
+        } else {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
+        }
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 

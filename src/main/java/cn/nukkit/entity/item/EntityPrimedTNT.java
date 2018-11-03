@@ -59,7 +59,6 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
     public EntityPrimedTNT(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true);
     }
 
     public EntityPrimedTNT(FullChunk chunk, CompoundTag nbt, Entity source) {

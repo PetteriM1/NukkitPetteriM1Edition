@@ -85,7 +85,12 @@ public class EntityHuman extends EntityHumanType {
     @Override
     protected void initEntity() {
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY);
+
+        if (this instanceof Player && ((Player) this).protocol <= 282) {
+            this.setDataFlag(DATA_FLAGS, 47);
+        } else {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY);
+        }
 
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0), false);
 
@@ -155,7 +160,7 @@ public class EntityHuman extends EntityHumanType {
             }
 
             if (this instanceof Player)
-                this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getName(), this.skin, ((Player) this).getLoginChainData().getXUID(), new Player[]{player});
+                this.server.sendFullPlayerListData(player);
             else
                 this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getName(), this.skin, new Player[]{player});
 
@@ -174,6 +179,9 @@ public class EntityHuman extends EntityHumanType {
             pk.pitch = (float) this.pitch;
             pk.item = this.getInventory().getItemInHand();
             pk.metadata = this.dataProperties;
+
+            if (player.protocol < 291) pk.protocolLowerThan291 = true;
+
             player.dataPacket(pk);
 
             this.inventory.sendArmorContents(player);

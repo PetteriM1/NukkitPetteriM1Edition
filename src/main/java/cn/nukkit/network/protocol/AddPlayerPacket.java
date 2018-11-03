@@ -18,6 +18,8 @@ public class AddPlayerPacket extends DataPacket {
         return NETWORK_ID;
     }
 
+    public boolean protocolLowerThan291 = false;
+
     public UUID uuid;
     public String username;
     public long entityUniqueId;
@@ -44,6 +46,8 @@ public class AddPlayerPacket extends DataPacket {
         this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
+        if (protocolLowerThan291) this.putString("");
+        if (protocolLowerThan291) this.putVarInt(0);
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
         this.putString(this.platformChatId);

@@ -960,6 +960,8 @@ public class Server {
                         p.getLoginChainData().getXUID()))
                 .toArray(PlayerListPacket.Entry[]::new);
 
+        if (player.protocol < 291) pk.protocolLowerThan291 = true;
+
         player.dataPacket(pk);
     }
 

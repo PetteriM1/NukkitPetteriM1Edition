@@ -168,6 +168,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String username;
     protected String iusername;
     protected String displayName;
+    public int protocol;
 
     protected int startAction = -1;
 
@@ -923,6 +924,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         // HACK: fix speed bug
         this.setMovementSpeed(this.getMovementSpeed());
+
+        if (this.protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+            this.sendMessage("\u00A7e[WARNING] You are running unsupported Minecraft version");
+        }
     }
 
     protected boolean orderChunks() {
@@ -2026,6 +2031,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.levelId = "";
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat, 3 nether, 4 end
+
+        if (this.protocol < 291) startGamePacket.protocolLowerThan291 = true;
+
         this.dataPacket(startGamePacket);
 
         this.loggedIn = true;
@@ -2080,8 +2088,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     LoginPacket loginPacket = (LoginPacket) packet;
 
+                    this.protocol = loginPacket.getProtocol();
+
                     String message;
-                    if (loginPacket.getProtocol() != ProtocolInfo.CURRENT_PROTOCOL) {
+                    if (this.protocol < ProtocolInfo.MINIUM_PROTOCOL || this.protocol > ProtocolInfo.CURRENT_PROTOCOL) {
                         message = "disconnectionScreen.unsupportedVersion";
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
 
@@ -3306,7 +3316,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        TextPacket pk = new TextPacket();
+        TextPacket pk = new TextPacket(this.protocol < 291);
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
         this.dataPacket(pk);
@@ -3326,7 +3336,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendTranslation(String message, String[] parameters) {
-        TextPacket pk = new TextPacket();
+        TextPacket pk = new TextPacket(this.protocol < 291);
         if (!this.server.isLanguageForced()) {
             pk.type = TextPacket.TYPE_TRANSLATION;
             pk.message = this.server.getLanguage().translateString(message, parameters, "nukkit.");
@@ -3347,7 +3357,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        TextPacket pk = new TextPacket();
+        TextPacket pk = new TextPacket(this.protocol < 291);
         pk.type = TextPacket.TYPE_CHAT;
         pk.source = source;
         pk.message = this.server.getLanguage().translateString(message);
@@ -3359,7 +3369,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendPopup(String message, String subtitle) {
-        TextPacket pk = new TextPacket();
+        TextPacket pk = new TextPacket(this.protocol < 291);
         pk.type = TextPacket.TYPE_POPUP;
         pk.source = message;
         pk.message = subtitle;
@@ -3367,7 +3377,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendTip(String message) {
-        TextPacket pk = new TextPacket();
+        TextPacket pk = new TextPacket(this.protocol < 291);
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
         this.dataPacket(pk);

@@ -12,6 +12,8 @@ public class StartGamePacket extends DataPacket {
         return NETWORK_ID;
     }
 
+    public boolean protocolLowerThan291 = false;
+
     public long entityUniqueId;
     public long entityRuntimeId;
     public int playerGamemode;
@@ -110,7 +112,7 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
-        this.putBoolean(this.isUsingMsaGamertagsOnly);
+        if (!protocolLowerThan291) this.putBoolean(this.isUsingMsaGamertagsOnly);
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);

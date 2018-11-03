@@ -7,9 +7,19 @@ public class TextPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.TEXT_PACKET;
 
+    public boolean protocolLowerThan291 = false;
+
     @Override
     public byte pid() {
         return NETWORK_ID;
+    }
+
+    public TextPacket() {
+        this(false);
+    }
+
+    public TextPacket(boolean protocolLowerThan291) {
+        this.protocolLowerThan291 = protocolLowerThan291;
     }
 
     public static final byte TYPE_RAW = 0;
@@ -66,6 +76,8 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
+                if (protocolLowerThan291) this.putString("");
+                if (protocolLowerThan291) this.putVarInt(0);
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:

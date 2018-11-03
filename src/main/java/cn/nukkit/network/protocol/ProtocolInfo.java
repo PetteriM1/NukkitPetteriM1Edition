@@ -6,10 +6,10 @@ package cn.nukkit.network.protocol;
  */
 public interface ProtocolInfo {
 
-    /**
-     * Actual Minecraft: PE protocol version
-     */
-    int CURRENT_PROTOCOL = Integer.valueOf("291");
+    int CURRENT_PROTOCOL = 291;
+
+    int MINIUM_PROTOCOL = 282;
+    int MAXIUM_PROTOCOL = 291;
 
     String MINECRAFT_VERSION = "v1.7";
     String MINECRAFT_VERSION_NETWORK = "1.7";
