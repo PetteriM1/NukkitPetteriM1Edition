@@ -1979,7 +1979,10 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (player != null && !player.hasInteracted.get()) {
+        // do not ignore interacts for chests etc. to make sure PlayerInteractEvent is called
+        List<Integer> blocks = Arrays.asList(Block.CHEST, Block.TRAPPED_CHEST, Block.FURNACE);
+
+        if (player != null && (!player.hasInteracted.get() || blocks.contains(target.getId()))) {
             PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face,
                     target.getId() == 0 ? Action.RIGHT_CLICK_AIR : Action.RIGHT_CLICK_BLOCK);
 
