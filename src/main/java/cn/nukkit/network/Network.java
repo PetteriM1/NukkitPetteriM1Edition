@@ -151,7 +151,7 @@ public class Network {
                 if ((pk = this.getPacket(buf[0])) != null) {
                     pk.setBuffer(buf, 1);
 
-                    pk.decode();
+                    try { pk.decode(); } catch (Exception e) {}
 
                     packets.add(pk);
                 }

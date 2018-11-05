@@ -959,9 +959,7 @@ public class Server {
                         p.getSkin(),
                         p.getLoginChainData().getXUID()))
                 .toArray(PlayerListPacket.Entry[]::new);
-
-        if (player.protocol < 291) pk.protocolLowerThan291 = true;
-
+        pk.protocolLowerThan291 = player.protocol < 291;
         player.dataPacket(pk);
     }
 

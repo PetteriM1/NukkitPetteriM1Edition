@@ -112,7 +112,9 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.levelId);
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
-        if (!protocolLowerThan291) this.putBoolean(this.isUsingMsaGamertagsOnly);
+        if (!protocolLowerThan291) {
+            this.putBoolean(this.isUsingMsaGamertagsOnly);
+        }
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);

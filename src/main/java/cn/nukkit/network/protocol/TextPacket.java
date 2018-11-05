@@ -76,8 +76,10 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
-                if (protocolLowerThan291) this.putString("");
-                if (protocolLowerThan291) this.putVarInt(0);
+                if (protocolLowerThan291) {
+                    this.putString("");
+                    this.putVarInt(0);
+                }
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:

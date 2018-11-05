@@ -33,8 +33,10 @@ public class PlayerListPacket extends DataPacket {
             if (type == TYPE_ADD) {
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
-                if (protocolLowerThan291) this.putString("");
-                if (protocolLowerThan291) this.putVarInt(0);
+                if (protocolLowerThan291) {
+                    this.putString("");
+                    this.putVarInt(0);
+                }
                 this.putSkin(entry.skin);
                 this.putString(entry.xboxUserId);
                 this.putString(entry.platformChatId);

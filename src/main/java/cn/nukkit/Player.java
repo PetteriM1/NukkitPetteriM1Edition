@@ -2031,9 +2031,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.levelId = "";
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat, 3 nether, 4 end
-
-        if (this.protocol < 291) startGamePacket.protocolLowerThan291 = true;
-
+        startGamePacket.protocolLowerThan291 = this.protocol < 291;
         this.dataPacket(startGamePacket);
 
         this.loggedIn = true;
@@ -2091,7 +2089,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.protocol = loginPacket.getProtocol();
 
                     String message;
-                    if (this.protocol < ProtocolInfo.MINIUM_PROTOCOL || this.protocol > ProtocolInfo.CURRENT_PROTOCOL) {
+                    if (this.protocol < ProtocolInfo.MINIUM_PROTOCOL || this.protocol > ProtocolInfo.MAXIUM_PROTOCOL) {
                         message = "disconnectionScreen.unsupportedVersion";
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
 
