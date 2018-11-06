@@ -67,6 +67,10 @@ public class EntityArrow extends EntityProjectile {
         super.initEntity();
 
         this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 2;
+
+        if (!this.namedTag.contains("canNotPickup")) {
+            this.namedTag.putBoolean("canNotPickup", false);
+        }
     }
 
     public void setCritical() {

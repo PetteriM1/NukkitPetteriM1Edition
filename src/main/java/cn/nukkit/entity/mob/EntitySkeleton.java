@@ -86,6 +86,7 @@ public class EntitySkeleton extends EntityWalkingMob {
                         projectile.kill();
                     } else {
                         projectile.spawnToAll();
+                        projectile.namedTag.putBoolean("canNotPickup", true);
                         this.level.addSound(this, "random.bow");
                     }
                 }

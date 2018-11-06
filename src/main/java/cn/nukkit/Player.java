@@ -4656,6 +4656,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     return false;
                 }
 
+                if (entity.namedTag.getBoolean("canNotPickup")) {
+                    return false;
+                }
+
                 InventoryPickupArrowEvent ev;
                 this.server.getPluginManager().callEvent(ev = new InventoryPickupArrowEvent(this.inventory, (EntityArrow) entity));
                 if (ev.isCancelled()) {

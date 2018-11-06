@@ -22,9 +22,7 @@ public class Spawner extends Thread {
 
     public Spawner() {        
         prepareMaxSpawns();
-        try {
-            prepareSpawnerClasses();
-        } catch (Exception e) {}
+        prepareSpawnerClasses();
     }
 
     @Override
@@ -79,8 +77,7 @@ public class Spawner extends Thread {
     }
 
     public boolean entitySpawnAllowed(Level level, int networkId, String entityName) {
-        int count = countEntity(level, networkId);
-        return count < maxSpawns.getOrDefault(networkId, 0);
+        return countEntity(level, networkId) < maxSpawns.getOrDefault(networkId, 0);
     }
 
     private int countEntity(Level level, int networkId) {

@@ -22,7 +22,7 @@ public class SpiderSpawner extends AbstractEntitySpawner {
         int time = level.getTime() % Level.TIME_FULL;
         int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (pos.y > 127 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {
+        if (pos.y > 256 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;

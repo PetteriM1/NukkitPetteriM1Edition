@@ -3,8 +3,6 @@ package cn.nukkit.utils;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -12,31 +10,22 @@ import java.util.Random;
  */
 public class FishSelector {
 
-	private static int hollRate = 6;
-	private static Map<String, Integer> fishes = new HashMap<String, Integer>()
-	{
-	    {
-			put("349:0", 10);
-			put("349:1", 9);
-			put("349:2", 6);
-			put("349:3", 5);
-			put("367:0", 3);
-			put("280:0", 2);
-	    }
-	};
-
 	public static String select() {
-		Random random = new Random();
-		int rand = random.nextInt(hollRate);
-		int current = 0;
-		for (Map.Entry<String, Integer> entry : fishes.entrySet()) {
-			if (current > rand) {
-				return entry.getKey();
-			} else {
-				current += entry.getValue();
-			}
-		}
-		return "349:0";
+		int rand = EntityUtils.rand(0, 18);
+		if (rand < 5)
+			return "349:0";
+		else if (rand < 10)
+			return "460:0";
+		else if (rand < 11)
+			return "461:0";
+		else if (rand < 13)
+			return "462:0";
+		else if (rand < 15)
+			return "367:0";
+		else if (rand < 17)
+			return "280:0";
+		else
+			return "349:0";
 	}
 
 	public static Item getFish(String code) {

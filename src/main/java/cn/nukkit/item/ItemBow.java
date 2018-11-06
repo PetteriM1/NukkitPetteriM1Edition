@@ -111,13 +111,18 @@ public class ItemBow extends ItemTool {
                 }
             }
             if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
-                ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
+                EntityProjectile proj = entityShootBowEvent.getProjectile();
+                ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(proj);
                 Server.getInstance().getPluginManager().callEvent(projectev);
                 if (projectev.isCancelled()) {
-                    entityShootBowEvent.getProjectile().kill();
+                    proj.kill();
                 } else {
-                    entityShootBowEvent.getProjectile().spawnToAll();
+                    proj.spawnToAll();
                     player.getLevel().addSound(player, "random.bow");
+
+                    if (this.hasEnchantment(Enchantment.ID_BOW_INFINITY)) {
+                        proj.namedTag.putBoolean("canNotPickup", true);
+                    }
                 }
             } else {
                 entityShootBowEvent.getProjectile().spawnToAll();
