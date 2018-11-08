@@ -2840,7 +2840,7 @@ public class Level implements ChunkManager, Metadatable {
     public boolean isSpawnChunk(int X, int Z) {
         Vector3 spawn = this.getSpawnLocation();
 
-        if (this.getServer().suomiCraftPEMode()) {
+        if (this.getServer().suomiCraftPEMode() && this.getServer().getPropertyString("do-not-tick-worlds").contains(this.getName())) {
             return Math.abs(X - (spawn.getFloorX() >> 4)) <= 4 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 4;
         } else {
             return Math.abs(X - (spawn.getFloorX() >> 4)) <= 1 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 1;
