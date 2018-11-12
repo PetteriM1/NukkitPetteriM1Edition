@@ -11,8 +11,8 @@ public interface ProtocolInfo {
     int MINIUM_PROTOCOL = 282;
     int MAXIUM_PROTOCOL = 291;
 
-    String MINECRAFT_VERSION = "v1.7";
-    String MINECRAFT_VERSION_NETWORK = "1.7";
+    String MINECRAFT_VERSION = "v1.7.0";
+    String MINECRAFT_VERSION_NETWORK = "1.7.0";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;

@@ -2,16 +2,13 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
 public abstract class EntityWalkingAnimal extends EntityWalking implements EntityAnimal {

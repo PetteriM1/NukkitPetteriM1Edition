@@ -16,12 +16,15 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityLlama extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 29;
 
     protected float lastSplit = 0;
+
+    private AtomicBoolean delay = new AtomicBoolean();
 
     public EntityLlama(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -74,6 +77,10 @@ public class EntityLlama extends EntityWalkingAnimal {
         if (ev instanceof EntityDamageByEntityEvent) {
             Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
             if (damager instanceof Player) {
+                if (delay.get()) return true;
+                delay.set(true);
+                server.getScheduler().scheduleDelayedTask(() -> delay.compareAndSet(true, false), 40);
+
                 this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
                     if (this.isAlive()) {
                         if (this.distance(damager) < 10) {
