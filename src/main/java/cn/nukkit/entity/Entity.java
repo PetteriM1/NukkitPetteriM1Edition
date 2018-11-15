@@ -1322,10 +1322,8 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void updateRiderPosition(float offset) {
-        // Messy unknown variables
         if (updateRidden()) {
-            linkedEntity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION,
-                    new Vector3f(0, offset, 0)));
+            linkedEntity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, offset, 0)));
         }
     }
 

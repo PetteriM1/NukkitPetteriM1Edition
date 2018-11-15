@@ -1,8 +1,5 @@
 package cn.nukkit.network.protocol;
 
-/**
- * Created on 15-10-13.
- */
 public class TextPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.TEXT_PACKET;
@@ -42,27 +39,43 @@ public class TextPacket extends DataPacket {
     public void decode() {
         this.type = (byte) getByte();
         this.isLocalized = this.getBoolean() || type == TYPE_TRANSLATION;
-        switch (type) {
-            case TYPE_POPUP:
-            case TYPE_CHAT:
-            case TYPE_WHISPER:
-            case TYPE_ANNOUNCEMENT:
-                this.source = this.getString();
-            case TYPE_RAW:
-            case TYPE_TIP:
-            case TYPE_SYSTEM:
-                this.message = this.getString();
-                break;
+        if (type == TYPE_CHAT) {
+            this.source = this.getString();
+            String value2 = this.getString();
+            try {
+                this.getVarInt();
+            } catch (Exception e) {
+                this.platformChatId = this.getString();
+            }
+            String value4 = this.getString();
+            try {
+                this.platformChatId = this.getString();
+                this.message = value4;
+            } catch (Exception e) {
+                this.message = value2;
+            }
+        } else {
+            switch (type) {
+                case TYPE_POPUP:
+                case TYPE_WHISPER:
+                case TYPE_ANNOUNCEMENT:
+                    this.source = this.getString();
+                case TYPE_RAW:
+                case TYPE_TIP:
+                case TYPE_SYSTEM:
+                    this.message = this.getString();
+                    break;
 
-            case TYPE_TRANSLATION:
-                this.message = this.getString();
-                int count = (int) this.getUnsignedVarInt();
-                this.parameters = new String[count];
-                for (int i = 0; i < count; i++) {
-                    this.parameters[i] = this.getString();
-                }
+                case TYPE_TRANSLATION:
+                    this.message = this.getString();
+                    int count = (int) this.getUnsignedVarInt();
+                    this.parameters = new String[count];
+                    for (int i = 0; i < count; i++) {
+                        this.parameters[i] = this.getString();
+                    }
+            }
+            this.platformChatId = this.getString();
         }
-        this.platformChatId = this.getString();
     }
 
     @Override

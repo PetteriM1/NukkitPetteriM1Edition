@@ -2020,15 +2020,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.spawnX = (int) this.x;
         startGamePacket.spawnY = (int) this.y;
         startGamePacket.spawnZ = (int) this.z;
-        startGamePacket.hasAchievementsDisabled = true;
-        startGamePacket.dayCycleStopTime = -1;
-        startGamePacket.eduMode = false;
-        startGamePacket.rainLevel = 0;
-        startGamePacket.lightningLevel = 0;
         startGamePacket.commandsEnabled = this.isEnableClientCommand();
-        startGamePacket.levelId = "";
         startGamePacket.worldName = this.getServer().getNetwork().getName();
-        startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat, 3 nether, 4 end
         startGamePacket.protocolLowerThan291 = this.protocol < 291;
         this.dataPacket(startGamePacket);
 
@@ -3627,10 +3620,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         List<String> params = new ArrayList<>();
         params.add(this.getDisplayName());
+        
+        EntityDamageEvent cause = this.getLastDamageCause();
+
         if (showMessages) {
-
-            EntityDamageEvent cause = this.getLastDamageCause();
-
             switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
                 case ENTITY_ATTACK:
                     if (cause instanceof EntityDamageByEntityEvent) {
@@ -3741,7 +3734,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 default:
                     break;
-
             }
         } else {
             message = "";
@@ -3750,7 +3742,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         
         PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel());
         
-        if (!ev.isCancelled()) {
+        if (!ev.isCancelled() && cause.getCause() != DamageCause.VOID) {
             if (this.getInventory().getItemInHand() instanceof ItemTotem) {
                 this.getInventory().remove(Item.get(Item.TOTEM, 0, 1));
                 this.getLevel().addSound(this, "random.totem");
@@ -3806,7 +3798,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (showMessages && !ev.getDeathMessage().toString().isEmpty()) {
             this.server.broadcast(ev.getDeathMessage(), Server.BROADCAST_CHANNEL_USERS);
         }
-
 
         RespawnPacket pk = new RespawnPacket();
         Position pos = this.getSpawn();

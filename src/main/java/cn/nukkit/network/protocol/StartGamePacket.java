@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.utils.RuleData;
 import cn.nukkit.level.GlobalBlockPalette;
 
@@ -31,7 +32,7 @@ public class StartGamePacket extends DataPacket {
     public int spawnY;
     public int spawnZ;
     public boolean hasAchievementsDisabled = true;
-    public int dayCycleStopTime = -1; //-1 = not stopped, any positive value = stopped at that time
+    public int dayCycleStopTime = -1;
     public boolean eduMode = false;
     public boolean hasEduFeaturesEnabled = false;
     public float rainLevel;
@@ -55,7 +56,7 @@ public class StartGamePacket extends DataPacket {
     public boolean hasLockedResourcePack = false;
     public boolean isFromLockedWorldTemplate = false;
     public boolean isUsingMsaGamertagsOnly = false;
-    public String levelId = ""; //base64 string, usually the same as world folder name in vanilla
+    public String levelId = "";
     public String worldName;
     public String premiumWorldTemplateId = "";
     public boolean isTrial = false;
