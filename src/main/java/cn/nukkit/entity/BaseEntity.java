@@ -42,7 +42,6 @@ public abstract class BaseEntity extends EntityCreature {
 
     private boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
     private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000);
-    public boolean canDespawn = true;
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -144,7 +143,7 @@ public abstract class BaseEntity extends EntityCreature {
     public boolean entityBaseTick(int tickDiff) {
         Timings.entityBaseTickTimer.startTiming();
 
-        if (this.despawn && this.age > this.despawnTicks && this.canDespawn) {
+        if (this.despawn && this.age > this.despawnTicks && !this.hasCustomName()) {
             this.close();
             return true;
         }
@@ -224,7 +223,6 @@ public abstract class BaseEntity extends EntityCreature {
                 this.setNameTag(item.getCustomName());
                 this.setNameTagVisible(true);
                 player.getInventory().removeItem(item);
-                this.canDespawn = false;
                 return true;
             }
         }
