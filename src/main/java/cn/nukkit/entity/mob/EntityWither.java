@@ -1,22 +1,22 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
-import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Explosion;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.network.protocol.DataPacket;
 
-public class EntityWither extends EntityFlyingMob implements EntityExplosive {
+public class EntityWither extends EntityFlyingMob {
 
     public static final int NETWORK_ID = 52;
 
@@ -41,7 +41,7 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
 
     @Override
     public double getSpeed() {
-        return 1.2;
+        return 1.3;
     }
 
     @Override
@@ -105,23 +105,22 @@ public class EntityWither extends EntityFlyingMob implements EntityExplosive {
     }
 
     @Override
-    public boolean onUpdate(int currentTick) {
-        boolean hasUpdate = super.onUpdate(currentTick);
-        if (this.health < 1) this.explode();
-        return hasUpdate;
-    }
-
-    public void explode() {
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
-        this.server.getPluginManager().callEvent(ev);
-    
-        if (!ev.isCancelled()) {
-            Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
-            if (ev.isBlockBreaking()) {
-                explosion.explodeA();
-            }
-            explosion.explodeB();
-        }
-        this.close();
+    protected DataPacket createAddEntityPacket() {
+        AddEntityPacket addEntity = new AddEntityPacket();
+        addEntity.type = this.getNetworkId();
+        addEntity.entityUniqueId = this.getId();
+        addEntity.entityRuntimeId = this.getId();
+        addEntity.yaw = (float) this.yaw;
+        addEntity.headYaw = (float) this.yaw;
+        addEntity.pitch = (float) this.pitch;
+        addEntity.x = (float) this.x;
+        addEntity.y = (float) this.y;
+        addEntity.z = (float) this.z;
+        addEntity.speedX = (float) this.motionX;
+        addEntity.speedY = (float) this.motionY;
+        addEntity.speedZ = (float) this.motionZ;
+        addEntity.metadata = this.dataProperties;
+        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(600).setValue(600)};
+        return addEntity;
     }
 }

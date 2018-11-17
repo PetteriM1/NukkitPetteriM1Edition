@@ -129,7 +129,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            drops.add(Item.get(Item.WOOL, this.namedTag.getByte("Color"), 1));
+            drops.add(Item.get(Item.WOOL, getColor(), 1));
             int muttonDrop = EntityUtils.rand(1, 3);
             for (int i = 0; i < muttonDrop; i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_MUTTON : Item.RAW_MUTTON, 0, 1));
@@ -141,7 +141,7 @@ public class EntitySheep extends EntityWalkingAnimal {
 
     public void setColor(int color) {
         this.color = color;
-        this.namedTag.putByte("Color",color);
+        this.namedTag.putByte("Color", color);
         this.setDataProperty(new ByteEntityData(DATA_COLOUR, color));
     }
 
@@ -153,11 +153,11 @@ public class EntitySheep extends EntityWalkingAnimal {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         int rand = random.nextInt(0, 2500);
 
-        if (rand < 125 && 0 <= rand)return DyeColor.BLACK.getDyeData();
-        else if (rand < 250 && 125 <= rand)return DyeColor.GRAY.getDyeData();
-        else if (rand < 375 && 250 <= rand)return DyeColor.LIGHT_GRAY.getDyeData();
-        else if (rand < 500 && 375 <= rand)return DyeColor.GRAY.getDyeData();
-        else if (rand < 541 && 500 <= rand)return DyeColor.PINK.getDyeData();
+        if (rand < 125 && 0 <= rand) return DyeColor.BLACK.getDyeData();
+        else if (rand < 250 && 125 <= rand) return DyeColor.GRAY.getDyeData();
+        else if (rand < 375 && 250 <= rand) return DyeColor.LIGHT_GRAY.getDyeData();
+        else if (rand < 500 && 375 <= rand) return DyeColor.GRAY.getDyeData();
+        else if (rand < 541 && 500 <= rand) return DyeColor.PINK.getDyeData();
         else return DyeColor.WHITE.getDyeData();
     }
 

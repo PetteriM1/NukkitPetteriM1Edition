@@ -29,7 +29,7 @@ public class HorseSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (pos.y > 256 || pos.y < 1 || level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.AIR) {
+        } else if (pos.y > 256 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
             this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
