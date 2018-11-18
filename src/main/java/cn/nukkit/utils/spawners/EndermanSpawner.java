@@ -27,7 +27,7 @@ public class EndermanSpawner extends AbstractEntitySpawner {
         int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
         int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (pos.y > 256 || pos.y < 1 || blockId == Block.AIR) {
+        if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
