@@ -1,7 +1,6 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
@@ -94,21 +93,23 @@ public class EntityWolf extends EntityTameableMob {
     public boolean onInteract(Player player, Item item) {
         super.onInteract(player, item);
         if (item.equals(Item.get(Item.BONE))) {
-            if (!this.hasOwner()) {
+            if (!this.hasOwner() && !this.isAngry()) {
                 player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
                 if (EntityUtils.rand(0, 3) == 3) {
                     EntityEventPacket packet = new EntityEventPacket();
                     packet.eid = player.getId();
                     packet.event = EntityEventPacket.TAME_SUCCESS;
-                    Server.broadcastPacket(new Player[] { player }, packet);
+                    player.dataPacket(packet);
+
                     this.setOwner(player);
                     this.setCollarColor(DyeColor.RED);
+                    this.saveNBT();
                     return true;
                 } else {
                     EntityEventPacket packet = new EntityEventPacket();
                     packet.eid = player.getId();
                     packet.event = EntityEventPacket.TAME_FAIL;
-                    Server.broadcastPacket(new Player[] { player }, packet);
+                    player.dataPacket(packet);
                 }
             }
         } else if (item.equals(Item.get(Item.DYE), false)) {

@@ -54,7 +54,6 @@ public class EntityEnderDragon extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        //TODO
     }
 
     @Override

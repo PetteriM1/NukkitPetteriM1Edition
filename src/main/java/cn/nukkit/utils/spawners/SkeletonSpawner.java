@@ -27,16 +27,16 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
 
         if (pos.y > 256 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
+        } else if (Block.transparent[blockId]) {
+            result = SpawnResult.WRONG_BLOCK;
         } else if (level.getName().equals("nether")) {
             if (blockId == Block.NETHERRACK) {
                 this.spawnTask.createEntity("WitherSkeleton", pos.add(0, 2.8, 0));
             }
         } else if (biomeId == Biome.ICE_PLAINS || biomeId == Biome.TUNDRA) {
-            if (time > 13184 && time < 22800) {
+            if (time > 13184 && time < 22800 && light < 7) {
                 this.spawnTask.createEntity("Stray", pos.add(0, 2.8, 0));
             }
-        } else if (Block.transparent[blockId]) {
-            result = SpawnResult.WRONG_BLOCK;
         } else if (level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else if (light > 7) {
