@@ -67,5 +67,4 @@ public interface CommandSender extends Permissible {
     String getName();
 
     boolean isPlayer();
-
 }

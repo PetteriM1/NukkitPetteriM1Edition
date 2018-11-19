@@ -107,6 +107,5 @@ public class ConsoleCommandSender implements CommandSender {
 
     @Override
     public void setOp(boolean value) {
-
     }
 }

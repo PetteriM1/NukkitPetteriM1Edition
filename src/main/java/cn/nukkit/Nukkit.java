@@ -105,13 +105,16 @@ public class Nukkit {
         if (ANSI) {
             System.out.print((char) 0x1b + "]0;Stopping Server..." + (char) 0x07);
         }
+
         logger.info("Stopping other threads...");
 
         for (Thread thread : java.lang.Thread.getAllStackTraces().keySet()) {
             if (!(thread instanceof InterruptibleThread)) {
                 continue;
             }
+
             logger.debug("Stopping " + thread.getClass().getSimpleName() + " thread...");
+
             if (thread.isAlive()) {
                 thread.interrupt();
             }
@@ -127,6 +130,7 @@ public class Nukkit {
         if (ANSI) {
             System.out.print((char) 0x1b + "]0;Server Stopped" + (char) 0x07);
         }
+
         System.exit(0);
     }
 

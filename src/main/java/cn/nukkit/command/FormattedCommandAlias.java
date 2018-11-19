@@ -134,5 +134,4 @@ public class FormattedCommandAlias extends Command {
     private static boolean inRange(int i, int j, int k) {
         return i >= j && i <= k;
     }
-
 }

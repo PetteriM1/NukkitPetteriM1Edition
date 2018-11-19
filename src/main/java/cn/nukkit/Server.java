@@ -235,7 +235,6 @@ public class Server {
         this.pluginPath = new File(pluginPath).getAbsolutePath() + "/";
 
         this.console = new CommandReader();
-
         this.console.start();
 
         this.logger.info("Loading server properties...");

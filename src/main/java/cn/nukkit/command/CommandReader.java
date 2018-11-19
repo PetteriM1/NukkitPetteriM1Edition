@@ -66,7 +66,6 @@ public class CommandReader extends Thread implements InterruptibleThread {
                 }
 
                 if (!line.trim().isEmpty()) {
-                    //todo 将即时执行指令改为每tick执行
                     try {
                         Timings.serverCommandTimer.startTiming();
                         ServerCommandEvent event = new ServerCommandEvent(Server.getInstance().getConsoleSender(), line);
