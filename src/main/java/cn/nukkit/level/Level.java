@@ -198,7 +198,6 @@ public class Level implements ChunkManager, Metadatable {
 
     private boolean useSections;
 
-    private Position temporalPosition;
     private Vector3 temporalVector;
 
     public int sleepTicks = 0;
@@ -303,7 +302,6 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkTickList.clear();
         this.clearChunksOnTick = (boolean) this.server.getPropertyBoolean("clear-chunk-tick-list", true);
         this.cacheChunks = (boolean) this.server.getPropertyBoolean("cache-chunks", true);
-        this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
 
@@ -414,9 +412,39 @@ public class Level implements ChunkManager, Metadatable {
         this.provider.close();
         this.provider = null;
         this.blockMetadata = null;
-        this.temporalPosition = null;
         this.server.getLevels().remove(this.levelId);
         this.generators.clean();
+    }
+
+    public void addSound(Vector3 pos, cn.nukkit.level.Sound sound) {
+        this.addSound(pos, sound, 1, 1, (Player[]) null);
+    }
+
+    public void addSound(Vector3 pos, cn.nukkit.level.Sound sound, float volume, float pitch) {
+        this.addSound(pos, sound, volume, pitch, (Player[]) null);
+    }
+
+    public void addSound(Vector3 pos, cn.nukkit.level.Sound sound, float volume, float pitch, Collection<Player> players) {
+        this.addSound(pos, sound, volume, pitch, players.toArray(new Player[0]));
+    }
+
+    public void addSound(Vector3 pos, cn.nukkit.level.Sound sound, float volume, float pitch, Player... players) {
+        Preconditions.checkArgument(volume >= 0 && volume <= 1, "Sound volume must be between 0 and 1");
+        Preconditions.checkArgument(pitch >= 0, "Sound pitch must be higher than 0");
+
+        PlaySoundPacket packet = new PlaySoundPacket();
+        packet.name = sound.getSound();
+        packet.volume = 1;
+        packet.pitch = 1;
+        packet.x = pos.getFloorX();
+        packet.y = pos.getFloorY();
+        packet.z = pos.getFloorZ();
+
+        if (players == null || players.length == 0) {
+            addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, packet);
+        } else {
+            Server.broadcastPacket(players, packet);
+        }
     }
     
     public void addSound(Vector3 pos, String sound) {

@@ -73,6 +73,7 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new WorldCommand("world"));
         this.register("nukkit", new GenerateWorldCommand("genworld"));
         if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new SeedCommand("seed"));
+        if (!Server.getInstance().suomiCraftPEMode()) this.register("nukkit", new PlaySoundCommand("playsound"));
     }
 
     @Override
