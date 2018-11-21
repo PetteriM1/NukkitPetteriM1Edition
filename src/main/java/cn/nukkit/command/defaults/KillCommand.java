@@ -62,7 +62,7 @@ public class KillCommand extends VanillaCommand {
                     }
                 }
                 sender.sendMessage(TextFormat.GOLD + "Killed all entities");
-            } else if (args[0].equals("@s")) {
+            } else if (args[0].equals("@s") && sender instanceof Player) {
                 if (!sender.hasPermission("nukkit.command.kill.self")) {
                     sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
                     return true;

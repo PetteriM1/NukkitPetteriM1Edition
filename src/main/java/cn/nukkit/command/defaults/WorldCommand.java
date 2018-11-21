@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 
 public class WorldCommand extends Command {
@@ -11,6 +12,9 @@ public class WorldCommand extends Command {
         super(name, "%nukkit.command.world.description", "%nukkit.command.world.usage");
         this.setPermission("nukkit.command.world");
         this.commandParameters.clear();
+        this.commandParameters.put("default", new CommandParameter[]{
+                new CommandParameter("world", CommandParameter.ARG_TYPE_STRING, false)
+        });
     }
 
     @Override
@@ -24,7 +28,7 @@ public class WorldCommand extends Command {
         }
         
         if (args.length == 2) {
-            if (Server.getInstance().getPlayer(args[1]) == null) {
+            if (Server.getInstance().getPlayer(args[1].replace("@s", sender.getName())) == null) {
                 sender.sendMessage("\u00A7cUnknown player");
                 return true;
             }
@@ -32,7 +36,7 @@ public class WorldCommand extends Command {
                 sender.sendMessage("\u00A7cUnknown level");
                 return true;
             }
-            Server.getInstance().getPlayer(args[1]).teleport(Server.getInstance().getLevelByName(args[0]).getSafeSpawn());
+            Server.getInstance().getPlayer(args[1].replace("@s", sender.getName())).teleport(Server.getInstance().getLevelByName(args[0]).getSafeSpawn());
             return true;
         }
 

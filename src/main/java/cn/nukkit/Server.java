@@ -211,8 +211,6 @@ public class Server {
     private final Thread currentThread;
 
     private Watchdog watchdog;
-
-    private Spawner spawner;
     
     public boolean suomicraftMode;
 
@@ -388,8 +386,9 @@ public class Server {
         this.network.setName(this.getMotd());
         this.network.setSubName(this.getSubMotd());
 
-        this.logger.info("-- Nukkit PetteriM1 Edition --");
+        this.logger.info("\u00A7a-- Nukkit PetteriM1 Edition --");
 
+        this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -501,10 +500,8 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            this.getScheduler().scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            this.getScheduler().scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200), true);
         }
-        
-        suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
 
         this.start();
     }
@@ -680,7 +677,6 @@ public class Server {
         if (!this.isPrimaryThread()) {
             getLogger().warning("Command Dispatched Async: " + commandLine);
             getLogger().warning("Please notify author of plugin causing this execution to fix this bug!", new Throwable());
-            // TODO: We should sync the command to the main thread too!
         }
         if (sender == null) {
             throw new ServerException("CommandSender is not valid");

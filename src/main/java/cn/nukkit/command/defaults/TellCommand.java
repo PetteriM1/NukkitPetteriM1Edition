@@ -20,7 +20,7 @@ public class TellCommand extends VanillaCommand {
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("message")
+                new CommandParameter("message", CommandParameter.ARG_TYPE_RAW_TEXT, false)
         });
     }
 
@@ -36,7 +36,7 @@ public class TellCommand extends VanillaCommand {
             return false;
         }
 
-        String name = args[0].toLowerCase();
+        String name = args[0].toLowerCase().replace("@s", sender.getName());
 
         Player player = sender.getServer().getPlayer(name);
         if (player == null) {

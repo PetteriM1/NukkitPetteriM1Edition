@@ -27,12 +27,14 @@ public class SummonCommand extends Command {
 
         String mob = args[0];
         Player playerThatSpawns = null;
-            if (args.length == 2) {
-            playerThatSpawns = Server.getInstance().getPlayer(args[1]);
+
+        if (args.length == 2) {
+            playerThatSpawns = Server.getInstance().getPlayer(args[1].replace("@s", sender.getName()));
         } else {
             playerThatSpawns = (Player) sender;
         }
-            if (playerThatSpawns != null) {
+
+        if (playerThatSpawns != null) {
             Position pos = playerThatSpawns.getPosition();
             Entity ent;
             if ((ent = EntityUtils.create(mob, pos)) != null) {

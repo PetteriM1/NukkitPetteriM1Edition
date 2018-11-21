@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.level.generator.Generator;
 
 public class GenerateWorldCommand extends Command {
@@ -10,6 +11,11 @@ public class GenerateWorldCommand extends Command {
         super(name, "%nukkit.command.generateworld.description", "%nukkit.command.generateworld.usage");
         this.setPermission("nukkit.command.generateworld");
         this.commandParameters.clear();
+        this.commandParameters.put("default", new CommandParameter[]{
+                new CommandParameter("name", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameter("type", CommandParameter.ARG_TYPE_STRING, false),
+                new CommandParameter("seed", CommandParameter.ARG_TYPE_INT, false)
+        });
     }
     
     long seed;

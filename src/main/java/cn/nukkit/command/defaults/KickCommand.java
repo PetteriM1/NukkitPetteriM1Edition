@@ -20,7 +20,7 @@ public class KickCommand extends VanillaCommand {
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("reason", true)
+                new CommandParameter("reason", CommandParameter.ARG_TYPE_STRING, true)
         });
     }
 
@@ -34,7 +34,7 @@ public class KickCommand extends VanillaCommand {
             return false;
         }
 
-        String name = args[0];
+        String name = args[0].replace("@s", sender.getName());
 
         String reason = "";
         for (int i = 1; i < args.length; i++) {

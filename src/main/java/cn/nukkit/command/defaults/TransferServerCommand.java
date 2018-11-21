@@ -15,7 +15,9 @@ public class TransferServerCommand extends VanillaCommand {
         super(name, "%nukkit.command.transferserver.description", "%commands.transferserver.usage");
         this.setPermission("nukkit.command.transferserver");
         this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{new CommandParameter("server address", CommandParameter.ARG_TYPE_STRING, false)});
+        this.commandParameters.put("default", new CommandParameter[]{
+                new CommandParameter("serverAddress", CommandParameter.ARG_TYPE_STRING, false)
+        });
     }
 
     @Override
@@ -26,7 +28,6 @@ public class TransferServerCommand extends VanillaCommand {
 
         if (!(sender instanceof Player)) {
             sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
-
             return false;
         }
 

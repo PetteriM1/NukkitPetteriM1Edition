@@ -19,7 +19,7 @@ public class WeatherCommand extends VanillaCommand {
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("clear|rain|thunder", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("duration in seconds", CommandParameter.ARG_TYPE_INT, true)
+                new CommandParameter("durationInSeconds", CommandParameter.ARG_TYPE_INT, true)
         });
     }
 

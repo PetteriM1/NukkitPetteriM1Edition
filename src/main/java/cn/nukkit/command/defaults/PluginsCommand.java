@@ -14,11 +14,7 @@ import java.util.Map;
 public class PluginsCommand extends VanillaCommand {
 
     public PluginsCommand(String name) {
-        super(name,
-                "%nukkit.command.plugins.description",
-                "%nukkit.command.plugins.usage",
-                new String[]{"pl"}
-        );
+        super(name, "%nukkit.command.plugins.description", "%nukkit.command.plugins.usage");
         this.setPermission("nukkit.command.plugins");
         this.commandParameters.clear();
     }

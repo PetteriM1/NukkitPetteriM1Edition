@@ -12,7 +12,7 @@ import cn.nukkit.lang.TranslationContainer;
 public class PlaySoundCommand extends VanillaCommand {
 
     public PlaySoundCommand(String name) {
-        super(name, "%nukkit.command.playsound.description", "%commands.playsound.usage", new String[]{"?"});
+        super(name, "%nukkit.command.playsound.description", "%commands.playsound.usage");
         this.setPermission("nukkit.command.playsound");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
@@ -40,13 +40,32 @@ public class PlaySoundCommand extends VanillaCommand {
 
             Player p = (Player) sender;
 
-            p.getLevel().addSound(p, args[0]);
+            p.getLevel().addSound(p, args[0], p);
             p.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
             
             return true;
         }
 
         if (args.length > 1) {
+            if (args[1].equalsIgnoreCase("@a")) {
+                for (Player p : Server.getInstance().getOnlinePlayers().values()) {
+                    p.getLevel().addSound(p, args[0], p);
+                }
+                
+                sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], "@a"));
+
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("@s") && sender instanceof Player) {
+                Player p = (Player) sender;
+
+                p.getLevel().addSound(p, args[0], p);
+                sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
+
+                return true;
+            }
+
             Player p = Server.getInstance().getPlayer(args[1]);
             
             if (p == null) {
@@ -54,7 +73,7 @@ public class PlaySoundCommand extends VanillaCommand {
                 return true;
             }
 
-            p.getLevel().addSound(p, args[0]);
+            p.getLevel().addSound(p, args[0], p);
             sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
         }
 
