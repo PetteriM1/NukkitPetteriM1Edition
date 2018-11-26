@@ -120,7 +120,7 @@ public class EntityFirework extends Entity {
                 pk2.y = (float) getY();
                 pk2.z = (float) getZ();
 
-                Server.broadcastPacket(getViewers().values(), pk);
+                this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
                 this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk2);
 
                 this.kill();
