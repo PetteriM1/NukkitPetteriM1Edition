@@ -32,12 +32,6 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         if (this.getDataFlag(DATA_FLAG_BABY, 0)) {
             this.setDataFlag(DATA_FLAG_BABY, DATA_TYPE_BYTE);
         }
-
-    }
-
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAG_BABY, 0);
     }
 
     @Override

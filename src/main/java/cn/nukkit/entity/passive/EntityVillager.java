@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -48,6 +47,7 @@ public class EntityVillager extends EntityWalkingAnimal {
     @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(10);
 
         if (!this.namedTag.contains("Profession")) {
@@ -61,11 +61,6 @@ public class EntityVillager extends EntityWalkingAnimal {
 
     public void setProfession(int profession) {
         this.namedTag.putInt("Profession", profession);
-    }
-
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
     }
 
     @Override

@@ -23,11 +23,6 @@ public class EntityEndCrystal extends Entity {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-    }
-
     public boolean attack(EntityDamageEvent source) {
         if (this.closed) return false;
         close();

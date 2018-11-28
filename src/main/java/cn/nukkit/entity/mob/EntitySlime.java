@@ -47,9 +47,9 @@ public class EntitySlime extends EntityJumpingMob {
     }
 
     protected void initEntity() {
-        this.setMaxHealth(16);
         super.initEntity();
 
+        this.setMaxHealth(16);
         this.setDamage(new int[] { 0, 2, 3, 4 });
     }
 
@@ -102,7 +102,7 @@ public class EntitySlime extends EntityJumpingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int slimeBalls = EntityUtils.rand(0, 3);
             for (int i = 0; i < slimeBalls; i++) {
                 drops.add(Item.get(Item.SLIMEBALL, 0, 1));

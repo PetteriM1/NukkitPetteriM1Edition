@@ -51,15 +51,11 @@ public class EntityPig extends EntityWalkingAnimal {
         return 0.9f;
     }
 
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
     public void initEntity() {
         super.initEntity();
-        this.fireProof = false;
+
         this.setMaxHealth(10);
+        this.fireProof = false;
     }
 
     @Override
@@ -100,7 +96,7 @@ public class EntityPig extends EntityWalkingAnimal {
 
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int drop = EntityUtils.rand(1, 4);
             for (int i = 0; i < drop; i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_PORKCHOP : Item.RAW_PORKCHOP, 0, 1));

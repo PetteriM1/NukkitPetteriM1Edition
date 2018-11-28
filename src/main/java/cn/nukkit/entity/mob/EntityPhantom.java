@@ -108,7 +108,7 @@ public class EntityPhantom extends EntityFlyingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int drop = EntityUtils.rand(0, 2);
             for (int i = 0; i < drop; i++) {
                 drops.add(Item.get(Item.PHANTOM_MEMBRANE, 0, 1));

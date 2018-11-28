@@ -2,6 +2,7 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.mob.EntityZombie;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -36,15 +37,24 @@ public class ZombieSpawner extends AbstractEntitySpawner {
             if (blockId != Block.SAND) {
                 result = SpawnResult.WRONG_BLOCK;
             } else if (time > 13184 && time < 22800) {
-                this.spawnTask.createEntity("Husk", pos.add(0, 2.8, 0));
+                BaseEntity entity = this.spawnTask.createEntity("Husk", pos.add(0, 2.8, 0));
+                if (EntityUtils.rand(0, 500) > 480) {
+                    entity.setBaby(true);
+                }
             }
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else if (time > 13184 && time < 22800) {
             if (EntityUtils.rand(1, 40) == 30) {
-                this.spawnTask.createEntity("ZombieVillager", pos.add(0, 2.8, 0));
+                BaseEntity entity = this.spawnTask.createEntity("ZombieVillager", pos.add(0, 2.8, 0));
+                if (EntityUtils.rand(0, 500) > 480) {
+                    entity.setBaby(true);
+                }
             } else {
-                this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+                BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+                if (EntityUtils.rand(0, 500) > 480) {
+                    entity.setBaby(true);
+                }
             }
         }
 

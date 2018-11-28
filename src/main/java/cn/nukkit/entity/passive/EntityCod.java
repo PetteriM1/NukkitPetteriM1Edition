@@ -30,6 +30,7 @@ public class EntityCod extends EntityFish {
     @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(3);
     }
 

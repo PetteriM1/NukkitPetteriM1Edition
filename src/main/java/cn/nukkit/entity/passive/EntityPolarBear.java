@@ -55,15 +55,14 @@ public class EntityPolarBear extends EntityWalkingMob {
         return 1.25;
     }
 
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
     @Override
     public void initEntity() {
         super.initEntity();
-        this.setDamage(new int[] { 0, 4, 6, 9 });
+
         this.setMaxHealth(30);
+        this.fireProof = false;
+        this.setDamage(new int[] { 0, 4, 6, 9 });
+
         if (this.namedTag.contains("Angry")) {
             this.angry = this.namedTag.getInt("Angry");
         }
@@ -150,7 +149,11 @@ public class EntityPolarBear extends EntityWalkingMob {
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.RAW_FISH), Item.get(Item.RAW_SALMON)};
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+            return new Item[]{Item.get(Item.RAW_FISH), Item.get(Item.RAW_SALMON)};
+        } else {
+            return new Item[0];
+        }
     }
 
     @Override

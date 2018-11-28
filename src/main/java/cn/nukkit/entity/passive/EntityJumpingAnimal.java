@@ -1,34 +1,15 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.EntityAgeable;
-import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.entity.EntityJumping;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
-import co.aikar.timings.Timings;
 
-public abstract class EntityJumpingAnimal extends EntityJumping implements EntityAgeable {
+public abstract class EntityJumpingAnimal extends EntityJumping implements EntityAnimal {
 
     public EntityJumpingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-
-        if (this.getDataFlag(DATA_FLAG_BABY, 0)) {
-            this.setDataFlag(DATA_FLAG_BABY, DATA_TYPE_BYTE);
-        }
-    }
-
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAG_BABY, 0);
     }
 
     @Override

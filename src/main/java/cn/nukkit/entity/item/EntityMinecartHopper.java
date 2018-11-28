@@ -15,8 +15,6 @@ public class EntityMinecartHopper extends EntityMinecartAbstract {
         super.setDisplayBlock(new BlockHopper(), false);
     }
 
-    // TODO: 2016/12/18 inventory
-
     @Override
     public MinecartType getType() {
         return MinecartType.valueOf(5);

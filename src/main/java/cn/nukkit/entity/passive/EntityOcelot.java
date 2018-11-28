@@ -1,15 +1,13 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public class EntityOcelot extends EntityWalkingAnimal {
+public class EntityOcelot extends EntityTameableAnimal {
 
     public static final int NETWORK_ID = 22;
 
@@ -44,13 +42,9 @@ public class EntityOcelot extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
-    @Override
     protected void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(10);
     }
 
@@ -66,4 +60,11 @@ public class EntityOcelot extends EntityWalkingAnimal {
     public int getKillExperience() {
         return EntityUtils.rand(1, 4);
     }
+
+    public String getOwnerUUID() {
+        return "";
+    }
+
+    public void setOwner(Player owner) {}
+    public void setOwnerUUID(String uuid) {}
 }

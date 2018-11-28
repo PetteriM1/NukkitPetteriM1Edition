@@ -33,7 +33,7 @@ public class EndermanSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BLOCK;
         } else if (light > 7 && !level.getName().equals("nether") && !level.getName().equals("end")) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
-        } else if ((time > 13184 && time < 22800) || level.getName().equals("nether") || !level.getName().equals("end")) {
+        } else if ((time > 13184 && time < 22800) || level.getName().equals("nether") || level.getName().equals("end")) {
             this.spawnTask.createEntity(getEntityName(), pos.add(0, 3.8, 0));
         }
 

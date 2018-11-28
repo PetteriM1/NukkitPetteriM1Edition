@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
@@ -56,11 +55,6 @@ public class EntitySheep extends EntityWalkingAnimal {
             return 0.65f;
         }
         return 1.1f;
-    }
-
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
     }
 
     @Override
@@ -128,7 +122,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.WOOL, this.getColor(), 1));
             int muttonDrop = EntityUtils.rand(1, 3);
             for (int i = 0; i < muttonDrop; i++) {

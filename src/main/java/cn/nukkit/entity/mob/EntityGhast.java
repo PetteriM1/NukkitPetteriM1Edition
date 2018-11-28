@@ -94,7 +94,7 @@ public class EntityGhast extends EntityFlyingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int gunPowder = EntityUtils.rand(0, 3);
             int ghastTears = EntityUtils.rand(0, 2);
             for (int i = 0; i < gunPowder; i++) {

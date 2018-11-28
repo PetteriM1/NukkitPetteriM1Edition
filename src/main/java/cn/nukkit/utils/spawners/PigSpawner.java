@@ -2,10 +2,12 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.passive.EntityPig;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
+import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
@@ -27,7 +29,10 @@ public class PigSpawner extends AbstractEntitySpawner {
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1.9, 0));
+            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1.9, 0));
+            if (EntityUtils.rand(0, 500) > 480) {
+                entity.setBaby(true);
+            }
         }
 
         return result;

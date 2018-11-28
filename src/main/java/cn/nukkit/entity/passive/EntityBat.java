@@ -45,6 +45,7 @@ public class EntityBat extends EntityFlyingAnimal {
         return 0;
     }
 
+    @Override
     public boolean doesTriggerPressurePlate() {
         return false;
     }

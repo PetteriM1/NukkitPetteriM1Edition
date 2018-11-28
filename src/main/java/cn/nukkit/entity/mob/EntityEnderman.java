@@ -116,7 +116,7 @@ public class EntityEnderman extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int enderPearls = EntityUtils.rand(0, 2);
             for (int i = 0; i < enderPearls; i++) {
                 drops.add(Item.get(Item.ENDER_PEARL, 0, 1));

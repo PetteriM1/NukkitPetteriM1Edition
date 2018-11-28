@@ -71,6 +71,7 @@ public class EntityEgg extends EntityProjectile {
                     EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 1, 0.5));
                     if (entity != null) {
                         entity.spawnToAll();
+                        entity.setBaby(true);
                     }
                 }
             }

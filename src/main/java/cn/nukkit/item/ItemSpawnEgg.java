@@ -6,7 +6,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockMobSpawner;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawner;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.passive.*;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
@@ -14,6 +16,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.Random;
 
@@ -97,7 +100,19 @@ public class ItemSpawnEgg extends Item {
                 item.setCount(item.getCount() - 1);
                 player.getInventory().setItemInHand(item);
             }
+
             entity.spawnToAll();
+
+            if (EntityUtils.rand(0, 500) > 480 &&
+                    entity instanceof BaseEntity &&
+                    (entity instanceof EntityCow ||
+                    entity instanceof EntityChicken ||
+                    entity instanceof EntityPig ||
+                    entity instanceof EntitySheep)) {
+
+                ((BaseEntity) entity).setBaby(true);
+            }
+
             return true;
         }
         return false;

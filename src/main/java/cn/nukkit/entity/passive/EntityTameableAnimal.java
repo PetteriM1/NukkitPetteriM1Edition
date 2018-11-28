@@ -1,13 +1,13 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.EntityOwnable;
+import cn.nukkit.entity.EntityTameable;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.StringEntityData;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public abstract class EntityTameableAnimal extends EntityWalkingAnimal implements EntityOwnable {
+public abstract class EntityTameableAnimal extends EntityWalkingAnimal implements EntityTameable {
 
     public static final int DATA_TAMED_FLAG = 16;
     public static final int DATA_OWNER_NAME = 17;
@@ -19,6 +19,7 @@ public abstract class EntityTameableAnimal extends EntityWalkingAnimal implement
     @Override
     protected void initEntity() {
         super.initEntity();
+
         if (getDataProperty(DATA_TAMED_FLAG) == null) {
             setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) 0));
         }
@@ -56,12 +57,10 @@ public abstract class EntityTameableAnimal extends EntityWalkingAnimal implement
         namedTag.putBoolean("Sitting", isSitting());
     }
 
-    @Override
     public String getOwnerName() {
         return getDataPropertyString(DATA_OWNER_NAME);
     }
 
-    @Override
     public void setOwnerName(String playerName) {
         setDataProperty(new StringEntityData(DATA_OWNER_NAME, playerName));
     }
@@ -81,7 +80,7 @@ public abstract class EntityTameableAnimal extends EntityWalkingAnimal implement
     }
 
     public void setTamed(boolean flag) {
-        int var = getDataPropertyByte(DATA_TAMED_FLAG); // ?
+        int var = getDataPropertyByte(DATA_TAMED_FLAG);
 
         if (flag) {
             setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) (var | 4)));
@@ -95,7 +94,7 @@ public abstract class EntityTameableAnimal extends EntityWalkingAnimal implement
     }
 
     public void setSitting(boolean flag) {
-        int var = getDataPropertyByte(DATA_TAMED_FLAG); // ?
+        int var = getDataPropertyByte(DATA_TAMED_FLAG);
 
         if (flag) {
             setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) (var | 1)));

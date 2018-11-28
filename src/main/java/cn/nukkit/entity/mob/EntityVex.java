@@ -39,8 +39,9 @@ public class EntityVex extends EntityFlyingMob {
     @Override
     public void initEntity() {
         super.initEntity();
-        this.setDamage(new int[] { 0, 5, 9, 13 });
+
         this.setMaxHealth(14);
+        this.setDamage(new int[] { 0, 5, 9, 13 });
     }
 
     @Override

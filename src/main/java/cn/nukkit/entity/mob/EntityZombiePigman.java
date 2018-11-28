@@ -158,7 +158,7 @@ public class EntityZombiePigman extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int rottenFlesh = EntityUtils.rand(0, 2);
             int goldNuggets = EntityUtils.rand(0, 101) <= 3 ? 1 : 0;
             int goldSword = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;

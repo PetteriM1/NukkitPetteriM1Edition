@@ -19,8 +19,6 @@ public class EntityMinecartChest extends EntityMinecartAbstract {
         super.setDisplayBlock(new BlockChest(), false);
     }
 
-    // TODO: 2016/1/30 inventory
-
     @Override
     public MinecartType getType() {
         return MinecartType.valueOf(1);

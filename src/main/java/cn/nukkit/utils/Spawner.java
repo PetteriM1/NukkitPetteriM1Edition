@@ -3,6 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
@@ -90,11 +91,12 @@ public class Spawner extends Thread {
         return count;
     }
 
-    public void createEntity(Object type, Position pos) {
-        Entity entity = EntityUtils.create(type, pos);
+    public BaseEntity createEntity(Object type, Position pos) {
+        BaseEntity entity = (BaseEntity) EntityUtils.create(type, pos);
         if (entity != null) {
             entity.spawnToAll();
         }
+        return entity;
     }
 
     public int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {

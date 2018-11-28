@@ -88,10 +88,6 @@ public class EntityFishingHook extends EntityProjectile {
 		return 0.05f;
 	}
 
-	public void initEntity() {
-		super.initEntity();
-	}
-
 	@Override
 	public boolean onUpdate(int currentTick) {
 		if (this.closed) {

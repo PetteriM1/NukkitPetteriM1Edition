@@ -47,9 +47,9 @@ public class EntityMagmaCube extends EntityJumpingMob {
     }
 
     protected void initEntity() {
-        this.setMaxHealth(16);
         super.initEntity();
 
+        this.setMaxHealth(16);
         this.setDamage(new int[] { 0, 2, 3, 4 });
     }
 
@@ -102,7 +102,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int magmaCream = EntityUtils.rand(0, 2);
             for (int i = 0; i < magmaCream; i++) {
                 drops.add(Item.get(Item.MAGMA_CREAM, 0, 1));

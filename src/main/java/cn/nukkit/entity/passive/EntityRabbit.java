@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -48,13 +47,9 @@ public class EntityRabbit extends EntityJumpingAnimal {
         return 1.2;
     }
 
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(3);
     }
 
@@ -73,7 +68,7 @@ public class EntityRabbit extends EntityJumpingAnimal {
 
         }
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int rabbitHide = EntityUtils.rand(0, 2);
             int rawRabbit = EntityUtils.rand(0, 2);
             int rabbitfoot = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;

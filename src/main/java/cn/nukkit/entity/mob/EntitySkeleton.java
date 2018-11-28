@@ -129,7 +129,7 @@ public class EntitySkeleton extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int bones = EntityUtils.rand(0, 3);
             int arrows = EntityUtils.rand(0, 3);
             for (int i = 0; i < bones; i++) {

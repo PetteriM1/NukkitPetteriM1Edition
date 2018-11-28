@@ -2,6 +2,7 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.passive.EntityPolarBear;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -37,7 +38,10 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.3, 0));
+            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.3, 0));
+            if (EntityUtils.rand(0, 500) > 480) {
+                entity.setBaby(true);
+            }
         }
 
         return result;

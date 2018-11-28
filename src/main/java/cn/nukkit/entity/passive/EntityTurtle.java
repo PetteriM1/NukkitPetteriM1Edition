@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
@@ -32,6 +31,7 @@ public class EntityTurtle extends EntityWaterAnimal {
     @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(30);
     }
 
@@ -43,10 +43,5 @@ public class EntityTurtle extends EntityWaterAnimal {
     @Override
     public int getKillExperience() {
         return EntityUtils.rand(1, 4);
-    }
-    
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
     }
 }

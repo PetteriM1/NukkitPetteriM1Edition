@@ -66,6 +66,7 @@ public class EntityChicken extends EntityWalkingAnimal {
     @Override
     public void initEntity() {
         super.initEntity();
+
         if (this.namedTag.contains("EggLayTime")) {
             this.EggLayTime = this.namedTag.getInt("EggLayTime");
         } else {
@@ -83,13 +84,17 @@ public class EntityChicken extends EntityWalkingAnimal {
     @Override
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
-        if (this.EggLayTime > 0) {
-            EggLayTime -= tickDiff;
-        } else {
-            this.level.dropItem(this, Item.get(Item.EGG, 0, 1));
-            this.level.addSound(this, "mob.chicken.plop");
-            this.EggLayTime = this.getRandomEggLayTime();
+
+        if (!this.isBaby()) {
+            if (this.EggLayTime > 0) {
+                EggLayTime -= tickDiff;
+            } else {
+                this.level.dropItem(this, Item.get(Item.EGG, 0, 1));
+                this.level.addSound(this, "mob.chicken.plop");
+                this.EggLayTime = this.getRandomEggLayTime();
+            }
         }
+
         return hasUpdate;
     }
 
@@ -140,6 +145,7 @@ public class EntityChicken extends EntityWalkingAnimal {
 
     public void saveNBT() {
         super.saveNBT();
+
         this.namedTag.putInt("EggLayTime", this.EggLayTime);
         this.namedTag.putBoolean("IsChickenJockey", this.IsChickenJockey);
     }
@@ -147,13 +153,17 @@ public class EntityChicken extends EntityWalkingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int featherDrop = EntityUtils.rand(0, 3);
+
             for (int i = 0; i < featherDrop; i++) {
                 drops.add(Item.get(Item.FEATHER, 0, 1));
             }
+
             drops.add(Item.get(this.isOnFire() ? Item.COOKED_CHICKEN : Item.RAW_CHICKEN, 0, 1));
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

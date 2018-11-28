@@ -81,6 +81,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     @Override
     public void saveNBT() {
         super.saveNBT();
+
         this.namedTag.putFloat("Health", this.getHealth());
     }
 
@@ -367,9 +368,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     return block;
                 }
             }
-        } catch (Exception ignored) {
-
-        }
+        } catch (Exception ignored) {}
 
         return null;
     }

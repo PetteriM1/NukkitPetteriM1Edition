@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.Server;
 import cn.nukkit.utils.RuleData;
 import cn.nukkit.level.GlobalBlockPalette;
 

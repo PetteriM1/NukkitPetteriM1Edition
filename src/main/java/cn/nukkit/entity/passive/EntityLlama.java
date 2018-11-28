@@ -60,13 +60,9 @@ public class EntityLlama extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(15);
     }
 
@@ -119,7 +115,7 @@ public class EntityLlama extends EntityWalkingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int leather = EntityUtils.rand(1, 3);
 
             for (int i = 0; i < leather; i++) {

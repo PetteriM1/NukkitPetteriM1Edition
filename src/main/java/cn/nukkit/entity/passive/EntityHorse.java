@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -12,7 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityHorse extends EntityTameableAnimal {
+public class EntityHorse extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 23;
 
@@ -50,13 +49,9 @@ public class EntityHorse extends EntityTameableAnimal {
     }
 
     @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(15);
     }
 
@@ -87,7 +82,7 @@ public class EntityHorse extends EntityTameableAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int leather = EntityUtils.rand(0, 3);
 
             for (int i = 0; i < leather; i++) {

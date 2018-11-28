@@ -46,9 +46,9 @@ public class EntityIronGolem extends EntityWalkingMob {
 
     @Override
     public void initEntity() {
-        this.setMaxHealth(100);
         super.initEntity();
 
+        this.setMaxHealth(100);
         this.setDamage(new int[] { 0, 21, 21, 21 });
         this.setMinDamage(new int[] { 0, 7, 7, 7 });
     }
@@ -105,7 +105,7 @@ public class EntityIronGolem extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int ironIngots = EntityUtils.rand(3, 6);
             int poppies = EntityUtils.rand(0, 3);
             for (int i = 0; i < ironIngots; i++) {

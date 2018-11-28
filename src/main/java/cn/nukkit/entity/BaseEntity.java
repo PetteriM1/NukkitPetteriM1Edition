@@ -19,7 +19,7 @@ import co.aikar.timings.Timings;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseEntity extends EntityCreature {
+public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
     EntityDamageEvent source;
 
@@ -32,6 +32,7 @@ public abstract class BaseEntity extends EntityCreature {
     protected Vector3 target = null;
     protected Entity followTarget = null;
 
+    protected boolean baby = false;
     protected boolean fireProof = false;
     private boolean movement = true;
     private boolean friendly = false;
@@ -103,6 +104,18 @@ public abstract class BaseEntity extends EntityCreature {
     }
 
     @Override
+    public boolean isBaby() {
+        return this.baby;
+    }
+
+    @Override
+    public void setBaby(boolean baby) {
+        this.baby = true;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BABY, true);
+        this.setScale((float) 0.5);
+    }
+
+    @Override
     protected void initEntity() {
         super.initEntity();
 
@@ -118,11 +131,17 @@ public abstract class BaseEntity extends EntityCreature {
             this.age = this.namedTag.getShort("Age");
         }
 
+        if (this.namedTag.getBoolean("Baby")) {
+            this.setBaby(true);
+        }
+
         this.setDataProperty(new ByteEntityData(DATA_FLAG_NO_AI, (byte) 1));
     }
 
     public void saveNBT() {
         super.saveNBT();
+
+        this.namedTag.putBoolean("Baby", this.isBaby());
         this.namedTag.putBoolean("Movement", this.isMovement());
         this.namedTag.putBoolean("WallCheck", this.isWallCheck());
         this.namedTag.putShort("Age", this.age);

@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.utils.EntityUtils;
@@ -30,9 +29,9 @@ public class EntityCow extends EntityWalkingAnimal {
     @Override
     public float getWidth() {
         if (this.isBaby()) {
-            return 0.2f;
+            return 0.45f;
         }
-        return 0.45f;
+        return 0.9f;
     }
 
     @Override
@@ -52,45 +51,51 @@ public class EntityCow extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
+    public double getSpeed() {
+        if (this.isBaby()) {
+            return 1.2;
+        }
+        return 1;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(10);
     }
 
     @Override
     public boolean onInteract(Player player, Item item) {
         super.onInteract(player, item);
-        if (item.equals(Item.get(Item.BUCKET, 0), true)) {
+
+        if (item.equals(Item.get(Item.BUCKET, 0), true) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.BUCKET, 0, 1));
             player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
             this.level.addSound(this, "mob.cow.milk");
-            return true;
         } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.WHEAT, 0, 1));
-            this.level
-                    .addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
             this.setInLove();
         }
-        return false;
+
+        return true;
     }
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.WHEAT
-                    && distance <= 40;
+
+            return player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.WHEAT && distance <= 40;
         }
+
         return false;
     }
 
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
 
             int leatherDropCount = EntityUtils.rand(0, 3);
             int beefDrop = EntityUtils.rand(1, 4);
@@ -98,10 +103,12 @@ public class EntityCow extends EntityWalkingAnimal {
             for (int i = 0; i < leatherDropCount; i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
+
             for (int i = 0; i < beefDrop; i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.STEAK : Item.RAW_BEEF, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

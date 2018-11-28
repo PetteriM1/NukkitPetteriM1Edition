@@ -1,8 +1,7 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.utils.EntityUtils;
@@ -43,13 +42,9 @@ public class EntityMooshroom extends EntityWalkingAnimal {
         return 1.4f;
     }
 
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(10);
     }
 
@@ -64,7 +59,7 @@ public class EntityMooshroom extends EntityWalkingAnimal {
 
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int leatherDrop = EntityUtils.rand(0, 3);
             int beefDrop = EntityUtils.rand(1, 4);
             for (int i = 0; i < leatherDrop; i++) {

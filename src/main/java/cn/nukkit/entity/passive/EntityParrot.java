@@ -12,7 +12,7 @@ import java.util.List;
 
 public class EntityParrot extends EntityFlyingAnimal {
 
-    public static final int NETWORK_ID = 105;
+    public static final int NETWORK_ID = 30;
 
     public EntityParrot(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -36,13 +36,14 @@ public class EntityParrot extends EntityFlyingAnimal {
     @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(6);
     }
 
     @Override
     public Item[] getDrops() {
          List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int featherDrop = EntityUtils.rand(1, 3);
             for (int i = 0; i < featherDrop; i++) {
                 drops.add(Item.get(Item.FEATHER, 0, 1));

@@ -42,6 +42,7 @@ public class EntitySquid extends EntityWaterAnimal {
     @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(10);
     }
 
@@ -52,7 +53,7 @@ public class EntitySquid extends EntityWaterAnimal {
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             return new Item[]{new ItemDye(DyeColor.BLACK.getDyeData())};
         } else {
             return new Item[0];

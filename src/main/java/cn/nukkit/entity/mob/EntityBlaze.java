@@ -220,7 +220,7 @@ public class EntityBlaze extends EntityFlyingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int blazeRod = EntityUtils.rand(0, 2);
             int glowStoneDust = EntityUtils.rand(0, 3);
             for (int i = 0; i < blazeRod; i++) {

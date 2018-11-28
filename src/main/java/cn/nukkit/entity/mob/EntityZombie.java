@@ -57,10 +57,6 @@ public class EntityZombie extends EntityWalkingMob {
         this.setMaxHealth(20);
     }
 
-    public boolean isBaby() {
-        return false;
-    }
-
     @Override
     public void setHealth(float health) {
         super.setHealth(health);
@@ -148,7 +144,7 @@ public class EntityZombie extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int rottenFlesh = EntityUtils.rand(0, 3);
             for (int i = 0; i < rottenFlesh; i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));

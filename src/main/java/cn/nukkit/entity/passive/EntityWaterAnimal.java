@@ -1,13 +1,10 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.EntitySwimming;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import co.aikar.timings.Timings;
 
 public abstract class EntityWaterAnimal extends EntitySwimming implements EntityAnimal {
 
@@ -21,16 +18,6 @@ public abstract class EntityWaterAnimal extends EntitySwimming implements Entity
     @Override
     public double getSpeed() {
         return 0.8;
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-    }
-
-    @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAG_BABY, 0);
     }
 
     @Override

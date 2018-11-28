@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.utils.EntityUtils;
@@ -48,13 +47,9 @@ public class EntityDonkey extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean isBaby() {
-        return this.getDataFlag(DATA_FLAGS, Entity.DATA_FLAG_BABY);
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
+
         this.setMaxHealth(15);
     }
 
@@ -78,13 +73,15 @@ public class EntityDonkey extends EntityWalkingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int leather = EntityUtils.rand(0, 3);
 
             for (int i = 0; i < leather; i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

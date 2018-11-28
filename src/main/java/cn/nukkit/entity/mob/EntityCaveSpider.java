@@ -100,7 +100,7 @@ public class EntityCaveSpider extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int strings = EntityUtils.rand(0, 3);
             int spiderEye = EntityUtils.rand(0, 3) == 0 ? 1 : 0;
             for (int i = 0; i < strings; i++) {

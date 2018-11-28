@@ -39,8 +39,9 @@ public class EntityEnderDragon extends EntityFlyingMob {
     @Override
     public void initEntity() {
         super.initEntity();
-        this.setMaxHealth(200);
+
         this.setHealth(200);
+        this.setMaxHealth(200);
     }
 
     @Override

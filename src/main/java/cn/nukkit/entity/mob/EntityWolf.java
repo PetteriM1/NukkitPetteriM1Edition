@@ -56,6 +56,7 @@ public class EntityWolf extends EntityTameableMob {
     @Override
     protected void initEntity() {
         super.initEntity();
+
         this.setDamage(new int[] { 0, 3, 4, 6 });
 
         if (this.namedTag.contains(NBT_KEY_ANGRY)) {
@@ -117,7 +118,18 @@ public class EntityWolf extends EntityTameableMob {
                 this.setCollarColor(((ItemDye) item).getDyeColor());
                 return true;
             }
+        } else if (this.hasOwner() && player.equals(this.getOwner())) {
+            if (this.namedTag.getByte("Sitting") == 0) {
+                this.namedTag.putByte("Sitting", 1);
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_SITTING, true);
+                this.saveNBT();
+            } else {
+                this.namedTag.putByte("Sitting", 0);
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_SITTING, false);
+                this.saveNBT();
+            }
         }
+
         return false;
     }
 

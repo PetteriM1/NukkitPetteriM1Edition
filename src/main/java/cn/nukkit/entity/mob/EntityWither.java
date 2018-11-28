@@ -7,6 +7,7 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -49,8 +50,8 @@ public class EntityWither extends EntityFlyingMob {
         super.initEntity();
 
         this.fireProof = true;
-        this.setMaxHealth(600);
         this.setHealth(600);
+        this.setMaxHealth(600);
         this.setDamage(new int[]{0, 2, 4, 6});
     }
 
@@ -101,7 +102,11 @@ public class EntityWither extends EntityFlyingMob {
 
     @Override
     public Item[] getDrops() {
-        return new Item[]{Item.get(Item.NETHER_STAR, 0, 1)};
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+            return new Item[]{Item.get(Item.NETHER_STAR, 0, 1)};
+        } else {
+            return new Item[0];
+        }
     }
 
     @Override
