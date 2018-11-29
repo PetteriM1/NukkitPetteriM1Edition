@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
 import cn.nukkit.entity.mob.EntityEnderman;
@@ -13,7 +12,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.potion.Effect;
 import co.aikar.timings.Timings;
 
 public abstract class EntityWalkingMob extends EntityWalking implements EntityMob {
@@ -185,18 +183,6 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
             if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
                 this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
                 this.move(EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20));
-            }
-        } else {
-            if (!this.hasEffect(Effect.WATER_BREATHING) && this.isInsideOfWater()) {
-                hasUpdate = true;
-                int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
-                if (airTicks <= -20) {
-                    airTicks = 0;
-                    this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-                }
-                this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
-            } else {
-                this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
             }
         }
 

@@ -3,14 +3,11 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntitySwimming;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import co.aikar.timings.Timings;
 
 public abstract class EntitySwimmingMob extends EntitySwimming implements EntityMob {
 
@@ -135,6 +132,7 @@ public abstract class EntitySwimmingMob extends EntitySwimming implements Entity
         }
     }
 
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;
@@ -166,31 +164,5 @@ public abstract class EntitySwimmingMob extends EntitySwimming implements Entity
             this.moveTime = 0;
         }
         return true;
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-
-        boolean hasUpdate = false;
-
-        Timings.entityBaseTickTimer.startTiming();
-
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        this.attackDelay += tickDiff;
-        if (this.isOnGround()) {
-            hasUpdate = true;
-            int airTicks = this.getDataPropertyShort(DATA_AIR) - tickDiff;
-            if (airTicks <= -20) {
-                airTicks = 0;
-                this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            }
-            this.setDataProperty(new ShortEntityData(DATA_AIR, airTicks));
-        } else {
-            this.setDataProperty(new ShortEntityData(DATA_AIR, 300));
-        }
-
-        Timings.entityBaseTickTimer.stopTiming();
-        return hasUpdate;
     }
 }

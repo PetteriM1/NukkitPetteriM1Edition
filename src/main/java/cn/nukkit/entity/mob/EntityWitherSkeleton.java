@@ -5,10 +5,16 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSwordStone;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
+import cn.nukkit.potion.Effect;
+import cn.nukkit.utils.EntityUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntityWitherSkeleton extends EntityWalkingMob {
 
@@ -47,6 +53,11 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
         if (this.attackDelay > 10 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, getDamage()));
+
+            Effect wither = Effect.getEffect(Effect.WITHER);
+            wither.setAmplifier(1);
+            wither.setDuration(200);
+            player.addEffect(wither);
         }
     }
 
@@ -59,6 +70,26 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
         pk.item = new ItemSwordStone();
         pk.hotbarSlot = 0;
         player.dataPacket(pk);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+            int coal = EntityUtils.rand(0, 2);
+            int bones = EntityUtils.rand(0, 3);
+
+            for (int i = 0; i < coal; i++) {
+                drops.add(Item.get(Item.COAL, 0, 1));
+            }
+
+            for (int i = 0; i < bones; i++) {
+                drops.add(Item.get(Item.BONE, 0, 1));
+            }
+        }
+
+        return drops.toArray(new Item[drops.size()]);
     }
 
     @Override

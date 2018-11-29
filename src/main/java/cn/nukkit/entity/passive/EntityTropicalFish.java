@@ -1,6 +1,8 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -42,6 +44,15 @@ public class EntityTropicalFish extends EntityFish {
     @Override
     public int getKillExperience() {
         return 0;
+    }
+
+    @Override
+    public Item[] getDrops() {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+            return new Item[]{Item.get(Item.CLOWNFISH, 0, 1)};
+        } else {
+            return new Item[0];
+        }
     }
 
     @Override

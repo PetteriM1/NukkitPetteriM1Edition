@@ -64,9 +64,6 @@ public class EntityRabbit extends EntityJumpingAnimal {
 
     @Override
     public Item[] getDrops() {
-        if (this.isBaby()) {
-
-        }
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             int rabbitHide = EntityUtils.rand(0, 2);

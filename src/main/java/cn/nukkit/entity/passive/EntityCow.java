@@ -51,14 +51,6 @@ public class EntityCow extends EntityWalkingAnimal {
     }
 
     @Override
-    public double getSpeed() {
-        if (this.isBaby()) {
-            return 1.2;
-        }
-        return 1;
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
 

@@ -81,6 +81,9 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public double getSpeed() {
+        if (this.isBaby()) {
+            return 1.2;
+        }
         return 1;
     }
 

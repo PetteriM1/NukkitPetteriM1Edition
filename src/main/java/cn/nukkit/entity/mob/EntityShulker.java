@@ -4,7 +4,10 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.projectile.EntityShulkerBullet;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -73,7 +76,33 @@ public class EntityShulker extends EntityWalkingMob {
     }
 
     @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
+
+        if (!ev.isCancelled()) {
+            if (EntityUtils.rand(1, 12) == 6) {
+                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops() {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && EntityUtils.rand(1, 2) == 1) {
+            return new Item[]{Item.get(Item.SHULKER_SHELL, 0, 1)};
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
     public int getKillExperience() {
         return 5;
+    }
+
+    @Override
+    public void knockBack(Entity attacker, double damage, double x, double z, double base) {
     }
 }

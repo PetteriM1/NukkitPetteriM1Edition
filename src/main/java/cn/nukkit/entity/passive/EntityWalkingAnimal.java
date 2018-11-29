@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
 import cn.nukkit.item.Item;
@@ -18,11 +17,6 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
 
     public EntityWalkingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public double getSpeed() {
-        return 0.8;
     }
 
     @Override
@@ -83,12 +77,8 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         } else if (target != null && (Math.pow(this.x - target.x, 2) + Math.pow(this.z - target.z, 2)) <= 1) {
             this.moveTime = 0;
         }
+
         return true;
-    }
-
-    public boolean onInteract(Entity entity, Item item) {
-
-        return false;
     }
 
     public void setInLove() {
