@@ -42,6 +42,7 @@ public class EntityMooshroom extends EntityWalkingAnimal {
         return 1.4f;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 

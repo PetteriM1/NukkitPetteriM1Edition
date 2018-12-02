@@ -42,11 +42,12 @@ public class EntityEnderman extends EntityWalkingMob {
         return 1.21;
     }
 
+    @Override
     protected void initEntity() {
-        this.setMaxHealth(40);
         super.initEntity();
 
         this.setDamage(new int[] { 0, 4, 7, 10 });
+        this.setMaxHealth(40);
     }
 
     public void attackEntity(Entity player) {

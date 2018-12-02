@@ -47,6 +47,7 @@ public class EntityRabbit extends EntityJumpingAnimal {
         return 1.2;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 

@@ -46,7 +46,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
     public void initEntity() {
         super.initEntity();
 
-        setMaxHealth(4);
+        this.setMaxHealth(4);
     }
 
     @Override

@@ -62,7 +62,7 @@ public class EntityZombiePigman extends EntityWalkingMob {
 
         this.fireProof = true;
         this.setDamage(new int[] { 0, 5, 9, 13 });
-        setMaxHealth(20);
+        this.setMaxHealth(20);
     }
 
     @Override

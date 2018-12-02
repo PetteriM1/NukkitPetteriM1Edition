@@ -59,6 +59,8 @@ public class EntitySheep extends EntityWalkingAnimal {
 
     @Override
     public void initEntity() {
+        super.initEntity();
+
         this.setMaxHealth(8);
 
         if (!this.namedTag.contains("Color")) {

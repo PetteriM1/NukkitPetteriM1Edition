@@ -57,7 +57,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     public void initEntity() {
         super.initEntity();
 
-        setMaxHealth(20);
+        this.setMaxHealth(20);
     }
 
     public int getBombTime() {

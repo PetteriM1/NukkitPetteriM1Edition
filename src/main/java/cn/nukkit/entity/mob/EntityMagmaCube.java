@@ -46,6 +46,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
         return 2;
     }
 
+    @Override
     protected void initEntity() {
         super.initEntity();
 

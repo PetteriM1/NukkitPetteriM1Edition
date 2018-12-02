@@ -46,6 +46,7 @@ public class EntitySlime extends EntityJumpingMob {
         return 2;
     }
 
+    @Override
     protected void initEntity() {
         super.initEntity();
 

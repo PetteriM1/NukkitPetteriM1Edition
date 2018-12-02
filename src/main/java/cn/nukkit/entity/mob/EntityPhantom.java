@@ -43,6 +43,7 @@ public class EntityPhantom extends EntityFlyingMob {
         return 1.1;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 

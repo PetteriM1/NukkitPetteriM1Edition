@@ -45,6 +45,7 @@ public class EntityGhast extends EntityFlyingMob {
         return 1.2;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 

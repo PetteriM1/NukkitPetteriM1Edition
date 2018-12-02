@@ -56,6 +56,7 @@ public class EntitySpider extends EntityWalkingMob {
         return 1.13;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 

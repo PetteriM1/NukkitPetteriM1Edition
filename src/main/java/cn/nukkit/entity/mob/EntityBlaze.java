@@ -46,6 +46,7 @@ public class EntityBlaze extends EntityFlyingMob {
         return 0.04f;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 

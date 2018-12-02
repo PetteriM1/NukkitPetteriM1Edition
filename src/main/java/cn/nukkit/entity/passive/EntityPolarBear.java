@@ -60,7 +60,6 @@ public class EntityPolarBear extends EntityWalkingMob {
         super.initEntity();
 
         this.setMaxHealth(30);
-        this.fireProof = false;
         this.setDamage(new int[] { 0, 4, 6, 9 });
 
         if (this.namedTag.contains("Angry")) {

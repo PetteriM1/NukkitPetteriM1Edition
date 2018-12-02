@@ -33,7 +33,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     protected Entity followTarget = null;
 
     protected boolean baby = false;
-    protected boolean fireProof = false;
     private boolean movement = true;
     private boolean friendly = false;
     private boolean wallcheck = true;

@@ -51,11 +51,11 @@ public class EntityPig extends EntityWalkingAnimal {
         return 0.9f;
     }
 
+    @Override
     public void initEntity() {
         super.initEntity();
 
         this.setMaxHealth(10);
-        this.fireProof = false;
     }
 
     @Override
