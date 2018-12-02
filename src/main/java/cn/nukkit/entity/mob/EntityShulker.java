@@ -80,7 +80,8 @@ public class EntityShulker extends EntityWalkingMob {
         super.attack(ev);
 
         if (!ev.isCancelled()) {
-            if (EntityUtils.rand(1, 12) == 6) {
+            if (EntityUtils.rand(1, 15) == 5) {
+                this.level.addSound(this, "mob.shulker.teleport");
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
             }
         }

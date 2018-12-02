@@ -92,7 +92,7 @@ public class EntityRabbit extends EntityJumpingAnimal {
     public boolean onUpdate(int currentTick) {
         boolean hasUpdate = super.onUpdate(currentTick);
         try {
-            this.level.addParticle(new PunchBlockParticle(this, this.level.getBlock((int) x, (int) y - 1, (int) z), BlockFace.UP));
+            if (this.isOnGround()) this.level.addParticle(new PunchBlockParticle(this, this.level.getBlock((int) x, (int) y - 1, (int) z), BlockFace.UP));
         } catch (Exception e) {}
         return hasUpdate;
     }
