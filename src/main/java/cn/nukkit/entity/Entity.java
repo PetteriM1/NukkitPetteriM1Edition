@@ -1433,9 +1433,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public void handleLavaMovement() {
-        //todo
-    }
+    public void handleLavaMovement() {}
 
     public void moveFlying(float strafe, float forward, float friction) {
         // This is special for Nukkit! :)
@@ -1455,9 +1453,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public void onCollideWithPlayer(EntityHuman entityPlayer) {
-
-    }
+    public void onCollideWithPlayer(EntityHuman entityPlayer) {}
 
     public void applyEntityCollision(Entity entity) {
         if (entity.riding != this && entity.linkedEntity != this) {
