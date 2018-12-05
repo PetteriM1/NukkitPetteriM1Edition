@@ -18,43 +18,54 @@ public class EntityArmorStand extends Entity {
 
 	public static final int NETWORK_ID = 61;
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    public EntityArmorStand(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
+	public final String TAG_MAINHAND = "Mainhand";
+	public final String TAG_OFFHAND = "Offhand";
+	public final String TAG_POSE_INDEX = "PoseIndex";
+	public final String TAG_ARMOR = "Armor";
 
 	@Override
-    protected void initEntity() {
-        super.initEntity();
+	public int getNetworkId() {
+		return NETWORK_ID;
+	}
+
+	@Override
+    protected float getGravity() {
+        return 0.1f;
+    }
+
+	public EntityArmorStand(FullChunk chunk, CompoundTag nbt) {
+		super(chunk, nbt);
+	}
+
+	@Override
+	protected void initEntity() {
+		super.initEntity();
 
 		this.setHealth(6);
-        this.setMaxHealth(6);
-    }
+		this.setMaxHealth(6);
+	}
 
 	@Override
-    public boolean attack(EntityDamageEvent source) {
-        boolean onCreative = false;
+	public boolean attack(EntityDamageEvent source) {
+		boolean onCreative = false;
 
-        if (source instanceof EntityDamageByEntityEvent) {
-            Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
-            onCreative = damager instanceof Player && ((Player) damager).isCreative();
-        }
+		if (source instanceof EntityDamageByEntityEvent) {
+			Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
+			onCreative = damager instanceof Player && ((Player) damager).isCreative();
+		}
 
-        if (!onCreative && level.getGameRules().getBoolean("doEntityDrops")) {
-            this.level.dropItem(this, new ItemArmorStand());
-        }
+		if (!onCreative && level.getGameRules().getBoolean("doEntityDrops")) {
+			this.level.dropItem(this, new ItemArmorStand());
+		}
+
 		this.remove();
 
-        return true;
-    }
+		return true;
+	}
 
 	public void remove() {
 		this.level.addParticle(new SmokeParticle(this));
-        this.close();
+		this.close();
 		this.kill();
 
 		Player[] players = this.getLevel().getPlayers().values().toArray(new Player[0]);
@@ -63,8 +74,31 @@ public class EntityArmorStand extends Entity {
 		Server.broadcastPacket(players, pk);
 	}
 
-    @Override
+	@Override
 	public boolean canCollideWith(Entity entity) {
 		return false;
+	}
+
+	@Override
+	public boolean onUpdate(int currentTick) {
+		if (this.closed) {
+			return false;
+		}
+
+		this.timing.startTiming();
+
+		boolean hasUpdate = super.onUpdate(currentTick);
+
+		if (!this.isOnGround()) {
+			this.motionX = 0;
+			this.motionY -= getGravity();
+			this.motionZ = 0;
+		}
+
+		this.move(this.motionX, this.motionY, this.motionZ);
+
+		this.timing.stopTiming();
+
+		return hasUpdate;
 	}
 }

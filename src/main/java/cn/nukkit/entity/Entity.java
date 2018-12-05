@@ -257,8 +257,6 @@ public abstract class Entity extends Location implements Metadatable {
     public AxisAlignedBB boundingBox;
     public boolean onGround;
     public boolean inBlock = false;
-    public boolean positionChanged;
-    public boolean motionChanged;
     public int deadTicks = 0;
     protected int age = 0;
 
@@ -280,8 +278,6 @@ public abstract class Entity extends Location implements Metadatable {
     public float scale = 1;
 
     public CompoundTag namedTag;
-
-    protected boolean isStatic = false;
 
     public boolean isCollided = false;
     public boolean isCollidedHorizontally = false;

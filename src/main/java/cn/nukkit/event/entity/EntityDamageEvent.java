@@ -163,6 +163,10 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
          */
         LAVA,
         /**
+         * Damage caused by standing on magma block
+         */
+        MAGMA,
+        /**
          * Damage caused by running out of air underwater
          */
         DROWNING,
