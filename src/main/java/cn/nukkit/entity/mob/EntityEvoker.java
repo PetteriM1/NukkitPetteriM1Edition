@@ -51,23 +51,6 @@ public class EntityEvoker extends EntityWalkingMob {
     }
 
     @Override
-    public void setHealth(float health) {
-        super.setHealth(health);
-
-        if (this.isAlive()) {
-            if (15 < this.getHealth()) {
-                this.setDamage(new int[] { 0, 2, 3, 4 });
-            } else if (10 < this.getHealth()) {
-                this.setDamage(new int[] { 0, 3, 4, 6 });
-            } else if (5 < this.getHealth()) {
-                this.setDamage(new int[] { 0, 3, 5, 7 });
-            } else {
-                this.setDamage(new int[] { 0, 4, 6, 9 });
-            }
-        }
-    }
-
-    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 10 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
