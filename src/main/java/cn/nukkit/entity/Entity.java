@@ -219,7 +219,9 @@ public abstract class Entity extends Location implements Metadatable {
             .putShort(DATA_MAX_AIR, 400)
             .putString(DATA_NAMETAG, "")
             .putLong(DATA_LEAD_HOLDER_EID, -1)
-            .putFloat(DATA_SCALE, 1f);
+            .putFloat(DATA_SCALE, 1f)
+            .putFloat(DATA_BOUNDING_BOX_HEIGHT, this.getHeight())
+            .putFloat(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
 
     public Entity linkedEntity = null;
 
@@ -363,6 +365,8 @@ public abstract class Entity extends Location implements Metadatable {
                 this.setNameTagVisible(this.namedTag.getBoolean("CustomNameVisible"));
             }
         }
+
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
 
         this.scheduleUpdate();
     }
