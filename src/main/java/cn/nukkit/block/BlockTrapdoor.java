@@ -128,6 +128,9 @@ public class BlockTrapdoor extends BlockTransparentMeta {
         if (type == Level.BLOCK_UPDATE_REDSTONE || type == Level.BLOCK_UPDATE_NORMAL) {
             if ((!isOpen() && this.level.isBlockPowered(this.getLocation())) || (isOpen() && !this.level.isBlockPowered(this.getLocation()))) {
                 this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isOpen() ? 15 : 0, isOpen() ? 0 : 15));
+                this.setDamage(this.getDamage() ^ 0x08);
+                this.level.setBlock(this, this, true);
+                this.level.addSound(new DoorSound(this));
                 return type;
             }
         }
