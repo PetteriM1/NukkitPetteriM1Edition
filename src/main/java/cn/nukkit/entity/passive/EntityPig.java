@@ -80,12 +80,12 @@ public class EntityPig extends EntityWalkingAnimal {
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));
             this.setInLove();
             return true;
-        }else if (item.equals(Item.get(Item.POTATO,0)) && !this.isBaby()) {
+        } else if (item.equals(Item.get(Item.POTATO,0)) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.POTATO,0,1));
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.POTATO)));
             this.setInLove();
             return true;
-        }else if (item.equals(Item.get(Item.BEETROOT,0)) && !this.isBaby()) {
+        } else if (item.equals(Item.get(Item.BEETROOT,0)) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.BEETROOT,0,1));
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.BEETROOT)));
             this.setInLove();
@@ -107,9 +107,5 @@ public class EntityPig extends EntityWalkingAnimal {
 
     public int getKillExperience() {
         return EntityUtils.rand(1, 4);
-    }
-
-    public boolean mountEntity(Entity entity) {
-        return false;
     }
 }

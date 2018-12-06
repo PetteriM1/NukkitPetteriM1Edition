@@ -47,7 +47,7 @@ public class Spawner extends Thread {
         entitySpawners.add(new CreeperSpawner(this));
         entitySpawners.add(new EndermanSpawner(this));
         entitySpawners.add(new HorseSpawner(this));
-        entitySpawners.add(new MCowSpawner(this));
+        entitySpawners.add(new MooshroomSpawner(this));
         entitySpawners.add(new OcelotSpawner(this));
         entitySpawners.add(new PigSpawner(this));
         entitySpawners.add(new PolarBearSpawner(this));

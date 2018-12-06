@@ -12,9 +12,9 @@ import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
-public class MCowSpawner extends AbstractEntitySpawner {
+public class MooshroomSpawner extends AbstractEntitySpawner {
 
-    public MCowSpawner(Spawner spawnTask) {
+    public MooshroomSpawner(Spawner spawnTask) {
         super(spawnTask);
     }
 

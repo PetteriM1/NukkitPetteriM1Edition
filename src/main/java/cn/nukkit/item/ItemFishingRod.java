@@ -30,7 +30,7 @@ public class ItemFishingRod extends ItemTool {
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         if (player.fishing != null) {
-			player.stopFishing();
+			player.stopFishing(true);
 		} else {
 			player.startFishing();
             this.meta++;

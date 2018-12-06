@@ -3485,7 +3485,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.save();
                 }
                 if (this.fishing != null) {
-                    this.stopFishing();
+                    this.stopFishing(false);
                 }
             }
 
@@ -4828,8 +4828,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 		}
     }
 
-    public void stopFishing() {
-        fishing.reelLine();
+    public void stopFishing(boolean click) {
+        if (click) {
+            fishing.reelLine();
+        } else if (this.fishing != null) {
+            this.fishing.kill();
+            this.fishing.close();
+        }
+
         this.fishing = null;
     }
 }

@@ -13,6 +13,8 @@ import cn.nukkit.item.ItemBoat;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
+import cn.nukkit.math.MathHelper;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -23,13 +25,10 @@ public class EntityBoat extends EntityVehicle {
 
     public static final int NETWORK_ID = 90;
 
-    public static final int DATA_WOOD_ID = 20;
-
     public EntityBoat(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
-    
     public boolean isRideable() {
         return true;
     }
@@ -38,7 +37,9 @@ public class EntityBoat extends EntityVehicle {
     protected void initEntity() {
         super.initEntity();
 
-        this.dataProperties.putByte(DATA_WOOD_ID, this.namedTag.getByte("woodID"));
+        this.dataProperties.putFloat(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
+        this.dataProperties.putFloat(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
 
         this.setHealth(4);
         this.setMaxHealth(4);
@@ -46,7 +47,7 @@ public class EntityBoat extends EntityVehicle {
 
     @Override
     public float getHeight() {
-        return 0.7f;
+        return 0.5f;
     }
 
     @Override
@@ -60,13 +61,13 @@ public class EntityBoat extends EntityVehicle {
     }
 
     @Override
-    protected float getGravity() {
-        return 0.1f;
+    public float getBaseOffset() {
+        return 0.35f;
     }
 
     @Override
-    public float getBaseOffset() {
-        return 0.35F;
+    public float getMountedYOffset() {
+        return 0.71f;
     }
 
     @Override
@@ -80,11 +81,18 @@ public class EntityBoat extends EntityVehicle {
             return false;
         } else {
             VehicleDamageEvent event = new VehicleDamageEvent(this, source.getEntity(), source.getFinalDamage());
-            getServer().getPluginManager().callEvent(event);
+            this.getServer().getPluginManager().callEvent(event);
+
             if (event.isCancelled()) {
                 return false;
             }
-            performHurtAnimation((int) event.getDamage());
+
+            if (source.getCause() == EntityDamageEvent.DamageCause.MAGMA) {
+                event.setCancelled(true);
+                return false;
+            }
+
+            this.performHurtAnimation((int) event.getDamage());
 
             boolean instantKill = true;
             boolean onCreative = false;
@@ -96,18 +104,22 @@ public class EntityBoat extends EntityVehicle {
 
             if (instantKill) {
                 VehicleDestroyEvent event2 = new VehicleDestroyEvent(this, source.getEntity());
-                getServer().getPluginManager().callEvent(event2);
+                this.getServer().getPluginManager().callEvent(event2);
+
                 if (event2.isCancelled()) {
                     return false;
                 }
+
                 if (linkedEntity != null) {
-                    mountEntity(linkedEntity);
+                    this.mountEntity(linkedEntity);
                 }
+
                 if (!onCreative && level.getGameRules().getBoolean("doEntityDrops")) {
                     this.level.dropItem(this, new ItemBoat());
                 }
-                close();
-                kill();
+
+                this.close();
+                this.kill();
             }
         }
 
@@ -140,31 +152,31 @@ public class EntityBoat extends EntityVehicle {
 
         this.lastUpdate = currentTick;
 
-        boolean hasUpdate = this.entityBaseTick(tickDiff);
+        this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-            super.onUpdate(currentTick);
 
-            this.motionY = (this.level.getBlock(new Vector3(this.x, this.y, this.z)).getBoundingBox() != null || this.isInsideOfWater()) ? getGravity() : -0.08;
+            this.checkObstruction(this.x, this.y, this.z);
 
-            if (this.checkObstruction(this.x, this.y, this.z)) {
-                hasUpdate = true;
+            if (this.isInsideOfWater() && this.linkedEntity == null) {
+                this.motionY = 0.01;
+            } else if (this.level.getBlock(new Vector3(this.x, this.y, this.z)).getBoundingBox() != null || this.isInsideOfWater() || this.isInsideOfSolid()) {
+                this.motionY = 0;
+            } else if (!this.isOnGround() && !this.isInsideOfWater()) {
+                this.motionY =- 0.2;
             }
 
             this.move(this.motionX, this.motionY, this.motionZ);
 
-            double friction = 1 - this.getDrag();
+            if (this.linkedEntity == null) {
+                double friction = 1 - this.getDrag();
 
-            if (this.onGround && (Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
-                friction *= this.getLevel().getBlock(this.temporalVector.setComponents((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1)).getFrictionFactor();
-            }
+                if (this.onGround && (Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionZ) > 0.00001)) {
+                    friction *= this.getLevel().getBlock(this.temporalVector.setComponents((int) Math.floor(this.x), (int) Math.floor(this.y - 1), (int) Math.floor(this.z) - 1)).getFrictionFactor();
+                }
 
-            this.motionX *= friction;
-            this.motionY *= 1 - this.getDrag();
-            this.motionZ *= friction;
-
-            if (this.onGround) {
-                this.motionY *= -0.5;
+                this.motionX *= friction;
+                this.motionZ *= friction;
             }
 
             Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
@@ -179,7 +191,7 @@ public class EntityBoat extends EntityVehicle {
             this.updateMovement();
         }
 
-        return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
+        return true;
     }
 
     @Override
@@ -190,5 +202,36 @@ public class EntityBoat extends EntityVehicle {
 
         super.mountEntity(player);
         return true;
+    }
+
+    @Override
+    public void applyEntityCollision(Entity entity) {
+        if (entity.riding != this && entity.linkedEntity != this && entity.y - this.y < 0.5) {
+            double dx = entity.x - this.x;
+            double dy = entity.z - this.z;
+            double dz = NukkitMath.getDirection(dx, dy);
+
+            if (dz >= 0.009999999776482582D) {
+                dz = MathHelper.sqrt((float) dz);
+                dx /= dz;
+                dy /= dz;
+                double d3 = 1.0D / dz;
+
+                if (d3 > 1.0D) {
+                    d3 = 1.0D;
+                }
+
+                dx *= d3;
+                dy *= d3;
+                dx *= 0.05000000074505806D;
+                dy *= 0.05000000074505806D;
+                dx *= 1.0F + entityCollisionReduction;
+                dz *= 1.0F + entityCollisionReduction;
+                if (this.riding == null) {
+                    motionX -= dx;
+                    motionZ -= dy;
+                }
+            }
+        }
     }
 }

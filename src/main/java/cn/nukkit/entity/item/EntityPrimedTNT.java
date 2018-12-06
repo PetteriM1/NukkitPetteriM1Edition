@@ -86,6 +86,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         }
 
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
         this.setDataProperty(new IntEntityData(DATA_FUSE_LENGTH, fuse));
 
         this.level.addSound(new TNTPrimeSound(this));
@@ -125,10 +126,8 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
 
         if (isAlive()) {
 
-            if (isOnGround()) {
-                this.motionY = getGravity();
-            } else {
-                this.motionY -= getGravity();
+            if (!isOnGround()) {
+                motionY -= getGravity();
             }
 
             move(motionX, motionY, motionZ);

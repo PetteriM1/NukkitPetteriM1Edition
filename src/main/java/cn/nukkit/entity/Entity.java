@@ -1290,7 +1290,6 @@ public abstract class Entity extends Location implements Metadatable {
             this.motionX = 0.0D;
             this.motionY = 0.0D;
             this.motionZ = 0.0D;
-            onUpdate(lastUpdate);
             if (this.linkedEntity != null) {
                 this.YawDelta += this.linkedEntity.yaw - this.linkedEntity.lastYaw;
                 for (this.PitchDelta += this.linkedEntity.pitch - this.linkedEntity.lastPitch; this.YawDelta >= 180.0D; this.YawDelta -= 360.0D) {
