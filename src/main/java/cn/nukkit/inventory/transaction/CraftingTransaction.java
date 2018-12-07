@@ -52,11 +52,13 @@ public class CraftingTransaction extends InventoryTransaction {
         int y = NukkitMath.floorDouble((double) index / this.gridSize);
         int x = index % this.gridSize;
 
-        if (this.inputs[y][x].isNull()) {
-            inputs[y][x] = item.clone();
-        } else if (!inputs[y][x].equals(item)) {
-            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ")");
-        }
+        try {
+            if (this.inputs[y][x].isNull()) {
+                inputs[y][x] = item.clone();
+            } else if (!inputs[y][x].equals(item)) {
+                if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ")");
+            }
+        } catch (Exception e) {}
     }
 
     public Item[][] getInputMap() {

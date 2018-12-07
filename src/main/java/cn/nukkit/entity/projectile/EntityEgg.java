@@ -66,7 +66,7 @@ public class EntityEgg extends EntityProjectile {
         } else if (this.isCollided) {
             this.kill();
 
-            if (Server.getInstance().getPropertyBoolean("spawn-animals", true)) {
+            if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
                 if (EntityUtils.rand(1, 20) == 5) {
                     EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 1, 0.5));
                     if (entity != null) {

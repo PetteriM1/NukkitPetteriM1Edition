@@ -248,7 +248,6 @@ public class Server {
                 put("announce-player-achievements", false);
                 put("spawn-protection", 10);
                 put("max-players", 50);
-                put("spawn-animals", true);
                 put("gamemode", 0);
                 put("force-gamemode", true);
                 put("hardcore", false);
