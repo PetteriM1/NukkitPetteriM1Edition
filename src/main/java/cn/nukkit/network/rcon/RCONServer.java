@@ -21,6 +21,7 @@ import java.util.*;
  * @author Tee7even
  */
 public class RCONServer extends Thread {
+
     private static final int SERVERDATA_AUTH = 3;
     private static final int SERVERDATA_AUTH_RESPONSE = 2;
     private static final int SERVERDATA_EXECCOMMAND = 2;

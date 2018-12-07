@@ -5,11 +5,10 @@ package cn.nukkit.network.protocol;
  * Nukkit Project
  */
 public class FullChunkDataPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.FULL_CHUNK_DATA_PACKET;
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.FULL_CHUNK_DATA_PACKET;
     }
 
     public int chunkX;
@@ -18,7 +17,6 @@ public class FullChunkDataPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

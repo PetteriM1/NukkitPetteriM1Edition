@@ -28,6 +28,7 @@ import cn.nukkit.Server;
 import java.util.*;
 
 public class TimingsManager {
+
     static final Map<TimingIdentifier, Timing> TIMING_MAP = Collections.synchronizedMap(new HashMap<>(256, 0.5f));
 
     static final Queue<Timing> TIMINGS = new ArrayDeque<>();

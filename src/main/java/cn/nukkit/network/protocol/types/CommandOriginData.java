@@ -1,6 +1,5 @@
 package cn.nukkit.network.protocol.types;
 
-
 import java.util.OptionalLong;
 import java.util.UUID;
 

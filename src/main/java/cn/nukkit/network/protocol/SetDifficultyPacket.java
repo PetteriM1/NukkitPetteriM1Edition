@@ -5,8 +5,6 @@ package cn.nukkit.network.protocol;
  */
 public class SetDifficultyPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.SET_DIFFICULTY_PACKET;
-
     public int difficulty;
 
     @Override
@@ -22,6 +20,6 @@ public class SetDifficultyPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.SET_DIFFICULTY_PACKET;
     }
 }

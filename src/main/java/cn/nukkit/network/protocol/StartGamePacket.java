@@ -5,11 +5,9 @@ import cn.nukkit.level.GlobalBlockPalette;
 
 public class StartGamePacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.START_GAME_PACKET;
-
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.START_GAME_PACKET;
     }
 
     public boolean protocolLowerThan291 = false;

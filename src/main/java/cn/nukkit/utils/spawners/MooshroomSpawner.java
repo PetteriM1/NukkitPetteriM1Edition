@@ -25,8 +25,8 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
             return SpawnResult.SPAWN_DENIED;
         }
 
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
         if (biomeId != Biome.MUSHROOM_ISLAND) {
             result = SpawnResult.WRONG_BIOME;
@@ -47,12 +47,12 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityMooshroom.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "Mooshroom";
     }
 }

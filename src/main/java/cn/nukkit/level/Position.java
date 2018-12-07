@@ -10,6 +10,7 @@ import cn.nukkit.utils.LevelException;
  * Nukkit Project
  */
 public class Position extends Vector3 {
+
     public Level level;
 
     public Position() {

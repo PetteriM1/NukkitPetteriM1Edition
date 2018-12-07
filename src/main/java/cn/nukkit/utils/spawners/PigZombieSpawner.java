@@ -21,7 +21,7 @@ public class PigZombieSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (!level.getName().equals("nether")) {
             result = SpawnResult.WRONG_BIOME;
@@ -40,12 +40,12 @@ public class PigZombieSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityZombiePigman.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "ZombiePigman";
     }
 }

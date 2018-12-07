@@ -5,11 +5,10 @@ package cn.nukkit.network.protocol;
  * Nukkit Project
  */
 public class ContainerClosePacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_CLOSE_PACKET;
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.CONTAINER_CLOSE_PACKET;
     }
 
     public int windowId;

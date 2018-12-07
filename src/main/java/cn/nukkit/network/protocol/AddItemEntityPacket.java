@@ -9,11 +9,10 @@ import cn.nukkit.utils.Binary;
  * Nukkit Project
  */
 public class AddItemEntityPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.ADD_ITEM_ENTITY_PACKET;
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.ADD_ITEM_ENTITY_PACKET;
     }
 
     public long entityUniqueId;
@@ -30,7 +29,6 @@ public class AddItemEntityPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

@@ -28,6 +28,7 @@ import com.google.gson.JsonArray;
 import cn.nukkit.timings.JsonUtil;
 
 class TimingsHistoryEntry {
+
     final TimingData data;
     final TimingData[] children;
 

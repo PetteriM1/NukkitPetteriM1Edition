@@ -9,11 +9,9 @@ public class SubClientLoginPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override
     public void encode() {
-        //TODO
     }
 }

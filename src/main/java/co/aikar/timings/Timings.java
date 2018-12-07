@@ -43,6 +43,7 @@ import java.util.Set;
 import static co.aikar.timings.TimingIdentifier.DEFAULT_GROUP;
 
 public final class Timings {
+
     private static boolean timingsEnabled = false;
     private static boolean verboseEnabled = false;
     private static boolean privacy = false;

@@ -5,7 +5,6 @@ package cn.nukkit.network.protocol;
  * Nukkit Project
  */
 public class UpdateBlockPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.UPDATE_BLOCK_PACKET;
 
     public static final int FLAG_NONE = 0b0000;
     public static final int FLAG_NEIGHBORS = 0b0001;
@@ -25,12 +24,11 @@ public class UpdateBlockPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.UPDATE_BLOCK_PACKET;
     }
 
     @Override
     public void decode() {
-
     }
 
     @Override

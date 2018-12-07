@@ -7,8 +7,6 @@ import cn.nukkit.math.Vector3f;
  */
 public class RespawnPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.RESPAWN_PACKET;
-
     public float x;
     public float y;
     public float z;
@@ -29,6 +27,6 @@ public class RespawnPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.RESPAWN_PACKET;
     }
 }

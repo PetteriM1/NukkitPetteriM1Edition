@@ -2,8 +2,6 @@ package cn.nukkit.network.protocol;
 
 public class ResourcePackChunkDataPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACK_CHUNK_DATA_PACKET;
-
     public String packId;
     public int chunkIndex;
     public long progress;
@@ -29,6 +27,6 @@ public class ResourcePackChunkDataPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.RESOURCE_PACK_CHUNK_DATA_PACKET;
     }
 }

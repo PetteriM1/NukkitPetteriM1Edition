@@ -1,6 +1,5 @@
 package cn.nukkit.plugin.service;
 
-
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;
 import com.google.common.base.Preconditions;
@@ -8,9 +7,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.*;
 
-/**
- * Created on 16-11-20.
- */
 public class NKServiceManager implements ServiceManager {
 
     private final Map<Class<?>, List<RegisteredServiceProvider<?>>> handle = new HashMap<>();
@@ -108,5 +104,4 @@ public class NKServiceManager implements ServiceManager {
     public List<Class<?>> getKnownService() {
         return ImmutableList.copyOf(handle.keySet());
     }
-
 }

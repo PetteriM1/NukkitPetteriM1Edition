@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlobalBlockPalette {
+
     private static final Int2IntArrayMap legacyToRuntimeId = new Int2IntArrayMap();
     private static final Int2IntArrayMap runtimeIdToLegacy = new Int2IntArrayMap();
     private static final AtomicInteger runtimeIdAllocator = new AtomicInteger(0);

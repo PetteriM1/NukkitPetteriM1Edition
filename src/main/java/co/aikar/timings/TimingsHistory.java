@@ -39,11 +39,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 import static co.aikar.timings.Timings.fullServerTickTimer;
 import static co.aikar.timings.TimingsManager.MINUTE_REPORTS;
 
 public class TimingsHistory {
+
     public static long lastMinuteTime;
     public static long timedTicks;
     public static long playerTicks;

@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
  * Nukkit Project
  */
 public class SimpleChunkManager implements ChunkManager {
+
     protected Long2ObjectOpenHashMap<FullChunk> chunks = new Long2ObjectOpenHashMap<>();
 
     protected long seed;

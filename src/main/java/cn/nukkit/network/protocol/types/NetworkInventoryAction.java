@@ -247,7 +247,6 @@ public class NetworkInventoryAction {
                     return new SlotChangeAction(beacon, this.inventorySlot, this.oldItem, this.newItem);
                 }
 
-                //TODO: more stuff
                 player.getServer().getLogger().debug("Player " + player.getName() + " has no open container with window ID " + this.windowId);
                 return null;
             default:

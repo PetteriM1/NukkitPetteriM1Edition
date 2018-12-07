@@ -10,8 +10,6 @@ import java.util.UUID;
  */
 public class CraftingEventPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.CRAFTING_EVENT_PACKET;
-
     public static final int TYPE_SHAPELESS = 0;
     public static final int TYPE_SHAPED = 1;
     public static final int TYPE_FURNACE = 2;
@@ -47,12 +45,10 @@ public class CraftingEventPacket extends DataPacket {
 
     @Override
     public void encode() {
-
     }
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.CRAFTING_EVENT_PACKET;
     }
-
 }

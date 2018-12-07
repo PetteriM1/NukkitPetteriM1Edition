@@ -48,6 +48,7 @@ import java.util.zip.Deflater;
 import static co.aikar.timings.TimingsManager.HISTORY;
 
 public class TimingsExport extends Thread {
+
     private final CommandSender sender;
     private final JsonObject out;
     private final TimingsHistory[] history;

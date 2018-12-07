@@ -1,30 +1,42 @@
 package cn.nukkit.utils;
 
+import java.util.Arrays;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.*;
-import cn.nukkit.entity.passive.*;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.Level;
 import cn.nukkit.utils.spawners.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Spawner extends Thread {
 
-    private Map<Integer, Integer> maxSpawns = new HashMap<>();
-    private List<EntitySpawner> entitySpawners = new ArrayList<>();
-
-    public Spawner() {        
-        prepareMaxSpawns();
-        prepareSpawnerClasses();
-    }
+    private final List<EntitySpawner> entitySpawners = Arrays.asList(
+            new ChickenSpawner(this),
+            new CowSpawner(this),
+            new CreeperSpawner(this),
+            new EndermanSpawner(this),
+            new HorseSpawner(this),
+            new HuskSpawner(this),
+            new MooshroomSpawner(this),
+            new OcelotSpawner(this),
+            new PigSpawner(this),
+            new PolarBearSpawner(this),
+            new PigZombieSpawner(this),
+            new RabbitSpawner(this),
+            new SheepSpawner(this),
+            new SkeletonSpawner(this),
+            new SpiderSpawner(this),
+            new StraySpawner(this),
+            new ZombieSpawner(this),
+            new WitchSpawner(this),
+            new WitherSkeletonSpawner(this),
+            new WolfSpawner(this)
+    );
 
     @Override
     public void run() {
@@ -41,44 +53,8 @@ public class Spawner extends Thread {
         }
     }
 
-    private void prepareSpawnerClasses() {
-        entitySpawners.add(new ChickenSpawner(this));
-        entitySpawners.add(new CowSpawner(this));
-        entitySpawners.add(new CreeperSpawner(this));
-        entitySpawners.add(new EndermanSpawner(this));
-        entitySpawners.add(new HorseSpawner(this));
-        entitySpawners.add(new MooshroomSpawner(this));
-        entitySpawners.add(new OcelotSpawner(this));
-        entitySpawners.add(new PigSpawner(this));
-        entitySpawners.add(new PolarBearSpawner(this));
-        entitySpawners.add(new PigZombieSpawner(this));
-        entitySpawners.add(new SheepSpawner(this));
-        entitySpawners.add(new SkeletonSpawner(this));
-        entitySpawners.add(new SpiderSpawner(this));
-        entitySpawners.add(new ZombieSpawner(this));
-        entitySpawners.add(new WitchSpawner(this));
-    }
-
-    private void prepareMaxSpawns() {
-        maxSpawns.put(EntityChicken.NETWORK_ID, 1);
-        maxSpawns.put(EntityCow.NETWORK_ID, 1);
-        maxSpawns.put(EntityCreeper.NETWORK_ID, 1);
-        maxSpawns.put(EntityEnderman.NETWORK_ID, 1);
-        maxSpawns.put(EntityHorse.NETWORK_ID, 1);
-        maxSpawns.put(EntityMooshroom.NETWORK_ID, 1);
-        maxSpawns.put(EntityOcelot.NETWORK_ID, 1);
-        maxSpawns.put(EntityPig.NETWORK_ID, 1);
-        maxSpawns.put(EntityPolarBear.NETWORK_ID, 1);
-        maxSpawns.put(EntityZombiePigman.NETWORK_ID, 1);
-        maxSpawns.put(EntitySheep.NETWORK_ID, 1);
-        maxSpawns.put(EntitySkeleton.NETWORK_ID, 1);
-        maxSpawns.put(EntitySpider.NETWORK_ID, 1);
-        maxSpawns.put(EntityZombie.NETWORK_ID, 1);
-        maxSpawns.put(EntityWitch.NETWORK_ID, 1);
-    }
-
-    public boolean entitySpawnAllowed(Level level, int networkId, String entityName) {
-        return countEntity(level, networkId) < maxSpawns.getOrDefault(networkId, 0);
+    public boolean entitySpawnAllowed(Level level, int networkId) {
+        return countEntity(level, networkId) < 1;
     }
 
     private int countEntity(Level level, int networkId) {

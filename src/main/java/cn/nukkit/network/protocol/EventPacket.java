@@ -13,7 +13,6 @@ public class EventPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

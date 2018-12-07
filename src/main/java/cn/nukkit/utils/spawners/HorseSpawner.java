@@ -22,8 +22,8 @@ public class HorseSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
         if (blockId != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
@@ -44,12 +44,12 @@ public class HorseSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityHorse.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "Horse";
     }
 }

@@ -12,7 +12,6 @@ public class ModalFormRequestPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

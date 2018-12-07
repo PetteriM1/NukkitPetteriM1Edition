@@ -200,7 +200,6 @@ public class Normal extends Generator {
                 new OreType(new BlockOreEmerald(), 2, 1, 4, 32),
                 new OreType(new BlockDirt(), 10, 33, 0, 128),
                 new OreType(new BlockGravel(), 8, 33, 0, 128),
-                new OreType(new BlockClay(), 10, 10, 50, 70),
                 new OreType(new BlockMonsterEgg(), 1, 5, 0, 30),
                 new OreType(new BlockStone(BlockStone.GRANITE), 10, 33, 0, 80),
                 new OreType(new BlockStone(BlockStone.DIORITE), 10, 33, 0, 80),
@@ -295,7 +294,9 @@ public class Normal extends Generator {
                         genyHeight -= riverGenerate * 64;
                         if (genyHeight < seaHeight) {
                             biomeBeforeRiver = biome.getId();
-                            biome = Biome.getBiome(Biome.RIVER);
+                            if (biomeBeforeRiver != Biome.SWAMP) {
+                                biome = Biome.getBiome(Biome.RIVER);
+                            }
                             //to generate river floor
                             if (genyHeight <= seaHeight - 8) {
                                 int genyHeight1 = seaHeight - 9 + (int) (basegroundHeight * (baseNoise[genx][genz] + 1F));

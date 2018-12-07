@@ -4,7 +4,6 @@ package cn.nukkit.network.protocol;
  * @author Tee7even
  */
 public class SetTitlePacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.SET_TITLE_PACKET;
 
     public static final int TYPE_CLEAR = 0;
     public static final int TYPE_RESET = 1;
@@ -21,7 +20,7 @@ public class SetTitlePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.SET_TITLE_PACKET;
     }
 
     @Override

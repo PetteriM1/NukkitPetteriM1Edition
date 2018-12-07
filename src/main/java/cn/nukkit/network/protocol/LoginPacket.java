@@ -13,8 +13,6 @@ import java.util.UUID;
 
 public class LoginPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.LOGIN_PACKET;
-
     public String username;
     public int protocol;
     public UUID clientUUID;
@@ -23,7 +21,7 @@ public class LoginPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.LOGIN_PACKET;
     }
 
     @Override

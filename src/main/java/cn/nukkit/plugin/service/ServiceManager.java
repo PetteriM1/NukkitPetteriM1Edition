@@ -1,13 +1,9 @@
 package cn.nukkit.plugin.service;
 
-
 import cn.nukkit.plugin.Plugin;
 
 import java.util.List;
 
-/**
- * Created on 16-11-20.
- */
 public interface ServiceManager {
 
     /**
@@ -57,5 +53,4 @@ public interface ServiceManager {
      * known service(s)
      */
     List<Class<?>> getKnownService();
-
 }

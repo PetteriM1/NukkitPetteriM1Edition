@@ -28,6 +28,7 @@ import com.google.gson.JsonArray;
 import cn.nukkit.timings.JsonUtil;
 
 class TimingData {
+
     private int id;
     int count = 0;
     private int lagCount = 0;

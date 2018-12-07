@@ -20,7 +20,7 @@ public class PigSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (blockId != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
@@ -39,12 +39,12 @@ public class PigSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityPig.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "Pig";
     }
 }

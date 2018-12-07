@@ -41,7 +41,7 @@ public class Nukkit {
     public final static String PATH = System.getProperty("user.dir") + "/";
     public final static String DATA_PATH = System.getProperty("user.dir") + "/";
     public final static String PLUGIN_PATH = DATA_PATH + "plugins";
-    public static final long START_TIME = System.currentTimeMillis();
+    public final static long START_TIME = System.currentTimeMillis();
     public static boolean ANSI = true;
     public static boolean TITLE = true;
     public static boolean shortTitle = false;

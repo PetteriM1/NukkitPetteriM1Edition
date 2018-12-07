@@ -12,7 +12,6 @@ public class ServerSettingsResponsePacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

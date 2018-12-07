@@ -4,7 +4,7 @@ public class UpdateEquipmentPacket extends DataPacket {
 
     public int windowId;
     public int windowType;
-    public int unknown; //TODO: find out what this is (vanilla always sends 0)
+    public int unknown;
     public long eid;
     public byte[] namedtag;
 
@@ -16,7 +16,6 @@ public class UpdateEquipmentPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

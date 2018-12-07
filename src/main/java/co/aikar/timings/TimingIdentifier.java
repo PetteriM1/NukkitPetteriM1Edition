@@ -28,6 +28,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 class TimingIdentifier {
+
     static final Map<String, TimingGroup> GROUP_MAP = new IdentityHashMap<>(64);
     static final TimingGroup DEFAULT_GROUP = getGroup("Nukkit");
 

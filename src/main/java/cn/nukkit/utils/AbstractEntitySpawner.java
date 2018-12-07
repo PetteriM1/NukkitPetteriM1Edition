@@ -54,7 +54,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         Position pos = ((Player) player).getPosition();
         Level level = ((Player) player).getLevel();
 
-        if (this.spawnTask.entitySpawnAllowed(level, getEntityNetworkId(), getEntityName())) {
+        if (this.spawnTask.entitySpawnAllowed(level, getEntityNetworkId())) {
             if (pos != null) {
                 pos.x += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
                 pos.z += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);

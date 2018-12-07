@@ -7,7 +7,6 @@ import cn.nukkit.math.Vector3f;
  * Nukkit Project
  */
 public class LevelEventPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.LEVEL_EVENT_PACKET;
 
     public static final int EVENT_SOUND_CLICK = 1000;
     public static final int EVENT_SOUND_CLICK_FAIL = 1001;
@@ -99,7 +98,7 @@ public class LevelEventPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.LEVEL_EVENT_PACKET;
     }
 
     @Override

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Timing implements AutoCloseable {
+
     private static int idPool = 1;
     final int id = idPool++;
 

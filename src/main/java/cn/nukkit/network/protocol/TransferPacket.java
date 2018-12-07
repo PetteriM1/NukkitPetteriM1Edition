@@ -1,11 +1,9 @@
 package cn.nukkit.network.protocol;
 
-// A wild TransferPacket appeared!
 public class TransferPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.TRANSFER_PACKET;
 
-    public String address; // Server address
-    public int port = 19132; // Server port
+    public String address;
+    public int port = 19132;
 
     @Override
     public void decode() {

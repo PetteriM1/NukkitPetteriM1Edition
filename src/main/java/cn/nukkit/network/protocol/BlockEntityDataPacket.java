@@ -7,7 +7,6 @@ import cn.nukkit.math.BlockVector3;
  * Nukkit Project
  */
 public class BlockEntityDataPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.BLOCK_ENTITY_DATA_PACKET;
 
     public int x;
     public int y;
@@ -16,7 +15,7 @@ public class BlockEntityDataPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.BLOCK_ENTITY_DATA_PACKET;
     }
 
     @Override

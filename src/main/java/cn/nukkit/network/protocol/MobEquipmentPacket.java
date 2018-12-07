@@ -7,11 +7,10 @@ import cn.nukkit.item.Item;
  * Nukkit Project
  */
 public class MobEquipmentPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.MOB_EQUIPMENT_PACKET;
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.MOB_EQUIPMENT_PACKET;
     }
 
     public long eid;

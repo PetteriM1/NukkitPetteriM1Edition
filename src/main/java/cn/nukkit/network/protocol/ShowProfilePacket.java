@@ -5,13 +5,12 @@ package cn.nukkit.network.protocol;
  * Nukkit Project
  */
 public class ShowProfilePacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.SHOW_PROFILE_PACKET;
 
     public String xuid;
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.SHOW_PROFILE_PACKET;
     }
 
     @Override
@@ -24,5 +23,4 @@ public class ShowProfilePacket extends DataPacket {
         this.reset();
         this.putString(this.xuid);
     }
-
 }

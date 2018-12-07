@@ -26,8 +26,8 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
             return SpawnResult.SPAWN_DENIED;
         }
 
-        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (biomeId != Biome.ICE_PLAINS) {
             result = SpawnResult.WRONG_BIOME;
@@ -48,12 +48,12 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityPolarBear.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "PolarBear";
     }
 }

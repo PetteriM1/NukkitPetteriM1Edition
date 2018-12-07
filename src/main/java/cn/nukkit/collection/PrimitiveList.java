@@ -7,6 +7,7 @@ import java.util.AbstractList;
  * @author https://github.com/boy0001/
  */
 public class PrimitiveList<T> extends AbstractList<T> {
+
     private final Class<?> primitive;
     private final Type type;
     private int length;

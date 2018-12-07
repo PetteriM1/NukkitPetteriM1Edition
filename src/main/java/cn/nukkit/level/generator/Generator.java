@@ -14,6 +14,7 @@ import java.util.Map;
  * Nukkit Project
  */
 public abstract class Generator {
+
     public static final int TYPE_OLD = 0;
     public static final int TYPE_INFINITE = 1;
     public static final int TYPE_FLAT = 2;

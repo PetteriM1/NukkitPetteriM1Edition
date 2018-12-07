@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
  * Nukkit Project
  */
 public class SimpleCommandMap implements CommandMap {
+
     protected final Map<String, Command> knownCommands = new HashMap<>();
 
     private final Server server;

@@ -7,14 +7,12 @@ import cn.nukkit.Player;
  */
 public class AdventureSettingsPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
-
     public static final int PERMISSION_NORMAL = 0;
     public static final int PERMISSION_OPERATOR = 1;
     public static final int PERMISSION_HOST = 2;
     public static final int PERMISSION_AUTOMATION = 3;
     public static final int PERMISSION_ADMIN = 4;
-    //TODO: check level 3
+
     /**
      * This constant is used to identify flags that should be set on the second field. In a sensible world, these
      * flags would all be set on the same packet field, but as of MCPE 1.2, the new abilities flags have for some
@@ -96,6 +94,6 @@ public class AdventureSettingsPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.ADVENTURE_SETTINGS_PACKET;
     }
 }

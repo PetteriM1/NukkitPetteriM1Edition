@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
  */
 public class AvailableCommandsPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
-
     public static final int ARG_FLAG_VALID = 0x100000;
 
     public static final int ARG_TYPE_INT = 0x01;
@@ -38,7 +36,7 @@ public class AvailableCommandsPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.AVAILABLE_COMMANDS_PACKET;
     }
 
     @Override

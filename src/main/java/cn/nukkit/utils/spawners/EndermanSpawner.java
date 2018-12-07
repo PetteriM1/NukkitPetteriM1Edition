@@ -23,9 +23,9 @@ public class EndermanSpawner extends AbstractEntitySpawner {
             return SpawnResult.SPAWN_DENIED;
         }
 
-        int time = level.getTime() % Level.TIME_FULL;
-        int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int time = level.getTime() % Level.TIME_FULL;
+        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
@@ -41,12 +41,12 @@ public class EndermanSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityEnderman.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "Enderman";
     }
 }

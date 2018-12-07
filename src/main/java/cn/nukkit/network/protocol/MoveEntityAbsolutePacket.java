@@ -7,7 +7,6 @@ import cn.nukkit.math.Vector3f;
  * Nukkit Project
  */
 public class MoveEntityAbsolutePacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.MOVE_ENTITY_ABSOLUTE_PACKET;
 
     public long eid;
     public double x;
@@ -21,7 +20,7 @@ public class MoveEntityAbsolutePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.MOVE_ENTITY_ABSOLUTE_PACKET;
     }
 
     @Override

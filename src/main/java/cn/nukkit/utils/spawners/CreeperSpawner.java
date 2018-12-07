@@ -18,9 +18,9 @@ public class CreeperSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        int time = level.getTime() % Level.TIME_FULL;
-        int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int time = level.getTime() % Level.TIME_FULL;
+        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
@@ -38,12 +38,12 @@ public class CreeperSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityCreeper.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "Creeper";
     }
 }

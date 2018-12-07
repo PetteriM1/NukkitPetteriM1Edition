@@ -5,8 +5,6 @@ package cn.nukkit.network.protocol;
  */
 public class AnimatePacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.ANIMATE_PACKET;
-
     public long eid;
     public int action;
     public float unknown;
@@ -32,7 +30,6 @@ public class AnimatePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.ANIMATE_PACKET;
     }
-
 }

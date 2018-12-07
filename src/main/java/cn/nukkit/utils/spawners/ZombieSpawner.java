@@ -6,7 +6,6 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.mob.EntityZombie;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.Spawner;
@@ -22,10 +21,9 @@ public class ZombieSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
-        int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        int time = level.getTime() % Level.TIME_FULL;
-        int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+        final int time = level.getTime() % Level.TIME_FULL;
+        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
@@ -33,15 +31,6 @@ public class ZombieSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (biomeId == Biome.DESERT) {
-            if (blockId != Block.SAND) {
-                result = SpawnResult.WRONG_BLOCK;
-            } else if (time > 13184 && time < 22800) {
-                BaseEntity entity = this.spawnTask.createEntity("Husk", pos.add(0, 2.8, 0));
-                if (EntityUtils.rand(0, 500) > 480) {
-                    entity.setBaby(true);
-                }
-            }
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else if (time > 13184 && time < 22800) {
@@ -62,12 +51,12 @@ public class ZombieSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public int getEntityNetworkId() {
+    public final int getEntityNetworkId() {
         return EntityZombie.NETWORK_ID;
     }
 
     @Override
-    public String getEntityName() {
+    public final String getEntityName() {
         return "Zombie";
     }
 }

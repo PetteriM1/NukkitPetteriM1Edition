@@ -1,7 +1,6 @@
 package cn.nukkit.network.protocol;
 
 public class MoveEntityDeltaPacket extends DataPacket {
-    public static final byte NETWORK_ID = ProtocolInfo.MOVE_ENTITY_DELTA_PACKET;
 
     public static final int FLAG_HAS_X = 0b1;
     public static final int FLAG_HAS_Y = 0b10;
@@ -20,7 +19,7 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.MOVE_ENTITY_DELTA_PACKET;
     }
 
     @Override

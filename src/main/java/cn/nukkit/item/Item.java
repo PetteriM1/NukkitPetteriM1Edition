@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  */
 public class Item implements Cloneable, BlockID, ItemID {
 
-    protected static String UNKNOWN_STR = "Unknown";
+    protected static final String UNKNOWN_STR = "Unknown";
     public static Class[] list = null;
 
     protected Block block = null;

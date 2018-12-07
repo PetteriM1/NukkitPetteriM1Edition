@@ -10,6 +10,7 @@ import java.util.TreeMap;
  * Created by CreeperFace on 25.6.2017.
  */
 public class GameRules {
+
     private final TreeMap<String, Value> theGameRules = new TreeMap<>();
 
     public GameRules() {

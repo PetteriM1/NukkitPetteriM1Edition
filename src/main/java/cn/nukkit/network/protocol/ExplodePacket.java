@@ -8,8 +8,6 @@ import cn.nukkit.math.Vector3;
  */
 public class ExplodePacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.EXPLODE_PACKET;
-
     public float x;
     public float y;
     public float z;
@@ -18,7 +16,7 @@ public class ExplodePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.EXPLODE_PACKET;
     }
 
     @Override
@@ -29,7 +27,6 @@ public class ExplodePacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override

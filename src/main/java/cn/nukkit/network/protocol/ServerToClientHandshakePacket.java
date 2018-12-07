@@ -13,11 +13,9 @@ public class ServerToClientHandshakePacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override
     public void encode() {
-        //TODO
     }
 }

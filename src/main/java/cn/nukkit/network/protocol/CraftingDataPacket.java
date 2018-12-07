@@ -18,8 +18,6 @@ import java.util.List;
  */
 public class CraftingDataPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.CRAFTING_DATA_PACKET;
-
     public static final int ENTRY_SHAPELESS = 0;
     public static final int ENTRY_SHAPED = 1;
     public static final int ENTRY_FURNACE = 2;
@@ -131,7 +129,6 @@ public class CraftingDataPacket extends DataPacket {
 
     @Override
     public void decode() {
-
     }
 
     @Override
@@ -158,7 +155,6 @@ public class CraftingDataPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.CRAFTING_DATA_PACKET;
     }
-
 }

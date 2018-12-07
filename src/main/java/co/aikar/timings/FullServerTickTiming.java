@@ -27,6 +27,7 @@ import static co.aikar.timings.TimingIdentifier.DEFAULT_GROUP;
 import static co.aikar.timings.TimingsManager.*;
 
 public class FullServerTickTiming extends Timing {
+
     private static final TimingIdentifier IDENTIFIER = new TimingIdentifier(DEFAULT_GROUP.name, "Full Server Tick", null);
     final TimingData minuteData;
     double avgFreeMemory = -1D;
@@ -35,7 +36,6 @@ public class FullServerTickTiming extends Timing {
     FullServerTickTiming() {
         super(IDENTIFIER);
         this.minuteData = new TimingData(this.id);
-
         TIMING_MAP.put(IDENTIFIER, this);
     }
 

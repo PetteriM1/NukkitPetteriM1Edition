@@ -2,13 +2,11 @@ package cn.nukkit.network.protocol;
 
 public class TextPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.TEXT_PACKET;
-
     public boolean protocolLowerThan291 = false;
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.TEXT_PACKET;
     }
 
     public TextPacket() {

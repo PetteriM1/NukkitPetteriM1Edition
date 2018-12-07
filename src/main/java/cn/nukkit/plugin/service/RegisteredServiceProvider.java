@@ -1,11 +1,7 @@
 package cn.nukkit.plugin.service;
 
-
 import cn.nukkit.plugin.Plugin;
 
-/**
- * Created on 16-11-20.
- */
 public class RegisteredServiceProvider<T> implements Comparable<RegisteredServiceProvider<T>> {
 
     private Plugin plugin;
@@ -70,5 +66,4 @@ public class RegisteredServiceProvider<T> implements Comparable<RegisteredServic
     public int compareTo(RegisteredServiceProvider<T> other) {
         return other.priority.ordinal() - priority.ordinal();
     }
-
 }

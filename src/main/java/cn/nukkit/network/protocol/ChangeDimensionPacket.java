@@ -6,8 +6,6 @@ package cn.nukkit.network.protocol;
  */
 public class ChangeDimensionPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.CHANGE_DIMENSION_PACKET;
-
     public int dimension;
 
     public float x;
@@ -35,6 +33,6 @@ public class ChangeDimensionPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.CHANGE_DIMENSION_PACKET;
     }
 }

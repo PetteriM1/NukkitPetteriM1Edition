@@ -6,7 +6,6 @@ public class PlayerHotbarPacket extends DataPacket {
 
     public int selectedHotbarSlot;
     public int windowId = ContainerIds.INVENTORY;
-
     public boolean selectHotbarSlot = true;
 
     @Override

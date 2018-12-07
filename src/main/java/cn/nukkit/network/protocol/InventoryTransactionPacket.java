@@ -36,7 +36,7 @@ public class InventoryTransactionPacket extends DataPacket {
     public TransactionData transactionData;
 
     /**
-     * NOTE: THIS FIELD DOES NOT EXIST IN THE PROTOCOL, it's merely used for convenience for PocketMine-MP to easily
+     * NOTE: THIS FIELD DOES NOT EXIST IN THE PROTOCOL, it's merely used to easily
      * determine whether we're doing a crafting transaction.
      */
     public boolean isCraftingPart = false;

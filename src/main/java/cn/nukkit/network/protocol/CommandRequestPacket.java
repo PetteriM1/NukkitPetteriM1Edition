@@ -10,8 +10,6 @@ import java.util.UUID;
  */
 public class CommandRequestPacket extends DataPacket {
 
-    public static final byte NETWORK_ID = ProtocolInfo.COMMAND_REQUEST_PACKET;
-
     public static final int TYPE_PLAYER = 0;
     public static final int TYPE_COMMAND_BLOCK = 1;
     public static final int TYPE_MINECART_COMMAND_BLOCK = 2;
@@ -29,7 +27,7 @@ public class CommandRequestPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return NETWORK_ID;
+        return ProtocolInfo.COMMAND_REQUEST_PACKET;
     }
 
     @Override
@@ -49,5 +47,4 @@ public class CommandRequestPacket extends DataPacket {
     @Override
     public void encode() {
     }
-
 }
