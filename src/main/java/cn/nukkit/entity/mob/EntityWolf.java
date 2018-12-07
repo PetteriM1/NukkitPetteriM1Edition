@@ -203,4 +203,9 @@ public class EntityWolf extends EntityTameableMob {
         this.setDataProperty(new IntEntityData(DATA_COLOUR, color.getColor().getRGB()));
         this.collarColor = color;
     }
+
+    @Override
+    public String getName() {
+        return "Wolf";
+    }
 }
