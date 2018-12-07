@@ -22,10 +22,6 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (EntityUtils.rand(0, 3) == 1) {
-            return SpawnResult.SPAWN_DENIED;
-        }
-
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 

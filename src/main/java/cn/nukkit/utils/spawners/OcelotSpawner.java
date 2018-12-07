@@ -21,6 +21,10 @@ public class OcelotSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
+        if (EntityUtils.rand(1, 3) == 1) {
+            return SpawnResult.SPAWN_DENIED;
+        }
+
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
