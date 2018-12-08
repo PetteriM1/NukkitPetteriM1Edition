@@ -748,7 +748,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         // Tick Weather
-        if (this.getServer().getPropertyBoolean("weather", true)) {
+        if (this.getServer().getPropertyBoolean("weather", true) && !this.getServer().getPropertyString("do-not-tick-worlds", "").contains(this.getName()) && !this.getName().equals("nether") && !this.getName().equals("end")) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -2864,7 +2864,7 @@ public class Level implements ChunkManager, Metadatable {
     public boolean isSpawnChunk(int X, int Z) {
         Vector3 spawn = this.getSpawnLocation();
 
-        if (this.getServer().suomiCraftPEMode() && this.getServer().getPropertyString("do-not-tick-worlds").contains(this.getName())) {
+        if (this.getServer().suomiCraftPEMode() && this.getServer().getPropertyString("do-not-tick-worlds", "").contains(this.getName())) {
             return Math.abs(X - (spawn.getFloorX() >> 4)) <= 4 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 4;
         } else {
             return Math.abs(X - (spawn.getFloorX() >> 4)) <= 1 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 1;

@@ -1,6 +1,7 @@
 package cn.nukkit.level.generator.biome;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockGravel;
 import cn.nukkit.level.generator.populator.PopulatorSugarcane;
 import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
 
@@ -27,7 +28,7 @@ public class OceanBiome extends WateryBiome {
 
     @Override
     public Block[] getGroundCover() {
-        return super.getGroundCover();
+        return new Block[]{new BlockGravel()};
     }
 
     @Override
