@@ -47,6 +47,7 @@ public class EntityShulker extends EntityWalkingMob {
 
         this.fireProof = true;
         this.setMaxHealth(15);
+        this.setDamage(new int[] { 0, 0, 0, 0 });
     }
 
     @Override
@@ -70,8 +71,13 @@ public class EntityShulker extends EntityWalkingMob {
 
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(bullet);
             this.server.getPluginManager().callEvent(launch);
-            bullet.spawnToAll();
-            this.level.addSound(this, "mob.shulker.shoot");
+
+            if (launch.isCancelled()) {
+                bullet.kill();
+            } else {
+                bullet.spawnToAll();
+                this.level.addSound(this, "mob.shulker.shoot");
+            }
         }
     }
 

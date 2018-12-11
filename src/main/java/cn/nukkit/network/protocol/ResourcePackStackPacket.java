@@ -4,9 +4,12 @@ import cn.nukkit.resourcepacks.ResourcePack;
 
 public class ResourcePackStackPacket extends DataPacket {
 
+    public boolean protocolLowerThan313 = false;
+
     public boolean mustAccept = false;
     public ResourcePack[] behaviourPackStack = new ResourcePack[0];
     public ResourcePack[] resourcePackStack = new ResourcePack[0];
+    public boolean isExperimental = false;
 
     @Override
     public void decode() {
@@ -16,17 +19,18 @@ public class ResourcePackStackPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBoolean(this.mustAccept);
-
         this.putUnsignedVarInt(this.behaviourPackStack.length);
         for (ResourcePack entry : this.behaviourPackStack) {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
         }
-
         this.putUnsignedVarInt(this.resourcePackStack.length);
         for (ResourcePack entry : this.resourcePackStack) {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
+        }
+        if (!this.protocolLowerThan313) {
+            this.putBoolean(isExperimental);
         }
     }
 

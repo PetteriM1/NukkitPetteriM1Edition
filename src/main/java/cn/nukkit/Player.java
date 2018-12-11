@@ -1007,6 +1007,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.unloadChunk(Level.getHashX(index), Level.getHashZ(index));
         }
 
+        if (this.protocol >= 313) {
+            if (!loadQueue.isEmpty()) {
+                NetworkChunkPublisherUpdatePacket packet = new NetworkChunkPublisherUpdatePacket();
+                packet.position = this.asBlockVector3();
+                packet.radius = viewDistance << 4;
+                this.dataPacket(packet);
+            }
+        }
+
         Timings.playerChunkOrderTimer.stopTiming();
         return true;
     }
@@ -2034,6 +2043,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.commandsEnabled = this.isEnableClientCommand();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.protocolLowerThan291 = this.protocol < 291;
+        startGamePacket.protocolLowerThan313 = this.protocol < 313;
         this.dataPacket(startGamePacket);
 
         this.loggedIn = true;
@@ -2090,22 +2100,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.protocol = loginPacket.getProtocol();
 
-                    String message;
                     if (this.protocol < ProtocolInfo.MINIUM_PROTOCOL || this.protocol > ProtocolInfo.MAXIUM_PROTOCOL) {
-                        message = "disconnectionScreen.unsupportedVersion";
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
-
-                    if (((LoginPacket) packet).protocol < 137) {
-                        DisconnectPacket disconnectPacket = new DisconnectPacket();
-                        disconnectPacket.message = message;
-                        disconnectPacket.encode();
-                        BatchPacket batch = new BatchPacket();
-                        batch.payload = disconnectPacket.getBuffer();
-                        this.directDataPacket(batch);
+                        kick(PlayerKickEvent.Reason.UNKNOWN, "disconnectionScreen.unsupportedVersion", false);
+                        break;
                     }
-                    this.close("", message, false);
-                    break;
-                }
+
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
@@ -2221,6 +2221,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             ResourcePackStackPacket stackPacket = new ResourcePackStackPacket();
                             stackPacket.mustAccept = this.server.getForceResources();
                             stackPacket.resourcePackStack = this.server.getResourcePackManager().getResourceStack();
+                            stackPacket.protocolLowerThan313 = this.protocol < 313;
                             this.dataPacket(stackPacket);
                             break;
                         case ResourcePackClientResponsePacket.STATUS_COMPLETED:

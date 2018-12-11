@@ -46,10 +46,11 @@ public class EntityEnderman extends EntityWalkingMob {
     protected void initEntity() {
         super.initEntity();
 
-        this.setDamage(new int[] { 0, 4, 7, 10 });
         this.setMaxHealth(40);
+        this.setDamage(new int[] { 0, 4, 7, 10 });
     }
 
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 10 && this.distanceSquared(player) < 1) {
             this.attackDelay = 0;

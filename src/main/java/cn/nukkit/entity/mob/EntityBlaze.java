@@ -52,9 +52,9 @@ public class EntityBlaze extends EntityFlyingMob {
 
         this.fireProof = true;
         this.setMaxHealth(20);
-        this.setDamage(new int[] { 0, 0, 0, 0 });
     }
 
+    @Override
     protected void checkTarget() {
         if (this.isKnockback()) {
             return;
@@ -188,6 +188,7 @@ public class EntityBlaze extends EntityFlyingMob {
         return this.target;
     }
 
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 20 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;

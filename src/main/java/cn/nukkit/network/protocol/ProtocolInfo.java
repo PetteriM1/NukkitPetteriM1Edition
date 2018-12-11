@@ -6,13 +6,13 @@ package cn.nukkit.network.protocol;
  */
 public interface ProtocolInfo {
 
-    final int CURRENT_PROTOCOL = 291;
+    final int CURRENT_PROTOCOL = 313;
 
     final int MINIUM_PROTOCOL = 282;
-    final int MAXIUM_PROTOCOL = 291;
+    final int MAXIUM_PROTOCOL = 313;
 
-    final String MINECRAFT_VERSION = "v1.7.0";
-    final String MINECRAFT_VERSION_NETWORK = "1.7.0";
+    final String MINECRAFT_VERSION = "v1.8.0";
+    final String MINECRAFT_VERSION_NETWORK = "1.8.0";
 
     final byte LOGIN_PACKET = 0x01;
     final byte PLAY_STATUS_PACKET = 0x02;
@@ -129,5 +129,11 @@ public interface ProtocolInfo {
     final byte SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET = 0x71;
     final byte UPDATE_SOFT_ENUM_PACKET = 0x72;
     final byte NETWORK_STACK_LATENCY_PACKET = 0x73;
+    final byte SCRIPT_CUSTOM_EVENT_PACKET = 0x75;
+    final byte SPAWN_PARTICLE_EFFECT_PACKET = 0x76;
+    final byte AVAILABLE_ENTITY_IDENTIFIERS_PACKET = 0x77;
+    final byte LEVEL_SOUND_EVENT_PACKET_V2 = 0x78;
+    final byte NETWORK_CHUNK_PUBLISHER_UPDATE_PACKET = 0x79;
+    final byte BIOME_DEFINITION_LIST_PACKET = 0x7a;
     final byte BATCH_PACKET = (byte) 0xff;
 }

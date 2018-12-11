@@ -105,7 +105,7 @@ public class EntityWither extends EntityFlyingMob {
     }
 
     @Override
-    protected DataPacket createAddEntityPacket() {
+    protected DataPacket createAddEntityPacket(int protocol) {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
         addEntity.entityUniqueId = this.getId();

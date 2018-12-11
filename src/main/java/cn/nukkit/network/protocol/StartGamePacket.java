@@ -11,6 +11,7 @@ public class StartGamePacket extends DataPacket {
     }
 
     public boolean protocolLowerThan291 = false;
+    public boolean protocolLowerThan313 = false;
 
     public long entityUniqueId;
     public long entityRuntimeId;
@@ -53,6 +54,8 @@ public class StartGamePacket extends DataPacket {
     public boolean hasLockedResourcePack = false;
     public boolean isFromLockedWorldTemplate = false;
     public boolean isUsingMsaGamertagsOnly = false;
+    public boolean isFromWorldTemplate = false;
+    public boolean isWorldTemplateOptionLocked = false;
     public String levelId = "";
     public String worldName;
     public String premiumWorldTemplateId = "";
@@ -109,6 +112,10 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isFromLockedWorldTemplate);
         if (!protocolLowerThan291) {
             this.putBoolean(this.isUsingMsaGamertagsOnly);
+            if (!protocolLowerThan313) {
+                this.putBoolean(this.isFromWorldTemplate);
+                this.putBoolean(this.isWorldTemplateOptionLocked);
+            }
         }
         this.putString(this.levelId);
         this.putString(this.worldName);

@@ -50,8 +50,8 @@ public class EntityDrowned extends EntityWalkingMob {
     protected void initEntity() {
         super.initEntity();
 
-        this.setDamage(new int[] { 0, 2, 3, 4 });
         this.setMaxHealth(20);
+        this.setDamage(new int[] { 0, 2, 3, 4 });
     }
 
     @Override

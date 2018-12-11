@@ -40,6 +40,9 @@ public class Effect implements Cloneable {
     public static final int HEALTH_BOOST = 21;
     public static final int ABSORPTION = 22;
     public static final int SATURATION = 23;
+    public static final int LEVITATION = 24;
+    public static final int FATAL_POISON = 25;
+    public static final int COUNDIT_POWER = 26;
 
     protected static Effect[] effects;
 
@@ -69,6 +72,9 @@ public class Effect implements Cloneable {
         effects[Effect.HEALTH_BOOST] = new Effect(Effect.HEALTH_BOOST, "%potion.healthBoost", 248, 125, 35);
         effects[Effect.ABSORPTION] = new Effect(Effect.ABSORPTION, "%potion.absorption", 36, 107, 251);
         effects[Effect.SATURATION] = new Effect(Effect.SATURATION, "%potion.saturation", 255, 0, 255);
+        effects[Effect.LEVITATION] = new Effect(Effect.LEVITATION, "%potion.levitation", 255, 255, 255);
+        effects[Effect.FATAL_POISON] = new Effect(Effect.FATAL_POISON, "%potion.poison", 78, 147, 49, true);
+        effects[Effect.COUNDIT_POWER] = new Effect(Effect.COUNDIT_POWER, "%potion.conduitPower", 0, 0, 0);
     }
 
     public static Effect getEffect(int id) {

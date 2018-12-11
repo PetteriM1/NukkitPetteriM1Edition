@@ -831,7 +831,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void spawnTo(Player player) {
-        player.dataPacket(createAddEntityPacket());
+        player.dataPacket(createAddEntityPacket(player.protocol));
 
         if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
             this.hasSpawned.put(player.getLoaderId(), player);
@@ -848,7 +848,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
     
-    protected DataPacket createAddEntityPacket() {
+    protected DataPacket createAddEntityPacket(int protocol) {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
         addEntity.entityUniqueId = this.getId();
@@ -863,6 +863,7 @@ public abstract class Entity extends Location implements Metadatable {
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
+        addEntity.protocolLowerThan313 = protocol < 313;
         return addEntity;
     }
 

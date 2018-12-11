@@ -46,6 +46,7 @@ public class EntityGuardian extends EntitySwimmingMob {
         super.initEntity();
 
         this.setMaxHealth(30);
+        this.setDamage(new int[] { 0, 4, 6, 9 });
     }
 
     @Override

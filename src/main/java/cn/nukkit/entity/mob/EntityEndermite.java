@@ -44,7 +44,7 @@ public class EntityEndermite extends EntityWalkingMob {
         super.initEntity();
 
         this.setMaxHealth(8);
-        this.setDamage(new int[] { 0, 1, 1, 1 });
+        this.setDamage(new int[] { 0, 2, 2, 3 });
     }
 
     @Override

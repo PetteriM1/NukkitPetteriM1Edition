@@ -31,7 +31,6 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
                 this.setSitting(namedTag.getBoolean(NAMED_TAG_SITTING));
             }
         }
-
     }
 
     @Override

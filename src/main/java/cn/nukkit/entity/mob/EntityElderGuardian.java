@@ -40,6 +40,7 @@ public class EntityElderGuardian extends EntitySwimmingMob {
 
         this.setMaxHealth(80);
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_ELDER, true);
+        this.setDamage(new int[] { 0, 5, 8, 12 });
     }
 
     @Override

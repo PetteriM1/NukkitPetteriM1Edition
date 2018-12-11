@@ -51,9 +51,9 @@ public class EntityGhast extends EntityFlyingMob {
 
         this.fireProof = true;
         this.setMaxHealth(10);
-        this.setDamage(new int[] { 0, 0, 0, 0 });
     }
 
+    @Override
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
@@ -62,6 +62,7 @@ public class EntityGhast extends EntityFlyingMob {
         return creature.isAlive() && !creature.closed && distance <= 100;
     }
 
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 30 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;

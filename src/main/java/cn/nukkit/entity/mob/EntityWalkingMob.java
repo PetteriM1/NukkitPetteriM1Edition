@@ -16,13 +16,13 @@ import co.aikar.timings.Timings;
 
 public abstract class EntityWalkingMob extends EntityWalking implements EntityMob {
 
-    private int[]   minDamage;
+    private int[] minDamage;
 
-    private int[]   maxDamage;
+    private int[] maxDamage;
 
-    protected int   attackDelay = 0;
+    protected int attackDelay = 0;
 
-    private boolean canAttack   = true;
+    private boolean canAttack = true;
 
     public EntityWalkingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

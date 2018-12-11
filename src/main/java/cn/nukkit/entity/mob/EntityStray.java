@@ -77,6 +77,7 @@ public class EntityStray extends EntityWalkingMob {
         return hasUpdate;
     }
 
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 30 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
