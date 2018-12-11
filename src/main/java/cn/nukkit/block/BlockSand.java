@@ -7,29 +7,17 @@ import cn.nukkit.utils.BlockColor;
  * @author MagicDroidX
  * Nukkit Project
  */
-public class BlockSand extends BlockFallable {
+public class BlockSand extends BlockFallableMeta {
 
     public static final int DEFAULT = 0;
     public static final int RED = 1;
-
-    private int meta;
 
     public BlockSand() {
         this(0);
     }
 
     public BlockSand(int meta) {
-        this.meta = meta;
-    }
-
-    @Override
-    public final int getDamage() {
-        return this.meta;
-    }
-
-    @Override
-    public final void setDamage(int meta) {
-        this.meta = meta;
+        super(meta);
     }
 
     @Override

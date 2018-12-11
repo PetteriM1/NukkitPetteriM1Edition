@@ -43,6 +43,11 @@ public class EntityEnderCharge extends EntityProjectile {
     }
 
     @Override
+    protected double getDamage() {
+        return 5;
+    }
+
+    @Override
     public boolean onUpdate(int currentTick) {
         if (this.closed) {
             return false;

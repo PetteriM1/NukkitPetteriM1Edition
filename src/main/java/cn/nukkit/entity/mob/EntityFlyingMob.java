@@ -10,13 +10,13 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class EntityFlyingMob extends EntityFlying implements EntityMob {
 
-    protected int[]   minDamage;
+    protected int[] minDamage;
 
-    protected int[]   maxDamage;
+    protected int[] maxDamage;
 
-    protected int     attackDelay = 0;
+    protected int attackDelay = 0;
 
-    protected boolean canAttack   = true;
+    protected boolean canAttack = true;
 
     public EntityFlyingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

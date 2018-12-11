@@ -33,6 +33,16 @@ public class EntityArmorStand extends Entity {
         return 0.1f;
     }
 
+	@Override
+    public float getHeight() {
+        return 2f;
+    }
+
+    @Override
+    public float getWidth() {
+        return 1f;
+    }
+
 	public EntityArmorStand(FullChunk chunk, CompoundTag nbt) {
 		super(chunk, nbt);
 	}

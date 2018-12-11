@@ -76,6 +76,7 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         return source.getCause() == DamageCause.VOID && super.attack(source);
     }
 
+    @Override
     protected void initEntity() {
         super.initEntity();
 
@@ -91,16 +92,18 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         this.level.addSound(new TNTPrimeSound(this));
     }
 
-
+    @Override
     public boolean canCollideWith(Entity entity) {
         return false;
     }
 
+    @Override
     public void saveNBT() {
         super.saveNBT();
         namedTag.putByte("Fuse", fuse);
     }
 
+    @Override
     public boolean onUpdate(int currentTick) {
 
         if (closed) {

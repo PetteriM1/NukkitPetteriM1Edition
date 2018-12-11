@@ -57,7 +57,7 @@ public class KillCommand extends VanillaCommand {
                 for (Level level : Server.getInstance().getLevels().values()) {
                     for (Entity entity : level.getEntities()) {
                         if (!(entity instanceof EntityHuman)) {
-                            entity.close();
+                            entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
                         }
                     }
                 }
@@ -83,7 +83,7 @@ public class KillCommand extends VanillaCommand {
                 for (Level level : Server.getInstance().getLevels().values()) {
                     for (Entity entity : level.getEntities()) {
                         if (entity instanceof Player) {
-                            entity.setHealth(0);
+                            entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
                         }
                     }
                 }

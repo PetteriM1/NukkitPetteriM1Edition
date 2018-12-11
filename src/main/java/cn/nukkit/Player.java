@@ -19,6 +19,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
+import cn.nukkit.event.entity.EntityPortalEnterEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
@@ -1402,22 +1403,32 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         
         if (inEndPortalTicks == 1 && Server.getInstance().getPropertyBoolean("end", false)) {
-            if (!this.getLevel().getName().equals("end")) {
-                if (this.getServer().getLevelByName("end") != null) {
-                    this.teleport(this.getServer().getLevelByName("end").getSafeSpawn());
+            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.END);
+            this.getServer().getPluginManager().callEvent(ev);
+
+            if (!ev.isCancelled()) {
+                if (!this.getLevel().getName().equals("end")) {
+                    if (this.getServer().getLevelByName("end") != null) {
+                        this.teleport(this.getServer().getLevelByName("end").getSafeSpawn());
+                    }
+                } else {
+                    this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
                 }
-            } else {
-                this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
             }
         }
 
-        if (inPortalTicks == 80 && Server.getInstance().getPropertyBoolean("nether", false)) {
-            if (!this.getLevel().getName().equals("nether")) {
-                if (this.getServer().getLevelByName("nether") != null) {
-                    this.teleport(this.getServer().getLevelByName("nether").getSafeSpawn());
+        if (inPortalTicks == 80 && Server.getInstance().getPropertyBoolean("nether", true)) {
+            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
+            this.getServer().getPluginManager().callEvent(ev);
+
+            if (!ev.isCancelled()) {
+                if (!this.getLevel().getName().equals("nether")) {
+                    if (this.getServer().getLevelByName("nether") != null) {
+                        this.teleport(this.getServer().getLevelByName("nether").getSafeSpawn());
+                    }
+                } else {
+                    this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
                 }
-            } else {
-                this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
             }
         }
     }
@@ -3679,12 +3690,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 case LAVA:
-                    Block block = this.level.getBlock(new Vector3(this.x, this.y - 1, this.z));
-                    if (block.getId() == Block.MAGMA) {
-                        message = "death.attack.magma";
-                        break;
-                    }
                     message = "death.attack.lava";
+                    break;
+
+                case MAGMA:
+                    message = "death.attack.magma";
                     break;
 
                 case FIRE:

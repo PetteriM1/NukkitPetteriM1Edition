@@ -60,11 +60,13 @@ public class EntityWolf extends EntityTameableMob {
         this.setDamage(new int[] { 0, 3, 4, 6 });
 
         if (this.namedTag.contains(NBT_KEY_ANGRY)) {
-            this.angry = this.namedTag.getInt(NBT_KEY_ANGRY);
+            if (this.namedTag.getByte(NBT_KEY_ANGRY) == 1) {
+                this.setAngry(true);
+            }
         }
 
         if (this.namedTag.contains(NBT_KEY_COLLAR_COLOR)) {
-            this.collarColor = DyeColor.getByDyeData(this.namedTag.getInt(NBT_KEY_COLLAR_COLOR));
+            this.collarColor = DyeColor.getByDyeData(this.namedTag.getByte(NBT_KEY_COLLAR_COLOR));
         }
 
         this.setMaxHealth(8);
@@ -73,8 +75,9 @@ public class EntityWolf extends EntityTameableMob {
     @Override
     public void saveNBT() {
         super.saveNBT();
-        this.namedTag.putInt(NBT_KEY_ANGRY, this.angry);
-        this.namedTag.putInt(NBT_KEY_COLLAR_COLOR, this.collarColor.getDyeData());
+
+        this.namedTag.putByte(NBT_KEY_ANGRY, this.angry);
+        this.namedTag.putByte(NBT_KEY_COLLAR_COLOR, this.collarColor.getDyeData());
     }
 
     @Override
@@ -88,6 +91,12 @@ public class EntityWolf extends EntityTameableMob {
 
     public void setAngry(boolean angry) {
         this.angry = angry ? 1 : 0;
+
+        if (this.isAngry()) {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, true);
+        } else {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, false);
+        }
     }
 
     @Override
@@ -98,7 +107,7 @@ public class EntityWolf extends EntityTameableMob {
                 player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
                 if (EntityUtils.rand(0, 3) == 3) {
                     EntityEventPacket packet = new EntityEventPacket();
-                    packet.eid = player.getId();
+                    packet.eid = this.getId();
                     packet.event = EntityEventPacket.TAME_SUCCESS;
                     player.dataPacket(packet);
 
@@ -108,7 +117,7 @@ public class EntityWolf extends EntityTameableMob {
                     return true;
                 } else {
                     EntityEventPacket packet = new EntityEventPacket();
-                    packet.eid = player.getId();
+                    packet.eid = this.getId();
                     packet.event = EntityEventPacket.TAME_FAIL;
                     player.dataPacket(packet);
                 }
@@ -118,15 +127,11 @@ public class EntityWolf extends EntityTameableMob {
                 this.setCollarColor(((ItemDye) item).getDyeColor());
                 return true;
             }
-        } else if (this.hasOwner() && player.equals(this.getOwner())) {
-            if (this.namedTag.getByte("Sitting") == 0) {
-                this.namedTag.putByte("Sitting", 1);
-                this.setDataFlag(DATA_FLAGS, DATA_FLAG_SITTING, true);
-                this.saveNBT();
+        } else if (this.hasOwner() && player.equals(this.getOwner()) && !this.isAngry()) {
+            if (this.isSitting()) {
+                this.setSitting(false);
             } else {
-                this.namedTag.putByte("Sitting", 0);
-                this.setDataFlag(DATA_FLAGS, DATA_FLAG_SITTING, false);
-                this.saveNBT();
+                this.setSitting(true);
             }
         }
 
@@ -140,13 +145,14 @@ public class EntityWolf extends EntityTameableMob {
         if (!ev.isCancelled()) {
             this.setAngry(true);
         }
+
         return true;
     }
 
     @Override
     public void attackEntity(Entity player) {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > 10 && this.distanceSquared(player) < 1.6) {
+            if (this.attackDelay > 10 && this.distanceSquared(player) < 1.5) {
                 this.attackDelay = 0;
                 HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
                 damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -199,7 +205,7 @@ public class EntityWolf extends EntityTameableMob {
     }
 
     public void setCollarColor(DyeColor color) {
-        this.namedTag.putInt(NBT_KEY_COLLAR_COLOR, color.getDyeData());
+        this.namedTag.putByte(NBT_KEY_COLLAR_COLOR, color.getDyeData());
         this.setDataProperty(new IntEntityData(DATA_COLOUR, color.getColor().getRGB()));
         this.collarColor = color;
     }

@@ -10,7 +10,6 @@ import cn.nukkit.entity.data.*;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
-import cn.nukkit.event.entity.EntityPortalEnterEvent.PortalType;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
@@ -77,7 +76,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_DISPLAY_ITEM = 16; //int (id | (data << 16))
     public static final int DATA_DISPLAY_OFFSET = 17; //int
     public static final int DATA_HAS_DISPLAY = 18; //byte (must be 1 for minecart to show block inside)
-    //TODO: add more properties
+    /* 19 - 22 */
     public static final int DATA_ENDERMAN_HELD_RUNTIME_ID = 23; //short
     public static final int DATA_ENTITY_AGE = 24; //short
     public static final int DATA_PLAYER_FLAGS = 26; //byte
@@ -1187,11 +1186,17 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        if (this.inPortalTicks == 80) {
-            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, PortalType.NETHER);
-            getServer().getPluginManager().callEvent(ev);
+        if (this.inPortalTicks == 80 && Server.getInstance().getPropertyBoolean("nether", true) && this instanceof BaseEntity) {
+            EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
+            this.getServer().getPluginManager().callEvent(ev);
 
-            //TODO: teleport
+            if (!ev.isCancelled()) {
+                if (this.getLevel().getName().equals("nether")) {
+                    this.switchLevel(getServer().getDefaultLevel());
+                } else {
+                    this.switchLevel(getServer().getLevelByName("nether"));
+                }
+            }
         }
 
         this.age += tickDiff;
@@ -1719,7 +1724,6 @@ public abstract class Entity extends Location implements Metadatable {
                 this.motionZ = 0;
             }
 
-            //TODO: vehicle collision events (first we need to spawn them!)
             Timings.entityMoveTimer.stopTiming();
             return true;
         }

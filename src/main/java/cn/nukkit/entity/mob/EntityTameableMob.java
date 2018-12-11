@@ -49,45 +49,40 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
 
     @Override
     public Player getOwner() {
-        return owner;
+        return this.owner;
     }
 
     public boolean hasOwner() {
-        return owner!=null;
+        return this.owner != null;
     }
 
     public void setOwner(Player player) {
         this.owner = player;
-        setDataProperty(new LongEntityData(DATA_OWNER_EID, player.getId()));
-        setTamed(true);
+        this.setDataProperty(new LongEntityData(DATA_OWNER_EID, player.getId()));
+        this.setTamed(true);
     }
 
     @Override
     public String getName() {
-        return getNameTag();
+        return this.getNameTag();
     }
 
     public boolean isSitting() {
-        return sitting;
+        return this.sitting;
     }
 
-    public void setSitting(boolean flag) {
-        this.sitting = flag;
-        setSittingDataProperty(flag);
-    }
-
-
-    private void setTamed (boolean tamed) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_TAMED, tamed);
-    }
-
-    private void setSittingDataProperty(boolean sit) {
+    public void setSitting(boolean sit) {
+        this.sitting = sit;
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_SITTING, sit);
+    }
+
+    public void setTamed (boolean tamed) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_TAMED, tamed);
     }
 
     @Override
     public String getOwnerUUID() {
-        return ownerUUID;
+        return this.ownerUUID;
     }
 
     @Override

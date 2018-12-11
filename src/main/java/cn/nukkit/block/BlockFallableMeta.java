@@ -11,9 +11,11 @@ import cn.nukkit.nbt.tag.ListTag;
  * @author rcsuperman
  * Nukkit Project
  */
-public abstract class BlockFallable extends BlockSolid {
+public abstract class BlockFallableMeta extends BlockSolidMeta {
 
-    protected BlockFallable() {};
+    protected BlockFallableMeta(int meta) {
+        super(meta);
+    }
 
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {

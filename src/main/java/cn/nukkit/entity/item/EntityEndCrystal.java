@@ -1,18 +1,29 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.Explosion;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
  * Created by PetteriM1
  */
-public class EntityEndCrystal extends Entity {
+public class EntityEndCrystal extends Entity implements EntityExplosive {
 
     public static final int NETWORK_ID = 71;
+
+    @Override
+    public float getLength() {
+        return 1f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 1f;
+    }
 
     @Override
     public int getNetworkId() {
@@ -23,22 +34,20 @@ public class EntityEndCrystal extends Entity {
         super(chunk, nbt);
     }
 
+    @Override
     public boolean attack(EntityDamageEvent source) {
-        if (this.closed) return false;
-        close();
-        kill();
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
-        this.server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) return true;
-		Explosion explode = new Explosion(this, (float) ev.getForce(), this);
-		explode.explodeA();
-		explode.explodeB();
+        if (this.closed) {
+            return false;
+        }
+
+        this.explode();
+
         return true;
 	}
 
     @Override
 	public boolean canCollideWith(Entity entity) {
-		return false;
+		return true;
 	}
     
     public boolean showBase() {
@@ -47,5 +56,17 @@ public class EntityEndCrystal extends Entity {
 
     public void setShowBase(boolean value) {
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE, value);
+    }
+
+    @Override
+    public void explode() {
+        this.close();
+        this.kill();
+        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
+        this.server.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) return;
+		Explosion explode = new Explosion(this, (float) ev.getForce(), this);
+		explode.explodeA();
+		explode.explodeB();
     }
 }

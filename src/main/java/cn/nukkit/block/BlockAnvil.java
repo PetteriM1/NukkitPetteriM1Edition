@@ -12,7 +12,7 @@ import cn.nukkit.utils.BlockColor;
 /**
  * Created by Pub4Game on 27.12.2015.
  */
-public class BlockAnvil extends BlockFallable {
+public class BlockAnvil extends BlockFallableMeta {
 
     private static final String[] NAMES = new String[]{
             "Anvil",
@@ -29,24 +29,12 @@ public class BlockAnvil extends BlockFallable {
             "Very Damaged Anvil"
     };
 
-    private int meta;
-
     public BlockAnvil() {
         this(0);
     }
 
     public BlockAnvil(int meta) {
-        this.meta = meta;
-    }
-
-    @Override
-    public final int getDamage() {
-        return this.meta;
-    }
-
-    @Override
-    public final void setDamage(int meta) {
-        this.meta = meta;
+        super(meta);
     }
 
     @Override
