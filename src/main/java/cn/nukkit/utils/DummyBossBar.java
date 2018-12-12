@@ -130,7 +130,7 @@ public class DummyBossBar {
         return this.color;
     }
 
-    private void createBossEntity() {
+    private void createBossEntity(int protocol) {
         AddEntityPacket pkAdd = new AddEntityPacket();
         pkAdd.type = EntityCreeper.NETWORK_ID;
         pkAdd.entityUniqueId = bossBarId;
@@ -149,7 +149,7 @@ public class DummyBossBar {
                 .putLong(Entity.DATA_LEAD_HOLDER_EID, -1)
                 .putString(Entity.DATA_NAMETAG, text) // Set the entity name
                 .putFloat(Entity.DATA_SCALE, 0); // And make it invisible
-
+        pkAdd.protocolLowerThan313 = protocol < 313;
         player.dataPacket(pkAdd);
     }
 
@@ -226,7 +226,11 @@ public class DummyBossBar {
     }
 
     public void create() {
-        createBossEntity();
+        this.create(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public void create(int protocol) {
+        createBossEntity(protocol);
         sendAttributes();
         sendShowBossBar();
         if (color != null) this.sendSetBossBarTexture();
@@ -244,5 +248,4 @@ public class DummyBossBar {
         sendHideBossBar();
         removeBossEntity();
     }
-
 }

@@ -95,7 +95,7 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityEgg.NETWORK_ID, "minecraft:egg")
             .put(EntityPainting.NETWORK_ID, "minecraft:painting")
             .put(EntityThrownTrident.NETWORK_ID, "minecraft:thrown_trident")
-            .put(EntityBlazeFireBall.NETWORK_ID, "minecraft:fireball")
+            .put(EntityGhastFireBall.NETWORK_ID, "minecraft:fireball")
             .put(EntityPotion.NETWORK_ID, "minecraft:splash_potion")
             .put(EntityEnderPearl.NETWORK_ID, "minecraft:ender_pearl")
             .put(88, "minecraft:leash_knot")
