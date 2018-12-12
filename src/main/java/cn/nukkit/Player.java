@@ -925,10 +925,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         // HACK: fix speed bug
         this.setMovementSpeed(this.getMovementSpeed());
-
-        if (this.protocol != ProtocolInfo.CURRENT_PROTOCOL) {
-            this.sendMessage("\u00A7e[WARNING] You are running unsupported Minecraft version");
-        }
     }
 
     protected boolean orderChunks() {
