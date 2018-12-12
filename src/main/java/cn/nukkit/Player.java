@@ -2050,6 +2050,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setNameTagAlwaysVisible(true);
         this.setCanClimb(true);
 
+        if (this.protocol >= 313) {
+            this.dataPacket(new AvailableEntityIdentifiersPacket());
+        }
+
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.ip,
