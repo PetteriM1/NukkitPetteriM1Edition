@@ -75,9 +75,7 @@ public class EntityDonkey extends EntityWalkingAnimal {
         List<Item> drops = new ArrayList<>();
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int leather = EntityUtils.rand(0, 3);
-
-            for (int i = 0; i < leather; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }

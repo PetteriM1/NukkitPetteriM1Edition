@@ -63,7 +63,6 @@ public class EntityMagmaCube extends EntityJumpingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);
@@ -103,12 +102,13 @@ public class EntityMagmaCube extends EntityJumpingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int magmaCream = EntityUtils.rand(0, 2);
-            for (int i = 0; i < magmaCream; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.MAGMA_CREAM, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

@@ -98,12 +98,13 @@ public class EntitySnowGolem extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int snowBall = EntityUtils.rand(0, 16);
-            for (int i = 0; i < snowBall; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 16); i++) {
                 drops.add(Item.get(Item.SNOWBALL, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

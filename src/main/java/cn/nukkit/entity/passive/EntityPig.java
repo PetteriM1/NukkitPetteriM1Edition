@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.EntityWalkingAnimal;
 import cn.nukkit.utils.EntityUtils;
@@ -96,12 +95,13 @@ public class EntityPig extends EntityWalkingAnimal {
 
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int drop = EntityUtils.rand(1, 4);
-            for (int i = 0; i < drop; i++) {
+            for (int i = 0; i < EntityUtils.rand(1, 4); i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_PORKCHOP : Item.RAW_PORKCHOP, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

@@ -96,16 +96,17 @@ public class EntityGhast extends EntityFlyingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int gunPowder = EntityUtils.rand(0, 3);
-            int ghastTears = EntityUtils.rand(0, 2);
-            for (int i = 0; i < gunPowder; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
             }
-            for (int i = 0; i < ghastTears; i++) {
+
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.GHAST_TEAR, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

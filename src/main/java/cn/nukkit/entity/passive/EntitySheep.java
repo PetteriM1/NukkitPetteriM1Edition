@@ -124,13 +124,15 @@ public class EntitySheep extends EntityWalkingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.WOOL, this.getColor(), 1));
-            int muttonDrop = EntityUtils.rand(1, 3);
-            for (int i = 0; i < muttonDrop; i++) {
+
+            for (int i = 0; i < EntityUtils.rand(1, 3); i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_MUTTON : Item.RAW_MUTTON, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

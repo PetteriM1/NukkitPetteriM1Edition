@@ -91,7 +91,6 @@ public class EntityPolarBear extends EntityWalkingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);

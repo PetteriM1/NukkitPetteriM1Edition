@@ -64,7 +64,6 @@ public class EntitySlime extends EntityJumpingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);
@@ -104,12 +103,13 @@ public class EntitySlime extends EntityJumpingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int slimeBalls = EntityUtils.rand(0, 3);
-            for (int i = 0; i < slimeBalls; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.SLIMEBALL, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

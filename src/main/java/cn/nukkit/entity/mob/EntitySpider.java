@@ -207,7 +207,6 @@ public class EntitySpider extends EntityWalkingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);
@@ -257,16 +256,17 @@ public class EntitySpider extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int strings = EntityUtils.rand(0, 3);
-            int spiderEye = EntityUtils.rand(0, 3) == 0 ? 1 : 0;
-            for (int i = 0; i < strings; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
             }
-            for (int i = 0; i < spiderEye; i++) {
+
+            for (int i = 0; i < (EntityUtils.rand(0, 3) == 0 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

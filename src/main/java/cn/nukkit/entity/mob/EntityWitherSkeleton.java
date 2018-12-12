@@ -77,14 +77,11 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
         List<Item> drops = new ArrayList<>();
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int coal = EntityUtils.rand(0, 2);
-            int bones = EntityUtils.rand(0, 3);
-
-            for (int i = 0; i < coal; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.COAL, 0, 1));
             }
 
-            for (int i = 0; i < bones; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.BONE, 0, 1));
             }
         }

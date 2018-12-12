@@ -49,9 +49,7 @@ public class EntityDolphin extends EntityWaterAnimal {
         List<Item> drops = new ArrayList<>();
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int fish = EntityUtils.rand(0, 2);
-
-            for (int i = 0; i < fish; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.RAW_FISH, 0, 1));
             }
         }

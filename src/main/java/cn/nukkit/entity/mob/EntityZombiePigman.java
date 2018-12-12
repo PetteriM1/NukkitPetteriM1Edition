@@ -89,7 +89,6 @@ public class EntityZombiePigman extends EntityWalkingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);
@@ -158,20 +157,21 @@ public class EntityZombiePigman extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int rottenFlesh = EntityUtils.rand(0, 2);
-            int goldNuggets = EntityUtils.rand(0, 101) <= 3 ? 1 : 0;
-            int goldSword = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;
-            for (int i = 0; i < rottenFlesh; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
-            for (int i = 0; i < goldNuggets; i++) {
+
+            for (int i = 0; i < (EntityUtils.rand(0, 101) <= 3 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.GOLD_NUGGET, 0, 1));
             }
-            for (int i = 0; i < goldSword; i++) {
+
+            for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.GOLD_SWORD, EntityUtils.rand(5, 30), 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

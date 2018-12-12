@@ -54,18 +54,18 @@ public class EntitySkeletonHorse extends EntityWalkingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int leather = EntityUtils.rand(0, 3);
-            int bone = EntityUtils.rand(0, 2);
 
-            for (int i = 0; i < leather; i++) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
 
-            for (int i = 0; i < bone; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.BONE, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

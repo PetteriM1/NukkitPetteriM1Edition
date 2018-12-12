@@ -69,7 +69,6 @@ public class EntityPhantom extends EntityFlyingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);
@@ -109,12 +108,13 @@ public class EntityPhantom extends EntityFlyingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int drop = EntityUtils.rand(0, 2);
-            for (int i = 0; i < drop; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.PHANTOM_MEMBRANE, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

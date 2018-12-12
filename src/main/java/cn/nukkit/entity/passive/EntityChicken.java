@@ -155,9 +155,7 @@ public class EntityChicken extends EntityWalkingAnimal {
         List<Item> drops = new ArrayList<>();
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int featherDrop = EntityUtils.rand(0, 3);
-
-            for (int i = 0; i < featherDrop; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.FEATHER, 0, 1));
             }
 

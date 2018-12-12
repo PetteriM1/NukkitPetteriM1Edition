@@ -42,13 +42,14 @@ public class EntityParrot extends EntityFlyingAnimal {
 
     @Override
     public Item[] getDrops() {
-         List<Item> drops = new ArrayList<>();
+        List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int featherDrop = EntityUtils.rand(1, 3);
-            for (int i = 0; i < featherDrop; i++) {
+            for (int i = 0; i < EntityUtils.rand(1, 3); i++) {
                 drops.add(Item.get(Item.FEATHER, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

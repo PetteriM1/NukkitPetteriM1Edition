@@ -1980,6 +1980,7 @@ public class Server {
         Entity.registerEntity("Zombie", EntityZombie.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
+        Entity.registerEntity("Cat", EntityCat.class);
         Entity.registerEntity("Chicken", EntityChicken.class);
         Entity.registerEntity("Cod", EntityCod.class);
         Entity.registerEntity("Cow", EntityCow.class);
@@ -1990,6 +1991,7 @@ public class Server {
         Entity.registerEntity("Llama", EntityLlama.class);
         Entity.registerEntity("Mooshroom", EntityMooshroom.class);
         Entity.registerEntity("Mule", EntityMule.class);
+        Entity.registerEntity("Panda", EntityPanda.class);
         Entity.registerEntity("Parrot", EntityParrot.class);
         Entity.registerEntity("PolarBear", EntityPolarBear.class);
         Entity.registerEntity("Pig", EntityPig.class);

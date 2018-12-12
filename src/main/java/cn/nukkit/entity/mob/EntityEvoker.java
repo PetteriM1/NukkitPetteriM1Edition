@@ -60,7 +60,6 @@ public class EntityEvoker extends EntityWalkingMob {
             if (player instanceof Player) {
                 @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-
                     {
                         put(Item.LEATHER_CAP, 1f);
                         put(Item.LEATHER_TUNIC, 3f);
@@ -100,13 +99,15 @@ public class EntityEvoker extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int emerald = EntityUtils.rand(0, 2);
-            for (int i = 0; i < emerald; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.EMERALD, 0, 1));
             }
+
             drops.add(Item.get(Item.TOTEM, 0, 1));
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

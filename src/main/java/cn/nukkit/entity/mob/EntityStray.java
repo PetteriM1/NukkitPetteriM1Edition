@@ -121,16 +121,17 @@ public class EntityStray extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int bones = EntityUtils.rand(0, 3);
-            int arrows = EntityUtils.rand(0, 3);
-            for (int i = 0; i < bones; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.BONE, 0, 1));
             }
-            for (int i = 0; i < arrows; i++) {
+
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.ARROW, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

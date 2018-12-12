@@ -66,20 +66,21 @@ public class EntityRabbit extends EntityJumpingAnimal {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            int rabbitHide = EntityUtils.rand(0, 2);
-            int rawRabbit = EntityUtils.rand(0, 2);
-            int rabbitfoot = EntityUtils.rand(0, 101) <= 9 ? 1 : 0;
-            for (int i = 0; i < rabbitHide; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.RABBIT_HIDE, 0, 1));
             }
-            for (int i = 0; i < rabbitfoot; i++) {
+
+            for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.RABBIT_FOOT, 0, 1));
             }
-            for (int i = 0; i < rawRabbit; i++) {
+
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_RABBIT : Item.RAW_RABBIT, 0, 1));
             }
         }
+
         return drops.toArray(new Item[drops.size()]);
     }
 

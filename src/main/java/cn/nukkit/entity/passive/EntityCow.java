@@ -88,15 +88,11 @@ public class EntityCow extends EntityWalkingAnimal {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-
-            int leatherDropCount = EntityUtils.rand(0, 3);
-            int beefDrop = EntityUtils.rand(1, 4);
-
-            for (int i = 0; i < leatherDropCount; i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
 
-            for (int i = 0; i < beefDrop; i++) {
+            for (int i = 0; i < EntityUtils.rand(1, 4); i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.STEAK : Item.RAW_BEEF, 0, 1));
             }
         }
