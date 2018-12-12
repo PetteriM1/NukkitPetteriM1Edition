@@ -142,8 +142,10 @@ public class EntityWolf extends EntityTameableMob {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (!ev.isCancelled()) {
-            this.setAngry(true);
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.setAngry(true);
+            }
         }
 
         return true;
