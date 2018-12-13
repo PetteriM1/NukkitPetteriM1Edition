@@ -15,7 +15,6 @@ public class RequestChunkRadiusPacket extends DataPacket {
 
     @Override
     public void encode() {
-
     }
 
     @Override
