@@ -122,8 +122,6 @@ public class AddEntityPacket extends DataPacket {
         return ProtocolInfo.ADD_ENTITY_PACKET;
     }
 
-    public boolean protocolLowerThan313 = false;
-
     public long entityUniqueId;
     public long entityRuntimeId;
     public int type;
@@ -150,7 +148,7 @@ public class AddEntityPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (this.protocolLowerThan313) {
+        if (this.protocol < 313) {
             this.putUnsignedVarInt(this.type);
         } else {
             if (id == null) {

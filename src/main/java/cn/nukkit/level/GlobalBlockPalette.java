@@ -19,33 +19,69 @@ public class GlobalBlockPalette {
     private static final Int2IntArrayMap legacyToRuntimeId = new Int2IntArrayMap();
     private static final Int2IntArrayMap runtimeIdToLegacy = new Int2IntArrayMap();
     private static final AtomicInteger runtimeIdAllocator = new AtomicInteger(0);
-    private static final byte[] compiledTable;
+    private static byte[] compiledTable282;
+    private static byte[] compiledTable291;
+    private static byte[] compiledTable313;
 
     static {
         legacyToRuntimeId.defaultReturnValue(-1);
         runtimeIdToLegacy.defaultReturnValue(-1);
 
-        InputStream stream = Server.class.getClassLoader().getResourceAsStream("runtimeid_table.json");
-        if (stream == null) {
-            throw new AssertionError("Unable to locate RuntimeID table");
-        }
-        Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+        Server.getInstance().getScheduler().scheduleTask(null, () -> {
+            InputStream stream1 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
+            if (stream1 == null) {
+                throw new AssertionError("Unable to locate RuntimeID table 282");
+            }
+            Reader reader1 = new InputStreamReader(stream1, StandardCharsets.UTF_8);
 
-        Gson gson = new Gson();
-        Type collectionType = new TypeToken<Collection<TableEntry>>() {
-        }.getType();
-        Collection<TableEntry> entries = gson.fromJson(reader, collectionType);
-        BinaryStream table = new BinaryStream();
+            Gson gson1 = new Gson();
+            Type collectionType1 = new TypeToken<Collection<TableEntry>>() {
+            }.getType();
+            Collection<TableEntry> entries1 = gson1.fromJson(reader1, collectionType1);
+            BinaryStream table1 = new BinaryStream();
 
-        table.putUnsignedVarInt(entries.size());
+            table1.putUnsignedVarInt(entries1.size());
 
-        for (TableEntry entry : entries) {
-            registerMapping((entry.id << 4) | entry.data);
-            table.putString(entry.name);
-            table.putLShort(entry.data);
-        }
+            compiledTable282 = table1.getBuffer();
 
-        compiledTable = table.getBuffer();
+            InputStream stream2 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_291.json");
+            if (stream2 == null) {
+                throw new AssertionError("Unable to locate RuntimeID table 291");
+            }
+            Reader reader2 = new InputStreamReader(stream2, StandardCharsets.UTF_8);
+
+            Gson gson2 = new Gson();
+            Type collectionType2 = new TypeToken<Collection<TableEntry>>() {
+            }.getType();
+            Collection<TableEntry> entries2 = gson2.fromJson(reader2, collectionType2);
+            BinaryStream table2 = new BinaryStream();
+
+            table2.putUnsignedVarInt(entries2.size());
+
+            compiledTable291 = table2.getBuffer();
+
+            InputStream stream3 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_313.json");
+            if (stream3 == null) {
+                throw new AssertionError("Unable to locate RuntimeID table 313");
+            }
+            Reader reader3 = new InputStreamReader(stream3, StandardCharsets.UTF_8);
+
+            Gson gson3 = new Gson();
+            Type collectionType3 = new TypeToken<Collection<TableEntry>>() {
+            }.getType();
+            Collection<TableEntry> entries3 = gson3.fromJson(reader3, collectionType3);
+            BinaryStream table3 = new BinaryStream();
+
+            table3.putUnsignedVarInt(entries3.size());
+
+            for (TableEntry entry3 : entries3) {
+                registerMapping((entry3.id << 4) | entry3.data);
+                table3.putString(entry3.name);
+                table3.putLShort(entry3.data);
+            }
+
+            compiledTable313 = table3.getBuffer();
+        }, true);
     }
 
     public static int getOrCreateRuntimeId(int id, int meta) {
@@ -64,8 +100,14 @@ public class GlobalBlockPalette {
         return runtimeId;
     }
 
-    public static byte[] getCompiledTable() {
-        return compiledTable;
+    public static byte[] getCompiledTable(int protocol) {
+        if (protocol < 291) {
+            return compiledTable282;
+        } else if (protocol > 282 && protocol < 313) {
+            return compiledTable291;
+        } else {
+            return compiledTable313;
+        }
     }
 
     private static class TableEntry {

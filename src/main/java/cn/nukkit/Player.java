@@ -2038,8 +2038,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.spawnZ = (int) this.z;
         startGamePacket.commandsEnabled = this.isEnableClientCommand();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
-        startGamePacket.protocolLowerThan291 = this.protocol < 291;
-        startGamePacket.protocolLowerThan313 = this.protocol < 313;
+        startGamePacket.protocol = this.protocol;
         this.dataPacket(startGamePacket);
 
         this.loggedIn = true;
@@ -2051,7 +2050,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setCanClimb(true);
 
         if (this.protocol >= 313) {
-            this.dataPacket(new AvailableEntityIdentifiersPacket());
+            this.getServer().getScheduler().scheduleTask(null, () -> {
+                this.dataPacket(new AvailableEntityIdentifiersPacket());
+            }, true);
         }
 
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
@@ -2221,7 +2222,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             ResourcePackStackPacket stackPacket = new ResourcePackStackPacket();
                             stackPacket.mustAccept = this.server.getForceResources();
                             stackPacket.resourcePackStack = this.server.getResourcePackManager().getResourceStack();
-                            stackPacket.protocolLowerThan313 = this.protocol < 313;
+                            stackPacket.protocol = this.protocol;
                             this.dataPacket(stackPacket);
                             break;
                         case ResourcePackClientResponsePacket.STATUS_COMPLETED:
@@ -3317,9 +3318,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void sendMessage(String message) {
-        TextPacket pk = new TextPacket(this.protocol < 291);
+        TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
+        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3337,7 +3339,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendTranslation(String message, String[] parameters) {
-        TextPacket pk = new TextPacket(this.protocol < 291);
+        TextPacket pk = new TextPacket();
         if (!this.server.isLanguageForced()) {
             pk.type = TextPacket.TYPE_TRANSLATION;
             pk.message = this.server.getLanguage().translateString(message, parameters, "nukkit.");
@@ -3350,6 +3352,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message, parameters);
         }
+        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3358,10 +3361,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendChat(String source, String message) {
-        TextPacket pk = new TextPacket(this.protocol < 291);
+        TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_CHAT;
         pk.source = source;
         pk.message = this.server.getLanguage().translateString(message);
+        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3370,17 +3374,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendPopup(String message, String subtitle) {
-        TextPacket pk = new TextPacket(this.protocol < 291);
+        TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_POPUP;
         pk.source = message;
         pk.message = subtitle;
+        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
     public void sendTip(String message) {
-        TextPacket pk = new TextPacket(this.protocol < 291);
+        TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
+        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 

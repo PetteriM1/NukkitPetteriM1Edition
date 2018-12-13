@@ -15,8 +15,6 @@ public class PlayerListPacket extends DataPacket {
     public byte type;
     public Entry[] entries = new Entry[0];
 
-    public boolean protocolLowerThan291 = false;
-
     @Override
     public void decode() {
     }
@@ -31,7 +29,7 @@ public class PlayerListPacket extends DataPacket {
             if (type == TYPE_ADD) {
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
-                if (protocolLowerThan291) {
+                if (protocol == 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }

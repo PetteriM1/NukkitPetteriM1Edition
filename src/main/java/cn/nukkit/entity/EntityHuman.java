@@ -179,7 +179,7 @@ public class EntityHuman extends EntityHumanType {
             pk.pitch = (float) this.pitch;
             pk.item = this.getInventory().getItemInHand();
             pk.metadata = this.dataProperties;
-            pk.protocolLowerThan291 = player.protocol < 291;
+            pk.protocol = player.protocol;
             player.dataPacket(pk);
 
             this.inventory.sendArmorContents(player);

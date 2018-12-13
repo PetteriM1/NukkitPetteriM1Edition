@@ -863,7 +863,7 @@ public abstract class Entity extends Location implements Metadatable {
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
-        addEntity.protocolLowerThan313 = protocol < 313;
+        addEntity.protocol = protocol;
         return addEntity;
     }
 

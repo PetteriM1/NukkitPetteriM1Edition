@@ -2,19 +2,9 @@ package cn.nukkit.network.protocol;
 
 public class TextPacket extends DataPacket {
 
-    public boolean protocolLowerThan291 = false;
-
     @Override
     public byte pid() {
         return ProtocolInfo.TEXT_PACKET;
-    }
-
-    public TextPacket() {
-        this(false);
-    }
-
-    public TextPacket(boolean protocolLowerThan291) {
-        this.protocolLowerThan291 = protocolLowerThan291;
     }
 
     public static final byte TYPE_RAW = 0;
@@ -87,7 +77,7 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
-                if (protocolLowerThan291) {
+                if (protocol == 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }

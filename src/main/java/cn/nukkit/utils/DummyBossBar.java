@@ -149,7 +149,7 @@ public class DummyBossBar {
                 .putLong(Entity.DATA_LEAD_HOLDER_EID, -1)
                 .putString(Entity.DATA_NAMETAG, text) // Set the entity name
                 .putFloat(Entity.DATA_SCALE, 0); // And make it invisible
-        pkAdd.protocolLowerThan313 = protocol < 313;
+        pkAdd.protocol = protocol;
         player.dataPacket(pkAdd);
     }
 

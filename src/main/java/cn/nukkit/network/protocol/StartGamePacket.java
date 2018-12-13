@@ -10,9 +10,6 @@ public class StartGamePacket extends DataPacket {
         return ProtocolInfo.START_GAME_PACKET;
     }
 
-    public boolean protocolLowerThan291 = false;
-    public boolean protocolLowerThan313 = false;
-
     public long entityUniqueId;
     public long entityRuntimeId;
     public int playerGamemode;
@@ -110,9 +107,9 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.hasLockedBehaviorPack);
         this.putBoolean(this.hasLockedResourcePack);
         this.putBoolean(this.isFromLockedWorldTemplate);
-        if (!protocolLowerThan291) {
+        if (protocol >= 291) {
             this.putBoolean(this.isUsingMsaGamertagsOnly);
-            if (!protocolLowerThan313) {
+            if (protocol >= 313) {
                 this.putBoolean(this.isFromWorldTemplate);
                 this.putBoolean(this.isWorldTemplateOptionLocked);
             }
@@ -123,7 +120,7 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
-        this.put(GlobalBlockPalette.getCompiledTable());
+        this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
         this.putString(this.multiplayerCorrelationId);
     }
 }

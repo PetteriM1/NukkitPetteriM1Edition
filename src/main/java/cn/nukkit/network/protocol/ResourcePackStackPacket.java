@@ -4,8 +4,6 @@ import cn.nukkit.resourcepacks.ResourcePack;
 
 public class ResourcePackStackPacket extends DataPacket {
 
-    public boolean protocolLowerThan313 = false;
-
     public boolean mustAccept = false;
     public ResourcePack[] behaviourPackStack = new ResourcePack[0];
     public ResourcePack[] resourcePackStack = new ResourcePack[0];
@@ -29,7 +27,7 @@ public class ResourcePackStackPacket extends DataPacket {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
         }
-        if (!this.protocolLowerThan313) {
+        if (this.protocol >= 313) {
             this.putBoolean(isExperimental);
         }
     }

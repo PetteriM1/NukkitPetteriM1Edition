@@ -4,16 +4,12 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public class ItemPotionLingering extends ProjectileItem {
 
-    public ItemPotionLingering() {
-        this(0, 1);
-    }
-
     public ItemPotionLingering(Integer meta) {
         this(meta, 1);
     }
 
     public ItemPotionLingering(Integer meta, int count) {
-        super(LINGERING_POTION, 0, count, "Lingering Potion");
+        super(LINGERING_POTION, meta, count, "Lingering Potion");
     }
 
     @Override
