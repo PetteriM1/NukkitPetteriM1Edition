@@ -37,7 +37,7 @@ public interface ProtocolInfo {
     final byte UPDATE_BLOCK_PACKET = 0x15;
     final byte ADD_PAINTING_PACKET = 0x16;
     final byte EXPLODE_PACKET = 0x17;
-    final byte LEVEL_SOUND_EVENT_PACKET = 0x18;
+    final byte LEVEL_SOUND_EVENT_PACKET_V1 = 0x18;
     final byte LEVEL_EVENT_PACKET = 0x19;
     final byte BLOCK_EVENT_PACKET = 0x1a;
     final byte ENTITY_EVENT_PACKET = 0x1b;
@@ -132,7 +132,7 @@ public interface ProtocolInfo {
     final byte SCRIPT_CUSTOM_EVENT_PACKET = 0x75;
     final byte SPAWN_PARTICLE_EFFECT_PACKET = 0x76;
     final byte AVAILABLE_ENTITY_IDENTIFIERS_PACKET = 0x77;
-    final byte LEVEL_SOUND_EVENT_PACKET_V2 = 0x78;
+    final byte LEVEL_SOUND_EVENT_PACKET = 0x78;
     final byte NETWORK_CHUNK_PUBLISHER_UPDATE_PACKET = 0x79;
     final byte BIOME_DEFINITION_LIST_PACKET = 0x7a;
     final byte BATCH_PACKET = (byte) 0xff;

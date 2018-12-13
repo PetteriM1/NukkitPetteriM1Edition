@@ -81,7 +81,7 @@ public class ItemTrident extends ItemTool {
                     entityShootBowEvent.getProjectile().kill();
                 } else {
                     entityShootBowEvent.getProjectile().spawnToAll();
-                    player.getLevel().addLevelSoundEvent(183, 1, -1, new Vector3(player.x, player.y, player.z));
+                    player.getLevel().addLevelSoundEvent(new Vector3(player.x, player.y, player.z), 183);
                     if (!player.isCreative()) {
                         new NukkitRunnable() {
                             public void run() {

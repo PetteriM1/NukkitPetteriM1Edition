@@ -2,7 +2,7 @@ package cn.nukkit.level.sound;
 
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacketV1;
 
 /**
  * @author Tee7even
@@ -29,7 +29,7 @@ public class LevelSoundEventSound extends Sound {
 
     @Override
     public DataPacket[] encode() {
-        LevelSoundEventPacket pk = new LevelSoundEventPacket();
+        LevelSoundEventPacketV1 pk = new LevelSoundEventPacketV1();
         pk.sound = this.type;
         pk.x = (float) this.x;
         pk.y = (float) this.y;

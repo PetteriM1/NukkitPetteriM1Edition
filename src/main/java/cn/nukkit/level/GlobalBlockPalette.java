@@ -42,6 +42,11 @@ public class GlobalBlockPalette {
 
             table1.putUnsignedVarInt(entries1.size());
 
+            for (TableEntry entry1 : entries1) {
+                table1.putString(entry1.name);
+                table1.putLShort(entry1.data);
+            }
+
             compiledTable282 = table1.getBuffer();
 
             InputStream stream2 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_291.json");
@@ -57,6 +62,11 @@ public class GlobalBlockPalette {
             BinaryStream table2 = new BinaryStream();
 
             table2.putUnsignedVarInt(entries2.size());
+
+            for (TableEntry entry2 : entries2) {
+                table2.putString(entry2.name);
+                table2.putLShort(entry2.data);
+            }
 
             compiledTable291 = table2.getBuffer();
 

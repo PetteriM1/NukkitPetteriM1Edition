@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class AddEntityPacket extends DataPacket {
 
-    private static final ImmutableMap<Integer, String> LEGACY_IDS = ImmutableMap.<Integer, String>builder()
+    public static final ImmutableMap<Integer, String> LEGACY_IDS = ImmutableMap.<Integer, String>builder()
             .put(51, "minecraft:npc")
             .put(63, "minecraft:player")
             .put(EntityWitherSkeleton.NETWORK_ID, "minecraft:wither_skeleton")

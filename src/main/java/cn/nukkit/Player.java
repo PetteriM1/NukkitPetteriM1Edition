@@ -2835,7 +2835,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     break;
                 case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET:
-                    this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, packet);
+                case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V1:
+                    this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), packet);
                     break;
                 case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:
                     if (this.isSpectator()) {

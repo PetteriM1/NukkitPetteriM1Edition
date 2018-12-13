@@ -502,35 +502,27 @@ public class Level implements ChunkManager, Metadatable {
         this.addSound(sound, players.stream().toArray(Player[]::new));
     }
 
-    /**
-     * Broadcasts sound to players
-     *
-     * @param type ID of the sound from cn.nukkit.network.protocol.LevelSoundEventPacket
-     * @param pitch pitch of sound
-     * @param data generic data that can affect sound
-     * @param pos  position where sound should be played
-     */
+    public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType, boolean isBaby, boolean isGlobal) {
+        String identifier = AddEntityPacket.LEGACY_IDS.getOrDefault(entityType, ":");
+        addLevelSoundEvent(pos, type, data, identifier, isBaby, isGlobal);
+    }
+     public void addLevelSoundEvent(Vector3 pos, int type) {
+        this.addLevelSoundEvent(pos, type, -1);
+    }
+
     public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos) {
-        this.addLevelSoundEvent(type, pitch, data, pos, false);
+        this.addLevelSoundEvent(pos, type, data, ":", false, false);
     }
 
-    /**
-     * Broadcasts sound to players
-     *
-     * @param pos  position where sound should be played
-     * @param type ID of the sound from cn.nukkit.network.protocol.LevelSoundEventPacket
-     * @param pitch pitch of sound
-     * @param data generic data that can affect sound
-     */
-    public void addLevelSoundEvent(Vector3 pos, int type, int pitch, int data) {
-        this.addLevelSoundEvent(pos, type, pitch, data, false);
+    public void addLevelSoundEvent(Vector3 pos, int type, int data) {
+        this.addLevelSoundEvent(pos, type, data, ":", false, false);
     }
 
-    public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos, boolean isGlobal) {
+    public void addLevelSoundEvent(Vector3 pos, int type, int data, String identifier, boolean isBaby, boolean isGlobal) {
         LevelSoundEventPacket pk = new LevelSoundEventPacket();
         pk.sound = type;
-        pk.pitch = pitch;
         pk.extraData = data;
+        pk.entityIdentifier = identifier;
         pk.x = (float) pos.x;
         pk.y = (float) pos.y;
         pk.z = (float) pos.z;
@@ -540,7 +532,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int pitch, int data, boolean isGlobal) {
-        LevelSoundEventPacket pk = new LevelSoundEventPacket();
+        LevelSoundEventPacketV1 pk = new LevelSoundEventPacketV1();
         pk.sound = type;
         pk.pitch = pitch;
         pk.extraData = data;
@@ -912,8 +904,8 @@ public class Level implements ChunkManager, Metadatable {
                 bolt.setEffect(false);
             }
 
-            this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_THUNDER, 93, -1, vector, false);
-            this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_EXPLODE, 93, -1, vector, false);
+            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_THUNDER, 93);
+            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_EXPLODE, 93);
         }
     }
 
@@ -2169,7 +2161,7 @@ public class Level implements ChunkManager, Metadatable {
 
 
         if (playSound) {
-            this.addLevelSoundEvent(LevelSoundEventPacket.SOUND_PLACE, 1, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()), hand, false);
+            this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()));
         }
 
         if (item.getCount() <= 0) {
