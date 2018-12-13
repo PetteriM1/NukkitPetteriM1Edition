@@ -5,7 +5,6 @@ import cn.nukkit.inventory.transaction.data.TransactionData;
 import cn.nukkit.inventory.transaction.data.UseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
 import cn.nukkit.network.protocol.types.NetworkInventoryAction;
-import cn.nukkit.network.protocol.types.NetworkInventoryActionOld;
 
 public class InventoryTransactionPacket extends DataPacket {
 
@@ -34,7 +33,6 @@ public class InventoryTransactionPacket extends DataPacket {
 
     public int transactionType;
     public NetworkInventoryAction[] actions;
-    public NetworkInventoryActionOld[] actionsOld;
     public TransactionData transactionData;
 
     /**
@@ -55,14 +53,8 @@ public class InventoryTransactionPacket extends DataPacket {
 
         this.putUnsignedVarInt(this.actions.length);
 
-        if (this.protocol >= 313) {
-            for (NetworkInventoryAction action : this.actions) {
-                action.write(this);
-            }
-        } else {
-            for (NetworkInventoryActionOld action : this.actionsOld) {
-                action.write(this);
-            }
+        for (NetworkInventoryAction action : this.actions) {
+            action.write(this);
         }
 
         switch (this.transactionType) {

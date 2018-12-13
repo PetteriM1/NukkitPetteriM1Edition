@@ -100,7 +100,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             return;
         }
 
-        this.attackTime = 0;
+        this.attackTime = 10;
     }
 
     @Override
@@ -142,7 +142,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z) {
-        this.knockBack(attacker, damage, x, z, 0.2);
+        this.knockBack(attacker, damage, x, z, 0.1);
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {

@@ -59,7 +59,6 @@ import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.network.protocol.types.NetworkInventoryAction;
-import cn.nukkit.network.protocol.types.NetworkInventoryActionOld;
 import cn.nukkit.permission.PermissibleBase;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.permission.PermissionAttachment;
@@ -2847,30 +2846,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     InventoryTransactionPacket transactionPacket = (InventoryTransactionPacket) packet;
 
                     List<InventoryAction> actions = new ArrayList<>();
-                    if (this.protocol >= 313) {
-                        for (NetworkInventoryAction networkInventoryAction : transactionPacket.actions) {
-                            InventoryAction a = networkInventoryAction.createInventoryAction(this);
+                    for (NetworkInventoryAction networkInventoryAction : transactionPacket.actions) {
+                        InventoryAction a = networkInventoryAction.createInventoryAction(this);
     
-                            if (a == null) {
-                                this.getServer().getLogger().debug("Unmatched inventory action from " + this.getName() + ": " + networkInventoryAction);
-                                this.sendAllInventories();
-                                break packetswitch;
-                            }
+                        if (a == null) {
+                            this.getServer().getLogger().debug("Unmatched inventory action from " + this.getName() + ": " + networkInventoryAction);
+                            this.sendAllInventories();
+                            break packetswitch;
+                        }
     
-                            actions.add(a);
-                        }
-                    } else {
-                        for (NetworkInventoryActionOld networkInventoryActionOld : transactionPacket.actionsOld) {
-                            InventoryAction a = networkInventoryActionOld.createInventoryAction(this);
-
-                            if (a == null) {
-                                this.getServer().getLogger().debug("Unmatched inventory action from " + this.getName() + ": " + networkInventoryActionOld);
-                                this.sendAllInventories();
-                                break packetswitch;
-                            }
-
-                            actions.add(a);
-                        }
+                        actions.add(a);
                     }
 
                     if (transactionPacket.isCraftingPart) {

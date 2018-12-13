@@ -421,13 +421,6 @@ public class PlayerInventory extends BaseInventory {
             pk.slots[i] = this.getItem(i);
         }
 
-        /*//Because PE is stupid and shows 9 less slots than you send it, give it 9 dummy slots so it shows all the REAL slots.
-        for(int i = this.getSize(); i < this.getSize() + this.getHotbarSize(); ++i) {
-            pk.slots[i] = new ItemBlock(new BlockAir());
-        }
-            pk.slots[i] = new ItemBlock(new BlockAir());
-        }*/
-
         for (Player player : players) {
             int id = player.getWindowId(this);
             if (id == -1 || !player.spawned) {
