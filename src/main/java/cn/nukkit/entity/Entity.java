@@ -257,7 +257,7 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean onGround;
     public boolean inBlock = false;
     public int deadTicks = 0;
-    protected int age = 0;
+    public int age = 0;
 
     protected float health = 20;
     private int maxHealth = 20;
