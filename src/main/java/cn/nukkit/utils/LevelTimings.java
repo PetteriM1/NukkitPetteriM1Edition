@@ -1,4 +1,4 @@
-package cn.nukkit.timings;
+package cn.nukkit.utils;
 
 import cn.nukkit.level.Level;
 import co.aikar.timings.Timing;

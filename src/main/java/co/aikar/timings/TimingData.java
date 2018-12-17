@@ -25,7 +25,7 @@ package co.aikar.timings;
 
 import com.google.gson.JsonArray;
 
-import cn.nukkit.timings.JsonUtil;
+import cn.nukkit.utils.JsonUtil;
 
 class TimingData {
 

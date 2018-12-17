@@ -122,7 +122,7 @@ public class Chunk extends BaseChunk {
 
         ListTag<CompoundTag> updateEntries = nbt.getList("TileTicks", CompoundTag.class);
 
-        if (updateEntries != null && updateEntries.size() > 0) {
+        if (updateEntries != null && updateEntries.size() > 0 && updateEntries.size() < 10000) {
             for (CompoundTag entryNBT : updateEntries.getAll()) {
                 Block block = null;
 

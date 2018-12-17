@@ -1,9 +1,6 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.api.API;
-import cn.nukkit.api.API.Definition;
-import cn.nukkit.api.API.Usage;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRail;
 import cn.nukkit.block.BlockRailActivator;
@@ -709,7 +706,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      * @param update Do update for the block. (This state changes if you want to show the block)
      * @return {@code true} if the block is normal block
      */
-    @API(usage = Usage.MAINTAINED, definition = Definition.UNIVERSAL)
     public boolean setDisplayBlock(Block block, boolean update) {
         if (!update) {
             if (block.isNormalBlock()) {
@@ -743,7 +739,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      *
      * @return Block of minecart display block
      */
-    @API(usage = Usage.STABLE, definition = Definition.UNIVERSAL)
     public Block getDisplayBlock() {
         return blockInside;
     }
@@ -753,7 +748,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      *
      * @param offset The offset
      */
-    @API(usage = Usage.EXPERIMENTAL, definition = Definition.PLATFORM_NATIVE)
     public void setDisplayBlockOffset(int offset) {
         setDataProperty(new IntEntityData(DATA_DISPLAY_OFFSET, offset));
     }
@@ -763,7 +757,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      *
      * @return integer
      */
-    @API(usage = Usage.EXPERIMENTAL, definition = Definition.UNIVERSAL)
     public int getDisplayBlockOffset() {
         return super.getDataPropertyInt(DATA_DISPLAY_OFFSET);
     }
@@ -773,7 +766,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      *
      * @return boolean
      */
-    @API(usage = Usage.EXPERIMENTAL, definition = Definition.UNIVERSAL)
     public boolean isSlowWhenEmpty() {
         return slowWhenEmpty;
     }
@@ -783,7 +775,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      *
      * @param slow The slowdown flag
      */
-    @API(usage = Usage.EXPERIMENTAL, definition = Definition.UNIVERSAL)
     public void setSlowWhenEmpty(boolean slow) {
         slowWhenEmpty = slow;
     }

@@ -1,5 +1,6 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
@@ -25,14 +26,17 @@ public class EntityFirework extends Entity {
 
     public static final int NETWORK_ID = 72;
 
-    private int fireworkAge;
     private int lifetime;
     private Item firework;
 
     public EntityFirework(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
 
-        this.fireworkAge = 0;
+    @Override
+    public void initEntity() {
+        super.initEntity();
+
         Random rand = new Random();
         this.lifetime = 30 + rand.nextInt(6) + rand.nextInt(7);
 
@@ -40,8 +44,8 @@ public class EntityFirework extends Entity {
         this.motionZ = rand.nextGaussian() * 0.001D;
         this.motionY = 0.05D;
 
-        if (nbt.contains("FireworkItem")) {
-            firework = NBTIO.getItemHelper(nbt.getCompound("FireworkItem"));
+        if (namedTag.contains("FireworkItem")) {
+            firework = NBTIO.getItemHelper(namedTag.getCompound("FireworkItem"));
         } else {
             firework = new ItemFirework();
         }
@@ -91,7 +95,7 @@ public class EntityFirework extends Entity {
             this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (180D / Math.PI));
 
 
-            if (this.fireworkAge == 0) {
+            if (this.age == 0) {
                 PlaySoundPacket pk = new PlaySoundPacket();
                 pk.name = "firework.launch";
                 pk.volume = 1;
@@ -101,14 +105,12 @@ public class EntityFirework extends Entity {
                 pk.z = getFloorZ();
 
                 this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
+
+                hasUpdate = true;
             }
 
-            this.fireworkAge++;
-
-            hasUpdate = true;
-            if (this.fireworkAge >= this.lifetime) {
+            if (this.age >= this.lifetime) {
                 EntityEventPacket pk = new EntityEventPacket();
-                pk.data = 0;
                 pk.event = EntityEventPacket.FIREWORK_EXPLOSION;
                 pk.eid = this.getId();
 
@@ -124,6 +126,7 @@ public class EntityFirework extends Entity {
                 this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk2);
 
                 this.kill();
+
                 hasUpdate = true;
             }
         }

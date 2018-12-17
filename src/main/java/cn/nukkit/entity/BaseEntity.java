@@ -194,7 +194,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (this.getServer().getMobAiEnabled()) {
+        if (this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0) {
             super.setMotion(motion);
         }
         return true;
@@ -202,7 +202,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean move(double dx, double dy, double dz) {
-        if (this.getServer().getMobAiEnabled()) {
+        if (this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0) {
             Timings.entityMoveTimer.startTiming();
 
             double movX = dx * moveMultifier;

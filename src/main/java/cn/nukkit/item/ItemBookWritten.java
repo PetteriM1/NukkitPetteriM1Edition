@@ -7,6 +7,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemBookWritten extends Item {
 
+    public static final int GENERATION_ORIGINAL = 0;
+	public static final int GENERATION_COPY = 1;
+	public static final int GENERATION_COPY_OF_COPY = 2;
+	public static final int GENERATION_TATTERED = 3;
+
+	public static final String TAG_GENERATION = "generation"; //TAG_Int
+	public static final String TAG_AUTHOR = "author"; //TAG_String
+	public static final String TAG_TITLE = "title"; //TAG_String
+
     protected boolean isWritten = false;
 
     public ItemBookWritten() {
@@ -35,11 +44,11 @@ public class ItemBookWritten extends Item {
             tag = this.getNamedTag();
         }
 
-        tag.putString("author", author);
-        tag.putString("title", title);
+        tag.putString(TAG_AUTHOR, author);
+        tag.putString(TAG_TITLE, title);
         tag.putList(pages);
 
-        tag.putInt("generation", 0);
+        tag.putInt(TAG_GENERATION, GENERATION_ORIGINAL);
         long randomId = 1095216660480L + ThreadLocalRandom.current().nextLong(0L, 2147483647L);
         tag.putLong("id", randomId);
 
@@ -49,12 +58,17 @@ public class ItemBookWritten extends Item {
 
     public String getAuthor() {
         if (!this.isWritten) return "";
-        return this.getNamedTag().getString("author");
+        return this.getNamedTag().getString(TAG_AUTHOR);
     }
 
     public String getTitle() {
         if (!this.isWritten) return "Book";
-        return this.getNamedTag().getString("title");
+        return this.getNamedTag().getString(TAG_TITLE);
+    }
+
+    public int getGeneration() {
+        if (!this.isWritten) return 0;
+        return this.getNamedTag().getInt(TAG_GENERATION);
     }
 
     public String[] getPages() {

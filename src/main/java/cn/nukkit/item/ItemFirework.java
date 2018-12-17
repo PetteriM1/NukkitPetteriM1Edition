@@ -75,19 +75,46 @@ public class ItemFirework extends Item {
                             .add(new FloatTag("", 0)))
                     .putCompound("FireworkItem", NBTIO.putItemHelper(this));
 
-            EntityFirework entity = new EntityFirework(level.getChunk(block.getFloorX() >> 4,
-                    block.getFloorZ() >> 4), nbt);
+            EntityFirework entity = new EntityFirework(level.getChunk(block.getFloorX() >> 4, block.getFloorZ() >> 4), nbt);
             entity.spawnToAll();
 
             if (!player.isCreative()) {
                 player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             }
-            
-            if (player.getInventory().getChestplate() instanceof ItemElytra && player.getLevel().getBlockIdAt((int) player.x, (int) player.y - 2, (int) player.z) == 0) {
-                player.setMotion(new Vector3(
-                        -Math.sin(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 3,
-                        -Math.sin(Math.toRadians(player.pitch)) * 3,
-                        Math.cos(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 3));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        if (player.getInventory().getChestplate() instanceof ItemElytra && player.getLevel().getBlockIdAt((int) player.x, (int) player.y - 2, (int) player.z) == 0) {
+            CompoundTag nbt = new CompoundTag()
+                    .putList(new ListTag<DoubleTag>("Pos")
+                            .add(new DoubleTag("", block.x + 0.5))
+                            .add(new DoubleTag("", block.y + 0.5))
+                            .add(new DoubleTag("", block.z + 0.5)))
+                    .putList(new ListTag<DoubleTag>("Motion")
+                            .add(new DoubleTag("", 0))
+                            .add(new DoubleTag("", 0))
+                            .add(new DoubleTag("", 0)))
+                    .putList(new ListTag<FloatTag>("Rotation")
+                            .add(new FloatTag("", 0))
+                            .add(new FloatTag("", 0)))
+                    .putCompound("FireworkItem", NBTIO.putItemHelper(this));
+
+            EntityFirework entity = new EntityFirework(player.getLevel().getChunk(block.getFloorX() >> 4, block.getFloorZ() >> 4), nbt);
+            entity.spawnToAll();
+
+            player.setMotion(new Vector3(
+                    -Math.sin(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 3,
+                    -Math.sin(Math.toRadians(player.pitch)) * 3,
+                    Math.cos(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 3));
+
+            if (!player.isCreative()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             }
 
             return true;

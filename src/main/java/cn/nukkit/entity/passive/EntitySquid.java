@@ -75,7 +75,7 @@ public class EntitySquid extends EntityWaterAnimal {
         EntityEventPacket pk0 = new EntityEventPacket();
         pk0.eid = this.getId();
         pk0.event = EntityEventPacket.SQUID_INK_CLOUD;
-        this.level.addChunkPacket(this.getChunkX() >> 4,this.getChunkZ() >> 4,pk0);
+        this.level.addChunkPacket(this.getChunkX() >> 4, this.getChunkZ() >> 4, pk0);
         return att;
     }
 }

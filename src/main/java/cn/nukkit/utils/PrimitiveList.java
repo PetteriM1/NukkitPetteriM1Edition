@@ -1,4 +1,4 @@
-package cn.nukkit.collection;
+package cn.nukkit.utils;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;

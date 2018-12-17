@@ -29,7 +29,7 @@ import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.command.RemoteConsoleCommandSender;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.nbt.stream.PGZIPOutputStream;
-import cn.nukkit.timings.JsonUtil;
+import cn.nukkit.utils.JsonUtil;
 import cn.nukkit.utils.TextFormat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

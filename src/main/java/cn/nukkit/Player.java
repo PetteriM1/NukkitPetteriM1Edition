@@ -103,7 +103,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int VIEW = SPECTATOR;
 
     public static final int SURVIVAL_SLOTS = 36;
-    public static final int CREATIVE_SLOTS = 112;
 
     public static final int CRAFTING_SMALL = 0;
     public static final int CRAFTING_BIG = 1;
@@ -575,7 +574,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (count > 0) {
             pk.commands = data;
             int identifier = this.dataPacket(pk, true); // We *need* ACK so we can be sure that the client received the packet or not
-            Server.getInstance().getScheduler().scheduleDelayedTask(new Task() {
+            this.getServer().getScheduler().scheduleDelayedTask(new Task() {
                 @Override
                 public void onRun(int currentTick) {
                     Boolean status = needACK.get(identifier);
@@ -871,35 +870,51 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.noDamageTicks = 60;
 
-        this.getServer().sendRecipeList(this);
+        this.getServer().getScheduler().scheduleTask(null, () -> {
+            this.getServer().sendRecipeList(this);
 
-        if (this.gamemode == Player.SPECTATOR) {
-            InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-            this.dataPacket(inventoryContentPacket);
-        } else {
-            inventory.sendCreativeContents();
-        }
+            if (this.gamemode == Player.SPECTATOR) {
+                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
+                this.dataPacket(inventoryContentPacket);
+            } else {
+                inventory.sendCreativeContents();
+            }
 
-        for (long index : this.usedChunks.keySet()) {
-            int chunkX = Level.getHashX(index);
-            int chunkZ = Level.getHashZ(index);
-            for (Entity entity : this.level.getChunkEntities(chunkX, chunkZ).values()) {
-                if (this != entity && !entity.closed && entity.isAlive()) {
-                    entity.spawnTo(this);
+            for (long index : this.usedChunks.keySet()) {
+                int chunkX = Level.getHashX(index);
+                int chunkZ = Level.getHashZ(index);
+                for (Entity entity : this.level.getChunkEntities(chunkX, chunkZ).values()) {
+                    if (this != entity && !entity.closed && entity.isAlive()) {
+                        entity.spawnTo(this);
+                    }
                 }
             }
-        }
 
-        int experience = this.getExperience();
-        if (experience != 0) {
-            this.sendExperience(experience);
-        }
+            int experience = this.getExperience();
+            if (experience != 0) {
+                this.sendExperience(experience);
+            }
 
-        int level = this.getExperienceLevel();
-        if (level != 0) {
-            this.sendExperienceLevel(this.getExperienceLevel());
-        }
+            int level = this.getExperienceLevel();
+            if (level != 0) {
+                this.sendExperienceLevel(this.getExperienceLevel());
+            }
+
+            PlayerFood food = this.getFoodData();
+            if (food.getLevel() != food.getMaxLevel()) {
+                food.sendFoodLevel();
+            }
+
+            this.getLevel().sendTime(this);
+            this.getLevel().sendWeather(this);
+
+            // HACK: fix laggy player list
+            this.getServer().sendFullPlayerListData(this);
+
+            // HACK: fix speed bug
+            this.setMovementSpeed(this.getMovementSpeed());
+        }, true);
 
         // Prevent PlayerTeleportEvent during player spawn
         this.teleport(pos, null);
@@ -907,24 +922,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.isSpectator()) {
             this.spawnToAll();
         }
-
-        // Time
-        this.getLevel().sendTime(this);
-
-        // Weather
-        this.getLevel().sendWeather(this);
-
-        // FoodLevel
-        PlayerFood food = this.getFoodData();
-        if (food.getLevel() != food.getMaxLevel()) {
-            food.sendFoodLevel();
-        }
-
-        // HACK: fix laggy player list
-        this.getServer().sendFullPlayerListData(this);
-
-        // HACK: fix speed bug
-        this.setMovementSpeed(this.getMovementSpeed());
     }
 
     protected boolean orderChunks() {
@@ -2255,7 +2252,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     PlayerInputPacket ipk = (PlayerInputPacket) packet;
                     if (riding instanceof EntityMinecartAbstract) {
-                        ((EntityMinecartEmpty) riding).setCurrentSpeed(ipk.motionY);
+                        ((EntityMinecartAbstract) riding).setCurrentSpeed(ipk.motionY);
                     }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
@@ -2871,7 +2868,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
 
                         if (this.craftingTransaction.getPrimaryOutput() != null) {
-                            this.craftingTransaction.execute();
+                            try {
+                                this.craftingTransaction.execute();
+                            } catch (Exception e) {
+                                this.server.getLogger().debug("Executing crafting transaction failed");
+                            }
                             this.craftingTransaction = null;
                         }
 
@@ -3779,6 +3780,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 absorption.setDuration(20 * 5);
                 absorption.setAmplifier(2);
                 this.addEffect(absorption);
+
+                EntityEventPacket pk = new EntityEventPacket();
+                pk.eid = this.getId();
+                pk.event = EntityEventPacket.CONSUME_TOTEM;
+                this.dataPacket(pk);
 
                 ev.setCancelled(true);
                 return;

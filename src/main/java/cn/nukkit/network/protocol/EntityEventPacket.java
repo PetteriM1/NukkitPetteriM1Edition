@@ -63,7 +63,7 @@ public class EntityEventPacket extends DataPacket {
 
     public long eid;
     public int event;
-    public int data;
+    public int data = 0;
 
     @Override
     public void decode() {
@@ -77,6 +77,6 @@ public class EntityEventPacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.eid);
         this.putByte((byte) this.event);
-        this.putVarInt((byte) this.data);
+        this.putVarInt(this.data);
     }
 }
