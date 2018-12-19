@@ -247,6 +247,16 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
                 return true;
             }
         }
+
         return false;
+    }
+
+    @Override
+    public Item[] getDrops() {
+        if (this.hasCustomName()) {
+            return new Item[]{Item.get(Item.NAME_TAG, 0, 1)};
+        } else {
+            return new Item[0];
+        }
     }
 }

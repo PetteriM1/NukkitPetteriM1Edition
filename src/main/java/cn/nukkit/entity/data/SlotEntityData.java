@@ -28,7 +28,6 @@ public class SlotEntityData extends EntityData<Item> {
         this.tag = tag;
     }
 
-
     public SlotEntityData(int id, Item item) {
         this(id, item.getId(), (byte) (item.hasMeta() ? item.getDamage() : 0), item.getCount(), item.getCompoundTag());
     }

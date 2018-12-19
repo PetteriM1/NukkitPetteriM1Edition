@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Level;
+import cn.nukkit.math.BlockFace;
 
 public class BlockChorusPlant extends BlockTransparent {
 
@@ -29,12 +31,35 @@ public class BlockChorusPlant extends BlockTransparent {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_NONE;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (block.down().isTransparent() &&
+        !(block.down() instanceof BlockChorusPlant) &&
+        !(block.north() instanceof BlockChorusPlant) &&
+        !(block.east() instanceof BlockChorusPlant) &&
+        !(block.south() instanceof BlockChorusPlant) &&
+        !(block.west() instanceof BlockChorusPlant)) {
+            return false;
+        }
+
+        this.level.setBlock(block, this, true, true);
+        return true;
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().isTransparent() &&
+            !(this.down() instanceof BlockChorusPlant) &&
+            !(this.north() instanceof BlockChorusPlant) &&
+            !(this.east() instanceof BlockChorusPlant) &&
+            !(this.south() instanceof BlockChorusPlant) &&
+            !(this.west() instanceof BlockChorusPlant)) {
+                this.getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 }

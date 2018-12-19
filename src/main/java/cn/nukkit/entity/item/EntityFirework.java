@@ -1,9 +1,6 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.ByteEntityData;
-import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.data.SlotEntityData;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -35,8 +32,6 @@ public class EntityFirework extends Entity {
 
     @Override
     public void initEntity() {
-        super.initEntity();
-
         Random rand = new Random();
         this.lifetime = 30 + rand.nextInt(6) + rand.nextInt(7);
 
@@ -46,13 +41,8 @@ public class EntityFirework extends Entity {
 
         if (namedTag.contains("FireworkItem")) {
             firework = NBTIO.getItemHelper(namedTag.getCompound("FireworkItem"));
-        } else {
-            firework = new ItemFirework();
+            this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, firework));
         }
-
-        this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, firework));
-        this.setDataProperty(new IntEntityData(Entity.DATA_DISPLAY_OFFSET, 1));
-        this.setDataProperty(new ByteEntityData(Entity.DATA_HAS_DISPLAY, 1));
     }
 
     @Override
@@ -76,7 +66,6 @@ public class EntityFirework extends Entity {
 
         this.timing.startTiming();
 
-
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
@@ -88,12 +77,10 @@ public class EntityFirework extends Entity {
 
             this.updateMovement();
 
-
             float f = (float) Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
             this.yaw = (float) (Math.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
 
             this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (180D / Math.PI));
-
 
             if (this.age == 0) {
                 PlaySoundPacket pk = new PlaySoundPacket();

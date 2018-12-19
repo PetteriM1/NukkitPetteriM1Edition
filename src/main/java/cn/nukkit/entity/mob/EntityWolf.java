@@ -215,13 +215,4 @@ public class EntityWolf extends EntityTameableMob {
     public String getName() {
         return "Wolf";
     }
-
-    @Override
-    public Item[] getDrops() {
-        if (this.hasCustomName()) {
-            return new Item[]{Item.get(Item.NAME_TAG, 0, 1)};
-        } else {
-            return new Item[0];
-        }
-    }
 }
