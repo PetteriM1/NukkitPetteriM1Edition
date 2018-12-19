@@ -116,7 +116,6 @@ public class BanList {
         } catch (IOException e) {
             MainLogger.getLogger().error("Could not load ban list: ", e);
         }
-
     }
 
     public void save() {

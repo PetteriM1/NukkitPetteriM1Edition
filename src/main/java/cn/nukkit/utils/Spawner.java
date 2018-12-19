@@ -54,7 +54,11 @@ public class Spawner extends Thread {
     }
 
     public boolean entitySpawnAllowed(Level level, int networkId) {
-        return countEntity(level, networkId) < 1;
+        try {
+            return countEntity(level, networkId) < 1;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private int countEntity(Level level, int networkId) {

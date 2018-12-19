@@ -5,6 +5,7 @@ package cn.nukkit.utils;
  * Nukkit Project
  */
 public class PluginException extends ServerException {
+
     public PluginException(String message) {
         super(message);
     }

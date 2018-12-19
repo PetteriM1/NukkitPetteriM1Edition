@@ -5,6 +5,7 @@ package cn.nukkit.utils;
  * Nukkit Project
  */
 public class ServerException extends RuntimeException {
+
     public ServerException(String message) {
         super(message);
     }

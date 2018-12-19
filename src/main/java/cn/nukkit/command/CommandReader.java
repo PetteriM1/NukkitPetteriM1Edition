@@ -23,8 +23,6 @@ public class CommandReader extends Thread implements InterruptibleThread {
 
     private CursorBuffer stashed;
 
-    private boolean running = true;
-
     public static CommandReader getInstance() {
         return instance;
     }
@@ -92,10 +90,6 @@ public class CommandReader extends Thread implements InterruptibleThread {
         }
     }
 
-    public void shutdown() {
-        this.running = false;
-    }
-
     public synchronized void stashLine() {
         this.stashed = reader.getCursorBuffer().copy();
         try {
@@ -112,7 +106,7 @@ public class CommandReader extends Thread implements InterruptibleThread {
         }
     }
 
-    public void removePromptLine() {
+    public synchronized void removePromptLine() {
         try {
             reader.resetPromptLine("", "", 0);
         } catch (IOException e) {

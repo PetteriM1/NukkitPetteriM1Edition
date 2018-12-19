@@ -12,6 +12,7 @@ import java.util.Iterator;
  * Nukkit Project
  */
 public class BlockIterator implements Iterator<Block> {
+
     private final Level level;
     private final int maxDistance;
 

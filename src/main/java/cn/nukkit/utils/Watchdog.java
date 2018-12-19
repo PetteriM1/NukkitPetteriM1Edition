@@ -6,6 +6,7 @@ import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 
 public class Watchdog extends Thread {
+
     private final Server server;
     private final long time;
     public boolean running = true;

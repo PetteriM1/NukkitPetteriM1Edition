@@ -15,6 +15,7 @@ import java.util.function.Function;
  */
 @SuppressWarnings("unchecked")
 public class JsonUtil {
+
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static JsonArray toArray(Object... objects) {

@@ -9,6 +9,7 @@ import co.aikar.timings.TimingsManager;
  * @author Tee7even
  */
 public class LevelTimings {
+
     public final Timing doChunkUnload;
     public final Timing doTickPending;
     public final Timing doChunkGC;

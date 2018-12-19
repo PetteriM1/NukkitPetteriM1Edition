@@ -13,6 +13,7 @@ import java.util.Random;
  * Nukkit Project
  */
 public class EnchantmentThorns extends Enchantment {
+
     protected EnchantmentThorns() {
         super(ID_THORNS, "thorns", 2, EnchantmentType.ARMOR_TORSO);
     }

@@ -8,6 +8,7 @@ import cn.nukkit.math.Vector3;
  * Nukkit Project
  */
 public class BlockUpdateEntry implements Comparable<BlockUpdateEntry> {
+
     private static long entryID = 0;
 
     public int priority;

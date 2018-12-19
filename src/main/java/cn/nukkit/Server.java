@@ -751,8 +751,6 @@ public class Server {
         }
 
         try {
-            this.console.shutdown();
-
             this.hasStopped = true;
 
             this.shutdown();
@@ -1143,12 +1141,10 @@ public class Server {
         String usage = Math.round(used / max * 100) + "%";
         String title = (char) 0x1b + "]0;Nukkit Server " +
                 " | Online " + this.players.size() + "/" + this.getMaxPlayers() +
-                " | Memory " + usage;
-        if (!Nukkit.shortTitle) {
-            title += " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2)
-                    + " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s";
-        }
-        title += " | TPS " + this.getTicksPerSecond() +
+                " | Memory " + usage +
+                " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
+                " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +
+                " | TPS " + this.getTicksPerSecond() +
                 " | Load " + this.getTickUsage() + "%" + (char) 0x07;
 
         System.out.print(title);

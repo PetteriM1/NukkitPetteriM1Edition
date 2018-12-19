@@ -44,7 +44,6 @@ public abstract class BlockEntity extends Position {
     public static final String DROPPER = "Dropper";
     public static final String DISPENSER = "Dispenser";
 
-
     public static long count = 1;
 
     private static final Map<String, Class<? extends BlockEntity>> knownBlockEntities = new HashMap<>();
@@ -122,9 +121,7 @@ public abstract class BlockEntity extends Position {
                         blockEntity = (BlockEntity) constructor.newInstance(objects);
 
                     }
-                } catch (Exception e) {
-                }
-
+                } catch (Exception e) {}
             }
         }
 

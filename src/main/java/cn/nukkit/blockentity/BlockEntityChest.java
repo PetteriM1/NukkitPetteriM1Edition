@@ -39,10 +39,6 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
             this.namedTag.putList(new ListTag<CompoundTag>("Items"));
         }
 
-        /* for (int i = 0; i < this.getSize(); i++) {
-            this.inventory.setItem(i, this.getItem(i));
-        } */
-
         ListTag<CompoundTag> list = (ListTag<CompoundTag>) this.namedTag.getList("Items");
         for (CompoundTag compound : list.getAll()) {
             Item item = NBTIO.getItemHelper(compound);
@@ -76,8 +72,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
     @Override
     public boolean isBlockEntityValid() {
-        // TODO: 2016/2/4 TRAPPED_CHEST?
-        return getBlock().getId() == Block.CHEST;
+        return getBlock().getId() == Block.CHEST || getBlock().getId() == Block.TRAPPED_CHEST;
     }
 
     @Override
@@ -142,6 +137,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
     protected void checkPairing() {
         BlockEntityChest pair = this.getPair();
+
         if (pair != null) {
             if (!pair.isPaired()) {
                 pair.createPair(this);
@@ -156,9 +152,11 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
                 }
             }
         } else {
-            this.doubleInventory = null;
-            this.namedTag.remove("pairx");
-            this.namedTag.remove("pairz");
+            if (level.isChunkLoaded(this.namedTag.getInt("pairx") >> 4, this.namedTag.getInt("pairz") >> 4)) {
+                this.doubleInventory = null;
+                this.namedTag.remove("pairx");
+                this.namedTag.remove("pairz");
+            }
         }
     }
 
@@ -188,7 +186,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
     public BlockEntityChest getPair() {
         if (this.isPaired()) {
-            BlockEntity blockEntity = this.getLevel().getBlockEntity(new Vector3(this.namedTag.getInt("pairx"), this.y, this.namedTag.getInt("pairz")));
+            BlockEntity blockEntity = this.getLevel().getBlockEntityIfLoaded(new Vector3(this.namedTag.getInt("pairx"), this.y, this.namedTag.getInt("pairz")));
             if (blockEntity instanceof BlockEntityChest) {
                 return (BlockEntityChest) blockEntity;
             }
@@ -266,5 +264,4 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
         return c;
     }
-
 }

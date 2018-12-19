@@ -7,6 +7,7 @@ import java.util.zip.Deflater;
 import java.util.zip.InflaterInputStream;
 
 public final class ZlibThreadLocal implements ZlibProvider {
+
     @Override
     public byte[] deflate(byte[][] datas, int level) throws Exception {
         Deflater deflater = getDef(level);
@@ -28,7 +29,6 @@ public final class ZlibThreadLocal implements ZlibProvider {
             int i = deflater.deflate(buffer);
             bos.write(buffer, 0, i);
         }
-        //Deflater::end is called the time when the process exits.
         return bos.toByteArray();
     }
 
@@ -46,12 +46,8 @@ public final class ZlibThreadLocal implements ZlibProvider {
             int i = deflater.deflate(buffer);
             bos.write(buffer, 0, i);
         }
-        //Deflater::end is called the time when the process exits.
         return bos.toByteArray();
     }
-
-    /* -=-=-=-=-=- Internal -=-=-=-=-=- Do NOT attempt to use in production -=-=-=-=-=- */
-
 
     public static final IterableThreadLocal<byte[]> buf = new IterableThreadLocal<byte[]>() {
         @Override

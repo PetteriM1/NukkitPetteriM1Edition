@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.Deflater;
 
-
 public abstract class Zlib {
+
     private static ZlibProvider[] providers;
     private static ZlibProvider provider;
 

@@ -7,6 +7,7 @@ import cn.nukkit.Server;
  * Nukkit Project
  */
 public abstract class DefaultPermissions {
+
     public static final String ROOT = "nukkit";
 
     public static Permission registerPermission(Permission perm) {

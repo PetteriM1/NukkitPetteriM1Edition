@@ -5,6 +5,7 @@ package cn.nukkit.item.enchantment;
  * Nukkit Project
  */
 public class EnchantmentLure extends Enchantment {
+
     protected EnchantmentLure() {
         super(ID_LURE, "fishingSpeed", 2, EnchantmentType.FISHING_ROD);
     }

@@ -44,19 +44,11 @@ public class Nukkit {
     public final static long START_TIME = System.currentTimeMillis();
     public static boolean ANSI = true;
     public static boolean TITLE = true;
-    public static boolean shortTitle = false;
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
 
         System.setProperty("java.net.preferIPv4Stack" , "true");
-
-        String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.contains("windows")) {
-            if (osName.contains("windows 8") || osName.contains("2012")) {
-                shortTitle = true;
-            }
-        }
 
         LogLevel logLevel = LogLevel.DEFAULT_LEVEL;
         int index = -1;
@@ -87,7 +79,6 @@ public class Nukkit {
                     } catch (ArrayIndexOutOfBoundsException e) {
                         System.out.println("You must enter the requested log level, using the default\n");
                     }
-
             }
         }
 

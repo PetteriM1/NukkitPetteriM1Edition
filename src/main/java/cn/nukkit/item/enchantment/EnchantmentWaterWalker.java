@@ -5,6 +5,7 @@ package cn.nukkit.item.enchantment;
  * Nukkit Project
  */
 public class EnchantmentWaterWalker extends Enchantment {
+
     protected EnchantmentWaterWalker() {
         super(ID_WATER_WALKER, "waterWalker", 2, EnchantmentType.ARMOR_FEET);
     }

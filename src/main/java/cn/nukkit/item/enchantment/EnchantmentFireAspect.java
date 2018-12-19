@@ -8,6 +8,7 @@ import cn.nukkit.event.entity.EntityCombustByEntityEvent;
  * Nukkit Project
  */
 public class EnchantmentFireAspect extends Enchantment {
+
     protected EnchantmentFireAspect() {
         super(ID_FIRE_ASPECT, "fire", 2, EnchantmentType.SWORD);
     }

@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
  * Nukkit Project
  */
 public class EnchantmentSilkTouch extends Enchantment {
+
     protected EnchantmentSilkTouch() {
         super(ID_SILK_TOUCH, "untouching", 1, EnchantmentType.DIGGER);
     }

@@ -9,6 +9,7 @@ import java.util.Random;
  * Nukkit Project
  */
 public class EnchantmentDurability extends Enchantment {
+
     protected EnchantmentDurability() {
         super(ID_DURABILITY, "durability", 5, EnchantmentType.BREAKABLE);
     }

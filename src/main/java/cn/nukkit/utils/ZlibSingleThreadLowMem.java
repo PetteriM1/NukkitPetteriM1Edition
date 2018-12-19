@@ -7,6 +7,7 @@ import java.util.zip.Deflater;
 import java.util.zip.InflaterInputStream;
 
 public class ZlibSingleThreadLowMem implements ZlibProvider {
+
     static final int BUFFER_SIZE = 8192;
     Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
     byte[] buffer = new byte[BUFFER_SIZE];
@@ -29,7 +30,6 @@ public class ZlibSingleThreadLowMem implements ZlibProvider {
             int i = deflater.deflate(buffer);
             bos.write(buffer, 0, i);
         }
-        //Deflater::end is called the time when the process exits.
         return bos.toByteArray();
     }
 
@@ -44,9 +44,7 @@ public class ZlibSingleThreadLowMem implements ZlibProvider {
                 int i = deflater.deflate(buffer);
                 bos.write(buffer, 0, i);
             }
-        } finally {
-            //deflater.end();
-        }
+        } finally {}
         return bos.toByteArray();
     }
 

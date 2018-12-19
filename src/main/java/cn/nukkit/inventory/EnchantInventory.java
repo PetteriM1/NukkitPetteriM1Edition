@@ -1,5 +1,6 @@
 package cn.nukkit.inventory;
 
+import cn.nukkit.Player;
 import cn.nukkit.level.Position;
 
 /**
@@ -16,5 +17,16 @@ public class EnchantInventory extends ContainerInventory {
     @Override
     public FakeBlockMenu getHolder() {
         return (FakeBlockMenu) this.holder;
+    }
+
+    @Override
+    public void onClose(Player who) {
+        super.onClose(who);
+        if (this.getViewers().size() == 0) {
+            for (int i = 0; i < 2; ++i) {
+                who.getInventory().addItem(this.getItem(i));
+                this.clear(i);
+            }
+        }
     }
 }

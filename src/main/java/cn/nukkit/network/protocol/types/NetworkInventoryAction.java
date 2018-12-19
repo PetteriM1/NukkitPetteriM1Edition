@@ -218,9 +218,6 @@ public class NetworkInventoryAction {
                         case SOURCE_TYPE_ENCHANT_MATERIAL:
                             this.inventorySlot = 1;
                             break;
-                        case SOURCE_TYPE_ENCHANT_OUTPUT:
-                            enchant.sendSlot(0, player);
-                            return null;
                     }
 
                     return new SlotChangeAction(enchant, this.inventorySlot, this.oldItem, this.newItem);

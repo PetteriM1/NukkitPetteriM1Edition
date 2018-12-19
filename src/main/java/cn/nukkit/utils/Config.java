@@ -25,12 +25,11 @@ public class Config {
     public static final int CNF = Config.PROPERTIES; // .cnf
     public static final int JSON = 1; // .js, .json
     public static final int YAML = 2; // .yml, .yaml
-    //public static final int EXPORT = 3; // .export, .xport
-    //public static final int SERIALIZED = 4; // .sl
+    public static final int EXPORT = 3; // .export, .xport
+    public static final int SERIALIZED = 4; // .sl
     public static final int ENUM = 5; // .txt, .list, .enum
     public static final int ENUMERATION = Config.ENUM;
 
-    //private LinkedHashMap<String, Object> config = new LinkedHashMap<>();
     private ConfigSection config = new ConfigSection();
     private File file;
     private boolean correct = false;

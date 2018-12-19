@@ -4,6 +4,7 @@ package cn.nukkit.item.enchantment;
  * @author Rover656
  */
 public class EnchantmentMending extends Enchantment {
+
     protected EnchantmentMending() {
         super(ID_MENDING, "mending", 2, EnchantmentType.ALL);
     }
