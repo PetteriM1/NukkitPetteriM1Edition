@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
@@ -40,13 +39,12 @@ public class EntityDolphin extends EntityWaterAnimal {
     }
 
     @Override
-    public boolean targetOption(EntityCreature creature, double distance) {
-        return false;
-    }
-
-    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
+        }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < EntityUtils.rand(0, 2); i++) {

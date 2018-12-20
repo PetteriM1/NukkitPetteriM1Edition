@@ -27,8 +27,6 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     private int bombTime = 0;
 
-    private boolean exploded = false;
-
     public EntityCreeper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -70,12 +68,14 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
         if (!ev.isCancelled()) {
             Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
+
             if (ev.isBlockBreaking()) {
                 explosion.explodeA();
             }
+
             explosion.explodeB();
-            this.exploded = true;
         }
+
         this.close();
     }
 
@@ -185,6 +185,10 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
+        }
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
@@ -202,11 +206,14 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     @Override
     public boolean onInteract(Player player, Item item) {
         super.onInteract(player, item);
+
         if (item.getId() == Item.FLINT_AND_STEEL) {
             this.level.addSound(this, "fire.ignite");
             this.explode();
+
             return true;
         }
+
         return false;
     }
 }

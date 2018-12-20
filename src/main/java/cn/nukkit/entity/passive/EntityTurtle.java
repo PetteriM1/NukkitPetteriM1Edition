@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -33,11 +32,6 @@ public class EntityTurtle extends EntityWaterAnimal {
         super.initEntity();
 
         this.setMaxHealth(30);
-    }
-
-    @Override
-    public boolean targetOption(EntityCreature creature, double distance) {
-        return false;
     }
 
     @Override

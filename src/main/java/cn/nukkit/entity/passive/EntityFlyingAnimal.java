@@ -6,7 +6,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public abstract class EntityFlyingAnimal extends EntityFlying {
+public abstract class EntityFlyingAnimal extends EntityFlying implements EntityAnimal {
 
     public EntityFlyingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -19,6 +19,7 @@ public abstract class EntityFlyingAnimal extends EntityFlying {
                 this.close();
                 return false;
             }
+
             return true;
         }
 
@@ -27,6 +28,7 @@ public abstract class EntityFlyingAnimal extends EntityFlying {
         this.entityBaseTick(tickDiff);
 
         Vector3 target = this.updateMove(tickDiff);
+
         if (target instanceof Player) {
             if (this.distanceSquared(target) <= 2) {
                 this.pitch = 22;
@@ -37,6 +39,7 @@ public abstract class EntityFlyingAnimal extends EntityFlying {
         } else if (target != null && this.distanceSquared(target) <= 1) {
             this.moveTime = 0;
         }
+
         return true;
     }
 }

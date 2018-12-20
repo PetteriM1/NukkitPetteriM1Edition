@@ -229,6 +229,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     @Override
     public void setBiomeId(int x, int z, int biomeId) {
         this.setChanged();
+
         int index = this.biomes.getIndex(x, z);
         int current = this.biomes.get(index);
         this.biomes.set(index, current & 0xffffff | (biomeId << 24));

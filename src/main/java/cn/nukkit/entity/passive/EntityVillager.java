@@ -12,6 +12,7 @@ public class EntityVillager extends EntityWalkingAnimal {
     public static final int PROFESSION_BLACKSMITH = 3;
     public static final int PROFESSION_BUTCHER = 4;
     public static final int PROFESSION_GENERIC = 5;
+
     public static final int NETWORK_ID = 15;
 
     public EntityVillager(FullChunk chunk, CompoundTag nbt) {

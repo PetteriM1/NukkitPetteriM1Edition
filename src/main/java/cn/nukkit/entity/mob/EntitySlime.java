@@ -104,6 +104,10 @@ public class EntitySlime extends EntityJumpingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
+        }
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
                 drops.add(Item.get(Item.SLIMEBALL, 0, 1));

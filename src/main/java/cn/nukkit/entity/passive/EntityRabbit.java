@@ -67,6 +67,10 @@ public class EntityRabbit extends EntityJumpingAnimal {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
+        }
+
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.RABBIT_HIDE, 0, 1));

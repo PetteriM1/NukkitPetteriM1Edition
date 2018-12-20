@@ -137,9 +137,12 @@ public class EntityZombiePigman extends EntityWalkingMob {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (!ev.isCancelled()) {
-            this.setAngry(1000);
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.setAngry(1000);
+            }
         }
+
         return true;
     }
 
@@ -157,6 +160,10 @@ public class EntityZombiePigman extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
+
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
+        }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < EntityUtils.rand(0, 2); i++) {

@@ -157,8 +157,7 @@ public class Flat extends Generator {
 
     private void generateChunk(FullChunk chunk) {
         chunk.setGenerated();
-        Biome biomeObj = Biome.getBiome(biome);
-        int biomeColorAndId = biomeObj.getColor() + (biome << 24);
+        int biomeColorAndId = Biome.getBiome(biome).getColor() + (biome << 24);
 
         for (int Z = 0; Z < 16; ++Z) {
             for (int X = 0; X < 16; ++X) {

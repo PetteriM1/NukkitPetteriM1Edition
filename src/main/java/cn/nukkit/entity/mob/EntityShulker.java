@@ -13,6 +13,9 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EntityShulker extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 54;
@@ -97,11 +100,17 @@ public class EntityShulker extends EntityWalkingMob {
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && EntityUtils.rand(1, 2) == 1) {
-            return new Item[]{Item.get(Item.SHULKER_SHELL, 0, 1)};
-        } else {
-            return new Item[0];
+        List<Item> drops = new ArrayList<>();
+
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
         }
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && EntityUtils.rand(1, 2) == 1) {
+            drops.add(Item.get(Item.SHULKER_SHELL, 0, 1));
+        }
+
+        return drops.toArray(new Item[drops.size()]);
     }
 
     @Override

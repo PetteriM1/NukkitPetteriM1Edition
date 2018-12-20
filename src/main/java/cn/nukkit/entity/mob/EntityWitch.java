@@ -16,6 +16,9 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EntityWitch extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 45;
@@ -104,11 +107,17 @@ public class EntityWitch extends EntityWalkingMob {
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && EntityUtils.rand(1, 5) == 1) {
-            return new Item[]{Item.get(Item.REDSTONE, 0, 1)};
-        } else {
-            return new Item[0];
+        List<Item> drops = new ArrayList<>();
+
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
         }
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && EntityUtils.rand(1, 5) == 1) {
+            drops.add(Item.get(Item.REDSTONE, 0, 1));
+        }
+
+        return drops.toArray(new Item[drops.size()]);
     }
 
     @Override

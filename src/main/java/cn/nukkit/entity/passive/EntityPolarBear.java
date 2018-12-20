@@ -10,7 +10,10 @@ import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class EntityPolarBear extends EntityWalkingMob {
 
@@ -139,19 +142,29 @@ public class EntityPolarBear extends EntityWalkingMob {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (!ev.isCancelled()) {
-            this.setAngry(1000);
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.setAngry(1000);
+            }
         }
+
         return true;
     }
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            return new Item[]{Item.get(Item.RAW_FISH), Item.get(Item.RAW_SALMON)};
-        } else {
-            return new Item[0];
+        List<Item> drops = new ArrayList<>();
+
+        if (this.hasCustomName()) {
+            drops.add(Item.get(Item.NAME_TAG, 0, 1));
         }
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+            drops.add(Item.get(Item.RAW_FISH, 0, EntityUtils.rand(0, 2)));
+            drops.add(Item.get(Item.RAW_SALMON, 0, EntityUtils.rand(0, 2)));
+        }
+
+        return drops.toArray(new Item[drops.size()]);
     }
 
     @Override
