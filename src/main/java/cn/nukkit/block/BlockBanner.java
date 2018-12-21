@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBanner;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBanner;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
@@ -94,5 +95,10 @@ public class BlockBanner extends BlockTransparentMeta {
         }
 
         return 0;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBanner(this.getDamage() & 0x0f);
     }
 }
