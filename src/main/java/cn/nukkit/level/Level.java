@@ -6,8 +6,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntityChest;
-import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
@@ -20,7 +18,6 @@ import cn.nukkit.event.level.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.weather.LightningStrikeEvent;
-import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -1903,19 +1900,7 @@ public class Level implements ChunkManager, Metadatable {
 
         BlockEntity blockEntity = this.getBlockEntity(target);
         if (blockEntity != null) {
-            // Fix shulker boxes dropping contents
-            if (!(blockEntity instanceof BlockEntityShulkerBox)) {
-                if (blockEntity instanceof InventoryHolder) {
-                    if (blockEntity instanceof BlockEntityChest) {
-                        ((BlockEntityChest) blockEntity).unpair();
-                    }
-
-                    for (Item chestItem : ((InventoryHolder) blockEntity).getInventory().getContents().values()) {
-                        this.dropItem(target, chestItem);
-                    }
-                }
-            }
-
+            blockEntity.onBreak();
             blockEntity.close();
 
             this.updateComparatorOutputLevel(target);

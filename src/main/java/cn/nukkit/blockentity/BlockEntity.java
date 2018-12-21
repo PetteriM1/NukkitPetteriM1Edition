@@ -85,9 +85,7 @@ public abstract class BlockEntity extends Position {
         this.getLevel().addBlockEntity(this);
     }
 
-    protected void initBlockEntity() {
-
-    }
+    protected void initBlockEntity() {}
 
     public static BlockEntity createBlockEntity(String type, FullChunk chunk, CompoundTag nbt, Object... args) {
         type = type.replaceFirst("BlockEntity", "");
@@ -193,6 +191,8 @@ public abstract class BlockEntity extends Position {
             this.level = null;
         }
     }
+
+    public void onBreak() {}
 
     public String getName() {
         return name;

@@ -4,8 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.inventory.BaseInventory;
-import cn.nukkit.inventory.ShulkerBoxInventory;
 import cn.nukkit.inventory.InventoryHolder;
+import cn.nukkit.inventory.ShulkerBoxInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
@@ -37,7 +37,7 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
     @Override
     public void close() {
-        if (!this.closed) {
+        if (!closed) {
             for (Player player : new HashSet<>(this.getInventory().getViewers())) {
                 player.removeWindow(this.getInventory());
             }
