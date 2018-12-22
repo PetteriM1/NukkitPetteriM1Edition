@@ -177,8 +177,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private int loaderId;
 
-    protected float stepHeight = 0.6f;
-
     public final Map<Long, Boolean> usedChunks = new Long2ObjectOpenHashMap<>();
 
     protected int chunkLoadCount = 0;
@@ -237,7 +235,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int formWindowCount = 0;
     protected Map<Integer, FormWindow> formWindows = new Int2ObjectOpenHashMap<>();
     protected Map<Integer, FormWindow> serverSettings = new Int2ObjectOpenHashMap<>();
-    protected List<String> forms = new ArrayList<>();
 
     protected Map<Long, DummyBossBar> dummyBossBars = new Long2ObjectLinkedOpenHashMap<>();
 
@@ -247,6 +244,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public AtomicBoolean hasInteracted = new AtomicBoolean();
     
     public EntityFishingHook fishing = null;
+
+    private boolean formOpen = false;
 
     public int getStartActionTick() {
         return startAction;
@@ -2541,11 +2540,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
+                    this.formOpen = false;
+
                     if (!this.spawned || !this.isAlive()) {
                         break;
                     }
-
-                    this.forms.remove(this.getName());
 
                     ModalFormResponsePacket modalFormPacket = (ModalFormResponsePacket) packet;
 
@@ -4260,12 +4259,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return form id to use in {@link PlayerFormRespondedEvent}
      */
     public int showFormWindow(FormWindow window, int id) {
-        if (this.forms.contains(this.getName())) return 0;
+        if (formOpen) return 0;
         ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.formId = id;
         packet.data = window.getJSONData();
         this.formWindows.put(packet.formId, window);
-        this.forms.add(this.getName());
+        this.formOpen = true;
 
         this.dataPacket(packet);
         return id;

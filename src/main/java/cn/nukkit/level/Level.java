@@ -171,7 +171,6 @@ public class Level implements ChunkManager, Metadatable {
         }
     };
 
-
     private final BlockUpdateScheduler updateQueue;
     private final Queue<Block> normalUpdateQueue = new ConcurrentLinkedDeque<>();
     //private final TreeSet<BlockUpdateEntry> updateQueue = new TreeSet<>();
@@ -213,22 +212,22 @@ public class Level implements ChunkManager, Metadatable {
     private Class<? extends Generator> generatorClass;
     private IterableThreadLocal<Generator> generators = new IterableThreadLocal<Generator>() {
 
-       @Override
-       public Generator init() {
-           try {
-               Generator generator = generatorClass.getConstructor(Map.class).newInstance(provider.getGeneratorOptions());
-               NukkitRandom rand = new NukkitRandom(getSeed());
-               if (Server.getInstance().isPrimaryThread()) {
-                   generator.init(Level.this, rand);
-               }
-               generator.init(new PopChunkManager(getSeed()), rand);
-               return generator;
-           } catch (Throwable e) {
-               e.printStackTrace();
-               return null;
-           }
-       }
-   };
+        @Override
+        public Generator init() {
+            try {
+                Generator generator = generatorClass.getConstructor(Map.class).newInstance(provider.getGeneratorOptions());
+                NukkitRandom rand = new NukkitRandom(getSeed());
+                if (Server.getInstance().isPrimaryThread()) {
+                    generator.init(Level.this, rand);
+                }
+                generator.init(new PopChunkManager(getSeed()), rand);
+                return generator;
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    };
 
     public final java.util.Random rand = new java.util.Random();
 
@@ -1983,15 +1982,28 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (player != null && !player.hasInteracted.get()) {
-            PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face,
-                    target.getId() == 0 ? Action.RIGHT_CLICK_AIR : Action.RIGHT_CLICK_BLOCK);
+        final List<Integer> ignore = new ArrayList<Integer>(
+                Arrays.asList(Block.ANVIL, Block.BEACON, Block.BED_BLOCK, Block.BREWING_STAND_BLOCK, Block.CAULDRON_BLOCK, Block.CHEST, Block.TRAPPED_CHEST,
+                Block.ENDER_CHEST, Block.DISPENSER, Block.DROPPER, Block.WOODEN_DOOR_BLOCK, Block.BIRCH_DOOR_BLOCK, Block.ACACIA_DOOR_BLOCK, Block.SPRUCE_DOOR_BLOCK,
+                Block.DARK_OAK_DOOR_BLOCK, Block.JUNGLE_DOOR_BLOCK, Block.TRAPDOOR, Block.ENCHANT_TABLE, Block.FURNACE, Block.LIT_FURNACE, Block.HOPPER_BLOCK,
+                Block.ITEM_FRAME_BLOCK, Block.JUKEBOX, Block.SHULKER_BOX, Block.UNDYED_SHULKER_BOX, Block.MONSTER_SPAWNER, Block.DAYLIGHT_DETECTOR,
+                Block.DAYLIGHT_DETECTOR_INVERTED, Block.END_PORTAL_FRAME, Block.DRAGON_EGG, Block.COMMAND_BLOCK, Block.CHAIN_COMMAND_BLOCK, Block.REPEATING_COMMAND_BLOCK,
+                Block.FLOWER_POT_BLOCK, Block.REDSTONE_ORE, Block.FENCE_GATE, Block.LEVER, Block.STONE_BUTTON, Block.WOODEN_BUTTON, Block.POWERED_REPEATER, Block.UNPOWERED_REPEATER,
+                Block.POWERED_COMPARATOR, Block.UNPOWERED_COMPARATOR, Block.OBSERVER, Block.FENCE_GATE_BIRCH, Block.FENCE_GATE_ACACIA, Block.FENCE_GATE_SPRUCE, Block.FENCE_GATE_JUNGLE,
+                Block.FENCE_GATE_DARK_OAK));
+
+        if (player != null && (!player.hasInteracted.get() || ignore.contains(target.getId()))) {
+            PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face, target.getId() == 0 ? Action.RIGHT_CLICK_AIR : Action.RIGHT_CLICK_BLOCK);
+
+            player.hasInteracted.set(true);
+            server.getScheduler().scheduleDelayedTask(() -> player.hasInteracted.compareAndSet(true, false), 5);
 
             if (player.getGamemode() > 1 && !Server.getInstance().suomiCraftPEMode()) {
                 ev.setCancelled();
             }
 
             int distance = this.server.getSpawnRadius();
+
             if (!player.isOp() && distance > -1) {
                 Vector2 t = new Vector2(target.x, target.z);
                 Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
@@ -2001,16 +2013,15 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             this.server.getPluginManager().callEvent(ev);
+
             if (!ev.isCancelled()) {
-                if (getBlockEntity(target) == null) {
-                    player.hasInteracted.set(true);
-                    server.getScheduler().scheduleDelayedTask(() -> player.hasInteracted.compareAndSet(true, false), 5);
-                }
                 target.onUpdate(BLOCK_UPDATE_TOUCH);
+
                 if ((!player.isSneaking() || player.getInventory().getItemInHand().isNull()) && target.canBeActivated() && target.onActivate(item, player)) {
                     if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
                         item = new ItemBlock(new BlockAir(), 0, 0);
                     }
+
                     return item;
                 }
 
@@ -2028,9 +2039,12 @@ public class Level implements ChunkManager, Metadatable {
             if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
                 item = new ItemBlock(new BlockAir(), 0, 0);
             }
+
             return item;
         }
+
         Block hand;
+
         if (item.canBePlaced()) {
             hand = item.getBlock();
             hand.position(block);
