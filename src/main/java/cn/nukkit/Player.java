@@ -245,8 +245,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     
     public EntityFishingHook fishing = null;
 
-    private boolean formOpen = false;
-
     public int getStartActionTick() {
         return startAction;
     }
@@ -2540,8 +2538,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
-                    this.formOpen = false;
-
                     if (!this.spawned || !this.isAlive()) {
                         break;
                     }
@@ -4259,12 +4255,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return form id to use in {@link PlayerFormRespondedEvent}
      */
     public int showFormWindow(FormWindow window, int id) {
-        if (formOpen) return 0;
         ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.formId = id;
         packet.data = window.getJSONData();
         this.formWindows.put(packet.formId, window);
-        this.formOpen = true;
 
         this.dataPacket(packet);
         return id;

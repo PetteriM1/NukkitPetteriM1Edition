@@ -13,7 +13,6 @@ import java.util.Random;
  */
 public class BlockGravel extends BlockFallable {
 
-
     public BlockGravel() {
     }
 

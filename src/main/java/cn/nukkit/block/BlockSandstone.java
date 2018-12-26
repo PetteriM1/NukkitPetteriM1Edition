@@ -9,7 +9,8 @@ import cn.nukkit.utils.BlockColor;
  * @author MagicDroidX
  * Nukkit Project
  */
-    public class BlockSandstone extends BlockSolidMeta {
+public class BlockSandstone extends BlockSolidMeta {
+
     public static final int NORMAL = 0;
     public static final int CHISELED = 1;
     public static final int SMOOTH = 2;

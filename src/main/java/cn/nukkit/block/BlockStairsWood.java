@@ -10,6 +10,7 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockStairsWood extends BlockStairs {
+
     public BlockStairsWood() {
         this(0);
     }

@@ -1,9 +1,5 @@
 package cn.nukkit.block;
 
-/**
- * @author Justin
- */
-
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySkull;
@@ -14,7 +10,9 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
 
-
+/**
+ * @author Justin
+ */
 public class BlockSkull extends BlockTransparentMeta {
 
     public BlockSkull() {

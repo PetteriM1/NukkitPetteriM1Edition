@@ -14,6 +14,7 @@ import java.util.Random;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockDoublePlant extends BlockFlowable {
+
     public static final int SUNFLOWER = 0;
     public static final int LILAC = 1;
     public static final int TALL_GRASS = 2;

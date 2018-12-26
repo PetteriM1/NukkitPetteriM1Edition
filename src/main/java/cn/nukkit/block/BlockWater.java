@@ -12,7 +12,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockWater extends BlockLiquid {
 
-
     public BlockWater() {
         this(0);
     }

@@ -8,6 +8,7 @@ import cn.nukkit.item.ItemTool;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockCoal extends BlockSolid {
+
     public BlockCoal() {
     }
 

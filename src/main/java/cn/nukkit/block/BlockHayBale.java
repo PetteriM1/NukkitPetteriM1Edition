@@ -10,6 +10,7 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockHayBale extends BlockSolidMeta {
+
     public BlockHayBale() {
         this(0);
     }

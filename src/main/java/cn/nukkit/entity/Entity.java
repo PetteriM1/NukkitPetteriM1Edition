@@ -1337,7 +1337,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public final void scheduleUpdate() {
-        this.level.updateEntities.put(this.id, this);
+        try {
+            this.level.updateEntities.put(this.id, this);
+        } catch (Exception e) {
+            this.getServer().getLogger().debug("Adding " + this.getId() + " to updateEntities failed");
+        }
     }
 
     public boolean isOnFire() {
@@ -2090,7 +2094,6 @@ public abstract class Entity extends Location implements Metadatable {
                 flags ^= 1L << id;
                 this.setDataProperty(new LongEntityData(propertyId, flags));
             }
-
         }
     }
 

@@ -9,9 +9,9 @@ import cn.nukkit.math.BlockFace;
  * Nukkit Project
  */
 public class BlockWall extends BlockTransparentMeta {
+
     public static final int NONE_MOSSY_WALL = 0;
     public static final int MOSSY_WALL = 1;
-
 
     public BlockWall() {
         this(0);

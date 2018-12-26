@@ -15,7 +15,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockOreLapis extends BlockSolid {
 
-
     public BlockOreLapis() {
     }
 

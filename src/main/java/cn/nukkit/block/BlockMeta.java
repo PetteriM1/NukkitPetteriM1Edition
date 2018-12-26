@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 public abstract class BlockMeta extends Block {
+
     private int meta;
 
     protected BlockMeta(int meta) {

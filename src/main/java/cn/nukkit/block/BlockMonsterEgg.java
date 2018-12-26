@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.EntityEventPacket;
 
 public class BlockMonsterEgg extends BlockSolidMeta {
+
     public static final int STONE = 0;
     public static final int COBBLESTONE = 1;
     public static final int STONE_BRICK = 2;

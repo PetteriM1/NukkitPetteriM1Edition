@@ -12,6 +12,7 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockPumpkin extends BlockSolidMeta {
+
     public BlockPumpkin() {
         this(0);
     }

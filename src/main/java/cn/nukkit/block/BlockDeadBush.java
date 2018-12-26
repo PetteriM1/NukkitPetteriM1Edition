@@ -14,12 +14,13 @@ import java.util.Random;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockDeadBush extends BlockFlowable {
+
     public BlockDeadBush() {
         this(0);
     }
 
     public BlockDeadBush(int meta) {
-        super(meta);
+        super(0);
     }
 
     @Override

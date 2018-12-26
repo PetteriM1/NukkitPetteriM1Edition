@@ -8,6 +8,7 @@ import cn.nukkit.item.ItemTool;
  * Nukkit Project
  */
 public class BlockStone extends BlockSolidMeta {
+
     public static final int NORMAL = 0;
     public static final int GRANITE = 1;
     public static final int POLISHED_GRANITE = 2;
@@ -15,7 +16,6 @@ public class BlockStone extends BlockSolidMeta {
     public static final int POLISHED_DIORITE = 4;
     public static final int ANDESITE = 5;
     public static final int POLISHED_ANDESITE = 6;
-
 
     public BlockStone() {
         this(0);

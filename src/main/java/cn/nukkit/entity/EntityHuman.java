@@ -85,12 +85,7 @@ public class EntityHuman extends EntityHumanType {
     @Override
     protected void initEntity() {
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
-
-        if (this instanceof Player && ((Player) this).protocol <= 282) {
-            this.setDataFlag(DATA_FLAGS, 47);
-        } else {
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY);
-        }
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY);
 
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0), false);
 

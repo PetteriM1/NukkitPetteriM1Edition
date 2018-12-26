@@ -10,7 +10,7 @@ import cn.nukkit.item.ItemTool;
 public class BlockSlabRedSandstone extends BlockSlab {
 
     public static final int RED_SANDSTONE = 0;
-    public static final int PURPUR = 1; //WHY THIS
+    public static final int PURPUR = 1;
 
     public BlockSlabRedSandstone() {
         this(0);

@@ -13,6 +13,7 @@ import cn.nukkit.utils.DyeColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockCarpet extends BlockFlowable {
+
     public BlockCarpet() {
         this(0);
     }

@@ -8,6 +8,7 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockStairsQuartz extends BlockStairs {
+
     public BlockStairsQuartz() {
         this(0);
     }

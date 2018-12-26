@@ -76,7 +76,7 @@ public class ItemFirework extends Item {
 
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
-        if (player.getInventory().getChestplate() instanceof ItemElytra && player.getLevel().getBlockIdAt((int) player.x, (int) player.y - 2, (int) player.z) == 0) {
+        if (player.getInventory().getChestplate() instanceof ItemElytra && player.isGliding()) {
             this.spawnFirework(player.getLevel(), player);
 
             player.setMotion(new Vector3(

@@ -9,7 +9,6 @@ import cn.nukkit.item.ItemTool;
  */
 public class BlockOreIron extends BlockSolid {
 
-
     public BlockOreIron() {
     }
 

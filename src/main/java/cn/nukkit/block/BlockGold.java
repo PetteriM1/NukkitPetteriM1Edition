@@ -10,7 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockGold extends BlockSolid {
 
-
     public BlockGold() {
     }
 

@@ -35,13 +35,12 @@ public class MainLogger extends ThreadedLogger {
     }
 
     public MainLogger(String logFile, LogLevel logLevel) {
-
         if (logger != null) {
             throw new RuntimeException("MainLogger has been already created");
         }
         logger = this;
         this.logPath = logFile;
-        this.setName("Logger");
+        this.setName("MainLogger");
         this.initialize();
         this.start();
     }
@@ -130,9 +129,13 @@ public class MainLogger extends ThreadedLogger {
     }
 
     protected void send(String message) {
-        this.send(message, -1);
-        synchronized (this) {
-            this.notify();
+        try {
+            this.send(message, -1);
+            synchronized (this) {
+                this.notify();
+            }
+        } catch (Exception e) {
+            this.debug("[MainLogger] Sending message failed");
         }
     }
 

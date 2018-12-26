@@ -12,6 +12,7 @@ import cn.nukkit.utils.BlockColor;
  * Nukkit Project
  */
 public class BlockWood extends BlockSolidMeta {
+
     public static final int OAK = 0;
     public static final int SPRUCE = 1;
     public static final int BIRCH = 2;

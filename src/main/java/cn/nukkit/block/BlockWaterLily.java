@@ -2,7 +2,6 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -19,7 +18,7 @@ public class BlockWaterLily extends BlockFlowable {
     }
 
     public BlockWaterLily(int meta) {
-        super(meta);
+        super(0);
     }
 
     @Override
@@ -65,11 +64,6 @@ public class BlockWaterLily extends BlockFlowable {
             }
         }
         return 0;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(this, 0);
     }
 
     @Override

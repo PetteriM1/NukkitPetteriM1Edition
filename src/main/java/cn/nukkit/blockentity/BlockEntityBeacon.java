@@ -43,7 +43,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable implements Inventory
             namedTag.putInt("Secondary", 0);
         }
 
-        scheduleUpdate();
+        this.scheduleUpdate();
 
         super.initBlockEntity();
     }

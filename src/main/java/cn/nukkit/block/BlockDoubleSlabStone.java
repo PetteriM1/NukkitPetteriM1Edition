@@ -10,6 +10,7 @@ import cn.nukkit.utils.BlockColor;
  * Nukkit Project
  */
 public class BlockDoubleSlabStone extends BlockSolidMeta {
+
     public static final int STONE = 0;
     public static final int SANDSTONE = 1;
     public static final int WOODEN = 2;

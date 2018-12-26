@@ -7,31 +7,19 @@ import cn.nukkit.math.BlockFace;
 /**
  * Created by CreeperFace on 2.6.2017.
  */
-public class BlockConcretePowder extends BlockFallable {
-
-    private int meta;
+public class BlockConcretePowder extends BlockFallableMeta {
 
     public BlockConcretePowder() {
-        this(0);
+        super(0);
     }
 
     public BlockConcretePowder(int meta) {
-        this.meta = meta;
+        super(meta);
     }
 
     @Override
     public int getFullId() {
         return (getId() << 4) + getDamage();
-    }
-
-    @Override
-    public final int getDamage() {
-        return this.meta;
-    }
-
-    @Override
-    public final void setDamage(int meta) {
-        this.meta = meta;
     }
 
     @Override
@@ -67,7 +55,7 @@ public class BlockConcretePowder extends BlockFallable {
             for (int side = 1; side <= 5; side++) {
                 Block block = this.getSide(BlockFace.fromIndex(side));
                 if (block.getId() == Block.WATER || block.getId() == Block.STILL_WATER || block.getId() == Block.LAVA || block.getId() == Block.STILL_LAVA) {
-                    this.level.setBlock(this, Block.get(Block.CONCRETE, this.meta), true, true);
+                    this.level.setBlock(this, Block.get(Block.CONCRETE, this.getDamage()), true, true);
                 }
             }
             return Level.BLOCK_UPDATE_NORMAL;

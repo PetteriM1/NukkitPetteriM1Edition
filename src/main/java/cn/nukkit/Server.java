@@ -853,7 +853,11 @@ public class Server {
                         }
 
                         if (allocated > 0) {
-                            Thread.sleep(allocated, 900000);
+                            try {
+                                Thread.sleep(allocated, 900000);
+                            } catch (Exception e) {
+                                this.getLogger().logException(e);
+                            }
                         }
                     }
                 } catch (RuntimeException e) {

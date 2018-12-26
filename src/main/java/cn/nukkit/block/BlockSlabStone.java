@@ -9,6 +9,7 @@ import cn.nukkit.utils.BlockColor;
  * Created by CreeperFace on 26. 11. 2016.
  */
 public class BlockSlabStone extends BlockSlab {
+
     public static final int STONE = 0;
     public static final int SANDSTONE = 1;
     public static final int WOODEN = 2;

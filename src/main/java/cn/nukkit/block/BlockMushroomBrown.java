@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.generator.object.mushroom.BigMushroom;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
@@ -20,7 +21,7 @@ public class BlockMushroomBrown extends BlockFlowable {
     }
 
     public BlockMushroomBrown(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
@@ -40,10 +41,12 @@ public class BlockMushroomBrown extends BlockFlowable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (canStay()) {
-            getLevel().setBlock(block, this, true, true);
+        if (this.canStay()) {
+            this.getLevel().setBlock(block, this, true, true);
+
             return true;
         }
+
         return false;
     }
 
@@ -91,5 +94,18 @@ public class BlockMushroomBrown extends BlockFlowable {
     @Override
     public boolean canSilkTouch() {
         return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!this.canStay()) {
+                this.getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 }

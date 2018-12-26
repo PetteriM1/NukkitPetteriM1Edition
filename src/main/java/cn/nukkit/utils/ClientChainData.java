@@ -279,6 +279,10 @@ public final class ClientChainData implements LoginChainData {
 
     private boolean verify(PublicKey key, JWSObject object) throws JOSEException {
         JWSVerifier verifier = new DefaultJWSVerifierFactory().createJWSVerifier(object.getHeader(), key);
-        return object.verify(verifier);
+        try {
+            return object.verify(verifier);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
