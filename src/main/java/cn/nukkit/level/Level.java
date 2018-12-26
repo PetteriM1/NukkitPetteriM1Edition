@@ -2687,7 +2687,11 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.entities.remove(entity.getId());
-        this.updateEntities.remove(entity.getId());
+        try {
+            this.updateEntities.remove(entity.getId());
+        } catch (Exception e) {
+            this.getServer().getLogger().debug("Removing " + entity.getId() + " from updateEntities failed");
+        }
     }
 
     public void addEntity(Entity entity) {
