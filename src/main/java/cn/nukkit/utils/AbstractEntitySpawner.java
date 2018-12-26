@@ -68,7 +68,11 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
             return SpawnResult.MAX_SPAWN_REACHED;
         }
 
-        return spawn(player, pos, level);
+		try {
+        	return spawn(player, pos, level);
+		} catch (Exception e) {
+			return SpawnResult.ERROR;
+		}
     }
 
     protected boolean isSpawnAllowedByDifficulty() {
