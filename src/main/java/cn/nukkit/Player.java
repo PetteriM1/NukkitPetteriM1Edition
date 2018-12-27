@@ -245,6 +245,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     
     public EntityFishingHook fishing = null;
 
+    private boolean formOpen = false;
+
     public int getStartActionTick() {
         return startAction;
     }
@@ -2538,6 +2540,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
+                    this.formOpen = false;
+
                     if (!this.spawned || !this.isAlive()) {
                         break;
                     }
@@ -4158,6 +4162,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         // HACK: solve the client-side teleporting bug (inside into the block)
         if (super.teleport(to.getY() == to.getFloorY() ? to.add(0, 0.00001, 0) : to, null)) { // null to prevent fire of duplicate EntityTeleportEvent
             this.removeAllWindows();
+            this.formOpen = false;
 
             this.teleportPosition = new Vector3(this.x, this.y, this.z);
             this.forceMovement = this.teleportPosition;
@@ -4255,11 +4260,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return form id to use in {@link PlayerFormRespondedEvent}
      */
     public int showFormWindow(FormWindow window, int id) {
+        if (formOpen) return 0;
         ModalFormRequestPacket packet = new ModalFormRequestPacket();
         packet.formId = id;
         packet.data = window.getJSONData();
         this.formWindows.put(packet.formId, window);
-
+        this.formOpen = true;
         this.dataPacket(packet);
         return id;
     }
