@@ -919,7 +919,10 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
-        Server.broadcastPacket(players, pk);
+        for (Player player : players) {
+            pk.protocol = player.protocol;
+            player.dataPacket(pk);
+        }
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
