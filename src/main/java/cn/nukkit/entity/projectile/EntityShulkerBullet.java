@@ -41,6 +41,11 @@ public class EntityShulkerBullet extends EntityProjectile {
         return 0.40f;
     }
 
+    @Override
+    protected double getDamage() {
+        return 4;
+    }
+
     public EntityShulkerBullet(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }

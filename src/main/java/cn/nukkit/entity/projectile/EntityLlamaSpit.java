@@ -43,6 +43,10 @@ public class EntityLlamaSpit extends EntityProjectile {
         return 1;
     }
 
+    public EntityLlamaSpit(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
     public EntityLlamaSpit(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
         this(chunk, nbt, shootingEntity, false);
     }

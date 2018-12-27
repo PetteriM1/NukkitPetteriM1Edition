@@ -31,6 +31,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
+    protected int attackDelay = 0;
 
     protected boolean baby = false;
     private boolean movement = true;
@@ -164,9 +165,13 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public boolean entityBaseTick(int tickDiff) {
         Timings.entityBaseTickTimer.startTiming();
 
-        if (this.despawn && this.age > this.despawnTicks && !this.hasCustomName()) {
+        if (this.despawn && this.age > this.despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
             return true;
+        }
+
+        if (this instanceof EntityMob && this.attackDelay < 500) {
+            this.attackDelay++;
         }
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);

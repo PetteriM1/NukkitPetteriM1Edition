@@ -2,25 +2,18 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
-import cn.nukkit.entity.mob.EntityEnderman;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import co.aikar.timings.Timings;
 
 public abstract class EntityWalkingMob extends EntityWalking implements EntityMob {
 
     private int[] minDamage;
 
     private int[] maxDamage;
-
-    protected int attackDelay = 0;
 
     private boolean canAttack = true;
 
@@ -168,25 +161,5 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
             this.moveTime = 0;
         }
         return true;
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = false;
-        
-        Timings.entityBaseTickTimer.startTiming();
-        
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        this.attackDelay += tickDiff;
-        if (this instanceof EntityEnderman) {
-            if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
-                this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-                this.move(EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20));
-            }
-        }
-
-        Timings.entityBaseTickTimer.stopTiming();
-        return hasUpdate;
     }
 }

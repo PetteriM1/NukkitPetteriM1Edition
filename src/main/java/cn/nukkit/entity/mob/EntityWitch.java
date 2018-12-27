@@ -99,8 +99,6 @@ public class EntityWitch extends EntityWalkingMob {
                         this.level.addSound(this, "mob.witch.throw");
                     }
                 }
-            } else {
-                this.attackDelay++;
             }
         }
     }

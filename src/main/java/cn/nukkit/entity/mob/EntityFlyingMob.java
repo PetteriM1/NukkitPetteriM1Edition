@@ -14,8 +14,6 @@ public abstract class EntityFlyingMob extends EntityFlying implements EntityMob 
 
     protected int[] maxDamage;
 
-    protected int attackDelay = 0;
-
     protected boolean canAttack = true;
 
     public EntityFlyingMob(FullChunk chunk, CompoundTag nbt) {

@@ -2,6 +2,7 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
@@ -18,7 +19,11 @@ public class EntityBlazeFireBall extends EntityProjectile {
     protected boolean canExplode = false;
 
     public EntityBlazeFireBall(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
+        this(chunk, nbt, null);
+    }
+
+    public EntityBlazeFireBall(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        super(chunk, nbt, shootingEntity);
     }
 
     @Override
@@ -44,11 +49,6 @@ public class EntityBlazeFireBall extends EntityProjectile {
     @Override
     public float getDrag() {
         return 0.01f;
-    }
-
-    @Override
-    protected double getDamage() {
-        return 4;
     }
 
     public boolean isExplode() {
@@ -100,5 +100,11 @@ public class EntityBlazeFireBall extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         this.isCollided = true;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent source) {
+        this.close();
+        return true;
     }
 }

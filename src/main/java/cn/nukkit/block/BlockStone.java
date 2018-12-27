@@ -37,7 +37,7 @@ public class BlockStone extends BlockSolidMeta {
 
     @Override
     public double getResistance() {
-        return 10;
+        return 30;
     }
 
     @Override

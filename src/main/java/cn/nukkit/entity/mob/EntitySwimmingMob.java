@@ -15,8 +15,6 @@ public abstract class EntitySwimmingMob extends EntitySwimming implements Entity
 
     private int[] maxDamage;
 
-    protected int attackDelay = 0;
-
     private boolean canAttack = true;
 
     public EntitySwimmingMob(FullChunk chunk, CompoundTag nbt) {

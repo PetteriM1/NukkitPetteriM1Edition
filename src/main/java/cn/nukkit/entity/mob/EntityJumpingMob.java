@@ -14,8 +14,6 @@ public abstract class EntityJumpingMob extends EntityJumping implements EntityMo
 
     protected int[] maxDamage;
 
-    protected int attackDelay = 0;
-
     protected boolean canAttack = true;
 
     public EntityJumpingMob(FullChunk chunk, CompoundTag nbt) {

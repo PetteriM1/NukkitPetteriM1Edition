@@ -3,11 +3,14 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.level.Location;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.entity.projectile.EntityEnderCharge;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.level.format.FullChunk;
@@ -15,7 +18,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 
-public class EntityEnderDragon extends EntityFlyingMob {
+public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     public static final int NETWORK_ID = 53;
 
@@ -136,5 +139,18 @@ public class EntityEnderDragon extends EntityFlyingMob {
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(200).setValue(200)};
         return addEntity;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof EntityEnderCharge) {
+                ev.setCancelled(true);
+            }
+        } else {
+            super.attack(ev);
+        }
+
+        return true;
     }
 }

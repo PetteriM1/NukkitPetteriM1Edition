@@ -10,6 +10,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 public class EntityEnderPearl extends EntityProjectile {
+
     public static final int NETWORK_ID = 87;
 
     @Override

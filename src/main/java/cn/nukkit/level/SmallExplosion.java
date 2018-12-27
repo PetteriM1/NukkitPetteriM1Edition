@@ -45,6 +45,7 @@ public class SmallExplosion extends Explosion {
     @Override
     public boolean explodeA() {
         if (this.size < 0.1) return false;
+        if (!level.getServer().getPropertyBoolean("explosion-break-blocks", true)) return false;
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
         for (int i = 0; i < 16; ++i) {
@@ -71,10 +72,8 @@ public class SmallExplosion extends Explosion {
                             if (block.getId() != 0 && block.getResistance() < 20) {
                                 blastForce -= (block.getResistance() / 5 + 0.3d) * 0.3d;
                                 if (blastForce > 0) {
-                                    if (level.getServer().getPropertyBoolean("explosion-break-blocks", true)) {
-                                        if (!this.affectedBlocks.contains(block)) {
-                                            this.affectedBlocks.add(block);
-                                        }
+                                    if (!this.affectedBlocks.contains(block)) {
+                                        this.affectedBlocks.add(block);
                                     }
                                 }
                             }
@@ -120,7 +119,7 @@ public class SmallExplosion extends Explosion {
                 Vector3 motion = entity.subtract(this.source).normalize();
                 int exposure = 1;
                 double impact = (1 - distance) * exposure;
-                int damage = (int) (((impact * impact + impact) / 2) * 8 * explosionSize + 1);
+                int damage = (int) (((impact * impact + impact) / 2) * 5 * explosionSize + 1);
                 if (this.what instanceof Entity) {
                     entity.attack(new EntityDamageByEntityEvent((Entity) this.what, entity, DamageCause.ENTITY_EXPLOSION, damage));
                 } else if (this.what instanceof Block) {

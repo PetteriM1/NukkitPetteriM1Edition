@@ -12,6 +12,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
  * Nukkit Project
  */
 public class EntityEgg extends EntityProjectile {
+
     public static final int NETWORK_ID = 82;
 
     @Override
