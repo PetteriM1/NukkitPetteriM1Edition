@@ -76,6 +76,7 @@ import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author MagicDroidX
@@ -88,21 +89,21 @@ public class Server {
 
     private static Server instance = null;
 
-    private BanList banByName = null;
+    private BanList banByName;
 
-    private BanList banByIP = null;
+    private BanList banByIP;
 
-    private Config operators = null;
+    private Config operators;
 
-    private Config whitelist = null;
+    private Config whitelist;
 
-    private boolean isRunning = true;
+    private AtomicBoolean isRunning = new AtomicBoolean(true);
 
     private boolean hasStopped = false;
 
-    private PluginManager pluginManager = null;
+    private PluginManager pluginManager;
 
-    private ServerScheduler scheduler = null;
+    private ServerScheduler scheduler;
 
     private int tickCounter;
 
@@ -132,7 +133,7 @@ public class Server {
 
     private int maxPlayers;
 
-    private boolean autoSave;
+    private boolean autoSave = true;
 
     private RCON rcon;
 
@@ -187,17 +188,17 @@ public class Server {
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
             Level result = super.put(key, value);
-            levelArray = levels.values().toArray(new Level[levels.size()]);
+            levelArray = levels.values().toArray(new Level[0]);
             return result;
         }
         public boolean remove(Object key, Object value) {
             boolean result = super.remove(key, value);
-            levelArray = levels.values().toArray(new Level[levels.size()]);
+            levelArray = levels.values().toArray(new Level[0]);
             return result;
         }
         public Level remove(Object key) {
             Level result = super.remove(key);
-            levelArray = levels.values().toArray(new Level[levels.size()]);
+            levelArray = levels.values().toArray(new Level[0]);
             return result;
         }
     };
@@ -212,7 +213,7 @@ public class Server {
 
     private Watchdog watchdog;
     
-    public boolean suomicraftMode;
+    private boolean suomicraftMode;
 
     Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -324,10 +325,10 @@ public class Server {
             new File(dataPath + "players/").mkdirs();
         }
 
-        this.forceLanguage = (Boolean) this.getPropertyBoolean("force-language", false);
-        this.baseLang = new BaseLang((String) this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
+        this.forceLanguage = this.getPropertyBoolean("force-language", false);
+        this.baseLang = new BaseLang(this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 
-        Object poolSize = this.getProperty("async-workers", "auto");
+        Object poolSize = this.getProperty("async-workers", (Object) "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);
@@ -338,16 +339,16 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        this.networkZlibProvider = (int) this.getPropertyInt("zlib-provider", 0);
+        this.networkZlibProvider = this.getPropertyInt("zlib-provider", 0);
         Zlib.setProvider(this.networkZlibProvider);
 
-        this.networkCompressionLevel = (int) this.getPropertyInt("compression-level", 1);
-        this.networkCompressionAsync = (boolean) this.getPropertyBoolean("async-compression", true);
+        this.networkCompressionLevel = this.getPropertyInt("compression-level", 1);
+        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
 
-        this.autoTickRate = (boolean) this.getPropertyBoolean("auto-tick-rate", true);
-        this.autoTickRateLimit = (int) this.getPropertyInt("auto-tick-rate-limit", 20);
-        this.alwaysTickPlayers = (boolean) this.getPropertyBoolean("always-tick-players", false);
-        this.baseTickRate = (int) this.getPropertyInt("base-tick-rate", 1);
+        this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
+        this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
+        this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);
+        this.baseTickRate = this.getPropertyInt("base-tick-rate", 1);
 
         this.scheduler = new ServerScheduler();
 
@@ -373,7 +374,7 @@ public class Server {
             this.setPropertyInt("difficulty", 3);
         }
 
-        Nukkit.DEBUG = (int) this.getPropertyInt("debug-level", 1);
+        Nukkit.DEBUG = this.getPropertyInt("debug-level", 1);
         if (this.logger instanceof MainLogger) {
             this.logger.setLogDebug(Nukkit.DEBUG > 1);
         }
@@ -385,7 +386,7 @@ public class Server {
         this.network.setName(this.getMotd());
         this.network.setSubName(this.getSubMotd());
 
-        this.logger.info("\u00A7a-- Nukkit PetteriM1 Edition --");
+        this.logger.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
 
         this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
 
@@ -459,8 +460,8 @@ public class Server {
             return;
         }
 
-        if ((int) this.getPropertyInt("ticks-per-autosave", 6000) > 0) {
-            this.autoSaveTicks = (int) this.getPropertyInt("ticks-per-autosave", 6000);
+        if (this.getPropertyInt("ticks-per-autosave", 6000) > 0) {
+            this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         }
         
         // Load levels
@@ -575,7 +576,7 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        broadcastPacket(players.stream().toArray(Player[]::new), packet);
+        broadcastPacket(players.toArray(new Player[0]), packet);
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
@@ -731,14 +732,9 @@ public class Server {
     }
 
     public void shutdown() {
-        if (this.watchdog != null) {
-            this.watchdog.kill();
+        if (!isRunning.compareAndSet(true, false)) {
+            throw new IllegalStateException("Server has already shutdown");
         }
-        if (this.isRunning) {
-            ServerKiller killer = new ServerKiller(90);
-            killer.start();
-        }
-        this.isRunning = false;
     }
 
     public void forceShutdown() {
@@ -751,9 +747,9 @@ public class Server {
         }
 
         try {
-            this.hasStopped = true;
+            isRunning.compareAndSet(true, false);
 
-            this.shutdown();
+            this.hasStopped = true;
 
             if (this.rcon != null) {
                 this.rcon.close();
@@ -789,6 +785,10 @@ public class Server {
 
             this.getLogger().debug("Disabling timings...");
             Timings.stopServer();
+
+            if (this.watchdog != null) {
+                this.watchdog.kill();
+            }
         } catch (Exception e) {
             this.logger.logException(e);
             this.logger.emergency("Exception happened while shutting down, exit the process");
@@ -830,7 +830,7 @@ public class Server {
     public void tickProcessor() {
         this.nextTick = System.currentTimeMillis();
         try {
-            while (this.isRunning) {
+            while (this.isRunning.get()) {
                 try {
                     this.tick();
 
@@ -944,7 +944,7 @@ public class Server {
     }
 
     public void removePlayerListData(UUID uuid, Collection<Player> players) {
-        this.removePlayerListData(uuid, players.stream().toArray(Player[]::new));
+        this.removePlayerListData(uuid, players.toArray(new Player[0]));
     }
 
     public void sendFullPlayerListData(Player player) {
@@ -995,7 +995,7 @@ public class Server {
                         this.getLogger().debug("Raising level \"" + level.getName() + "\" tick rate to " + level.getTickRate() + " ticks");
                     } else if (tickMs >= 50) {
                         if (level.getTickRate() == this.baseTickRate) {
-                            level.setTickRate((int) Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, Math.floor(tickMs / 50))));
+                            level.setTickRate(Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, tickMs / 50)));
                             this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
                         } else if ((tickMs / level.getTickRate()) >= 50 && level.getTickRate() < this.autoTickRateLimit) {
                             level.setTickRate(level.getTickRate() + 1);
@@ -1035,10 +1035,10 @@ public class Server {
     private boolean tick() {
         long tickTime = System.currentTimeMillis();
 
-        long sleepTime = tickTime - this.nextTick;
-        if (sleepTime < -25) {
+        long time = tickTime - this.nextTick;
+        if (time < -25) {
             try {
-                Thread.sleep(Math.max(5, -sleepTime - 25));
+                Thread.sleep(Math.max(5, -time - 25));
             } catch (InterruptedException e) {
                 Server.getInstance().getLogger().logException(e);
             }
@@ -1166,7 +1166,7 @@ public class Server {
     }
 
     public boolean isRunning() {
-        return isRunning;
+        return isRunning.get();
     }
 
     public String getNukkitVersion() {
@@ -1552,7 +1552,7 @@ public class Server {
             }
         }
 
-        return matchedPlayer.toArray(new Player[matchedPlayer.size()]);
+        return matchedPlayer.toArray(new Player[0]);
     }
 
     public void removePlayer(Player player) {
@@ -1740,10 +1740,7 @@ public class Server {
 
         String path = this.getDataPath() + "worlds/" + name + "/";
         if (this.getLevelByName(name) == null) {
-
-            if (LevelProviderManager.getProvider(path) == null) {
-                return false;
-            }
+            return LevelProviderManager.getProvider(path) != null;
         }
 
         return true;
@@ -1906,7 +1903,7 @@ public class Server {
     }
 
     public boolean shouldSavePlayerData() {
-        return (Boolean) this.getPropertyBoolean("save-player-data", false);
+        return this.getPropertyBoolean("save-player-data", false);
     }
 
     /**

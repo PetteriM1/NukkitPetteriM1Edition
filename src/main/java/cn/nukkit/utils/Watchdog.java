@@ -16,6 +16,7 @@ public class Watchdog extends Thread {
         this.server = server;
         this.time = time;
         this.running = true;
+        this.setName("Watchdog");
     }
 
     public void kill() {

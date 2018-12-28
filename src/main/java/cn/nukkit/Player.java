@@ -2054,12 +2054,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.ip,
-                String.valueOf(this.port),
-                String.valueOf(this.id),
-                this.level.getName(),
-                String.valueOf(NukkitMath.round(this.x, 4)),
-                String.valueOf(NukkitMath.round(this.y, 4)),
-                String.valueOf(NukkitMath.round(this.z, 4))));
+                String.valueOf(this.port)));
+
+        this.server.getLogger().debug("[" + this.id + "] Player " + this.username + " (" + this.ip + ":" + this.port + ") logged in with protocol " + this.protocol + " in " + this.level.getName());
 
         if (this.isOp() || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
             this.setRemoveFormat(false);
