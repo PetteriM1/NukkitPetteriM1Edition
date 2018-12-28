@@ -190,7 +190,7 @@ public class Effect implements Cloneable {
                 return true;
             case Effect.SPEED:
             case Effect.SLOWNESS:
-                return (this.duration % 20) == 0;
+                return true;
         }
         return false;
     }
