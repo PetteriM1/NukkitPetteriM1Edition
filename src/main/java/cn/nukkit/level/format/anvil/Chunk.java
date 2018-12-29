@@ -83,7 +83,7 @@ public class Chunk extends BaseChunk {
         Map<Integer, Integer> extraData = new HashMap<>();
 
         Tag extra = nbt.get("ExtraData");
-        if (extra != null && extra instanceof ByteArrayTag) {
+        if (extra instanceof ByteArrayTag) {
             BinaryStream stream = new BinaryStream(((ByteArrayTag) extra).data);
             for (int i = 0; i < stream.getInt(); i++) {
                 int key = stream.getInt();

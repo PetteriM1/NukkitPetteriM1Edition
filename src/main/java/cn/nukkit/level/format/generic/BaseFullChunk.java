@@ -1,7 +1,6 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.ChunkManager;
@@ -438,12 +437,12 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public boolean unload(boolean save, boolean safe) {
-        LevelProvider level = this.getProvider();
-        if (level == null) {
+        LevelProvider provider = this.getProvider();
+        if (provider == null) {
             return true;
         }
         if (save && this.changes != 0) {
-            level.saveChunk(this.getX(), this.getZ());
+            provider.saveChunk(this.getX(), this.getZ());
         }
         if (safe) {
             for (Entity entity : this.getEntities().values()) {

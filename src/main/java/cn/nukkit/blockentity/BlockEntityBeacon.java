@@ -198,7 +198,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable implements Inventory
         int currentLevel = getPowerLevel();
         if (level != currentLevel) {
             namedTag.putInt("Level", level);
-            chunk.setChanged();
+            setDirty();
             this.spawnToAll();
         }
     }
@@ -211,7 +211,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable implements Inventory
         int currentPower = getPrimaryPower();
         if (power != currentPower) {
             namedTag.putInt("Primary", power);
-            chunk.setChanged();
+            setDirty();
             this.spawnToAll();
         }
     }
@@ -224,7 +224,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable implements Inventory
         int currentPower = getSecondaryPower();
         if (power != currentPower) {
             namedTag.putInt("Secondary", power);
-            chunk.setChanged();
+            setDirty();
             this.spawnToAll();
         }
     }

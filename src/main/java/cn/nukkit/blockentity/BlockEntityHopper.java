@@ -160,7 +160,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             boolean pickup = this.pickupDroppedItems();
 
             if (transfer || pickup) {
-                this.chunk.setChanged(true);
+                setDirty();
             }
 
             this.setTransferCooldown(8);
