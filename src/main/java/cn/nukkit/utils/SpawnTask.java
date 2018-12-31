@@ -6,9 +6,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SpawnTask extends Thread {
 
     private static final int MAX_RADIUS = 10;
@@ -16,23 +13,15 @@ public class SpawnTask extends Thread {
 
     @Override
     public void run() {
-        List<Player> onlinePlayers = new ArrayList<>();
-
         for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-            onlinePlayers.add((Player) player);
-        }
-        
-        for (Player player : onlinePlayers) {
-            Position pos = player.getPosition();
-        
-            Position spawnPosition = new Position(pos.x, pos.y, pos.z);
+            Position spawnPosition = new Position(player.x, player.y, player.z);
             getSpawnPosition(spawnPosition, new int[0], 2, 5, player.getLevel());
         }
     }
 
     private Position getSpawnPosition(Position startSpawnPosition, int[] notAllowedBlockIds, int minAirAboveSpawnBlock, int maxFindingTries, Level level) {
-        int spawnX = (int)startSpawnPosition.x;
-        int spawnZ = (int)startSpawnPosition.z;
+        int spawnX = (int) startSpawnPosition.x;
+        int spawnZ = (int) startSpawnPosition.z;
         Position spawnPosition = null;
 
         int minSpawnX1 = spawnX - MIN_RADIUS;

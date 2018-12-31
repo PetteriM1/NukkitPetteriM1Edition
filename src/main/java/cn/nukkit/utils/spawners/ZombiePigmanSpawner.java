@@ -11,9 +11,9 @@ import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
-public class PigZombieSpawner extends AbstractEntitySpawner {
+public class ZombiePigmanSpawner extends AbstractEntitySpawner {
 
-    public PigZombieSpawner(Spawner spawnTask) {
+    public ZombiePigmanSpawner(Spawner spawnTask) {
         super(spawnTask);
     }
 

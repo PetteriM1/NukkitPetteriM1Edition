@@ -6,6 +6,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -27,7 +28,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     }
 
     @Override
-    public void spawn(List<Player> onlinePlayers) {
+    public void spawn(Collection<Player> onlinePlayers) {
         if (isSpawnAllowedByDifficulty()) {
             SpawnResult lastSpawnResult = null;
             for (Player player : onlinePlayers) {
@@ -76,7 +77,6 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     }
 
     protected boolean isSpawnAllowedByDifficulty() {
-
         int randomNumber = EntityUtils.rand(0, 4);
 
         switch (Server.getInstance().getDifficulty()) {

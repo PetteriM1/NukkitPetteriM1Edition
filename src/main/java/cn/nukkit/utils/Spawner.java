@@ -1,7 +1,6 @@
 package cn.nukkit.utils;
 
 import java.util.Arrays;
-import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
@@ -10,7 +9,6 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.Level;
 import cn.nukkit.utils.spawners.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Spawner extends Thread {
@@ -26,7 +24,7 @@ public class Spawner extends Thread {
             new OcelotSpawner(this),
             new PigSpawner(this),
             new PolarBearSpawner(this),
-            new PigZombieSpawner(this),
+            new ZombiePigmanSpawner(this),
             new RabbitSpawner(this),
             new SheepSpawner(this),
             new SkeletonSpawner(this),
@@ -40,15 +38,9 @@ public class Spawner extends Thread {
 
     @Override
     public void run() {
-        List<Player> onlinePlayers = new ArrayList<>();
-
-        for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-            onlinePlayers.add((Player) player);
-        }
-
-        if (onlinePlayers.size() > 0) {
+        if (Server.getInstance().getOnlinePlayers().size() > 0) {
             for (EntitySpawner spawner : entitySpawners) {
-                spawner.spawn(onlinePlayers);
+                spawner.spawn(Server.getInstance().getOnlinePlayers().values());
             }
         }
     }
