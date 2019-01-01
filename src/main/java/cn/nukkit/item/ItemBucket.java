@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockLava;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
@@ -76,7 +77,7 @@ public class ItemBucket extends Item {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        Block targetBlock = Block.get(this.meta);
+        Block targetBlock = Block.get(getDamageByTarget(this.meta));
 
         if (targetBlock instanceof BlockAir) {
             if (target instanceof BlockLiquid && target.getDamage() == 0) {
@@ -101,7 +102,13 @@ public class ItemBucket extends Item {
                         player.getInventory().setItemInHand(clone);
                         player.getInventory().addItem(ev.getItem());
                     }
-                    level.addSound(block, "bucket.empty_water");
+
+                    if (target instanceof BlockLava) {
+                        level.addSound(block, "bucket.fill_lava");
+                    } else {
+                        level.addSound(block, "bucket.fill_water");
+                    }
+
                     return true;
                 } else {
                     player.getInventory().sendContents(player);
@@ -111,6 +118,11 @@ public class ItemBucket extends Item {
             Item result = Item.get(BUCKET, 0, 1);
             PlayerBucketEmptyEvent ev;
             player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
+
+            if (player.getLevel().getName().equals("nether") && this.getDamage() != 10) {
+                ev.setCancelled(true);
+            }
+
             if (!ev.isCancelled()) {
                 player.getLevel().setBlock(block, targetBlock, true, true);
                 if (player.isSurvival()) {
@@ -119,7 +131,13 @@ public class ItemBucket extends Item {
                     player.getInventory().setItemInHand(clone);
                     player.getInventory().addItem(ev.getItem());
                 }
-                level.addSound(block, "bucket.fill_water");
+
+                if (this.getDamage() == 10) {
+                    level.addSound(block, "bucket.empty_lava");
+                } else {
+                    level.addSound(block, "bucket.empty_water");
+                }
+
                 return true;
             } else {
                 player.getInventory().sendContents(player);
