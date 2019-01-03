@@ -2090,25 +2090,27 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        Tag tag = item.getNamedTagEntry("CanPlaceOn");
-        if (tag instanceof ListTag) {
-            boolean canPlace = false;
-            for (Tag v : ((ListTag<Tag>) tag).getAll()) {
-                if (v instanceof StringTag) {
-                    Item entry = Item.fromString(((StringTag) v).data);
-                    if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
-                        canPlace = true;
-                        break;
+        if (player != null) {
+            Tag tag = item.getNamedTagEntry("CanPlaceOn");
+            if (tag instanceof ListTag) {
+                boolean canPlace = false;
+                for (Tag v : ((ListTag<Tag>) tag).getAll()) {
+                    if (v instanceof StringTag) {
+                        Item entry = Item.fromString(((StringTag) v).data);
+                        if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
+                            canPlace = true;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if (!canPlace) {
+                if (!canPlace) {
+                    return null;
+                }
+            } else if (player.getGamemode() == 2) {
                 return null;
             }
-        }
 
-        if (player != null) {
             BlockPlaceEvent event = new BlockPlaceEvent(player, hand, block, target, item);
             int distance = this.server.getSpawnRadius();
             if (!player.isOp() && distance > -1) {
