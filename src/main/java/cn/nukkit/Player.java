@@ -245,7 +245,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     
     public EntityFishingHook fishing = null;
 
-    private boolean formOpen = false;
+    public boolean formOpen = false;
 
     public int getStartActionTick() {
         return startAction;
