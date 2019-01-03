@@ -9,6 +9,8 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.*;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.math.Vector3f;
+import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.Random;
@@ -44,7 +46,6 @@ public class ParticleCommand extends VanillaCommand {
 
         if (args.length < 7) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
-
             return true;
         }
 
@@ -77,8 +78,7 @@ public class ParticleCommand extends VanillaCommand {
             try {
                 double c = Double.valueOf(args[7]);
                 count = (int) c;
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
         }
         count = Math.max(1, count);
 
@@ -87,28 +87,30 @@ public class ParticleCommand extends VanillaCommand {
             try {
                 double d = Double.valueOf(args[8]);
                 data = (int) d;
-            } catch (Exception e) {
+            } catch (Exception e) {}
+        }
+        if (showParticleEffect(name, pos, level, count)) {
+            sender.sendMessage(new TranslationContainer("commands.particle.success", new String[]{name, String.valueOf(count)}));
+        } else {
+            Particle particle = this.getParticle(name, pos, xd, yd, zd, data);
+
+            if (particle == null) {
+                sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.particle.notFound", name));
+                return true;
             }
-        }
 
-        Particle particle = this.getParticle(name, pos, xd, yd, zd, data);
+            sender.sendMessage(new TranslationContainer("commands.particle.success", new String[]{name, String.valueOf(count)}));
 
-        if (particle == null) {
-            sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.particle.notFound", name));
-            return true;
-        }
+            Random random = new Random(System.currentTimeMillis());
 
-        sender.sendMessage(new TranslationContainer("commands.particle.success", new String[]{name, String.valueOf(count)}));
-
-        Random random = new Random(System.currentTimeMillis());
-
-        for (int i = 0; i < count; i++) {
-            particle.setComponents(
-                    pos.x + (random.nextFloat() * 2 - 1) * xd,
-                    pos.y + (random.nextFloat() * 2 - 1) * yd,
-                    pos.z + (random.nextFloat() * 2 - 1) * zd
-            );
-            level.addParticle(particle);
+            for (int i = 0; i < count; i++) {
+                particle.setComponents(
+                        pos.x + (random.nextFloat() * 2 - 1) * xd,
+                        pos.y + (random.nextFloat() * 2 - 1) * yd,
+                        pos.z + (random.nextFloat() * 2 - 1) * zd
+                );
+                level.addParticle(particle);
+            }
         }
 
         return true;
@@ -200,5 +202,40 @@ public class ParticleCommand extends VanillaCommand {
         }
 
         return null;
+    }
+
+    private boolean showParticleEffect(String name, Vector3 pos, Level level, int count) {
+        switch (name) {
+            case "minecraft:test_beziercurve":
+            case "minecraft:test_catmullromcurve":
+            case "minecraft:test_combocurve":
+            case "minecraft:test_linearcurve":
+            case "minecraft:test_spiral":
+            case "minecraft:test_sphere":
+            case "minecraft:test_smoke_puff":
+            case "minecraft:test_mule":
+            case "minecraft:test_highrestitution":
+            case "minecraft:test_bounce":
+            case "minecraft:test_colorcurve":
+            case "minecraft:mobflame_emitter":
+                break;
+            default:
+                return false;
+        }
+
+        SpawnParticleEffectPacket pk = new SpawnParticleEffectPacket();
+        pk.dimensionId = level.getDimension();
+        pk.position = new Vector3f((int) pos.x, (int) pos.y, (int) pos.z);
+        pk.identifier = name;
+
+        for (Player p : level.getPlayers().values()) {
+            if (p.protocol >= 313) {
+                for (int i = 0; i < count; i++) {
+                    p.dataPacket(pk);
+                }
+            }
+        }
+
+        return true;
     }
 }
