@@ -68,9 +68,7 @@ public class AxisAlignedBB implements Cloneable {
         return new AxisAlignedBB(this.minX - x, this.minY - y, this.minZ - z, this.maxX + x, this.maxY + y, this.maxZ + z);
     }
 
-    public AxisAlignedBB expand(double x, double y, double z)
-
-    {
+    public AxisAlignedBB expand(double x, double y, double z) {
         this.minX -= x;
         this.minY -= y;
         this.minZ -= z;

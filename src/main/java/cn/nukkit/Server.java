@@ -185,6 +185,7 @@ public class Server {
 
     private final Map<Integer, String> identifier = new HashMap<>();
 
+    @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
             Level result = super.put(key, value);

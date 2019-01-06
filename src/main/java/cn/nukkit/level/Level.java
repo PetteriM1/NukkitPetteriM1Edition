@@ -164,6 +164,7 @@ public class Level implements ChunkManager, Metadatable {
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
+    @SuppressWarnings("serial")
     private final Map<Character, Object> changeBlocksFullMap = new HashMap<Character, Object>() {
         @Override
         public int size() {
@@ -1986,6 +1987,10 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
+        if (block.y > 127 && this.getName().equals("nether")) {
+            return null;
+        }
+
         if (target.getId() == Item.AIR) {
             return null;
         }
@@ -3057,6 +3062,9 @@ public class Level implements ChunkManager, Metadatable {
         this.unloadChunk(x, z, false);
 
         this.cancelUnloadChunkRequest(x, z);
+
+        BaseFullChunk chunk = provider.getEmptyChunk(x, z);
+        provider.setChunk(x, z, chunk);
 
         this.generateChunk(x, z);
     }

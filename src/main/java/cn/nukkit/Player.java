@@ -1691,7 +1691,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.isAlive() && this.spawned) {
             //++this.deadTicks;
             //if (this.deadTicks >= 10) {
-                this.despawnFromAll(); //HACK: fix "dead" players
+                this.despawnFromAll(); // HACK: fix "dead" players
             //}
             return true;
         }
