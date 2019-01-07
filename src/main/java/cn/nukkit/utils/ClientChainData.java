@@ -213,7 +213,6 @@ public final class ClientChainData implements LoginChainData {
         String[] base = token.split("\\.");
         if (base.length < 2) return null;
         String json = new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8);
-        //Server.getInstance().getLogger().debug(json);
         return new Gson().fromJson(json, JsonObject.class);
     }
 
@@ -240,8 +239,9 @@ public final class ClientChainData implements LoginChainData {
                 if (extra.has("identity")) this.clientUUID = UUID.fromString(extra.get("identity").getAsString());
                 if (extra.has("XUID")) this.xuid = extra.get("XUID").getAsString();
             }
-            if (chainMap.has("identityPublicKey"))
+            if (chainMap.has("identityPublicKey")) {
                 this.identityPublicKey = chainMap.get("identityPublicKey").getAsString();
+            }
         }
 
         if (!xboxAuthed) {
@@ -279,10 +279,6 @@ public final class ClientChainData implements LoginChainData {
 
     private boolean verify(PublicKey key, JWSObject object) throws JOSEException {
         JWSVerifier verifier = new DefaultJWSVerifierFactory().createJWSVerifier(object.getHeader(), key);
-        try {
-            return object.verify(verifier);
-        } catch (Exception e) {
-            return false;
-        }
+        return object.verify(verifier);
     }
 }

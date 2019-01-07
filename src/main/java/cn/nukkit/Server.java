@@ -404,7 +404,7 @@ public class Server {
         Effect.init();
         Potion.init();
         Attribute.init();
-        GlobalBlockPalette.getOrCreateRuntimeId(0, 0);
+        GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
 
         this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(new File(Nukkit.DATA_PATH, "resource_packs"));

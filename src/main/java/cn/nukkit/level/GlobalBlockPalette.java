@@ -16,16 +16,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlobalBlockPalette {
 
-    private static final Int2IntArrayMap legacyToRuntimeId = new Int2IntArrayMap();
-    private static final Int2IntArrayMap runtimeIdToLegacy = new Int2IntArrayMap();
-    private static final AtomicInteger runtimeIdAllocator = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator282 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator291 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator313 = new AtomicInteger(0);
+    private static final Int2IntArrayMap legacyToRuntimeId282 = new Int2IntArrayMap();
+    private static final Int2IntArrayMap legacyToRuntimeId291 = new Int2IntArrayMap();
+    private static final Int2IntArrayMap legacyToRuntimeId313 = new Int2IntArrayMap();
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
     private static byte[] compiledTable313;
 
     static {
-        legacyToRuntimeId.defaultReturnValue(-1);
-        runtimeIdToLegacy.defaultReturnValue(-1);
+        legacyToRuntimeId282.defaultReturnValue(-1);
+        legacyToRuntimeId291.defaultReturnValue(-1);
+        legacyToRuntimeId313.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
             InputStream stream1 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
@@ -43,6 +47,7 @@ public class GlobalBlockPalette {
             table1.putUnsignedVarInt(entries1.size());
 
             for (TableEntry entry1 : entries1) {
+                registerMapping(282, (entry1.id << 4) | entry1.data);
                 table1.putString(entry1.name);
                 table1.putLShort(entry1.data);
             }
@@ -64,6 +69,7 @@ public class GlobalBlockPalette {
             table2.putUnsignedVarInt(entries2.size());
 
             for (TableEntry entry2 : entries2) {
+                registerMapping(291, (entry2.id << 4) | entry2.data);
                 table2.putString(entry2.name);
                 table2.putLShort(entry2.data);
             }
@@ -85,7 +91,7 @@ public class GlobalBlockPalette {
             table3.putUnsignedVarInt(entries3.size());
 
             for (TableEntry entry3 : entries3) {
-                registerMapping((entry3.id << 4) | entry3.data);
+                registerMapping(313, (entry3.id << 4) | entry3.data);
                 table3.putString(entry3.name);
                 table3.putLShort(entry3.data);
             }
@@ -94,29 +100,43 @@ public class GlobalBlockPalette {
         }, true);
     }
 
-    public static int getOrCreateRuntimeId(int id, int meta) {
-        return getOrCreateRuntimeId((id << 4) | meta);
+    public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
+        return getOrCreateRuntimeId(protocol, (id << 4) | meta);
     }
 
-    public static int getOrCreateRuntimeId(int legacyId) {
-        int runtimeId = legacyToRuntimeId.get(legacyId);
-        return runtimeId;
+    public static int getOrCreateRuntimeId(int protocol, int legacyId) {
+        switch (protocol) {
+            case 282:
+                return legacyToRuntimeId282.get(legacyId);
+            case 291:
+                return legacyToRuntimeId291.get(legacyId);
+            default:
+                return legacyToRuntimeId313.get(legacyId);
+        }
     }
 
-    private static int registerMapping(int legacyId) {
-        int runtimeId = runtimeIdAllocator.getAndIncrement();
-        runtimeIdToLegacy.put(runtimeId, legacyId);
-        legacyToRuntimeId.put(legacyId, runtimeId);
-        return runtimeId;
+    private static void registerMapping(int protocol, int legacyId) {
+        switch (protocol) {
+            case 282:
+                legacyToRuntimeId282.put(legacyId, runtimeIdAllocator282.getAndIncrement());
+                break;
+            case 291:
+                legacyToRuntimeId291.put(legacyId, runtimeIdAllocator291.getAndIncrement());
+                break;
+            default:
+                legacyToRuntimeId313.put(legacyId, runtimeIdAllocator313.getAndIncrement());
+                break;
+        }
     }
 
     public static byte[] getCompiledTable(int protocol) {
-        if (protocol < 291) {
-            return compiledTable282;
-        } else if (protocol > 282 && protocol < 313) {
-            return compiledTable291;
-        } else {
-            return compiledTable313;
+        switch (protocol) {
+            case 282:
+                return compiledTable282;
+            case 291:
+                return compiledTable291;
+            default:
+                return compiledTable313;
         }
     }
 

@@ -6,6 +6,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class PunchBlockParticle extends Particle {
 
@@ -17,7 +18,7 @@ public class PunchBlockParticle extends Particle {
 
     public PunchBlockParticle(Vector3 pos, int blockId, int blockDamage, BlockFace face) {
         super(pos.x, pos.y, pos.z);
-        this.data = GlobalBlockPalette.getOrCreateRuntimeId(blockId, blockDamage) | (face.getIndex() << 24);
+        this.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, blockId, blockDamage) | (face.getIndex() << 24);
     }
 
     @Override

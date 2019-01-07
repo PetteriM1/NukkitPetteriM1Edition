@@ -5,6 +5,7 @@ import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * Created on 2015/11/21 by xtypr.
@@ -16,7 +17,7 @@ public class DestroyBlockParticle extends Particle {
 
     public DestroyBlockParticle(Vector3 pos, Block block) {
         super(pos.x, pos.y, pos.z);
-        this.data = GlobalBlockPalette.getOrCreateRuntimeId(block.getId(), block.getDamage());
+        this.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, block.getId(), block.getDamage());
     }
 
     @Override

@@ -1,5 +1,9 @@
 package cn.nukkit.network.protocol;
 
+import com.google.common.primitives.Ints;
+
+import java.util.List;
+
 /**
  * @author MagicDroidX &amp; iNevet
  * Nukkit Project
@@ -8,8 +12,7 @@ public interface ProtocolInfo {
 
     final int CURRENT_PROTOCOL = 313;
 
-    final int MINIUM_PROTOCOL = 282;
-    final int MAXIUM_PROTOCOL = 313;
+    final List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(282, 291, CURRENT_PROTOCOL);
 
     final String MINECRAFT_VERSION = "v1.8.0";
     final String MINECRAFT_VERSION_NETWORK = "1.8.0";

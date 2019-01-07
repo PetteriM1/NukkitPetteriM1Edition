@@ -999,9 +999,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int i = 0; i < blocks.length; i++) {
             if (blocks[i] != null) size++;
         }
-        int packetIndex = 0;
         LongSet chunks = null;
-        UpdateBlockPacket[] packets = new UpdateBlockPacket[size];
         if (optimizeRebuilds) {
             chunks = new LongOpenHashSet();
         }
@@ -1023,18 +1021,21 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
-            try {
-                if (b instanceof Block) {
-                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(((Block) b).getFullId());
-                } else {
-                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(getFullBlock((int) b.x, (int) b.y, (int) b.z));
+
+            for (Player p : target) {
+                try {
+                    if (b instanceof Block) {
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, ((Block) b).getFullId());
+                    } else {
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                    }
+                } catch (NoSuchElementException e) {
+                    throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for player " + p.getName() + " with protocol " + p.protocol);
                 }
-            } catch (NoSuchElementException e) {
-                throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName());
+
+                p.batchDataPacket(updateBlockPacket);
             }
-            packets[packetIndex++] = updateBlockPacket;
         }
-        this.server.batchPackets(target, packets);
     }
 
     private void tickChunks() {
@@ -2181,7 +2182,7 @@ public class Level implements ChunkManager, Metadatable {
 
 
         if (playSound) {
-            this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, GlobalBlockPalette.getOrCreateRuntimeId(hand.getId(), hand.getDamage()));
+            this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, hand.getId(), hand.getDamage()));
         }
 
         if (item.getCount() <= 0) {
@@ -2697,11 +2698,17 @@ public class Level implements ChunkManager, Metadatable {
             entity.close();
         }
 
-        this.entities.remove(entity.getId());
         try {
+            this.entities.remove(entity.getId());
+        } catch (Exception e) {
+            this.getServer().getLogger().debug("Failed to remove entity " + entity.getId() + " from entities");
+        }
+
+        try {
+            this.entities.remove(entity.getId());
             this.updateEntities.remove(entity.getId());
         } catch (Exception e) {
-            this.getServer().getLogger().debug("Removing " + entity.getId() + " from updateEntities failed");
+            this.getServer().getLogger().debug("Failed to remove entity " + entity.getId() + " from updateEntities");
         }
     }
 

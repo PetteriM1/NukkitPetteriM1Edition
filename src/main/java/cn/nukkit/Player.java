@@ -2094,7 +2094,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.protocol = loginPacket.getProtocol();
 
-                    if (this.protocol < ProtocolInfo.MINIUM_PROTOCOL || this.protocol > ProtocolInfo.MAXIUM_PROTOCOL) {
+                    if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol)) {
                         this.sendPlayStatus(PlayStatusPacket.LOGIN_FAILED_CLIENT);
                         kick(PlayerKickEvent.Reason.UNKNOWN, "disconnectionScreen.unsupportedVersion", false);
                         break;
