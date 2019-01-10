@@ -234,6 +234,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
         BlockEntityChest chest = this.getPair();
 
+        this.doubleInventory = null;
         this.namedTag.remove("pairx");
         this.namedTag.remove("pairz");
 
@@ -242,6 +243,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         if (chest != null) {
             chest.namedTag.remove("pairx");
             chest.namedTag.remove("pairz");
+            chest.doubleInventory = null;
             chest.checkPairing();
             chest.spawnToAll();
         }
