@@ -16,6 +16,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -311,10 +312,13 @@ public class Item implements Cloneable, BlockID, ItemID {
             }
         }
 
-        initCreativeItems();
+        Server.getInstance().getScheduler().scheduleTask(null, () -> {
+            initCreativeItems();
+        }, true);
     }
 
     private static final ArrayList<Item> creative = new ArrayList<>();
+    private static final ArrayList<Item> creative291 = new ArrayList<>();
 
     private static void initCreativeItems() {
         clearCreativeItems();
@@ -343,18 +347,60 @@ public class Item implements Cloneable, BlockID, ItemID {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // Creative inventory for older versions
+        String path291 = server.getDataPath() + "creativeitems291.json";
+        if (!new File(path291).exists()) {
+            try {
+                Utils.writeFile(path291, Server.class.getClassLoader().getResourceAsStream("creativeitems291.json"));
+            } catch (IOException e) {
+                MainLogger.getLogger().logException(e);
+                return;
+            }
+        }
+        List<Map> list291 = new Config(path291, Config.YAML).getMapList("items");
+
+        for (Map map : list291) {
+            try {
+                int id = (int) map.get("id");
+                int damage = (int) map.getOrDefault("damage", 0);
+                String hex = (String) map.get("nbt_hex");
+                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
+
+                addCreativeItem(291, Item.get(id, damage, 1, nbt));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
     }
 
     public static void clearCreativeItems() {
         Item.creative.clear();
+        Item.creative291.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
-        return new ArrayList<>(Item.creative);
+        return getCreativeItems(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public static ArrayList<Item> getCreativeItems(int protocol) {
+        if (protocol <= 291) {
+            return new ArrayList<>(Item.creative291);
+        } else {
+            return new ArrayList<>(Item.creative);
+        }
     }
 
     public static void addCreativeItem(Item item) {
-        Item.creative.add(item.clone());
+        addCreativeItem(ProtocolInfo.CURRENT_PROTOCOL, item);
+    }
+
+    public static void addCreativeItem(int protocol, Item item) {
+        if (protocol <= 291) {
+            Item.creative291.add(item.clone());
+        } else {
+            Item.creative.add(item.clone());
+        }
     }
 
     public static void removeCreativeItem(Item item) {

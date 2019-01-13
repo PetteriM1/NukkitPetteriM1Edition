@@ -78,6 +78,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -880,16 +881,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 inventory.sendCreativeContents();
             }
 
-            for (long index : this.usedChunks.keySet()) {
-                int chunkX = Level.getHashX(index);
-                int chunkZ = Level.getHashZ(index);
-                for (Entity entity : this.level.getChunkEntities(chunkX, chunkZ).values()) {
-                    if (this != entity && !entity.closed && entity.isAlive()) {
-                        entity.spawnTo(this);
-                    }
-                }
-            }
-
             int experience = this.getExperience();
             if (experience != 0) {
                 this.sendExperience(experience);
@@ -914,6 +905,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             // HACK: fix speed bug
             this.setMovementSpeed(this.getMovementSpeed());
         }, true);
+
+        for (long index : this.usedChunks.keySet()) {
+            int chunkX = Level.getHashX(index);
+            int chunkZ = Level.getHashZ(index);
+            for (Entity entity : this.level.getChunkEntities(chunkX, chunkZ).values()) {
+                if (this != entity && !entity.closed && entity.isAlive()) {
+                    entity.spawnTo(this);
+                }
+            }
+        }
 
         // Prevent PlayerTeleportEvent during player spawn
         this.teleport(pos, null);
@@ -1278,7 +1279,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
             inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            inventoryContentPacket.slots = Item.getCreativeItems().stream().toArray(Item[]::new);
+            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).stream().toArray(Item[]::new);
             this.dataPacket(inventoryContentPacket);
         }
 
@@ -4681,7 +4682,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 entity.close();
                 return true;
             } else if (entity instanceof EntityThrownTrident && ((EntityThrownTrident) entity).hadCollision) {
-                ItemTrident item = new ItemTrident();
+                Item item = ((EntityThrownTrident) entity).getItem();
                 if (this.isSurvival() && !this.inventory.canAddItem(item)) {
                     return false;
                 }

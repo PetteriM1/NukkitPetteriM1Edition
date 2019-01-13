@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.block.BlockFromToEvent;
+import cn.nukkit.event.block.LiquidFlowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
@@ -8,7 +10,6 @@ import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.level.sound.FizzSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
-
 import it.unimi.dsi.fastutil.longs.Long2ByteMap;
 import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
 
@@ -36,10 +37,12 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
         return true;
     }
 
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return null;
     }
 
+    @Override
     public Item[] getDrops(Item item) {
         return new Item[0];
     }
@@ -211,11 +214,20 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                 }
                 if (newDecay != decay) {
                     decay = newDecay;
-                    if (decay < 0) {
-                        this.level.setBlock(this, new BlockAir(), true, true);
+                    boolean decayed = decay < 0;
+                    Block to;
+                    if (decayed) {
+                        to = new BlockAir();
                     } else {
-                        this.level.setBlock(this, getBlock(decay), true, true);
-                        this.level.scheduleUpdate(this, this.tickRate());
+                        to = getBlock(decay);
+                    }
+                    BlockFromToEvent event = new BlockFromToEvent(this, to);
+                    level.getServer().getPluginManager().callEvent(event);
+                    if (!event.isCancelled()) {
+                        this.level.setBlock(this, to, true, true);
+                        if (!decayed) {
+                            this.level.scheduleUpdate(this, this.tickRate());
+                        }
                     }
                 }
             }
@@ -256,8 +268,12 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
             if (block.getId() > 0) {
                 this.level.useBreakOn(block);
             }
-            this.level.setBlock(block, getBlock(newFlowDecay), true, true);
-            this.level.scheduleUpdate(block, this.tickRate());
+            LiquidFlowEvent event = new LiquidFlowEvent(block, this, newFlowDecay);
+            level.getServer().getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                this.level.setBlock(block, getBlock(newFlowDecay), true, true);
+                this.level.scheduleUpdate(block, this.tickRate());
+            }
         }
     }
 
@@ -402,6 +418,11 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
     }
 
     protected boolean liquidCollide(Block cause, Block result) {
+        BlockFromToEvent event = new BlockFromToEvent(this, result);
+        this.level.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
         this.level.setBlock(this, result, true, true);
         this.level.addSound(new FizzSound(this.add(0.5, 0.5, 0.5)));
         return true;

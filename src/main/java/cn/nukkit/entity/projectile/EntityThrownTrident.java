@@ -6,8 +6,10 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.EntityUtils;
 
@@ -23,6 +25,8 @@ public class EntityThrownTrident extends EntityProjectile {
     public static final int DATA_SOURCE_ID = 17;
 
     public boolean firstTickOnGround = true;
+
+    protected Item trident;
 
     @Override
     public int getNetworkId() {
@@ -75,6 +79,22 @@ public class EntityThrownTrident extends EntityProjectile {
         super.initEntity();
 
         this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 8;
+        this.trident = namedTag.contains("trident") ? NBTIO.getItemHelper(namedTag.getCompound("trident")) : Item.get(0);
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.put("trident", NBTIO.putItemHelper(this.trident));
+    }
+
+    public Item getItem() {
+        return this.trident != null ? this.trident.clone() : Item.get(0);
+    }
+
+    public void setItem(Item item) {
+        this.trident = item.clone();
     }
 
     public void setCritical() {
@@ -147,7 +167,8 @@ public class EntityThrownTrident extends EntityProjectile {
         entity.attack(ev);
         this.hadCollision = true;
         this.close();
-        Entity newTrident = EntityUtils.create("ThrownTrident", this);
+        EntityThrownTrident newTrident = (EntityThrownTrident) EntityUtils.create("ThrownTrident", this);
+        newTrident.setItem(trident);
         newTrident.spawnToAll();
     }
 }
