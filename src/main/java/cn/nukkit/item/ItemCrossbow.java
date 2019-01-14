@@ -14,38 +14,26 @@ import cn.nukkit.nbt.tag.ListTag;
 
 import java.util.Random;
 
-/**
- * @author MagicDroidX
- * Nukkit Project
- */
-public class ItemBow extends ItemTool {
+public class ItemCrossbow extends ItemBow {
 
-    public ItemBow() {
+    public ItemCrossbow() {
         this(0, 1);
     }
 
-    public ItemBow(Integer meta) {
+    public ItemCrossbow(Integer meta) {
         this(meta, 1);
     }
 
-    public ItemBow(Integer meta, int count) {
-        this(BOW, meta, count, "Bow");
-    }
-
-    public ItemBow(int id, Integer meta, int count, String name) {
-        super(id, meta, count, name);
+    public ItemCrossbow(Integer meta, int count) {
+        super(CROSSBOW, meta, count, "Crossbow");
     }
 
     @Override
     public int getMaxDurability() {
-        return ItemTool.DURABILITY_BOW;
+        return ItemTool.DURABILITY_CROSSBOW;
     }
 
     @Override
-    public int getEnchantAbility() {
-        return 1;
-    }
-
     public boolean onReleaseUsing(Player player) {
         Item itemArrow = Item.get(Item.ARROW, 0, 1);
 
@@ -54,7 +42,7 @@ public class ItemBow extends ItemTool {
             return false;
         }
 
-        double damage = 2;
+        double damage = 6;
         boolean flame = false;
 
         if (this.hasEnchantments()) {
@@ -86,7 +74,7 @@ public class ItemBow extends ItemTool {
         int diff = (Server.getInstance().getTick() - player.getStartActionTick());
         double p = (double) diff / 20;
 
-        double f = Math.min((p * p + p * 2) / 3, 1) * 2.8;
+        double f = Math.min((p * p + p * 2) / 3, 1) * 3;
         EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, f == 2), f);
 
         if (f < 0.1 || diff < 5) {
@@ -122,7 +110,7 @@ public class ItemBow extends ItemTool {
                     proj.kill();
                 } else {
                     proj.spawnToAll();
-                    player.getLevel().addSound(player, "random.bow");
+                    player.getLevel().addSound(player, "crossbow.shoot");
 
                     if (this.hasEnchantment(Enchantment.ID_BOW_INFINITY)) {
                         proj.namedTag.putBoolean("canNotPickup", true);

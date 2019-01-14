@@ -234,7 +234,7 @@ public interface ItemID {
     final int SCUTE = 468;
     final int TURTLE_SHELL = 469;
     final int PHANTOM_MEMBRANE = 470;
-    // 471 - 498 not yet in Minecraft
+    final int CROSSBOW = 471;
     final int COMPOUND = 499;
     final int RECORD_13 = 500;
     final int RECORD_CAT = 501;
