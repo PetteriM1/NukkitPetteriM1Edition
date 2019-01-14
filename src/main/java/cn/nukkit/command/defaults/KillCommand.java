@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -62,6 +63,15 @@ public class KillCommand extends VanillaCommand {
                     }
                 }
                 sender.sendMessage(TextFormat.GOLD + "Killed all entities");
+            } else if (args[0].equals("@b")) {
+                for (Level level : Server.getInstance().getLevels().values()) {
+                    for (Entity entity : level.getEntities()) {
+                        if (entity instanceof BaseEntity) {
+                            entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
+                        }
+                    }
+                }
+                sender.sendMessage(TextFormat.GOLD + "Killed all entities instanceof BaseEntity");
             } else if (args[0].equals("@s") && sender instanceof Player) {
                 if (!sender.hasPermission("nukkit.command.kill.self")) {
                     sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));

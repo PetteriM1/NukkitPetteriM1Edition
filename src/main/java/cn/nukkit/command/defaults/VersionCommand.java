@@ -32,7 +32,7 @@ public class VersionCommand extends VanillaCommand {
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage("\u00A76Version " + Nukkit.VERSION + ". \u00A7aThis server is running Nukkit PetteriM1 Edition for Minecraft Bedrock Edition " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + " (Protocol " + ProtocolInfo.CURRENT_PROTOCOL + ").");
+            sender.sendMessage("\u00A76Version " + Nukkit.VERSION + ". \u00A7bThis server is running \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7bfor Minecraft Bedrock Edition \u00A76" + ProtocolInfo.MINECRAFT_VERSION_NETWORK + " \u00A7b(Protocol \u00A76" + ProtocolInfo.CURRENT_PROTOCOL + "\u00A7b) including experimental multiversion support.");
         } else {
             String pluginName = "";
             for (String arg : args) pluginName += arg + " ";
