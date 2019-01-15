@@ -33,6 +33,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     public int fuelTotal;
     public int fuelAmount;
 
+    @SuppressWarnings("serial")
     public static final List<Integer> ingredients = new ArrayList<Integer>() {
         {
             addAll(Arrays.asList(Item.NETHER_WART, Item.GOLD_NUGGET, Item.GHAST_TEAR, Item.GLOWSTONE_DUST, Item.REDSTONE_DUST, Item.GUNPOWDER, Item.MAGMA_CREAM, Item.BLAZE_POWDER, Item.GOLDEN_CARROT, Item.SPIDER_EYE, Item.FERMENTED_SPIDER_EYE, Item.GLISTERING_MELON, Item.SUGAR, Item.RAW_FISH));
@@ -241,6 +242,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
                             this.inventory.setItem(i, recipe.getResult());
                         }
                     }
+                    this.getLevel().addSound(this, "random.potion.brewed");
 
                     ingredient.count--;
                     this.inventory.setIngredient(ingredient);

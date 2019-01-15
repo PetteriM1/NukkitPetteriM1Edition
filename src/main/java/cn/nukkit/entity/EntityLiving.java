@@ -117,6 +117,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     animate.eid = getId();
 
                     this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
+                    this.getLevel().addSound(this, "game.player.attack.strong");
 
                     source.setDamage(source.getDamage() * 1.5f);
                 }

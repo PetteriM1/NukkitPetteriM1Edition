@@ -7,8 +7,8 @@ import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.EntityUtils;
@@ -133,14 +133,14 @@ public class EntityThrownTrident extends EntityProjectile {
 
         this.timing.startTiming();
 
+        if (this.isCollided && !this.hadCollision) {
+            this.getLevel().addSound(this, "item.trident.hit_ground");
+        }
+
         boolean hasUpdate = super.onUpdate(currentTick);
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
-            if (firstTickOnGround) {
-                this.level.addLevelSoundEvent(178, 1, -1, this);
-                this.firstTickOnGround = false;
-            }
         }
 
         if (this.age > 1200) {
@@ -165,6 +165,7 @@ public class EntityThrownTrident extends EntityProjectile {
             ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, entity, DamageCause.PROJECTILE, damage);
         }
         entity.attack(ev);
+        this.getLevel().addSound(this, "item.trident.hit");
         this.hadCollision = true;
         this.close();
         EntityThrownTrident newTrident = (EntityThrownTrident) EntityUtils.create("ThrownTrident", this);
