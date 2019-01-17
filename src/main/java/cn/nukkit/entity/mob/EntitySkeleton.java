@@ -18,6 +18,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 
@@ -88,7 +89,7 @@ public class EntitySkeleton extends EntityWalkingMob {
                     } else {
                         projectile.spawnToAll();
                         projectile.namedTag.putBoolean("canNotPickup", true);
-                        this.level.addSound(this, "random.bow");
+                        this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW);
                     }
                 }
             }

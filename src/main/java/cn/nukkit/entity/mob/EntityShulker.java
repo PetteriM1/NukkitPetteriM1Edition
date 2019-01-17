@@ -9,7 +9,9 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -79,7 +81,7 @@ public class EntityShulker extends EntityWalkingMob {
                 bullet.kill();
             } else {
                 bullet.spawnToAll();
-                this.level.addSound(this, "mob.shulker.shoot");
+                this.level.addSound(this, Sound.MOB_SHULKER_SHOOT);
             }
         }
     }
@@ -90,7 +92,7 @@ public class EntityShulker extends EntityWalkingMob {
 
         if (!ev.isCancelled()) {
             if (EntityUtils.rand(1, 15) == 5) {
-                this.level.addSound(this, "mob.shulker.teleport");
+                this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
             }
         }

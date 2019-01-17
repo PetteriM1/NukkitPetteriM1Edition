@@ -11,6 +11,7 @@ import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
  * @author MagicDroidX
@@ -107,9 +108,9 @@ public class ItemBucket extends Item {
                     }
 
                     if (target instanceof BlockLava) {
-                        level.addSound(block, "bucket.fill_lava");
+                        level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_FILL_LAVA);
                     } else {
-                        level.addSound(block, "bucket.fill_water");
+                        level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_FILL_WATER);
                     }
 
                     return true;
@@ -136,9 +137,9 @@ public class ItemBucket extends Item {
                 }
 
                 if (this.getDamage() == 10) {
-                    level.addSound(block, "bucket.empty_lava");
+                    level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
                 } else {
-                    level.addSound(block, "bucket.empty_water");
+                    level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
                 }
 
                 return true;

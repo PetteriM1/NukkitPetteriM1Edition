@@ -3,6 +3,7 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -76,7 +77,7 @@ public class EntityShulkerBullet extends EntityProjectile {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        this.level.addSound(this, "mob.shulker.bullet.hit");
+        this.level.addSound(this, Sound.MOB_SHULKER_BULLET_HIT);
         this.close();
         return true;
     }

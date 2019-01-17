@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
@@ -47,9 +48,9 @@ public class FoodChorusFruit extends FoodNormal {
                 continue;
             }
 
-            level.addSound(player, "mob.endermen.portal");
+            level.addSound(new EndermanTeleportSound(player));
             player.teleport(new Vector3(x + 0.5, y + 1, z + 0.5));
-            level.addSound(player, "mob.endermen.portal");
+            level.addSound(new EndermanTeleportSound(player));
 
             break;
         }

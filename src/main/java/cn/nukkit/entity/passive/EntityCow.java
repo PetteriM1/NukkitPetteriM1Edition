@@ -8,6 +8,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class EntityCow extends EntityWalkingAnimal {
         if (item.equals(Item.get(Item.BUCKET, 0), true) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.BUCKET, 0, 1));
             player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
-            this.level.addSound(this, "mob.cow.milk");
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
         } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
             player.getInventory().removeItem(Item.get(Item.WHEAT, 0, 1));
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));

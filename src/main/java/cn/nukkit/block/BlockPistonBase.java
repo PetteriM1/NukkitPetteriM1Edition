@@ -7,11 +7,10 @@ import cn.nukkit.event.block.BlockPistonChangeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.sound.PistonInSound;
-import cn.nukkit.level.sound.PistonOutSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,8 +120,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta {
                     return;
                 }
 
-                this.level.addSound(new PistonOutSound(this));
-            } else {
+                this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_PISTON_OUT);
             }
         } else if (!isPowered && isExtended()) {
             //this.level.setBlock() TODO: set piston extension?
@@ -141,7 +139,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta {
                 this.level.setBlock(getLocation().getSide(facing), new BlockAir(), true, false);
             }
 
-            this.level.addSound(new PistonInSound(this));
+            this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_PISTON_IN);
         }
     }
 

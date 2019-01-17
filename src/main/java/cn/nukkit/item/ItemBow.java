@@ -11,6 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.Random;
 
@@ -122,7 +123,7 @@ public class ItemBow extends ItemTool {
                     proj.kill();
                 } else {
                     proj.spawnToAll();
-                    player.getLevel().addSound(player, "random.bow");
+                    player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);
 
                     if (this.hasEnchantment(Enchantment.ID_BOW_INFINITY)) {
                         proj.namedTag.putBoolean("canNotPickup", true);

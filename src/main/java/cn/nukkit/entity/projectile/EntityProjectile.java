@@ -22,6 +22,8 @@ public abstract class EntityProjectile extends Entity {
 
     public Entity shootingEntity = null;
 
+    public boolean firstTickOnGround = true;
+
     protected double getDamage() {
         return namedTag.contains("damage") ? namedTag.getDouble("damage") : getBaseDamage();
     }

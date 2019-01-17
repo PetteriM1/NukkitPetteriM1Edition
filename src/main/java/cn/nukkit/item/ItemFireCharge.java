@@ -1,14 +1,16 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.Block;
-import cn.nukkit.math.BlockFace;
-import cn.nukkit.level.Level;
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockSolid;
 import cn.nukkit.block.BlockSolidMeta;
-import java.util.concurrent.ThreadLocalRandom;
 import cn.nukkit.event.block.BlockIgniteEvent;
-import cn.nukkit.block.BlockFire;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
+import cn.nukkit.math.BlockFace;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by PetteriM1
@@ -54,7 +56,7 @@ public class ItemFireCharge extends Item {
                     item.setCount(item.getCount() - 1);
                     player.getInventory().setItemInHand(item);
                 }
-                level.addSound(block, "mob.ghast.fireball");
+                level.addSound(block, Sound.MOB_GHAST_FIREBALL);
                 return true;
             }
         }

@@ -3768,7 +3768,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!ev.isCancelled() && cause.getCause() != DamageCause.VOID) {
             if (this.getInventory().getItemInHand() instanceof ItemTotem) {
                 this.getInventory().remove(Item.get(Item.TOTEM, 0, 1));
-                this.getLevel().addSound(this, "random.totem");
+                this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
                 this.extinguish();
                 this.setHealth(1);
 

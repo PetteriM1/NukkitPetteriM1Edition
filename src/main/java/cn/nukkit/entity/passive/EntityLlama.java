@@ -11,6 +11,7 @@ import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -101,7 +102,7 @@ public class EntityLlama extends EntityWalkingAnimal {
                                 split.kill();
                             } else {
                                 split.spawnToAll();
-                                this.level.addSound(this, "mob.llama.spit");
+                                this.level.addSound(this, Sound.MOB_LLAMA_SPIT);
                             }
                         }
                     }

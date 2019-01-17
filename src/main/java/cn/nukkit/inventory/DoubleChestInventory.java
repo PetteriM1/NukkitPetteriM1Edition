@@ -123,7 +123,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
             pk1.case2 = 2;
             Level level = this.left.getHolder().getLevel();
             if (level != null) {
-                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_OPEN, 1, -1, this.left.getHolder().add(0.5, 0.5, 0.5));
+                level.addLevelSoundEvent(this.left.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
                 level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk1);
             }
 
@@ -136,7 +136,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
             level = this.right.getHolder().getLevel();
             if (level != null) {
-                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_OPEN, 1, -1, this.right.getHolder().add(0.5, 0.5, 0.5));
+                level.addLevelSoundEvent(this.left.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
                 level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk2);
             }
         }
@@ -154,7 +154,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
             Level level = this.right.getHolder().getLevel();
             if (level != null) {
-                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_CLOSED, 1, -1, this.right.getHolder().add(0.5, 0.5, 0.5));
+                level.addLevelSoundEvent(this.right.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_CLOSED);
                 level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk1);
             }
 
@@ -167,7 +167,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
 
             level = this.left.getHolder().getLevel();
             if (level != null) {
-                level.addLevelSoundEvent(LevelSoundEventPacket.SOUND_CHEST_CLOSED, 1, -1, this.left.getHolder().add(0.5, 0.5, 0.5));
+                level.addLevelSoundEvent(this.right.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_CLOSED);
                 level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk2);
             }
         }

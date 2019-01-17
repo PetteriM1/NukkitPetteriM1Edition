@@ -10,7 +10,6 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.network.protocol.PlaySoundPacket;
 
 import java.util.Random;
 
@@ -81,17 +80,7 @@ public class EntityFirework extends Entity {
             this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (180D / Math.PI));
 
             if (this.age == 0) {
-                PlaySoundPacket pk = new PlaySoundPacket();
-                pk.name = "firework.launch";
-                pk.volume = 1;
-                pk.pitch = 1;
-                pk.x = getFloorX();
-                pk.y = getFloorY();
-                pk.z = getFloorZ();
-
-                this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
-
-                hasUpdate = true;
+                this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LAUNCH);
             }
 
             if (this.age >= this.lifetime) {

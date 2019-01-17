@@ -11,6 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.Random;
 
@@ -110,7 +111,7 @@ public class ItemCrossbow extends ItemBow {
                     proj.kill();
                 } else {
                     proj.spawnToAll();
-                    player.getLevel().addSound(player, "crossbow.shoot");
+                    player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_SHOOT);
 
                     if (this.hasEnchantment(Enchantment.ID_BOW_INFINITY)) {
                         proj.namedTag.putBoolean("canNotPickup", true);

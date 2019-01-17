@@ -6,6 +6,7 @@ import cn.nukkit.blockentity.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.item.*;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
@@ -92,7 +93,7 @@ public class BlockCauldron extends BlockSolidMeta {
                         this.setDamage(0);//empty
                         this.level.setBlock(this, this, true);
                         cauldron.clearCustomColor();
-                        this.getLevel().addSound(this, "cauldron.fillwater");
+                        this.getLevel().addSound(this, Sound.CAULDRON_TAKEWATER);
                     }
                 } else if (item.getDamage() == 8) {//water bucket
 
@@ -115,12 +116,12 @@ public class BlockCauldron extends BlockSolidMeta {
                             cauldron.setSplashPotion(false);
                             cauldron.clearCustomColor();
                             this.level.setBlock(this, this, true);
-                            this.level.addSound(this, "cauldron.explode");
+                            this.level.addSound(this, Sound.CAULDRON_EXPLODE);
                         } else {
                             this.setDamage(6);//fill
                             cauldron.clearCustomColor();
                             this.level.setBlock(this, this, true);
-                            this.getLevel().addSound(this, "cauldron.fillwater");
+                            this.getLevel().addSound(this, Sound.CAULDRON_FILLWATER);
                         }
                         //this.update();
                     }
@@ -155,7 +156,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     }
                 }
 
-                this.getLevel().addSound(this, "cauldron.fillpotion");
+                this.getLevel().addSound(this, Sound.CAULDRON_FILLPOTION);
                 break;
             case Item.GLASS_BOTTLE:
                 if (isEmpty()) {
@@ -180,7 +181,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     }
                 }
 
-                this.getLevel().addSound(this, "cauldron.takepotion");
+                this.getLevel().addSound(this, Sound.CAULDRON_TAKEPOTION);
                 break;
             default:
                 return true;

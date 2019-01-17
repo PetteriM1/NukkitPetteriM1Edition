@@ -11,6 +11,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.EntityUtils;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,8 +24,6 @@ public class EntityThrownTrident extends EntityProjectile {
     public static final int NETWORK_ID = 73;
 
     public static final int DATA_SOURCE_ID = 17;
-
-    public boolean firstTickOnGround = true;
 
     protected Item trident;
 
@@ -79,14 +78,14 @@ public class EntityThrownTrident extends EntityProjectile {
         super.initEntity();
 
         this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 8;
-        this.trident = namedTag.contains("trident") ? NBTIO.getItemHelper(namedTag.getCompound("trident")) : Item.get(0);
+        this.trident = namedTag.contains("Trident") ? NBTIO.getItemHelper(namedTag.getCompound("Trident")) : Item.get(0);
     }
 
     @Override
     public void saveNBT() {
         super.saveNBT();
 
-        this.namedTag.put("trident", NBTIO.putItemHelper(this.trident));
+        this.namedTag.put("Trident", NBTIO.putItemHelper(this.trident));
     }
 
     public Item getItem() {
@@ -133,14 +132,14 @@ public class EntityThrownTrident extends EntityProjectile {
 
         this.timing.startTiming();
 
-        if (this.isCollided && !this.hadCollision) {
-            this.getLevel().addSound(this, "item.trident.hit_ground");
-        }
-
         boolean hasUpdate = super.onUpdate(currentTick);
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
+            if (this.firstTickOnGround) {
+                this.firstTickOnGround = false;
+                this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
+            }
         }
 
         if (this.age > 1200) {
@@ -165,7 +164,7 @@ public class EntityThrownTrident extends EntityProjectile {
             ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, entity, DamageCause.PROJECTILE, damage);
         }
         entity.attack(ev);
-        this.getLevel().addSound(this, "item.trident.hit");
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT);
         this.hadCollision = true;
         this.close();
         EntityThrownTrident newTrident = (EntityThrownTrident) EntityUtils.create("ThrownTrident", this);

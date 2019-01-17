@@ -9,6 +9,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -105,13 +106,13 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (!ev.isCancelled()) {
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-                this.level.addSound(this, "mob.endermen.portal");
+                this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
-                this.level.addSound(this, "mob.endermen.portal");
+                this.level.addSound(new EndermanTeleportSound(this));
             } else if (EntityUtils.rand(1, 15) == 5) {
-                this.level.addSound(this, "mob.endermen.portal");
+                this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
-                this.level.addSound(this, "mob.endermen.portal");
+                this.level.addSound(new EndermanTeleportSound(this));
             }
         }
         return true;

@@ -16,9 +16,9 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.sound.ExplodeSound;
 import cn.nukkit.math.*;
 import cn.nukkit.network.protocol.ExplodePacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Hash;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 
@@ -162,7 +162,7 @@ public class SmallExplosion extends Explosion {
         pk.radius = (float) this.size;
         pk.records = send.toArray(new Vector3[0]);
         this.level.addChunkPacket((int) source.x >> 4, (int) source.z >> 4, pk);
-        this.level.addSound(new ExplodeSound(new Vector3(this.source.x, this.source.y, this.source.z)));
+        this.level.addLevelSoundEvent(source, LevelSoundEventPacket.SOUND_EXPLODE);
         return true;
     }
 }

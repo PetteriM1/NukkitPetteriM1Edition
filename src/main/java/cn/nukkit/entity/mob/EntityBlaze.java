@@ -14,6 +14,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelEventPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,7 +215,7 @@ public class EntityBlaze extends EntityFlyingMob {
                 fireball.kill();
             } else {
                 fireball.spawnToAll();
-                this.level.addSound(this, "mob.blaze.shoot");
+                this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_BLAZE_SHOOT);
             }
         }
     }

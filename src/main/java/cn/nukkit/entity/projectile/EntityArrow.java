@@ -3,6 +3,8 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -14,8 +16,6 @@ public class EntityArrow extends EntityProjectile {
     public static final int NETWORK_ID = 80;
 
     public static final int DATA_SOURCE_ID = 17;
-
-    protected boolean firstTickOnGround = true;
 
     @Override
     public int getNetworkId() {
@@ -114,9 +114,9 @@ public class EntityArrow extends EntityProjectile {
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
-            if (firstTickOnGround) {
-                this.level.addSound(this, "random.bowhit");
+            if (this.firstTickOnGround) {
                 this.firstTickOnGround = false;
+                this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW_HIT);
             }
         }
 

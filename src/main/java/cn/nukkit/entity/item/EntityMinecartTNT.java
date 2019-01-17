@@ -1,7 +1,6 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
-
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
@@ -11,6 +10,7 @@ import cn.nukkit.item.ItemMinecartTNT;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.MinecartType;
 
 import java.util.Random;
@@ -132,7 +132,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     public boolean onInteract(Player player, Item item) {
         boolean interact = super.onInteract(player, item);
         if (item.getId() == Item.FLINT_AND_STEEL) {
-            this.level.addSound(this, "fire.ignite");
+            level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
             this.explode();
             return true;
         }

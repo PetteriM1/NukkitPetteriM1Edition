@@ -11,6 +11,7 @@ import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -95,7 +96,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
                 blueskull.kill();
             } else {
                 blueskull.spawnToAll();
-                this.level.addSound(this, "mob.wither.shoot");
+                this.level.addSound(this, Sound.MOB_WITHER_SHOOT);
             }
         }
     }

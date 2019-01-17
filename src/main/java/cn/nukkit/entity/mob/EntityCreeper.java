@@ -17,6 +17,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,7 +209,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         super.onInteract(player, item);
 
         if (item.getId() == Item.FLINT_AND_STEEL) {
-            this.level.addSound(this, "fire.ignite");
+            level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
             this.explode();
 
             return true;
