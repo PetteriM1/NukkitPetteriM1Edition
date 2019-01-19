@@ -4572,6 +4572,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.foodData;
     }
 
+    @SuppressWarnings("unused")
     private void setDimension(int dimension) {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
         pk.dimension = dimension;

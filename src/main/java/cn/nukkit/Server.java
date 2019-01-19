@@ -117,8 +117,6 @@ public class Server {
 
     private float maxUse = 0;
 
-    private int sendUsageTicker = 0;
-
     private final MainLogger logger;
 
     private final CommandReader console;
@@ -216,6 +214,7 @@ public class Server {
     
     private boolean suomicraftMode;
 
+    @SuppressWarnings("serial")
     Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
@@ -501,7 +500,7 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            this.getScheduler().scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200), true);
+            this.getScheduler().scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
 
         this.start();
@@ -601,6 +600,7 @@ public class Server {
         this.batchPackets(players, packets, false);
     }
 
+    @SuppressWarnings("unused")
     public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync) {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
@@ -877,9 +877,7 @@ public class Server {
     }
 
     public void onPlayerLogin(Player player) {
-        if (this.sendUsageTicker > 0) {
-            this.uniquePlayers.add(player.getUniqueId());
-        }
+        this.uniquePlayers.add(player.getUniqueId());
     }
 
     public void addPlayer(String identifier, Player player) {
@@ -1073,7 +1071,10 @@ public class Server {
         }
 
         if ((this.tickCounter & 0b1111) == 0) {
-            this.titleTick();
+            this.getScheduler().scheduleTask(null, () -> {
+                this.titleTick();
+            }, true);
+
             this.network.resetStatistics();
             this.maxTick = 20;
             this.maxUse = 0;
@@ -1095,10 +1096,6 @@ public class Server {
         if (this.autoSave && ++this.autoSaveTicker >= this.autoSaveTicks) {
             this.autoSaveTicker = 0;
             this.doAutoSave();
-        }
-
-        if (this.sendUsageTicker > 0 && --this.sendUsageTicker == 0) {
-            this.sendUsageTicker = 6000;
         }
 
         if (this.tickCounter % 100 == 0) {
@@ -1163,7 +1160,7 @@ public class Server {
     }
 
     public String getName() {
-        return "Nukkit";
+        return "Nukkit PetteriM1 Edition";
     }
 
     public boolean isRunning() {

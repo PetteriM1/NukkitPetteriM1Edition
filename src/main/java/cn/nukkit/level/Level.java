@@ -982,10 +982,6 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void sendBlocks(Player[] target, Vector3[] blocks, int flags, boolean optimizeRebuilds) {
-        int size = 0;
-        for (int i = 0; i < blocks.length; i++) {
-            if (blocks[i] != null) size++;
-        }
         LongSet chunks = null;
         if (optimizeRebuilds) {
             chunks = new LongOpenHashSet();
