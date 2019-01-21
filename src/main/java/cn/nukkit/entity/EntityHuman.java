@@ -30,6 +30,8 @@ public class EntityHuman extends EntityHumanType {
     protected UUID uuid;
     protected byte[] rawUUID;
 
+    protected Skin skin;
+
     @Override
     public float getWidth() {
         return 0.6f;
@@ -47,15 +49,13 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getEyeHeight() {
-        return 1.62f;
+        return 1.62f - (this.isSwimming() || this.isGliding() ? 1 : 0);
     }
 
     @Override
     protected float getBaseOffset() {
         return this.getEyeHeight();
     }
-
-    protected Skin skin;
 
     @Override
     public int getNetworkId() {

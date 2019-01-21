@@ -3772,15 +3772,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.extinguish();
                 this.setHealth(1);
 
-                Effect regeneration = Effect.getEffect(Effect.REGENERATION);
-                regeneration.setDuration(20 * 40);
-                regeneration.setAmplifier(2);
-                this.addEffect(regeneration);
-                
-                Effect absorption = Effect.getEffect(Effect.ABSORPTION);
-                absorption.setDuration(20 * 5);
-                absorption.setAmplifier(2);
-                this.addEffect(absorption);
+                this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(20 * 40).setAmplifier(2));
+                this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(20 * 5).setAmplifier(2));
 
                 EntityEventPacket pk = new EntityEventPacket();
                 pk.eid = this.getId();
@@ -4572,8 +4565,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.foodData;
     }
 
-    @SuppressWarnings("unused")
-    private void setDimension(int dimension) {
+    public void setDimension(int dimension) {
         ChangeDimensionPacket pk = new ChangeDimensionPacket();
         pk.dimension = dimension;
         pk.x = (float) this.x;

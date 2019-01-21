@@ -46,14 +46,6 @@ public class EntityPolarBear extends EntityWalkingMob {
     }
 
     @Override
-    public float getEyeHeight() {
-        if (this.isBaby()) {
-            return 0.65f;
-        }
-        return 1.4f;
-    }
-
-    @Override
     public double getSpeed() {
         return 1.25;
     }

@@ -43,14 +43,6 @@ public class EntityPig extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getEyeHeight() {
-        if (this.isBaby()) {
-            return 0.45f;
-        }
-        return 0.9f;
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
 

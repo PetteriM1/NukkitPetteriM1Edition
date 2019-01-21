@@ -40,7 +40,7 @@ public class PlaySoundCommand extends VanillaCommand {
 
             Player p = (Player) sender;
 
-            p.getLevel().addSound(p, args[0]);
+            p.getLevel().addSound(p, args[0], p);
             p.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
             
             return true;
@@ -49,7 +49,7 @@ public class PlaySoundCommand extends VanillaCommand {
         if (args.length > 1) {
             if (args[1].equalsIgnoreCase("@a")) {
                 for (Player p : Server.getInstance().getOnlinePlayers().values()) {
-                    p.getLevel().addSound(p, args[0]);
+                    p.getLevel().addSound(p, args[0], p);
                 }
                 
                 sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], "@a"));
@@ -60,7 +60,7 @@ public class PlaySoundCommand extends VanillaCommand {
             if (args[1].equalsIgnoreCase("@s") && sender instanceof Player) {
                 Player p = (Player) sender;
 
-                p.getLevel().addSound(p, args[0]);
+                p.getLevel().addSound(p, args[0], p);
                 sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
 
                 return true;
@@ -73,7 +73,7 @@ public class PlaySoundCommand extends VanillaCommand {
                 return true;
             }
 
-            p.getLevel().addSound(p, args[0]);
+            p.getLevel().addSound(p, args[0], p);
             sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
         }
 

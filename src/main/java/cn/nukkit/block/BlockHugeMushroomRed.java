@@ -45,7 +45,7 @@ public class BlockHugeMushroomRed extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (new NukkitRandom().nextRange(1, 20) == 0) {
+        if (new NukkitRandom().nextRange(1, 10) == 5) {
             return new Item[]{
                     new ItemBlock(new BlockMushroomRed())
             };

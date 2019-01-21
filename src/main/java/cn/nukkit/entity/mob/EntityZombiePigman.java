@@ -43,11 +43,6 @@ public class EntityZombiePigman extends EntityWalkingMob {
     }
 
     @Override
-    public float getEyeHeight() {
-        return 1.62f;
-    }
-
-    @Override
     public double getSpeed() {
         return 1.15;
     }

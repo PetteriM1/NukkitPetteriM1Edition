@@ -47,14 +47,6 @@ public class EntityChicken extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getEyeHeight() {
-        if (this.isBaby()) {
-            return 0.51f;
-        }
-        return 0.7f;
-    }
-
-    @Override
     public float getDrag() {
         return 0.2f;
     }

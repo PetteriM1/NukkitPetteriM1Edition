@@ -302,7 +302,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public float getEyeHeight() {
-        return this.getHeight() / 2 + 0.1f;
+        return this.getHeight() / 2 + 0.1f - (this.isSwimming() || this.isGliding() ? 1 : 0);
     }
 
     public float getWidth() {
@@ -1529,7 +1529,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isSubmerged() {
-        double y = this.y + this.getEyeHeight();
+        double y = this.y + this.getEyeHeight() - (this.isSwimming() || this.isGliding() ? 1 : 0);
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {

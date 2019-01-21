@@ -47,11 +47,6 @@ public class EntitySpider extends EntityWalkingMob {
     }
 
     @Override
-    public float getEyeHeight() {
-        return 1;
-    }
-
-    @Override
     public double getSpeed() {
         return 1.13;
     }

@@ -85,10 +85,6 @@ public class EntityShulkerBullet extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         super.onCollideWithEntity(entity);
-        
-        Effect levitation = Effect.getEffect(Effect.LEVITATION);
-        levitation.setAmplifier(1);
-        levitation.setDuration(200);
-        entity.addEffect(levitation);
+        entity.addEffect(Effect.getEffect(Effect.LEVITATION).setAmplifier(1).setDuration(200));
     }
 }
