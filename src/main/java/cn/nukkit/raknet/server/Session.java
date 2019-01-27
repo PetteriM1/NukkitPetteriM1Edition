@@ -47,7 +47,6 @@ public class Session {
     private int lastSeqNumber = -1;
 
     private long lastUpdate;
-    private final long startTime;
 
     private boolean isTemporal = true;
 
@@ -81,7 +80,6 @@ public class Session {
         this.port = port;
         this.sendQueue = new DATA_PACKET_4();
         this.lastUpdate = System.currentTimeMillis();
-        this.startTime = System.currentTimeMillis();
         this.isActive = false;
         this.windowStart = -1;
         this.windowEnd = WINDOW_SIZE;
@@ -294,6 +292,7 @@ public class Session {
         }
     }
 
+    @SuppressWarnings("serial")
     private void handleSplit(EncapsulatedPacket packet) throws Exception {
         if (packet.splitCount >= MAX_SPLIT_SIZE || packet.splitIndex >= MAX_SPLIT_SIZE || packet.splitIndex < 0) {
             return;
@@ -525,7 +524,6 @@ public class Session {
         } else if ((packet.buffer[0] & 0xff) > 0x00 || (packet.buffer[0] & 0xff) < 0x80) { //Not Data packet :)
             packet.decode();
             if (packet instanceof OPEN_CONNECTION_REQUEST_1) {
-                //TODO: check protocol number and refuse connections
                 OPEN_CONNECTION_REPLY_1 pk = new OPEN_CONNECTION_REPLY_1();
                 pk.mtuSize = ((OPEN_CONNECTION_REQUEST_1) packet).mtuSize;
                 pk.serverID = sessionManager.getID();

@@ -76,19 +76,13 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_DISPLAY_ITEM = 16; //int (id | (data << 16))
     public static final int DATA_DISPLAY_OFFSET = 17; //int
     public static final int DATA_HAS_DISPLAY = 18; //byte (must be 1 for minecart to show block inside)
-    /* 19 - 22 */
     public static final int DATA_ENDERMAN_HELD_RUNTIME_ID = 23; //short
     public static final int DATA_ENTITY_AGE = 24; //short
     public static final int DATA_PLAYER_FLAGS = 26; //byte
-    /* 27 (int) player "index"? */
     public static final int DATA_PLAYER_BED_POSITION = 28; //block coords
     public static final int DATA_FIREBALL_POWER_X = 29; //float
     public static final int DATA_FIREBALL_POWER_Y = 30;
     public static final int DATA_FIREBALL_POWER_Z = 31;
-    /* 32 (unknown)
-     * 33 (float) fishing bobber
-     * 34 (float) fishing bobber
-     * 35 (float) fishing bobber */
     public static final int DATA_POTION_AUX_VALUE = 36; //short
     public static final int DATA_LEAD_HOLDER_EID = 37; //long
     public static final int DATA_SCALE = 38; //float
@@ -105,7 +99,6 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_WITHER_TARGET_1 = 49; //long
     public static final int DATA_WITHER_TARGET_2 = 50; //long
     public static final int DATA_WITHER_TARGET_3 = 51; //long
-    /* 52 (short) */
     public static final int DATA_BOUNDING_BOX_WIDTH = 53; //float
     public static final int DATA_BOUNDING_BOX_HEIGHT = 54; //float
     public static final int DATA_FUSE_LENGTH = 55; //int
@@ -116,28 +109,24 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_AREA_EFFECT_CLOUD_RADIUS = 60; //float
     public static final int DATA_AREA_EFFECT_CLOUD_WAITING = 61; //int
     public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE_ID = 62; //int
-    /* 63 (int) shulker-related */
     public static final int DATA_SHULKER_ATTACH_FACE = 64; //byte
-    /* 65 (short) shulker-related */
     public static final int DATA_SHULKER_ATTACH_POS = 66; //block coords
     public static final int DATA_TRADING_PLAYER_EID = 67; //long
-    /* 69 (byte) command-block */
     public static final int DATA_COMMAND_BLOCK_COMMAND = 70; //string
     public static final int DATA_COMMAND_BLOCK_LAST_OUTPUT = 71; //string
     public static final int DATA_COMMAND_BLOCK_TRACK_OUTPUT = 72; //byte
     public static final int DATA_CONTROLLING_RIDER_SEAT_NUMBER = 73; //byte
     public static final int DATA_STRENGTH = 74; //int
     public static final int DATA_MAX_STRENGTH = 75; //int
-    // 76 (int)
     public static final int DATA_LIMITED_LIFE = 77;
     public static final int DATA_ARMOR_STAND_POSE_INDEX = 78; // int
     public static final int DATA_ENDER_CRYSTAL_TIME_OFFSET = 79; // int
     public static final int DATA_ALWAYS_SHOW_NAMETAG = 80; // byte
     public static final int DATA_COLOR_2 = 81; // byte
-    // 82 unknown
     public static final int DATA_SCORE_TAG = 83; //String
     public static final int DATA_BALLOON_ATTACHED_ENTITY = 84; // long
     public static final int DATA_PUFFERFISH_SIZE = 85;
+    public static final int DATA_FLAGS2 = 91; //long (extended data flags)
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -194,7 +183,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_ENCHANTED = 51;
     public static final int DATA_FLAG_SHOW_TRIDENT_ROPE = 52;
     public static final int DATA_FLAG_CONTAINER_PRIVATE = 53;
-    /* 54 TransformationComponent */
+    public static final int DATA_FLAG_TRANSFORMING = 54;
     public static final int DATA_FLAG_SPIN_ATTACK = 55;
     public static final int DATA_FLAG_SWIMMING = 56;
     public static final int DATA_FLAG_BRIBED = 57;
@@ -302,7 +291,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public float getEyeHeight() {
-        return this.getHeight() / 2 + 0.1f - (this.isSwimming() || this.isGliding() ? 1 : 0);
+        return this.getHeight() / 2 + 0.1f;
     }
 
     public float getWidth() {
@@ -1226,14 +1215,12 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void addMotion(double motionX, double motionY, double motionZ) {
-        int chunkX = this.getFloorX() >> 16;
-        int chunkZ = this.getFloorZ() >> 16;
         SetEntityMotionPacket pk = new SetEntityMotionPacket();
         pk.eid = this.getId();
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
-        this.level.addChunkPacket(chunkX, chunkZ, pk);
+        this.level.addChunkPacket(this.getFloorX() >> 16, this.getFloorZ() >> 16, pk);
     }
 
     public Vector3 getDirectionVector() {
@@ -1325,11 +1312,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public final void scheduleUpdate() {
-        try {
-            this.level.updateEntities.put(this.id, this);
-        } catch (Exception e) {
-            this.getServer().getLogger().debug("Adding " + this.getId() + " to updateEntities failed");
-        }
+        this.level.updateEntities.put(this.id, this);
     }
 
     public boolean isOnFire() {
@@ -2087,6 +2070,14 @@ public abstract class Entity extends Location implements Metadatable {
 
     public boolean getDataFlag(int propertyId, int id) {
         return (((propertyId == EntityHuman.DATA_PLAYER_FLAGS ? this.getDataPropertyByte(propertyId) & 0xff : this.getDataPropertyLong(propertyId))) & (1L << id)) > 0;
+    }
+
+    public void setGenericFlag(int propertyId, boolean value) {
+        this.setDataFlag(propertyId >= 64 ? DATA_FLAGS2 : DATA_FLAGS, propertyId % 64, value);
+    }
+
+    public boolean getGenericFlag(int propertyId) {
+        return this.getDataFlag(propertyId >= 64 ? DATA_FLAGS2 : DATA_FLAGS, propertyId % 64);
     }
 
     @Override

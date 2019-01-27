@@ -5,6 +5,7 @@ package cn.nukkit.level.generator.biome;
  * @author MagicDroidX
  */
 public interface CaveBiome {
+
     int getStoneBlock();
 
     int getSurfaceBlock();

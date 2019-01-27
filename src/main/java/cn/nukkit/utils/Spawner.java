@@ -17,20 +17,24 @@ public class Spawner extends Thread {
             new ChickenSpawner(this),
             new CowSpawner(this),
             new CreeperSpawner(this),
+            new DonkeySpawner(this),
             new EndermanSpawner(this),
             new HorseSpawner(this),
             new HuskSpawner(this),
+            new MagmaCubeSpawner(this),
             new MooshroomSpawner(this),
             new OcelotSpawner(this),
+            new ParrotSpawner(this),
             new PigSpawner(this),
             new PolarBearSpawner(this),
-            new ZombiePigmanSpawner(this),
             new RabbitSpawner(this),
             new SheepSpawner(this),
             new SkeletonSpawner(this),
+            new SlimeSpawner(this),
             new SpiderSpawner(this),
             new StraySpawner(this),
             new ZombieSpawner(this),
+            new ZombiePigmanSpawner(this),
             new WitchSpawner(this),
             new WitherSkeletonSpawner(this),
             new WolfSpawner(this)
@@ -112,7 +116,6 @@ public class Spawner extends Thread {
                         if (checkY > 255 || checkY < 1 || level.getBlockIdAt(x, checkY, z) != Block.AIR) {
                             break;
                         }
-
                         if (checkNeedDegree <= 0) {
                             return y;
                         }
@@ -126,12 +129,10 @@ public class Spawner extends Thread {
                     y = 256;
                     break;
                 }
-
                 if (y < 1) {
                     y = 0;
                     break;
                 }
-
                 if (level.getBlockIdAt(x, y, z) != Block.AIR) {
                     int checkNeedDegree = needDegree;
                     int checkY = y;
@@ -141,7 +142,6 @@ public class Spawner extends Thread {
                         if (checkY > 255 || checkY < 1 || level.getBlockIdAt(x, checkY, z) != Block.AIR) {
                             break;
                         }
-
                         if (checkNeedDegree <= 0) {
                             return y;
                         }

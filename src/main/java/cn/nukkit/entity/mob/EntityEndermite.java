@@ -95,6 +95,6 @@ public class EntityEndermite extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return 3;
+        return this.isBaby() ? 0 : 3;
     }
 }

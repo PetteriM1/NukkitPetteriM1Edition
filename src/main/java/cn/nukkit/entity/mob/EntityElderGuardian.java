@@ -71,7 +71,7 @@ public class EntityElderGuardian extends EntitySwimmingMob {
 
     @Override
     public int getKillExperience() {
-        return 10;
+        return this.isBaby() ? 0 : 10;
     }
 
     @Override

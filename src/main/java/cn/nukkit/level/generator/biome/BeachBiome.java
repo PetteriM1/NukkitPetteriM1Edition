@@ -11,6 +11,7 @@ import cn.nukkit.level.generator.populator.PopulatorTallSugarcane;
  * Nukkit Project
  */
 public class BeachBiome extends SandyBiome {
+
     public BeachBiome() {
         PopulatorSugarcane sugarcane = new PopulatorSugarcane();
         sugarcane.setBaseAmount(2);

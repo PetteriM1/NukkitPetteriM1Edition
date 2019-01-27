@@ -1,5 +1,6 @@
 package cn.nukkit.plugin;
 
+@SuppressWarnings("serial")
 public class LibraryLoadException extends RuntimeException {
 
     public LibraryLoadException(Library library) {

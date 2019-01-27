@@ -17,6 +17,7 @@ import java.util.Set;
  * @author MagicDroidX
  * Nukkit Project
  */
+@SuppressWarnings("unchecked")
 public class Network {
 
     public static final byte CHANNEL_NONE = 0;

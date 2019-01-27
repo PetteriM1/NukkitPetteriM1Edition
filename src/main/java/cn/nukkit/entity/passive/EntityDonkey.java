@@ -89,6 +89,6 @@ public class EntityDonkey extends EntityWalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
     }
 }

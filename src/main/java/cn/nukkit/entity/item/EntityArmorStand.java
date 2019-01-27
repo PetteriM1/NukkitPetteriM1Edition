@@ -2,18 +2,17 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemArmorStand;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.SmokeParticle;
+import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 
-/**
- * Created by PetteriM1
- */
 public class EntityArmorStand extends Entity {
 
 	public static final int NETWORK_ID = 61;
@@ -30,21 +29,25 @@ public class EntityArmorStand extends Entity {
 
 	@Override
     protected float getGravity() {
-        return 0.1f;
+        return 0.04f;
     }
 
 	@Override
     public float getHeight() {
-        return 2f;
+        return 1.975f;
     }
 
     @Override
     public float getWidth() {
-        return 1f;
+        return 0.5f;
     }
 
 	public EntityArmorStand(FullChunk chunk, CompoundTag nbt) {
 		super(chunk, nbt);
+
+		if (nbt.contains(TAG_POSE_INDEX)) {
+            this.setPose(nbt.getInt(TAG_POSE_INDEX));
+        }
 	}
 
 	@Override
@@ -74,8 +77,7 @@ public class EntityArmorStand extends Entity {
 	}
 
 	public void remove() {
-		this.level.addParticle(new SmokeParticle(this));
-		this.close();
+		this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
 		this.kill();
 
 		Player[] players = this.getLevel().getPlayers().values().toArray(new Player[0]);
@@ -110,5 +112,33 @@ public class EntityArmorStand extends Entity {
 		this.timing.stopTiming();
 
 		return hasUpdate;
+	}
+
+	@Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putInt(TAG_POSE_INDEX, this.getPose());
+    }
+
+	@Override
+	public boolean onInteract(Player player, Item item) {
+		if (player.isSneaking()) {
+			if (this.getPose() >= 12) {
+				this.setPose(0);
+			} else {
+				this.setPose(this.getPose() + 1);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public int getPose() {
+		return this.dataProperties.getInt(Entity.DATA_ARMOR_STAND_POSE_INDEX);
+	}
+
+	public void setPose(int pose) {
+		this.dataProperties.putInt(Entity.DATA_ARMOR_STAND_POSE_INDEX, pose);
 	}
 }

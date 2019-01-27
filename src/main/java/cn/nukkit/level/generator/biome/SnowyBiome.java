@@ -10,6 +10,7 @@ import cn.nukkit.block.BlockSnowLayer;
  * Nukkit Project
  */
 public abstract class SnowyBiome extends NormalBiome {
+
     public SnowyBiome() {
         this.setGroundCover(new Block[]{
                 new BlockSnowLayer(),

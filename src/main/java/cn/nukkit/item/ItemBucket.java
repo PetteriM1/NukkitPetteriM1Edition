@@ -1,17 +1,20 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockLava;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.block.BlockWater;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.EntityUtils;
 
 /**
  * @author MagicDroidX
@@ -140,6 +143,27 @@ public class ItemBucket extends Item {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
                 } else {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
+                }
+
+                if (Server.getInstance().getPropertyBoolean("spawn-eggs", true)) {
+                    switch (this.getDamage()) {
+                        case 2:
+                            Entity e2 = EntityUtils.create("Cod", block);
+                            if (e2 != null) e2.spawnToAll();
+                            break;
+                        case 3:
+                            Entity e3 = EntityUtils.create("Salmon", block);
+                            if (e3 != null) e3.spawnToAll();
+                            break;
+                        case 4:
+                            Entity e4 = EntityUtils.create("TropicalFish", block);
+                            if (e4 != null) e4.spawnToAll();
+                            break;
+                        case 5:
+                            Entity e5 = EntityUtils.create("Pufferfish", block);
+                            if (e5 != null) e5.spawnToAll();
+                            break;
+                    }
                 }
 
                 return true;

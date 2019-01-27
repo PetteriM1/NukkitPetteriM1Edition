@@ -202,7 +202,7 @@ public class EntityWolf extends EntityTameableMob {
 
     @Override
     public int getKillExperience() {
-        return 3;
+        return this.isBaby() ? 0 : 3;
     }
 
     public void setCollarColor(DyeColor color) {

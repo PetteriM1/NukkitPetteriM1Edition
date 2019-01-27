@@ -160,6 +160,6 @@ public class JavaPluginLoader implements PluginLoader {
     }
 
     private void removeClass(String name) {
-        Class<?> clazz = classes.remove(name);
+        classes.remove(name);
     }
 }

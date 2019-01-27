@@ -11,8 +11,8 @@ import cn.nukkit.level.generator.populator.PopulatorDeadBush;
  * Nukkit Project
  */
 public abstract class SandyBiome extends NormalBiome implements CaveBiome {
-    public SandyBiome() {
 
+    public SandyBiome() {
         PopulatorCactus cactus = new PopulatorCactus();
         cactus.setBaseAmount(2);
 

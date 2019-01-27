@@ -1,6 +1,7 @@
 package cn.nukkit.resourcepacks;
 
 public interface ResourcePack {
+
     String getPackName();
 
     String getPackId();

@@ -170,7 +170,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return true;
         }
 
-        if (this instanceof EntityMob && this.attackDelay < 500) {
+        if (this instanceof EntityMob && this.attackDelay < 400) {
             this.attackDelay++;
         }
 

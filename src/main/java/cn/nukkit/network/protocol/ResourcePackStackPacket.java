@@ -21,11 +21,17 @@ public class ResourcePackStackPacket extends DataPacket {
         for (ResourcePack entry : this.behaviourPackStack) {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
+            if (this.protocol >= 313) {
+                this.putString("");
+            }
         }
         this.putUnsignedVarInt(this.resourcePackStack.length);
         for (ResourcePack entry : this.resourcePackStack) {
             this.putString(entry.getPackId());
             this.putString(entry.getPackVersion());
+            if (this.protocol >= 313) {
+                this.putString("");
+            }
         }
         if (this.protocol >= 313) {
             this.putBoolean(isExperimental);

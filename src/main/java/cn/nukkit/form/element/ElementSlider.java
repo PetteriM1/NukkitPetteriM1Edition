@@ -2,7 +2,8 @@ package cn.nukkit.form.element;
 
 public class ElementSlider extends Element {
 
-    private final String type = "slider"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "slider";
     private String text = "";
     private float min = 0f;
     private float max = 100f;

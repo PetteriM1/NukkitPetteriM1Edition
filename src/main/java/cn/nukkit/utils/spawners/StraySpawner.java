@@ -23,7 +23,6 @@ public class StraySpawner extends AbstractEntitySpawner {
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int time = level.getTime() % Level.TIME_FULL;
-        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
@@ -33,10 +32,10 @@ public class StraySpawner extends AbstractEntitySpawner {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (light > 7) {
+        } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (time > 13184 && time < 22800) {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
         }
 
         return result;

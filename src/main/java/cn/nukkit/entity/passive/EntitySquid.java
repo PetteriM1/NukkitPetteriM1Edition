@@ -51,7 +51,7 @@ public class EntitySquid extends EntityWaterAnimal {
 
     @Override
     public int getKillExperience() {
-        return EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
     }
 
     @Override

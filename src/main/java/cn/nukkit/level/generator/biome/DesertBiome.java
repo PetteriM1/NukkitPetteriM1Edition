@@ -7,6 +7,7 @@ import cn.nukkit.level.generator.populator.PopulatorWell;
  * Nukkit Project
  */
 public class DesertBiome extends SandyBiome {
+
     public DesertBiome() {
         super();
         this.setElevation(63, 74);

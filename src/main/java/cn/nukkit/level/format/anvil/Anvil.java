@@ -217,11 +217,7 @@ public class Anvil extends BaseLevelProvider {
                 putChunk(index, chunk);
             }
         } else {
-            try {
-                putChunk(index, chunk);
-            } catch (Exception e) {
-                this.getServer().getLogger().debug("[Anvil] putChunk failed");
-            }
+            putChunk(index, chunk);
         }
         this.level.timings.syncChunkLoadDataTimer.stopTiming();
         return chunk;

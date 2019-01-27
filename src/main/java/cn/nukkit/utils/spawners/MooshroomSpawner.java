@@ -26,9 +26,8 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
         }
 
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (biomeId != Biome.MUSHROOM_ISLAND) {
+        if (level.getBiomeId((int) pos.x, (int) pos.z) != Biome.MUSHROOM_ISLAND) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
@@ -37,7 +36,7 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1.9, 0));
+            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }

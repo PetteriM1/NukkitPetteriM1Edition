@@ -2,7 +2,8 @@ package cn.nukkit.form.element;
 
 public class ElementToggle extends Element {
 
-    private final String type = "toggle"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "toggle";
     private String text = "";
     private boolean defaultValue = false;
 

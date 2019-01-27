@@ -8,6 +8,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public class BiomeSelector {
+
     private final Biome fallback;
     private final Simplex temperature;
     private final Simplex rainfall;

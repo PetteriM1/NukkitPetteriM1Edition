@@ -11,14 +11,12 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.LevelEventPacket;
 
-/**
- * Created by PetteriM1
- */
 public class ItemArmorStand extends Item {
 
     public ItemArmorStand() {
-        this(0, 1);
+        this(0);
     }
 
     public ItemArmorStand(Integer meta) {
@@ -56,7 +54,7 @@ public class ItemArmorStand extends Item {
                         .add(new DoubleTag("", 0))
                         .add(new DoubleTag("", 0)))
                 .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", (float) player.yaw + 180))
+                        .add(new FloatTag("", this.getDirection((float) player.getYaw())))
                         .add(new FloatTag("", 0)));
 
         if (this.hasCustomName()) {
@@ -67,13 +65,16 @@ public class ItemArmorStand extends Item {
 
         if (entity != null) {
             if (player.isSurvival()) {
-                Item item = player.getInventory().getItemInHand();
-                item.setCount(item.getCount() - 1);
-                player.getInventory().setItemInHand(item);
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             }
             entity.spawnToAll();
+            player.getLevel().addLevelSoundEvent(entity, LevelEventPacket.EVENT_SOUND_ARMOR_STAND_PLACE);
             return true;
         }
         return false;
+    }
+
+    public float getDirection(float yaw) {
+        return (Math.round(yaw / 22.5f / 2) * 45) - 180;
     }
 }

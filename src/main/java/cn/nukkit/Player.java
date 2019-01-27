@@ -95,6 +95,7 @@ import java.util.function.Consumer;
  * @author MagicDroidX &amp; Box
  * Nukkit Project
  */
+@SuppressWarnings("deprecation")
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
 
     public static final int SURVIVAL = 0;
@@ -871,39 +872,43 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.noDamageTicks = 60;
 
         this.getServer().getScheduler().scheduleTask(null, () -> {
-            this.getServer().sendRecipeList(this);
+            try {
+                this.getServer().sendRecipeList(this);
 
-            if (this.gamemode == Player.SPECTATOR) {
-                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-                this.dataPacket(inventoryContentPacket);
-            } else {
-                inventory.sendCreativeContents();
+                if (this.gamemode == Player.SPECTATOR) {
+                    InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                    inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
+                    this.dataPacket(inventoryContentPacket);
+                } else {
+                    inventory.sendCreativeContents();
+                }
+
+                int experience = this.getExperience();
+                if (experience != 0) {
+                    this.sendExperience(experience);
+                }
+
+                int level = this.getExperienceLevel();
+                if (level != 0) {
+                    this.sendExperienceLevel(this.getExperienceLevel());
+                }
+
+                PlayerFood food = this.getFoodData();
+                if (food.getLevel() != food.getMaxLevel()) {
+                    food.sendFoodLevel();
+                }
+
+                this.getLevel().sendTime(this);
+                this.getLevel().sendWeather(this);
+
+                // HACK: fix laggy player list
+                this.getServer().sendFullPlayerListData(this);
+
+                // HACK: fix speed bug
+                this.setMovementSpeed(this.getMovementSpeed());
+            } catch (Exception e) {
+                this.getServer().getLogger().error("doFirstSpawn() failed for " + this.getName());
             }
-
-            int experience = this.getExperience();
-            if (experience != 0) {
-                this.sendExperience(experience);
-            }
-
-            int level = this.getExperienceLevel();
-            if (level != 0) {
-                this.sendExperienceLevel(this.getExperienceLevel());
-            }
-
-            PlayerFood food = this.getFoodData();
-            if (food.getLevel() != food.getMaxLevel()) {
-                food.sendFoodLevel();
-            }
-
-            this.getLevel().sendTime(this);
-            this.getLevel().sendWeather(this);
-
-            // HACK: fix laggy player list
-            this.getServer().sendFullPlayerListData(this);
-
-            // HACK: fix speed bug
-            this.setMovementSpeed(this.getMovementSpeed());
         }, true);
 
         for (long index : this.usedChunks.keySet()) {
@@ -2271,7 +2276,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     boolean revert = false;
                     if (!this.isAlive() || !this.spawned) {
                         revert = true;
-                        this.forceMovement = new Vector3(this.x, this.y, this.z);
+                        this.forceMovement = this;
                     }
 
                     if (this.forceMovement != null && (newPos.distanceSquared(this.forceMovement) > 0.1 || revert)) {
@@ -4152,7 +4157,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.removeAllWindows();
             this.formOpen = false;
 
-            this.teleportPosition = new Vector3(this.x, this.y, this.z);
+            this.teleportPosition = this;
             this.forceMovement = this.teleportPosition;
             this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_TELEPORT);
 
@@ -4213,7 +4218,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 dataPacket(pk);
             }
 
-            this.forceMovement = new Vector3(this.x, this.y, this.z);
+            this.forceMovement = this;
             this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
 
             this.resetFallDistance();
@@ -4253,8 +4258,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet.formId = id;
         packet.data = window.getJSONData();
         this.formWindows.put(packet.formId, window);
-        this.formOpen = true;
         this.dataPacket(packet);
+        this.formOpen = true;
         return id;
     }
 

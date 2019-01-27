@@ -45,7 +45,7 @@ public class BlockObsidianGlowing extends BlockSolid {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockObsidian());
+        return new ItemBlock(new BlockObsidianGlowing());
     }
 
     @Override

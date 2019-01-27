@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ResourcePackManager {
+
     private ResourcePack[] resourcePacks;
     private Map<String, ResourcePack> resourcePacksById = new HashMap<>();
 

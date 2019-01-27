@@ -23,22 +23,20 @@ public class HuskSpawner extends AbstractEntitySpawner {
         SpawnResult result = SpawnResult.OK;
 
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int time = level.getTime() % Level.TIME_FULL;
-        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (biomeId != Biome.DESERT) {
+        } else if (level.getBiomeId((int) pos.x, (int) pos.z) != Biome.DESERT) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (blockId != Block.SAND) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (light > 7) {
+        } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (time > 13184 && time < 22800) {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }

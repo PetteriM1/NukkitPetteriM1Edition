@@ -28,7 +28,7 @@ public class WitherSkeletonSpawner extends AbstractEntitySpawner {
         } else if (blockId != Block.NETHERRACK) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
         }
 
         return result;

@@ -1,6 +1,7 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.IntPositionEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.format.FullChunk;
@@ -44,12 +45,12 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return isSwimming() || isGliding() ? 0.8f : 1.8f;
     }
 
     @Override
     public float getEyeHeight() {
-        return 1.62f - (this.isSwimming() || this.isGliding() ? 1 : 0);
+        return isSwimming() || isGliding() ? 0.62f : 1.62f;
     }
 
     @Override
@@ -215,6 +216,16 @@ public class EntityHuman extends EntityHumanType {
             }
 
             super.close();
+        }
+    }
+
+    @Override
+    public void setSwimming(boolean value) {
+        boolean oldValue = isSwimming();
+        super.setSwimming(value);
+        if (value != oldValue) {
+            boundingBox.maxY = boundingBox.maxX + (value ? -1 : 1);
+            setDataProperty(new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight()), true);
         }
     }
 }

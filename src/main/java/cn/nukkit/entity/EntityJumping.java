@@ -89,14 +89,16 @@ public abstract class EntityJumping extends BaseEntity {
             }
         }
 
-        if (!this.onGround || this.stayTime > 0) {
+        if (!this.onGround) {
             return false;
         }
 
-        if (this.motionY <= (this.getGravity() * 5)) {
-            this.motionY = this.getGravity() * 5;
-        } else {
-            this.motionY += this.getGravity() * 0.25;
+        if (this.motionX > 0 || this.motionZ > 0) {
+            if (this.motionY <= (this.getGravity() * 5)) {
+                this.motionY = this.getGravity() * 5;
+            } else {
+                this.motionY += this.getGravity() * 0.25;
+            }
         }
 
         return false;

@@ -12,7 +12,8 @@ import java.util.List;
 
 public class FormWindowCustom extends FormWindow {
 
-    private final String type = "custom_form"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "custom_form";
     private String title = "";
     private ElementButtonImageData icon;
     private List<Element> content;

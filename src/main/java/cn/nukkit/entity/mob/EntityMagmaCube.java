@@ -118,7 +118,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
 
     @Override
     public int getKillExperience() {
-        return 4;
+        return this.isBaby() ? 0 : 4;
     }
 
     @Override

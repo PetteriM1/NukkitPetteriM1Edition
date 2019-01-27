@@ -62,6 +62,7 @@ import java.util.concurrent.*;
 /**
  * @author MagicDroidX Nukkit Project
  */
+@SuppressWarnings("deprecation")
 public class Level implements ChunkManager, Metadatable {
 
     private static int levelIdCounter = 1;
@@ -795,17 +796,13 @@ public class Level implements ChunkManager, Metadatable {
 
         if (!this.updateEntities.isEmpty()) {
             for (long id : new ArrayList<>(this.updateEntities.keySet())) {
-                try {
-                    Entity entity = this.updateEntities.get(id);
-                    if (entity == null) {
-                        this.updateEntities.remove(id);
-                        continue;
-                    }
-                    if (entity.closed || !entity.onUpdate(currentTick)) {
-                        this.updateEntities.remove(id);
-                    }
-                } catch (Exception e) {
-                    this.getServer().getLogger().debug("Processing updateEntities failed");
+                Entity entity = this.updateEntities.get(id);
+                if (entity == null) {
+                    this.updateEntities.remove(id);
+                    continue;
+                }
+                if (entity.closed || !entity.onUpdate(currentTick)) {
+                    this.updateEntities.remove(id);
                 }
             }
         }
@@ -2687,18 +2684,8 @@ public class Level implements ChunkManager, Metadatable {
             entity.close();
         }
 
-        try {
-            this.entities.remove(entity.getId());
-        } catch (Exception e) {
-            this.getServer().getLogger().debug("Failed to remove entity " + entity.getId() + " from entities");
-        }
-
-        try {
-            this.entities.remove(entity.getId());
-            this.updateEntities.remove(entity.getId());
-        } catch (Exception e) {
-            this.getServer().getLogger().debug("Failed to remove entity " + entity.getId() + " from updateEntities");
-        }
+        this.entities.remove(entity.getId());
+        this.updateEntities.remove(entity.getId());
     }
 
     public void addEntity(Entity entity) {

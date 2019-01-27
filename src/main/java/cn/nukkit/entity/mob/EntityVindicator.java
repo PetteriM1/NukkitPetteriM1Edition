@@ -115,6 +115,6 @@ public class EntityVindicator extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return 5;
+        return this.isBaby() ? 0 : 5;
     }
 }

@@ -23,11 +23,10 @@ public class ZombieSpawner extends AbstractEntitySpawner {
 
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int time = level.getTime() % Level.TIME_FULL;
-        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (light > 7) {
+        } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
@@ -35,12 +34,12 @@ public class ZombieSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else if (time > 13184 && time < 22800) {
             if (EntityUtils.rand(1, 40) == 30) {
-                BaseEntity entity = this.spawnTask.createEntity("ZombieVillager", pos.add(0, 2.8, 0));
+                BaseEntity entity = this.spawnTask.createEntity("ZombieVillager", pos.add(0, 1, 0));
                 if (EntityUtils.rand(0, 500) > 480) {
                     entity.setBaby(true);
                 }
             } else {
-                BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+                BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
                 if (EntityUtils.rand(0, 500) > 480) {
                     entity.setBaby(true);
                 }

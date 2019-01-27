@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public abstract class AbstractResourcePack implements ResourcePack {
+
     protected JsonObject manifest;
 
     protected boolean verifyManifest() {
