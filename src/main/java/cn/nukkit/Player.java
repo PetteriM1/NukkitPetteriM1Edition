@@ -154,8 +154,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected CraftingGrid craftingGrid;
     protected CraftingTransaction craftingTransaction;
 
-    public long creationTime = 0;
-
     protected long randomClientId;
 
     protected Vector3 forceMovement = null;
@@ -614,8 +612,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.uuid = null;
         this.rawUUID = null;
-
-        this.creationTime = System.currentTimeMillis();
     }
 
     @Override
@@ -825,19 +821,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void doFirstSpawn() {
         this.spawned = true;
 
-        this.setEnableClientCommand(true);
-
-        this.getAdventureSettings().update();
-
-        this.sendPotionEffects(this);
-        this.sendData(this);
-        this.inventory.sendContents(this);
-        this.inventory.sendArmorContents(this);
-
-        SetTimePacket setTimePacket = new SetTimePacket();
-        setTimePacket.time = this.level.getTime();
-        this.dataPacket(setTimePacket);
-
         Position pos = this.level.getSafeSpawn(this);
 
         PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(this, pos);
@@ -865,14 +848,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.server.getPluginManager().callEvent(playerJoinEvent);
 
-        if (playerJoinEvent.getJoinMessage().toString().trim().length() > 0) {
-            this.server.broadcastMessage(playerJoinEvent.getJoinMessage());
-        }
-
-        this.noDamageTicks = 60;
-
         this.getServer().getScheduler().scheduleTask(null, () -> {
             try {
+                this.setEnableClientCommand(true);
+        
+                this.getAdventureSettings().update();
+        
+                this.sendPotionEffects(this);
+                this.sendData(this);
+                this.inventory.sendContents(this);
+                this.inventory.sendArmorContents(this);
+        
+                SetTimePacket setTimePacket = new SetTimePacket();
+                setTimePacket.time = this.level.getTime();
+                this.dataPacket(setTimePacket);
+
+                if (playerJoinEvent.getJoinMessage().toString().trim().length() > 0) {
+                    this.server.broadcastMessage(playerJoinEvent.getJoinMessage());
+                }
+        
+                this.noDamageTicks = 60;
+
                 this.getServer().sendRecipeList(this);
 
                 if (this.gamemode == Player.SPECTATOR) {
@@ -906,6 +902,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 // HACK: fix speed bug
                 this.setMovementSpeed(this.getMovementSpeed());
+
+                this.formOpen = false;
             } catch (Exception e) {
                 this.getServer().getLogger().error("doFirstSpawn() failed for " + this.getName());
             }

@@ -14,6 +14,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
 
+import java.util.StringJoiner;
+
 /**
  * Created on 2015/12/08 by Pub4Game.
  * Package cn.nukkit.command.defaults in project Nukkit .
@@ -55,23 +57,33 @@ public class KillCommand extends VanillaCommand {
                 player.setHealth(0);
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.kill.successful", player.getName()));
             } else if (args[0].equals("@e")) {
+                StringJoiner joiner = new StringJoiner(", ");
                 for (Level level : Server.getInstance().getLevels().values()) {
                     for (Entity entity : level.getEntities()) {
                         if (!(entity instanceof EntityHuman)) {
-                            entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
+                            joiner.add(entity.getName());
+                            if (!(entity instanceof BaseEntity)) {
+                                entity.close();
+                            } else {
+                                entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
+                            }
                         }
                     }
                 }
-                sender.sendMessage(TextFormat.GOLD + "Killed all entities");
+                String entities = joiner.toString();
+                sender.sendMessage(new TranslationContainer("commands.kill.successful", entities.isEmpty() ? "0" : entities));
             } else if (args[0].equals("@b")) {
+                StringJoiner joiner = new StringJoiner(", ");
                 for (Level level : Server.getInstance().getLevels().values()) {
                     for (Entity entity : level.getEntities()) {
                         if (entity instanceof BaseEntity) {
+                            joiner.add(entity.getName());
                             entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
                         }
                     }
                 }
-                sender.sendMessage(TextFormat.GOLD + "Killed all entities instanceof BaseEntity");
+                String entities = joiner.toString();
+                sender.sendMessage(new TranslationContainer("commands.kill.successful", entities.isEmpty() ? "0" : entities));
             } else if (args[0].equals("@s") && sender instanceof Player) {
                 if (!sender.hasPermission("nukkit.command.kill.self")) {
                     sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.permission"));
