@@ -154,6 +154,7 @@ public class Level implements ChunkManager, Metadatable {
     private final Long2LongMap unloadQueue = Long2LongMaps.synchronize(new Long2LongOpenHashMap());
 
     private float time;
+
     public boolean stopTime;
 
     public float skyLightSubtracted;
@@ -290,8 +291,7 @@ public class Level implements ChunkManager, Metadatable {
         this.levelCurrentTick = this.provider.getCurrentTick();
         this.updateQueue = new BlockUpdateScheduler(this, levelCurrentTick);
 
-        this.chunkTickRadius = Math.min(this.server.getViewDistance(),
-                Math.max(1, (Integer) this.server.getPropertyInt("chunk-ticking-radius", 4)));
+        this.chunkTickRadius = Math.min(this.server.getViewDistance(), Math.max(1, (Integer) this.server.getPropertyInt("chunk-ticking-radius", 4)));
         this.chunksPerTicks = (int) this.server.getPropertyInt("chunk-ticking-per-tick", 40);
         this.chunkGenerationQueueSize = (int) this.server.getPropertyInt("chunk-generation-queue-size", 8);
         this.chunkPopulationQueueSize = (int) this.server.getPropertyInt("chunk-generation-population-queue-size", 8);

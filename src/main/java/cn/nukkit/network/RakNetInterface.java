@@ -159,10 +159,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                 this.server.getLogger().logException(e);
                 if (Nukkit.DEBUG > 1 && pk != null) {
                     MainLogger logger = this.server.getLogger();
-//                    if (logger != null) {
                     logger.debug("Packet " + pk.getClass().getName() + " 0x" + Binary.bytesToHexString(packet.buffer));
-                    //logger.logException(e);
-//                    }
                 }
 
                 if (this.players.containsKey(identifier)) {
@@ -208,7 +205,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public void setName(String name) {
         QueryRegenerateEvent info = this.server.getQueryInformation();
-        String[] names = name.split("!@#");  //Split double names within the program
+        String[] names = name.split("!@#");  // Split double names within the program
         this.handler.sendOption("name",
                 "MCPE;" + Utils.rtrim(names[0].replace(";", "\\;"), '\\') + ";" +
                         ProtocolInfo.CURRENT_PROTOCOL + ";" +

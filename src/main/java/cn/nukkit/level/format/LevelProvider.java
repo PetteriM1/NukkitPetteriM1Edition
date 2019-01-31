@@ -13,6 +13,7 @@ import java.util.Map;
  * Nukkit Project
  */
 public interface LevelProvider {
+
     byte ORDER_YZX = 0;
     byte ORDER_ZXY = 1;
 

@@ -5,6 +5,7 @@ package cn.nukkit.level.format;
  * Nukkit Project
  */
 public interface Chunk extends FullChunk {
+
     byte SECTION_COUNT = 16;
 
     boolean isSectionEmpty(float fY);

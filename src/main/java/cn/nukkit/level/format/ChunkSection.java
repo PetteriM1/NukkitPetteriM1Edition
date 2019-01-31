@@ -7,6 +7,7 @@ import cn.nukkit.block.Block;
  * Nukkit Project
  */
 public interface ChunkSection {
+
     int getY();
 
     int getBlockId(int x, int y, int z);
