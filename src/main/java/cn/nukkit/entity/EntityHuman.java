@@ -35,12 +35,12 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getWidth() {
-        return 0.6f;
+        return 0.58f;
     }
 
     @Override
     public float getLength() {
-        return 0.6f;
+        return 0.58f;
     }
 
     @Override

@@ -4059,7 +4059,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             Server.broadcastPacket(targets, pk);
         } else {
             pk.eid = this.id;
-            this.dataPacket(pk);
+            this.directDataPacket(pk);
         }
     }
 
