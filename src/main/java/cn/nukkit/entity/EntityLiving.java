@@ -230,7 +230,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
         if (this.isAlive()) {
 
-            if (this.isInsideOfSolid()) {
+            if (this.isInsideOfSolid() && !this.isSubmerged()) {
                 hasUpdate = true;
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
             }

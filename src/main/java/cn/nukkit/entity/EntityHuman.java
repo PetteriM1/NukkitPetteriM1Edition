@@ -45,12 +45,12 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getHeight() {
-        return isSwimming() || isGliding() ? 0.8f : 1.8f;
+        return isSwimming() || isGliding() ? 0.6f : 1.8f;
     }
 
     @Override
     public float getEyeHeight() {
-        return isSwimming() || isGliding() ? 0.62f : 1.62f;
+        return isSwimming() || isGliding() ? 0.58f : 1.62f;
     }
 
     @Override
@@ -224,7 +224,6 @@ public class EntityHuman extends EntityHumanType {
         boolean oldValue = isSwimming();
         super.setSwimming(value);
         if (value != oldValue) {
-            boundingBox.maxY = boundingBox.maxX + (value ? -1 : 1);
             setDataProperty(new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight()), true);
         }
     }
