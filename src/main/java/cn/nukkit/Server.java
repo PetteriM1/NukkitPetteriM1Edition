@@ -353,7 +353,11 @@ public class Server {
         this.scheduler = new ServerScheduler();
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
-            this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+            try {
+                this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+            } catch (IllegalArgumentException e) {
+                logger.critical(getLanguage().translateString(e.getMessage(), e.getCause().getMessage()));
+            }
         }
 
         this.entityMetadata = new EntityMetadataStore();

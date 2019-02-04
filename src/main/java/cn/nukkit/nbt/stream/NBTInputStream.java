@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
  * Nukkit Project
  */
 public class NBTInputStream implements DataInput, AutoCloseable {
+
     private final DataInputStream stream;
     private final ByteOrder endianness;
     private final boolean network;
@@ -132,6 +133,7 @@ public class NBTInputStream implements DataInput, AutoCloseable {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public String readLine() throws IOException {
         return this.stream.readLine();
     }

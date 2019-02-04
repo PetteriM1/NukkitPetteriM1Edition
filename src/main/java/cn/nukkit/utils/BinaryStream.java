@@ -224,7 +224,7 @@ public class BinaryStream {
             }
         }
 
-        return list.stream().toArray(Attribute[]::new);
+        return list.toArray(new Attribute[0]);
     }
 
     /**

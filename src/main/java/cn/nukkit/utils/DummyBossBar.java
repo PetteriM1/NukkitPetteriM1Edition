@@ -7,9 +7,8 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.network.protocol.*;
-import java.util.concurrent.ThreadLocalRandom;
 
-import java.awt.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * DummyBossBar
@@ -25,7 +24,7 @@ public class DummyBossBar {
 
     private String text;
     private float length;
-    private Color color;
+    private BlockColor color;
 
     private DummyBossBar(Builder builder) {
         this.player = builder.player;
@@ -41,12 +40,12 @@ public class DummyBossBar {
 
         private String text = "";
         private float length = 100;
-        private Color color = null;
+        private BlockColor color = null;
 
         public Builder(Player player) {
             this.player = player;
             if (Server.getInstance().suomiCraftPEMode()) {
-                this.bossBarId = 1095216660480L; //This is hack to get one thing work
+                this.bossBarId = 1095216660480L; // This is hack to get one thing work
             } else {
                 this.bossBarId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
             }
@@ -62,13 +61,13 @@ public class DummyBossBar {
             return this;
         }
 
-        public Builder color(Color color) {
+        public Builder color(BlockColor color) {
             this.color = color;
             return this;
         }
 
         public Builder color(int red, int green, int blue) {
-            return color(new Color(red, green, blue));
+            return color(new BlockColor(red, green, blue));
         }
 
         public DummyBossBar build() {
@@ -111,7 +110,7 @@ public class DummyBossBar {
      * Color is not working in the current version. We are keep waiting for client support.
      * @param color the boss bar color
      */
-    public void setColor(Color color) {
+    public void setColor(BlockColor color) {
         if (this.color == null || !this.color.equals(color)) {
             this.color = color;
             this.sendSetBossBarTexture();
@@ -119,14 +118,14 @@ public class DummyBossBar {
     }
 
     public void setColor(int red, int green, int blue) {
-        this.setColor(new Color(red, green, blue));
+        this.setColor(new BlockColor(red, green, blue));
     }
 
     public int getMixedColor() {
-        return this.color.getRGB();//(this.color.getRed() << 16 | this.color.getGreen() << 8 | this.color.getBlue()) & 0xffffff;
+        return this.color.getRGB(); // (this.color.getRed() << 16 | this.color.getGreen() << 8 | this.color.getBlue()) & 0xffffff;
     }
 
-    public Color getColor() {
+    public BlockColor getColor() {
         return this.color;
     }
 

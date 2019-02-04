@@ -596,9 +596,7 @@ public class Item implements Cloneable, BlockID, ItemID {
 
         if (tag.contains("ench")) {
             Tag enchTag = tag.get("ench");
-            if (enchTag instanceof ListTag) {
-                return true;
-            }
+            return enchTag instanceof ListTag;
         }
 
         return false;
@@ -684,7 +682,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             }
         }
 
-        return enchantments.stream().toArray(Enchantment[]::new);
+        return enchantments.toArray(new Enchantment[0]);
     }
 
     public boolean hasEnchantment(int id) {
@@ -703,9 +701,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         CompoundTag tag = this.getNamedTag();
         if (tag.contains("display")) {
             Tag tag1 = tag.get("display");
-            if (tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag) {
-                return true;
-            }
+            return tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag;
         }
 
         return false;

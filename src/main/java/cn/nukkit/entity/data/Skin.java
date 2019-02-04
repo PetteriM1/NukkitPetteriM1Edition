@@ -3,7 +3,7 @@ package cn.nukkit.entity.data;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import com.google.common.base.Preconditions;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
@@ -12,6 +12,7 @@ import java.util.Arrays;
  * Nukkit Project
  */
 public class Skin {
+
     private static final int PIXEL_SIZE = 4;
 
     public static final int SINGLE_SKIN_SIZE = 64 * 32 * PIXEL_SIZE;

@@ -3,6 +3,7 @@ package cn.nukkit.nbt.stream;
 import java.util.concurrent.Callable;
 
 public class PGZIPBlock implements Callable<byte[]> {
+
     public PGZIPBlock(final PGZIPOutputStream parent) {
         STATE = new PGZIPThreadLocal(parent);
     }

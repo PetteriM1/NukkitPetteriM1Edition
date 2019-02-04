@@ -26,6 +26,7 @@ import java.util.Map;
  * Nukkit Project
  */
 public abstract class BaseFullChunk implements FullChunk, ChunkManager {
+
     protected Map<Long, Entity> entities;
 
     protected Map<Long, BlockEntity> tiles;

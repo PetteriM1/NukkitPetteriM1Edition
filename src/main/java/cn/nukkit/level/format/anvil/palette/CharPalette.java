@@ -6,6 +6,7 @@ import java.util.Arrays;
  * @author https://github.com/boy0001/
  */
 public class CharPalette {
+
     private static char[] CHAR0 = new char[0];
     private char[] keys = CHAR0;
     private char lastIndex = Character.MAX_VALUE;

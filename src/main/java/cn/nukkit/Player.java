@@ -601,8 +601,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.port = port;
         this.clientID = clientID;
         this.loaderId = Level.generateChunkLoaderId(this);
-        this.chunksPerTick = (int) this.server.getPropertyInt("chunk-sending-per-tick", 5);
-        this.spawnThreshold = (int) this.server.getPropertyInt("spawn-threshold", 50);
+        this.chunksPerTick = this.server.getPropertyInt("chunk-sending-per-tick", 5);
+        this.spawnThreshold = this.server.getPropertyInt("spawn-threshold", 50);
         this.spawnPosition = null;
         this.gamemode = this.server.getGamemode();
         this.setLevel(this.server.getDefaultLevel());
@@ -858,10 +858,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.sendData(this);
                 this.inventory.sendContents(this);
                 this.inventory.sendArmorContents(this);
-        
-                SetTimePacket setTimePacket = new SetTimePacket();
-                setTimePacket.time = this.level.getTime();
-                this.dataPacket(setTimePacket);
 
                 if (playerJoinEvent.getJoinMessage().toString().trim().length() > 0) {
                     this.server.broadcastMessage(playerJoinEvent.getJoinMessage());
@@ -1282,7 +1278,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
             inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).stream().toArray(Item[]::new);
+            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
             this.dataPacket(inventoryContentPacket);
         }
 
@@ -1326,11 +1322,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean setDataProperty(EntityData data) {
         return setDataProperty(data, true);
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public boolean setDataProperty(EntityData data, boolean send) {
         if (super.setDataProperty(data, send)) {
             if (send) this.sendData(this, new EntityMetadata().put(this.getDataProperty(data.getId())));
@@ -1628,8 +1626,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.lastYaw = from.yaw;
             this.lastPitch = from.pitch;
 
-            this.sendPosition(from, from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
-            this.forceMovement = new Vector3(from.x, from.y, from.z);
+            // We have to send slightly above otherwise the player will fall into the ground
+            this.sendPosition(from.add(0, 0.00001, 0), from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
+            this.forceMovement = new Vector3(from.x, from.y + 0.00001, from.z);
         } else {
             this.forceMovement = null;
             if (distanceSquared != 0 && this.nextChunkOrderRun > 20) {
@@ -1853,7 +1852,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             while (iter.hasNext()) {
                 Entry<Integer, List<DataPacket>> entry = iter.next();
                 List<DataPacket> packets = entry.getValue();
-                DataPacket[] arr = packets.toArray(new DataPacket[packets.size()]);
+                DataPacket[] arr = packets.toArray(new DataPacket[0]);
                 packets.clear();
                 this.server.batchPackets(pArr, arr, false);
             }
@@ -2826,7 +2825,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 					            Graphics2D graphics = image.createGraphics();
 					            for (int x = 0; x != 128; x++) {
 						            for (int y = 0; y != 128; y++) {
-							            graphics.setColor(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y));
+							            graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
 							            graphics.fillRect(x, y, x, y);
 						            }
                                 }
@@ -3765,9 +3764,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             message = "";
             params.clear();
         }
-        
-        PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.stream().toArray(String[]::new)), this.getExperienceLevel());
-        
+
+        PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.toArray(new String[0])), this.getExperienceLevel());
+
         if (!ev.isCancelled() && cause.getCause() != DamageCause.VOID) {
             if (this.getInventory().getItemInHand() instanceof ItemTotem) {
                 this.getInventory().remove(Item.get(Item.TOTEM, 0, 1));
@@ -4213,7 +4212,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.x = spawn.getFloorX();
                 pk.y = spawn.getFloorY();
                 pk.z = spawn.getFloorZ();
-                dataPacket(pk);
+                this.dataPacket(pk);
             }
 
             this.forceMovement = this;
@@ -4307,7 +4306,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return DummyBossBar object
      * @see DummyBossBar#setText(String) Set BossBar text
      * @see DummyBossBar#setLength(float) Set BossBar length
-     * @see DummyBossBar#setColor(Color) Set BossBar color
+     * @see DummyBossBar#setColor(BlockColor) Set BossBar color
      */
     public DummyBossBar getDummyBossBar(long bossBarId) {
         return this.dummyBossBars.getOrDefault(bossBarId, null);
@@ -4437,7 +4436,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void resetCraftingGridType() {
         if (this.craftingGrid != null) {
-            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().stream().toArray(Item[]::new));
+            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(new Item[0]));
 
             if (drops.length > 0) {
                 for (Item drop : drops) {
@@ -4595,12 +4594,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 int chunkZ = Level.getHashZ(index);
                 this.unloadChunk(chunkX, chunkZ, oldLevel);
             }
+
             this.usedChunks.clear();
             this.loadQueue.clear();
 
-            SetTimePacket setTime = new SetTimePacket();
-            setTime.time = level.getTime();
-            this.dataPacket(setTime);
+            level.sendTime(this);
+            level.sendWeather(this);
 
             return true;
         }

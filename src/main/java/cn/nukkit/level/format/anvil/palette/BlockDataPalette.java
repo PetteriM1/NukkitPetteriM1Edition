@@ -11,6 +11,7 @@ import java.util.Arrays;
  * @author https://github.com/boy0001/
  */
 public final class BlockDataPalette implements Cloneable {
+
     private static final int BLOCK_SIZE = 4096;
     private volatile char[] rawData;
 

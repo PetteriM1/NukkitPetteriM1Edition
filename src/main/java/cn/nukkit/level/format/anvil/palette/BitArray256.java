@@ -6,6 +6,7 @@ import cn.nukkit.utils.ThreadCache;
  * @author https://github.com/boy0001/
  */
 public final class BitArray256 {
+
     private final int bitsPerEntry;
     protected final long[] data;
 

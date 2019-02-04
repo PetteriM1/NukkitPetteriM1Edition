@@ -7,6 +7,7 @@ import java.util.Arrays;
  * @author https://github.com/boy0001/
  */
 public final class DataPalette implements Cloneable {
+
     protected static final ThreadLocal<boolean[]> countCache = new ThreadLocal<boolean[]>() {
         @Override
         protected boolean[] initialValue() {

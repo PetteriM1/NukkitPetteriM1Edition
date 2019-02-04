@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Nukkit Project
  */
 public abstract class BaseLevelProvider implements LevelProvider {
+
     protected Level level;
 
     protected final String path;

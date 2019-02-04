@@ -4,17 +4,19 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.lang.TranslationContainer;
 
 public class WorldCommand extends Command {
+
     public WorldCommand(String name) {
         super(name, "%nukkit.command.world.description", "%nukkit.command.world.usage");
         this.setPermission("nukkit.command.world");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                new CommandParameter("world", CommandParameter.ARG_TYPE_STRING, false)
+                new CommandParameter("world", CommandParamType.STRING, false)
         });
     }
 

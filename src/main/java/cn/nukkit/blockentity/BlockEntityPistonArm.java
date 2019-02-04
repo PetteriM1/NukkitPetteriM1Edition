@@ -71,9 +71,7 @@ public class BlockEntityPistonArm extends BlockEntity {
         AxisAlignedBB bb = new AxisAlignedBB(x, y, z, x + 1.0D, y + 1.0D, z + 1.0D);
         Entity[] entities = this.level.getCollidingEntities(bb);
         if (entities.length != 0) {
-            ;
         }
-
     }
 
     private float getExtendedProgress(float progress) {

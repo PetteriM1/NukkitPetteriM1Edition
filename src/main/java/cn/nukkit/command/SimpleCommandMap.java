@@ -76,6 +76,7 @@ public class SimpleCommandMap implements CommandMap {
             this.register("nukkit", new TransferServerCommand("transfer"));
             this.register("nukkit", new SeedCommand("seed"));
             this.register("nukkit", new PlaySoundCommand("playsound"));
+            this.register("nukkit", new DebugPasteCommand("debugpaste"));
         }
     }
 
@@ -109,7 +110,7 @@ public class SimpleCommandMap implements CommandMap {
                 iterator.remove();
             }
         }
-        command.setAliases(aliases.stream().toArray(String[]::new));
+        command.setAliases(aliases.toArray(new String[0]));
 
         if (!registered) {
             command.setLabel(fallbackPrefix + ":" + label);
@@ -185,7 +186,7 @@ public class SimpleCommandMap implements CommandMap {
         }
 
         // Then we need to check if there isn't any command conflicts with vanilla commands
-        ArrayList<String> toRemove = new ArrayList<String>();
+        ArrayList<String> toRemove = new ArrayList<>();
 
         for (Entry<String, Command> entry : knownCommands.entrySet()) {
             Command cmd = entry.getValue();
@@ -247,7 +248,7 @@ public class SimpleCommandMap implements CommandMap {
         }
 
         String sentCommandLabel = parsed.remove(0).toLowerCase();
-        String[] args = parsed.toArray(new String[parsed.size()]);
+        String[] args = parsed.toArray(new String[0]);
         Command target = this.getCommand(sentCommandLabel);
 
         if (target == null) {

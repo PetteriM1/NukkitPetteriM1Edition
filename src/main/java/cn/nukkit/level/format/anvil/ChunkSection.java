@@ -6,7 +6,6 @@ import cn.nukkit.level.format.anvil.util.NibbleArray;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Binary;
-import cn.nukkit.utils.ThreadCache;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
 
@@ -303,17 +302,6 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     @Override
     public boolean isEmpty() {
         return false;
-    }
-
-    private byte[] toXZY(char[] raw) {
-        byte[] buffer = ThreadCache.byteCache6144.get();
-        for (int i = 0; i < 4096; i++) {
-            buffer[i] = (byte) (raw[i] >> 4);
-        }
-        for (int i = 0, j = 4096; i < 4096; i += 2, j++) {
-            buffer[j] = (byte) (((raw[i + 1] & 0xF) << 4) | (raw[i] & 0xF));
-        }
-        return buffer;
     }
 
     @Override

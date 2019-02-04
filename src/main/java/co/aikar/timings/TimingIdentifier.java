@@ -53,7 +53,6 @@ class TimingIdentifier {
     }
 
     @Override
-    @SuppressWarnings("all")
     public boolean equals(Object o) {
         if (o == null || !(o instanceof TimingIdentifier)) {
             return false;

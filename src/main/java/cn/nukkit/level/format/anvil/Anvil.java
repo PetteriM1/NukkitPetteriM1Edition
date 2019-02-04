@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
  * Nukkit Project
  */
 public class Anvil extends BaseLevelProvider {
+
     public static final int VERSION = 19133;
     static private final byte[] PAD_256 = new byte[256];
 
@@ -70,11 +71,10 @@ public class Anvil extends BaseLevelProvider {
 
         CompoundTag levelData = new CompoundTag("Data")
                 .putCompound("GameRules", new CompoundTag())
-
                 .putLong("DayTime", 0)
                 .putInt("GameType", 0)
                 .putString("generatorName", Generator.getGeneratorName(generator))
-                .putString("generatorOptions", options.containsKey("preset") ? options.get("preset") : "")
+                .putString("generatorOptions", options.getOrDefault("preset", ""))
                 .putInt("generatorVersion", 1)
                 .putBoolean("hardcore", false)
                 .putBoolean("initialized", true)

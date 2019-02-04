@@ -10,6 +10,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.DyeColor;
 
 import java.util.Random;
 
@@ -194,7 +195,7 @@ public class BlockCocoa extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemDye(ItemDye.BROWN);
+        return new ItemDye(DyeColor.BROWN.getDyeData());
     }
 
     @Override

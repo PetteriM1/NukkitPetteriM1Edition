@@ -143,11 +143,11 @@ public class BlockShulkerBox extends BlockTransparentMeta {
             }
         }
 
-        BlockEntity blockEntity = new BlockEntityShulkerBox(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+        BlockEntityShulkerBox blockEntity = new BlockEntityShulkerBox(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
 
         if (box != null) {
-            box.pairWith(((BlockEntityShulkerBox) blockEntity));
-            ((BlockEntityShulkerBox) blockEntity).pairWith(box);
+            box.pairWith(blockEntity);
+            blockEntity.pairWith(box);
         }
 
         return true;

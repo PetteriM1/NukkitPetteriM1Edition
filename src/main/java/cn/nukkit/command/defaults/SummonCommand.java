@@ -4,15 +4,22 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParamType;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.Position;
 
 public class SummonCommand extends Command {
+
     public SummonCommand(String name) {
         super(name, "nukkit.command.summon.description", "nukkit.command.summon.usage");
         this.setPermission("nukkit.command.summon");
         this.commandParameters.clear();
+        this.commandParameters.put("default", new CommandParameter[]{
+                new CommandParameter("entity", CommandParamType.STRING, false),
+                new CommandParameter("player", CommandParamType.TARGET, true)
+        });
     }
 
     @Override

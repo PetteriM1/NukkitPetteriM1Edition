@@ -30,6 +30,7 @@ import java.util.Optional;
  */
 public abstract class Block extends Position implements Metadatable, Cloneable, BlockID {
 
+    @SuppressWarnings("rawtypes")
     public static Class[] list = null;
     public static Block[] fullList = null;
     public static int[] light = null;
@@ -311,12 +312,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[RESERVED6] = BlockReserved6.class; //255
 
             for (int id = 0; id < 256; id++) {
+                @SuppressWarnings("rawtypes")
                 Class c = list[id];
                 if (c != null) {
                     Block block;
                     try {
                         block = (Block) c.newInstance();
                         try {
+                            @SuppressWarnings("rawtypes")
                             Constructor constructor = c.getDeclaredConstructor(int.class);
                             constructor.setAccessible(true);
                             for (int data = 0; data < 16; ++data) {
@@ -873,7 +876,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public String getSaveId() {
         String name = getClass().getName();
-        return name.substring(16, name.length());
+        return name.substring(16);
     }
 
     @Override

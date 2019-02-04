@@ -16,7 +16,6 @@ import java.util.*;
  * Nukkit Project
  */
 public class QueryRegenerateEvent extends ServerEvent {
-    //alot todo
 
     private static final HandlerList handlers = new HandlerList();
 
@@ -51,15 +50,15 @@ public class QueryRegenerateEvent extends ServerEvent {
     public QueryRegenerateEvent(Server server, int timeout) {
         this.timeout = timeout;
         this.serverName = server.getMotd();
-        this.listPlugins = (boolean) server.getPropertyBoolean("query-plugins", false);
-        this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[server.getPluginManager().getPlugins().values().size()]);
+        this.listPlugins = server.getPropertyBoolean("query-plugins", false);
+        this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
         List<Player> players = new ArrayList<>();
         for (Player player : server.getOnlinePlayers().values()) {
             if (player.isOnline()) {
                 players.add(player);
             }
         }
-        this.players = players.toArray(new Player[players.size()]);
+        this.players = players.toArray(new Player[0]);
 
         this.gameType = (server.getGamemode() & 0x01) == 0 ? "SMP" : "CMP";
         this.version = server.getVersion();
@@ -210,5 +209,4 @@ public class QueryRegenerateEvent extends ServerEvent {
         query.put((byte) 0x00);
         return Arrays.copyOf(query.array(), query.position());
     }
-
 }

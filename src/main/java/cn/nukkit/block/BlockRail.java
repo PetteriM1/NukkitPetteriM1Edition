@@ -123,16 +123,14 @@ public class BlockRail extends BlockFlowable {
                     this.setDamage(this.connect(rail1, railsAround.get(rail1), rail2, railsAround.get(rail2)).metadata());
                 } else {
                     List<BlockFace> cd = Stream.of(CURVED_SOUTH_EAST, CURVED_NORTH_EAST, CURVED_SOUTH_WEST)
-                            .filter(o -> o.connectingDirections().stream().allMatch(faces::contains))
+                            .filter(o -> faces.containsAll(o.connectingDirections()))
                             .findFirst().get().connectingDirections();
                     BlockFace f1 = cd.get(0);
                     BlockFace f2 = cd.get(1);
                     this.setDamage(this.connect(rails.get(faces.indexOf(f1)), f1, rails.get(faces.indexOf(f2)), f2).metadata());
                 }
             } else {
-                BlockFace f = faces.stream()
-                        .sorted((f1, f2) -> (f1.getIndex() < f2.getIndex()) ? 1 : ((x == y) ? 0 : -1))
-                        .findFirst().get();
+                BlockFace f = faces.stream().min((f1, f2) -> (f1.getIndex() < f2.getIndex()) ? 1 : ((x == y) ? 0 : -1)).get();
                 BlockFace fo = f.getOpposite();
                 if (faces.contains(fo)) { //Opposite connectable
                     this.setDamage(this.connect(rails.get(faces.indexOf(f)), f, rails.get(faces.indexOf(fo)), fo).metadata());

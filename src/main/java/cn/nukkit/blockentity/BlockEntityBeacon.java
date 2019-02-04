@@ -93,8 +93,8 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         Map<Long, Player> players = this.level.getPlayers();
 
         //Calculate vars for beacon power
-        Integer range = 10 + getPowerLevel() * 10;
-        Integer duration = 9 + getPowerLevel() * 2;
+        int range = 10 + getPowerLevel() * 10;
+        int duration = 9 + getPowerLevel() * 2;
 
         for(Map.Entry<Long, Player> entry : players.entrySet()) {
             Player p = entry.getValue();
