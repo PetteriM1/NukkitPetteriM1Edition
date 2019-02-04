@@ -45,7 +45,7 @@ public class DebugPasteCommand extends VanillaCommand {
                     b.append("\n# Server Information\n");
 
                     b.append("version.api: ").append("CUSTOM").append('\n');
-                    b.append("version.nukkit: ").append("PetteriM1 Edition " + server.getNukkitVersion()).append('\n');
+                    b.append("version.nukkit: ").append("Nukkit PetteriM1 Edition " + server.getNukkitVersion()).append('\n');
                     b.append("version.minecraft: ").append(server.getVersion()).append('\n');
                     b.append("version.protocol: ").append(ProtocolInfo.CURRENT_PROTOCOL).append('\n');
                     b.append("plugins:");
@@ -75,7 +75,6 @@ public class DebugPasteCommand extends VanillaCommand {
                     b.append("os.arch: '").append(System.getProperty("os.arch")).append("'\n");
                     b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
                     b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
-                    b.append("\n# Create a ticket: https://github.com/NukkitX/Nukkit/issues/new");
                     String link = HastebinUtility.upload(b.toString());
                     sender.sendMessage(link);
                 } catch (IOException e) {
