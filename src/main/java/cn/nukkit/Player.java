@@ -1875,7 +1875,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public boolean canInteract(Vector3 pos, double maxDistance, double maxDiff) {
         if (this.distanceSquared(pos) > maxDistance * maxDistance) {
-            return false;
+            return true;
         }
 
         Vector2 dV = this.getDirectionPlane();
