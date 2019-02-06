@@ -4,7 +4,8 @@ import cn.nukkit.resourcepacks.ResourcePack;
 
 public class ResourcePacksInfoPacket extends DataPacket {
 
-    public boolean mustAccept = false;
+    public boolean mustAccept;
+    public boolean unknownBool;
     public ResourcePack[] behaviourPackEntries = new ResourcePack[0];
     public ResourcePack[] resourcePackEntries = new ResourcePack[0];
 
@@ -16,6 +17,9 @@ public class ResourcePacksInfoPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBoolean(this.mustAccept);
+        if (protocol >= 332) {
+            this.putBoolean(this.unknownBool);
+        }
 
         encodePacks(this.resourcePackEntries);
         encodePacks(this.behaviourPackEntries);
@@ -30,6 +34,9 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putString(""); // encryption key
             this.putString(""); // sub-pack name
             this.putString(""); // content identity
+            if (protocol >= 332) {
+                this.putBoolean(false); // ???
+            }
         }
     }
 

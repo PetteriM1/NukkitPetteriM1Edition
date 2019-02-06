@@ -117,6 +117,7 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission(ROOT + ".command.seed", "Allows the user to see world's seed", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.playsound", "Allows the user to play sounds", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission(ROOT + ".command.debug.perform", "Allows the user to create debug paste", Permission.DEFAULT_OP), commands);
+        registerPermission(new Permission(ROOT + ".command.gamerule", "Allows the user to change game rules", Permission.DEFAULT_OP), commands);
 
         registerPermission(new Permission(ROOT + ".textcolor", "Allows the user to write colored text", Permission.DEFAULT_OP), commands);
 

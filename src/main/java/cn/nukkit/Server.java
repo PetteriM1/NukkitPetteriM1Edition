@@ -28,11 +28,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
 import cn.nukkit.level.format.anvil.Anvil;
-import cn.nukkit.level.generator.End;
-import cn.nukkit.level.generator.Flat;
-import cn.nukkit.level.generator.Generator;
-import cn.nukkit.level.generator.Nether;
-import cn.nukkit.level.generator.Normal;
+import cn.nukkit.level.generator.*;
 import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.metadata.EntityMetadataStore;
@@ -71,8 +67,17 @@ import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -407,7 +412,7 @@ public class Server {
         Effect.init();
         Potion.init();
         Attribute.init();
-        GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
+        GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
 
         this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(new File(Nukkit.DATA_PATH, "resource_packs"));
@@ -506,6 +511,26 @@ public class Server {
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
             this.getScheduler().scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
+
+        // Check for updates
+        this.getScheduler().scheduleTask(null, () -> {
+            try {
+                URL url = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master");
+                URLConnection request = url.openConnection();
+                request.connect();
+                JsonElement root = new JsonParser().parse(new InputStreamReader((InputStream) request.getContent()));
+                JsonObject rootobj = root.getAsJsonObject();
+                String latest = "git-" + rootobj.get("sha").getAsString().substring(0, 7);
+
+                if (!this.getNukkitVersion().equals(latest)) {
+                    this.getLogger().notice("[Update] \u00A7eThere is a newer build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                }
+
+                this.getLogger().debug("Update check done");
+            } catch (Exception ignore) {
+                this.getLogger().debug("Update check failed");
+            }
+        }, true);
 
         this.start();
     }
@@ -1946,6 +1971,7 @@ public class Server {
         Entity.registerEntity("ShulkerBullet", EntityShulkerBullet.class);
         Entity.registerEntity("ThrownLinearingPotion", EntityPotionLinearing.class);
         Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
+        Entity.registerEntity("WitherSkull", EntityWitherSkull.class);
         Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);
         Entity.registerEntity("LlamaSplit", EntityLlamaSpit.class);
         Entity.registerEntity("EvocationFangs", EntityEvocationFangs.class);

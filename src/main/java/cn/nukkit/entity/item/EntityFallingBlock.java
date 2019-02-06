@@ -7,6 +7,7 @@ import cn.nukkit.event.entity.EntityBlockChangeEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.sound.AnvilFallSound;
@@ -132,7 +133,7 @@ public class EntityFallingBlock extends Entity {
                 close();
                 Block block = level.getBlock(pos);
                 if (block.getId() > 0 && block.isTransparent() && !block.canBeReplaced()) {
-                    if (this.level.getGameRules().getBoolean("doEntityDrops")) {
+                    if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
                         getLevel().dropItem(this, Item.get(this.getBlock(), this.getDamage(), 1));
                     }
                 } else {

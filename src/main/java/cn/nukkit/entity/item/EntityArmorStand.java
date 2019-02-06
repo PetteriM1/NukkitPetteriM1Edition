@@ -8,6 +8,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemArmorStand;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -67,7 +68,7 @@ public class EntityArmorStand extends Entity {
 			onCreative = damager instanceof Player && ((Player) damager).isCreative();
 		}
 
-		if (!onCreative && level.getGameRules().getBoolean("doEntityDrops")) {
+		if (!onCreative && level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
 			this.level.dropItem(this, new ItemArmorStand());
 		}
 

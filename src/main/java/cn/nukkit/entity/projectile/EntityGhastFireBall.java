@@ -1,14 +1,13 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 public class EntityGhastFireBall extends EntityProjectile {
 
@@ -43,6 +42,11 @@ public class EntityGhastFireBall extends EntityProjectile {
         return 0.01f;
     }
 
+    @Override
+    public double getDamage() {
+        return 5;
+    }
+
     public EntityGhastFireBall(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
@@ -55,10 +59,6 @@ public class EntityGhastFireBall extends EntityProjectile {
         super(chunk, nbt, shootingEntity);
 
         this.critical = critical;
-    }
-
-    public boolean isExplode() {
-        return this.canExplode;
     }
 
     public void setExplode(boolean bool) {
@@ -82,7 +82,7 @@ public class EntityGhastFireBall extends EntityProjectile {
 
         if (this.age > 1200 || this.isCollided) {
             if (this.isCollided && this.canExplode) {
-                ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 2);
+                ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1);
                 this.server.getPluginManager().callEvent(ev);
                 if (!ev.isCancelled()) {
                     SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);

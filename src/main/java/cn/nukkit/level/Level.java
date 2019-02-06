@@ -870,6 +870,13 @@ public class Level implements ChunkManager, Metadatable {
             this.chunkPackets.clear();
         }
 
+        if(gameRules.isStale()) {
+            GameRulesChangedPacket packet = new GameRulesChangedPacket();
+            packet.gameRules = gameRules;
+            Server.broadcastPacket(players.values().toArray(new Player[players.size()]), packet);
+            gameRules.refresh();
+        }
+
         this.timings.doTick.stopTiming();
     }
 
@@ -1905,7 +1912,7 @@ public class Level implements ChunkManager, Metadatable {
             item = new ItemBlock(new BlockAir(), 0, 0);
         }
 
-        if (this.gameRules.getBoolean("doTileDrops")) {
+        if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
             int dropExp = target.getDropExp();
             if (!isSilkTouch && player != null) {
                 player.addExperience(dropExp);

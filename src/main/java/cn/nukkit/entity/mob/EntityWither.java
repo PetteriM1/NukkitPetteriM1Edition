@@ -5,9 +5,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityFlyingMob;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
+import cn.nukkit.entity.projectile.EntityWitherSkull;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -17,6 +15,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.utils.EntityUtils;
 
 public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
@@ -80,22 +79,41 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
             double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("BlueWitherSkull", pos, this);
-            if (!(k instanceof EntityBlueWitherSkull)) {
-                return;
+
+            Entity k;
+            ProjectileLaunchEvent launch;
+            EntityWitherSkull skull;
+            if (EntityUtils.rand(0, 200) > 180 || EntityUtils.rand(0, 200) < 20) {
+                f = 0.8;
+                k = EntityUtils.create("BlueWitherSkull", pos, this);
+                if (!(k instanceof EntityWitherSkull)) {
+                    return;
+                }
+
+                skull = (EntityWitherSkull) k;
+                skull.setExplode(true);
+                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+
+                launch = new ProjectileLaunchEvent(skull);
+            } else {
+                k = EntityUtils.create("WitherSkull", pos, this);
+                if (!(k instanceof EntityWitherSkull)) {
+                    return;
+                }
+
+                skull = (EntityWitherSkull) k;
+                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+
+                launch = new ProjectileLaunchEvent(skull);
             }
 
-            EntityBlueWitherSkull blueskull = (EntityBlueWitherSkull) k;
-            blueskull.setExplode(true);
-            blueskull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
-            ProjectileLaunchEvent launch = new ProjectileLaunchEvent(blueskull);
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                blueskull.kill();
+                skull.kill();
             } else {
-                blueskull.spawnToAll();
+                skull.spawnToAll();
                 this.level.addSound(this, Sound.MOB_WITHER_SHOOT);
             }
         }
