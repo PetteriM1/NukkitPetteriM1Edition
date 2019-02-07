@@ -4,16 +4,16 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.ProjectileHitEvent;
-import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
+import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.item.randomitem.Fishing;
 import cn.nukkit.level.MovingObjectPosition;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.level.particle.WaterParticle;
 import cn.nukkit.math.Vector3;
@@ -25,7 +25,6 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.utils.FishSelector;
 
 import java.util.Random;
 
@@ -49,6 +48,7 @@ public class EntityFishingHook extends EntityProjectile {
 
 	public Vector3 fish = null;
 
+	public Item rod = null;
 
 	public EntityFishingHook(FullChunk chunk, CompoundTag nbt) {
 		this(chunk, nbt, null);
@@ -222,8 +222,7 @@ public class EntityFishingHook extends EntityProjectile {
 
 	public void reelLine() {
 		if (this.shootingEntity instanceof Player && this.coughted) {
-			String code = FishSelector.select();
-			Item item = FishSelector.getFish(code);
+			Item item = Fishing.getFishingResult(this.rod);
 			int experience = EntityUtils.rand(1, 3);
 			Vector3 motion;
 

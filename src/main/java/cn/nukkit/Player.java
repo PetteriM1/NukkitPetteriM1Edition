@@ -4816,7 +4816,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
-    public void startFishing() {
+    public void startFishing(Item fishingRod) {
         CompoundTag nbt = new CompoundTag()
 				.putList(new ListTag<DoubleTag>("Pos")
 						.add(new DoubleTag("", x))
@@ -4840,6 +4840,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 		} else {
 			fishingHook.spawnToAll();
             this.fishing = fishingHook;
+            fishingHook.rod = fishingRod;
 		}
     }
 
