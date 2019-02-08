@@ -231,6 +231,7 @@ public class ParticleCommand extends VanillaCommand {
         for (Player p : level.getPlayers().values()) {
             if (p.protocol >= 313) {
                 for (int i = 0; i < count; i++) {
+                    pk.protocol = p.protocol;
                     p.dataPacket(pk);
                 }
             }
