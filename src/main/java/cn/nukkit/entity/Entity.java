@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author MagicDroidX
  */
+@SuppressWarnings("rawtypes")
 public abstract class Entity extends Location implements Metadatable {
 
     public static final int NETWORK_ID = -1;
@@ -475,6 +476,14 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void setNameTagAlwaysVisible(boolean value) {
         this.setDataProperty(new ByteEntityData(DATA_ALWAYS_SHOW_NAMETAG, value ? 1 : 0));
+    }
+
+    public void setScoreTag(String score) {
+        this.setDataProperty(new StringEntityData(DATA_SCORE_TAG, score));
+    }
+
+    public String getScoreTag() {
+        return this.getDataPropertyString(DATA_SCORE_TAG);
     }
 
     public boolean isSneaking() {
