@@ -10,6 +10,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDeathEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTurtleShell;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -55,6 +56,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     protected float movementSpeed = 0.1f;
 
     public AtomicBoolean inKnockback = new AtomicBoolean();
+
+    protected int turtleTicks = 200;
 
     @Override
     protected void initEntity() {
@@ -219,9 +222,21 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     @Override
     public boolean entityBaseTick(int tickDiff) {
         Timings.livingEntityBaseTickTimer.startTiming();
+
         boolean isBreathing = !this.isSubmerged();
         if (this instanceof Player && ((Player) this).isCreative()) {
             isBreathing = true;
+        }
+
+        if (this instanceof Player) {
+            if (!isBreathing && ((Player) this).getInventory().getHelmet() instanceof ItemTurtleShell) {
+                if (turtleTicks > 0) {
+                    isBreathing = true;
+                    turtleTicks--;
+                }
+            } else {
+                turtleTicks = 200;
+            }
         }
 
         if (this instanceof Player && ((Player) this).protocol <= 282) {
@@ -243,15 +258,17 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 if (this instanceof EntitySwimming || (this instanceof Player && ((Player) this).isCreative())) {
                     this.setAirTicks(400);
                 } else {
-                    hasUpdate = true;
-                    int airTicks = this.getAirTicks() - tickDiff;
+                    if (turtleTicks == 0 || turtleTicks == 200) {
+                        hasUpdate = true;
+                        int airTicks = this.getAirTicks() - tickDiff;
 
-                    if (airTicks <= -20) {
-                        airTicks = 0;
-                        this.attack(new EntityDamageEvent(this, DamageCause.DROWNING, 2));
+                        if (airTicks <= -20) {
+                            airTicks = 0;
+                            this.attack(new EntityDamageEvent(this, DamageCause.DROWNING, 2));
+                        }
+
+                        this.setAirTicks(airTicks);
                     }
-
-                    this.setAirTicks(airTicks);
                 }
             } else {
                 if (this instanceof EntitySwimming) {

@@ -40,22 +40,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull {
 
         this.timing.startTiming();
 
-        if (this.hadCollision && this.canExplode) {
-            ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1);
-            this.server.getPluginManager().callEvent(ev);
-
-            if (!ev.isCancelled()) {
-                SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);
-                if (ev.isBlockBreaking()) {
-                    explosion.explodeA();
-                }
-                explosion.explodeB();
-            }
-
-            this.kill();
-        }
-
-        if (this.age > 1200 || this.isCollided) {
+        if (this.age > 1200 || this.hadCollision) {
             if (this.canExplode) {
                 ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1);
                 this.server.getPluginManager().callEvent(ev);
@@ -83,6 +68,5 @@ public class EntityBlueWitherSkull extends EntityWitherSkull {
     public void onCollideWithEntity(Entity entity) {
         super.onCollideWithEntity(entity);
         entity.addEffect(Effect.getEffect(Effect.WITHER).setAmplifier(1).setDuration(200));
-        this.isCollided = true;
     }
 }
