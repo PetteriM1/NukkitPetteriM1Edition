@@ -71,8 +71,6 @@ public class EntityGhastFireBall extends EntityProjectile {
             return false;
         }
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(
                     this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
@@ -93,10 +91,9 @@ public class EntityGhastFireBall extends EntityProjectile {
                 }
             }
             this.kill();
-            hasUpdate = true;
         }
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
     
     @Override

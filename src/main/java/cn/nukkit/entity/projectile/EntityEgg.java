@@ -59,11 +59,8 @@ public class EntityEgg extends EntityProjectile {
             return false;
         }
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.age > 1200) {
             this.kill();
-            hasUpdate = true;
         } else if (this.isCollided) {
             this.kill();
 
@@ -76,10 +73,8 @@ public class EntityEgg extends EntityProjectile {
                     }
                 }
             }
-
-            hasUpdate = true;
         }
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
 }

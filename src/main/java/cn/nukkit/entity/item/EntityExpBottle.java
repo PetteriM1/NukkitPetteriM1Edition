@@ -62,22 +62,18 @@ public class EntityExpBottle extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.age > 1200) {
             this.kill();
-            hasUpdate = true;
         }
 
         if (this.isCollided) {
             this.kill();
             this.dropXp();
-            hasUpdate = true;
         }
 
         this.timing.stopTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
 
     @Override

@@ -131,7 +131,6 @@ public class EntityItem extends Entity {
 
         this.timing.startTiming();
 
-
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (isInsideOfFire()) {

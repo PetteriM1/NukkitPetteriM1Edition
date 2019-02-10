@@ -90,9 +90,12 @@ public class EntityFishingHook extends EntityProjectile {
 	@Override
 	public boolean onUpdate(int currentTick) {
 		boolean hasUpdate = super.onUpdate(currentTick);
+
 		if (hasUpdate) {
 			return false;
 		}
+
+		this.timing.startTiming();
 
 		if (this.isInsideOfWater()) {
 			this.motionX = 0;
@@ -146,6 +149,8 @@ public class EntityFishingHook extends EntityProjectile {
 				}
 			}
 		}
+
+		this.timing.stopTiming();
 
 		return hasUpdate;
 	}

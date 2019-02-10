@@ -147,6 +147,8 @@ public class EntityBoat extends EntityVehicle {
             return true;
         }
 
+        this.timing.startTiming();
+
         this.lastUpdate = currentTick;
 
         this.entityBaseTick(tickDiff);
@@ -187,6 +189,8 @@ public class EntityBoat extends EntityVehicle {
 
             this.updateMovement();
         }
+
+        this.timing.stopTiming();
 
         return true;
     }

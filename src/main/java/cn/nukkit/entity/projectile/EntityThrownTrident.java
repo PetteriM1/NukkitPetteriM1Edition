@@ -132,8 +132,6 @@ public class EntityThrownTrident extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
             if (this.firstTickOnGround) {
@@ -144,12 +142,11 @@ public class EntityThrownTrident extends EntityProjectile {
 
         if (this.age > 1200) {
             this.close();
-            hasUpdate = true;
         }
 
         this.timing.stopTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
 
     @Override

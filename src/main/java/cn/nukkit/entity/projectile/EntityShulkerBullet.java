@@ -1,12 +1,11 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.potion.Effect;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
 
 public class EntityShulkerBullet extends EntityProjectile {
 
@@ -63,16 +62,13 @@ public class EntityShulkerBullet extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.age > 1200 || this.isCollided) {
             this.kill();
-            hasUpdate = true;
         }
 
         this.timing.stopTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -65,8 +64,6 @@ public class EntityLlamaSpit extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
         } else if (this.onGround) {
@@ -75,11 +72,10 @@ public class EntityLlamaSpit extends EntityProjectile {
 
         if (this.age > 100 || this.isCollided) {
             this.kill();
-            hasUpdate = true;
         }
 
         this.timing.stopTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
 }

@@ -59,8 +59,6 @@ public class EntityEnderPearl extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.isCollided && this.shootingEntity instanceof Player) {
             this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
             if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
@@ -69,12 +67,11 @@ public class EntityEnderPearl extends EntityProjectile {
 
         if (this.age > 1200 || this.isCollided) {
             this.kill();
-            hasUpdate = true;
         }
 
         this.timing.stopTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
     
     @Override
@@ -83,7 +80,8 @@ public class EntityEnderPearl extends EntityProjectile {
             this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
             if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
             this.level.addSound(new EndermanTeleportSound(this));
-            super.onCollideWithEntity(entity);
         }
+
+        super.onCollideWithEntity(entity);
     }
 }
