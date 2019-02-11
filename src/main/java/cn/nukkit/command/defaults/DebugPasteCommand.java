@@ -34,7 +34,7 @@ public class DebugPasteCommand extends VanillaCommand {
                     new StatusCommand("status").execute(server.getConsoleSender(), "status", new String[]{});
                     String dataPath = server.getDataPath();
                     String serverProperties = HastebinUtility.upload(new File(dataPath, "server.properties"));
-                    String latestLog = HastebinUtility.upload(new File(dataPath, "server.log"));
+                    String latestLog = HastebinUtility.upload(new File(dataPath, "/logs/server.log"));
                     String threadDump = HastebinUtility.upload(Utils.getAllThreadDumps());
 
                     StringBuilder b = new StringBuilder();

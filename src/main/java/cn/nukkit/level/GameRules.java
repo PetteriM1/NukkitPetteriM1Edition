@@ -9,100 +9,44 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.TreeMap;
 
-/**
- * Created by CreeperFace on 25.6.2017.
- */
-@SuppressWarnings("all")
+import static cn.nukkit.level.GameRule.*;
+
+@SuppressWarnings("unchecked")
 public class GameRules {
 
-    private final TreeMap<String, ValueOld> theGameRules = new TreeMap<>();
     private final EnumMap<GameRule, Value> gameRules = new EnumMap<>(GameRule.class);
     private boolean stale;
 
-    public GameRules() {
-        this.addGameRule("doFireTick", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("mobGriefing", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("keepInventory", "false", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doMobSpawning", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doMobLoot", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doTileDrops", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doEntityDrops", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("commandBlockOutput", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("naturalRegeneration", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doDaylightCycle", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doWeatherCycle", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("drowningdamage", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("falldamage", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("firedamage", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("sendCommandFeedback", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("showcoordinates", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("pvp", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("tntexplodes", "true", ValueType.BOOLEAN_VALUE);
-        this.addGameRule("showDeathMessages", "true", ValueType.BOOLEAN_VALUE);
-    }
-
-    public void addGameRule(String key, String value, ValueType type) {
-        this.theGameRules.put(key, new GameRules.ValueOld(value, type));
-    }
-
-    public void setGameRule(String key, String ruleValue) {
-        ValueOld value = this.theGameRules.get(key);
-
-        if (value != null) {
-            value.setValue(ruleValue);
-        } else {
-            this.addGameRule(key, ruleValue, ValueType.ANY_VALUE);
-        }
-    }
-
-    public String getString(String name) {
-        ValueOld value = this.theGameRules.get(name);
-        return value != null ? value.getString() : "";
-    }
-
-    public boolean getBoolean(String name) {
-        ValueOld value = this.theGameRules.get(name);
-        return value != null && value.getBoolean();
-    }
-
-    public int getInt(String name) {
-        ValueOld value = this.theGameRules.get(name);
-        return value != null ? value.getInt() : 0;
-    }
-
-    public boolean hasRule(String name) {
-        return this.theGameRules.containsKey(name);
-    }
-
-    public boolean areSameType(String key, ValueType otherValue) {
-        ValueOld value = this.theGameRules.get(key);
-        return value != null && (value.getType() == otherValue || otherValue == ValueType.ANY_VALUE);
+    private GameRules() {
     }
 
     public static GameRules getDefault() {
         GameRules gameRules = new GameRules();
 
-        gameRules.gameRules.put(GameRule.COMMAND_BLOCK_OUTPUT, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_DAYLIGHT_CYCLE, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_ENTITY_DROPS, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_FIRE_TICK, new Value(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_MOB_LOOT, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_MOB_SPAWNING, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_TILE_DROPS, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DO_WEATHER_CYCLE, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.DROWNING_DAMAGE, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.FALL_DAMAGE, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.FIRE_DAMAGE, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.KEEP_INVENTORY, new Value<>(Type.BOOLEAN, false));
-        gameRules.gameRules.put(GameRule.MOB_GRIEFING, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.NATURAL_REGENERATION, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.PVP, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.SEND_COMMAND_FEEDBACK, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.SHOW_COORDINATES, new Value<>(Type.BOOLEAN, false));
-        gameRules.gameRules.put(GameRule.TNT_EXPLODES, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(GameRule.SHOW_DEATH_MESSAGE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(COMMAND_BLOCKS_ENABLED, new Value<>(Type.BOOLEAN, false));
+        gameRules.gameRules.put(COMMAND_BLOCK_OUTPUT, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_DAYLIGHT_CYCLE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_ENTITY_DROPS, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_FIRE_TICK, new Value(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_INSOMNIA, new Value(Type.BOOLEAN, false));
+        gameRules.gameRules.put(DO_MOB_LOOT, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_MOB_SPAWNING, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_TILE_DROPS, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DO_WEATHER_CYCLE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(DROWNING_DAMAGE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(FALL_DAMAGE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(FIRE_DAMAGE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(KEEP_INVENTORY, new Value<>(Type.BOOLEAN, false));
+        gameRules.gameRules.put(MAX_COMMAND_CHAIN_LENGTH, new Value<>(Type.INTEGER, 65536));
+        gameRules.gameRules.put(MOB_GRIEFING, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(NATURAL_REGENERATION, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(PVP, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(RANDOM_TICK_SPEED, new Value<>(Type.INTEGER, 3));
+        gameRules.gameRules.put(SEND_COMMAND_FEEDBACK, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(SHOW_COORDINATES, new Value<>(Type.BOOLEAN, false));
+        gameRules.gameRules.put(TNT_EXPLODES, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(SHOW_DEATH_MESSAGE, new Value<>(Type.BOOLEAN, true));
 
         return gameRules;
     }
@@ -219,57 +163,7 @@ public class GameRules {
         }
     }
 
-    private static class ValueOld {
-
-        private String valueString;
-
-        private boolean valueBoolean;
-
-        private int valueInteger;
-
-        private final ValueType type;
-
-        public ValueOld(String value, ValueType type) {
-            this.type = type;
-            this.setValue(value);
-        }
-
-        public void setValue(String value) {
-            this.valueString = value;
-            this.valueBoolean = Boolean.parseBoolean(value);
-            this.valueInteger = this.valueBoolean ? 1 : 0;
-
-            try {
-                this.valueInteger = Integer.parseInt(value);
-            } catch (NumberFormatException ex) {}
-        }
-
-        public String getString() {
-            return this.valueString;
-        }
-
-        public boolean getBoolean() {
-            return this.valueBoolean;
-        }
-
-        public int getInt() {
-            return this.valueInteger;
-        }
-
-        public ValueType getType() {
-            return this.type;
-        }
-    }
-
-    public enum ValueType {
-        ANY_VALUE,
-        BOOLEAN_VALUE,
-        NUMERICAL_VALUE
-    }
-
-    @SuppressWarnings("rawtypes")
     public enum Type {
-
         UNKNOWN {
             @Override
             void write(BinaryStream pk, Value value) {
@@ -298,7 +192,6 @@ public class GameRules {
     }
 
     public static class Value<T> {
-
         private final Type type;
         private T value;
 

@@ -63,6 +63,7 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new WorldCommand("world"));
         this.register("nukkit", new GenerateWorldCommand("genworld"));
         this.register("nukkit", new WhitelistCommand("whitelist"));
+        this.register("nukkit", new GameruleCommand("gamerule"));
         if (!Server.getInstance().suomiCraftPEMode()) {
             this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
             this.register("nukkit", new SayCommand("say"));
@@ -77,7 +78,6 @@ public class SimpleCommandMap implements CommandMap {
             this.register("nukkit", new SeedCommand("seed"));
             this.register("nukkit", new PlaySoundCommand("playsound"));
             this.register("nukkit", new DebugPasteCommand("debugpaste"));
-            this.register("nukkit", new GameruleCommand("gamerule"));
         }
     }
 

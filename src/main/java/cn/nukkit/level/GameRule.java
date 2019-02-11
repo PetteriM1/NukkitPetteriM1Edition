@@ -4,10 +4,12 @@ import java.util.Optional;
 
 public enum GameRule {
 
+    COMMAND_BLOCKS_ENABLED("commandBlocksEnabled"),
     COMMAND_BLOCK_OUTPUT("commandBlockOutput"),
     DO_DAYLIGHT_CYCLE("doDaylightCycle"),
     DO_ENTITY_DROPS("doEntityDrops"),
     DO_FIRE_TICK("doFireTick"),
+    DO_INSOMNIA("doInsomnia"),
     DO_MOB_LOOT("doMobLoot"),
     DO_MOB_SPAWNING("doMobSpawning"),
     DO_TILE_DROPS("doTileDrops"),
@@ -16,9 +18,11 @@ public enum GameRule {
     FALL_DAMAGE("fallDamage"),
     FIRE_DAMAGE("fireDamage"),
     KEEP_INVENTORY("keepInventory"),
+    MAX_COMMAND_CHAIN_LENGTH("maxCommandChainLength"),
     MOB_GRIEFING("mobGriefing"),
     NATURAL_REGENERATION("naturalRegeneration"),
     PVP("pvp"),
+    RANDOM_TICK_SPEED("randomTickSpeed"),
     SEND_COMMAND_FEEDBACK("sendCommandFeedback"),
     SHOW_COORDINATES("showCoordinates"),
     TNT_EXPLODES("tntExplodes"),

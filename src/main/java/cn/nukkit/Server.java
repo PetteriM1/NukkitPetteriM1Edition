@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.*;
 import cn.nukkit.command.*;
+import cn.nukkit.console.NukkitConsole;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
@@ -70,12 +71,9 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.extern.log4j.Log4j2;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteOrder;
@@ -87,6 +85,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author MagicDroidX
  * @author Box
  */
+@Log4j2
 public class Server {
 
     public static final String BROADCAST_CHANNEL_ADMINISTRATIVE = "nukkit.broadcast.admin";
@@ -122,9 +121,8 @@ public class Server {
 
     private float maxUse = 0;
 
-    private final MainLogger logger;
-
-    private final CommandReader console;
+    private final NukkitConsole console;
+    private final ConsoleThread consoleThread;
 
     private SimpleCommandMap commandMap;
 
@@ -180,7 +178,6 @@ public class Server {
     private QueryRegenerateEvent queryRegenerateEvent;
 
     private Config properties;
-    private Config config;
 
     private final Map<String, Player> players = new HashMap<>();
 
@@ -220,11 +217,10 @@ public class Server {
     private boolean suomicraftMode;
 
     @SuppressWarnings("serial")
-    Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
+    Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
-        this.logger = logger;
 
         this.filePath = filePath;
         if (!new File(dataPath + "worlds/").exists()) {
@@ -238,10 +234,12 @@ public class Server {
         this.dataPath = new File(dataPath).getAbsolutePath() + "/";
         this.pluginPath = new File(pluginPath).getAbsolutePath() + "/";
 
-        this.console = new CommandReader();
-        this.console.start();
+        this.console = new NukkitConsole();
+        this.consoleThread = new ConsoleThread();
+        this.consoleThread.start();
+        this.console.setExecutingCommands(true);
 
-        this.logger.info("Loading server properties...");
+        log.info("Loading server properties...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
             {
                 put("motd", "Minecraft Server");
@@ -323,9 +321,9 @@ public class Server {
                 put("block-listener", true);
             }
         });
-        
+
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
-        
+
         if (!new File(dataPath + "players/").exists() && this.getPropertyBoolean("save-player-data", true)) {
             new File(dataPath + "players/").mkdirs();
         }
@@ -361,7 +359,7 @@ public class Server {
             try {
                 this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
             } catch (IllegalArgumentException e) {
-                logger.critical(getLanguage().translateString(e.getMessage(), e.getCause().getMessage()));
+                log.error(getLanguage().translateString(e.getMessage(), e.getCause().getMessage()));
             }
         }
 
@@ -383,19 +381,23 @@ public class Server {
             this.setPropertyInt("difficulty", 3);
         }
 
-        Nukkit.DEBUG = this.getPropertyInt("debug-level", 1);
-        if (this.logger instanceof MainLogger) {
-            this.logger.setLogDebug(Nukkit.DEBUG > 1);
+        Nukkit.DEBUG = Math.max(this.getPropertyInt("debug-level", 1), 1);
+
+        for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
+            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100) {
+                Nukkit.setLogLevel(level);
+                break;
+            }
         }
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        log.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
 
         this.network = new Network(this);
         this.network.setName(this.getMotd());
         this.network.setSubName(this.getSubMotd());
 
-        this.logger.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
+        log.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
 
         this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
 
@@ -472,12 +474,11 @@ public class Server {
         if (this.getPropertyInt("ticks-per-autosave", 6000) > 0) {
             this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         }
-        
+
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             String dir2 = null;
             Level level = this.getDefaultLevel();
-            level.getFolderName();
             File directory = new File("");
             try {
                 String f = directory.getCanonicalPath();
@@ -726,9 +727,9 @@ public class Server {
     }
 
     public void reload() {
-        this.logger.info("Reloading...");
+        log.info("Reloading...");
 
-        this.logger.info("Saving levels...");
+        log.info("Saving levels...");
 
         for (Level level : this.levelArray) {
             level.save();
@@ -737,7 +738,7 @@ public class Server {
         this.pluginManager.clearPlugins();
         this.commandMap.clearCommands();
 
-        this.logger.info("Reloading properties...");
+        log.info("Reloading properties...");
         this.properties.reload();
         this.maxPlayers = this.getPropertyInt("max-players", 50);
 
@@ -762,9 +763,7 @@ public class Server {
     }
 
     public void shutdown() {
-        if (!isRunning.compareAndSet(true, false)) {
-            throw new IllegalStateException("Server has already shutdown");
-        }
+        isRunning.compareAndSet(true, false);
     }
 
     public void forceShutdown() {
@@ -805,7 +804,7 @@ public class Server {
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
             this.getLogger().debug("Closing console...");
-            this.console.interrupt();
+            this.consoleThread.interrupt();
 
             this.getLogger().debug("Stopping network interfaces...");
             for (SourceInterface interfaz : this.network.getInterfaces()) {
@@ -820,8 +819,7 @@ public class Server {
                 this.watchdog.kill();
             }
         } catch (Exception e) {
-            this.logger.logException(e);
-            this.logger.emergency("Exception happened while shutting down, exit the process");
+            log.fatal("Exception happened while shutting down, exiting the process", e);
             System.exit(1);
         }
     }
@@ -837,7 +835,7 @@ public class Server {
 
         this.tickCounter = 0;
 
-        this.logger.info(this.getLanguage().translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
+        log.info(this.getLanguage().translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
 
         this.tickProcessor();
         this.forceShutdown();
@@ -849,7 +847,7 @@ public class Server {
                 this.queryHandler.handle(address, port, payload);
             }
         } catch (Exception e) {
-            this.logger.logException(e);
+            log.error("Error whilst handling packet", e);
 
             this.getNetwork().blockAddress(address, 600);
         }
@@ -895,9 +893,8 @@ public class Server {
                 }
             }
         } catch (Throwable e) {
-            this.logger.emergency("Exception happened while ticking server");
-            this.logger.alert(Utils.getExceptionMessage(e));
-            this.logger.alert(Utils.getAllThreadDumps());
+            log.fatal("Exception happened while ticking server", e);
+            log.fatal(Utils.getAllThreadDumps());
         }
     }
 
@@ -1033,9 +1030,7 @@ public class Server {
                     }
                 }
             } catch (Exception e) {
-                if (this.logger != null) {
-                    if (!suomiCraftPEMode()) this.logger.critical(this.getLanguage().translateString("nukkit.level.tickError"), e);
-                }
+                log.error(this.getLanguage().translateString("nukkit.level.tickError"), e);
             }
         }
     }
@@ -1115,7 +1110,7 @@ public class Server {
                         this.queryHandler.regenerateInfo();
                     }
                 } catch (Exception e) {
-                    this.logger.logException(e);
+                    log.error(e);
                 }
             }
 
@@ -1259,10 +1254,6 @@ public class Server {
         return this.getPropertyString("level-type", "default");
     }
 
-    public boolean getGenerateStructures() {
-        return this.getPropertyBoolean("generate-structures", true);
-    }
-
     public int getGamemode() {
         return this.getPropertyInt("gamemode", 0) & 0b11;
     }
@@ -1391,7 +1382,7 @@ public class Server {
     }
 
     public MainLogger getLogger() {
-        return this.logger;
+        return MainLogger.getLogger();
     }
 
     public EntityMetadataStore getEntityMetadata() {
@@ -1529,10 +1520,7 @@ public class Server {
                     Utils.writeFile(this.getDataPath() + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
                 }
             } catch (Exception e) {
-                this.logger.critical(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
-                if (Nukkit.DEBUG > 1) {
-                    this.logger.logException(e);
-                }
+                log.error(this.getLanguage().translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
             }
         }
     }
@@ -1655,7 +1643,7 @@ public class Server {
         if (this.isLevelLoaded(name)) {
             return true;
         } else if (!this.isLevelGenerated(name)) {
-            this.logger.notice(this.getLanguage().translateString("nukkit.level.notFound", name));
+            log.warn(this.getLanguage().translateString("nukkit.level.notFound", name));
 
             return false;
         }
@@ -1671,8 +1659,7 @@ public class Server {
         Class<? extends LevelProvider> provider = LevelProviderManager.getProvider(path);
 
         if (provider == null) {
-            this.logger.error(this.getLanguage().translateString("nukkit.level.loadError", new String[]{name, "Unknown provider"}));
-
+            log.error(this.getLanguage().translateString("nukkit.level.loadError", new String[]{name, "Unknown provider"}));
             return false;
         }
 
@@ -1680,8 +1667,7 @@ public class Server {
         try {
             level = new Level(this, name, path, provider);
         } catch (Exception e) {
-            this.logger.error(this.getLanguage().translateString("nukkit.level.loadError", new String[]{name, e.getMessage()}));
-            this.logger.logException(e);
+            log.error(this.getLanguage().translateString("nukkit.level.loadError", new String[]{name, e.getMessage()}));
             return false;
         }
 
@@ -1748,8 +1734,7 @@ public class Server {
 
             level.setTickRate(this.baseTickRate);
         } catch (Exception e) {
-            this.logger.error(this.getLanguage().translateString("nukkit.level.generationError", new String[]{name, e.getMessage()}));
-            this.logger.logException(e);
+            log.error(this.getLanguage().translateString("nukkit.level.generationError", new String[]{name, e.getMessage()}));
             return false;
         }
 
@@ -1783,19 +1768,6 @@ public class Server {
 
     public Network getNetwork() {
         return network;
-    }
-
-    public Config getConfig() {
-        return this.config;
-    }
-
-    public Object getConfig(String variable) {
-        return this.getConfig(variable, null);
-    }
-
-    public Object getConfig(String variable, Object defaultValue) {
-        Object value = this.config.get(variable);
-        return value == null ? defaultValue : value;
     }
 
     public Config getProperties() {
@@ -1935,7 +1907,7 @@ public class Server {
 
     /**
      * Checks the current thread against the expected primary thread for the server.
-     * 
+     *
      * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
      *
      * @return true if the current thread matches the expected primary thread, false otherwise
@@ -1949,7 +1921,7 @@ public class Server {
     }
 
     private void registerEntities() {
-        //Items    
+        //Items
         Entity.registerEntity("Item", EntityItem.class);
         Entity.registerEntity("Painting", EntityPainting.class);
         Entity.registerEntity("XpOrb", EntityXPOrb.class);
@@ -2073,5 +2045,13 @@ public class Server {
 
     public boolean suomiCraftPEMode() {
         return suomicraftMode;
+    }
+
+    private class ConsoleThread extends Thread implements InterruptibleThread {
+
+        @Override
+        public void run() {
+            console.start();
+        }
     }
 }
