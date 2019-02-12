@@ -56,8 +56,8 @@ public class Nukkit {
                 System.out.print((char) 0x1b + "]0;Nukkit PetteriM1 Edition" + (char) 0x07);
             }
             new Server(PATH, DATA_PATH, PLUGIN_PATH);
-        } catch (Exception e) {
-            log.fatal(e);
+        } catch (Throwable t) {
+            log.throwing(t);
         }
 
         if (TITLE) {
