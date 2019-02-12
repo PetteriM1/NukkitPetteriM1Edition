@@ -58,8 +58,8 @@ public class MainLogger extends ThreadedLogger {
         log.debug(message);
     }
 
-    public void logException(Exception e) {
-        log.error(e);
+    public void logException(Throwable t) {
+        log.throwing(t);
     }
 
     @Override
@@ -109,6 +109,6 @@ public class MainLogger extends ThreadedLogger {
 
     @Override
     public void log(LogLevel level, String message, Throwable t) {
-        this.log(level, message + "\r\n" + Utils.getExceptionMessage(t));
+        level.log(this, message, t);
     }
 }
