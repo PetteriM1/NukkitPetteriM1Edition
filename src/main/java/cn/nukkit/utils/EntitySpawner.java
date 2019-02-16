@@ -13,6 +13,4 @@ public interface EntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level);
 
     public int getEntityNetworkId();
-
-    public String getEntityName();
 }

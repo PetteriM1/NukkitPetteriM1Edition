@@ -32,7 +32,7 @@ public class WolfSpawner extends AbstractEntitySpawner {
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            this.spawnTask.createEntity("Wolf", pos.add(0, 1, 0));
         }
 
         return result;
@@ -41,10 +41,5 @@ public class WolfSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityWolf.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Wolf";
     }
 }

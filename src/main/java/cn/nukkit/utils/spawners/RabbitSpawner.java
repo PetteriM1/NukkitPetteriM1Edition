@@ -32,7 +32,7 @@ public class RabbitSpawner extends AbstractEntitySpawner {
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            this.spawnTask.createEntity("Rabbit", pos.add(0, 1, 0));
         }
 
         return result;
@@ -41,10 +41,5 @@ public class RabbitSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityRabbit.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Rabbit";
     }
 }

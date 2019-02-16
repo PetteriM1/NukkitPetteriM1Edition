@@ -39,7 +39,7 @@ public class ZombieSpawner extends AbstractEntitySpawner {
                     entity.setBaby(true);
                 }
             } else {
-                BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+                BaseEntity entity = this.spawnTask.createEntity("Zombie", pos.add(0, 1, 0));
                 if (EntityUtils.rand(0, 500) > 480) {
                     entity.setBaby(true);
                 }
@@ -52,10 +52,5 @@ public class ZombieSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityZombie.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Zombie";
     }
 }

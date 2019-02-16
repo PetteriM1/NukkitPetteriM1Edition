@@ -29,7 +29,7 @@ public class ChickenSpawner extends AbstractEntitySpawner {
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            BaseEntity entity = this.spawnTask.createEntity("Chicken", pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }
@@ -41,10 +41,5 @@ public class ChickenSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityChicken.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Chicken";
     }
 }

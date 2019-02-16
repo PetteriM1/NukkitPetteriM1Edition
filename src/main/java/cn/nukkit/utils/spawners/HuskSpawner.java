@@ -36,7 +36,7 @@ public class HuskSpawner extends AbstractEntitySpawner {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (time > 13184 && time < 22800) {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            BaseEntity entity = this.spawnTask.createEntity("Husk", pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }
@@ -48,10 +48,5 @@ public class HuskSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityHusk.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Husk";
     }
 }

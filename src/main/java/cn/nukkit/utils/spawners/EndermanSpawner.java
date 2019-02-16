@@ -33,7 +33,7 @@ public class EndermanSpawner extends AbstractEntitySpawner {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7 && !level.getName().equals("nether") && !level.getName().equals("end")) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if ((time > 13184 && time < 22800) || level.getName().equals("nether") || level.getName().equals("end")) {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            this.spawnTask.createEntity("Enderman", pos.add(0, 1, 0));
         }
 
         return result;
@@ -42,10 +42,5 @@ public class EndermanSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityEnderman.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Enderman";
     }
 }

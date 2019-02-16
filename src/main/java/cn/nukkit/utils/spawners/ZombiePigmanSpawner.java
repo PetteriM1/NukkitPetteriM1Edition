@@ -30,7 +30,7 @@ public class ZombiePigmanSpawner extends AbstractEntitySpawner {
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            BaseEntity entity = this.spawnTask.createEntity("ZombiePigman", pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }
@@ -42,10 +42,5 @@ public class ZombiePigmanSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityZombiePigman.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "ZombiePigman";
     }
 }

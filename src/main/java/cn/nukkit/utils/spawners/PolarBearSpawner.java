@@ -33,7 +33,7 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            BaseEntity entity = this.spawnTask.createEntity("PolarBear", pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }
@@ -45,10 +45,5 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityPolarBear.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "PolarBear";
     }
 }

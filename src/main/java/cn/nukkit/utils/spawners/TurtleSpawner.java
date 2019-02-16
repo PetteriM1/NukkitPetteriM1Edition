@@ -2,37 +2,36 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.BaseEntity;
-import cn.nukkit.entity.passive.EntitySheep;
+import cn.nukkit.entity.passive.EntityTurtle;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
-public class SheepSpawner extends AbstractEntitySpawner {
+public class TurtleSpawner extends AbstractEntitySpawner {
 
-    public SheepSpawner(Spawner spawnTask) {
+    public TurtleSpawner(Spawner spawnTask) {
         super(spawnTask);
     }
 
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (blockId != Block.GRASS) {
+        if (blockId != Block.WATER && blockId != Block.STILL_WATER) {
             result = SpawnResult.WRONG_BLOCK;
+        } else if (biomeId != Biome.OCEAN) {
+            result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else {
-            BaseEntity entity = this.spawnTask.createEntity("Sheep", pos.add(0, 1, 0));
-            if (EntityUtils.rand(0, 500) > 480) {
-                entity.setBaby(true);
-            }
+            this.spawnTask.createEntity("Turtle", pos.add(0, -1, 0));
         }
 
         return result;
@@ -40,6 +39,6 @@ public class SheepSpawner extends AbstractEntitySpawner {
 
     @Override
     public final int getEntityNetworkId() {
-        return EntitySheep.NETWORK_ID;
+        return EntityTurtle.NETWORK_ID;
     }
 }

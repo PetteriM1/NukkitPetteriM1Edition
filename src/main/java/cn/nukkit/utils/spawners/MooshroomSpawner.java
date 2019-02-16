@@ -36,7 +36,7 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            BaseEntity entity = this.spawnTask.createEntity("Mooshroom", pos.add(0, 1, 0));
             if (EntityUtils.rand(0, 500) > 480) {
                 entity.setBaby(true);
             }
@@ -48,10 +48,5 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityMooshroom.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Mooshroom";
     }
 }

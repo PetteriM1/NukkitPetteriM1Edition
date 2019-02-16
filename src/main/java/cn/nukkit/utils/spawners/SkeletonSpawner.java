@@ -35,7 +35,7 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (time > 13184 && time < 22800) {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            this.spawnTask.createEntity("Skeleton", pos.add(0, 1, 0));
         }
 
         return result;
@@ -44,10 +44,5 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntitySkeleton.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Skeleton";
     }
 }

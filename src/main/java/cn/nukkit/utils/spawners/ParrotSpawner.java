@@ -35,7 +35,7 @@ public class ParrotSpawner extends AbstractEntitySpawner {
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 1, 0));
+            this.spawnTask.createEntity("Parrot", pos.add(0, 1, 0));
         }
 
         return result;
@@ -44,10 +44,5 @@ public class ParrotSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityParrot.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Parrot";
     }
 }

@@ -1,22 +1,24 @@
 package cn.nukkit.utils;
 
-import java.util.Arrays;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.level.Position;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
 import cn.nukkit.utils.spawners.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Spawner extends Thread {
 
     private final List<EntitySpawner> entitySpawners = Arrays.asList(
             new ChickenSpawner(this),
+            new CodSpawner(this),
             new CowSpawner(this),
             new CreeperSpawner(this),
+            new DolphinSpawner(this),
             new DonkeySpawner(this),
             new EndermanSpawner(this),
             new HorseSpawner(this),
@@ -27,12 +29,17 @@ public class Spawner extends Thread {
             new ParrotSpawner(this),
             new PigSpawner(this),
             new PolarBearSpawner(this),
+            new PufferfishSpawner(this),
             new RabbitSpawner(this),
+            new SalmonSpawner(this),
             new SheepSpawner(this),
             new SkeletonSpawner(this),
             new SlimeSpawner(this),
             new SpiderSpawner(this),
+            new SquidSpawner(this),
             new StraySpawner(this),
+            new TropicalFishSpawner(this),
+            new TurtleSpawner(this),
             new ZombieSpawner(this),
             new ZombiePigmanSpawner(this),
             new WitchSpawner(this),
