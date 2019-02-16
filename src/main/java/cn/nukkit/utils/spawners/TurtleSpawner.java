@@ -2,6 +2,7 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.passive.EntityTurtle;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -31,7 +32,11 @@ public class TurtleSpawner extends AbstractEntitySpawner {
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else {
-            this.spawnTask.createEntity("Turtle", pos.add(0, -1, 0));
+            if (level.getBlock(pos.add(0, -1, 0)) instanceof BlockWater) {
+                pos = pos.add(0, -1, 0);
+            }
+
+            this.spawnTask.createEntity("Turtle", pos);
         }
 
         return result;
