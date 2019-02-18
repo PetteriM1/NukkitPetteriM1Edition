@@ -26,6 +26,7 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
 import cn.nukkit.level.format.anvil.Anvil;
@@ -411,6 +412,7 @@ public class Server {
         Enchantment.init();
         Item.init();
         Biome.init();
+        EnumBiome.values();
         Effect.init();
         Potion.init();
         Attribute.init();

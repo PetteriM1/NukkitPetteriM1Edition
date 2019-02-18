@@ -80,10 +80,14 @@ public interface FullChunk extends Cloneable {
 
     void setBiomeIdAndColor(int x, int z, int idAndColor);
 
-    void setBiomeId(int x, int z, int biomeId);
+    default void setBiomeId(int x, int z, int biomeId)  {
+        setBiomeId(x, z, (byte) biomeId);
+    }
+
+    void setBiomeId(int x, int z, byte biomeId);
 
     default void setBiome(int x, int z, Biome biome) {
-        setBiomeIdAndColor(x, z, biome.getColor() + (biome.getId() << 24));
+        setBiomeId(x, z, (byte) biome.getId());
     }
 
     int getBiomeColor(int x, int z);

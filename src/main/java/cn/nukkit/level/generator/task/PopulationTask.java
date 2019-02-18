@@ -8,157 +8,158 @@ import cn.nukkit.level.generator.SimpleChunkManager;
 import cn.nukkit.scheduler.AsyncTask;
 
 /**
-* @author MagicDroidX
-* Nukkit Project
-*/
+ * @author MagicDroidX
+ * Nukkit Project
+ */
 public class PopulationTask extends AsyncTask {
-private final long seed;
-private final Level level;
-private boolean state;
-private BaseFullChunk centerChunk;
 
-public final BaseFullChunk[] chunks = new BaseFullChunk[9];
+    private final long seed;
+    private final Level level;
+    private boolean state;
+    private BaseFullChunk centerChunk;
 
-public PopulationTask(Level level, BaseFullChunk chunk) {
-    this.state = true;
-    this.level = level;
-    this.centerChunk = chunk;
-    this.seed = level.getSeed();
+    public final BaseFullChunk[] chunks = new BaseFullChunk[9];
 
-    chunks[4] = chunk;
+    public PopulationTask(Level level, BaseFullChunk chunk) {
+        this.state = true;
+        this.level = level;
+        this.centerChunk = chunk;
+        this.seed = level.getSeed();
 
-    int i = 0;
-    for (int z = -1; z <= 1; z++) {
-        for (int x = -1; x <= 1; x++, i++) {
-            if (i == 4) continue;
-            BaseFullChunk ck = level.getChunk(chunk.getX() + x, chunk.getZ() + z, true);
-            this.chunks[i] = ck;
-        }
-    }
-}
+        chunks[4] = chunk;
 
-
-@Override
-public void onRun() {
-    syncGen(0);
-}
-
-private void syncGen(int i) {
-    if (i == chunks.length) {
-        generationTask();
-    } else {
-        BaseFullChunk chunk = chunks[i];
-        if (chunk != null) {
-            synchronized (chunk) {
-                syncGen(i + 1);
+        int i = 0;
+        for (int z = -1; z <= 1; z++) {
+            for (int x = -1; x <= 1; x++, i++) {
+                if (i == 4) continue;
+                BaseFullChunk ck = level.getChunk(chunk.getX() + x, chunk.getZ() + z, true);
+                this.chunks[i] = ck;
             }
         }
     }
-}
 
-private void generationTask() {
-    this.state = false;
-    Generator generator = level.getGenerator();
-    if (generator == null) {
-        return;
+
+    @Override
+    public void onRun() {
+        syncGen(0);
     }
 
-    SimpleChunkManager manager = (SimpleChunkManager) generator.getChunkManager();
+    private void syncGen(int i) {
+        if (i == chunks.length) {
+            generationTask();
+        } else {
+            BaseFullChunk chunk = chunks[i];
+            if (chunk != null) {
+                synchronized (chunk) {
+                    syncGen(i + 1);
+                }
+            }
+        }
+    }
 
-    if (manager == null) {
+    private void generationTask() {
         this.state = false;
-        return;
+        Generator generator = level.getGenerator();
+        if (generator == null) {
+            return;
+        }
+
+        SimpleChunkManager manager = (SimpleChunkManager) generator.getChunkManager();
+
+        if (manager == null) {
+            this.state = false;
+            return;
+        }
+
+        synchronized (manager) {
+            try {
+                manager.cleanChunks(this.seed);
+                BaseFullChunk centerChunk = this.centerChunk;
+
+                if (centerChunk == null) {
+                    return;
+                }
+
+                int index = 0;
+                for (int x = -1; x < 2; x++) {
+                    for (int z = -1; z < 2; z++, index++) {
+                        BaseFullChunk ck = this.chunks[index];
+                        if (ck == centerChunk) continue;
+                        if (ck == null) {
+                            try {
+                                this.chunks[index] = (BaseFullChunk) centerChunk.getClass().getMethod("getEmptyChunk", int.class, int.class).invoke(null, centerChunk.getX() + x, centerChunk.getZ() + z);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else {
+                            this.chunks[index] = ck;
+                        }
+
+                    }
+                }
+
+                for (BaseFullChunk chunk : this.chunks) {
+                    manager.setChunk(chunk.getX(), chunk.getZ(), chunk);
+                    if (!chunk.isGenerated()) {
+                        generator.generateChunk(chunk.getX(), chunk.getZ());
+                        BaseFullChunk newChunk = manager.getChunk(chunk.getX(), chunk.getZ());
+                        newChunk.setGenerated();
+                        if (newChunk != chunk) manager.setChunk(chunk.getX(), chunk.getZ(), newChunk);
+                    }
+                }
+
+                if (!centerChunk.isPopulated()) {
+                    generator.populateChunk(centerChunk.getX(), centerChunk.getZ());
+                    centerChunk = manager.getChunk(centerChunk.getX(), centerChunk.getZ());
+                    centerChunk.setPopulated();
+                    centerChunk.recalculateHeightMap();
+                    centerChunk.populateSkyLight();
+                    centerChunk.setLightPopulated();
+                    this.centerChunk = centerChunk;
+                }
+
+                manager.setChunk(centerChunk.getX(), centerChunk.getZ());
+
+                index = 0;
+                for (int x = -1; x < 2; x++) {
+                    for (int z = -1; z < 2; z++, index++) {
+                        chunks[index] = null;
+                        BaseFullChunk newChunk = manager.getChunk(centerChunk.getX() + x, centerChunk.getZ() + z);
+                        if (newChunk != null) {
+                            if (newChunk.hasChanged()) {
+                                chunks[index] = newChunk;
+                            }
+                        }
+
+                    }
+                }
+                this.state = true;
+            } finally {
+                manager.cleanChunks(this.seed);
+            }
+        }
     }
 
-    synchronized (manager) {
-        try {
-            manager.cleanChunks(this.seed);
+    @Override
+    public void onCompletion(Server server) {
+        if (level != null) {
+            if (!this.state) {
+                return;
+            }
+
             BaseFullChunk centerChunk = this.centerChunk;
 
             if (centerChunk == null) {
                 return;
             }
 
-            int index = 0;
-            for (int x = -1; x < 2; x++) {
-                for (int z = -1; z < 2; z++, index++) {
-                    BaseFullChunk ck = this.chunks[index];
-                    if (ck == centerChunk) continue;
-                    if (ck == null) {
-                        try {
-                            this.chunks[index] = (BaseFullChunk) centerChunk.getClass().getMethod("getEmptyChunk", int.class, int.class).invoke(null, centerChunk.getX() + x, centerChunk.getZ() + z);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
-                        this.chunks[index] = ck;
-                    }
-
-                }
-            }
-
             for (BaseFullChunk chunk : this.chunks) {
-                manager.setChunk(chunk.getX(), chunk.getZ(), chunk);
-                if (!chunk.isGenerated()) {
-                    generator.generateChunk(chunk.getX(), chunk.getZ());
-                    BaseFullChunk newChunk = manager.getChunk(chunk.getX(), chunk.getZ());
-                    newChunk.setGenerated();
-                    if (newChunk != chunk) manager.setChunk(chunk.getX(), chunk.getZ(), newChunk);
-               }
-            }
-
-            if (!centerChunk.isPopulated()) {
-                generator.populateChunk(centerChunk.getX(), centerChunk.getZ());
-                centerChunk = manager.getChunk(centerChunk.getX(), centerChunk.getZ());
-                centerChunk.setPopulated();
-                centerChunk.recalculateHeightMap();
-                centerChunk.populateSkyLight();
-                centerChunk.setLightPopulated();
-                this.centerChunk = centerChunk;
-            }
-
-            manager.setChunk(centerChunk.getX(), centerChunk.getZ());
-
-            index = 0;
-            for (int x = -1; x < 2; x++) {
-                for (int z = -1; z < 2; z++, index++) {
-                    chunks[index] = null;
-                    BaseFullChunk newChunk = manager.getChunk(centerChunk.getX() + x, centerChunk.getZ() + z);
-                    if (newChunk != null) {
-                        if (newChunk.hasChanged()) {
-                            chunks[index] = newChunk;
-                        }
-                    }
-
+                if (chunk != null) {
+                    level.generateChunkCallback(chunk.getX(), chunk.getZ(), chunk);
                 }
             }
-            this.state = true;
-        } finally {
-            manager.cleanChunks(this.seed);
+
+            level.generateChunkCallback(centerChunk.getX(), centerChunk.getZ(), centerChunk);
         }
     }
-}
-
-@Override
-public void onCompletion(Server server) {
-    if (level != null) {
-        if (!this.state) {
-            return;
-        }
-
-        BaseFullChunk centerChunk = this.centerChunk;
-
-        if (centerChunk == null) {
-            return;
-        }
-
-        for (BaseFullChunk chunk : this.chunks) {
-            if (chunk != null) {
-                level.generateChunkCallback(chunk.getX(), chunk.getZ(), chunk);
-            }
-        }
-
-        level.generateChunkCallback(centerChunk.getX(), centerChunk.getZ(), centerChunk);
-    }
-}
 }

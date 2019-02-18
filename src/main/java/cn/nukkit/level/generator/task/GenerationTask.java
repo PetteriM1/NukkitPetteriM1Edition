@@ -12,6 +12,7 @@ import cn.nukkit.scheduler.AsyncTask;
  * Nukkit Project
  */
 public class GenerationTask extends AsyncTask {
+
     private final Level level;
     public boolean state;
     private BaseFullChunk chunk;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class Biome {
+public abstract class Biome extends cn.nukkit.level.biome.Biome{
 
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
@@ -34,8 +34,6 @@ public abstract class Biome {
     public static final int FLOWER_FOREST = 132;
 
     private static final Biome[] biomes = new Biome[256];
-
-    private int id;
 
     private final ArrayList<Populator> populators = new ArrayList<>();
 
@@ -110,20 +108,6 @@ public abstract class Biome {
         }
     }
 
-    public ArrayList<Populator> getPopulators() {
-        return populators;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public abstract String getName();
-
     public int getMinElevation() {
         return minElevation;
     }
@@ -174,14 +158,4 @@ public abstract class Biome {
     }
 
     abstract public int getColor();
-
-    @Override
-    public int hashCode() {
-        return getId();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return hashCode() == obj.hashCode();
-    }
 }

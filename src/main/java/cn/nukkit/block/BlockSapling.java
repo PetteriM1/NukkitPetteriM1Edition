@@ -101,7 +101,7 @@ public class BlockSapling extends BlockFlowable {
                     }
 
                     if (!bigTree) {
-                        generator = new NewJungleTree(4 + ThreadLocalRandom.current().nextInt(7));
+                        generator = new NewJungleTree(4, 7);
                     }
                     break;
                 case ACACIA:
