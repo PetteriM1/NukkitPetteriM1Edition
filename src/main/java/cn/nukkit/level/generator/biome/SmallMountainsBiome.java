@@ -8,7 +8,6 @@ public class SmallMountainsBiome extends MountainsBiome {
 
     public SmallMountainsBiome() {
         super();
-
         this.setElevation(63, 97);
     }
 

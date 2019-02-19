@@ -3,7 +3,7 @@ package cn.nukkit.level.format;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.level.generator.biome.Biome;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -80,10 +80,14 @@ public interface FullChunk extends Cloneable {
 
     void setBiomeIdAndColor(int x, int z, int idAndColor);
 
-    void setBiomeId(int x, int z, int biomeId);
+    default void setBiomeId(int x, int z, int biomeId)  {
+        setBiomeId(x, z, (byte) biomeId);
+    }
 
-    default void setBiome(int x, int z, Biome biome) {
-        setBiomeIdAndColor(x, z, biome.getColor() + (biome.getId() << 24));
+    void setBiomeId(int x, int z, byte biomeId);
+
+    default void setBiome(int x, int z, cn.nukkit.level.biome.Biome biome) {
+        setBiomeId(x, z, (byte) biome.getId());
     }
 
     int getBiomeColor(int x, int z);
