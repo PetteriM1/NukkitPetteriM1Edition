@@ -3,6 +3,7 @@ package cn.nukkit.level.biome.impl.desert;
 import cn.nukkit.level.biome.type.SandyBiome;
 import cn.nukkit.level.generator.populator.impl.PopulatorCactus;
 import cn.nukkit.level.generator.populator.impl.PopulatorDeadBush;
+import cn.nukkit.level.generator.populator.impl.PopulatorWell;
 
 /**
  * @author MagicDroidX
@@ -17,6 +18,9 @@ public class DesertBiome extends SandyBiome {
         PopulatorDeadBush deadbush = new PopulatorDeadBush();
         deadbush.setBaseAmount(2);
         this.addPopulator(deadbush);
+
+        PopulatorWell well = new PopulatorWell();
+        this.addPopulator(well);
 
         this.setBaseHeight(0.125f);
         this.setHeightVariation(0.05f);

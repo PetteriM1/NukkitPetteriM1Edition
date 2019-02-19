@@ -15,6 +15,7 @@ public class BeachBiome extends SandyBiome {
         sugarcane.setRandomAmount(2);
         this.addPopulator(sugarcane);
         PopulatorTallSugarcane tallSugarcane = new PopulatorTallSugarcane();
+        tallSugarcane.setBaseAmount(1);
         tallSugarcane.setRandomAmount(1);
 
         this.setBaseHeight(0f);

@@ -130,9 +130,6 @@ public class Normal extends Generator {
 
         PopulatorCaves caves = new PopulatorCaves();
         this.populators.add(caves);
-
-        PopulatorRavines ravines = new PopulatorRavines();
-        this.populators.add(ravines);
     }
 
     @Override

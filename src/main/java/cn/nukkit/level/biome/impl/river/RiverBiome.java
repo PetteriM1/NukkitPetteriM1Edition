@@ -1,6 +1,10 @@
 package cn.nukkit.level.biome.impl.river;
 
+import cn.nukkit.block.BlockClay;
+import cn.nukkit.block.BlockGravel;
 import cn.nukkit.level.biome.type.WateryBiome;
+import cn.nukkit.level.generator.object.ore.OreType;
+import cn.nukkit.level.generator.populator.impl.PopulatorOre;
 import cn.nukkit.level.generator.populator.impl.PopulatorSugarcane;
 import cn.nukkit.level.generator.populator.impl.PopulatorTallSugarcane;
 
@@ -17,6 +21,12 @@ public class RiverBiome extends WateryBiome {
         this.addPopulator(sugarcane);
         PopulatorTallSugarcane tallSugarcane = new PopulatorTallSugarcane();
         tallSugarcane.setRandomAmount(1);
+
+        PopulatorOre ores = new PopulatorOre(DIRT);
+        ores.setOreTypes(new OreType[]{
+                new OreType(new BlockGravel(), 13, 33, 50, 60),
+                new OreType(new BlockClay(), 8, 22, 50, 60)
+        });
 
         this.setBaseHeight(-0.5f);
         this.setHeightVariation(0f);

@@ -27,10 +27,6 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
         return "Ice Plains Spikes";
     }
 
-    @Override
-    public boolean isFreezing() {
-        return true;
-    }
 
     /**
      * @author DaPorkchop_
