@@ -103,4 +103,9 @@ public class MathHelper {
     public static float denormalizeClamp(float lowerBnd, float upperBnd, float slide) {
         return slide < 0.0f ? lowerBnd : (slide > 1.0f ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide);
     }
+
+    public static int log2nlz(int bits) {
+        if (bits == 0) return 0;
+        return 31 - Integer.numberOfLeadingZeros(bits);
+    }
 }

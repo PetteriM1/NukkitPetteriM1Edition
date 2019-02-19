@@ -56,7 +56,7 @@ public class Chunk extends BaseChunk {
         }
 
         if (nbt == null) {
-            setBiomeId(x, z, (byte) biome.getId());
+            this.biomes = new byte[16 * 16];
             this.sections = new cn.nukkit.level.format.ChunkSection[16];
             if (16 >= 0) System.arraycopy(EmptyChunkSection.EMPTY, 0, this.sections, 0, 16);
             return;
