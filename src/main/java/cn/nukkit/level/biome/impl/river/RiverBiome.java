@@ -21,6 +21,7 @@ public class RiverBiome extends WateryBiome {
         this.addPopulator(sugarcane);
         PopulatorTallSugarcane tallSugarcane = new PopulatorTallSugarcane();
         tallSugarcane.setRandomAmount(1);
+        this.addPopulator(tallSugarcane);
 
         PopulatorOre ores = new PopulatorOre(DIRT);
         ores.setOreTypes(new OreType[]{
