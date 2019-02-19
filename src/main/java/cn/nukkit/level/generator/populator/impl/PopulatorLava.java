@@ -7,6 +7,7 @@ import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 
 public class PopulatorLava extends Populator {
+
     private ChunkManager level;
     private int randomAmount;
     private int baseAmount;

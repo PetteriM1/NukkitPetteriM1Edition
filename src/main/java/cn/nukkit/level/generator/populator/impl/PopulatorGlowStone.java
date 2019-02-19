@@ -8,6 +8,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
 public class PopulatorGlowStone extends Populator {
+
     @Override
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         int x = NukkitMath.randomRange(random, chunkX << 4, (chunkX << 4) + 15);
@@ -23,7 +24,7 @@ public class PopulatorGlowStone extends Populator {
 
     private int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
         int y;
-        //start scanning a bit lower down to allow space for placing on top
+        // Start scanning a bit lower down to allow space for placing on top
         for (y = 120; y >= 0; y--) {
             int b = chunk.getBlockId(x, y, z);
             if (b == Block.AIR) {

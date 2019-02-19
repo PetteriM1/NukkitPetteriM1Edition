@@ -15,6 +15,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public class PopulatorGroundCover extends Populator {
+
     public static final int STONE = BlockID.STONE << 4;
 
     @Override

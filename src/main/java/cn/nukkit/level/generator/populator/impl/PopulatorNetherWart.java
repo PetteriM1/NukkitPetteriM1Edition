@@ -1,9 +1,9 @@
-package cn.nukkit.level.generator.populator;
+package cn.nukkit.level.generator.populator.impl;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 
 /**
@@ -11,7 +11,6 @@ import cn.nukkit.math.NukkitRandom;
  */
 public class PopulatorNetherWart extends Populator {
 
-    private ChunkManager level;
     private int randomAmount;
     private int baseAmount;
 
@@ -24,9 +23,7 @@ public class PopulatorNetherWart extends Populator {
     }
 
     @Override
-    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
-        this.level = level;
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
+    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         int amount = random.nextRange(0, this.randomAmount + 1) + this.baseAmount;
         for (int i = 0; i < amount; ++i) {
             int x = random.nextRange(0, 15);
@@ -39,12 +36,12 @@ public class PopulatorNetherWart extends Populator {
     }
 
     private boolean canNetherWartStay(FullChunk chunk, int x, int y, int z) {
-        int b = chunk.getBlockId(x, y, z);
-        return (b == Block.AIR) && chunk.getBlockId(x, y - 1, z) == Block.SOUL_SAND;
+        return (chunk.getBlockId(x, y, z) == Block.AIR) && chunk.getBlockId(x, y - 1, z) == Block.SOUL_SAND;
     }
 
     private int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
         int y;
+
         for (y = 0; y <= 127; ++y) {
             int b = chunk.getBlockId(x, y, z);
             if (b == Block.AIR) {

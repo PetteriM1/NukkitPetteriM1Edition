@@ -13,6 +13,7 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public class PopulatorOre extends Populator {
+
     private final int replaceId;
     private OreType[] oreTypes = new OreType[0];
 

@@ -17,7 +17,7 @@ public class PopulatorRavines extends Populator {
     private long worldLong1;
     private long worldLong2;
 
-    private int ravineRarity = 1;//2
+    private int ravineRarity = 1;
     private int ravineMinAltitude = 20;
     private int ravineMaxAltitude = 67;
     private int ravineMinLength = 84;

@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 
 public class PopulatorTallSugarcane extends PopulatorSugarcane {
+
     @Override
     protected void placeBlock(int x, int y, int z, int id, FullChunk chunk, NukkitRandom random) {
         int height = ThreadLocalRandom.current().nextInt(3) + 1;

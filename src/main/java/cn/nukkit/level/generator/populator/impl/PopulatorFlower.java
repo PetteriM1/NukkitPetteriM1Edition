@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * </p>
  */
 public class PopulatorFlower extends PopulatorSurfaceBlock {
+
     private final List<int[]> flowerTypes = new ArrayList<>();
 
     public void addType(int a, int b) {
