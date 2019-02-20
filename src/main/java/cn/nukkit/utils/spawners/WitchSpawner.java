@@ -5,10 +5,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class WitchSpawner extends AbstractEntitySpawner {
 
@@ -20,12 +19,13 @@ public class WitchSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int time = level.getTime() % Level.TIME_FULL;
 
         if (blockId != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (level.getBiomeId((int) pos.x, (int) pos.z) != Biome.SWAMP) {
+        } else if (biomeId != 6 && biomeId != 134) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;

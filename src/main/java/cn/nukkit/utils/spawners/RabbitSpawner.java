@@ -5,10 +5,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.passive.EntityRabbit;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class RabbitSpawner extends AbstractEntitySpawner {
 
@@ -25,7 +24,7 @@ public class RabbitSpawner extends AbstractEntitySpawner {
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (biomeId != Biome.DESERT && biomeId != Biome.TUNDRA && biomeId != Biome.TAIGA && biomeId != Biome.ICE_PLAINS) {
+        } else if (biomeId != 2 && biomeId != 130 && biomeId != 30 && biomeId != 5 && biomeId != 12) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;

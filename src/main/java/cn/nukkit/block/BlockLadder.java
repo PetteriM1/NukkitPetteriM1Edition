@@ -9,12 +9,13 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Faceable;
 
 /**
  * Created on 2015/12/8 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockLadder extends BlockTransparentMeta {
+public class BlockLadder extends BlockTransparentMeta implements Faceable {
 
     public BlockLadder() {
         this(0);
@@ -160,5 +161,10 @@ public class BlockLadder extends BlockTransparentMeta {
         return new Item[]{
             new ItemLadder(0, 1)
         };
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

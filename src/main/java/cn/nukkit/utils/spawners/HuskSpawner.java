@@ -6,11 +6,10 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.mob.EntityHusk;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class HuskSpawner extends AbstractEntitySpawner {
 
@@ -22,12 +21,13 @@ public class HuskSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int time = level.getTime() % Level.TIME_FULL;
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (level.getBiomeId((int) pos.x, (int) pos.z) != Biome.DESERT) {
+        } else if (biomeId != 2 && biomeId != 130) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;

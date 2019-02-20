@@ -6,11 +6,10 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.passive.EntityDonkey;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class DonkeySpawner extends AbstractEntitySpawner {
 
@@ -27,7 +26,7 @@ public class DonkeySpawner extends AbstractEntitySpawner {
 
         if (blockId != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (biomeId != Biome.PLAINS || biomeId != Biome.SAVANNA) {
+        } else if (biomeId != 1 && biomeId != 35 && biomeId != 128 && biomeId != 129) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;

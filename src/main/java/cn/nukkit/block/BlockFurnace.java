@@ -1,10 +1,13 @@
 package cn.nukkit.block;
 
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.Faceable;
+
 /**
  * @author Angelic47
  * Nukkit Project
  */
-public class BlockFurnace extends BlockFurnaceBurning {
+public class BlockFurnace extends BlockFurnaceBurning implements Faceable {
 
     public BlockFurnace() {
         this(0);
@@ -32,5 +35,10 @@ public class BlockFurnace extends BlockFurnaceBurning {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

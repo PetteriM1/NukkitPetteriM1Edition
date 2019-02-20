@@ -5,10 +5,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class WolfSpawner extends AbstractEntitySpawner {
 
@@ -25,7 +24,7 @@ public class WolfSpawner extends AbstractEntitySpawner {
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (biomeId != Biome.FOREST && biomeId != Biome.TAIGA && biomeId != Biome.ICE_PLAINS) {
+        } else if (biomeId != 4 && biomeId != 5 && biomeId != 20 && biomeId != 27 && biomeId != 30 && biomeId != 32 && biomeId != 133 && biomeId != 158) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;

@@ -4,8 +4,9 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.Faceable;
 
-public class BlockObserver extends BlockSolid {
+public class BlockObserver extends BlockSolid implements Faceable {
 
     public BlockObserver() {
     }
@@ -71,5 +72,10 @@ public class BlockObserver extends BlockSolid {
         }
         this.getLevel().setBlock(block, this, true, true);
         return true;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

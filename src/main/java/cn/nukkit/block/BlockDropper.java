@@ -6,11 +6,13 @@ import cn.nukkit.blockentity.BlockEntityDropper;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.utils.Faceable;
+
 import java.util.Map;
 
-public class BlockDropper extends BlockSolidMeta {
+public class BlockDropper extends BlockSolidMeta implements Faceable {
 
     public BlockDropper() {
         this(0);
@@ -114,5 +116,10 @@ public class BlockDropper extends BlockSolidMeta {
         }
 
         return true;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

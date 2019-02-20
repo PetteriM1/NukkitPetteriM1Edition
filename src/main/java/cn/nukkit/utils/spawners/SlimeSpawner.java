@@ -5,10 +5,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntitySlime;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class SlimeSpawner extends AbstractEntitySpawner {
 
@@ -26,7 +25,7 @@ public class SlimeSpawner extends AbstractEntitySpawner {
 
         if (blockId != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (biomeId != Biome.SWAMP) {
+        } else if (biomeId != 6 && biomeId != 134) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;

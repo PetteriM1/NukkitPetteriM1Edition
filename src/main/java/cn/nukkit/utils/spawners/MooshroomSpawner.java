@@ -6,11 +6,10 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.passive.EntityMooshroom;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class MooshroomSpawner extends AbstractEntitySpawner {
 
@@ -27,7 +26,7 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
 
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (level.getBiomeId((int) pos.x, (int) pos.z) != Biome.MUSHROOM_ISLAND) {
+        if (level.getBiomeId((int) pos.x, (int) pos.z) != 14) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;

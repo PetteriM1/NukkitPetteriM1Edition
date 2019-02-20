@@ -7,14 +7,16 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.utils.Faceable;
+
 import java.util.Map;
 
 /**
  * Created by CreeperFace on 15.4.2017.
  */
-public class BlockDispenser extends BlockSolidMeta {
+public class BlockDispenser extends BlockSolidMeta implements Faceable {
 
     public BlockDispenser() {
         this(0);
@@ -134,5 +136,10 @@ public class BlockDispenser extends BlockSolidMeta {
         }
 
         return true;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

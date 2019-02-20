@@ -6,11 +6,10 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.passive.EntityOcelot;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class OcelotSpawner extends AbstractEntitySpawner {
 
@@ -25,9 +24,10 @@ public class OcelotSpawner extends AbstractEntitySpawner {
             return SpawnResult.SPAWN_DENIED;
         }
 
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (level.getBiomeId((int) pos.x, (int) pos.z) != Biome.JUNGLE) {
+        if (biomeId != 21 && biomeId != 149 && biomeId != 23 && biomeId != 151) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;

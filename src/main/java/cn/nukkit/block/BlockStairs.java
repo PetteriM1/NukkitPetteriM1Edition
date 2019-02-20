@@ -5,12 +5,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.Faceable;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockStairs extends BlockSolidMeta {
+public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
     protected BlockStairs(int meta) {
         super(meta);
@@ -143,5 +144,10 @@ public abstract class BlockStairs extends BlockSolidMeta {
         }
 
         return false;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

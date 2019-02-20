@@ -6,7 +6,6 @@ import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.passive.EntitySalmon;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.SpawnResult;
 import cn.nukkit.utils.Spawner;
@@ -25,7 +24,7 @@ public class SalmonSpawner extends AbstractEntitySpawner {
 
         if (blockId != Block.WATER && blockId != Block.STILL_WATER) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (biomeId != Biome.OCEAN && biomeId != Biome.RIVER) {
+        } else if (biomeId != 0 && biomeId != 7) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
@@ -33,10 +32,10 @@ public class SalmonSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else {
             if (level.getBlock(pos.add(0, -1, 0)) instanceof BlockWater) {
-                pos = pos.add(0, -1, 0);
+                this.spawnTask.createEntity("Salmon", pos.add(0, -1, 0));
+            } else {
+                result = SpawnResult.POSITION_MISMATCH;
             }
-
-            this.spawnTask.createEntity("Salmon", pos);
         }
 
         return result;

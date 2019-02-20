@@ -5,10 +5,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntityStray;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class StraySpawner extends AbstractEntitySpawner {
 
@@ -26,7 +25,7 @@ public class StraySpawner extends AbstractEntitySpawner {
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (biomeId != Biome.ICE_PLAINS && biomeId != Biome.TUNDRA) {
+        } else if (biomeId != 12 && biomeId != 30) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
