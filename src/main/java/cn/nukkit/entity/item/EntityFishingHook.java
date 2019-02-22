@@ -266,7 +266,6 @@ public class EntityFishingHook extends EntityProjectile {
 			Server.broadcastPacket(this.level.getPlayers().values(), pk);
 		}
 		if (!this.closed) {
-			this.kill();
 			this.close();
 		}
 	}

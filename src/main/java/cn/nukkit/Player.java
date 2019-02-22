@@ -4176,6 +4176,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.nextChunkOrderRun = 0;
             this.newPosition = null;
 
+            this.stopFishing(false);
+
             // DummyBossBar
             this.getDummyBossBars().values().forEach(DummyBossBar::reshow);
             // Weather
@@ -4854,10 +4856,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void stopFishing(boolean click) {
-        if (click) {
+        if (this.fishing != null && click) {
             fishing.reelLine();
         } else if (this.fishing != null) {
-            this.fishing.kill();
             this.fishing.close();
         }
 
