@@ -8,9 +8,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class EntityWaterAnimal extends EntitySwimming implements EntityAnimal {
 
-    protected int inLoveTicks = 0;
-    protected int spawnBabyDelay = 0;
-
     public EntityWaterAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }

@@ -1,51 +1,15 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
-import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import co.aikar.timings.Timings;
 
 public abstract class EntityWalkingAnimal extends EntityWalking implements EntityAnimal {
 
-    protected int inLoveTicks = 0;
-    protected int spawnBabyDelay = 0;
-
     public EntityWalkingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-
-        if (this.getDataFlag(DATA_FLAG_BABY, 0)) {
-            this.setDataFlag(DATA_FLAG_BABY, DATA_TYPE_BYTE);
-        }
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = false;
-        Timings.entityBaseTickTimer.startTiming();
-
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (this.isInLove()) {
-            this.inLoveTicks -= tickDiff;
-            if (this.age % 20 == 0) {
-                for (int i = 0; i < 3; i++) {
-                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0, 1.0), this.getMountedYOffset() + EntityUtils.rand(-1.0, 1.0), EntityUtils.rand(-1.0, 1.0))));
-                }
-            }
-        }
-
-        Timings.entityBaseTickTimer.stopTiming();
-        return hasUpdate;
     }
 
     @Override
@@ -79,18 +43,5 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         }
 
         return true;
-    }
-
-    public void setInLove() {
-        this.inLoveTicks = 600;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
-    }
-
-    public boolean isInLove() {
-        return inLoveTicks > 0;
-    }
-
-    public boolean isBreedingItem(Item item) {
-        return item != null && item.getId() == Item.WHEAT;
     }
 }

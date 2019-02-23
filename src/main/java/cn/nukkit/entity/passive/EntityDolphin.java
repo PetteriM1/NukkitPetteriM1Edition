@@ -1,10 +1,14 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.Player;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.EntityUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,5 +62,18 @@ public class EntityDolphin extends EntityWaterAnimal {
     @Override
     public int getKillExperience() {
         return 0;
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        super.onInteract(player, item);
+        if (item.equals(Item.get(Item.RAW_FISH,0,1)) && !this.isBaby()) {
+            player.getInventory().removeItem(Item.get(Item.RAW_FISH, 0, 1));
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
+            this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.RAW_FISH)));
+            this.setInLove();
+            return true;
+        }
+        return false;
     }
 }

@@ -2,22 +2,18 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.ByteEntityData;
+import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 import co.aikar.timings.Timings;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
@@ -30,13 +26,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     protected Vector3 target = null;
     protected Entity followTarget = null;
     protected int attackDelay = 0;
+    protected int inLoveTicks = 0;
 
     protected boolean baby = false;
     private boolean movement = true;
     private boolean friendly = false;
-
-    protected List<Block> blocksAround = new ArrayList<>();
-    protected List<Block> collisionBlocks = new ArrayList<>();
 
     private boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
     private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000);
@@ -164,6 +158,15 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             this.moveTime -= tickDiff;
         }
 
+        if (this.isInLove()) {
+            this.inLoveTicks -= tickDiff;
+            if (this.age % 20 == 0) {
+                for (int i = 0; i < 3; i++) {
+                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0, 1.0), this.getMountedYOffset() + EntityUtils.rand(-1.0, 1.0), EntityUtils.rand(-1.0, 1.0))));
+                }
+            }
+        }
+
         Timings.entityBaseTickTimer.stopTiming();
 
         return hasUpdate;
@@ -247,5 +250,14 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return new Item[]{Item.get(Item.NAME_TAG, 0, 1)};
         }
         return new Item[0];
+    }
+
+    public void setInLove() {
+        this.inLoveTicks = 600;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
+    }
+
+    public boolean isInLove() {
+        return inLoveTicks > 0;
     }
 }
