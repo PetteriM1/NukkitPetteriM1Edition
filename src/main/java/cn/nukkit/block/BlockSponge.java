@@ -2,11 +2,14 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.utils.BlockColor;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * @author Angelic47
@@ -57,47 +60,58 @@ public class BlockSponge extends BlockSolidMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.getDamage() == 0 && (block.getId() == Block.WATER || block.getId() == Block.STILL_WATER)) {
-            Vector3 vector = new Vector3(0, 0, 0);
-            Vector3 vBlock = new Vector3(0, 0, 0);
-            for (int i = 0; i < 16; ++i) {
-                for (int j = 0; j < 16; ++j) {
-                    for (int k = 0; k < 16; ++k) {
-                        if (i == 0 || i == 15 || j == 0 || j == 15 || k == 0 || k == 15) {
-                            vector.setComponents((double) i / (double) 15 * 2d - 1, (double) j / (double) 15 * 2d - 1, (double) k / (double) 15 * 2d - 1);
-                            double len = vector.length();
-                            vector.setComponents((vector.x / len) * 0.3d, (vector.y / len) * 0.3d, (vector.z / len) * 0.3d);
-                            double pointerX = this.x;
-                            double pointerY = this.y;
-                            double pointerZ = this.z;
-                            for (double rand = 3 * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; rand > 0; rand -= 0.3d * 0.75d) {
-                                int x = (int) pointerX;
-                                int y = (int) pointerY;
-                                int z = (int) pointerZ;
-                                vBlock.x = pointerX >= x ? x : x - 1;
-                                vBlock.y = pointerY >= y ? y : y - 1;
-                                vBlock.z = pointerZ >= z ? z : z - 1;
-                                if (vBlock.y < 0 || vBlock.y > 255) {
-                                    break;
-                                }
-                                Block b = this.level.getBlock(vBlock);
-                                if (b.getId() == Block.WATER || b.getId() == Block.STILL_WATER) {
-                                    if (rand > 0) {
-                                        this.level.setBlock(b, Block.get(0));
-                                    }
-                                }
-                                pointerX += vector.x;
-                                pointerY += vector.y;
-                                pointerZ += vector.z;
-                            }
-                        }
+        Level level = block.getLevel();
+        boolean blockSet = level.setBlock(block, this);
+        if (blockSet && this.getDamage() == 0 && performWaterAbsorb(block)) {
+            level.setBlock(block, Block.get(BlockID.SPONGE, 1));
+
+            for (int i = 0; i < 4; i++) {
+                LevelEventPacket packet = new LevelEventPacket();
+                packet.evid = 2001;
+                packet.x = (float) block.getX();
+                packet.y = (float) block.getY();
+                packet.z = (float) block.getZ();
+                packet.data = GlobalBlockPalette.getOrCreateRuntimeId(0, BlockID.WATER, 0);
+                level.addChunkPacket(getChunkX(), getChunkZ(), packet);
+            }
+        }
+        return blockSet;
+    }
+
+    private boolean performWaterAbsorb(Block block) {
+        Queue<Entry> entries = new ArrayDeque<>();
+
+        entries.add(new Entry(block, 0));
+
+        Entry entry;
+        int waterRemoved = 0;
+        while (waterRemoved < 64 && (entry = entries.poll()) != null) {
+            for (BlockFace face : BlockFace.values()) {
+
+                Block faceBlock = entry.block.getSide(face);
+                if (faceBlock.getId() == BlockID.WATER || faceBlock.getId() == BlockID.STILL_WATER) {
+                    this.level.setBlock(faceBlock, Block.get(BlockID.AIR));
+                    ++waterRemoved;
+                    if (entry.distance < 6) {
+                        entries.add(new Entry(faceBlock, entry.distance + 1));
+                    }
+                } else if (faceBlock.getId() == BlockID.AIR) {
+                    if (entry.distance < 6) {
+                        entries.add(new Entry(faceBlock, entry.distance + 1));
                     }
                 }
             }
-            this.level.setBlock(this, Block.get(Block.SPONGE, 1), true, true);
-        } else {
-            this.level.setBlock(this, Block.get(Block.SPONGE, this.getDamage()), true, true);
         }
-        return true;
+        return waterRemoved > 0;
+    }
+
+    private static class Entry {
+        private final Block block;
+        private final int distance;
+
+        public Entry(Block block, int distance) {
+            this.block = block;
+            this.distance = distance;
+        }
     }
 }

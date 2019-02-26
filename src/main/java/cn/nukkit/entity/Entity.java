@@ -1229,7 +1229,7 @@ public abstract class Entity extends Location implements Metadatable {
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
-        this.level.addChunkPacket(this.getFloorX() >> 16, this.getFloorZ() >> 16, pk);
+        this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
     }
 
     public Vector3 getDirectionVector() {
@@ -1475,10 +1475,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void onStruckByLightning(Entity entity) {
-        this.attack(new EntityDamageByEntityEvent(entity, this, DamageCause.LIGHTNING, 5));
-
-        if (this.fireTicks < 8 * 20) {
-            this.setOnFire(8);
+        if (this.attack(new EntityDamageByEntityEvent(entity, this, DamageCause.LIGHTNING, 5))) {
+            if (this.fireTicks < 8 * 20) {
+                this.setOnFire(8);
+            }
         }
     }
 

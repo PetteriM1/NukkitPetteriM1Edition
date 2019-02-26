@@ -2,6 +2,8 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.EndermanTeleportSound;
@@ -61,7 +63,11 @@ public class EntityEnderPearl extends EntityProjectile {
 
         if (this.isCollided && this.shootingEntity instanceof Player) {
             this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
-            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
+            
+            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {
+                this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.PROJECTILE, 5f, 0f));
+            }
+
             this.level.addSound(new EndermanTeleportSound(this));
         }
 
@@ -78,7 +84,11 @@ public class EntityEnderPearl extends EntityProjectile {
     public void onCollideWithEntity(Entity entity) {
         if (this.shootingEntity instanceof Player) {
             this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
-            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) this.shootingEntity.attack(5);
+
+            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {
+                this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.PROJECTILE, 5f, 0f));
+            }
+
             this.level.addSound(new EndermanTeleportSound(this));
         }
 
