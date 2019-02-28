@@ -12,6 +12,7 @@ import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.vehicle.VehicleDamageEvent;
 import cn.nukkit.event.vehicle.VehicleMoveEvent;
 import cn.nukkit.event.vehicle.VehicleUpdateEvent;
 import cn.nukkit.item.Item;
@@ -225,9 +226,16 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        if (invulnerable) {
+        if (invulnerable || source.isCancelled()) {
             return false;
         } else {
+            VehicleDamageEvent event = new VehicleDamageEvent(this, source.getEntity(), source.getFinalDamage());
+            this.getServer().getPluginManager().callEvent(event);
+
+            if (event.isCancelled()) {
+                return false;
+            }
+
             Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
             boolean instantKill = damager instanceof Player && ((Player) damager).isCreative();
             if (!instantKill) performHurtAnimation((int) source.getFinalDamage());
@@ -236,15 +244,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 mountEntity(linkedEntity);
             }
 
-                if (instantKill && (!hasCustomName())) {
+            if (instantKill && (!hasCustomName())) {
                 close();
-                kill();
             } else {
                 if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
                     dropItem();
                 }
                 close();
-                kill();
             }
         }
 

@@ -62,13 +62,7 @@ public class EntityEnderPearl extends EntityProjectile {
         this.timing.startTiming();
 
         if (this.isCollided && this.shootingEntity instanceof Player) {
-            this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
-            
-            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {
-                this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.PROJECTILE, 5f, 0f));
-            }
-
-            this.level.addSound(new EndermanTeleportSound(this));
+            teleport();
         }
 
         if (this.age > 1200 || this.isCollided) {
@@ -83,15 +77,19 @@ public class EntityEnderPearl extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         if (this.shootingEntity instanceof Player) {
-            this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
-
-            if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {
-                this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.PROJECTILE, 5f, 0f));
-            }
-
-            this.level.addSound(new EndermanTeleportSound(this));
+            teleport();
         }
 
         super.onCollideWithEntity(entity);
+    }
+
+    private void teleport() {
+        this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
+
+        if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {
+            this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.PROJECTILE, 5f, 0f));
+        }
+
+        this.level.addSound(new EndermanTeleportSound(this));
     }
 }
