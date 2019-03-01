@@ -74,7 +74,7 @@ public class EntityBoat extends EntityVehicle {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        if (invulnerable || source.isCancelled()) {
+        if (invulnerable || source.isCancelled() || !this.isAlive() || this.isClosed()) {
             return false;
         } else {
             VehicleDamageEvent event = new VehicleDamageEvent(this, source.getEntity(), source.getFinalDamage());
