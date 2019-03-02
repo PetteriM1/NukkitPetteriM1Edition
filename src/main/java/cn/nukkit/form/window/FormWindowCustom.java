@@ -25,13 +25,17 @@ public class FormWindowCustom extends FormWindow {
     }
 
     public FormWindowCustom(String title, List<Element> contents) {
-        this(title, contents, "");
+        this(title, contents, (ElementButtonImageData) null);
     }
 
     public FormWindowCustom(String title, List<Element> contents, String icon) {
+        this(title, contents, icon.isEmpty() ? null : new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon));
+    }
+
+    public FormWindowCustom(String title, List<Element> contents, ElementButtonImageData icon) {
         this.title = title;
         this.content = contents;
-        if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
+        this.icon = icon;
     }
 
     public String getTitle() {
@@ -56,6 +60,10 @@ public class FormWindowCustom extends FormWindow {
 
     public void setIcon(String icon) {
         if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
+    }
+
+    public void setIcon(ElementButtonImageData icon) {
+        this.icon = icon;
     }
 
     public String getJSONData() {
