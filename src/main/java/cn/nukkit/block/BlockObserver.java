@@ -23,7 +23,7 @@ public class BlockObserver extends BlockSolid implements Faceable {
 
     @Override
     public double getHardness() {
-        return 3.5;
+        return 0.5;
     }
 
     @Override

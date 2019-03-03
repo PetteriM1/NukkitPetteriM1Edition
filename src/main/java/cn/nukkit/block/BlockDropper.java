@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityDropper;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -34,7 +35,7 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
 
     @Override
     public double getHardness() {
-        return 3.5;
+        return 0.5;
     }
 
     @Override
@@ -122,4 +123,10 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, 0);
+    }
+
 }

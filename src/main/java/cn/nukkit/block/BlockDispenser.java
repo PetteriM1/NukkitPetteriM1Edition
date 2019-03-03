@@ -142,4 +142,9 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
+    }
 }
