@@ -168,7 +168,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String username;
     protected String iusername;
     protected String displayName;
-    public int protocol;
+    public int protocol = ProtocolInfo.CURRENT_PROTOCOL;
 
     protected int startAction = -1;
 
@@ -1056,6 +1056,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 return -1;
             }
 
+            packet.protocol = this.protocol;
+
             Integer identifier = this.interfaz.putPacket(this, packet, needACK, false);
 
             if (needACK && identifier != null) {
@@ -1063,6 +1065,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 return identifier;
             }
         }
+
         return 0;
     }
 
@@ -1088,6 +1091,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (ev.isCancelled()) {
                 return -1;
             }
+
+            packet.protocol = this.protocol;
 
             Integer identifier = this.interfaz.putPacket(this, packet, needACK, true);
 
@@ -2008,7 +2013,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         ResourcePacksInfoPacket infoPacket = new ResourcePacksInfoPacket();
         infoPacket.resourcePackEntries = this.server.getResourcePackManager().getResourceStack();
         infoPacket.mustAccept = this.server.getForceResources();
-        infoPacket.protocol = this.protocol;
         this.dataPacket(infoPacket);
     }
 
@@ -2039,7 +2043,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.commandsEnabled = this.isEnableClientCommand();
         startGamePacket.gameRules = getLevel().getGameRules();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
-        startGamePacket.protocol = this.protocol;
         this.dataPacket(startGamePacket);
 
         this.loggedIn = true;
@@ -2075,6 +2078,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!connected) {
             return;
         }
+
+        packet.protocol = this.protocol;
 
         try (Timing timing = Timings.getReceiveDataPacketTiming(packet)) {
             DataPacketReceiveEvent ev = new DataPacketReceiveEvent(this, packet);
@@ -2224,7 +2229,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             ResourcePackStackPacket stackPacket = new ResourcePackStackPacket();
                             stackPacket.mustAccept = this.server.getForceResources();
                             stackPacket.resourcePackStack = this.server.getResourcePackManager().getResourceStack();
-                            stackPacket.protocol = this.protocol;
                             this.dataPacket(stackPacket);
                             break;
                         case ResourcePackClientResponsePacket.STATUS_COMPLETED:
@@ -3337,7 +3341,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
-        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3368,7 +3371,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message, parameters);
         }
-        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3381,7 +3383,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.type = TextPacket.TYPE_CHAT;
         pk.source = source;
         pk.message = this.server.getLanguage().translateString(message);
-        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3394,7 +3395,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.type = TextPacket.TYPE_POPUP;
         pk.source = message;
         pk.message = subtitle;
-        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 
@@ -3402,7 +3402,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
-        pk.protocol = this.protocol;
         this.dataPacket(pk);
     }
 

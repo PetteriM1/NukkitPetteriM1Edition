@@ -947,7 +947,6 @@ public class Server {
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
         for (Player player : players) {
-            pk.protocol = player.protocol;
             player.dataPacket(pk);
         }
     }
@@ -985,7 +984,6 @@ public class Server {
                         p.getSkin(),
                         p.getLoginChainData().getXUID()))
                 .toArray(PlayerListPacket.Entry[]::new);
-        pk.protocol = player.protocol;
         player.dataPacket(pk);
     }
 

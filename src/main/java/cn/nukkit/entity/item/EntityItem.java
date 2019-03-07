@@ -257,7 +257,7 @@ public class EntityItem extends Entity {
     }
 
     @Override
-    public DataPacket createAddEntityPacket(int protocol) {
+    public DataPacket createAddEntityPacket() {
         AddItemEntityPacket addEntity = new AddItemEntityPacket();
         addEntity.entityUniqueId = this.getId();
         addEntity.entityRuntimeId = this.getId();
