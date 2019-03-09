@@ -13,6 +13,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTurtleShell;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -308,10 +309,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             block.onEntityCollide(this);
         }
         if (id == Block.MAGMA && this.isInsideOfWater()) {
-            this.setMotion(new Vector3(0, -0.5, 0));
+            this.level.addParticle(new BubbleParticle(this));
+            this.setMotion(new Vector3(0, -0.3, 0));
         }
         if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
-            this.setMotion(new Vector3(0, 0.5, 0));
+            this.level.addParticle(new BubbleParticle(this));
+            this.setMotion(new Vector3(0, 0.3, 0));
         }
 
         Timings.livingEntityBaseTickTimer.stopTiming();

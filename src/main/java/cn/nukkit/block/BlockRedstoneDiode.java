@@ -32,6 +32,7 @@ public abstract class BlockRedstoneDiode extends BlockFlowable implements Faceab
         for (BlockFace face : BlockFace.values()) {
             this.level.updateAroundRedstone(pos.getSide(face), null);
         }
+
         return true;
     }
 
