@@ -2009,6 +2009,9 @@ public class Server {
         Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
+        Entity.registerEntity("MinecartChest", EntityMinecartChest.class);
+        Entity.registerEntity("MinecartHopper", EntityMinecartHopper.class);
+        Entity.registerEntity("MinecartTnt", EntityMinecartTNT.class);
         Entity.registerEntity("Boat", EntityBoat.class);
         //Others
         Entity.registerEntity("Human", EntityHuman.class, true);

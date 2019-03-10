@@ -17,6 +17,7 @@ import cn.nukkit.network.protocol.DataPacket;
  * @author MagicDroidX
  */
 public class EntityItem extends Entity {
+
     public static final int NETWORK_ID = 64;
 
     public static final int DATA_SOURCE_ID = 17;
@@ -157,7 +158,7 @@ public class EntityItem extends Entity {
                 this.motionY -= this.getGravity() * -0.015;
             } else if (this.isInsideOfWater()) {
                 this.motionY = this.getGravity() - 0.06;
-            } else {
+            } else if (!this.isOnGround()) {
                 this.motionY -= this.getGravity();
             }
 
