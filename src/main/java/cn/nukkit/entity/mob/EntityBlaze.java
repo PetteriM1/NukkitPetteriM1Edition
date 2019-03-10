@@ -3,9 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.passive.EntityAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.projectile.EntityBlazeFireBall;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -15,6 +13,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,13 +104,13 @@ public class EntityBlaze extends EntityFlyingMob {
         } else if (EntityUtils.rand(1, 410) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.stayTime = EntityUtils.rand(100, 400);
+            this.stayTime = EntityUtils.rand(100, 300);
             this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
             z = EntityUtils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(300, 1200);
+            this.moveTime = EntityUtils.rand(100, 200);
             this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
         }
     }

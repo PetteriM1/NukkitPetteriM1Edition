@@ -1,13 +1,11 @@
 package cn.nukkit.entity;
 
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.passive.EntityAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 public abstract class EntityFlying extends BaseEntity {
 
@@ -72,7 +70,7 @@ public abstract class EntityFlying extends BaseEntity {
             } else {
                 y = EntityUtils.rand(-10, 10);
             }
-            this.stayTime = EntityUtils.rand(100, 400);
+            this.stayTime = EntityUtils.rand(100, 300);
             this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || !(this.target instanceof Vector3)) {
             x = EntityUtils.rand(20, 100);
@@ -83,7 +81,7 @@ public abstract class EntityFlying extends BaseEntity {
                 y = EntityUtils.rand(-10, 10);
             }
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(200, 1000);
+            this.moveTime = EntityUtils.rand(100, 200);
             this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
         }
     }

@@ -1,21 +1,14 @@
 package cn.nukkit.entity;
 
-import cn.nukkit.block.BlockStairs;
-import cn.nukkit.block.BlockSlab;
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockFence;
-import cn.nukkit.block.BlockFenceGate;
-import cn.nukkit.block.BlockLiquid;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.block.*;
 import cn.nukkit.entity.passive.EntityAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 public abstract class EntityWalking extends BaseEntity {
 
@@ -73,13 +66,13 @@ public abstract class EntityWalking extends BaseEntity {
         } else if (EntityUtils.rand(1, 410) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.stayTime = EntityUtils.rand(100, 400);
+            this.stayTime = EntityUtils.rand(100, 300);
             this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
             z = EntityUtils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(300, 1200);
+            this.moveTime = EntityUtils.rand(100, 200);
             this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
         }
     }

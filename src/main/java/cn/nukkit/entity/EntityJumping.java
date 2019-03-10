@@ -68,13 +68,13 @@ public abstract class EntityJumping extends BaseEntity {
         } else if (EntityUtils.rand(1, 410) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.stayTime = EntityUtils.rand(100, 400);
+            this.stayTime = EntityUtils.rand(100, 300);
             this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
             z = EntityUtils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(200, 1000);
+            this.moveTime = EntityUtils.rand(100, 200);
             this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
         }
     }
