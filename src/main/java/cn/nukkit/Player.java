@@ -14,13 +14,9 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
-import cn.nukkit.event.entity.EntityDamageByBlockEvent;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
-import cn.nukkit.event.entity.EntityPortalEnterEvent;
-import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
 import cn.nukkit.event.inventory.InventoryPickupItemEvent;
@@ -71,6 +67,9 @@ import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
+import com.google.common.base.Strings;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
@@ -79,12 +78,12 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
+import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -135,9 +134,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int windowCnt = 4;
 
-    protected Map<Inventory, Integer> windows;
-
-    protected final Map<Integer, Inventory> windowIndex = new Int2ObjectOpenHashMap<>();
+    protected final BiMap<Inventory, Integer> windows = HashBiMap.create();
+    protected final BiMap<Integer, Inventory> windowIndex = windows.inverse();
     protected final Set<Integer> permanentWindows = new IntOpenHashSet();
 
     protected int messageCounter = 2;
@@ -593,7 +591,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public Player(SourceInterface interfaz, Long clientID, String ip, int port) {
         super(null, new CompoundTag());
         this.interfaz = interfaz;
-        this.windows = new HashMap<>();
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
         this.lastBreak = -1;
@@ -3436,6 +3433,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
+
+    private void setTitle(String text) {
+        SetTitlePacket packet = new SetTitlePacket();
+        packet.text = text;
+        packet.type = SetTitlePacket.TYPE_TITLE;
+        this.dataPacket(packet);
+    }
+
     public void sendTitle(String title) {
         this.sendTitle(title, "", 20, 20, 5);
     }
@@ -3444,23 +3449,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendTitle(title, subtitle, 20, 20, 5);
     }
 
-    public void sendTitle(String title, String subtitle, int fadein, int duration, int fadeout) {
-        if (!subtitle.equals("")) {
-            SetTitlePacket pk = new SetTitlePacket();
-            pk.type = SetTitlePacket.TYPE_SUBTITLE;
-            pk.text = subtitle;
-            pk.fadeInTime = fadein;
-            pk.stayTime = duration;
-            pk.fadeOutTime = fadeout;
-            this.dataPacket(pk);
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        this.setTitleAnimationTimes(fadeIn, stay, fadeOut);
+        if (!Strings.isNullOrEmpty(subtitle)) {
+            this.setSubtitle(subtitle);
         }
-        SetTitlePacket pk2 = new SetTitlePacket();
-        pk2.type = SetTitlePacket.TYPE_TITLE;
-        pk2.text = title;
-        pk2.fadeInTime = fadein;
-        pk2.stayTime = duration;
-        pk2.fadeOutTime = fadeout;
-        this.dataPacket(pk2);
+        // Title won't send if an empty string is used
+        this.setTitle(Strings.isNullOrEmpty(title) ? " " : title);
     }
 
     public void sendActionBar(String title) {
@@ -3566,8 +3561,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.ip,
                     String.valueOf(this.port),
                     this.getServer().getLanguage().translateString(reason)));
-            this.windows = new HashMap<>();
-            this.windowIndex.clear();
+            this.windows.clear();
             this.usedChunks.clear();
             this.loadQueue.clear();
             this.hasSpawned.clear();
@@ -4211,7 +4205,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Location from = this.getLocation();
         if (super.teleport(location, cause)) {
 
-            for (Inventory window : new ArrayList<>(this.windowIndex.values())) {
+            for (Inventory window : new ArrayList<>(this.windows.keySet())) {
                 if (window == this.inventory) {
                     continue;
                 }
@@ -4391,7 +4385,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             cnt = forceId;
         }
-        this.windowIndex.put(cnt, inventory);
         this.windows.put(inventory, cnt);
 
         if (isPermanent) {
@@ -4409,15 +4402,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void removeWindow(Inventory inventory) {
         inventory.close(this);
-        if (this.windows.containsKey(inventory)) {
-            int id = this.windows.get(inventory);
-            this.windows.remove(this.windowIndex.get(id));
-            this.windowIndex.remove(id);
-        }
+        this.windows.remove(inventory);
     }
 
     public void sendAllInventories() {
-        for (Inventory inv : this.windowIndex.values()) {
+        for (Inventory inv : this.windows.keySet()) {
             inv.sendContents(this);
 
             if (inv instanceof PlayerInventory) {
