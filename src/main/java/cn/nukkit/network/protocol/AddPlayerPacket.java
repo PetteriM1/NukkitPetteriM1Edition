@@ -43,7 +43,7 @@ public class AddPlayerPacket extends DataPacket {
         this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
-        if (protocol == 282) {
+        if (protocol <= 282) {
             this.putString("");
             this.putVarInt(0);
         }

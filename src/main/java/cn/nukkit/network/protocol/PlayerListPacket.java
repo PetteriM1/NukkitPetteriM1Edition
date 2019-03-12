@@ -29,7 +29,7 @@ public class PlayerListPacket extends DataPacket {
             if (type == TYPE_ADD) {
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
-                if (protocol == 282) {
+                if (protocol <= 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }
