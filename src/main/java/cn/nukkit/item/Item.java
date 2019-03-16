@@ -321,6 +321,7 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     private static final ArrayList<Item> creative = new ArrayList<>();
     private static final ArrayList<Item> creative291 = new ArrayList<>();
+    private static final ArrayList<Item> creative313 = new ArrayList<>();
 
     private static void initCreativeItems() {
         clearCreativeItems();
@@ -350,7 +351,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             }
         }
 
-        // Creative inventory for older versions
+        // Creative inventory for 291
         String path291 = server.getDataPath() + "creativeitems291.json";
         if (!new File(path291).exists()) {
             try {
@@ -374,11 +375,37 @@ public class Item implements Cloneable, BlockID, ItemID {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // Creative inventory for 313
+        String path313 = server.getDataPath() + "creativeitems313.json";
+        if (!new File(path313).exists()) {
+            try {
+                Utils.writeFile(path313, Server.class.getClassLoader().getResourceAsStream("creativeitems313.json"));
+            } catch (IOException e) {
+                MainLogger.getLogger().logException(e);
+                return;
+            }
+        }
+        List<Map> list313 = new Config(path313, Config.YAML).getMapList("items");
+
+        for (Map map : list313) {
+            try {
+                int id = (int) map.get("id");
+                int damage = (int) map.getOrDefault("damage", 0);
+                String hex = (String) map.get("nbt_hex");
+                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
+
+                addCreativeItem(313, Item.get(id, damage, 1, nbt));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
     }
 
     public static void clearCreativeItems() {
         Item.creative.clear();
         Item.creative291.clear();
+        Item.creative313.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -388,6 +415,8 @@ public class Item implements Cloneable, BlockID, ItemID {
     public static ArrayList<Item> getCreativeItems(int protocol) {
         if (protocol <= 291) {
             return new ArrayList<>(Item.creative291);
+        } else if (protocol == 313){
+            return new ArrayList<>(Item.creative313);
         } else {
             return new ArrayList<>(Item.creative);
         }
@@ -400,6 +429,8 @@ public class Item implements Cloneable, BlockID, ItemID {
     public static void addCreativeItem(int protocol, Item item) {
         if (protocol <= 291) {
             Item.creative291.add(item.clone());
+        } else if (protocol == 313) {
+            Item.creative313.add(item.clone());
         } else {
             Item.creative.add(item.clone());
         }
