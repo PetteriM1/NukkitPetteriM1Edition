@@ -58,20 +58,16 @@ public class Spawner extends Thread {
 
     public boolean entitySpawnAllowed(Level level, int networkId) {
         try {
-            return countEntity(level, networkId) < 1;
+            int count = 0;
+            for (Entity entity : level.getEntities()) {
+                if (entity.isAlive() && entity.getNetworkId() == networkId) {
+                    count++;
+                }
+            }
+            return count < 1;
         } catch (Exception e) {
             return false;
         }
-    }
-
-    private int countEntity(Level level, int networkId) {
-        int count = 0;
-        for (Entity entity : level.getEntities()) {
-            if (entity.isAlive() && entity.getNetworkId() == networkId) {
-                count++;
-            }
-        }
-        return count;
     }
 
     public BaseEntity createEntity(Object type, Position pos) {

@@ -14,7 +14,7 @@ public class SpawnTask extends Thread {
     @Override
     public void run() {
         for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-            getSpawnPosition(new Position(player.x, player.y, player.z,player.getLevel()));
+            getSpawnPosition(new Position(player.x, player.y, player.z, player.getLevel()));
         }
     }
 
@@ -57,9 +57,8 @@ public class SpawnTask extends Thread {
 
     private boolean isEnoughAirAboveBlock(int x, int y, int z, int minAirAbove, Level level) {
         if (minAirAbove > 0) {
-            int maxTestY = y + minAirAbove;
             int addY = 1;
-            while ((y + addY) <= maxTestY) {
+            while ((y + addY) <= y + minAirAbove) {
                 int blockId = level.getBlockIdAt(x, y + addY, z);
                 if (blockId != Block.AIR) {
                     return false;
