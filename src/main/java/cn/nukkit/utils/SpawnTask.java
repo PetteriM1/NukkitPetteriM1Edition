@@ -14,12 +14,11 @@ public class SpawnTask extends Thread {
     @Override
     public void run() {
         for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-            Position spawnPosition = new Position(player.x, player.y, player.z);
-            getSpawnPosition(spawnPosition, new int[0], 2, 5, player.getLevel());
+            getSpawnPosition(new Position(player.x, player.y, player.z,player.getLevel()));
         }
     }
 
-    private Position getSpawnPosition(Position startSpawnPosition, int[] notAllowedBlockIds, int minAirAboveSpawnBlock, int maxFindingTries, Level level) {
+    private Position getSpawnPosition(Position startSpawnPosition) {
         int spawnX = (int) startSpawnPosition.x;
         int spawnZ = (int) startSpawnPosition.z;
         Position spawnPosition = null;
@@ -36,16 +35,13 @@ public class SpawnTask extends Thread {
 
         boolean found = false;
         int findTries = 0;
-        boolean startEast = EntityUtils.rand();
-        boolean startNorth = EntityUtils.rand();
 
-        int x = startEast ? EntityUtils.rand(minSpawnX1, maxSpawnX1) : EntityUtils.rand(minSpawnX2, maxSpawnX2);
-        int z = startNorth ? EntityUtils.rand(minSpawnZ1, maxSpawnZ1) : EntityUtils.rand(minSpawnZ2, maxSpawnZ2);
-        int y = spawnZ;
+        int x = EntityUtils.rand() ? EntityUtils.rand(minSpawnX1, maxSpawnX1) : EntityUtils.rand(minSpawnX2, maxSpawnX2);
+        int z = EntityUtils.rand() ? EntityUtils.rand(minSpawnZ1, maxSpawnZ1) : EntityUtils.rand(minSpawnZ2, maxSpawnZ2);
+        int y = (int) startSpawnPosition.y;
 
-        while (!found && findTries < maxFindingTries) {
-            int blockId = level.getBlockIdAt(x, y, z);
-            if (isBlockAllowed(blockId, notAllowedBlockIds) && isEnoughAirAboveBlock(x, y, z, minAirAboveSpawnBlock, level)) {
+        while (!found && findTries < 5) {
+            if (isEnoughAirAboveBlock(x, y, z, 2, startSpawnPosition.getLevel())) {
                 found = true;
             }
 
@@ -53,21 +49,10 @@ public class SpawnTask extends Thread {
         }
 
         if (found) {
-            spawnPosition = new Position (x, y, z);
+            spawnPosition = new Position(x, y, z);
         }
 
         return spawnPosition;
-    }
-
-    private boolean isBlockAllowed(int blockId, int[] notAllowedBlockIds) {
-        if (notAllowedBlockIds.length > 0) {
-            for (int notAllowed : notAllowedBlockIds) {
-                if (notAllowed == blockId) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private boolean isEnoughAirAboveBlock(int x, int y, int z, int minAirAbove, Level level) {

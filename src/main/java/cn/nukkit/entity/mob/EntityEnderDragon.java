@@ -1,22 +1,21 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-import cn.nukkit.level.Location;
-import cn.nukkit.event.entity.ProjectileLaunchEvent;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.math.Vector3;
-import cn.nukkit.entity.projectile.EntityEnderCharge;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityFlyingMob;
+import cn.nukkit.entity.projectile.EntityEnderCharge;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.utils.EntityUtils;
 
 public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
@@ -50,7 +49,6 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     public void initEntity() {
         super.initEntity();
 
-        this.setHealth(200);
         this.setMaxHealth(200);
     }
 

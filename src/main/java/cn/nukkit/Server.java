@@ -320,6 +320,7 @@ public class Server {
                 put("ansi-title", true);
                 put("worlds-entity-spawning-disabled", "");
                 put("block-listener", true);
+                put("mobs-drop-xp-orbs", true);
             }
         });
 

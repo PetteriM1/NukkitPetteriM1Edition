@@ -24,7 +24,7 @@ public class ZombieSpawner extends AbstractEntitySpawner {
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int time = level.getTime() % Level.TIME_FULL;
 
-        if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
+        if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;

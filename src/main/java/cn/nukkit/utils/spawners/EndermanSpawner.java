@@ -26,7 +26,7 @@ public class EndermanSpawner extends AbstractEntitySpawner {
         final int time = level.getTime() % Level.TIME_FULL;
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
+        if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;

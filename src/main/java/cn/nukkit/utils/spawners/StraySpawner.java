@@ -27,7 +27,7 @@ public class StraySpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 12 && biomeId != 30) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
+        } else if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (Block.transparent[blockId]) {
             result = SpawnResult.WRONG_BLOCK;

@@ -4400,6 +4400,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    public Optional<Inventory> getTopWindow() {
+        return Optional.ofNullable(this.windowIndex.get(windowCnt));
+    }
+
     public void removeWindow(Inventory inventory) {
         inventory.close(this);
         this.windows.remove(inventory);

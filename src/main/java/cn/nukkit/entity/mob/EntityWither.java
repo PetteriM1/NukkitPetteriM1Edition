@@ -50,7 +50,6 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
         super.initEntity();
 
         this.fireProof = true;
-        this.setHealth(600);
         this.setMaxHealth(600);
         this.setDamage(new int[]{0, 2, 4, 6});
     }

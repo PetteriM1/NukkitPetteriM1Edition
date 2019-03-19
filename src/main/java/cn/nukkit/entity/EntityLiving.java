@@ -201,8 +201,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 if (damager instanceof Player) {
                     Player player = (Player) damager;
                     int killExperience = baseEntity.getKillExperience();
-                    if (killExperience > 0 && player != null && player.isSurvival()) {
-                        player.addExperience(killExperience);
+                    if (killExperience > 0 && player != null && !player.isCreative()) {
+                        if (this.getServer().getPropertyBoolean("mobs-drop-xp-orbs", true)) {
+                            this.getLevel().dropExpOrb(this, killExperience);
+                        } else {
+                            player.addExperience(killExperience);
+                        }
                     }
                 }
             }
