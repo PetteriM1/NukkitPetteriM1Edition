@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface ProtocolInfo {
 
-    int CURRENT_PROTOCOL = 332;
+    int CURRENT_PROTOCOL = 340;
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(281, 282, 291, 313, 332, 340);
 
