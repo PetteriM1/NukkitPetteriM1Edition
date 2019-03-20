@@ -309,7 +309,7 @@ public class Server {
                 put("chunk-generation-population-queue-size", 8);
                 put("ticks-per-autosave", 6000);
                 put("ticks-per-entity-spawns", 200);
-                put("ticks-per-entity-despawns", 10000);
+                put("ticks-per-entity-despawns", 8000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
                 put("nether", true);

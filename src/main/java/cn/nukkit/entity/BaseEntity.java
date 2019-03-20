@@ -33,7 +33,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     private boolean friendly = false;
 
     private boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
-    private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000);
+    private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 8000);
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
