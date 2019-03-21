@@ -1693,6 +1693,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.lastUpdate = currentTick;
 
+        if (this.fishing != null) {
+            if (this.distance(fishing) > 80) {
+                this.stopFishing(false);
+            }
+        }
+
         if (!this.isAlive() && this.spawned) {
             //++this.deadTicks;
             //if (this.deadTicks >= 10) {
@@ -3791,6 +3797,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
+        if (this.fishing != null) {
+            this.stopFishing(false);
+        }
+
         this.health = 0;
         this.extinguish();
         this.scheduleUpdate();
@@ -4831,7 +4841,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 				.putList(new ListTag<FloatTag>("Rotation")
 						.add(new FloatTag("", (float) yaw))
 						.add(new FloatTag("", (float) pitch)));
-		double f = 0.9;
+		double f = 1;
 		EntityFishingHook fishingHook = new EntityFishingHook(chunk, nbt, this);
 		fishingHook.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                 Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));

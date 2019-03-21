@@ -271,7 +271,7 @@ public class AvailableCommandsPacket extends DataPacket {
                     putLInt(type);
                     putBoolean(parameter.optional);
                     if (protocol >= 340) {
-                        putByte((byte) 0);
+                        putByte(parameter.options);
                     }
                 }
             }
