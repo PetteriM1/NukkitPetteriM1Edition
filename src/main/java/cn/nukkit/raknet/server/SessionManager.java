@@ -19,6 +19,7 @@ import java.util.*;
  * Nukkit Project
  */
 public class SessionManager {
+
     protected final Packet.PacketFactory[] packetPool = new Packet.PacketFactory[256];
 
     protected final RakNetServer server;

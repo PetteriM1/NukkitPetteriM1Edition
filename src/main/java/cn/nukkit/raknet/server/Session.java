@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public class Session {
+
     public final static int STATE_UNCONNECTED = 0;
     public final static int STATE_CONNECTING_1 = 1;
     public final static int STATE_CONNECTING_2 = 2;

@@ -37,7 +37,7 @@ public class Nukkit {
     public final static Properties GIT_INFO = getGitInfo();
     public final static String VERSION = getVersion();
     public final static String API_VERSION = "CUSTOM";
-    public final static String CODENAME = "";
+    public final static String CODENAME = "On My Way";
     public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
     public final static String MINECRAFT_VERSION_NETWORK = ProtocolInfo.MINECRAFT_VERSION_NETWORK;
     public final static String PATH = System.getProperty("user.dir") + "/";
@@ -48,6 +48,7 @@ public class Nukkit {
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
+
         System.setProperty("java.net.preferIPv4Stack" , "true");
         System.setProperty("log4j.skipJansi", "false");
 

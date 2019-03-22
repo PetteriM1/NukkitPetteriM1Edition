@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Nukkit</name>
+    <name>Nukkit PetteriM1 Edition</name>
     <groupId>cn.nukkit</groupId>
     <artifactId>Nukkit</artifactId>
-    <version>SuomiCraftPE</version>
+    <version>PM1E</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

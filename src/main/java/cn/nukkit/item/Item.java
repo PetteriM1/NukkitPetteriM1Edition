@@ -84,6 +84,9 @@ public class Item implements Cloneable, BlockID, ItemID {
     public static void init() {
         if (list == null) {
             list = new Class[65535];
+            list[LADDER] = ItemLadder.class; //65
+            list[RAIL] = ItemRail.class; //66
+            list[CACTUS] = ItemCactus.class; //81
             list[IRON_SHOVEL] = ItemShovelIron.class; //256
             list[IRON_PICKAXE] = ItemPickaxeIron.class; //257
             list[IRON_AXE] = ItemAxeIron.class; //258
@@ -154,7 +157,6 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[SIGN] = ItemSign.class; //323
             list[WOODEN_DOOR] = ItemDoorWood.class; //324
             list[BUCKET] = ItemBucket.class; //325
-
             list[MINECART] = ItemMinecart.class; //328
             list[SADDLE] = ItemSaddle.class; //329
             list[IRON_DOOR] = ItemDoorIron.class; //330
@@ -162,7 +164,6 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[SNOWBALL] = ItemSnowball.class; //332
             list[BOAT] = ItemBoat.class; //333
             list[LEATHER] = ItemLeather.class; //334
-
             list[BRICK] = ItemBrick.class; //336
             list[CLAY] = ItemClay.class; //337
             list[SUGARCANE] = ItemSugarcane.class; //338
@@ -170,7 +171,6 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[BOOK] = ItemBook.class; //340
             list[SLIMEBALL] = ItemSlimeball.class; //341
             list[MINECART_WITH_CHEST] = ItemMinecartChest.class; //342
-
             list[EGG] = ItemEgg.class; //344
             list[COMPASS] = ItemCompass.class; //345
             list[FISHING_ROD] = ItemFishingRod.class; //346
@@ -229,7 +229,6 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
             list[FIREWORKS] = ItemFirework.class; //401
-
             list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
             list[COMPARATOR] = ItemRedstoneComparator.class; //404
             list[NETHER_BRICK] = ItemNetherBrick.class; //405
@@ -261,20 +260,14 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[DARK_OAK_DOOR] = ItemDoorDarkOak.class; //431
             list[CHORUS_FRUIT] = ItemChorusFruit.class; //432
             list[POPPED_CHORUS_FRUIT] = ItemChorusFruitPopped.class; //433
-
             list[DRAGON_BREATH] = ItemDragonBreath.class; //437
             list[SPLASH_POTION] = ItemPotionSplash.class; //438
-
             list[LINGERING_POTION] = ItemPotionLingering.class; //441
-
             list[ELYTRA] = ItemElytra.class; //444
             list[SHULKER_SHELL] = ItemShulkerShell.class; //445
             list[BANNER] = ItemBanner.class; //446
-
             list[TOTEM] = ItemTotem.class; //450
-
             list[TRIDENT] = ItemTrident.class; //455
-
             list[BEETROOT] = ItemBeetroot.class; //457
             list[BEETROOT_SEEDS] = ItemSeedsBeetroot.class; //458
             list[BEETROOT_SOUP] = ItemBeetrootSoup.class; //459
@@ -283,13 +276,9 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[PUFFERFISH] = ItemPufferfish.class; //462
             list[COOKED_SALMON] = ItemSalmonCooked.class; //463
             list[DRIED_KELP] = ItemDriedKelp.class; //464
-
             list[GOLDEN_APPLE_ENCHANTED] = ItemAppleGoldEnchanted.class; //466
-
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
-
             list[CROSSBOW] = ItemCrossbow.class; //471
-
             list[RECORD_11] = ItemRecord11.class;
             list[RECORD_CAT] = ItemRecordCat.class;
             list[RECORD_13] = ItemRecord13.class;
@@ -303,10 +292,6 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[RECORD_STRAD] = ItemRecordStrad.class;
             list[RECORD_WAIT] = ItemRecordWait.class;
 
-            list[LADDER] = ItemLadder.class;
-            list[CACTUS] = ItemCactus.class;
-            list[RAIL] = ItemRail.class;
-
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
                     list[i] = Block.list[i];
@@ -319,14 +304,16 @@ public class Item implements Cloneable, BlockID, ItemID {
         }, true);
     }
 
-    private static final ArrayList<Item> creative = new ArrayList<>();
+    private static final ArrayList<Item> creative = new ArrayList<>(); // Current protocol
     private static final ArrayList<Item> creative291 = new ArrayList<>();
     private static final ArrayList<Item> creative313 = new ArrayList<>();
+    private static final ArrayList<Item> creative332 = new ArrayList<>();
 
     private static void initCreativeItems() {
         clearCreativeItems();
         Server server = Server.getInstance();
 
+        // Creative inventory for current protocol
         String path = server.getDataPath() + "creativeitems.json";
         if (!new File(path).exists()) {
             try {
@@ -400,12 +387,38 @@ public class Item implements Cloneable, BlockID, ItemID {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // Creative inventory for 332
+        String path332 = server.getDataPath() + "creativeitems332.json";
+        if (!new File(path332).exists()) {
+            try {
+                Utils.writeFile(path332, Server.class.getClassLoader().getResourceAsStream("creativeitems332.json"));
+            } catch (IOException e) {
+                MainLogger.getLogger().logException(e);
+                return;
+            }
+        }
+        List<Map> list332 = new Config(path332, Config.YAML).getMapList("items");
+
+        for (Map map : list332) {
+            try {
+                int id = (int) map.get("id");
+                int damage = (int) map.getOrDefault("damage", 0);
+                String hex = (String) map.get("nbt_hex");
+                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
+
+                addCreativeItem(332, Item.get(id, damage, 1, nbt));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
     }
 
     public static void clearCreativeItems() {
         Item.creative.clear();
         Item.creative291.clear();
         Item.creative313.clear();
+        Item.creative332.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -413,12 +426,17 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static ArrayList<Item> getCreativeItems(int protocol) {
-        if (protocol <= 291) {
-            return new ArrayList<>(Item.creative291);
-        } else if (protocol == 313){
-            return new ArrayList<>(Item.creative313);
-        } else {
-            return new ArrayList<>(Item.creative);
+        switch (protocol) {
+            case 281:
+            case 282:
+            case 291:
+                return new ArrayList<>(Item.creative291);
+            case 313:
+                return new ArrayList<>(Item.creative313);
+            case 332:
+                return new ArrayList<>(Item.creative332);
+            default: // Current protocol
+                return new ArrayList<>(Item.creative);
         }
     }
 
@@ -427,12 +445,21 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static void addCreativeItem(int protocol, Item item) {
-        if (protocol <= 291) {
-            Item.creative291.add(item.clone());
-        } else if (protocol == 313) {
-            Item.creative313.add(item.clone());
-        } else {
-            Item.creative.add(item.clone());
+        switch (protocol) {
+            case 281:
+            case 282:
+            case 291:
+                Item.creative291.add(item.clone());
+                break;
+            case 313:
+                Item.creative313.add(item.clone());
+                break;
+            case 332:
+                Item.creative332.add(item.clone());
+                break;
+            default: // Current protocol
+                Item.creative.add(item.clone());
+                break;
         }
     }
 
