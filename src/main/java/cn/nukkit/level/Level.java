@@ -3244,7 +3244,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.y = (float) y;
         pk.z = (float) z;
         pk.yaw = (float) yaw;
-        pk.headYaw = (float) yaw;
+        pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
 
         this.addChunkPacket(chunkX, chunkZ, pk);
