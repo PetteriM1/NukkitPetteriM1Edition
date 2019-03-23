@@ -323,9 +323,8 @@ public class Item implements Cloneable, BlockID, ItemID {
                 return;
             }
         }
-        List<Map> list = new Config(path, Config.YAML).getMapList("items");
 
-        for (Map map : list) {
+        for (Map map : new Config(path, Config.YAML).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -348,9 +347,8 @@ public class Item implements Cloneable, BlockID, ItemID {
                 return;
             }
         }
-        List<Map> list291 = new Config(path291, Config.YAML).getMapList("items");
 
-        for (Map map : list291) {
+        for (Map map : new Config(path291, Config.YAML).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -373,9 +371,8 @@ public class Item implements Cloneable, BlockID, ItemID {
                 return;
             }
         }
-        List<Map> list313 = new Config(path313, Config.YAML).getMapList("items");
 
-        for (Map map : list313) {
+        for (Map map : new Config(path313, Config.YAML).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -398,9 +395,8 @@ public class Item implements Cloneable, BlockID, ItemID {
                 return;
             }
         }
-        List<Map> list332 = new Config(path332, Config.YAML).getMapList("items");
 
-        for (Map map : list332) {
+        for (Map map : new Config(path332, Config.YAML).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);

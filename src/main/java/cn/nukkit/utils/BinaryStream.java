@@ -319,6 +319,10 @@ public class BinaryStream {
             }
         }
 
+        if (id == 513) {
+            this.getVarLong(); //"blocking tick" (ffs mojang)
+        }
+
         return Item.get(
                 id, data, cnt, nbt
         );
@@ -338,23 +342,10 @@ public class BinaryStream {
         this.put(nbt);
         this.putVarInt(0); //TODO CanPlaceOn entry count
         this.putVarInt(0); //TODO CanDestroy entry count
-    }
 
-    public void putSlot2(Item item) {
-        if (item == null || item.getId() == 0) {
-            this.putVarInt(0);
-            return;
+        if (item.getId() == 513) {
+            this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
-
-        this.putVarInt(item.getId());
-        int metadata = item.hasMeta() ? item.getDamage() : Short.MAX_VALUE;
-
-        this.putVarInt((metadata << 8) + (item.getCount() & 0xff));
-        byte[] nbt = item.getCompoundTag();
-        this.putLShort(nbt.length);
-        this.put(nbt);
-        this.putVarInt(0); //TODO CanPlaceOn entry count
-        this.putVarInt(0); //TODO CanDestroy entry count
     }
 
     public byte[] getByteArray() {
