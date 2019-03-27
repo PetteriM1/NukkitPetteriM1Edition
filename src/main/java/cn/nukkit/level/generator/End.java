@@ -8,6 +8,7 @@ import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.noise.Noise;
 import cn.nukkit.level.generator.noise.Simplex;
+import cn.nukkit.level.generator.populator.impl.PopulatorEndPillar;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
@@ -66,6 +67,8 @@ public class End extends Generator {
         this.random = new Random();
         this.noiseBase = new Simplex(this.nukkitRandom, 4, 1 / 4f, 1 / 64f);
         this.random.setSeed(this.level.getSeed());
+
+        this.generationPopulators.add(new PopulatorEndPillar());
     }
 
     @Override

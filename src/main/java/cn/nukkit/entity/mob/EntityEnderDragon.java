@@ -5,6 +5,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.item.EntityEndCrystal;
 import cn.nukkit.entity.projectile.EntityEnderCharge;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -101,17 +102,18 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (this.level.getName().equals("end")) {
-            float health = this.getHealth();
-
-            if (!(health > this.getMaxHealth()) && health != 0) {
-                this.setHealth(health + (float) 0.1);
+        for (Entity e : this.getLevel().getEntities()) {
+            if (e instanceof EntityEndCrystal) {
+                if (e.distanceSquared(this) <= 32) {
+                    float health = this.getHealth();
+                    if (!(health > this.getMaxHealth()) && health != 0) {
+                        this.setHealth(health + 0.1f);
+                    }
+                }
             }
         }
 
-        return hasUpdate;
+        return super.entityBaseTick(tickDiff);
     }
 
     @Override

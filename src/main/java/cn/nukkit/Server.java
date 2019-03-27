@@ -313,7 +313,7 @@ public class Server {
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
                 put("nether", true);
-                put("end", false);
+                put("end", true);
                 put("suomicraft-mode", false);
                 put("do-not-tick-worlds", "");
                 put("load-all-worlds", true);
