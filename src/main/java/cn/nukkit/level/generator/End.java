@@ -1,18 +1,18 @@
 package cn.nukkit.level.generator;
 
-import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.biome.Biome;
+import cn.nukkit.level.biome.EnumBiome;
+import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.generator.noise.Noise;
+import cn.nukkit.level.generator.noise.Simplex;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * Created by PetteriM1
@@ -20,23 +20,20 @@ import java.util.regex.Pattern;
 public class End extends Generator {
 
     private ChunkManager level;
-
-    private NukkitRandom random;
-
+    private NukkitRandom nukkitRandom;
+    private Random random;
     private final List<Populator> populators = new ArrayList<>();
+    private List<Populator> generationPopulators = new ArrayList<>();
 
-    private int[][] structure;
+    private Simplex noiseBase;
 
-    private final Map<String, Object> options;
+    public End() {
+        this(new HashMap<>());
+    }
 
-    private int floorLevel;
+    public End(Map<String, Object> options) {
+    }
 
-    private String preset;
-
-    private boolean init = false;
-
-    private int biome;
-    
     @Override
     public int getId() {
         return Generator.TYPE_END;
@@ -54,7 +51,7 @@ public class End extends Generator {
 
     @Override
     public Map<String, Object> getSettings() {
-        return this.options;
+        return new HashMap<>();
     }
 
     @Override
@@ -62,114 +59,105 @@ public class End extends Generator {
         return "end";
     }
 
-    public End() {
-        this(new HashMap<>());
-    }
-
-    public End(Map<String, Object> options) {
-        this.preset = "121;121,121x121,121;121;";
-        this.options = options;
-    }
-
-    protected void parsePreset(String preset, int chunkX, int chunkZ) {
-        try {
-            this.preset = preset;
-            String[] presetArray = preset.split(";");
-            String blocks = presetArray.length > 1 ? presetArray[1] : "";
-            this.biome = presetArray.length > 2 ? Integer.valueOf(presetArray[2]) : 1;
-            String options = presetArray.length > 3 ? presetArray[1] : "";
-            this.structure = new int[256][];
-            int y = 0;
-            for (String block : blocks.split(",")) {
-                int id, meta = 0, cnt = 1;
-                if (Pattern.matches("^[0-9]{1,3}x[0-9]$", block)) {
-                    String[] s = block.split("x");
-                    cnt = Integer.valueOf(s[0]);
-                    id = Integer.valueOf(s[1]);
-                } else if (Pattern.matches("^[0-9]{1,3}:[0-9]{0,2}$", block)) {
-                    String[] s = block.split(":");
-                    id = Integer.valueOf(s[0]);
-                    meta = Integer.valueOf(s[1]);
-                } else if (Pattern.matches("^[0-9]{1,3}$", block)) {
-                    id = Integer.valueOf(block);
-                } else {
-                    continue;
-                }
-                int cY = y;
-                y += cnt;
-                if (y > 0xFF) {
-                    y = 0xFF;
-                }
-                for (; cY < y; ++cY) {
-                    this.structure[cY] = new int[]{id, meta};
-                }
-            }
-            this.floorLevel = y;
-            for (; y <= 0xFF; ++y) {
-                this.structure[y] = new int[]{0, 0};
-            }
-            for (String option : options.split(",")) {
-                if (Pattern.matches("^[0-9a-z_]+$", option)) {
-                    this.options.put(option, true);
-                } else if (Pattern.matches("^[0-9a-z_]+\\([0-9a-z_ =]+\\)$", option)) {
-                    String name = option.substring(0, option.indexOf("("));
-                    String extra = option.substring(option.indexOf("(") + 1, option.indexOf(")"));
-                    Map<String, Float> map = new HashMap<>();
-                    for (String kv : extra.split(" ")) {
-                        String[] data = kv.split("=");
-                        map.put(data[0], Float.valueOf(data[1]));
-                    }
-                    this.options.put(name, map);
-                }
-            }
-        } catch (Exception e) {
-            Server.getInstance().getLogger().error("error while parsing the preset", e);
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
-        this.random = random;
+        this.nukkitRandom = random;
+        this.random = new Random();
+        this.noiseBase = new Simplex(this.nukkitRandom, 4, 1 / 4f, 1 / 64f);
+        this.random.setSeed(this.level.getSeed());
     }
 
     @Override
     public void generateChunk(int chunkX, int chunkZ) {
-        if (!this.init) {
-            init = true;
-            if (this.options.containsKey("preset") && !"".equals(this.options.get("preset"))) {
-                this.parsePreset((String) this.options.get("preset"), chunkX, chunkZ);
-            } else {
-                this.parsePreset(this.preset, chunkX, chunkZ);
-            }
-        }
-        this.generateChunk(level.getChunk(chunkX, chunkZ));
-    }
+        this.nukkitRandom.setSeed(0xa6fe78dc ^ (chunkX << 8) ^ chunkZ ^ this.level.getSeed());
 
-    private void generateChunk(FullChunk chunk) {
-        chunk.setGenerated();
+        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
 
-        for (int Z = 0; Z < 16; ++Z) {
-            for (int X = 0; X < 16; ++X) {
-                chunk.setBiomeId(X, Z, biome);
-                for (int y = 0; y < 256; ++y) {
-                    chunk.setBlock(X, y, Z, this.structure[y][0], this.structure[y][1]);
+        double[][][] noise = getFastNoise3D(this.noiseBase, 16, 128, 16, 4, 8, 4, chunkX * 16, 0, chunkZ * 16);
+
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                chunk.setBiomeId(x, z, EnumBiome.THE_END.biome.getId());
+
+                for (int y = 12; y < 64; ++y) {
+                    double noiseValue = (Math.abs(64 - y) / 64) * 1 - noise[x][z][y];
+                    noiseValue -= 1 - 0.5;
+
+                    double distance = new Vector3(0, 64, 0).distance(new Vector3(chunkX * 16 + x, y / 1.3, chunkZ * 16 + z));
+
+                    if ((noiseValue < 0 && distance < 100) || (noiseValue < -0.2 && distance > 400)) {
+                        chunk.setBlockId(x, y, z, Block.END_STONE);
+                    }
                 }
             }
+        }
+        for (Populator populator : this.generationPopulators) {
+            populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
         }
     }
 
     @Override
     public void populateChunk(int chunkX, int chunkZ) {
-        this.random.setSeed(0xdeadbeef ^ (chunkX << 8) ^ chunkZ ^ this.level.getSeed());
+        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
+        this.nukkitRandom.setSeed(0xa6fe78dc ^ (chunkX << 8) ^ chunkZ ^ this.level.getSeed());
         for (Populator populator : this.populators) {
-            populator.populate(this.level, chunkX, chunkZ, this.random, level.getChunk(chunkX, chunkZ));
+            populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
         }
+
+        Biome biome = EnumBiome.getBiome(chunk.getBiomeId(7, 7));
+        biome.populateChunk(this.level, chunkX, chunkZ, this.nukkitRandom);
     }
 
-    @Override
     public Vector3 getSpawn() {
-        return new Vector3(0.5, this.floorLevel, 0.5);
+        return new Vector3(0, 64, 0);
+    }
+
+    private double[][][] getFastNoise3D(Noise noise, int xSize, int ySize, int zSize, int xSamplingRate, int ySamplingRate, int zSamplingRate, int x, int y, int z) {
+        double[][][] noiseArray = new double[xSize + 1][zSize + 1][ySize + 1];
+        for (int xx = 0; xx <= xSize; xx += xSamplingRate) {
+            for (int zz = 0; zz <= zSize; zz += zSamplingRate) {
+                for (int yy = 0; yy <= ySize; yy += ySamplingRate) {
+                    noiseArray[xx][zz][yy] = noise.noise3D(x + xx, y + yy, z + zz, true);
+                }
+            }
+        }
+
+        for (int xx = 0; xx < xSize; ++xx) {
+            for (int zz = 0; zz < zSize; ++zz) {
+                for (int yy = 0; yy < ySize; ++yy) {
+                    if (xx % xSamplingRate != 0 || zz % zSamplingRate != 0 || yy % ySamplingRate != 0) {
+                        int nx = xx / xSamplingRate * xSamplingRate;
+                        int ny = yy / ySamplingRate * ySamplingRate;
+                        int nz = zz / zSamplingRate * zSamplingRate;
+
+                        int nnx = nx + xSamplingRate;
+                        int nny = ny + ySamplingRate;
+                        int nnz = nz + zSamplingRate;
+
+                        double dx1 = ((double) (nnx - xx) / (double) (nnx - nx));
+                        double dx2 = ((double) (xx - nx) / (double) (nnx - nx));
+                        double dy1 = ((double) (nny - yy) / (double) (nny - ny));
+                        double dy2 = ((double) (yy - ny) / (double) (nny - ny));
+
+                        noiseArray[xx][zz][yy] = ((double) (nnz - zz) / (double) (nnz - nz)) * (
+                                dy1 * (
+                                        dx1 * noiseArray[nx][nz][ny] + dx2 * noiseArray[nnx][nz][ny]
+                                ) + dy2 * (
+                                        dx1 * noiseArray[nx][nz][nny] + dx2 * noiseArray[nnx][nz][nny]
+                                )
+                        ) + ((double) (zz - nz) / (double) (nnz - nz)) * (
+                                dy1 * (
+                                        dx1 * noiseArray[nx][nnz][ny] + dx2 * noiseArray[nnx][nnz][ny]
+                                ) + dy2 * (
+                                        dx1 * noiseArray[nx][nnz][nny] + dx2 * noiseArray[nnx][nnz][nny]
+                                )
+                        );
+                    }
+                }
+            }
+        }
+
+        return noiseArray;
     }
 }

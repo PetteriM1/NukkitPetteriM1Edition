@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome;
 
+import cn.nukkit.level.biome.impl.EndBiome;
 import cn.nukkit.level.biome.impl.HellBiome;
 import cn.nukkit.level.biome.impl.beach.BeachBiome;
 import cn.nukkit.level.biome.impl.beach.ColdBeachBiome;
@@ -51,6 +52,7 @@ public enum EnumBiome {
     SWAMP(6, new SwampBiome()),
     RIVER(7, new RiverBiome()),
     HELL(8, new HellBiome()),
+    THE_END(9, new EndBiome()),
     FROZEN_OCEAN(10, new FrozenOceanBiome()),
     FROZEN_RIVER(11, new FrozenRiverBiome()),
     ICE_PLAINS(12, new IcePlainsBiome()),

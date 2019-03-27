@@ -309,6 +309,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     private static final ArrayList<Item> creative313 = new ArrayList<>();
     private static final ArrayList<Item> creative332 = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
         clearCreativeItems();
         Server server = Server.getInstance();
