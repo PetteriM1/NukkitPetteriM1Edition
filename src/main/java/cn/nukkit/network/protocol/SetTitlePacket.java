@@ -1,8 +1,11 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author Tee7even
  */
+@ToString
 public class SetTitlePacket extends DataPacket {
 
     public static final int TYPE_CLEAR = 0;

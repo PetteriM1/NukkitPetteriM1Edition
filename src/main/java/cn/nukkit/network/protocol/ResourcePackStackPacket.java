@@ -1,7 +1,9 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.resourcepacks.ResourcePack;
+import lombok.ToString;
 
+@ToString
 public class ResourcePackStackPacket extends DataPacket {
 
     public boolean mustAccept = false;

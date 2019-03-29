@@ -1,9 +1,12 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class ContainerSetDataPacket extends DataPacket {
 
     public static final int PROPERTY_FURNACE_TICK_COUNT = 0;

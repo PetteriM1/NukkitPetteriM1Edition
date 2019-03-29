@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class SetEntityLinkPacket extends DataPacket {
 
     public static final byte TYPE_REMOVE = 0;

@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class VideoStreamConnectPacket extends DataPacket {
 
     public static final byte ACTION_OPEN = 0;

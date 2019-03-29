@@ -1,7 +1,10 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 import java.util.UUID;
 
+@ToString
 public class ResourcePackClientResponsePacket extends DataPacket {
 
     public static final byte STATUS_REFUSED = 1;
@@ -37,6 +40,7 @@ public class ResourcePackClientResponsePacket extends DataPacket {
         return ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET;
     }
 
+    @ToString
     public static class Entry {
 
         public final UUID uuid;

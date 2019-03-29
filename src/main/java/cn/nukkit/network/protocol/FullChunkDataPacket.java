@@ -1,9 +1,12 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString(exclude = "data")
 public class FullChunkDataPacket extends DataPacket {
 
     @Override

@@ -2,8 +2,9 @@ package cn.nukkit.entity.data;
 
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import com.google.common.base.Preconditions;
+import lombok.ToString;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
@@ -11,6 +12,7 @@ import java.util.Arrays;
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString(exclude = {"skinData", "capeData", "geometryData"})
 public class Skin {
 
     private static final int PIXEL_SIZE = 4;

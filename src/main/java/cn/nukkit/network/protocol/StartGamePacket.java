@@ -2,7 +2,9 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
+import lombok.ToString;
 
+@ToString
 public class StartGamePacket extends DataPacket {
 
     public static final int GAME_PUBLISH_SETTING_NO_MULTI_PLAY = 0;

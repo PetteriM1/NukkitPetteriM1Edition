@@ -1,9 +1,12 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class UpdateBlockPacket extends DataPacket {
 
     public static final int FLAG_NONE = 0b0000;

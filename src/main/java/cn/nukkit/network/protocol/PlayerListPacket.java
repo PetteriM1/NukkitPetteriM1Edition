@@ -1,12 +1,14 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.entity.data.Skin;
+import lombok.ToString;
 
 import java.util.UUID;
 
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class PlayerListPacket extends DataPacket {
 
     public static final byte TYPE_ADD = 0;
@@ -45,6 +47,7 @@ public class PlayerListPacket extends DataPacket {
         return ProtocolInfo.PLAYER_LIST_PACKET;
     }
 
+    @ToString
     public static class Entry {
 
         public final UUID uuid;

@@ -1,7 +1,10 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 import java.util.UUID;
 
+@ToString(exclude = "sha256")
 public class ResourcePackDataInfoPacket extends DataPacket {
 
     public UUID packId;

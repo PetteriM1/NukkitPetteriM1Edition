@@ -1,8 +1,11 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class SetSpawnPositionPacket extends DataPacket {
 
     public static final int TYPE_PLAYER_SPAWN = 0;

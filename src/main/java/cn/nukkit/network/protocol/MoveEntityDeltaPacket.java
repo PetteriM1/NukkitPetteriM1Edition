@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class MoveEntityDeltaPacket extends DataPacket {
 
     public static final int FLAG_HAS_X = 0b1;

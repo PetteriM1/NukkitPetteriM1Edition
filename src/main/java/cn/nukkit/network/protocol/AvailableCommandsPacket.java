@@ -2,6 +2,7 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.command.data.*;
 import cn.nukkit.utils.BinaryStream;
+import lombok.ToString;
 
 import java.util.*;
 import java.util.function.ObjIntConsumer;
@@ -11,6 +12,7 @@ import java.util.function.ToIntFunction;
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class AvailableCommandsPacket extends DataPacket {
 
     private static final ObjIntConsumer<BinaryStream> WRITE_BYTE = (s, v) -> s.putByte((byte) v);

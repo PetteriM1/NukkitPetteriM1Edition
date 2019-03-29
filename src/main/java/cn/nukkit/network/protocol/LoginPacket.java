@@ -4,6 +4,7 @@ import cn.nukkit.entity.data.Skin;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import lombok.ToString;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@ToString
 public class LoginPacket extends DataPacket {
 
     public String username;

@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString(exclude = "tag")
 public class BiomeDefinitionListPacket extends DataPacket {
 
     public byte[] tag;
