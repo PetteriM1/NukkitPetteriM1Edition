@@ -46,7 +46,9 @@ public class BlockIceFrosted extends BlockIce {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
-            this.getLevel().setBlock(this, new BlockWater(), true);
+            if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) >= 12 || (level.getTime() % Level.TIME_FULL < 13184 || level.getTime() % Level.TIME_FULL > 22800)) {
+                this.getLevel().setBlock(this, new BlockWater(), true);
+            }
             return Level.BLOCK_UPDATE_RANDOM;
         }
         return 0;

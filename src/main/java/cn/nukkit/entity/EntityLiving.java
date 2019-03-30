@@ -193,26 +193,22 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         super.kill();
         EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
         this.server.getPluginManager().callEvent(ev);
-        
-        if (ev.getEntity() instanceof BaseEntity) {
-            BaseEntity baseEntity = (BaseEntity) ev.getEntity();
-            if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
-                if (damager instanceof Player) {
-                    Player player = (Player) damager;
-                    int killExperience = baseEntity.getKillExperience();
-                    if (killExperience > 0 && player != null) {
-                        if (this.getServer().getPropertyBoolean("mobs-drop-xp-orbs", true)) {
+
+        if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+            if (ev.getEntity() instanceof BaseEntity) {
+                BaseEntity baseEntity = (BaseEntity) ev.getEntity();
+                if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                    Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
+                    if (damager instanceof Player) {
+                        Player player = (Player) damager;
+                        int killExperience = baseEntity.getKillExperience();
+                        if (killExperience > 0) {
                             this.getLevel().dropExpOrb(this, killExperience);
-                        } else {
-                            player.addExperience(killExperience);
                         }
                     }
                 }
             }
-        }
 
-        if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
             for (cn.nukkit.item.Item item : ev.getDrops()) {
                 this.getLevel().dropItem(this, item);
             }

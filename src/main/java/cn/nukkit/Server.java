@@ -248,7 +248,7 @@ public class Server {
                 put("sub-motd", "Powered by Nukkit");
                 put("server-port", 19132);
                 put("server-ip", "0.0.0.0");
-                put("view-distance", 10);
+                put("view-distance", 8);
                 put("white-list", false);
                 put("achievements", true);
                 put("announce-player-achievements", false);
@@ -321,7 +321,7 @@ public class Server {
                 put("ansi-title", true);
                 put("worlds-entity-spawning-disabled", "");
                 put("block-listener", true);
-                put("mobs-drop-xp-orbs", true);
+                put("allow-flight", false);
             }
         });
 
@@ -1358,7 +1358,7 @@ public class Server {
 
     public boolean getAllowFlight() {
         if (getAllowFlight == null) {
-            getAllowFlight = true; // If false, this just cause problems. Use anticheat plugin if you want.
+            getAllowFlight = this.getPropertyBoolean("allow-flight", false);
         }
         return getAllowFlight;
     }

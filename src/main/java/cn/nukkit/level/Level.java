@@ -66,7 +66,6 @@ public class Level implements ChunkManager, Metadatable {
 
     private static int levelIdCounter = 1;
     private static int chunkLoaderCounter = 1;
-    public static int COMPRESSION_LEVEL = 8;
 
     public static final int BLOCK_UPDATE_NORMAL = 1;
     public static final int BLOCK_UPDATE_RANDOM = 2;
@@ -118,9 +117,6 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.COCOA_BLOCK] = true;
         randomTickBlocks[Block.FROSTED_ICE] = true;
     }
-
-    // Disable random block ticking in these worlds if SuomiCraft PE mode is enabled
-    public final String doNotTickWorlds = Server.getInstance().getPropertyString("do-not-tick-worlds", "");
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
 
@@ -244,6 +240,8 @@ public class Level implements ChunkManager, Metadatable {
 
     public GameRules gameRules;
 
+    private List<String> noTickingWorlds = new ArrayList<>();
+
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
 
         this.levelId = levelIdCounter++;
@@ -301,6 +299,14 @@ public class Level implements ChunkManager, Metadatable {
         this.tickRate = 1;
 
         this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
+
+        String list = Server.getInstance().getPropertyString("do-not-tick-worlds");
+        if (!list.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                noTickingWorlds.add(tokenizer.nextToken());
+            }
+        }
     }
 
     public static long chunkHash(int x, int z) {
@@ -1104,7 +1110,7 @@ public class Level implements ChunkManager, Metadatable {
                                     int blockId = fullId >> 4;
                                     if (randomTickBlocks[blockId]) {
                                         Block block = Block.get(fullId, this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
-                                        if (!doNotTickWorlds.contains(block.getLevel().getName())) {
+                                        if (this.randomTickingEnabled()) {
                                             block.onUpdate(BLOCK_UPDATE_RANDOM);
                                         }
                                     }
@@ -1125,7 +1131,7 @@ public class Level implements ChunkManager, Metadatable {
                                 blockTest |= fullId;
                                 if (randomTickBlocks[blockId]) {
                                     Block block = Block.get(fullId, this, x, y + (Y << 4), z);
-                                    if (!doNotTickWorlds.contains(block.getLevel().getName())) {
+                                    if (this.randomTickingEnabled()) {
                                         block.onUpdate(BLOCK_UPDATE_RANDOM);
                                     }
                                 }
@@ -1828,17 +1834,16 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 eventDrops = target.getDrops(item);
             }
-             BlockBreakEvent ev = new BlockBreakEvent(player, target, face, item, eventDrops, player.isCreative(),
+            BlockBreakEvent ev = new BlockBreakEvent(player, target, face, item, eventDrops, player.isCreative(),
                     (player.lastBreak + breakTime * 1000) > System.currentTimeMillis());
 
-            double distance;
             if (player.isSurvival() && !target.isBreakable(item)) {
                 ev.setCancelled();
-            } else if (!player.isOp() && (distance = this.server.getSpawnRadius()) > -1) {
+            } else if (!player.isOp() && this.server.getSpawnRadius() > -1) {
                 Vector2 t = new Vector2(target.x, target.z);
                 Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
-                if (!this.server.getOps().getAll().isEmpty() && t.distance(s) <= distance) {
-                    if (!this.server.suomiCraftPEMode()) ev.setCancelled();
+                if (t.distance(s) <= this.server.getSpawnRadius()) {
+                    ev.setCancelled();
                 }
             }
 
@@ -3464,5 +3469,14 @@ public class Level implements ChunkManager, Metadatable {
 
     public int getUpdateLCG() {
         return (this.updateLCG = (this.updateLCG * 3) ^ LCG_CONSTANT);
+    }
+
+    public boolean randomTickingEnabled() {
+        for (String name : this.noTickingWorlds) {
+            if (this.getName().equalsIgnoreCase(name)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

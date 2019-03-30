@@ -19,7 +19,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     public AbstractEntitySpawner(Spawner spawnTask) {
         this.spawnTask = spawnTask;
         String disabledWorlds = Server.getInstance().getPropertyString("worlds-entity-spawning-disabled");
-        if (disabledWorlds != null && !disabledWorlds.trim().isEmpty()) {
+        if (!disabledWorlds.trim().isEmpty()) {
             StringTokenizer tokenizer = new StringTokenizer(disabledWorlds, ", ");
             while (tokenizer.hasMoreTokens()) {
                 disabledSpawnWorlds.add(tokenizer.nextToken());
@@ -30,7 +30,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     @Override
     public void spawn(Collection<Player> onlinePlayers) {
         if (isSpawnAllowedByDifficulty()) {
-            SpawnResult lastSpawnResult = null;
+            SpawnResult lastSpawnResult;
             for (Player player : onlinePlayers) {
                 if (isWorldSpawnAllowed (player.getLevel())) {
                     lastSpawnResult = spawn(player);
@@ -42,9 +42,9 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         }
     }
 
-    private boolean isWorldSpawnAllowed (Level level) {
-        for (String worldName : this.disabledSpawnWorlds) {
-            if (level.getName().toLowerCase().equals(worldName.toLowerCase())) {
+    protected boolean isWorldSpawnAllowed(Level level) {
+        for (String name : this.disabledSpawnWorlds) {
+            if (level.getName().equalsIgnoreCase(name)) {
                 return false;
             }
         }
