@@ -3,8 +3,6 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -13,6 +11,7 @@ import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,6 +105,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (!ev.isCancelled()) {
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                ev.setCancelled(true);
                 this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
                 this.level.addSound(new EndermanTeleportSound(this));
