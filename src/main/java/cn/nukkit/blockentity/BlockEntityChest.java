@@ -207,7 +207,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
     }
 
     public boolean pairWith(BlockEntityChest chest) {
-        if (this.isPaired() || chest.isPaired()) {
+        if (this.isPaired() || chest.isPaired() || this.getBlock().getId() != chest.getBlock().getId()) {
             return false;
         }
 

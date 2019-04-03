@@ -1734,7 +1734,7 @@ public abstract class Entity extends Location implements Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
+                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z), false);
                         this.blocksAround.add(block);
                     }
                 }
