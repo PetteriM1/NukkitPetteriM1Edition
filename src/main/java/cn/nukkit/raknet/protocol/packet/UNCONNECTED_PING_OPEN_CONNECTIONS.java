@@ -20,6 +20,5 @@ public class UNCONNECTED_PING_OPEN_CONNECTIONS extends UNCONNECTED_PING {
         public Packet create() {
             return new UNCONNECTED_PING_OPEN_CONNECTIONS();
         }
-
     }
 }

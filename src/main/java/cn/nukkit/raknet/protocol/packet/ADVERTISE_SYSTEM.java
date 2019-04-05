@@ -20,6 +20,5 @@ public class ADVERTISE_SYSTEM extends UNCONNECTED_PONG {
         public Packet create() {
             return new ADVERTISE_SYSTEM();
         }
-
     }
 }

@@ -43,7 +43,6 @@ public class ChunkRequestTask extends AsyncTask {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
             }
         }
 

@@ -59,7 +59,6 @@ public class NKServiceManager implements ServiceManager {
                         builder.add(registered);
                     }
                 }
-
             }
         }
 
@@ -82,7 +81,6 @@ public class NKServiceManager implements ServiceManager {
                     result = next;
                 }
             }
-
         }
 
         return result;

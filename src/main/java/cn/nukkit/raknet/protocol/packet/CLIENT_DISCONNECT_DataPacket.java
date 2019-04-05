@@ -20,6 +20,5 @@ public class CLIENT_DISCONNECT_DataPacket extends Packet {
         public Packet create() {
             return new CLIENT_DISCONNECT_DataPacket();
         }
-
     }
 }

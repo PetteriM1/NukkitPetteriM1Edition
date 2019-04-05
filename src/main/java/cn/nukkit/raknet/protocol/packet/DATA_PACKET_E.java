@@ -21,7 +21,5 @@ public class DATA_PACKET_E extends DataPacket {
         public Packet create() {
             return new DATA_PACKET_E();
         }
-
     }
-
 }

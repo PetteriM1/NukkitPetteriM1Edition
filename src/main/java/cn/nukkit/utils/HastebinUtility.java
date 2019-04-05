@@ -58,5 +58,4 @@ public class HastebinUtility {
         }
         return upload(content.toString());
     }
-
 }

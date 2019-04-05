@@ -20,5 +20,4 @@ public class ItemDoorIron extends Item {
         super(IRON_DOOR, 0, count, "Iron Door");
         this.block = new BlockDoorIron();
     }
-
 }

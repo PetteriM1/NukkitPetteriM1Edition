@@ -50,5 +50,4 @@ public class EntityExplodeEvent extends EntityEvent implements Cancellable {
     public void setYield(double yield) {
         this.yield = yield;
     }
-
 }

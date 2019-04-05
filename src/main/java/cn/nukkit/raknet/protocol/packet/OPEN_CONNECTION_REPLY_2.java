@@ -49,6 +49,5 @@ public class OPEN_CONNECTION_REPLY_2 extends Packet {
         public Packet create() {
             return new OPEN_CONNECTION_REPLY_2();
         }
-
     }
 }

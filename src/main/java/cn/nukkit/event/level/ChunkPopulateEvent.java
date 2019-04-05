@@ -18,5 +18,4 @@ public class ChunkPopulateEvent extends ChunkEvent {
     public ChunkPopulateEvent(FullChunk chunk) {
         super(chunk);
     }
-
 }

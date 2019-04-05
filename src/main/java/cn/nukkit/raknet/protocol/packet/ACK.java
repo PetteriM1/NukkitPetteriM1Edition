@@ -22,6 +22,5 @@ public class ACK extends AcknowledgePacket {
         public Packet create() {
             return new ACK();
         }
-
     }
 }

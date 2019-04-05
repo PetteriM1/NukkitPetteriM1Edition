@@ -94,7 +94,6 @@ public class PopulationTask extends AsyncTask {
                         } else {
                             this.chunks[index] = ck;
                         }
-
                     }
                 }
 
@@ -130,7 +129,6 @@ public class PopulationTask extends AsyncTask {
                                 chunks[index] = newChunk;
                             }
                         }
-
                     }
                 }
                 this.state = true;

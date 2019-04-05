@@ -15,5 +15,4 @@ public class ItemDoorBirch extends Item {
         super(BIRCH_DOOR, 0, count, "Birch Door");
         this.block = new BlockDoorBirch();
     }
-
 }

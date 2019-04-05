@@ -62,7 +62,6 @@ public class JavaPluginLoader implements PluginLoader {
                 } catch (InstantiationException | IllegalAccessException e) {
                     Server.getInstance().getLogger().logException(e);
                 }
-
             } catch (ClassNotFoundException e) {
                 throw new PluginException("Couldn't load plugin " + description.getName() + ": main class not found");
             }

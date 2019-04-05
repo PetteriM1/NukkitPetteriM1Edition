@@ -28,5 +28,4 @@ public class EntityExitVehicleEvent extends VehicleEvent implements Cancellable 
     public boolean isPlayer() {
         return riding instanceof Player;
     }
-
 }

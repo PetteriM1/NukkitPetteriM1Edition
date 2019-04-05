@@ -53,7 +53,5 @@ public class SERVER_HANDSHAKE_DataPacket extends Packet {
         public Packet create() {
             return new SERVER_HANDSHAKE_DataPacket();
         }
-
     }
-
 }

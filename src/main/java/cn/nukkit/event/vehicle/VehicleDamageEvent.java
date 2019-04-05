@@ -33,5 +33,4 @@ public class VehicleDamageEvent extends VehicleEvent implements Cancellable {
     public void setDamage(double damage) {
         this.damage = damage;
     }
-
 }

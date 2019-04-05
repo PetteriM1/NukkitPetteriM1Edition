@@ -34,7 +34,6 @@ public class PlayerInventory extends BaseInventory {
         for (int i = 0; i < this.hotbar.length; i++) {
             this.hotbar[i] = i;
         }
-
     }
 
     @Override

@@ -32,5 +32,4 @@ public class PlayerInvalidMoveEvent extends PlayerEvent implements Cancellable {
     public void setRevert(boolean revert) {
         this.revert = revert;
     }
-
 }

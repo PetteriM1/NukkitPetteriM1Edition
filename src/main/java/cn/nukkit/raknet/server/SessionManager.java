@@ -480,16 +480,14 @@ public class SessionManager {
     }
 
     private void registerPackets() {
-        // fill with dummy returning null
+        // Fill with dummy returning null
         Arrays.fill(this.packetPool, (Packet.PacketFactory) () -> null);
 
-        this.registerPacket(UNCONNECTED_PING_OPEN_CONNECTIONS.ID, new UNCONNECTED_PING_OPEN_CONNECTIONS.Factory());
         this.registerPacket(OPEN_CONNECTION_REQUEST_1.ID, new OPEN_CONNECTION_REQUEST_1.Factory());
         this.registerPacket(OPEN_CONNECTION_REPLY_1.ID, new OPEN_CONNECTION_REPLY_1.Factory());
         this.registerPacket(OPEN_CONNECTION_REQUEST_2.ID, new OPEN_CONNECTION_REQUEST_2.Factory());
         this.registerPacket(OPEN_CONNECTION_REPLY_2.ID, new OPEN_CONNECTION_REPLY_2.Factory());
         this.registerPacket(UNCONNECTED_PONG.ID, new UNCONNECTED_PONG.Factory());
-        this.registerPacket(ADVERTISE_SYSTEM.ID, new ADVERTISE_SYSTEM.Factory());
         this.registerPacket(DATA_PACKET_0.ID, new DATA_PACKET_0.Factory());
         this.registerPacket(DATA_PACKET_1.ID, new DATA_PACKET_1.Factory());
         this.registerPacket(DATA_PACKET_2.ID, new DATA_PACKET_2.Factory());

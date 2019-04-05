@@ -187,7 +187,6 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
                             ) {
                         return powerLevel - 1;
                     }
-
                 }
             }
         }

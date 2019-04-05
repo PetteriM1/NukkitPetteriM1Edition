@@ -24,7 +24,6 @@ public class FloatEntityData extends EntityData<Float> {
         } else {
             this.data = data;
         }
-
     }
 
     @Override

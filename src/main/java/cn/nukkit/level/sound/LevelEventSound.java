@@ -41,5 +41,4 @@ public class LevelEventSound extends Sound {
 
         return new DataPacket[]{pk};
     }
-
 }

@@ -27,5 +27,4 @@ public class InstantSpellParticle extends SpellParticle {
         //this 0x01 is the only difference between instant spell and non-instant one
         super(pos, r, g, b, 0x01);
     }
-
 }

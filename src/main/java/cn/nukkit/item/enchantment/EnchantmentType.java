@@ -50,7 +50,6 @@ public enum EnchantmentType {
                 default:
                     return false;
             }
-
         } else {
             switch (this) {
                 case SWORD:

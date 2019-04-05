@@ -578,7 +578,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
             }
         }
-
     }
 
     private void applyDrag() {

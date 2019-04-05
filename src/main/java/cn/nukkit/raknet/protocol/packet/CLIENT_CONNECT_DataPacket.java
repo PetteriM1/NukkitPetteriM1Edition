@@ -40,6 +40,5 @@ public class CLIENT_CONNECT_DataPacket extends Packet {
         public Packet create() {
             return new CLIENT_CONNECT_DataPacket();
         }
-
     }
 }

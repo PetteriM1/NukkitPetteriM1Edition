@@ -34,6 +34,5 @@ public class PING_DataPacket extends Packet {
         public Packet create() {
             return new PING_DataPacket();
         }
-
     }
 }

@@ -128,5 +128,4 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     public Item toItem() {
         return new ItemBlock(this, 0);
     }
-
 }

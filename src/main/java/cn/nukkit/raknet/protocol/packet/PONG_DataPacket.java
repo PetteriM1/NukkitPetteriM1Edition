@@ -34,6 +34,5 @@ public class PONG_DataPacket extends Packet {
         public Packet create() {
             return new PONG_DataPacket();
         }
-
     }
 }

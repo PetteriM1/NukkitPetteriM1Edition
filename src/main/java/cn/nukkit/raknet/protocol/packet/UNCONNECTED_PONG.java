@@ -43,6 +43,5 @@ public class UNCONNECTED_PONG extends Packet {
         public Packet create() {
             return new UNCONNECTED_PONG();
         }
-
     }
 }

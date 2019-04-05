@@ -352,7 +352,6 @@ public abstract class BaseInventory implements Inventory {
                     if (slot.getCount() <= 0) {
                         itemSlots.remove(slot);
                     }
-
                 }
             }
 

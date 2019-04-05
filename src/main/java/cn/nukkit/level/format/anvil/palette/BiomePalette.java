@@ -94,7 +94,6 @@ public final class BiomePalette {
                 encodedData.fromRaw(raw);
             }
         }
-
     }
 
     public synchronized int[] toRaw() {

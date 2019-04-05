@@ -53,5 +53,4 @@ public class BlockEntityEnchantTable extends BlockEntitySpawnable implements Blo
 
         return c;
     }
-
 }

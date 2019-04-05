@@ -54,5 +54,4 @@ public class ItemSkull extends Item {
     public boolean isHelmet() {
         return true;
     }
-    
 }

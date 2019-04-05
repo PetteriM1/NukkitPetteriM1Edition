@@ -65,5 +65,4 @@ public class BlockSoulSand extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.SAND_BLOCK_COLOR;
     }
-
 }

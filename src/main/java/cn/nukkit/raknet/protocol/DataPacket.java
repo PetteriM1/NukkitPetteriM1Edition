@@ -61,5 +61,4 @@ public abstract class DataPacket extends Packet {
         packet.packets = new ConcurrentLinkedQueue<>(this.packets);
         return packet;
     }
-
 }

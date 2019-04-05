@@ -1873,7 +1873,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.loadQueue.isEmpty() || !this.spawned) {
             this.sendNextChunk();
         }
-
     }
 
     public boolean canInteract(Vector3 pos, double maxDistance) {
@@ -3172,7 +3171,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             if (potion != null) {
                                                 potion.applyPotion(this);
                                             }
-
                                         } else if (itemInHand.getId() == Item.BUCKET && itemInHand.getDamage() == 1) {
                                             this.server.getPluginManager().callEvent(consumeEvent);
                                             if (consumeEvent.isCancelled()) {

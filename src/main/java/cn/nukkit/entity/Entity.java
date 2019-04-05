@@ -634,7 +634,6 @@ public abstract class Entity extends Location implements Metadatable {
         if (effect.getId() == Effect.HEALTH_BOOST) {
             this.setHealth(this.getHealth() + 4 * (effect.getAmplifier() + 1));
         }
-
     }
 
     protected void recalculateEffectColor() {
@@ -701,7 +700,6 @@ public abstract class Entity extends Location implements Metadatable {
                 } catch (Exception e) {
                     MainLogger.getLogger().logException(e);
                 }
-
             }
         }
 
@@ -1684,7 +1682,6 @@ public abstract class Entity extends Location implements Metadatable {
                 } else {
                     this.ySize += 0.5;
                 }
-
             }
 
             this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;

@@ -15,5 +15,4 @@ public class VehicleCreateEvent extends VehicleEvent implements Cancellable {
     public VehicleCreateEvent(EntityVehicle vehicle) {
         super(vehicle);
     }
-
 }

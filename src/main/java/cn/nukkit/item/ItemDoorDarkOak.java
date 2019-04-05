@@ -15,5 +15,4 @@ public class ItemDoorDarkOak extends Item {
         super(DARK_OAK_DOOR, 0, count, "Dark Oak Door");
         this.block = new BlockDoorDarkOak();
     }
-
 }

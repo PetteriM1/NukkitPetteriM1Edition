@@ -149,5 +149,4 @@ public class HandlerList {
             return new ArrayList<>(allLists);
         }
     }
-
 }

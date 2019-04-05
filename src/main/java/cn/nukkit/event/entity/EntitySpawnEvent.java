@@ -54,5 +54,4 @@ public class EntitySpawnEvent extends EntityEvent {
     public boolean isItem() {
         return this.entity instanceof EntityItem;
     }
-
 }

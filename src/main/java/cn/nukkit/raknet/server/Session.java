@@ -359,7 +359,6 @@ public class Session {
                 this.reliableWindow.put(packet.messageIndex, packet);
             }
         }
-
     }
 
     public int getState() {

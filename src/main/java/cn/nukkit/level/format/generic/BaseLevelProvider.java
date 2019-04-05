@@ -281,7 +281,6 @@ public abstract class BaseLevelProvider implements LevelProvider {
                     lastRegion.set(null);
                     iter.remove();
                 }
-
             }
         }
     }

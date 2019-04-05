@@ -48,6 +48,5 @@ public class OPEN_CONNECTION_REQUEST_2 extends Packet {
         public Packet create() {
             return new OPEN_CONNECTION_REQUEST_2();
         }
-
     }
 }

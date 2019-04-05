@@ -23,5 +23,4 @@ public class EntityVehicleExitEvent extends EntityEvent implements Cancellable {
     public EntityVehicle getVehicle() {
         return vehicle;
     }
-
 }

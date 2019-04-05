@@ -57,5 +57,4 @@ public class PluginClassLoader extends URLClassLoader {
     Set<String> getClasses() {
         return classes.keySet();
     }
-
 }

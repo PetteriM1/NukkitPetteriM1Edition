@@ -103,5 +103,4 @@ public class ItemPainting extends Item {
 
         return false;
     }
-
 }

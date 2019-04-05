@@ -62,7 +62,6 @@ public class GenerationTask extends AsyncTask {
                 manager.cleanChunks(level.getSeed());
             }
         }
-
     }
 
     @Override

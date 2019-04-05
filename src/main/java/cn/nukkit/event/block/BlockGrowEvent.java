@@ -26,5 +26,4 @@ public class BlockGrowEvent extends BlockEvent implements Cancellable {
     public Block getNewState() {
         return newState;
     }
-
 }

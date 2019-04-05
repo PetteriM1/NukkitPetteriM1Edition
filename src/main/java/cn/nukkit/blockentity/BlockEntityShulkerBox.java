@@ -234,5 +234,4 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
         return c;
     }
-
 }

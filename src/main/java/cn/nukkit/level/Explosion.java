@@ -206,5 +206,4 @@ public class Explosion {
 
         return true;
     }
-
 }

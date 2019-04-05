@@ -48,7 +48,5 @@ public class CLIENT_HANDSHAKE_DataPacket extends Packet {
         public Packet create() {
             return new CLIENT_HANDSHAKE_DataPacket();
         }
-
     }
-
 }

@@ -36,6 +36,5 @@ public class UNCONNECTED_PING extends Packet {
         public Packet create() {
             return new UNCONNECTED_PING();
         }
-
     }
 }
