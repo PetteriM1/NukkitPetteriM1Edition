@@ -2153,4 +2153,9 @@ public abstract class Entity extends Location implements Metadatable {
 
         return Entity.createEntity(type.toString(), chunk, nbt, args);
     }
+
+    public boolean isOnLadder() {
+        int b = this.getLevelBlock().getId();
+        return b == Block.LADDER || b == Block.VINES;
+    }
 }

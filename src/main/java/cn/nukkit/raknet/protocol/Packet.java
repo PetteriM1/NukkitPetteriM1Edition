@@ -82,7 +82,7 @@ public abstract class Packet implements Cloneable {
             int port = this.getShort();
             return new InetSocketAddress(addr, port);
         } else {
-            //todo IPV6 SUPPORT
+            // TODO: IPV6 SUPPORT
             return null;
         }
     }
@@ -143,8 +143,6 @@ public abstract class Packet implements Cloneable {
                 this.putByte((byte) ((~Integer.valueOf(b)) & 0xff));
             }
             this.putShort(port);
-        } else {
-            //todo ipv6
         }
     }
 

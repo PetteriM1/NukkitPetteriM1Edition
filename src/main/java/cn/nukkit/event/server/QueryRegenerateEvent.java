@@ -23,8 +23,6 @@ public class QueryRegenerateEvent extends ServerEvent {
         return handlers;
     }
 
-    private static final String GAME_ID = "MINECRAFTPE";
-
     private int timeout;
     private String serverName;
     private boolean listPlugins;
@@ -163,7 +161,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         LinkedHashMap<String, String> KVdata = new LinkedHashMap<>();
         KVdata.put("hostname", this.serverName);
         KVdata.put("gametype", this.gameType);
-        KVdata.put("game_id", GAME_ID);
+        KVdata.put("game_id", "MINECRAFTPE");
         KVdata.put("version", this.version);
         KVdata.put("server_engine", this.server_engine);
         KVdata.put("plugins", plist);

@@ -260,7 +260,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[COLORED_TORCH_RG] = BlockColoredTorchRG.class; //202
             list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
             list[COLORED_TORCH_BP] = BlockColoredTorchBP.class; //204
-            list[UNDYED_SHULKER_BOX] = BlockShulkerBox.class; //205
+            list[UNDYED_SHULKER_BOX] = BlockUndyedShulkerBox.class; //205
             list[END_BRICKS] = BlockBricksEndStone.class; //206
             list[FROSTED_ICE] = BlockIceFrosted.class; //207
             list[END_ROD] = BlockEndRod.class; //208

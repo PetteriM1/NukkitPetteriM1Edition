@@ -257,6 +257,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
             }
 
+            if (this.isOnLadder()) {
+                this.resetFallDistance();
+            }
+
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
                 if (this instanceof EntitySwimming || (this instanceof Player && ((Player) this).isCreative())) {
                     this.setAirTicks(400);
