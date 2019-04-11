@@ -99,7 +99,7 @@ public class EntityPig extends EntityWalkingAnimal {
             }
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     public int getKillExperience() {

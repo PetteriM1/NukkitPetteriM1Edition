@@ -116,7 +116,7 @@ public class EntityWitch extends EntityWalkingMob {
             drops.add(Item.get(Item.REDSTONE, 0, 1));
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override

@@ -876,10 +876,10 @@ public class Level implements ChunkManager, Metadatable {
             this.chunkPackets.clear();
         }
 
-        if(gameRules.isStale()) {
+        if (gameRules.isStale()) {
             GameRulesChangedPacket packet = new GameRulesChangedPacket();
             packet.gameRules = gameRules;
-            Server.broadcastPacket(players.values().toArray(new Player[players.size()]), packet);
+            Server.broadcastPacket(players.values().toArray(new Player[0]), packet);
             gameRules.refresh();
         }
 
@@ -1360,6 +1360,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public AxisAlignedBB[] getCollisionCubes(Entity entity, AxisAlignedBB bb, boolean entities) {
+        return getCollisionCubes(entity, bb, entities, false);
+    }
+
+    public AxisAlignedBB[] getCollisionCubes(Entity entity, AxisAlignedBB bb, boolean entities, boolean solidEntities) {
         int minX = NukkitMath.floorDouble(bb.minX);
         int minY = NukkitMath.floorDouble(bb.minY);
         int minZ = NukkitMath.floorDouble(bb.minZ);
@@ -1380,9 +1384,11 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (entities) {
+        if (entities || solidEntities) {
             for (Entity ent : this.getCollidingEntities(bb.grow(0.25f, 0.25f, 0.25f), entity)) {
-                collides.add(ent.boundingBox.clone());
+                if (solidEntities && !ent.canPassThrough()) {
+                    collides.add(ent.boundingBox.clone());
+                }
             }
         }
 
@@ -2417,7 +2423,7 @@ public class Level implements ChunkManager, Metadatable {
         this.getChunk(x >> 4, z >> 4, true).setBiomeColor(x & 0x0f, z & 0x0f, R, G, B);
     }
 
-    public Map<Long,? extends FullChunk> getChunks() {
+    public Map<Long, ? extends FullChunk> getChunks() {
         return provider.getLoadedChunks();
     }
 

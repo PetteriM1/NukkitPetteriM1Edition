@@ -950,4 +950,28 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public boolean canSilkTouch() {
        return false;
     }
+
+    public double getMinX() {
+        return this.x;
+    }
+
+    public double getMinY() {
+        return this.y;
+    }
+
+    public double getMinZ() {
+        return this.z;
+    }
+
+    public double getMaxX() {
+        return this.x + 1;
+    }
+
+    public double getMaxY() {
+        return this.y + 1;
+    }
+
+    public double getMaxZ() {
+        return this.z + 1;
+    }
 }

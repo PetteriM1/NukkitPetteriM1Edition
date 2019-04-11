@@ -112,7 +112,7 @@ public class EntityShulker extends EntityWalkingMob {
             drops.add(Item.get(Item.SHULKER_SHELL, 0, 1));
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override

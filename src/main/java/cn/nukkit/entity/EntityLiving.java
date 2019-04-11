@@ -122,7 +122,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 // Critical hit
                 if (damager instanceof Player && !damager.onGround) {
                     AnimatePacket animate = new AnimatePacket();
-                    animate.action = 4; // Critical hit id
+                    animate.action = AnimatePacket.Action.CRITICAL_HIT;
                     animate.eid = getId();
 
                     this.getLevel().addChunkPacket(damager.getChunkX(), damager.getChunkZ(), animate);
@@ -301,7 +301,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             this.attackTime -= tickDiff;
         }
         if (this.riding == null) {
-            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D), this)) {
+            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this)) {
                 if (entity instanceof EntityRideable) {
                     this.collidingWith(entity);
                 }

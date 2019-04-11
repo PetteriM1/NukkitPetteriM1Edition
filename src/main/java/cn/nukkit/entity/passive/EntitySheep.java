@@ -128,7 +128,7 @@ public class EntitySheep extends EntityWalkingAnimal {
             }
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
 
