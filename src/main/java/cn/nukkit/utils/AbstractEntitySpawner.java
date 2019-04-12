@@ -59,6 +59,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
             if (pos != null) {
                 pos.x += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
                 pos.z += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
+                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return SpawnResult.ERROR;
                 pos.y = this.spawnTask.getSafeYCoord(level, pos, 3);
             }
 
