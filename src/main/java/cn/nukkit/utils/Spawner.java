@@ -14,6 +14,7 @@ import java.util.List;
 public class Spawner extends Thread {
 
     private final List<EntitySpawner> entitySpawners = Arrays.asList(
+            new BlazeSpawner(this),
             new ChickenSpawner(this),
             new CodSpawner(this),
             new CowSpawner(this),
@@ -21,6 +22,7 @@ public class Spawner extends Thread {
             new DolphinSpawner(this),
             new DonkeySpawner(this),
             new EndermanSpawner(this),
+            new GhastSpawner(this),
             new HorseSpawner(this),
             new HuskSpawner(this),
             new MagmaCubeSpawner(this),
