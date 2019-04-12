@@ -2,14 +2,13 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.EntityWalkingAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,25 +108,25 @@ public class EntityChicken extends EntityWalkingAnimal {
     public boolean onInteract(Player player, Item item) {
         super.onInteract(player, item);
         if ((item.equals(Item.get(Item.SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
                     this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
                     Item.get(Item.SEEDS)));
             this.setInLove();
         } else if ((item.equals(Item.get(Item.BEETROOT_SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.BEETROOT_SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
                     this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
                     Item.get(Item.BEETROOT_SEEDS)));
             this.setInLove();
         } else if ((item.equals(Item.get(Item.MELON_SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.MELON_SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
                     this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
                     Item.get(Item.MELON_SEEDS)));
             this.setInLove();
         } else if ((item.equals(Item.get(Item.PUMPKIN_SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.PUMPKIN_SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
                     this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
                     Item.get(Item.PUMPKIN_SEEDS)));

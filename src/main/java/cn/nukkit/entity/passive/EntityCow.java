@@ -2,14 +2,13 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.EntityWalkingAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,11 +54,11 @@ public class EntityCow extends EntityWalkingAnimal {
         super.onInteract(player, item);
 
         if (item.equals(Item.get(Item.BUCKET, 0), true) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.BUCKET, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
         } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.WHEAT, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
             this.setInLove();
         }

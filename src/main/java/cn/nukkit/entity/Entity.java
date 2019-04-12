@@ -132,7 +132,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_SCORE_TAG = 83; //String
     public static final int DATA_BALLOON_ATTACHED_ENTITY = 84; // long
     public static final int DATA_PUFFERFISH_SIZE = 85;
-    public static final int DATA_FLAGS2 = 91; //long (extended data flags)
+    public static final int DATA_FLAGS2 = 91, DATA_FLAGS_EXTENDED = 91; //long (extended data flags)
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;

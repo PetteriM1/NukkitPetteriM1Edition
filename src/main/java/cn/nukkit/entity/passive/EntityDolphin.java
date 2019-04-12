@@ -68,7 +68,7 @@ public class EntityDolphin extends EntityWaterAnimal {
     public boolean onInteract(Player player, Item item) {
         super.onInteract(player, item);
         if (item.equals(Item.get(Item.RAW_FISH,0,1)) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.RAW_FISH, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.RAW_FISH)));
             this.setInLove();

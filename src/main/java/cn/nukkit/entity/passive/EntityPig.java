@@ -2,13 +2,12 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.EntityWalkingAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,17 +66,17 @@ public class EntityPig extends EntityWalkingAnimal {
     public boolean onInteract(Player player, Item item) {
         super.onInteract(player, item);
         if (item.equals(Item.get(Item.CARROT,0)) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.CARROT,0,1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));
             this.setInLove();
             return true;
         } else if (item.equals(Item.get(Item.POTATO,0)) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.POTATO,0,1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.POTATO)));
             this.setInLove();
             return true;
         } else if (item.equals(Item.get(Item.BEETROOT,0)) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.BEETROOT,0,1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.BEETROOT)));
             this.setInLove();
             return true;

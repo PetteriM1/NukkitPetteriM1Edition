@@ -312,9 +312,9 @@ public class EntityBoat extends EntityVehicle {
         if (entity.riding != null) {
             updatePassengers(true);
 
-            entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90));
-            entity.setDataProperty(new FloatEntityData(DATA_RIDER_MIN_ROTATION, -90));
             entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1));
+            entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90));
+            entity.setDataProperty(new FloatEntityData(DATA_RIDER_MIN_ROTATION, this.passengers.indexOf(entity) == 1 ? -90 : 0));
         }
 
         return r;

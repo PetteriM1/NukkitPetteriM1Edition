@@ -11,6 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.scheduler.NukkitRunnable;
 import cn.nukkit.utils.DyeColor;
 
 import java.util.ArrayList;
@@ -79,14 +80,19 @@ public class ItemFirework extends Item {
         if (player.getInventory().getChestplate() instanceof ItemElytra && player.isGliding()) {
             this.spawnFirework(player.getLevel(), player);
 
+            if (!player.isCreative()) {
+                // HACK: Fix item count not decrease when clicking air
+                new NukkitRunnable() {
+                    public void run() {
+                        player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                    }
+                }.runTaskLater(null, 1);
+            }
+
             player.setMotion(new Vector3(
                     -Math.sin(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 2,
                     -Math.sin(Math.toRadians(player.pitch)) * 2,
                     Math.cos(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 2));
-
-            if (!player.isCreative()) {
-                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            }
 
             return true;
         }

@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBanner;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBanner;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
@@ -100,7 +99,11 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
 
     @Override
     public Item toItem() {
-        return new ItemBanner(this.getDamage() & 0x0f);
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (blockEntity instanceof BlockEntityBanner) {
+            return Item.get(Item.BANNER, ((BlockEntityBanner) blockEntity).getBaseColor() & 0xf);
+        }
+        return Item.get(Item.BANNER);
     }
 
     @Override
