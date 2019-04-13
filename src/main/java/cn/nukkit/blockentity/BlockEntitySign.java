@@ -51,7 +51,9 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         }
 
         // Check old text to sanitize
-        sanitizeText(text);
+        if (text != null) {
+            sanitizeText(text);
+        }
 
         super.initBlockEntity();
     }
@@ -137,7 +139,9 @@ public class BlockEntitySign extends BlockEntitySpawnable {
     private static void sanitizeText(String[] lines) {
         for (int i = 0; i < lines.length; i++) {
             // Don't allow excessive text per line
-            lines[i] = lines[i].substring(0, Math.min(255, lines[i].length()));
+            if (lines[i] != null) {
+                lines[i] = lines[i].substring(0, Math.min(255, lines[i].length()));
+            }
         }
     }
 }

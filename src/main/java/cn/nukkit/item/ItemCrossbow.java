@@ -139,7 +139,7 @@ public class ItemCrossbow extends ItemBow {
                     } else {
                         proj.spawnToAll();
                         player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_SHOOT);
-                        this.clearNamedTag();
+                        this.loaded = false;
                     }
                 } else {
                     entityShootBowEvent.getProjectile().spawnToAll();
