@@ -148,14 +148,14 @@ public class Server {
 
     private Network network;
 
-    private boolean networkCompressionAsync = true;
-    public int networkCompressionLevel = 1;
-    private int networkZlibProvider = 0;
+    private boolean networkCompressionAsync;
+    public int networkCompressionLevel;
+    private int networkZlibProvider;
 
-    private boolean autoTickRate = true;
-    private int autoTickRateLimit = 20;
-    private boolean alwaysTickPlayers = false;
-    private int baseTickRate = 1;
+    private boolean autoTickRate;
+    private int autoTickRateLimit;
+    private boolean alwaysTickPlayers;
+    private int baseTickRate;
     private Boolean getAllowFlight = null;
     private int difficulty = Integer.MAX_VALUE;
     private int defaultGamemode = Integer.MAX_VALUE;
@@ -165,7 +165,7 @@ public class Server {
 
     private BaseLang baseLang;
 
-    private boolean forceLanguage = false;
+    private boolean forceLanguage;
 
     private UUID serverID;
 
@@ -1104,9 +1104,7 @@ public class Server {
         }
 
         if ((this.tickCounter & 0b1111) == 0) {
-            this.getScheduler().scheduleTask(null, () -> {
-                this.titleTick();
-            }, true);
+            this.titleTick();
 
             this.network.resetStatistics();
             this.maxTick = 20;

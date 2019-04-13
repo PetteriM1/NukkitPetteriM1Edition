@@ -9,7 +9,7 @@ public class Watchdog extends Thread {
 
     private final Server server;
     private final long time;
-    public boolean running = true;
+    public boolean running;
     private boolean responding = true;
 
     public Watchdog(Server server, long time) {

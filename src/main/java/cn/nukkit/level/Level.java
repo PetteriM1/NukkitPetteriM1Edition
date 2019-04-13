@@ -1093,14 +1093,13 @@ public class Level implements ChunkManager, Metadatable {
                 for (Entity entity : chunk.getEntities().values()) {
                     entity.scheduleUpdate();
                 }
-                int tickSpeed = 3;
 
-                if (tickSpeed > 0) {
+                if (this.randomTickingEnabled()) {
                     if (this.useSections) {
                         for (ChunkSection section : ((Chunk) chunk).getSections()) {
                             if (!(section instanceof EmptyChunkSection)) {
                                 int Y = section.getY();
-                                for (int i = 0; i < tickSpeed; ++i) {
+                                for (int i = 0; i < 3; ++i) {
                                     int lcg = this.getUpdateLCG();
                                     int x = lcg & 0x0f;
                                     int y = lcg >>> 8 & 0x0f;
@@ -1110,9 +1109,7 @@ public class Level implements ChunkManager, Metadatable {
                                     int blockId = fullId >> 4;
                                     if (randomTickBlocks[blockId]) {
                                         Block block = Block.get(fullId, this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
-                                        if (this.randomTickingEnabled()) {
-                                            block.onUpdate(BLOCK_UPDATE_RANDOM);
-                                        }
+                                        block.onUpdate(BLOCK_UPDATE_RANDOM);
                                     }
                                 }
                             }
@@ -1120,7 +1117,7 @@ public class Level implements ChunkManager, Metadatable {
                     } else {
                         for (int Y = 0; Y < 8 && (Y < 3 || blockTest != 0); ++Y) {
                             blockTest = 0;
-                            for (int i = 0; i < tickSpeed; ++i) {
+                            for (int i = 0; i < 3; ++i) {
                                 int lcg = this.getUpdateLCG();
                                 int x = lcg & 0x0f;
                                 int y = lcg >>> 8 & 0x0f;
@@ -1131,9 +1128,7 @@ public class Level implements ChunkManager, Metadatable {
                                 blockTest |= fullId;
                                 if (randomTickBlocks[blockId]) {
                                     Block block = Block.get(fullId, this, x, y + (Y << 4), z);
-                                    if (this.randomTickingEnabled()) {
-                                        block.onUpdate(BLOCK_UPDATE_RANDOM);
-                                    }
+                                    block.onUpdate(BLOCK_UPDATE_RANDOM);
                                 }
                             }
                         }
