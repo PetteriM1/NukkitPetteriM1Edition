@@ -5,6 +5,7 @@ import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.Explosion;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -62,11 +63,13 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     public void explode() {
         this.close();
         this.kill();
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
-        this.server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) return;
-		Explosion explode = new Explosion(this, (float) ev.getForce(), this);
-		explode.explodeA();
-		explode.explodeB();
+        if (this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) {
+            ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
+            this.server.getPluginManager().callEvent(ev);
+            if (ev.isCancelled()) return;
+            Explosion explode = new Explosion(this, (float) ev.getForce(), this);
+            explode.explodeA();
+            explode.explodeB();
+        }
     }
 }

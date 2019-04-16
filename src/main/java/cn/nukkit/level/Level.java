@@ -710,7 +710,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void checkTime() {
-        if (!this.stopTime) {
+        if (!this.stopTime && this.getGameRules().getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
             this.time += tickRate;
         }
     }
@@ -737,12 +737,12 @@ public class Level implements ChunkManager, Metadatable {
         updateBlockLight(lightQueue);
         this.checkTime();
         
-        if (stopTime) {
+        if (stopTime || !this.getGameRules().getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
             this.sendTime();
         }
 
         // Tick Weather
-        if (this.getServer().getPropertyBoolean("weather", true) && !this.getServer().getPropertyString("do-not-tick-worlds", "").contains(this.getName()) && !this.getName().equals("nether") && !this.getName().equals("end")) {
+        if (this.getGameRules().getBoolean(GameRule.DO_WEATHER_CYCLE) && !this.getServer().getPropertyString("do-not-tick-worlds", "").contains(this.getName()) && !this.getName().equals("nether") && !this.getName().equals("end")) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -1099,7 +1099,7 @@ public class Level implements ChunkManager, Metadatable {
                         for (ChunkSection section : ((Chunk) chunk).getSections()) {
                             if (!(section instanceof EmptyChunkSection)) {
                                 int Y = section.getY();
-                                for (int i = 0; i < 3; ++i) {
+                                for (int i = 0; i < getGameRules().getInteger(GameRule.RANDOM_TICK_SPEED); ++i) {
                                     int lcg = this.getUpdateLCG();
                                     int x = lcg & 0x0f;
                                     int y = lcg >>> 8 & 0x0f;
@@ -1117,7 +1117,7 @@ public class Level implements ChunkManager, Metadatable {
                     } else {
                         for (int Y = 0; Y < 8 && (Y < 3 || blockTest != 0); ++Y) {
                             blockTest = 0;
-                            for (int i = 0; i < 3; ++i) {
+                            for (int i = 0; i < getGameRules().getInteger(GameRule.RANDOM_TICK_SPEED); ++i) {
                                 int lcg = this.getUpdateLCG();
                                 int x = lcg & 0x0f;
                                 int y = lcg >>> 8 & 0x0f;

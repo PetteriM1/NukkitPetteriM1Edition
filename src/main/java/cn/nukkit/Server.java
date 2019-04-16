@@ -271,7 +271,6 @@ public class Server {
                 put("xbox-auth", true);
                 put("bed-spawnpoints", true);
                 put("explosion-break-blocks", true);
-                put("weather", true);
                 put("stop-in-game", false);
                 put("op-in-game", true);
                 put("xp-bottles-on-creative", true);

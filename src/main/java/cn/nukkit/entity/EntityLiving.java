@@ -196,13 +196,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
         this.server.getPluginManager().callEvent(ev);
 
-        if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+        if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT)) {
             if (ev.getEntity() instanceof BaseEntity) {
                 BaseEntity baseEntity = (BaseEntity) ev.getEntity();
                 if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                     Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
                     if (damager instanceof Player) {
-                        Player player = (Player) damager;
                         int killExperience = baseEntity.getKillExperience();
                         if (killExperience > 0) {
                             this.getLevel().dropExpOrb(this, killExperience);
@@ -271,7 +270,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
                         if (airTicks <= -20) {
                             airTicks = 0;
-                            this.attack(new EntityDamageEvent(this, DamageCause.DROWNING, 2));
+                            if (!(this instanceof Player) || level.getGameRules().getBoolean(GameRule.DROWNING_DAMAGE)) {
+                                this.attack(new EntityDamageEvent(this, DamageCause.DROWNING, 2));
+                            }
                         }
 
                         this.setAirTicks(airTicks);

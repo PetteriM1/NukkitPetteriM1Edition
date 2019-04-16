@@ -2,6 +2,7 @@ package cn.nukkit.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
@@ -48,7 +49,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
                 return false;
             }
         }
-        return true;
+        return level.getGameRules().getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
     protected SpawnResult spawn(Player player) {
