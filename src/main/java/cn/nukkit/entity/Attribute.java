@@ -1,10 +1,4 @@
 package cn.nukkit.entity;
-/**
- * Attribute
- *
- * @author Box, MagicDroidX(code), PeratX @ Nukkit Project
- * @since Nukkit 1.0 | Nukkit API 1.0.0
- */
 
 import cn.nukkit.utils.ServerException;
 
@@ -12,6 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Attribute
+ *
+ * @author Box, MagicDroidX(code), PeratX @ Nukkit Project
+ * @since Nukkit 1.0 | Nukkit API 1.0.0
+ */
 public class Attribute implements Cloneable {
 
     public static final int ABSORPTION = 0;

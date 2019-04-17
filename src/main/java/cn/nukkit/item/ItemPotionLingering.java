@@ -29,7 +29,7 @@ public class ItemPotionLingering extends ProjectileItem {
 
     @Override
     public float getThrowForce() {
-        return 0.47f;
+        return 0.50f;
     }
 
     @Override

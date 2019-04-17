@@ -171,7 +171,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int startAction = -1;
 
     protected Vector3 sleeping = null;
-    protected Long clientID = null;
+    protected Long clientID;
 
     private int loaderId;
 
@@ -190,7 +190,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected final int chunksPerTick;
     protected final int spawnThreshold;
 
-    protected Position spawnPosition = null;
+    protected Position spawnPosition;
 
     protected int inAirTicks = 0;
     protected int startAirTicks = 5;
@@ -203,7 +203,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
 
-    private PermissibleBase perm = null;
+    private PermissibleBase perm;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -1708,6 +1708,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.spawned) {
             this.processMovement(tickDiff);
+            this.motionX = this.motionY = this.motionZ = 0; // HACK: fix player knockback being messed up
 
             if (!this.isSpectator()) {
                 this.checkNearEntities();

@@ -18,6 +18,7 @@ import java.util.UUID;
  * @since Nukkit 1.0 | Nukkit API 1.0.0
  */
 public class OfflinePlayer implements IPlayer {
+
     private final String name;
     private final Server server;
     private final CompoundTag namedTag;

@@ -13,9 +13,9 @@ import cn.nukkit.potion.Effect;
  */
 public class PlayerFood {
 
-    private int foodLevel = 20;
+    private int foodLevel;
     private final int maxFoodLevel;
-    private float foodSaturationLevel = 20f;
+    private float foodSaturationLevel;
     private int foodTickTimer = 0;
     private double foodExpLevel = 0;
 

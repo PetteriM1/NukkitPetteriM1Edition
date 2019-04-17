@@ -183,6 +183,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return false;
         }
 
+        if (source instanceof EntityDamageByEntityEvent) {
+            ((EntityDamageByEntityEvent) source).setKnockBack(0.25f);
+        }
+
         super.attack(source);
 
         this.target = null;

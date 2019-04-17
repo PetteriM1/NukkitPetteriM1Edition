@@ -24,11 +24,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
 import co.aikar.timings.Timings;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.*;
 
 /**
  * @author MagicDroidX
@@ -55,8 +51,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     protected boolean invisible = false;
 
     protected float movementSpeed = 0.1f;
-
-    public AtomicBoolean inKnockback = new AtomicBoolean();
 
     protected int turtleTicks = 200;
 
@@ -154,14 +148,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z) {
-        this.knockBack(attacker, damage, x, z, 0.3);
+        this.knockBack(attacker, damage, x, z, 0.4);
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {
-        if (inKnockback.get()) return;
-        inKnockback.set(true);
-        server.getScheduler().scheduleDelayedTask(() -> inKnockback.compareAndSet(true, false), 10);
-
         double f = Math.sqrt(x * x + z * z);
         if (f <= 0) {
             return;
