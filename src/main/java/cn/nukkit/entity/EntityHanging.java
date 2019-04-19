@@ -9,6 +9,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
  * Nukkit Project
  */
 public abstract class EntityHanging extends Entity {
+
     protected int direction;
 
     public EntityHanging(FullChunk chunk, CompoundTag nbt) {

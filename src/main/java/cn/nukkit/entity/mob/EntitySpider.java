@@ -146,11 +146,11 @@ public class EntitySpider extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
             }
 
-            for (int i = 0; i < (EntityUtils.rand(0, 3) == 0 ? 1 : 0); i++) {
+            for (int i = 0; i < (EntityUtils.rand(0, 2) == 0 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
             }
         }

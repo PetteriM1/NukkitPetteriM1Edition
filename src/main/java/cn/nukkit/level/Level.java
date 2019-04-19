@@ -128,7 +128,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private final ConcurrentLinkedQueue<BlockEntity> updateBlockEntities = new ConcurrentLinkedQueue<>();
 
-    private boolean cacheChunks = false;
+    private boolean cacheChunks;
 
     private final Server server;
 
@@ -229,12 +229,12 @@ public class Level implements ChunkManager, Metadatable {
         }
     };
 
-    private boolean raining = false;
-    private int rainTime = 0;
-    private boolean thundering = false;
-    private int thunderTime = 0;
+    private boolean raining;
+    private int rainTime;
+    private boolean thundering;
+    private int thunderTime;
 
-    private long levelCurrentTick = 0;
+    private long levelCurrentTick;
 
     private int dimension;
 
@@ -496,7 +496,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addSound(Sound sound, Collection<Player> players) {
-        this.addSound(sound, players.stream().toArray(Player[]::new));
+        this.addSound(sound, players.toArray(new Player[0]));
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType) {
@@ -3232,19 +3232,19 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getLevelMetadata().removeMetadata(this, metadataKey, owningPlugin);
     }
 
-    public void addEntityMotion(int chunkX, int chunkZ, long entityId, double x, double y, double z) {
+    public void addEntityMotion(Entity entity, double x, double y, double z) {
         SetEntityMotionPacket pk = new SetEntityMotionPacket();
-        pk.eid = entityId;
+        pk.eid = entity.getId();
         pk.motionX = (float) x;
         pk.motionY = (float) y;
         pk.motionZ = (float) z;
 
-        this.addChunkPacket(chunkX, chunkZ, pk);
+        Server.broadcastPacket(entity.getViewers().values(), pk);
     }
 
-    public void addEntityMovement(int chunkX, int chunkZ, long entityId, double x, double y, double z, double yaw, double pitch, double headYaw) {
+    public void addEntityMovement(Entity entity, double x, double y, double z, double yaw, double pitch, double headYaw) {
         MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
-        pk.eid = entityId;
+        pk.eid = entity.getId();
         pk.x = (float) x;
         pk.y = (float) y;
         pk.z = (float) z;
@@ -3252,7 +3252,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
 
-        this.addChunkPacket(chunkX, chunkZ, pk);
+        Server.broadcastPacket(entity.getViewers().values(), pk);
     }
 
     public boolean isRaining() {

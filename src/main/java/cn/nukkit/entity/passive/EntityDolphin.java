@@ -51,9 +51,7 @@ public class EntityDolphin extends EntityWaterAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.RAW_FISH, 0, 1));
-            }
+            drops.add(Item.get(Item.RAW_FISH, 0, EntityUtils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

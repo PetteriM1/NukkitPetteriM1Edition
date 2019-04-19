@@ -67,7 +67,7 @@ public class EntityBlazeFireBall extends EntityProjectile {
 
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
+                    this.add(this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }

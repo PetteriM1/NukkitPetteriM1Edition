@@ -7,6 +7,7 @@ import cn.nukkit.plugin.Plugin;
  * This class is provided as an easy way to handle scheduling tasks.
  */
 public abstract class NukkitRunnable implements Runnable {
+
     private TaskHandler taskHandler;
 
     /**

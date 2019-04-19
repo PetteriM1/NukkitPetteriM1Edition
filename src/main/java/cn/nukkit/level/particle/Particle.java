@@ -8,6 +8,7 @@ import cn.nukkit.network.protocol.DataPacket;
  * Nukkit Project
  */
 public abstract class Particle extends Vector3 {
+
     public static final int TYPE_BUBBLE = 1;
     public static final int TYPE_CRITICAL = 2;
     public static final int TYPE_BLOCK_FORCE_FIELD = 3;
@@ -46,9 +47,22 @@ public abstract class Particle extends Vector3 {
     public static final int TYPE_NOTE = 36;
     public static final int TYPE_WITCH_SPELL = 37;
     public static final int TYPE_CARROT = 38;
-    //39 unknown
+    // 39 unknown
     public static final int TYPE_END_ROD = 40;
     public static final int TYPE_DRAGONS_BREATH = 41;
+    public static final int TYPE_SPIT = 42;
+    public static final int TYPE_TOTEM = 43;
+    public static final int TYPE_FOOD = 44;
+    public static final int TYPE_FIREWORKS_STARTER = 45;
+    public static final int TYPE_FIREWORKS_SPARK = 46;
+    public static final int TYPE_FIREWORKS_OVERLAY = 47;
+    public static final int TYPE_BALLOON_GAS = 48;
+    public static final int TYPE_COLORED_FLAME = 49;
+    public static final int TYPE_SPARKLER = 50;
+    public static final int TYPE_CONDUIT = 51;
+    public static final int TYPE_BUBBLE_COLUMN_UP = 52;
+    public static final int TYPE_BUBBLE_COLUMN_DOWN = 53;
+    public static final int TYPE_SNEEZE = 54;
 
     public Particle() {
         super(0, 0, 0);

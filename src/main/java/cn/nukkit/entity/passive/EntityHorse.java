@@ -15,9 +15,9 @@ public class EntityHorse extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 23;
 
-    private int Type = 0;
+    private int type = 0;
 
-    private int Variant = this.getRandomVariant();
+    private int variant = this.getRandomVariant();
 
     public EntityHorse(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -58,8 +58,8 @@ public class EntityHorse extends EntityWalkingAnimal {
     @Override
     public void saveNBT() {
         super.saveNBT();
-        this.namedTag.putByte("Type", this.Type);
-        this.namedTag.putInt("Variant", this.Variant);
+        this.namedTag.putByte("Type", this.type);
+        this.namedTag.putInt("Variant", this.variant);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class EntityHorse extends EntityWalkingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }
@@ -98,28 +98,28 @@ public class EntityHorse extends EntityWalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
 
     public int getType() {
-        return Type;
+        return type;
     }
 
     public void setType(int type) {
-        Type = type;
+        type = type;
     }
 
     public int getVariant() {
-        return Variant;
+        return this.variant;
     }
 
     public void setVariant(int variant) {
-        Variant = variant;
+        this.variant = variant;
     }
 
     private int getRandomVariant() {
-        int VariantList[] = { 0, 1, 2, 3, 4, 5, 6, 256, 257, 258, 259, 260, 261, 262, 512, 513, 514, 515, 516, 517, 518,
+        int variantList[] = { 0, 1, 2, 3, 4, 5, 6, 256, 257, 258, 259, 260, 261, 262, 512, 513, 514, 515, 516, 517, 518,
                 768, 769, 770, 771, 772, 773, 774, 1024, 1025, 1026, 1027, 1028, 1029, 1030 };
-        return VariantList[EntityUtils.rand(0, VariantList.length)];
+        return variantList[EntityUtils.rand(0, variantList.length - 1)];
     }
 }

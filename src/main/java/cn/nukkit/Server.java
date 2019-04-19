@@ -173,8 +173,6 @@ public class Server {
     private final String dataPath;
     private final String pluginPath;
 
-    private final Set<UUID> uniquePlayers = new HashSet<>();
-
     private QueryHandler queryHandler;
 
     private QueryRegenerateEvent queryRegenerateEvent;
@@ -910,10 +908,6 @@ public class Server {
 
     public void onPlayerCompleteLoginSequence(Player player) {
         this.sendFullPlayerListData(player);
-    }
-
-    public void onPlayerLogin(Player player) {
-        this.uniquePlayers.add(player.getUniqueId());
     }
 
     public void addPlayer(String identifier, Player player) {

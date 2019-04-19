@@ -10,7 +10,7 @@ public class EntityLlamaSpit extends EntityProjectile {
 
     public static final int NETWORK_ID = 102;
 
-    protected boolean critical = false;
+    protected boolean critical;
 
     @Override
     public int getNetworkId() {
@@ -65,7 +65,7 @@ public class EntityLlamaSpit extends EntityProjectile {
         this.timing.startTiming();
 
         if (!this.hadCollision && this.critical) {
-            this.level.addParticle(new CriticalParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
+            this.level.addParticle(new CriticalParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }

@@ -47,7 +47,6 @@ public class Item implements Cloneable, BlockID, ItemID {
     private byte[] tags = new byte[0];
     private CompoundTag cachedNBT = null;
     public int count;
-    protected int durability = 0;
     protected String name;
 
     public Item(int id) {

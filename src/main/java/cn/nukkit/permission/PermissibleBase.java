@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public class PermissibleBase implements Permissible {
 
-    ServerOperator opable = null;
+    ServerOperator opable;
 
     private Permissible parent = null;
 

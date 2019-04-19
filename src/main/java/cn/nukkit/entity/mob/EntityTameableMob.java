@@ -2,9 +2,10 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.entity.EntityTameable;
+import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class EntityTameableMob extends EntityWalkingMob implements EntityTameable {
@@ -87,5 +88,14 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
     @Override
     public void setOwnerUUID(String ownerUUID) {
         this.ownerUUID = ownerUUID;
+    }
+
+    @Override
+    public Vector3 updateMove(int tickDiff) {
+        if (this.isSitting()) {
+            return this.target;
+        }
+
+        return super.updateMove(tickDiff);
     }
 }

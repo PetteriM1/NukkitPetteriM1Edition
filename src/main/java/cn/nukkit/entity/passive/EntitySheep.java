@@ -123,7 +123,7 @@ public class EntitySheep extends EntityWalkingAnimal {
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.WOOL, this.getColor(), 1));
 
-            for (int i = 0; i < EntityUtils.rand(1, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(1, 2); i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_MUTTON : Item.RAW_MUTTON, 0, 1));
             }
         }
@@ -156,6 +156,6 @@ public class EntitySheep extends EntityWalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
 }

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class BlockUpdateScheduler {
+
     private final Level level;
     private long lastTick;
     private Map<Long, LinkedHashSet<BlockUpdateEntry>> queuedUpdates;

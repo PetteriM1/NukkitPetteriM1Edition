@@ -72,16 +72,11 @@ public class EntityRabbit extends EntityJumpingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.RABBIT_HIDE, 0, 1));
-            }
+            drops.add(Item.get(Item.RABBIT_HIDE, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(this.isOnFire() ? Item.COOKED_RABBIT : Item.RAW_RABBIT, 0, EntityUtils.rand(0, 1)));
 
             for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.RABBIT_FOOT, 0, 1));
-            }
-
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(this.isOnFire() ? Item.COOKED_RABBIT : Item.RAW_RABBIT, 0, 1));
             }
         }
 
@@ -90,7 +85,7 @@ public class EntityRabbit extends EntityJumpingAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
     
     @Override

@@ -110,11 +110,11 @@ public class EntityIronGolem extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(3, 6); i++) {
+            for (int i = 0; i < EntityUtils.rand(3, 5); i++) {
                 drops.add(Item.get(Item.IRON_INGOT, 0, 1));
             }
 
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.POPPY, 0, 1));
             }
         }

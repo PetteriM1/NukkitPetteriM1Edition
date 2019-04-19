@@ -129,7 +129,7 @@ public class Potion implements Cloneable {
 
     protected final int level;
 
-    protected boolean splash = false;
+    protected boolean splash;
 
     public Potion(int id) {
         this(id, 1);

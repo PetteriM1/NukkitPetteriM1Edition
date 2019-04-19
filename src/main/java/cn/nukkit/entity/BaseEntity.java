@@ -49,7 +49,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean isMovement() {
-        return this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0 ? this.movement : false;
+        return this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0 && this.movement;
     }
 
     public boolean isKnockback() {

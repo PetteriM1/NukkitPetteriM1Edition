@@ -5,8 +5,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -19,6 +17,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,8 +83,8 @@ public class EntityStray extends EntityWalkingMob {
             this.attackDelay = 0;
 
             double f = 1.2;
-            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-220.0, 220.0) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-120.0, 120.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             if (this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
@@ -128,11 +127,11 @@ public class EntityStray extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.BONE, 0, 1));
             }
 
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ARROW, 0, 1));
             }
         }

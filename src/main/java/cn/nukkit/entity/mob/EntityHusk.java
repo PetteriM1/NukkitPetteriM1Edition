@@ -89,7 +89,7 @@ public class EntityHusk extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
         }

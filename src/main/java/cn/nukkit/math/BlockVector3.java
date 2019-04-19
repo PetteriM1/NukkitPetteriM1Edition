@@ -1,6 +1,7 @@
 package cn.nukkit.math;
 
 public class BlockVector3 implements Cloneable {
+
     public int x;
     public int y;
     public int z;

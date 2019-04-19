@@ -28,15 +28,15 @@ public abstract class Command {
 
     private String label;
 
-    private String[] aliases = new String[0];
+    private String[] aliases;
 
-    private String[] activeAliases = new String[0];
+    private String[] activeAliases;
 
     private CommandMap commandMap = null;
 
-    protected String description = "";
+    protected String description;
 
-    protected String usageMessage = "";
+    protected String usageMessage;
 
     private String permission = null;
 

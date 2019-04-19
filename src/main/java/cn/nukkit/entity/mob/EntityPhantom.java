@@ -3,13 +3,12 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityFlyingMob;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,9 +113,7 @@ public class EntityPhantom extends EntityFlyingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.PHANTOM_MEMBRANE, 0, 1));
-            }
+            drops.add(Item.get(Item.PHANTOM_MEMBRANE, 0, EntityUtils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

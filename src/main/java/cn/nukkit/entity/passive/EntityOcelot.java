@@ -58,7 +58,7 @@ public class EntityOcelot extends EntityTameableAnimal {
     }
 
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
 
     public String getOwnerUUID() {

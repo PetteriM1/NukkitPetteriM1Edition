@@ -60,8 +60,8 @@ public class EntitySnowGolem extends EntityWalkingMob {
             this.attackDelay = 0;
 
             double f = 1.2;
-            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-220.0, 220.0) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-120.0, 120.0) / 10;
             Location location = new Location(this.x + (-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5), this.y + this.getEyeHeight(),
                     this.z + (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5), yaw, pitch, this.level);
             Entity k = EntityUtils.create("Snowball", location, this);
@@ -104,7 +104,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 16); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 15); i++) {
                 drops.add(Item.get(Item.SNOWBALL, 0, 1));
             }
         }

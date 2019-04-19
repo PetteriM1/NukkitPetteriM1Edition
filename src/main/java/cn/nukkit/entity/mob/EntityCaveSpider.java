@@ -2,13 +2,12 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,11 +104,11 @@ public class EntityCaveSpider extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
             }
 
-            for (int i = 0; i < (EntityUtils.rand(0, 3) == 0 ? 1 : 0); i++) {
+            for (int i = 0; i < (EntityUtils.rand(0, 2) == 0 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
             }
         }

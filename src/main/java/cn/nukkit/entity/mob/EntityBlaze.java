@@ -100,12 +100,12 @@ public class EntityBlaze extends EntityFlyingMob {
             }
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
         } else if (EntityUtils.rand(1, 410) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
             this.stayTime = EntityUtils.rand(100, 300);
-            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
             z = EntityUtils.rand(20, 100);
@@ -141,7 +141,6 @@ public class EntityBlaze extends EntityFlyingMob {
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
             }
             this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-            this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
             return this.followTarget;
         }
 
@@ -172,7 +171,6 @@ public class EntityBlaze extends EntityFlyingMob {
                 }
             }
             this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-            this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
         }
 
         double dx = this.motionX * tickDiff;
@@ -194,8 +192,8 @@ public class EntityBlaze extends EntityFlyingMob {
             this.attackDelay = 0;
 
             double f = 1.1;
-            double yaw = this.yaw + EntityUtils.rand(-150, 150) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75, 75) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             Entity k = EntityUtils.create("BlazeFireBall", pos, this);
@@ -228,13 +226,7 @@ public class EntityBlaze extends EntityFlyingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.BLAZE_ROD, 0, 1));
-            }
-
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
-                drops.add(Item.get(Item.GLOWSTONE_DUST, 0, 1));
-            }
+            drops.add(Item.get(Item.BLAZE_ROD, 0, EntityUtils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

@@ -1,19 +1,18 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.math.Vector3;
-import cn.nukkit.event.entity.ProjectileLaunchEvent;
-import cn.nukkit.entity.projectile.EntityLlamaSpit;
-import cn.nukkit.level.Location;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.passive.EntityWalkingAnimal;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.entity.projectile.EntityLlamaSpit;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +113,7 @@ public class EntityLlama extends EntityWalkingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(1, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }

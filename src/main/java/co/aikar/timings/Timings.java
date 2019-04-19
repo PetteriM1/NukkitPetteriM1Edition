@@ -46,7 +46,7 @@ public final class Timings {
 
     private static boolean timingsEnabled = false;
     private static boolean verboseEnabled = false;
-    private static boolean privacy = false;
+    private static boolean privacy;
     private static Set<String> ignoredConfigSections = new HashSet<>();
 
     private static final int MAX_HISTORY_FRAMES = 12;

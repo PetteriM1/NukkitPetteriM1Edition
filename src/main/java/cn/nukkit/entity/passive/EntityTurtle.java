@@ -36,6 +36,6 @@ public class EntityTurtle extends EntityWaterAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
 }

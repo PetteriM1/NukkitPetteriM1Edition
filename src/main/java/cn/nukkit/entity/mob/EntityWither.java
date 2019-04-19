@@ -74,8 +74,8 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
             this.attackDelay = 0;
 
             double f = 1;
-            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
+            double yaw = this.yaw + EntityUtils.rand(-220.0, 220.0) / 10;
+            double pitch = this.pitch + EntityUtils.rand(-120.0, 120.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 

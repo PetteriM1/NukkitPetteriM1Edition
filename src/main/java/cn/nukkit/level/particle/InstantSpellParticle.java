@@ -8,6 +8,7 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.level.particle in project nukkit .
  */
 public class InstantSpellParticle extends SpellParticle {
+
     protected int data;
 
     public InstantSpellParticle(Vector3 pos) {

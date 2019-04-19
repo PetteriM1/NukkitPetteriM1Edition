@@ -48,7 +48,7 @@ public class EntityParrot extends EntityFlyingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(1, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(1, 2); i++) {
                 drops.add(Item.get(Item.FEATHER, 0, 1));
             }
         }
@@ -58,6 +58,6 @@ public class EntityParrot extends EntityFlyingAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
 }

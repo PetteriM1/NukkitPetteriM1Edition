@@ -9,6 +9,7 @@ import java.util.LinkedList;
  * Nukkit Project
  */
 public class AsyncWorker extends Thread implements InterruptibleThread {
+
     private final LinkedList<AsyncTask> stack = new LinkedList<>();
 
     public AsyncWorker() {

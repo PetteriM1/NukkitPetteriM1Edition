@@ -3,8 +3,6 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -12,6 +10,7 @@ import cn.nukkit.item.ItemSwordGold;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,13 +160,8 @@ public class EntityZombiePigman extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
-            }
-
-            for (int i = 0; i < (EntityUtils.rand(0, 101) <= 3 ? 1 : 0); i++) {
-                drops.add(Item.get(Item.GOLD_NUGGET, 0, 1));
-            }
+            drops.add(Item.get(Item.ROTTEN_FLESH, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.GOLD_NUGGET, 0, EntityUtils.rand(0, 1)));
 
             for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.GOLD_SWORD, EntityUtils.rand(5, 30), 1));

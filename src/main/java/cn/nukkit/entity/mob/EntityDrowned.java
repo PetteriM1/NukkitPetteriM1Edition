@@ -3,8 +3,6 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -12,6 +10,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.utils.EntityUtils;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -129,13 +128,11 @@ public class EntityDrowned extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
 
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.GOLD_INGOT, 0, 1));
-            }
+            drops.add(Item.get(Item.GOLD_INGOT, 0, EntityUtils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityEgg;
 import cn.nukkit.entity.item.EntityExpBottle;
+import cn.nukkit.entity.projectile.EntityEnderPearl;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.math.Vector3;
@@ -64,6 +65,9 @@ public abstract class ProjectileItem extends Item {
                 } else {
                     if (!player.isCreative()) {
                         this.count--;
+                    }
+                    if (projectile instanceof EntityEnderPearl) {
+                        player.onThrowEnderPearl();
                     }
                     projectile.spawnToAll();
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);

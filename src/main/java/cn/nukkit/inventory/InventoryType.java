@@ -5,6 +5,7 @@ package cn.nukkit.inventory;
  * Nukkit Project
  */
 public enum InventoryType {
+
     CHEST(27, "Chest", 0),
     ENDER_CHEST(27, "Ender Chest", 0),
     DOUBLE_CHEST(27 + 27, "Double Chest", 0),

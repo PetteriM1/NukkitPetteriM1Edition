@@ -62,12 +62,12 @@ public abstract class EntityWalking extends BaseEntity {
             }
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
         } else if (EntityUtils.rand(1, 410) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
             this.stayTime = EntityUtils.rand(100, 300);
-            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20, 20) / 10, EntityUtils.rand() ? z : -z);
+            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
             z = EntityUtils.rand(20, 100);
@@ -147,7 +147,6 @@ public abstract class EntityWalking extends BaseEntity {
                     }
                 }
                 this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-                this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
                 return this.followTarget;
             }
 
@@ -173,7 +172,6 @@ public abstract class EntityWalking extends BaseEntity {
                     }
                 }
                 this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-                this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
             }
 
             double dx = this.motionX * tickDiff;

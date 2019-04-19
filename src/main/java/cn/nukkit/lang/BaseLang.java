@@ -19,7 +19,7 @@ public class BaseLang {
 
     protected final String langName;
 
-    protected Map<String, String> lang = new HashMap<>();
+    protected Map<String, String> lang;
     protected Map<String, String> fallbackLang = new HashMap<>();
 
 

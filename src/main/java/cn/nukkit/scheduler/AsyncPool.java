@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
  * @author Nukkit Project Team
  */
 public class AsyncPool extends ThreadPoolExecutor {
+
     private final Server server;
 
     public AsyncPool(Server server, int size) {

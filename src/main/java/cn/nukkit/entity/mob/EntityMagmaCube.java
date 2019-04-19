@@ -108,9 +108,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.MAGMA_CREAM, 0, 1));
-            }
+            drops.add(Item.get(Item.MAGMA_CREAM, 0, EntityUtils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

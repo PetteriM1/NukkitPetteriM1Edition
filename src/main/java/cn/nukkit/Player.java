@@ -140,8 +140,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int messageCounter = 2;
 
-    private String clientSecret;
-
     public Vector3 speed = null;
 
     public final HashSet<String> achievements = new HashSet<>();
@@ -283,7 +281,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public String getClientSecret() {
-        return clientSecret;
+        return "null";
     }
 
     /**
@@ -1644,7 +1642,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean setMotion(Vector3 motion) {
         if (super.setMotion(motion)) {
             if (this.chunk != null) {
-                this.getLevel().addEntityMotion(this.chunk.getX(), this.chunk.getZ(), this.getId(), this.motionX, this.motionY, this.motionZ);  //Send to others
+                this.getLevel().addEntityMotion(this, this.motionX, this.motionY, this.motionZ);  // Send to others
                 SetEntityMotionPacket pk = new SetEntityMotionPacket();
                 pk.eid = this.id;
                 pk.motionX = (float) motion.x;
@@ -1992,7 +1990,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.sendPlayStatus(PlayStatusPacket.LOGIN_SUCCESS);
-        this.server.onPlayerLogin(this);
 
         ListTag<DoubleTag> posList = nbt.getList("Pos", DoubleTag.class);
 

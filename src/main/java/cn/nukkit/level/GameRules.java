@@ -18,9 +18,6 @@ public class GameRules {
     private final EnumMap<GameRule, Value> gameRules = new EnumMap<>(GameRule.class);
     private boolean stale;
 
-    private GameRules() {
-    }
-
     public static GameRules getDefault() {
         GameRules gameRules = new GameRules();
 

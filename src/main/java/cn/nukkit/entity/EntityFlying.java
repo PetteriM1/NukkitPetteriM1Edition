@@ -114,7 +114,6 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
                 this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-                this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
             }
 
             Vector3 before = this.target;
@@ -134,7 +133,6 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
                 this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-                this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
             }
 
             double dx = this.motionX * tickDiff;

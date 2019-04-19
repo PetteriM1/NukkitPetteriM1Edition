@@ -56,7 +56,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull {
 
             this.kill();
         } else {
-            this.level.addParticle(new SmokeParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
+            this.level.addParticle(new SmokeParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500)));
         }
 
         this.timing.stopTiming();

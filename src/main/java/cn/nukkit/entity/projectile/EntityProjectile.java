@@ -21,7 +21,7 @@ public abstract class EntityProjectile extends Entity {
 
     public static final int DATA_SHOOTER_ID = 17;
 
-    public Entity shootingEntity = null;
+    public Entity shootingEntity;
 
     public boolean firstTickOnGround = true;
 
