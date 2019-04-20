@@ -31,7 +31,7 @@ public class ZombiePigmanSpawner extends AbstractEntitySpawner {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
             BaseEntity entity = this.spawnTask.createEntity("ZombiePigman", pos.add(0, 1, 0));
-            if (EntityUtils.rand(0, 500) > 480) {
+            if (EntityUtils.rand(1, 20) == 1) {
                 entity.setBaby(true);
             }
         }

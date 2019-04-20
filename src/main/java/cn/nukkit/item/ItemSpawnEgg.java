@@ -8,6 +8,7 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawner;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityZombie;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
@@ -52,7 +53,7 @@ public class ItemSpawnEgg extends Item {
 
         if (target instanceof BlockMobSpawner) {
             BlockEntity blockEntity = level.getBlockEntity(target);
-            if (blockEntity != null && blockEntity instanceof BlockEntitySpawner) {
+            if (blockEntity instanceof BlockEntitySpawner) {
                 ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
             } else {
                 if (blockEntity != null) {
@@ -103,11 +104,12 @@ public class ItemSpawnEgg extends Item {
 
             entity.spawnToAll();
 
-            if (EntityUtils.rand(0, 500) > 480 &&
+            if (EntityUtils.rand(1, 20) == 1 &&
                     (entity instanceof EntityCow ||
                     entity instanceof EntityChicken ||
                     entity instanceof EntityPig ||
-                    entity instanceof EntitySheep)) {
+                    entity instanceof EntitySheep ||
+                    entity instanceof EntityZombie)) {
 
                 ((BaseEntity) entity).setBaby(true);
             }

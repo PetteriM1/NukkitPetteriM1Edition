@@ -164,7 +164,7 @@ public class EntityZombiePigman extends EntityWalkingMob {
             drops.add(Item.get(Item.GOLD_NUGGET, 0, EntityUtils.rand(0, 1)));
 
             for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
-                drops.add(Item.get(Item.GOLD_SWORD, EntityUtils.rand(5, 30), 1));
+                drops.add(Item.get(Item.GOLD_SWORD, EntityUtils.rand(20, 30), 1));
             }
         }
 

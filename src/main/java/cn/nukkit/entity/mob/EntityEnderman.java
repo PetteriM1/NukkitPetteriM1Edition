@@ -109,7 +109,7 @@ public class EntityEnderman extends EntityWalkingMob {
                 this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
                 this.level.addSound(new EndermanTeleportSound(this));
-            } else if (EntityUtils.rand(1, 15) == 5) {
+            } else if (EntityUtils.rand(1, 10) == 1) {
                 this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
                 this.level.addSound(new EndermanTeleportSound(this));

@@ -67,12 +67,15 @@ public class EntitySpider extends EntityWalkingMob {
             }
         }
 
-        Block block = this.getLevel().getBlock(new Vector3(NukkitMath.floorDouble(this.x + dx), (int) this.y, NukkitMath.floorDouble(this.z + dz)));
-        Block directionBlock = block.getSide(this.getDirection());
-        if (!directionBlock.canPassThrough()) {
-            this.motionY = this.getGravity() * 3;
-            return true;
-        }
+        try {
+            Block block = this.getLevel().getBlock(new Vector3(NukkitMath.floorDouble(this.x + dx), (int) this.y, NukkitMath.floorDouble(this.z + dz)));
+            Block directionBlock = block.getSide(this.getDirection());
+            if (!directionBlock.canPassThrough()) {
+                this.motionY = this.getGravity() * 3;
+                return true;
+            }
+        } catch (Exception ignore) {}
+
         return false;
     }
 

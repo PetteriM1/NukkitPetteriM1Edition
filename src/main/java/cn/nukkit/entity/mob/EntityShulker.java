@@ -90,7 +90,7 @@ public class EntityShulker extends EntityWalkingMob {
         super.attack(ev);
 
         if (!ev.isCancelled()) {
-            if (EntityUtils.rand(1, 15) == 5) {
+            if (EntityUtils.rand(1, 10) == 1) {
                 this.level.addSound(new EndermanTeleportSound(this));
                 this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
             }

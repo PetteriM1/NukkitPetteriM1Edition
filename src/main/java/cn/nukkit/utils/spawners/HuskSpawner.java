@@ -37,7 +37,7 @@ public class HuskSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (time > 13184 && time < 22800) {
             BaseEntity entity = this.spawnTask.createEntity("Husk", pos.add(0, 1, 0));
-            if (EntityUtils.rand(0, 500) > 480) {
+            if (EntityUtils.rand(1, 20) == 1) {
                 entity.setBaby(true);
             }
         }

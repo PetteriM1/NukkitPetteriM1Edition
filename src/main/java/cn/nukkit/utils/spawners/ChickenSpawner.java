@@ -30,7 +30,7 @@ public class ChickenSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else {
             BaseEntity entity = this.spawnTask.createEntity("Chicken", pos.add(0, 1, 0));
-            if (EntityUtils.rand(0, 500) > 480) {
+            if (EntityUtils.rand(1, 20) == 1) {
                 entity.setBaby(true);
             }
         }

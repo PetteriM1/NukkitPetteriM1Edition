@@ -35,12 +35,12 @@ public class ZombieSpawner extends AbstractEntitySpawner {
         } else if (time > 13184 && time < 22800) {
             if (EntityUtils.rand(1, 40) == 30) {
                 BaseEntity entity = this.spawnTask.createEntity("ZombieVillager", pos.add(0, 1, 0));
-                if (EntityUtils.rand(0, 500) > 480) {
+                if (EntityUtils.rand(1, 20) == 1) {
                     entity.setBaby(true);
                 }
             } else {
                 BaseEntity entity = this.spawnTask.createEntity("Zombie", pos.add(0, 1, 0));
-                if (EntityUtils.rand(0, 500) > 480) {
+                if (EntityUtils.rand(1, 20) == 1) {
                     entity.setBaby(true);
                 }
             }

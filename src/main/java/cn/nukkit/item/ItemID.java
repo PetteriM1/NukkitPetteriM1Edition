@@ -53,8 +53,11 @@ public interface ItemID {
     int WHEAT = 296;
     int BREAD = 297;
     int LEATHER_CAP = 298;
+    int LEATHER_HELMET = 298;
     int LEATHER_TUNIC = 299;
+    int LEATHER_CHESTPLATE = 299;
     int LEATHER_PANTS = 300;
+    int LEATHER_LEGGINGS = 300;
     int LEATHER_BOOTS = 301;
     int CHAIN_HELMET = 302;
     int CHAIN_CHESTPLATE = 303;

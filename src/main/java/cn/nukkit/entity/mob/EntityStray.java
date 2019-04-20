@@ -65,7 +65,7 @@ public class EntityStray extends EntityWalkingMob {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = false;
+        boolean hasUpdate;
 
         hasUpdate = super.entityBaseTick(tickDiff);
 
