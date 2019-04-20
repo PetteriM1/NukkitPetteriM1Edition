@@ -37,4 +37,9 @@ public class EntityWanderingTrader extends EntityWalkingAnimal {
     public int getKillExperience() {
         return 0;
     }
+
+    @Override
+    public String getName() {
+        return "Wandering Trader";
+    }
 }

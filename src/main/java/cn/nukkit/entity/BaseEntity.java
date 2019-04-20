@@ -99,8 +99,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public void setBaby(boolean baby) {
-        this.baby = true;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BABY, true);
+        this.baby = baby;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BABY, baby);
         this.setScale((float) 0.5);
     }
 
@@ -243,7 +243,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             if (item.hasCustomName()) {
                 this.setNameTag(item.getCustomName());
                 this.setNameTagVisible(true);
-                player.getInventory().removeItem(item);
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                 return true;
             }
         }

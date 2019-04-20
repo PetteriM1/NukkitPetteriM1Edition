@@ -58,6 +58,7 @@ public class EntityMooshroom extends EntityWalkingAnimal {
         return false;
     }
 
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 

@@ -102,7 +102,7 @@ public abstract class EntityWalking extends BaseEntity {
                 this.motionY = this.getGravity();
             } else if (this.motionY <= this.getGravity() * 4) {
                 this.motionY = this.getGravity() * 4;
-            } else if (block instanceof BlockSlab && block instanceof BlockStairs) {
+            } else if (block instanceof BlockStairs) {
                 this.motionY = this.getGravity() * 4;
             } else if (this.motionY <= (this.getGravity() * 8)) {
                 this.motionY = this.getGravity() * 8;
