@@ -149,6 +149,7 @@ public class Network {
                 count++;
                 if (count >= 500) {
                     player.close("Too many packets in a single batch");
+                    return;
                 }
                 byte[] buf = stream.getByteArray();
 
