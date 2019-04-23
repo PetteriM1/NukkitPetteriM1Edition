@@ -148,7 +148,7 @@ public class Network {
             while (stream.offset < len) {
                 count++;
                 if (count >= 500) {
-                    player.close("Too many packets in a single batch");
+                    player.close("", "Illegal Batch Packet");
                     return;
                 }
                 byte[] buf = stream.getByteArray();

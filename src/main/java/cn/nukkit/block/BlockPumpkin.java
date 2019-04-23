@@ -65,11 +65,6 @@ public class BlockPumpkin extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
