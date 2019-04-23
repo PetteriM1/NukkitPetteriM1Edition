@@ -10,12 +10,12 @@ import java.util.List;
  */
 public interface ProtocolInfo {
 
-    int CURRENT_PROTOCOL = 340;
+    int CURRENT_PROTOCOL = 354;
 
-    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(281, 282, 291, 313, 332, 340);
+    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(281, 282, 291, 313, 332, 340, 354);
 
-    String MINECRAFT_VERSION = "v1.10.0";
-    String MINECRAFT_VERSION_NETWORK = "1.10.0";
+    String MINECRAFT_VERSION = "v1.11.0";
+    String MINECRAFT_VERSION_NETWORK = "1.11.0";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
@@ -140,5 +140,7 @@ public interface ProtocolInfo {
     byte LEVEL_SOUND_EVENT_PACKET = 0x7b;
     byte LECTERN_UPDATE_PACKET = 0x7c;
     byte VIDEO_STREAM_CONNECT_PACKET = 0x7d;
+    byte MAP_CREATE_LOCKED_COPY_PACKET = 0x7e;
+    byte ON_SCREEN_TEXTURE_ANIMATION_PACKET = 0x7f;
     byte BATCH_PACKET = (byte) 0xff;
 }

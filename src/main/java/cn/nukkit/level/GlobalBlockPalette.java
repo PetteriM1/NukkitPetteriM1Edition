@@ -19,16 +19,19 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator313 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator332 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator340 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
     private static final Int2IntArrayMap legacyToRuntimeId282 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId291 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId313 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId332 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId340 = new Int2IntArrayMap();
+    private static final Int2IntArrayMap legacyToRuntimeId354 = new Int2IntArrayMap();
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
     private static byte[] compiledTable313;
     private static byte[] compiledTable332;
     private static byte[] compiledTable340;
+    private static byte[] compiledTable354;
 
     static {
         legacyToRuntimeId282.defaultReturnValue(-1);
@@ -36,6 +39,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId313.defaultReturnValue(-1);
         legacyToRuntimeId332.defaultReturnValue(-1);
         legacyToRuntimeId340.defaultReturnValue(-1);
+        legacyToRuntimeId354.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
             // 282
@@ -98,6 +102,18 @@ public class GlobalBlockPalette {
                 table340.putLShort(entry340.data);
             }
             compiledTable340 = table340.getBuffer();
+            // 354
+            InputStream stream354 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_354.json");
+            if (stream354 == null) throw new AssertionError("Unable to locate RuntimeID table 354");
+            Collection<TableEntry> entries354 = new Gson().fromJson(new InputStreamReader(stream354, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table354 = new BinaryStream();
+            table354.putUnsignedVarInt(entries354.size());
+            for (TableEntry entry354 : entries354) {
+                registerMapping(354, (entry354.id << 4) | entry354.data);
+                table354.putString(entry354.name);
+                table354.putLShort(entry354.data);
+            }
+            compiledTable354 = table354.getBuffer();
         }, true);
     }
 
@@ -116,8 +132,10 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId313.get(legacyId);
             case 332:
                 return legacyToRuntimeId332.get(legacyId);
-            default: // Current protocol
+            case 340:
                 return legacyToRuntimeId340.get(legacyId);
+            default: // Current protocol
+                return legacyToRuntimeId354.get(legacyId);
         }
     }
 
@@ -136,8 +154,11 @@ public class GlobalBlockPalette {
             case 332:
                 legacyToRuntimeId332.put(legacyId, runtimeIdAllocator332.getAndIncrement());
                 break;
-            default: // Current protocol
+            case 340:
                 legacyToRuntimeId340.put(legacyId, runtimeIdAllocator340.getAndIncrement());
+                break;
+            default: // Current protocol
+                legacyToRuntimeId354.put(legacyId, runtimeIdAllocator354.getAndIncrement());
                 break;
         }
     }
@@ -153,8 +174,10 @@ public class GlobalBlockPalette {
                 return compiledTable313;
             case 332:
                 return compiledTable332;
-            default: // Current protocol
+            case 340:
                 return compiledTable340;
+            default: // Current protocol
+                return compiledTable354;
         }
     }
 

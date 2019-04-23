@@ -7,8 +7,9 @@ import lombok.ToString;
 public class LecternUpdatePacket extends DataPacket {
 
     public int page;
+    public int totalPages;
     public BlockVector3 blockPosition;
-    public boolean unknownBool;
+    public boolean dropBook;
 
     @Override
     public byte pid() {
@@ -17,9 +18,16 @@ public class LecternUpdatePacket extends DataPacket {
 
     @Override
     public void decode() {
-        page = this.getByte();
-        blockPosition = this.getBlockVector3();
-        unknownBool = this.getBoolean();
+        if (protocol < 354) {
+            this.page = this.getByte();
+            this.blockPosition = this.getBlockVector3();
+            this.dropBook = this.getBoolean();
+        } else {
+            this.page = this.getByte();
+            this.totalPages = this.getByte();
+            this.blockPosition = this.getBlockVector3();
+            this.dropBook = this.getBoolean();
+        }
     }
 
     @Override
