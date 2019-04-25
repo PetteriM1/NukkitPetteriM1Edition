@@ -1044,14 +1044,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return -1;
         }
 
+        packet.protocol = this.protocol;
+
         try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
                 return -1;
             }
-
-            packet.protocol = this.protocol;
 
             Integer identifier = this.interfaz.putPacket(this, packet, needACK, false);
 
@@ -1080,14 +1080,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return -1;
         }
 
+        packet.protocol = this.protocol;
+
         try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
                 return -1;
             }
-
-            packet.protocol = this.protocol;
 
             Integer identifier = this.interfaz.putPacket(this, packet, needACK, true);
 
