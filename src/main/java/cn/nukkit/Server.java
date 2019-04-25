@@ -990,7 +990,7 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        player.dataPacket(CraftingManager.packet);
+        player.dataPacket(player.protocol >= 354 ? CraftingManager.packet : CraftingManager.packetPre354);
     }
 
     private void checkTickUpdates(int currentTick, long tickTime) {

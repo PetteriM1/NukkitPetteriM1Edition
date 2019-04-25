@@ -40,7 +40,7 @@ public class CraftingDataPacket extends DataPacket {
     public List<Object> entries = new ArrayList<>();
     public boolean cleanRecipes;
 
-    private static int writeEntry(Object entry, BinaryStream stream) {
+    private int writeEntry(Object entry, BinaryStream stream) {
         if (entry instanceof ShapelessRecipe) {
             return writeShapelessRecipe(((ShapelessRecipe) entry), stream);
         } else if (entry instanceof ShapedRecipe) {
@@ -53,7 +53,7 @@ public class CraftingDataPacket extends DataPacket {
         return -1;
     }
 
-    private static int writeShapelessRecipe(ShapelessRecipe recipe, BinaryStream stream) {
+    private int writeShapelessRecipe(ShapelessRecipe recipe, BinaryStream stream) {
         stream.putUnsignedVarInt(recipe.getIngredientCount());
 
         for (Item item : recipe.getIngredientList()) {
@@ -71,7 +71,7 @@ public class CraftingDataPacket extends DataPacket {
         return CraftingDataPacket.ENTRY_SHAPELESS;
     }
 
-    private static int writeShapedRecipe(ShapedRecipe recipe, BinaryStream stream) {
+    private int writeShapedRecipe(ShapedRecipe recipe, BinaryStream stream) {
         stream.putVarInt(recipe.getWidth());
         stream.putVarInt(recipe.getHeight());
 
@@ -93,7 +93,7 @@ public class CraftingDataPacket extends DataPacket {
         return CraftingDataPacket.ENTRY_SHAPED;
     }
 
-    private static int writeFurnaceRecipe(FurnaceRecipe recipe, BinaryStream stream) {
+    private int writeFurnaceRecipe(FurnaceRecipe recipe, BinaryStream stream) {
         if (recipe.getInput().hasMeta()) { //Data recipe
             stream.putVarInt(recipe.getInput().getId());
             stream.putVarInt(recipe.getInput().getDamage());
@@ -116,7 +116,7 @@ public class CraftingDataPacket extends DataPacket {
         }
     }
 
-    private static int writeEnchantList(EnchantmentList list, BinaryStream stream) {
+    private int writeEnchantList(EnchantmentList list, BinaryStream stream) {
         stream.putByte((byte) list.getSize());
         for (int i = 0; i < list.getSize(); ++i) {
             EnchantmentEntry entry = list.getSlot(i);

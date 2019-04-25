@@ -12,7 +12,7 @@ import cn.nukkit.utils.Zlib;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
-    public static int protocol = ProtocolInfo.CURRENT_PROTOCOL;
+    public int protocol = ProtocolInfo.CURRENT_PROTOCOL;
 
     public boolean isEncoded = false;
     private int channel = 0;

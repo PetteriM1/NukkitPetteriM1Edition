@@ -1012,6 +1012,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
+        packet.protocol = this.protocol;
+
         try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(event);
