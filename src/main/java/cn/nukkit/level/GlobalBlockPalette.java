@@ -14,18 +14,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlobalBlockPalette {
 
+    private static final AtomicInteger runtimeIdAllocator274 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator282 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator291 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator313 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator332 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator340 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
+    private static final Int2IntArrayMap legacyToRuntimeId274 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId282 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId291 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId313 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId332 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId340 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId354 = new Int2IntArrayMap();
+    private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
     private static byte[] compiledTable313;
@@ -34,6 +37,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable354;
 
     static {
+        legacyToRuntimeId274.defaultReturnValue(-1);
         legacyToRuntimeId282.defaultReturnValue(-1);
         legacyToRuntimeId291.defaultReturnValue(-1);
         legacyToRuntimeId313.defaultReturnValue(-1);
@@ -42,6 +46,18 @@ public class GlobalBlockPalette {
         legacyToRuntimeId354.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
+            // 282
+            InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
+            if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
+            Collection<TableEntry> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table274 = new BinaryStream();
+            table274.putUnsignedVarInt(entries274.size());
+            for (TableEntry entry274 : entries274) {
+                registerMapping(274, (entry274.id << 4) | entry274.data);
+                table274.putString(entry274.name);
+                table274.putLShort(entry274.data);
+            }
+            compiledTable274 = table274.getBuffer();
             // 282
             InputStream stream282 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
             if (stream282 == null) throw new AssertionError("Unable to locate RuntimeID table 282");
@@ -123,6 +139,9 @@ public class GlobalBlockPalette {
 
     public static int getOrCreateRuntimeId(int protocol, int legacyId) {
         switch (protocol) {
+            case 261:
+            case 274:
+                return legacyToRuntimeId274.get(legacyId);
             case 281:
             case 282:
                 return legacyToRuntimeId282.get(legacyId);
@@ -141,6 +160,9 @@ public class GlobalBlockPalette {
 
     private static void registerMapping(int protocol, int legacyId) {
         switch (protocol) {
+            case 261:
+            case 274:
+                legacyToRuntimeId274.put(legacyId, runtimeIdAllocator274.getAndIncrement());
             case 281:
             case 282:
                 legacyToRuntimeId282.put(legacyId, runtimeIdAllocator282.getAndIncrement());
@@ -165,6 +187,9 @@ public class GlobalBlockPalette {
 
     public static byte[] getCompiledTable(int protocol) {
         switch (protocol) {
+            case 261:
+            case 274:
+                return compiledTable274;
             case 281:
             case 282:
                 return compiledTable282;

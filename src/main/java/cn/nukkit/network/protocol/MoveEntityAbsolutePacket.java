@@ -28,9 +28,11 @@ public class MoveEntityAbsolutePacket extends DataPacket {
     @Override
     public void decode() {
         this.eid = this.getEntityRuntimeId();
-        int flags = this.getByte();
-        teleport = (flags & 0x01) != 0;
-        onGround = (flags & 0x02) != 0;
+        if (protocol >= 274) {
+            int flags = this.getByte();
+            teleport = (flags & 0x01) != 0;
+            onGround = (flags & 0x02) != 0;
+        }
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
@@ -44,17 +46,23 @@ public class MoveEntityAbsolutePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putEntityRuntimeId(this.eid);
-        byte flags = 0;
-        if (teleport) {
-            flags |= 0x01;
+        if (protocol >= 274) {
+            byte flags = 0;
+            if (teleport) {
+                flags |= 0x01;
+            }
+            if (onGround) {
+                flags |= 0x02;
+            }
+            this.putByte(flags);
         }
-        if (onGround) {
-            flags |= 0x02;
-        }
-        this.putByte(flags);
         this.putVector3f((float) this.x, (float) this.y, (float) this.z);
         this.putByte((byte) (this.pitch / (360d / 256d)));
         this.putByte((byte) (this.headYaw / (360d / 256d)));
         this.putByte((byte) (this.yaw / (360d / 256d)));
+        if (protocol <= 261) {
+            this.putBoolean(this.onGround);
+            this.putBoolean(this.teleport);
+        }
     }
 }

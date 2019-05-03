@@ -4331,7 +4331,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     public long createBossBar(DummyBossBar dummyBossBar) {
         this.dummyBossBars.put(dummyBossBar.getBossBarId(), dummyBossBar);
-        dummyBossBar.create(this.protocol);
+        dummyBossBar.create();
         return dummyBossBar.getBossBarId();
     }
 

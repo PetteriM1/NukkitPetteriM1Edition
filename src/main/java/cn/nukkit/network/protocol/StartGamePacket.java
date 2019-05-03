@@ -142,7 +142,9 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
-        this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
-        this.putString(this.multiplayerCorrelationId);
+        if (protocol > 274) {
+            this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+            this.putString(this.multiplayerCorrelationId);
+        }
     }
 }

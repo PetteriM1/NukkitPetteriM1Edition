@@ -279,12 +279,14 @@ public class AvailableCommandsPacket extends DataPacket {
             }
         });
 
-        this.putUnsignedVarInt(softEnums.size());
+        if (protocol > 274) {
+            this.putUnsignedVarInt(softEnums.size());
 
-        softEnums.forEach((name, values) -> {
-            this.putString(name);
-            this.putUnsignedVarInt(values.size());
-            values.forEach(this::putString);
-        });
+            softEnums.forEach((name, values) -> {
+                this.putString(name);
+                this.putUnsignedVarInt(values.size());
+                values.forEach(this::putString);
+            });
+        }
     }
 }

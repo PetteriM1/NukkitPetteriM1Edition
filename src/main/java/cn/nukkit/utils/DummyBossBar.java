@@ -129,7 +129,7 @@ public class DummyBossBar {
         return this.color;
     }
 
-    private void createBossEntity(int protocol) {
+    private void createBossEntity() {
         AddEntityPacket pkAdd = new AddEntityPacket();
         pkAdd.type = EntityCreeper.NETWORK_ID;
         pkAdd.entityUniqueId = bossBarId;
@@ -224,11 +224,7 @@ public class DummyBossBar {
     }
 
     public void create() {
-        this.create(ProtocolInfo.CURRENT_PROTOCOL);
-    }
-
-    public void create(int protocol) {
-        createBossEntity(protocol);
+        createBossEntity();
         sendAttributes();
         sendShowBossBar();
         if (color != null) this.sendSetBossBarTexture();

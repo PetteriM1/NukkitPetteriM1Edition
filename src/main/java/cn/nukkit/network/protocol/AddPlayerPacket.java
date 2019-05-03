@@ -59,13 +59,15 @@ public class AddPlayerPacket extends DataPacket {
         this.putLFloat(this.yaw);
         this.putSlot(this.item);
         this.put(Binary.writeMetadata(this.metadata));
-        this.putUnsignedVarInt(0);
-        this.putUnsignedVarInt(0);
-        this.putUnsignedVarInt(0);
-        this.putUnsignedVarInt(0);
-        this.putUnsignedVarInt(0);
-        this.putLLong(entityUniqueId);
-        this.putUnsignedVarInt(0);
-        this.putString(deviceId);
+        if (protocol > 274) {
+            this.putUnsignedVarInt(0);
+            this.putUnsignedVarInt(0);
+            this.putUnsignedVarInt(0);
+            this.putUnsignedVarInt(0);
+            this.putUnsignedVarInt(0);
+            this.putLLong(entityUniqueId);
+            this.putUnsignedVarInt(0);
+            this.putString(deviceId);
+        }
     }
 }

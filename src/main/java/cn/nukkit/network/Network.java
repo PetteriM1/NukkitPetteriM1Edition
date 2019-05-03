@@ -156,9 +156,16 @@ public class Network {
                 DataPacket pk;
 
                 if ((pk = this.getPacket(buf[0])) != null) {
-                    pk.setBuffer(buf, 1);
+                    pk.setBuffer(buf, player.protocol <= 274 ? 3 : 1);
 
-                    try { pk.decode(); } catch (Exception e) {}
+                    try {
+                        pk.decode();
+                    } catch (Exception e) { // LoginPacket < 1.6
+                        try {
+                            pk.setBuffer(buf, 3);
+                            pk.decode();
+                        } catch (Exception ignore) {}
+                    }
 
                     packets.add(pk);
                 }

@@ -35,9 +35,11 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putLLong(entry.getPackSize());
             this.putString(""); // encryption key
             this.putString(""); // sub-pack name
-            this.putString(""); // content identity
-            if (protocol >= 332) {
-                this.putBoolean(false); // ???
+            if (protocol > 274) {
+                this.putString(""); // content identity
+                if (protocol >= 332) {
+                    this.putBoolean(false); // ???
+                }
             }
         }
     }
