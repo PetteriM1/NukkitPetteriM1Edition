@@ -88,8 +88,6 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
                 return randomNumber <= 1;
             case 2:
                 return randomNumber <= 2;
-            case 3:
-                return true;
             default:
                 return true;
         }

@@ -1057,7 +1057,7 @@ public class Server {
         }
     }
 
-    private boolean tick() {
+    private void tick() {
         long tickTime = System.currentTimeMillis();
 
         long time = tickTime - this.nextTick;
@@ -1071,7 +1071,7 @@ public class Server {
 
         long tickTimeNano = System.nanoTime();
         if ((tickTime - this.nextTick) < -25) {
-            return false;
+            return;
         }
 
         Timings.fullServerTickTimer.startTiming();
@@ -1153,8 +1153,6 @@ public class Server {
         } else {
             this.nextTick += 50;
         }
-
-        return true;
     }
 
     public long getNextTick() {

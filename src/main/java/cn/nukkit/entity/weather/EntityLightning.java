@@ -24,7 +24,6 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
     public int state;
     public int liveTime;
 
-
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -37,9 +36,6 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
     @Override
     protected void initEntity() {
         super.initEntity();
-
-        this.setHealth(4);
-        this.setMaxHealth(4);
 
         this.state = 2;
         this.liveTime = ThreadLocalRandom.current().nextInt(3) + 1;

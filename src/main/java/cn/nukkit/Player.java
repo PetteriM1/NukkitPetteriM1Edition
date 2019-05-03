@@ -604,7 +604,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.viewDistance = this.server.getViewDistance();
         this.chunkRadius = viewDistance;
         this.boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-
         this.uuid = null;
         this.rawUUID = null;
     }
@@ -1768,10 +1767,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.highestPosition = this.y;
                     }
 
-                    if (this.isGliding()) this.resetFallDistance();
+                    if (this.isGliding() || this.isSwimming()) {
+                        this.resetFallDistance();
+                    }
 
                     ++this.inAirTicks;
-
                 }
 
                 if (this.isSurvival() || this.isAdventure()) {

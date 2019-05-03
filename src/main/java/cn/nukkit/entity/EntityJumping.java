@@ -77,7 +77,7 @@ public abstract class EntityJumping extends BaseEntity {
         }
     }
 
-    protected boolean checkJump(double dx, double dz) {
+    protected boolean checkJump() {
         if (this.motionY == this.getGravity() * 2) {
             return this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockLiquid;
         } else {
@@ -117,7 +117,6 @@ public abstract class EntityJumping extends BaseEntity {
 
             if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
                 double x = this.followTarget.x - this.x;
-                double y = this.followTarget.y - this.y;
                 double z = this.followTarget.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
@@ -142,7 +141,6 @@ public abstract class EntityJumping extends BaseEntity {
             this.checkTarget();
             if (this.target instanceof EntityCreature || before != this.target) {
                 double x = this.target.x - this.x;
-                double y = this.target.y - this.y;
                 double z = this.target.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
@@ -164,7 +162,7 @@ public abstract class EntityJumping extends BaseEntity {
 
             double dx = this.motionX * tickDiff;
             double dz = this.motionZ * tickDiff;
-            boolean isJump = this.checkJump(dx, dz);
+            boolean isJump = this.checkJump();
             if (this.stayTime > 0) {
                 this.stayTime -= tickDiff;
                 this.move(0, this.motionY * tickDiff, 0);

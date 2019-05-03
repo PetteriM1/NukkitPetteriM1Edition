@@ -89,7 +89,6 @@ public abstract class EntitySwimming extends BaseEntity {
 
             if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
                 double x = this.followTarget.x - this.x;
-                double y = this.followTarget.y - this.y;
                 double z = this.followTarget.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
@@ -108,7 +107,6 @@ public abstract class EntitySwimming extends BaseEntity {
             this.checkTarget();
             if (this.target instanceof EntityCreature || before != this.target) {
                 double x = this.target.x - this.x;
-                double y = this.target.y - this.y;
                 double z = this.target.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);

@@ -75,10 +75,9 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         int oldPowerLevel = this.getPowerLevel();
         //Get the power level based on the pyramid
         setPowerLevel(calculatePowerLevel());
-        int newPowerLevel = this.getPowerLevel();
 
         //Skip beacons that do not have a pyramid or sky access
-        if (newPowerLevel < 1 || !hasSkyAccess()) {
+        if (this.getPowerLevel() < 1 || !hasSkyAccess()) {
             if (oldPowerLevel > 0) {
                 this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BEACON_DEACTIVATE);
             }
@@ -89,18 +88,13 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
             this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BEACON_AMBIENT);
         }
 
-        //Get all players in game
-        Map<Long, Player> players = this.level.getPlayers();
-
-        //Calculate vars for beacon power
-        int range = 10 + getPowerLevel() * 10;
         int duration = 9 + getPowerLevel() * 2;
 
-        for(Map.Entry<Long, Player> entry : players.entrySet()) {
+        for(Map.Entry<Long, Player> entry : this.level.getPlayers().entrySet()) {
             Player p = entry.getValue();
 
             //If the player is in range
-            if (p.distance(this) < range) {
+            if (p.distance(this) < 10 + getPowerLevel() * 10) {
                 Effect e;
 
                 if (getPrimaryPower() != 0) {

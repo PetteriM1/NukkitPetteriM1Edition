@@ -106,7 +106,7 @@ public class EntityHorse extends EntityWalkingAnimal {
     }
 
     public void setType(int type) {
-        type = type;
+        this.type = type;
     }
 
     public int getVariant() {
