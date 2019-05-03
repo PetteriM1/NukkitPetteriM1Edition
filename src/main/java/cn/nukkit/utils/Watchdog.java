@@ -36,7 +36,7 @@ public class Watchdog extends Thread {
                     if (responding) {
                         MainLogger logger = this.server.getLogger();
                         logger.emergency("--------- Server stopped responding ---------");
-                        logger.emergency(diff / 1000d + "s");
+                        logger.emergency(Math.round(diff / 1000d) + "s");
                         logger.emergency("---------------- Main thread ----------------");
 
                         dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger);
@@ -49,7 +49,7 @@ public class Watchdog extends Thread {
                         }
                         logger.emergency("---------------------------------------------");
                         responding = false;
-                        this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + diff / 1000d + " seconds");
+                        this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
                     }
                 } else {
                     responding = true;

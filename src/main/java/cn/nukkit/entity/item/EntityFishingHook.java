@@ -36,9 +36,7 @@ public class EntityFishingHook extends EntityProjectile {
 	public static final int NETWORK_ID = 77;
 
 	public static final int WAIT_CHANCE = 120;
-	public static final int CHANCE = 40;
 
-	public boolean chance = false;
 	public int waitChance = WAIT_CHANCE * 2;
 	public boolean attracted = false;
 	public int attractTimer = 0;

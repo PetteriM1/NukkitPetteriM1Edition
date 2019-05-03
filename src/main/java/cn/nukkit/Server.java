@@ -525,7 +525,7 @@ public class Server {
                 JsonObject rootobj = root.getAsJsonObject();
                 String latest = "git-" + rootobj.get("sha").getAsString().substring(0, 7);
 
-                if (!this.getNukkitVersion().equals(latest)) {
+                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
                     this.getLogger().notice("[Update] \u00A7eThere is a newer build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
                 }
 
@@ -612,16 +612,16 @@ public class Server {
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
-        packet.encode();
-        packet.isEncoded = true;
+        //packet.encode();
+        //packet.isEncoded = true;
 
-        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+        //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
-                player.dataPacket(packet);
+                player.dataPacket(packet); // HACK: Force multiversion
             }
-        } else {
-            getInstance().batchPackets(players, new DataPacket[]{packet}, true);
-        }
+        //} else {
+        //    getInstance().batchPackets(players, new DataPacket[]{packet}, true);
+        //}
 
         if (packet.encapsulatedPacket != null) {
             packet.encapsulatedPacket = null;
@@ -1929,7 +1929,6 @@ public class Server {
         Entity.registerEntity("FallingSand", EntityFallingBlock.class);
         Entity.registerEntity("PrimedTnt", EntityPrimedTNT.class);
         Entity.registerEntity("Firework", EntityFirework.class);
-        Entity.registerEntity("FishingHook", EntityFishingHook.class);
         //Projectiles
         Entity.registerEntity("Arrow", EntityArrow.class);
         Entity.registerEntity("Snowball", EntitySnowball.class);
@@ -1947,6 +1946,7 @@ public class Server {
         Entity.registerEntity("LlamaSplit", EntityLlamaSpit.class);
         Entity.registerEntity("EvocationFangs", EntityEvocationFangs.class);
         Entity.registerEntity("EnderCharge", EntityEnderCharge.class);
+        Entity.registerEntity("FishingHook", EntityFishingHook.class);
         //Monsters
         Entity.registerEntity("Blaze", EntityBlaze.class);
         Entity.registerEntity("Creeper", EntityCreeper.class);

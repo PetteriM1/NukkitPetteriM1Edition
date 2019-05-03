@@ -2106,7 +2106,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.protocol = loginPacket.getProtocol();
 
                     if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol)) {
-                        kick(PlayerKickEvent.Reason.UNKNOWN, "You are running unsupported Minecraft version", false);
+                        this.close("", "You are running unsupported Minecraft version");
                         break;
                     }
 
