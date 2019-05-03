@@ -915,6 +915,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.isSpectator()) {
             this.spawnToAll();
         }
+
+        // HACK: Fix boss bar in 1.11
+        if (this.protocol >= 354) {
+            this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
+                this.getDummyBossBars().forEach((a, b) -> {
+                    this.createBossBar(b);
+                });
+            }, 200);
+        }
     }
 
     protected boolean orderChunks() {
