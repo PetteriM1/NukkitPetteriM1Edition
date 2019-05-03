@@ -321,18 +321,16 @@ public class Item implements Cloneable, BlockID, ItemID {
         String path313 = server.getDataPath() + "creativeitems313.json";
         String path332 = server.getDataPath() + "creativeitems332.json";
 
-        if (!new File(path).exists()) {
-            try {
-                Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("creativeitems.json"));
-                Utils.writeFile(path137, Server.class.getClassLoader().getResourceAsStream("creativeitems137.json"));
-                Utils.writeFile(path274, Server.class.getClassLoader().getResourceAsStream("creativeitems274.json"));
-                Utils.writeFile(path291, Server.class.getClassLoader().getResourceAsStream("creativeitems291.json"));
-                Utils.writeFile(path313, Server.class.getClassLoader().getResourceAsStream("creativeitems313.json"));
-                Utils.writeFile(path332, Server.class.getClassLoader().getResourceAsStream("creativeitems332.json"));
-            } catch (IOException e) {
-                MainLogger.getLogger().logException(e);
-                return;
-            }
+        try {
+            if (!new File(path).exists()) Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("creativeitems.json"));
+            if (!new File(path137).exists()) Utils.writeFile(path137, Server.class.getClassLoader().getResourceAsStream("creativeitems137.json"));
+            if (!new File(path274).exists()) Utils.writeFile(path274, Server.class.getClassLoader().getResourceAsStream("creativeitems274.json"));
+            if (!new File(path291).exists()) Utils.writeFile(path291, Server.class.getClassLoader().getResourceAsStream("creativeitems291.json"));
+            if (!new File(path313).exists()) Utils.writeFile(path313, Server.class.getClassLoader().getResourceAsStream("creativeitems313.json"));
+            if (!new File(path332).exists()) Utils.writeFile(path332, Server.class.getClassLoader().getResourceAsStream("creativeitems332.json"));
+        } catch (IOException e) {
+            MainLogger.getLogger().logException(e);
+            return;
         }
 
         // Creative inventory for current protocol

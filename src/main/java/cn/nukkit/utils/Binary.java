@@ -108,7 +108,7 @@ public class Binary {
             EntityData d = map.get(id);
             if (protocol < 354) {
                 if (id > 40) {
-                    id -= id;
+                    id = id - 1;
                 }
             }
             stream.putUnsignedVarInt(id);
