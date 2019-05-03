@@ -70,8 +70,6 @@ import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.extern.log4j.Log4j2;
 
@@ -521,9 +519,7 @@ public class Server {
                 URL url = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master");
                 URLConnection request = url.openConnection();
                 request.connect();
-                JsonElement root = new JsonParser().parse(new InputStreamReader((InputStream) request.getContent()));
-                JsonObject rootobj = root.getAsJsonObject();
-                String latest = "git-" + rootobj.get("sha").getAsString().substring(0, 7);
+                String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
                     this.getLogger().notice("[Update] \u00A7eThere is a newer build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);

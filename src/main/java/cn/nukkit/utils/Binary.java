@@ -5,6 +5,7 @@ import cn.nukkit.entity.data.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitMath;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -96,11 +97,20 @@ public class Binary {
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {
+        return writeMetadata(ProtocolInfo.CURRENT_PROTOCOL, metadata);
+    }
+
+    public static byte[] writeMetadata(int protocol, EntityMetadata metadata) {
         BinaryStream stream = new BinaryStream();
         Map<Integer, EntityData> map = metadata.getMap();
         stream.putUnsignedVarInt(map.size());
         for (int id : map.keySet()) {
             EntityData d = map.get(id);
+            if (protocol < 354) {
+                if (id > 40) {
+                    id -= id;
+                }
+            }
             stream.putUnsignedVarInt(id);
             stream.putUnsignedVarInt(d.getType());
             switch (d.getType()) {

@@ -34,7 +34,7 @@ public class EntityDeathEvent extends EntityEvent {
         if (drops == null) {
             drops = new Item[0];
         }
-        
+
         this.drops = drops;
     }
 }
