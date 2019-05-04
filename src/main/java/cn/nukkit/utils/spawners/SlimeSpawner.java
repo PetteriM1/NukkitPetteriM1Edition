@@ -19,21 +19,19 @@ public class SlimeSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
-        final int time = level.getTime() % Level.TIME_FULL;
 
-        if (blockId != Block.GRASS) {
+        if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
         } else if (biomeId != 6 && biomeId != 134) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
-        } else if (time > 13184 && time < 22800) {
+        } else if (level.isMobSpawningAllowedByTime()) {
             this.spawnTask.createEntity("Slime", pos.add(0, 1, 0));
         }
 

@@ -3467,7 +3467,7 @@ public class Level implements ChunkManager, Metadatable {
         addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
     }
 
-    public int getUpdateLCG() {
+    private int getUpdateLCG() {
         return (this.updateLCG = (this.updateLCG * 3) ^ LCG_CONSTANT);
     }
 
@@ -3478,5 +3478,15 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
         return true;
+    }
+
+    public boolean isMobSpawningAllowedByTime() {
+        int time = this.getTime() % TIME_FULL;
+        return time > 13184 && time < 22800;
+    }
+
+    public boolean shouldMobBurn(Entity entity) {
+        int time = this.getTime() % TIME_FULL;
+        return !entity.isOnFire() && !this.isRaining() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
     }
 }

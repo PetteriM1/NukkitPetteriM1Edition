@@ -19,16 +19,15 @@ public class RabbitSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
         if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 2 && biomeId != 130 && biomeId != 30 && biomeId != 5 && biomeId != 12) {
             result = SpawnResult.WRONG_BIOME;
-        } else if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (Block.transparent[blockId]) {
+        } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
             this.spawnTask.createEntity("Rabbit", pos.add(0, 1, 0));

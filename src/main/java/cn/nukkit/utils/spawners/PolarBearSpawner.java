@@ -21,15 +21,13 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
-
         if (level.getBiomeId((int) pos.x, (int) pos.z) != 12) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (Block.transparent[blockId]) {
+        } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
             result = SpawnResult.WRONG_BLOCK;
         } else {
             BaseEntity entity = this.spawnTask.createEntity("PolarBear", pos.add(0, 1, 0));

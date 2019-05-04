@@ -32,7 +32,7 @@ public class ParrotSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else if (blockId != Block.GRASS && blockId != Block.LEAVES) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
         } else {
             this.spawnTask.createEntity("Parrot", pos.add(0, 1, 0));

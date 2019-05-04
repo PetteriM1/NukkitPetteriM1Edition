@@ -6,7 +6,6 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
@@ -110,8 +109,7 @@ public class EntityZombieVillager extends EntityWalkingMob {
 
         hasUpdate = super.entityBaseTick(tickDiff);
 
-        int time = this.getLevel().getTime() % Level.TIME_FULL;
-        if (!this.isOnFire() && !this.level.isRaining() && (time < 12567 || time > 23450) && !this.isInsideOfWater() && this.level.canBlockSeeSky(this)) {
+        if (level.shouldMobBurn(this)) {
             this.setOnFire(100);
         }
 

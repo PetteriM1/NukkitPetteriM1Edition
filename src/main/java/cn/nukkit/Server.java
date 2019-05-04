@@ -608,16 +608,31 @@ public class Server {
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
+        boolean mvplayers = false;
         //packet.encode();
         //packet.isEncoded = true;
 
         //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
-                player.dataPacket(packet); // HACK: Force multiversion
+                //player.dataPacket(packet); // HACK: Force multiversion
+                if (player.protocol <= 274) { // 1.5 or lower
+                    mvplayers = true;
+                    break;
+                }
             }
         //} else {
         //    getInstance().batchPackets(players, new DataPacket[]{packet}, true);
         //}
+
+        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+            packet.encode();
+            packet.isEncoded = true;
+            getInstance().batchPackets(players, new DataPacket[]{packet}, true);
+        } else { // Need to force multiversion
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+        }
 
         if (packet.encapsulatedPacket != null) {
             packet.encapsulatedPacket = null;
@@ -1155,7 +1170,7 @@ public class Server {
         return nextTick;
     }
 
-    public void titleTick() {
+    private void titleTick() {
         if (!Nukkit.TITLE) return;
 
         Runtime runtime = Runtime.getRuntime();

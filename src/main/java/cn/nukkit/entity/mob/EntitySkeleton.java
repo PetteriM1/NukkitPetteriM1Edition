@@ -11,7 +11,6 @@ import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBow;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -119,8 +118,7 @@ public class EntitySkeleton extends EntityWalkingMob {
 
         hasUpdate = super.entityBaseTick(tickDiff);
 
-        int time = this.getLevel().getTime() % Level.TIME_FULL;
-        if (!this.isOnFire() && !this.level.isRaining() && (time < 12567 || time > 23450) && !this.isInsideOfWater() && this.level.canBlockSeeSky(this)) {
+        if (level.shouldMobBurn(this)) {
             this.setOnFire(100);
         }
 

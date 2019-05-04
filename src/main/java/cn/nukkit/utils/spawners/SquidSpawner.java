@@ -19,14 +19,13 @@ public class SquidSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
         final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
 
         if (blockId != Block.WATER && blockId != Block.STILL_WATER) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (biomeId != 0) {
+        } else if (level.getBiomeId((int) pos.x, (int) pos.z) != 0) {
             result = SpawnResult.WRONG_BIOME;
-        } else if ((pos.y > 255 || (level.getName().equals("nether") && pos.y > 127)) || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
