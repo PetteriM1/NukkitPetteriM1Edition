@@ -147,7 +147,7 @@ public class Network {
             int count = 0;
             while (stream.offset < len) {
                 count++;
-                if (count >= 500) {
+                if (count >= 1000) {
                     player.close("", "Illegal Batch Packet");
                     return;
                 }
