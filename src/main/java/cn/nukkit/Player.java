@@ -241,7 +241,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     
     public EntityFishingHook fishing = null;
 
-    public boolean formOpen = false;
+    public boolean formOpen;
+
+    public boolean initialized;
 
     public int getStartActionTick() {
         return startAction;
@@ -892,8 +894,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 // HACK: fix speed bug
                 this.setMovementSpeed(this.getMovementSpeed());
-
-                this.formOpen = false;
             } catch (Exception e) {
                 this.getServer().getLogger().error("doFirstSpawn() failed for " + this.getName());
             }
@@ -914,15 +914,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.isSpectator()) {
             this.spawnToAll();
-        }
-
-        // HACK: Fix boss bar in 1.11
-        if (this.protocol >= 354) {
-            this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
-                this.getDummyBossBars().forEach((a, b) -> {
-                    this.createBossBar(b);
-                });
-            }, 200);
         }
     }
 
@@ -2161,7 +2152,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (!valid || Objects.equals(this.iusername, "rcon") || Objects.equals(this.iusername, "console")) {
                         this.close("", "disconnectionScreen.invalidName");
-
                         break;
                     }
 
@@ -2176,7 +2166,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.server.getPluginManager().callEvent(playerPreLoginEvent = new PlayerPreLoginEvent(this, "Plugin reason"));
                     if (playerPreLoginEvent.isCancelled()) {
                         this.close("", playerPreLoginEvent.getKickMessage());
-
                         break;
                     }
 
@@ -2361,7 +2350,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     actionswitch:
                     switch (playerActionPacket.action) {
                         case PlayerActionPacket.ACTION_START_BREAK:
-                        long currentBreak = System.currentTimeMillis();
+                            long currentBreak = System.currentTimeMillis();
                             BlockVector3 currentBreakPosition = new BlockVector3(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
                             // HACK: Client spams multiple left clicks so we need to skip them.
                             if ((lastBreakPosition.equals(currentBreakPosition) && (currentBreak - this.lastBreak) < 10) || pos.distanceSquared(this) > 100) {
@@ -2560,9 +2549,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.startAction = -1;
                     this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
                     break;
-                case ProtocolInfo.MOB_ARMOR_EQUIPMENT_PACKET:
-                    break;
-
                 case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
                     this.formOpen = false;
 
@@ -2611,8 +2597,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
                         break;
                     }
-
-                    item = this.inventory.getItemInHand();
 
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_MOUSEOVER:
@@ -2687,8 +2671,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     animatePacket.action = animationEvent.getAnimationType();
                     Server.broadcastPacket(this.getViewers().values(), animatePacket);
                     break;
-                case ProtocolInfo.SET_HEALTH_PACKET:
-                    break;
                 case ProtocolInfo.ENTITY_EVENT_PACKET:
                     if (!this.spawned || !this.isAlive()) {
                         break;
@@ -2697,18 +2679,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
-                    switch (entityEventPacket.event) {
-                        case EntityEventPacket.EATING_ITEM:
-                            if (entityEventPacket.data == 0) {
-                                break;
-                            }
-
-                            entityEventPacket.eid = this.id;
-                            entityEventPacket.isEncoded = false;
-
-                            this.dataPacket(entityEventPacket);
-                            Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
+                    if (entityEventPacket.event == EntityEventPacket.EATING_ITEM) {
+                        if (entityEventPacket.data == 0) {
                             break;
+                        }
+
+                        entityEventPacket.eid = this.id;
+                        entityEventPacket.isEncoded = false;
+
+                        this.dataPacket(entityEventPacket);
+                        Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
                     }
                     break;
                 case ProtocolInfo.COMMAND_REQUEST_PACKET:
@@ -2752,8 +2732,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else {
                         this.windowIndex.remove(containerClosePacket.windowId);
                     }
-                    break;
-                case ProtocolInfo.CRAFTING_EVENT_PACKET:
                     break;
                 case ProtocolInfo.BLOCK_ENTITY_DATA_PACKET:
                     if (!this.spawned || !this.isAlive()) {
@@ -3265,6 +3243,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             re.formId = id;
                             re.data = window.getJSONData();
                             this.dataPacket(re);
+                        });
+                    }
+                    break;
+                case ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET:
+                    if (this.initialized) {
+                        return;
+                    }
+
+                    this.getServer().getPluginManager().callEvent(new PlayerInitializedEvent(this));
+                    this.initialized = true;
+
+                    // HACK: Fix boss bar in 1.11
+                    if (this.protocol >= 354) {
+                        this.getDummyBossBars().forEach((a, b) -> {
+                            this.createBossBar(b);
                         });
                     }
                     break;
