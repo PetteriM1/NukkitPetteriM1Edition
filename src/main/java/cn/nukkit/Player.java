@@ -4863,7 +4863,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 				.putList(new ListTag<FloatTag>("Rotation")
 						.add(new FloatTag("", (float) yaw))
 						.add(new FloatTag("", (float) pitch)));
-		double f = 1;
+		double f = 1.1;
 		EntityFishingHook fishingHook = new EntityFishingHook(chunk, nbt, this);
 		fishingHook.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                 Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));

@@ -33,12 +33,12 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public float getWidth() {
-        return 13f;
+        return 16f;
     }
 
     @Override
     public float getHeight() {
-        return 4f;
+        return 8f;
     }
 
     @Override
@@ -146,10 +146,11 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
         if (ev instanceof EntityDamageByEntityEvent) {
             if (((EntityDamageByEntityEvent) ev).getDamager() instanceof EntityEnderCharge) {
                 ev.setCancelled(true);
+                return false;
             }
-        } else {
-            super.attack(ev);
         }
+
+        super.attack(ev);
 
         return true;
     }
