@@ -45,6 +45,13 @@ public abstract class ProjectileItem extends Item {
 
         Entity projectile = Entity.createEntity(this.getProjectileEntityType(), player.getLevel().getChunk(player.getFloorX() >> 4, player.getFloorZ() >> 4), nbt, player);
         if (projectile != null) {
+            if (projectile instanceof EntityEnderPearl) {
+                if (player.getServer().getTick() - player.getLastEnderPearlThrowingTick() < 20) {
+                    projectile.kill();
+                    return false;
+                }
+            }
+
             projectile.setMotion(projectile.getMotion().multiply(this.getThrowForce()));
 
             if (projectile instanceof EntityProjectile) {

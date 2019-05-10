@@ -2043,7 +2043,9 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.ySize = 0;
 
-        this.setMotion(this.temporalVector.setComponents(0, 0, 0));
+        if (cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+            this.setMotion(this.temporalVector.setComponents(0, 0, 0));
+        }
 
         if (this.setPositionAndRotation(to, yaw, pitch)) {
             this.resetFallDistance();

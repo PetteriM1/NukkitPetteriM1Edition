@@ -220,7 +220,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private BlockEnderChest viewingEnderChest = null;
 
-    protected int lastEnderPearl = -1;
+    protected int lastEnderPearl = 20;
 
     private LoginChainData loginChainData;
 
@@ -4132,6 +4132,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected boolean checkTeleportPosition() {
+        return checkTeleportPosition(false);
+    }
+
+    protected boolean checkTeleportPosition(boolean enderPearl) {
         if (this.teleportPosition != null) {
             int chunkX = (int) this.teleportPosition.x >> 4;
             int chunkZ = (int) this.teleportPosition.z >> 4;
@@ -4146,7 +4150,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             this.spawnToAll();
-            this.forceMovement = this.teleportPosition;
+            if (!enderPearl) {
+                this.forceMovement = this.teleportPosition;
+            }
             this.teleportPosition = null;
             return true;
         }
@@ -4191,10 +4197,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.formOpen = false;
 
             this.teleportPosition = this;
-            this.forceMovement = this.teleportPosition;
+            if (cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+                this.forceMovement = this.teleportPosition;
+            }
             this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_TELEPORT);
 
-            this.checkTeleportPosition();
+            this.checkTeleportPosition(cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL);
 
             this.resetFallDistance();
             this.nextChunkOrderRun = 0;
@@ -4234,7 +4242,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void teleportImmediate(Location location, TeleportCause cause) {
         Location from = this.getLocation();
-        if (super.teleport(location, cause)) {
+        if (super.teleport(location.add(0, 0.00001, 0), cause)) {
 
             for (Inventory window : new ArrayList<>(this.windows.keySet())) {
                 if (window == this.inventory) {
