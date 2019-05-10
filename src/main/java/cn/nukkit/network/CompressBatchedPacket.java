@@ -4,7 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.Zlib;
 
-import java.util.ArrayList;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 /**
@@ -13,21 +13,21 @@ import java.util.List;
  */
 public class CompressBatchedPacket extends AsyncTask {
 
-    public int level = 7;
+    public int level;
     public byte[] data;
     public byte[] finalData;
-    public int channel = 0;
-    public List<String> targets = new ArrayList<>();
+    public int channel;
+    public List<InetSocketAddress> targets;
 
-    public CompressBatchedPacket(byte[] data, List<String> targets) {
+    public CompressBatchedPacket(byte[] data, List<InetSocketAddress> targets) {
         this(data, targets, 7);
     }
 
-    public CompressBatchedPacket(byte[] data, List<String> targets, int level) {
+    public CompressBatchedPacket(byte[] data, List<InetSocketAddress> targets, int level) {
         this(data, targets, level, 0);
     }
 
-    public CompressBatchedPacket(byte[] data, List<String> targets, int level, int channel) {
+    public CompressBatchedPacket(byte[] data, List<InetSocketAddress> targets, int level, int channel) {
         this.data = data;
         this.targets = targets;
         this.level = level;

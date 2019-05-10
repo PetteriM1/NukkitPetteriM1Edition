@@ -38,6 +38,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.nukkitx.network</groupId>
+            <artifactId>raknet</artifactId>
+            <version>1.3.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>com.nukkitx</groupId>
             <artifactId>fastutil-lite</artifactId>
             <version>8.1.1</version>
@@ -56,19 +62,6 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.16</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-handler</artifactId>
-            <version>4.1.6.Final</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport-native-epoll</artifactId>
-            <version>4.1.6.Final</version>
-            <scope>compile</scope>
-            <classifier>linux-x86_64</classifier>
         </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
