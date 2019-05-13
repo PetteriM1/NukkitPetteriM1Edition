@@ -134,10 +134,10 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             }
 
             float originalDamage = source.getDamage();
+            float damage = (float) (originalDamage * (1 - Math.max(points / 5f, points - originalDamage / (2 + toughness / 4f)) / 25) * (1 - /*0.75 */ epf * 0.04)) - originalDamage;
+            if (damage < 0) damage = 0;
 
-            float finalDamage = (float) (originalDamage * (1 - Math.max(points / 5f, points - originalDamage / (2 + toughness / 4f)) / 25) * (1 - /*0.75 */ epf * 0.04));
-
-            source.setDamage(originalDamage - finalDamage, DamageModifier.ARMOR);
+            source.setDamage(damage, DamageModifier.ARMOR);
         }
 
         if (super.attack(source)) {
