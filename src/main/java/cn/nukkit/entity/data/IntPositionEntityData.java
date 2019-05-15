@@ -9,6 +9,7 @@ import cn.nukkit.math.Vector3;
  * Nukkit Project
  */
 public class IntPositionEntityData extends EntityData<BlockVector3> {
+
     public int x;
     public int y;
     public int z;

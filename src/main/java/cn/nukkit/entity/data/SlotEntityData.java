@@ -8,6 +8,7 @@ import cn.nukkit.item.Item;
  * Nukkit Project
  */
 public class SlotEntityData extends EntityData<Item> {
+
     public int blockId;
     public int meta;
     public int count;

@@ -1,8 +1,6 @@
 package cn.nukkit.blockentity;
 
-import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -61,21 +59,6 @@ public class BlockEntityPistonArm extends BlockEntity {
         }
 
         super.initBlockEntity();
-    }
-
-    private void pushEntities() {
-        float lastProgress = this.getExtendedProgress(this.lastProgress);
-        double x = (double) (lastProgress * (float) this.facing.getXOffset());
-        double y = (double) (lastProgress * (float) this.facing.getYOffset());
-        double z = (double) (lastProgress * (float) this.facing.getZOffset());
-        AxisAlignedBB bb = new AxisAlignedBB(x, y, z, x + 1.0D, y + 1.0D, z + 1.0D);
-        Entity[] entities = this.level.getCollidingEntities(bb);
-        if (entities.length != 0) {
-        }
-    }
-
-    private float getExtendedProgress(float progress) {
-        return this.extending ? progress - 1.0F : 1.0F - progress;
     }
 
     public boolean isBlockEntityValid() {

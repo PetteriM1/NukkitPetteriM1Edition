@@ -478,7 +478,6 @@ public class Server {
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             String dir2 = null;
-            Level level = this.getDefaultLevel();
             File directory = new File("");
             try {
                 String f = directory.getCanonicalPath();
@@ -1004,7 +1003,7 @@ public class Server {
         player.dataPacket(player.protocol >= 354 ? CraftingManager.packet : CraftingManager.packetPre354);
     }
 
-    private void checkTickUpdates(int currentTick, long tickTime) {
+    private void checkTickUpdates(int currentTick) {
         for (Player p : new ArrayList<>(this.players.values())) {
             if (this.alwaysTickPlayers) {
                 p.onUpdate(currentTick);
@@ -1101,7 +1100,7 @@ public class Server {
         this.scheduler.mainThreadHeartbeat(this.tickCounter);
         Timings.schedulerTimer.stopTiming();
 
-        this.checkTickUpdates(this.tickCounter, tickTime);
+        this.checkTickUpdates(this.tickCounter);
 
         for (Player player : new ArrayList<>(this.players.values())) {
             player.checkNetwork();

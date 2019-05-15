@@ -57,9 +57,6 @@ public class EntityThrownTrident extends EntityProjectile {
         return 0.01f;
     }
 
-    protected float gravity = 0.04f;
-    protected float drag = 0.01f;
-
     public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }

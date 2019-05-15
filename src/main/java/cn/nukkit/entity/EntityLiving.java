@@ -48,8 +48,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected int attackTime = 0;
 
-    protected boolean invisible = false;
-
     protected float movementSpeed = 0.1f;
 
     protected int turtleTicks = 200;

@@ -157,8 +157,4 @@ public class JavaPluginLoader implements PluginLoader {
             classes.put(name, clazz);
         }
     }
-
-    private void removeClass(String name) {
-        classes.remove(name);
-    }
 }

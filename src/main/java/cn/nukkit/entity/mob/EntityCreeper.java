@@ -114,7 +114,6 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
         if (this.target instanceof EntityCreature || before != this.target) {
             double x = this.target.x - this.x;
-            double y = this.target.y - this.y;
             double z = this.target.z - this.z;
 
             double diff = Math.abs(x) + Math.abs(z);
