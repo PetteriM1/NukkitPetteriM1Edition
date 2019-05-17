@@ -1,5 +1,6 @@
 package cn.nukkit.raknet.server;
 
+import cn.nukkit.Server;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.raknet.RakNet;
 import cn.nukkit.raknet.protocol.DataPacket;
@@ -39,7 +40,6 @@ public class Session {
     private final String address;
     private final int port;
     private int state = STATE_UNCONNECTED;
-    //private List<EncapsulatedPacket> preJoinQueue = new ArrayList<>();
     private int mtuSize = MIN_MTU_SIZE;
     private long id = 0;
     private int splitID = 0;
@@ -106,11 +106,11 @@ public class Session {
     }
 
     public void update(long time) throws Exception {
-        if (!this.isActive && (this.lastUpdate + 10000) < time) { //10 second timeout
+        if (!this.isActive && (this.lastUpdate + Server.getInstance().getPropertyInt("timeout-milliseconds", 15000)) < time) {
             this.disconnect("timeout");
-
             return;
         }
+
         this.isActive = false;
 
         if (!this.ACKQueue.isEmpty()) {
@@ -452,8 +452,6 @@ public class Session {
             }
         } else if (state == STATE_CONNECTED) {
             this.sessionManager.streamEncapsulated(this, packet);
-        } else {
-            //this.sessionManager.getLogger().notice("Received packet before connection: "+Binary.bytesToHexString(packet.buffer));
         }
     }
 

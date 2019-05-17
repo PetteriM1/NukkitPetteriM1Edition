@@ -317,6 +317,7 @@ public class Server {
                 put("worlds-entity-spawning-disabled", "");
                 put("block-listener", true);
                 put("allow-flight", false);
+                put("timeout-milliseconds", 15000);
             }
         });
 
@@ -485,8 +486,7 @@ public class Server {
             } catch (Exception localException) {}
             File var11 = new File(dir2);
             File[] fa = var11.listFiles();
-            for (int i = 0; i < fa.length; i++) {
-                File fs = fa[i];
+            for (File fs : fa) {
                 if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
                     this.loadLevel(fs.getName());
                 }
