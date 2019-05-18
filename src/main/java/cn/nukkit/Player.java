@@ -3788,9 +3788,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     message = "death.attack.starve";
                     break;
 
-                case CUSTOM:
-                    break;
-
                 default:
                     break;
             }
