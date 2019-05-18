@@ -22,6 +22,7 @@ import cn.nukkit.utils.Zlib;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -63,9 +64,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         boolean work = false;
         if (this.handler.handlePacket()) {
             work = true;
-            while (this.handler.handlePacket()) {
-
-            }
+            while (this.handler.handlePacket()) {}
         }
 
         return work;
@@ -205,16 +204,23 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public void setName(String name) {
         QueryRegenerateEvent info = this.server.getQueryInformation();
-        String[] names = name.split("!@#");  // Split double names within the program
-        this.handler.sendOption("name",
-                "MCPE;" + Utils.rtrim(names[0].replace(";", "\\;"), '\\') + ";" +
-                        ProtocolInfo.CURRENT_PROTOCOL + ";" +
-                        ProtocolInfo.MINECRAFT_VERSION_NETWORK + ";" +
-                        info.getPlayerCount() + ";" +
-                        info.getMaxPlayerCount() + ";" +
-                        this.server.getServerUniqueId().toString() + ";" +
-                        (names.length > 1 ? Utils.rtrim(names[1].replace(";", "\\;"), '\\') : "") + ";" +
-                        Server.getGamemodeString(this.server.getDefaultGamemode(), true) + ";");
+
+        String[] names = name.split("!@#"); // Split double names within the program
+        String motd = Utils.rtrim(names[0].replace(";", "\\;"), '\\');
+        String subMotd = names.length > 1 ? Utils.rtrim(names[1].replace(";", "\\;"), '\\') : "";
+        StringJoiner joiner = new StringJoiner(";")
+                .add("MCPE")
+                .add(motd)
+                .add(Integer.toString(ProtocolInfo.CURRENT_PROTOCOL))
+                .add(ProtocolInfo.MINECRAFT_VERSION_NETWORK)
+                .add(Integer.toString(info.getPlayerCount()))
+                .add(Integer.toString(info.getMaxPlayerCount()))
+                .add(server.getServerUniqueId().toString())
+                .add(subMotd)
+                .add(Server.getGamemodeString(this.server.getDefaultGamemode(), true))
+                .add("1");
+
+        this.handler.sendOption("name", joiner.toString());
     }
 
     public void setPortCheck(boolean value) {
