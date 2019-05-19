@@ -94,7 +94,7 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.hasAchievementsDisabled);
         this.putVarInt(this.dayCycleStopTime);
         this.putBoolean(this.eduMode);
-        if (protocol > 223) {
+        if (protocol > 224) {
             this.putBoolean(this.hasEduFeaturesEnabled);
         }
         this.putLFloat(this.rainLevel);
@@ -128,7 +128,7 @@ public class StartGamePacket extends DataPacket {
             this.putVarInt(this.platformBroadcastMode);
             this.putBoolean(this.xblBroadcastIntentOld);
         }
-        if (protocol > 223) {
+        if (protocol > 224) {
             this.putBoolean(this.hasLockedBehaviorPack);
             this.putBoolean(this.hasLockedResourcePack);
             this.putBoolean(this.isFromLockedWorldTemplate);

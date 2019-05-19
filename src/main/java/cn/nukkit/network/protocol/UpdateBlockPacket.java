@@ -40,7 +40,7 @@ public class UpdateBlockPacket extends DataPacket {
         this.putBlockVector3(x, y, z);
         this.putUnsignedVarInt(blockRuntimeId);
         this.putUnsignedVarInt(flags);
-        if (protocol > 223) {
+        if (protocol > 224) {
             this.putUnsignedVarInt(dataLayer);
         }
     }

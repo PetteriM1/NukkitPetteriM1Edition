@@ -140,6 +140,7 @@ public class GlobalBlockPalette {
     public static int getOrCreateRuntimeId(int protocol, int legacyId) {
         switch (protocol) {
             case 223:
+            case 224:
             case 261:
             case 274:
                 return legacyToRuntimeId274.get(legacyId);
@@ -162,6 +163,7 @@ public class GlobalBlockPalette {
     private static void registerMapping(int protocol, int legacyId) {
         switch (protocol) {
             case 223:
+            case 224:
             case 261:
             case 274:
                 legacyToRuntimeId274.put(legacyId, runtimeIdAllocator274.getAndIncrement());
@@ -190,6 +192,7 @@ public class GlobalBlockPalette {
     public static byte[] getCompiledTable(int protocol) {
         switch (protocol) {
             case 223:
+            case 224:
             case 261:
             case 274:
                 return compiledTable274;
