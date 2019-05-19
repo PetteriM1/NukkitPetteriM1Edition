@@ -55,10 +55,15 @@ public class ItemSpawnEgg extends Item {
             BlockEntity blockEntity = level.getBlockEntity(target);
             if (blockEntity instanceof BlockEntitySpawner) {
                 ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
+
+                if (!player.isCreative()) {
+                    player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                }
             } else {
                 if (blockEntity != null) {
                     blockEntity.close();
                 }
+
                 CompoundTag nbt = new CompoundTag()
                         .putString("id", BlockEntity.MOB_SPAWNER)
                         .putInt("EntityId", this.getDamage())
@@ -66,7 +71,12 @@ public class ItemSpawnEgg extends Item {
                         .putInt("y", (int) target.y)
                         .putInt("z", (int) target.z);
                 new BlockEntitySpawner(level.getChunk((int) target.x >> 4, (int) target.z >> 4), nbt);
+
+                if (!player.isCreative()) {
+                    player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                }
             }
+
             return true;
         }
 
@@ -96,10 +106,8 @@ public class ItemSpawnEgg extends Item {
         Entity entity = Entity.createEntity(this.meta, chunk, nbt);
 
         if (entity != null) {
-            if (player.isSurvival()) {
-                Item item = player.getInventory().getItemInHand();
-                item.setCount(item.getCount() - 1);
-                player.getInventory().setItemInHand(item);
+            if (!player.isCreative()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             }
 
             entity.spawnToAll();
