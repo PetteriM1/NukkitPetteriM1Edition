@@ -27,7 +27,7 @@ public class PlayerListPacket extends DataPacket {
         this.putByte(this.type);
         this.putUnsignedVarInt(this.entries.length);
         for (Entry entry : this.entries) {
-            if (protocol > 201) {
+            if (protocol >= 223) {
                 this.putUUID(entry.uuid);
             }
             if (type == TYPE_ADD) {
@@ -36,7 +36,7 @@ public class PlayerListPacket extends DataPacket {
                 }
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
-                if (protocol > 201 && protocol <= 282) {
+                if (protocol >= 223 && protocol <= 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }
@@ -45,9 +45,11 @@ public class PlayerListPacket extends DataPacket {
                     this.putByteArray(new byte[0]);
                 }
                 this.putString(entry.xboxUserId);
-                if (protocol > 201) {
+                if (protocol >= 223) {
                     this.putString(entry.platformChatId);
                 }
+            } else if (protocol <= 201) {
+                this.putUUID(entry.uuid);
             }
         }
     }

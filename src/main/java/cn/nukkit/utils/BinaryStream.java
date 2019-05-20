@@ -261,7 +261,7 @@ public class BinaryStream {
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
         this.putByteArray(skin.getSkinData());
-        if (protocol > 201) {
+        if (protocol >= 223) {
             this.putByteArray(skin.getCapeData());
         }
         this.putString(skin.getGeometryName());
