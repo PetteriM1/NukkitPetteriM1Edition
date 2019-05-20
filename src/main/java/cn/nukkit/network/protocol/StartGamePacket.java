@@ -124,7 +124,7 @@ public class StartGamePacket extends DataPacket {
         if (protocol < 332) {
             this.putVarInt(this.gamePublish);
         }
-        if (protocol >= 223) {
+        if (protocol >= 201) {
             this.putLInt(this.serverChunkTickRange);
         }
         if (protocol >= 223 && protocol < 332) {
