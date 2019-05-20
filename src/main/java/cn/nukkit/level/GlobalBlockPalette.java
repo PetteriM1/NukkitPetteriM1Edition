@@ -171,7 +171,6 @@ public class GlobalBlockPalette {
 
     public static int getOrCreateRuntimeId(int protocol, int legacyId) {
         switch (protocol) {
-                //TODO others
             case 223:
             case 224:
                 return legacyToRuntimeId223.get(legacyId);
