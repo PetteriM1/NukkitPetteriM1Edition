@@ -435,7 +435,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             case 140:
             case 141:
             case 150:
-            case 200:
+            case 160:
             case 201:
             case 223:
             case 224:
