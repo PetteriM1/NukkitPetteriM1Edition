@@ -32,8 +32,6 @@ public class GlobalBlockPalette {
     private static final Int2IntArrayMap legacyToRuntimeId332 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId340 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId354 = new Int2IntArrayMap();
-    private static byte[] compiledTable223;
-    private static byte[] compiledTable261;
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -65,7 +63,7 @@ public class GlobalBlockPalette {
                 table223.putString(entry223.name);
                 table223.putLShort(entry223.data);
             }
-            compiledTable223 = table223.getBuffer();
+            // Compiled table not needed for 223
             // 261
             InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
             if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
@@ -77,8 +75,8 @@ public class GlobalBlockPalette {
                 table261.putString(entry261.name);
                 table261.putLShort(entry261.data);
             }
-            compiledTable261 = table261.getBuffer();
-            // 282
+            // Compiled table not needed 261
+            // 274
             InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
             if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
             Collection<TableEntry> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
@@ -171,6 +169,7 @@ public class GlobalBlockPalette {
 
     public static int getOrCreateRuntimeId(int protocol, int legacyId) {
         switch (protocol) {
+            // Versions before this doesn't use runtime IDs
             case 223:
             case 224:
                 return legacyToRuntimeId223.get(legacyId);
@@ -195,15 +194,13 @@ public class GlobalBlockPalette {
     }
 
     private static void registerMapping(int protocol, int legacyId) {
-        switch (protocol) {
+        switch (protocol) { // NOTE: Not all versions are supposed to be here
             case 223:
-            case 224:
                 legacyToRuntimeId223.put(legacyId, runtimeIdAllocator223.getAndIncrement());
             case 261:
                 legacyToRuntimeId261.put(legacyId, runtimeIdAllocator261.getAndIncrement());
             case 274:
                 legacyToRuntimeId274.put(legacyId, runtimeIdAllocator274.getAndIncrement());
-            case 281:
             case 282:
                 legacyToRuntimeId282.put(legacyId, runtimeIdAllocator282.getAndIncrement());
                 break;
@@ -219,19 +216,18 @@ public class GlobalBlockPalette {
             case 340:
                 legacyToRuntimeId340.put(legacyId, runtimeIdAllocator340.getAndIncrement());
                 break;
-            default: // Current protocol
+            case 354:
                 legacyToRuntimeId354.put(legacyId, runtimeIdAllocator354.getAndIncrement());
+                break;
+            default:
+                Server.getInstance().getLogger().alert("Tried to register mapping for unsupported protocol version: " + protocol);
                 break;
         }
     }
 
     public static byte[] getCompiledTable(int protocol) {
         switch (protocol) {
-            case 223:
-            case 224:
-                return compiledTable223;
-            case 261:
-                return compiledTable261;
+            // Versions before this doesn't need compiled table in StartGamePacket
             case 274:
                 return compiledTable274;
             case 281:

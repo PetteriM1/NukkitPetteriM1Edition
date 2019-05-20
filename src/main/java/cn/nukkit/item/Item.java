@@ -432,6 +432,10 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     public static ArrayList<Item> getCreativeItems(int protocol) {
         switch (protocol) {
+            case 140:
+            case 141:
+            case 150:
+            case 200:
             case 201:
             case 223:
             case 224:
@@ -457,16 +461,11 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static void addCreativeItem(int protocol, Item item) {
-        switch (protocol) {
-            case 201:
-            case 223:
-            case 224:
-            case 261:
+        switch (protocol) { // NOTE: Not all versions are supposed to be here
+            case 137:
                 Item.creative137.add(item.clone());
             case 274:
                 Item.creative274.add(item.clone());
-            case 281:
-            case 282:
             case 291:
                 Item.creative291.add(item.clone());
                 break;
