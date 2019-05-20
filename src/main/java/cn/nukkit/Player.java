@@ -2110,6 +2110,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    if (this.protocol < getServer().getPropertyInt("multiversion-min-protocol")) {
+                        this.close("", "Multiversion support for this Minecraft version is disabled");
+                        break;
+                    }
+
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();

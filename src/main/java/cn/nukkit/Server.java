@@ -318,6 +318,7 @@ public class Server {
                 put("block-listener", true);
                 put("allow-flight", false);
                 put("timeout-milliseconds", 15000);
+                put("multiversion-min-protocol", 0);
             }
         });
 
