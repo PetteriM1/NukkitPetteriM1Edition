@@ -31,7 +31,7 @@ public class PlayerListPacket extends DataPacket {
                 this.putUUID(entry.uuid);
             }
             if (type == TYPE_ADD) {
-                if (protocol <= 201) {
+                if (protocol < 223) {
                     this.putUUID(entry.uuid);
                 }
                 this.putVarLong(entry.entityId);
@@ -41,14 +41,14 @@ public class PlayerListPacket extends DataPacket {
                     this.putVarInt(0);
                 }
                 this.putSkin(entry.skin);
-                if (protocol <= 201) {
+                if (protocol < 223) {
                     this.putByteArray(new byte[0]);
                 }
                 this.putString(entry.xboxUserId);
                 if (protocol >= 223) {
                     this.putString(entry.platformChatId);
                 }
-            } else if (protocol <= 201) {
+            } else if (protocol < 223) {
                 this.putUUID(entry.uuid);
             }
         }
