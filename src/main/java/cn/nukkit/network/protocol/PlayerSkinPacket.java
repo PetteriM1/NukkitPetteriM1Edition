@@ -44,6 +44,8 @@ public class PlayerSkinPacket extends DataPacket {
         putByteArray(skin.getCapeData());
         putString(skin.getGeometryName());
         putString(skin.getGeometryData());
-        putBoolean(premium);
+        if (protocol > 274) {
+            putBoolean(premium);
+        }
     }
 }
