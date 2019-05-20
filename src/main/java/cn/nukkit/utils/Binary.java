@@ -107,6 +107,11 @@ public class Binary {
         for (int id : map.keySet()) {
             EntityData d = map.get(id);
             if (protocol < 354) {
+                if (protocol <= 201) {
+                    if (id > 35) {
+                        id = id + 1;
+                    }
+                }
                 if (id > 40) {
                     id = id - 1;
                 }

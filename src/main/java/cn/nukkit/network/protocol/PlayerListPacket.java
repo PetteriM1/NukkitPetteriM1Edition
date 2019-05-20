@@ -41,8 +41,13 @@ public class PlayerListPacket extends DataPacket {
                     this.putVarInt(0);
                 }
                 this.putSkin(entry.skin);
+                if (protocol <= 201) {
+                    this.putByteArray(new byte[0]);
+                }
                 this.putString(entry.xboxUserId);
-                this.putString(entry.platformChatId);
+                if (protocol > 201) {
+                    this.putString(entry.platformChatId);
+                }
             }
         }
     }
