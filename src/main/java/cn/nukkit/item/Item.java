@@ -432,6 +432,7 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     public static ArrayList<Item> getCreativeItems(int protocol) {
         switch (protocol) {
+            case 137:
             case 140:
             case 141:
             case 150:
