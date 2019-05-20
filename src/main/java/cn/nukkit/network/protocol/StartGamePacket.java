@@ -114,7 +114,9 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(gameRules);
         this.putBoolean(this.bonusChest);
-        this.putBoolean(this.hasStartWithMapEnabled);
+        if (protocol > 201) { // Should maybe be > 261
+            this.putBoolean(this.hasStartWithMapEnabled);
+        }
         if (protocol < 332) {
             this.putBoolean(this.trustPlayers);
         }

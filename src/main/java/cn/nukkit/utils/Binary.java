@@ -106,6 +106,8 @@ public class Binary {
         stream.putUnsignedVarInt(map.size());
         for (int id : map.keySet()) {
             EntityData d = map.get(id);
+
+            // HACK: Multiversion entity data
             if (protocol < 354) {
                 if (protocol <= 201) {
                     if (id > 35) {
@@ -116,6 +118,7 @@ public class Binary {
                     id = id - 1;
                 }
             }
+
             stream.putUnsignedVarInt(id);
             stream.putUnsignedVarInt(d.getType());
             switch (d.getType()) {
