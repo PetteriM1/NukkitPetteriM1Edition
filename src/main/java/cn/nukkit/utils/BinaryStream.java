@@ -10,6 +10,7 @@ import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.EntityLink;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 
@@ -254,9 +255,15 @@ public class BinaryStream {
     }
 
     public void putSkin(Skin skin) {
+        this.putSkin(ProtocolInfo.CURRENT_PROTOCOL, skin);
+    }
+
+    public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
         this.putByteArray(skin.getSkinData());
-        this.putByteArray(skin.getCapeData());
+        if (protocol > 201) {
+            this.putByteArray(skin.getCapeData());
+        }
         this.putString(skin.getGeometryName());
         this.putString(skin.getGeometryData());
     }

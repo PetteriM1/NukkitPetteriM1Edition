@@ -42,6 +42,8 @@ public class AddItemEntityPacket extends DataPacket {
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.put(Binary.writeMetadata(protocol, metadata));
-        this.putBoolean(this.isFromFishing);
+        if (protocol > 201) {
+            this.putBoolean(this.isFromFishing);
+        }
     }
 }

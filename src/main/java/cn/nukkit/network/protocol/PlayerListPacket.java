@@ -27,11 +27,16 @@ public class PlayerListPacket extends DataPacket {
         this.putByte(this.type);
         this.putUnsignedVarInt(this.entries.length);
         for (Entry entry : this.entries) {
-            this.putUUID(entry.uuid);
+            if (protocol > 201) {
+                this.putUUID(entry.uuid);
+            }
             if (type == TYPE_ADD) {
+                if (protocol <= 201) {
+                    this.putUUID(entry.uuid);
+                }
                 this.putVarLong(entry.entityId);
                 this.putString(entry.name);
-                if (protocol <= 282) {
+                if (protocol > 201 && protocol <= 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }
