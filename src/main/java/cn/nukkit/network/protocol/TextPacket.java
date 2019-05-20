@@ -103,7 +103,7 @@ public class TextPacket extends DataPacket {
                     this.putString(parameter);
                 }
         }
-        if (protocol > 201) {
+        if (protocol >= 223) {
             this.putString(this.platformChatId);
         }
     }

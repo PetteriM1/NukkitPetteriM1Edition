@@ -45,13 +45,13 @@ public class AddPlayerPacket extends DataPacket {
         this.reset();
         this.putUUID(this.uuid);
         this.putString(this.username);
-        if (protocol > 201 && protocol <= 282) {
+        if (protocol >= 223 && protocol <= 282) {
             this.putString("");
             this.putVarInt(0);
         }
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (protocol > 201) {
+        if (protocol >= 223) {
             this.putString(this.platformChatId);
         }
         this.putVector3f(this.x, this.y, this.z);
