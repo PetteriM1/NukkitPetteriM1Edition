@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlobalBlockPalette {
 
+    private static final AtomicInteger runtimeIdAllocator223 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator261 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator274 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator282 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator291 = new AtomicInteger(0);
@@ -21,6 +23,8 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator332 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator340 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
+    private static final Int2IntArrayMap legacyToRuntimeId223 = new Int2IntArrayMap();
+    private static final Int2IntArrayMap legacyToRuntimeId261 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId274 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId282 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId291 = new Int2IntArrayMap();
@@ -28,6 +32,8 @@ public class GlobalBlockPalette {
     private static final Int2IntArrayMap legacyToRuntimeId332 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId340 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId354 = new Int2IntArrayMap();
+    private static byte[] compiledTable223;
+    private static byte[] compiledTable261;
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -37,6 +43,8 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable354;
 
     static {
+        legacyToRuntimeId223.defaultReturnValue(-1);
+        legacyToRuntimeId261.defaultReturnValue(-1);
         legacyToRuntimeId274.defaultReturnValue(-1);
         legacyToRuntimeId282.defaultReturnValue(-1);
         legacyToRuntimeId291.defaultReturnValue(-1);
@@ -46,6 +54,30 @@ public class GlobalBlockPalette {
         legacyToRuntimeId354.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
+            // 223
+            InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
+            if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
+            Collection<TableEntry> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table223 = new BinaryStream();
+            table223.putUnsignedVarInt(entries223.size());
+            for (TableEntry entry223 : entries223) {
+                registerMapping(223, (entry223.id << 4) | entry223.data);
+                table223.putString(entry223.name);
+                table223.putLShort(entry223.data);
+            }
+            compiledTable223 = table223.getBuffer();
+            // 261
+            InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
+            if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
+            Collection<TableEntry> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table261 = new BinaryStream();
+            table261.putUnsignedVarInt(entries261.size());
+            for (TableEntry entry261 : entries261) {
+                registerMapping(261, (entry261.id << 4) | entry261.data);
+                table261.putString(entry261.name);
+                table261.putLShort(entry261.data);
+            }
+            compiledTable261 = table261.getBuffer();
             // 282
             InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
             if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
@@ -139,9 +171,12 @@ public class GlobalBlockPalette {
 
     public static int getOrCreateRuntimeId(int protocol, int legacyId) {
         switch (protocol) {
+                //TODO others
             case 223:
             case 224:
+                return legacyToRuntimeId223.get(legacyId);
             case 261:
+                return legacyToRuntimeId261.get(legacyId);
             case 274:
                 return legacyToRuntimeId274.get(legacyId);
             case 281:
@@ -164,7 +199,9 @@ public class GlobalBlockPalette {
         switch (protocol) {
             case 223:
             case 224:
+                legacyToRuntimeId223.put(legacyId, runtimeIdAllocator223.getAndIncrement());
             case 261:
+                legacyToRuntimeId261.put(legacyId, runtimeIdAllocator261.getAndIncrement());
             case 274:
                 legacyToRuntimeId274.put(legacyId, runtimeIdAllocator274.getAndIncrement());
             case 281:
@@ -193,7 +230,9 @@ public class GlobalBlockPalette {
         switch (protocol) {
             case 223:
             case 224:
+                return compiledTable223;
             case 261:
+                return compiledTable261;
             case 274:
                 return compiledTable274;
             case 281:
