@@ -5,6 +5,7 @@ package cn.nukkit.item;
  * Nukkit Project
  */
 public abstract class ItemEdible extends Item {
+
     public ItemEdible(int id, Integer meta, int count, String name) {
         super(id, meta, count, name);
     }

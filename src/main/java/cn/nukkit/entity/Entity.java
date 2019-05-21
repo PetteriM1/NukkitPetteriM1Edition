@@ -377,7 +377,7 @@ public abstract class Entity extends Location implements Metadatable {
             // We've already initialized this entity
             return;
         }
-        
+
         this.initialized = true;
 
         this.timing = Timings.getEntityTiming(this);
