@@ -252,7 +252,6 @@ public abstract class Entity extends Location implements Metadatable {
     public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
     public boolean onGround;
-    public boolean inBlock = false;
     public int deadTicks = 0;
     public int age = 0;
 
@@ -266,7 +265,6 @@ public abstract class Entity extends Location implements Metadatable {
 
     public float fallDistance = 0;
     public int lastUpdate;
-    public int maxFireTicks;
     public int fireTicks = 0;
     public int inPortalTicks = 0;
     public int inEndPortalTicks = 0;
@@ -293,6 +291,8 @@ public abstract class Entity extends Location implements Metadatable {
     protected Timing timing;
 
     protected boolean isPlayer = false;
+
+    private volatile boolean initialized;
 
     public float getHeight() {
         return 0;
@@ -372,6 +372,13 @@ public abstract class Entity extends Location implements Metadatable {
         if ((chunk == null || chunk.getProvider() == null)) {
             throw new ChunkException("Invalid garbage Chunk given to Entity");
         }
+
+        if (this.initialized) {
+            // We've already initialized this entity
+            return;
+        }
+        
+        this.initialized = true;
 
         this.timing = Timings.getEntityTiming(this);
 
