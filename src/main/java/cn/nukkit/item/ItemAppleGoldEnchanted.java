@@ -5,6 +5,7 @@ package cn.nukkit.item;
  * Package cn.nukkit.item in project nukkit.
  */
 public class ItemAppleGoldEnchanted extends ItemEdible {
+
     public ItemAppleGoldEnchanted() {
         this(0, 1);
     }

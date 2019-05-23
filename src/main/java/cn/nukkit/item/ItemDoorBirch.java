@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockDoorBirch;
 
 public class ItemDoorBirch extends Item {
+
     public ItemDoorBirch() {
         this(0, 1);
     }

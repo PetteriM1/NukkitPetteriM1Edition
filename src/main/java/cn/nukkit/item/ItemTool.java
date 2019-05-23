@@ -13,6 +13,7 @@ import java.util.Random;
  * Nukkit Project
  */
 public abstract class ItemTool extends Item {
+
     public static final int TIER_WOODEN = 1;
     public static final int TIER_GOLD = 2;
     public static final int TIER_STONE = 3;

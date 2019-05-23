@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockDoorJungle;
 
 public class ItemDoorJungle extends Item {
+
     public ItemDoorJungle() {
         this(0, 1);
     }
