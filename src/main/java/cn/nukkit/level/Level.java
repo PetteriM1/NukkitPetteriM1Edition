@@ -30,7 +30,9 @@ import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.PopChunkManager;
-import cn.nukkit.level.generator.task.*;
+import cn.nukkit.level.generator.task.GenerationTask;
+import cn.nukkit.level.generator.task.LightPopulationTask;
+import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
@@ -50,7 +52,10 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
 import com.google.common.base.Preconditions;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
@@ -1793,7 +1798,7 @@ public class Level implements ChunkManager, Metadatable {
 
     @SuppressWarnings("unchecked")
     public Item useBreakOn(Vector3 vector, BlockFace face, Item item, Player player, boolean createParticles) {
-        if (player != null && player.getGamemode() > 1) {
+        if (player != null && player.getGamemode() > 2) {
             return null;
         }
         Block target = this.getBlock(vector);
@@ -1805,6 +1810,25 @@ public class Level implements ChunkManager, Metadatable {
         boolean isSilkTouch = item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null;
 
         if (player != null) {
+            if (player.getGamemode() == 2) {
+                Tag tag = item.getNamedTagEntry("CanDestroy");
+                boolean canBreak = false;
+                if (tag instanceof ListTag) {
+                    for (Tag v : ((ListTag<Tag>) tag).getAll()) {
+                        if (v instanceof StringTag) {
+                            Item entry = Item.fromString(((StringTag) v).data);
+                            if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
+                                canBreak = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!canBreak) {
+                    return null;
+                }
+            }
+
             double breakTime = target.getBreakTime(item, player);
 
             if (player.isCreative() && breakTime > 0.15) {
@@ -1872,24 +1896,6 @@ public class Level implements ChunkManager, Metadatable {
         if (above != null) {
             if (above.getId() == Item.FIRE) {
                 this.setBlock(above, new BlockAir(), true);
-            }
-        }
-
-        Tag tag = item.getNamedTagEntry("CanDestroy");
-        if (tag instanceof ListTag) {
-            boolean canBreak = false;
-            for (Tag v : ((ListTag<Tag>) tag).getAll()) {
-                if (v instanceof StringTag) {
-                    Item entry = Item.fromString(((StringTag) v).data);
-                    if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
-                        canBreak = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!canBreak) {
-                return null;
             }
         }
 
@@ -2007,7 +2013,7 @@ public class Level implements ChunkManager, Metadatable {
             player.hasInteracted.set(true);
             server.getScheduler().scheduleDelayedTask(() -> player.hasInteracted.compareAndSet(true, false), 5);
 
-            if (player.getGamemode() > 1 && !Server.getInstance().suomiCraftPEMode()) {
+            if (player.getGamemode() > 2) {
                 ev.setCancelled();
             }
 
@@ -2095,27 +2101,26 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (player != null) {
-            Tag tag = item.getNamedTagEntry("CanPlaceOn");
-            if (tag instanceof ListTag) {
+            BlockPlaceEvent event = new BlockPlaceEvent(player, hand, block, target, item);
+            if (player.getGamemode() == 2) {
+                Tag tag = item.getNamedTagEntry("CanPlaceOn");
                 boolean canPlace = false;
-                for (Tag v : ((ListTag<Tag>) tag).getAll()) {
-                    if (v instanceof StringTag) {
-                        Item entry = Item.fromString(((StringTag) v).data);
-                        if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
-                            canPlace = true;
-                            break;
+                if (tag instanceof ListTag) {
+                    for (Tag v : ((ListTag<Tag>) tag).getAll()) {
+                        if (v instanceof StringTag) {
+                            Item entry = Item.fromString(((StringTag) v).data);
+                            if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {
+                                canPlace = true;
+                                break;
+                            }
                         }
                     }
                 }
-
                 if (!canPlace) {
-                    return null;
+                    event.setCancelled();
                 }
-            } else if (player.getGamemode() == 2) {
-                return null;
             }
 
-            BlockPlaceEvent event = new BlockPlaceEvent(player, hand, block, target, item);
             int distance = this.server.getSpawnRadius();
             if (!player.isOp() && distance > -1) {
                 Vector2 t = new Vector2(target.x, target.z);
