@@ -1027,6 +1027,8 @@ public class Level implements ChunkManager, Metadatable {
             for (Player p : target) {
                 try {
                     if (b instanceof Block) {
+                        updateBlockPacket.blockId = ((Block) b).getId();
+                        updateBlockPacket.blockData = ((Block) b).getDamage();
                         updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, ((Block) b).getFullId());
                     } else {
                         updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));

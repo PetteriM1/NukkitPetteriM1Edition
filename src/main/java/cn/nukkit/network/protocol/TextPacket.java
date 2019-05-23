@@ -84,7 +84,7 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
-                if (protocol <= 282) {
+                if (protocol > 201 && protocol <= 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }
@@ -103,6 +103,8 @@ public class TextPacket extends DataPacket {
                     this.putString(parameter);
                 }
         }
-        this.putString(this.platformChatId);
+        if (protocol >= 223) {
+            this.putString(this.platformChatId);
+        }
     }
 }

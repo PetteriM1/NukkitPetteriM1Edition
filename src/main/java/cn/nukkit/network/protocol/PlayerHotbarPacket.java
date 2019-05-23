@@ -27,6 +27,9 @@ public class PlayerHotbarPacket extends DataPacket {
         this.reset();
         this.putUnsignedVarInt(this.selectedHotbarSlot);
         this.putByte((byte) this.windowId);
+        if (protocol == 201) {
+            this.putUnsignedVarInt(0);
+        }
         this.putBoolean(this.selectHotbarSlot);
     }
 }
