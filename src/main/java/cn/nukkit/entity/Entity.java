@@ -8,6 +8,7 @@ import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
+import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -1574,6 +1575,10 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.attack(new EntityDamageByEntityEvent(entity, this, DamageCause.LIGHTNING, 5))) {
             if (this.fireTicks < 8 * 20) {
                 this.setOnFire(8);
+            }
+
+            if (this instanceof EntityCreeper) {
+                ((EntityCreeper) this).setPowered(true);
             }
         }
     }

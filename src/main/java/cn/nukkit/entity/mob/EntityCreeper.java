@@ -5,6 +5,7 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
+import cn.nukkit.item.ItemSkull;
 import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
@@ -118,26 +119,24 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
             double diff = Math.abs(x) + Math.abs(z);
             double distance = target.distance(this);
-            if (distance <= 4.5) {
+            if (distance <= 4) {
                 if (target instanceof EntityCreature) {
                     if (bombTime == 0) {
                         this.level.addSound(new TNTPrimeSound(this.add(0, getEyeHeight())));
                         this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
                     }
                     this.bombTime += tickDiff;
-                    if (this.bombTime >= 64) {
+                    if (this.bombTime >= 30) {
                         this.explode();
                         return false;
                     }
-                } else if (Math.pow(this.x - target.x, 2) + Math.pow(this.z - target.z, 2) <= 1) {
-                    this.moveTime = 0;
+                    if (distance <= 1) {
+                        this.moveTime = 0;
+                    }
                 }
             } else {
-                this.bombTime -= tickDiff;
-                if (this.bombTime < 0) {
-                    this.bombTime = 0;
-                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
-                }
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
+                this.bombTime = 0;
 
                 this.motionX = this.getSpeed() * 0.15 * (x / diff);
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
@@ -191,6 +190,18 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
             for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
             }
+
+            Entity killer = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
+
+            if (killer instanceof EntitySkeleton || killer instanceof EntityStray) {
+                drops.add(Item.get(EntityUtils.rand(500, 511), 0, 1));
+            }
+
+            if (killer instanceof EntityCreeper) {
+                if (((EntityCreeper) killer).isPowered()) {
+                    drops.add(Item.get(Item.SKULL, ItemSkull.CREEPER_HEAD, 1));
+                }
+            }
         }
 
         return drops.toArray(new Item[0]);
@@ -213,5 +224,13 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         }
 
         return false;
+    }
+
+    public boolean isPowered() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_POWERED);
+    }
+
+    public void setPowered(boolean charged) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_POWERED, charged);
     }
 }
