@@ -1,15 +1,13 @@
 package cn.nukkit.blockentity;
 
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ShortTag;
+import cn.nukkit.utils.EntityUtils;
 
 import java.util.ArrayList;
 
@@ -107,9 +105,12 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                                 this.z + EntityUtils.rand(-this.spawnRange, this.spawnRange),
                                 this.level
                         );
+
                 Entity entity = EntityUtils.create(this.entityId, pos);
-                if (entity == null) return true;
-                entity.spawnToAll();
+
+                if (entity != null) {
+                    entity.spawnToAll();
+                }
             }
         }
         return true;
@@ -146,6 +147,10 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public void setSpawnEntityType(int entityId) {
         this.entityId = entityId;
         this.spawnToAll();
+    }
+
+    public int getSpawnEntityType() {
+        return this.entityId;
     }
 
     public void setMinSpawnDelay(int minDelay) {

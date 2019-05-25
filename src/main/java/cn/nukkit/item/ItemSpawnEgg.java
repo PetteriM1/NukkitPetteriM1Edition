@@ -54,10 +54,12 @@ public class ItemSpawnEgg extends Item {
         if (target instanceof BlockMobSpawner) {
             BlockEntity blockEntity = level.getBlockEntity(target);
             if (blockEntity instanceof BlockEntitySpawner) {
-                ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
+                if (((BlockEntitySpawner) blockEntity).getSpawnEntityType() != this.getDamage()) {
+                    ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
 
-                if (!player.isCreative()) {
-                    player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                    if (!player.isCreative()) {
+                        player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                    }
                 }
             } else {
                 if (blockEntity != null) {

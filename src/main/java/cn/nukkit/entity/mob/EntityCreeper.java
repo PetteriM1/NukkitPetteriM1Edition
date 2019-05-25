@@ -64,7 +64,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     }
 
     public void explode() {
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 3);
+        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, this.isPowered() ? 3 : 2.8);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {

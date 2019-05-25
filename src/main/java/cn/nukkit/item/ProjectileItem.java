@@ -2,7 +2,6 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.projectile.EntityEgg;
 import cn.nukkit.entity.item.EntityExpBottle;
 import cn.nukkit.entity.projectile.EntityEnderPearl;
 import cn.nukkit.entity.projectile.EntityProjectile;
@@ -65,10 +64,6 @@ public abstract class ProjectileItem extends Item {
                     ev.setCancelled(true);
                     projectile.kill();
                     player.sendMessage("\u00A7cXP bottles are disabled on creative");
-                } else if (player.getGamemode() == 1 && projectile instanceof EntityEgg && !player.getServer().getPropertyBoolean("spawn-eggs", false)) {
-                    ev.setCancelled(true);
-                    projectile.kill();
-                    player.sendMessage("\u00A7cEggs are disabled on creative");
                 } else {
                     if (!player.isCreative()) {
                         this.count--;
