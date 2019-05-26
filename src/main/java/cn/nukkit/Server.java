@@ -627,7 +627,7 @@ public class Server {
         if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
-            getInstance().batchPackets(players, new DataPacket[]{packet}, true);
+            getInstance().batchPackets(players, new DataPacket[]{packet}, false); // forceSync should be true?
         } else { // Need to force multiversion
             for (Player player : players) {
                 player.dataPacket(packet);

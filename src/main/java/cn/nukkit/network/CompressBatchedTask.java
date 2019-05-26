@@ -4,7 +4,6 @@ import cn.nukkit.Server;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.Zlib;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,11 +12,11 @@ import java.util.List;
  */
 public class CompressBatchedTask extends AsyncTask {
 
-    public int level = 5;
+    public int level;
     public byte[][] data;
     public byte[] finalData;
-    public int channel = 0;
-    public List<String> targets = new ArrayList<>();
+    public int channel;
+    public List<String> targets;
 
     public CompressBatchedTask(byte[][] data, List<String> targets) {
         this(data, targets, 5);
