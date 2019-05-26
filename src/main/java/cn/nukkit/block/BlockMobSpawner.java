@@ -56,4 +56,9 @@ public class BlockMobSpawner extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
 }
