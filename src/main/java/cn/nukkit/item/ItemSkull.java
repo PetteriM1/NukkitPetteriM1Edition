@@ -7,6 +7,7 @@ import cn.nukkit.block.Block;
  * Package cn.nukkit.item in project Nukkit.
  */
 public class ItemSkull extends Item {
+
     public static final int SKELETON_SKULL = 0;
     public static final int WITHER_SKELETON_SKULL = 1;
     public static final int ZOMBIE_HEAD = 2;
@@ -29,17 +30,17 @@ public class ItemSkull extends Item {
 
     public static String getItemSkullName(int meta) {
         switch (meta) {
-            case 1:
+            case WITHER_SKELETON_SKULL :
                 return "Wither Skeleton Skull";
-            case 2:
+            case ZOMBIE_HEAD:
                 return "Zombie Head";
-            case 3:
+            case HEAD:
                 return "Head";
-            case 4:
+            case CREEPER_HEAD:
                 return "Creeper Head";
-            case 5:
+            case DRAGON_HEAD:
                 return "Dragon Head";
-            case 0:
+            case SKELETON_SKULL:
             default:
                 return "Skeleton Skull";
         }

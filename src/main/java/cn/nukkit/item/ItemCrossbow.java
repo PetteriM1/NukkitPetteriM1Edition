@@ -111,14 +111,13 @@ public class ItemCrossbow extends ItemBow {
                             .add(new DoubleTag("", Math.cos(player.yaw / 180 * Math.PI) * Math.cos(player.pitch / 180 * Math.PI))))
                     .putList(new ListTag<FloatTag>("Rotation")
                             .add(new FloatTag("", (player.yaw > 180 ? 360 : 0) - (float) player.yaw))
-                            .add(new FloatTag("", (float) -player.pitch)))
-                    .putDouble("damage", 6);
+                            .add(new FloatTag("", (float) -player.pitch)));
 
             int diff = (Server.getInstance().getTick() - player.getStartActionTick());
             double p = (double) diff / 20;
 
             double f = Math.min((p * p + p * 2) / 3, 1) * 4;
-            EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, f == 2), f);
+            EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, false), f);
 
             if (f < 0.1 || diff < 5) {
                 entityShootBowEvent.setCancelled();

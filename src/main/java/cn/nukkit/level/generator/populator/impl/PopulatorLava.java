@@ -29,8 +29,6 @@ public class PopulatorLava extends Populator {
             int amount = random.nextRange(0, this.randomAmount + 1) + this.baseAmount;
             int bx = chunkX << 4;
             int bz = chunkZ << 4;
-            int tx = bx + 15;
-            int tz = bz + 15;
             for (int i = 0; i < amount; ++i) {
                 int x = random.nextRange(0, 15);
                 int z = random.nextRange(0, 15);
@@ -142,7 +140,6 @@ public class PopulatorLava extends Populator {
                             (j == 3 && previousDirection == 2)
                     ) {
                 int x = xx;
-                int y = yy;
                 int z = zz;
                 if (j == 0) {
                     --x;
@@ -153,17 +150,17 @@ public class PopulatorLava extends Populator {
                 } else if (j == 3) {
                     ++z;
                 }
-                if (!this.canFlowInto(x, y, z)) {
+                if (!this.canFlowInto(x, yy, z)) {
                     continue;
-                } else if (this.canFlowInto(x, y, z) && this.level.getBlockDataAt(x, y, z) == 0) {
+                } else if (this.canFlowInto(x, yy, z) && this.level.getBlockDataAt(x, yy, z) == 0) {
                     continue;
-                } else if (this.canFlowInto(x, y - 1, z)) {
+                } else if (this.canFlowInto(x, yy - 1, z)) {
                     return accumulatedCost;
                 }
                 if (accumulatedCost >= 4) {
                     continue;
                 }
-                int realCost = this.calculateFlowCost(x, y, z, accumulatedCost + 1, j);
+                int realCost = this.calculateFlowCost(x, yy, z, accumulatedCost + 1, j);
                 if (realCost < cost) {
                     cost = realCost;
                 }
@@ -178,7 +175,6 @@ public class PopulatorLava extends Populator {
         for (int j = 0; j < 4; ++j) {
             flowCost[j] = 1000;
             int x = xx;
-            int y = yy;
             int z = zz;
             if (j == 0) {
                 --x;
@@ -189,10 +185,10 @@ public class PopulatorLava extends Populator {
             } else if (j == 3) {
                 ++z;
             }
-            if (this.canFlowInto(x, y - 1, z)) {
+            if (this.canFlowInto(x, yy - 1, z)) {
                 flowCost[j] = 0;
             } else {
-                flowCost[j] = this.calculateFlowCost(x, y, z, 1, j);
+                flowCost[j] = this.calculateFlowCost(x, yy, z, 1, j);
             }
         }
         int minCost = flowCost[0];

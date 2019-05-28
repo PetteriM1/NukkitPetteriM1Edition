@@ -1,6 +1,7 @@
 package cn.nukkit.item;
 
 public class ItemLeatherHorseArmor extends Item {
+
     public ItemLeatherHorseArmor() {
         this(0, 1);
     }

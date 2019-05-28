@@ -191,7 +191,6 @@ public class PopulatorCaves extends Populator {
                                 }
 
                                 int material = chunk.getBlockId(xx, yy, zz);
-                                int materialAbove = chunk.getBlockId(xx, yy + 1, zz);
                                 if (material == Block.GRASS || material == Block.MYCELIUM) {
                                     grassFound = true;
                                 }

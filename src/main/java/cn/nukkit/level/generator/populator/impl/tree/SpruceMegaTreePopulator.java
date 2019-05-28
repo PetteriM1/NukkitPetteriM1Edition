@@ -18,15 +18,11 @@ public class SpruceMegaTreePopulator extends Populator {
     private int randomAmount;
     private int baseAmount;
 
-    private final int type;
-
     public SpruceMegaTreePopulator() {
         this(BlockSapling.SPRUCE);
     }
 
-    private SpruceMegaTreePopulator(int type) {
-        this.type = type;
-    }
+    private SpruceMegaTreePopulator(int type) {}
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

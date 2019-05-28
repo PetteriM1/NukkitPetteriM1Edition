@@ -216,7 +216,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private BlockEnderChest viewingEnderChest = null;
 
-    protected int lastEnderPearl = -1;
+    protected int lastEnderPearl = 20;
 
     private LoginChainData loginChainData;
 
@@ -1726,7 +1726,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inAirTicks = 0;
                     this.highestPosition = this.y;
                 } else {
-                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && !this.getAdventureSettings().get(Type.ALLOW_FLIGHT) && this.inAirTicks > 20 && !this.isSleeping() && !this.isImmobile() && !this.isSwimming()) {
+                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && !this.getAdventureSettings().get(Type.ALLOW_FLIGHT) && this.inAirTicks > 20 && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null) {
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
@@ -2091,6 +2091,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    if (this.protocol < getServer().getPropertyInt("multiversion-min-protocol")) {
+                        this.close("", "Multiversion support for this Minecraft version is disabled");
+                        break;
+                    }
+
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
@@ -2099,7 +2104,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.loginChainData = ClientChainData.read(loginPacket);
 
                     if (!loginChainData.isXboxAuthed() && server.getPropertyBoolean("xbox-auth")) {
-                        kick(PlayerKickEvent.Reason.UNKNOWN, "disconnectionScreen.notAuthenticated", false);
+                        this.close("", "disconnectionScreen.notAuthenticated");
                     }
 
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
@@ -3769,9 +3774,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     message = "death.attack.starve";
                     break;
 
-                case CUSTOM:
-                    break;
-
                 default:
                     break;
             }
@@ -4113,6 +4115,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected boolean checkTeleportPosition() {
+        return checkTeleportPosition(false);
+    }
+
+    protected boolean checkTeleportPosition(boolean enderPearl) {
         if (this.teleportPosition != null) {
             int chunkX = (int) this.teleportPosition.x >> 4;
             int chunkZ = (int) this.teleportPosition.z >> 4;
@@ -4127,7 +4133,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             this.spawnToAll();
-            this.forceMovement = this.teleportPosition;
+            if (!enderPearl) {
+                this.forceMovement = this.teleportPosition;
+            }
             this.teleportPosition = null;
             return true;
         }
@@ -4172,10 +4180,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.formOpen = false;
 
             this.teleportPosition = this;
-            this.forceMovement = this.teleportPosition;
+            if (cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+                this.forceMovement = this.teleportPosition;
+            }
             this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_TELEPORT);
 
-            this.checkTeleportPosition();
+            this.checkTeleportPosition(cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL);
 
             this.resetFallDistance();
             this.nextChunkOrderRun = 0;
@@ -4215,7 +4225,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void teleportImmediate(Location location, TeleportCause cause) {
         Location from = this.getLocation();
-        if (super.teleport(location, cause)) {
+        if (super.teleport(location.add(0, 0.00001, 0), cause)) {
 
             for (Inventory window : new ArrayList<>(this.windows.keySet())) {
                 if (window == this.inventory) {

@@ -48,7 +48,7 @@ public class ItemPainting extends Item {
         }
 
         if (!target.isTransparent() && face.getIndex() > 1 && !block.isSolid()) {
-            int[] direction = {3, 0, 2, 1};
+            int[] direction = {2, 3, 4, 5};
             int[] right = {4, 5, 3, 2};
 
             List<EntityPainting.Motive> validMotives = new ArrayList<>();
@@ -70,11 +70,8 @@ public class ItemPainting extends Item {
                 }
             }
 
-            int rot = direction[face.getHorizontalIndex()] * 90;
-            if (direction[face.getHorizontalIndex()] * 90 == 0) rot = 360;
-
             CompoundTag nbt = new CompoundTag()
-                    .putByte("Direction", direction[face.getHorizontalIndex()])
+                    .putByte("Direction", direction[face.getIndex() - 2])
                     .putString("Motive", validMotives.get(ThreadLocalRandom.current().nextInt(validMotives.size())).title)
                     .putList(new ListTag<DoubleTag>("Pos")
                             .add(new DoubleTag("0", target.x))
@@ -85,7 +82,7 @@ public class ItemPainting extends Item {
                             .add(new DoubleTag("1", 0))
                             .add(new DoubleTag("2", 0)))
                     .putList(new ListTag<FloatTag>("Rotation")
-                            .add(new FloatTag("0", rot))
+                            .add(new FloatTag("0", direction[face.getIndex() - 2] * 90))
                             .add(new FloatTag("1", 0)));
 
             EntityPainting entity = new EntityPainting(chunk, nbt);

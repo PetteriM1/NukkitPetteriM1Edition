@@ -1,20 +1,18 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.MovingObjectPosition;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.EntityUtils;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by PetteriM1
@@ -22,8 +20,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class EntityThrownTrident extends EntityProjectile {
 
     public static final int NETWORK_ID = 73;
-
-    public static final int DATA_SOURCE_ID = 17;
 
     protected Item trident;
 
@@ -57,20 +53,12 @@ public class EntityThrownTrident extends EntityProjectile {
         return 0.01f;
     }
 
-    protected float gravity = 0.04f;
-    protected float drag = 0.01f;
-
     public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
 
     public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        this(chunk, nbt, shootingEntity, false);
-    }
-
-    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
         super(chunk, nbt, shootingEntity);
-        this.setCritical(critical);
     }
 
     @Override
@@ -96,29 +84,6 @@ public class EntityThrownTrident extends EntityProjectile {
         this.trident = item.clone();
     }
 
-    public void setCritical() {
-        this.setCritical(true);
-    }
-
-    public void setCritical(boolean value) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL, value);
-    }
-
-    public boolean isCritical() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL);
-    }
-
-    @Override
-    public int getResultDamage() {
-        int base = super.getResultDamage();
-
-        if (this.isCritical()) {
-            base += ThreadLocalRandom.current().nextInt(base / 2 + 2);
-        }
-
-        return base;
-    }
-
     @Override
     protected double getBaseDamage() {
         return 8;
@@ -133,7 +98,6 @@ public class EntityThrownTrident extends EntityProjectile {
         this.timing.startTiming();
 
         if (this.onGround || this.hadCollision) {
-            this.setCritical(false);
             if (this.firstTickOnGround) {
                 this.firstTickOnGround = false;
                 this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);

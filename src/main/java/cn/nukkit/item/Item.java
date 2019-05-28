@@ -309,6 +309,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     private static final ArrayList<Item> creative291 = new ArrayList<>();
     private static final ArrayList<Item> creative313 = new ArrayList<>();
     private static final ArrayList<Item> creative332 = new ArrayList<>();
+    private static final ArrayList<Item> creative340 = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -320,6 +321,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         String path291 = server.getDataPath() + "creativeitems291.json";
         String path313 = server.getDataPath() + "creativeitems313.json";
         String path332 = server.getDataPath() + "creativeitems332.json";
+        String path340 = server.getDataPath() + "creativeitems340.json";
 
         try {
             if (!new File(path).exists()) Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("creativeitems.json"));
@@ -328,6 +330,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             if (!new File(path291).exists()) Utils.writeFile(path291, Server.class.getClassLoader().getResourceAsStream("creativeitems291.json"));
             if (!new File(path313).exists()) Utils.writeFile(path313, Server.class.getClassLoader().getResourceAsStream("creativeitems313.json"));
             if (!new File(path332).exists()) Utils.writeFile(path332, Server.class.getClassLoader().getResourceAsStream("creativeitems332.json"));
+            if (!new File(path340).exists()) Utils.writeFile(path340, Server.class.getClassLoader().getResourceAsStream("creativeitems340.json"));
         } catch (IOException e) {
             MainLogger.getLogger().logException(e);
             return;
@@ -416,6 +419,20 @@ public class Item implements Cloneable, BlockID, ItemID {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // Creative inventory for 340
+        for (Map map : new Config(path340, Config.YAML).getMapList("items")) {
+            try {
+                int id = (int) map.get("id");
+                int damage = (int) map.getOrDefault("damage", 0);
+                String hex = (String) map.get("nbt_hex");
+                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
+
+                addCreativeItem(340, Item.get(id, damage, 1, nbt));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
     }
 
     public static void clearCreativeItems() {
@@ -424,6 +441,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         Item.creative291.clear();
         Item.creative313.clear();
         Item.creative332.clear();
+        Item.creative340.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -432,6 +450,14 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     public static ArrayList<Item> getCreativeItems(int protocol) {
         switch (protocol) {
+            case 137:
+            case 140:
+            case 141:
+            case 150:
+            case 160:
+            case 201:
+            case 223:
+            case 224:
             case 261:
                 return new ArrayList<>(Item.creative137);
             case 274:
@@ -444,6 +470,8 @@ public class Item implements Cloneable, BlockID, ItemID {
                 return new ArrayList<>(Item.creative313);
             case 332:
                 return new ArrayList<>(Item.creative332);
+            case 340:
+                return new ArrayList<>(Item.creative340);
             default: // Current protocol
                 return new ArrayList<>(Item.creative);
         }
@@ -454,13 +482,11 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static void addCreativeItem(int protocol, Item item) {
-        switch (protocol) {
-            case 261:
+        switch (protocol) { // NOTE: Not all versions are supposed to be here
+            case 137:
                 Item.creative137.add(item.clone());
             case 274:
                 Item.creative274.add(item.clone());
-            case 281:
-            case 282:
             case 291:
                 Item.creative291.add(item.clone());
                 break;
@@ -469,6 +495,9 @@ public class Item implements Cloneable, BlockID, ItemID {
                 break;
             case 332:
                 Item.creative332.add(item.clone());
+                break;
+            case 340:
+                Item.creative340.add(item.clone());
                 break;
             default: // Current protocol
                 Item.creative.add(item.clone());

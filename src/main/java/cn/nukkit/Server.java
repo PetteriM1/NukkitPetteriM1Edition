@@ -319,6 +319,8 @@ public class Server {
                 put("worlds-entity-spawning-disabled", "");
                 put("block-listener", true);
                 put("allow-flight", false);
+                put("timeout-milliseconds", 15000);
+                put("multiversion-min-protocol", 0);
             }
         });
 
@@ -480,7 +482,6 @@ public class Server {
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             String dir2 = null;
-            Level level = this.getDefaultLevel();
             File directory = new File("");
             try {
                 String f = directory.getCanonicalPath();
@@ -488,8 +489,7 @@ public class Server {
             } catch (Exception localException) {}
             File var11 = new File(dir2);
             File[] fa = var11.listFiles();
-            for (int i = 0; i < fa.length; i++) {
-                File fs = fa[i];
+            for (File fs : fa) {
                 if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
                     this.loadLevel(fs.getName());
                 }
@@ -629,7 +629,7 @@ public class Server {
         if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
-            getInstance().batchPackets(players, new DataPacket[]{packet}, true);
+            getInstance().batchPackets(players, new DataPacket[]{packet}, false); // forceSync should be true?
         } else { // Need to force multiversion
             for (Player player : players) {
                 player.dataPacket(packet);
@@ -1014,7 +1014,7 @@ public class Server {
         player.dataPacket(player.protocol >= 354 ? CraftingManager.packet : CraftingManager.packetPre354);
     }
 
-    private void checkTickUpdates(int currentTick, long tickTime) {
+    private void checkTickUpdates(int currentTick) {
         for (Player p : new ArrayList<>(this.players.values())) {
             if (this.alwaysTickPlayers) {
                 p.onUpdate(currentTick);
@@ -1111,7 +1111,7 @@ public class Server {
         this.scheduler.mainThreadHeartbeat(this.tickCounter);
         Timings.schedulerTimer.stopTiming();
 
-        this.checkTickUpdates(this.tickCounter, tickTime);
+        this.checkTickUpdates(this.tickCounter);
 
         for (Player player : new ArrayList<>(this.players.values())) {
             player.checkNetwork();

@@ -48,8 +48,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected int attackTime = 0;
 
-    protected boolean invisible = false;
-
     protected float movementSpeed = 0.1f;
 
     protected int turtleTicks = 200;
@@ -231,8 +229,13 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
+        // HACK!
         if (this instanceof Player && ((Player) this).protocol <= 282) {
-            this.setDataFlag(DATA_FLAGS, 34, isBreathing);
+            if (((Player) this).protocol <= 201) {
+                this.setDataFlag(DATA_FLAGS, 33, isBreathing);
+            } else {
+                this.setDataFlag(DATA_FLAGS, 34, isBreathing);
+            }
         } else {
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
         }

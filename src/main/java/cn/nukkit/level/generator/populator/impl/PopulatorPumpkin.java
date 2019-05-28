@@ -11,7 +11,6 @@ import cn.nukkit.math.NukkitRandom;
  */
 public class PopulatorPumpkin extends Populator {
 
-    private ChunkManager level;
     private int randomAmount;
     private int baseAmount;
 
@@ -25,7 +24,6 @@ public class PopulatorPumpkin extends Populator {
 
     @Override
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        this.level = level;
         int amount = random.nextRange(0, this.randomAmount + 1) + this.baseAmount;
         for (int i = 0; i < amount; ++i) {
             int x = random.nextRange(0, 15);

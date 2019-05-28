@@ -7,6 +7,7 @@ import cn.nukkit.entity.Entity;
  * Nukkit Project
  */
 public class FloatEntityData extends EntityData<Float> {
+
     public float data;
 
     public FloatEntityData(int id, float data) {

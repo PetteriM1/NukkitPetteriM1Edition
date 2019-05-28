@@ -21,6 +21,8 @@ public class UpdateBlockPacket extends DataPacket {
     public int x;
     public int z;
     public int y;
+    public int blockId;
+    public int blockData;
     public int blockRuntimeId;
     public int flags;
     public int dataLayer = 0;
@@ -38,9 +40,16 @@ public class UpdateBlockPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBlockVector3(x, y, z);
-        this.putUnsignedVarInt(blockRuntimeId);
-        this.putUnsignedVarInt(flags);
-        this.putUnsignedVarInt(dataLayer);
+        if (protocol > 201) {
+            this.putUnsignedVarInt(blockRuntimeId);
+            this.putUnsignedVarInt(flags);
+        } else {
+            this.putUnsignedVarInt(blockId);
+            this.putUnsignedVarInt((0xb << 4) | blockData & 0xf);
+        }
+        if (protocol > 224) {
+            this.putUnsignedVarInt(dataLayer);
+        }
     }
 
     public static class Entry {

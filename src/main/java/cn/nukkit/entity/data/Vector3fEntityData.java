@@ -8,6 +8,7 @@ import cn.nukkit.math.Vector3f;
  * Nukkit Project
  */
 public class Vector3fEntityData extends EntityData<Vector3f> {
+
     public float x;
     public float y;
     public float z;

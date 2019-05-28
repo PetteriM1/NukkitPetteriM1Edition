@@ -7,6 +7,7 @@ import cn.nukkit.entity.Entity;
  * Nukkit Project
  */
 public class StringEntityData extends EntityData<String> {
+
     public String data;
 
     public StringEntityData(int id, String data) {

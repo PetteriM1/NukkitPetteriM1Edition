@@ -94,7 +94,9 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.hasAchievementsDisabled);
         this.putVarInt(this.dayCycleStopTime);
         this.putBoolean(this.eduMode);
-        this.putBoolean(this.hasEduFeaturesEnabled);
+        if (protocol > 224) {
+            this.putBoolean(this.hasEduFeaturesEnabled);
+        }
         this.putLFloat(this.rainLevel);
         this.putLFloat(this.lightningLevel);
         if (protocol >= 332) {
@@ -112,7 +114,9 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(gameRules);
         this.putBoolean(this.bonusChest);
-        this.putBoolean(this.hasStartWithMapEnabled);
+        if (protocol > 201) {
+            this.putBoolean(this.hasStartWithMapEnabled);
+        }
         if (protocol < 332) {
             this.putBoolean(this.trustPlayers);
         }
@@ -120,15 +124,19 @@ public class StartGamePacket extends DataPacket {
         if (protocol < 332) {
             this.putVarInt(this.gamePublish);
         }
-        this.putLInt(this.serverChunkTickRange);
-        if (protocol < 332) {
+        if (protocol >= 201) {
+            this.putLInt(this.serverChunkTickRange);
+        }
+        if (protocol >= 223 && protocol < 332) {
             this.putBoolean(this.broadcastToPlatform);
             this.putVarInt(this.platformBroadcastMode);
             this.putBoolean(this.xblBroadcastIntentOld);
         }
-        this.putBoolean(this.hasLockedBehaviorPack);
-        this.putBoolean(this.hasLockedResourcePack);
-        this.putBoolean(this.isFromLockedWorldTemplate);
+        if (protocol > 224) {
+            this.putBoolean(this.hasLockedBehaviorPack);
+            this.putBoolean(this.hasLockedResourcePack);
+            this.putBoolean(this.isFromLockedWorldTemplate);
+        }
         if (protocol >= 291) {
             this.putBoolean(this.isUsingMsaGamertagsOnly);
             if (protocol >= 313) {

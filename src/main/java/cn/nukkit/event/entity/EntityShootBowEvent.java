@@ -12,6 +12,7 @@ import cn.nukkit.item.Item;
  * Nukkit Project
  */
 public class EntityShootBowEvent extends EntityEvent implements Cancellable {
+
     private static final HandlerList handlers = new HandlerList();
 
     public static HandlerList getHandlers() {

@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlobalBlockPalette {
 
+    private static final AtomicInteger runtimeIdAllocator223 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator261 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator274 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator282 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator291 = new AtomicInteger(0);
@@ -21,6 +23,8 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator332 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator340 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
+    private static final Int2IntArrayMap legacyToRuntimeId223 = new Int2IntArrayMap();
+    private static final Int2IntArrayMap legacyToRuntimeId261 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId274 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId282 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId291 = new Int2IntArrayMap();
@@ -37,6 +41,8 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable354;
 
     static {
+        legacyToRuntimeId223.defaultReturnValue(-1);
+        legacyToRuntimeId261.defaultReturnValue(-1);
         legacyToRuntimeId274.defaultReturnValue(-1);
         legacyToRuntimeId282.defaultReturnValue(-1);
         legacyToRuntimeId291.defaultReturnValue(-1);
@@ -46,7 +52,31 @@ public class GlobalBlockPalette {
         legacyToRuntimeId354.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
-            // 282
+            // 223
+            InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
+            if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
+            Collection<TableEntry> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table223 = new BinaryStream();
+            table223.putUnsignedVarInt(entries223.size());
+            for (TableEntry entry223 : entries223) {
+                registerMapping(223, (entry223.id << 4) | entry223.data);
+                table223.putString(entry223.name);
+                table223.putLShort(entry223.data);
+            }
+            // Compiled table not needed for 223
+            // 261
+            InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
+            if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
+            Collection<TableEntry> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table261 = new BinaryStream();
+            table261.putUnsignedVarInt(entries261.size());
+            for (TableEntry entry261 : entries261) {
+                registerMapping(261, (entry261.id << 4) | entry261.data);
+                table261.putString(entry261.name);
+                table261.putLShort(entry261.data);
+            }
+            // Compiled table not needed 261
+            // 274
             InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
             if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
             Collection<TableEntry> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
@@ -139,7 +169,12 @@ public class GlobalBlockPalette {
 
     public static int getOrCreateRuntimeId(int protocol, int legacyId) {
         switch (protocol) {
+            // Versions before this doesn't use runtime IDs
+            case 223:
+            case 224:
+                return legacyToRuntimeId223.get(legacyId);
             case 261:
+                return legacyToRuntimeId261.get(legacyId);
             case 274:
                 return legacyToRuntimeId274.get(legacyId);
             case 281:
@@ -159,11 +194,13 @@ public class GlobalBlockPalette {
     }
 
     private static void registerMapping(int protocol, int legacyId) {
-        switch (protocol) {
+        switch (protocol) { // NOTE: Not all versions are supposed to be here
+            case 223:
+                legacyToRuntimeId223.put(legacyId, runtimeIdAllocator223.getAndIncrement());
             case 261:
+                legacyToRuntimeId261.put(legacyId, runtimeIdAllocator261.getAndIncrement());
             case 274:
                 legacyToRuntimeId274.put(legacyId, runtimeIdAllocator274.getAndIncrement());
-            case 281:
             case 282:
                 legacyToRuntimeId282.put(legacyId, runtimeIdAllocator282.getAndIncrement());
                 break;
@@ -179,15 +216,18 @@ public class GlobalBlockPalette {
             case 340:
                 legacyToRuntimeId340.put(legacyId, runtimeIdAllocator340.getAndIncrement());
                 break;
-            default: // Current protocol
+            case 354:
                 legacyToRuntimeId354.put(legacyId, runtimeIdAllocator354.getAndIncrement());
+                break;
+            default:
+                Server.getInstance().getLogger().alert("Tried to register mapping for unsupported protocol version: " + protocol);
                 break;
         }
     }
 
     public static byte[] getCompiledTable(int protocol) {
         switch (protocol) {
-            case 261:
+            // Versions before this doesn't need compiled table in StartGamePacket
             case 274:
                 return compiledTable274;
             case 281:

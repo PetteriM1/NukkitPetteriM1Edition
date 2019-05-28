@@ -7,6 +7,7 @@ import java.util.Objects;
  * Nukkit Project
  */
 public abstract class EntityData<T> {
+
     private int id;
 
     protected EntityData(int id) {
