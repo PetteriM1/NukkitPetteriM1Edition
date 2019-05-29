@@ -2,7 +2,6 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -119,8 +118,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this.namedTag.getBoolean("Baby")) {
             this.setBaby(true);
         }
-
-        this.setDataProperty(new ByteEntityData(DATA_FLAG_NO_AI, (byte) 1));
     }
 
     public void saveNBT() {
@@ -192,6 +189,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         super.attack(source);
 
         this.target = null;
+        this.stayTime = 0;
         return true;
     }
 
@@ -278,27 +276,42 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         switch (EntityUtils.rand(1, 5)) {
             case 1:
                 if (EntityUtils.rand(1, 100) < 39) {
-                    helmet = Item.get(Item.LEATHER_HELMET, 0, EntityUtils.rand(0, 1));
+                    if (EntityUtils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.LEATHER_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 2:
                 if (EntityUtils.rand(1, 100) < 50) {
-                    helmet = Item.get(Item.GOLD_HELMET, 0, EntityUtils.rand(0, 1));
+                    if (EntityUtils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.GOLD_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 3:
                 if (EntityUtils.rand(1, 100) < 14) {
-                    helmet = Item.get(Item.CHAIN_HELMET, 0, EntityUtils.rand(0, 1));
+                    if (EntityUtils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.CHAIN_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 4:
                 if (EntityUtils.rand(1, 100) < 3) {
-                    helmet = Item.get(Item.IRON_HELMET, 0, EntityUtils.rand(0, 1));
+                    if (EntityUtils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.IRON_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 5:
                 if (EntityUtils.rand(1, 100) == 100) {
-                    helmet = Item.get(Item.DIAMOND_HELMET, 0, EntityUtils.rand(0, 1));
+                    if (EntityUtils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.DIAMOND_HELMET, 0, 1);
+                        this.addHealth(2);
+                    }
                 }
                 break;
         }
@@ -309,27 +322,42 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             switch (EntityUtils.rand(1, 5)) {
                 case 1:
                     if (EntityUtils.rand(1, 100) < 39) {
-                        chestplate = Item.get(Item.LEATHER_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.LEATHER_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 2:
                     if (EntityUtils.rand(1, 100) < 50) {
-                        chestplate = Item.get(Item.GOLD_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.GOLD_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 3:
                     if (EntityUtils.rand(1, 100) < 14) {
-                        chestplate = Item.get(Item.CHAIN_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.CHAIN_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 4:
                     if (EntityUtils.rand(1, 100) < 3) {
-                        chestplate = Item.get(Item.IRON_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.IRON_CHESTPLATE, 0, 1);
+                            this.addHealth(2);
+                        }
                     }
                     break;
                 case 5:
                     if (EntityUtils.rand(1, 100) == 100) {
-                        chestplate = Item.get(Item.DIAMOND_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.DIAMOND_CHESTPLATE, 0, 1);
+                            this.addHealth(3);
+                        }
                     }
                     break;
             }
@@ -341,27 +369,42 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             switch (EntityUtils.rand(1, 5)) {
                 case 1:
                     if (EntityUtils.rand(1, 100) < 39) {
-                        leggings = Item.get(Item.LEATHER_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.LEATHER_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 2:
                     if (EntityUtils.rand(1, 100) < 50) {
-                        leggings = Item.get(Item.GOLD_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.GOLD_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 3:
                     if (EntityUtils.rand(1, 100) < 14) {
-                        leggings = Item.get(Item.CHAIN_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.CHAIN_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 4:
                     if (EntityUtils.rand(1, 100) < 3) {
-                        leggings = Item.get(Item.IRON_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.IRON_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 5:
                     if (EntityUtils.rand(1, 100) == 100) {
-                        leggings = Item.get(Item.DIAMOND_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.DIAMOND_LEGGINGS, 0, 1);
+                            this.addHealth(2);
+                        }
                     }
                     break;
             }
@@ -373,27 +416,42 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             switch (EntityUtils.rand(1, 5)) {
                 case 1:
                     if (EntityUtils.rand(1, 100) < 39) {
-                        boots = Item.get(Item.LEATHER_BOOTS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.LEATHER_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 2:
                     if (EntityUtils.rand(1, 100) < 50) {
-                        boots = Item.get(Item.GOLD_BOOTS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.GOLD_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 3:
                     if (EntityUtils.rand(1, 100) < 14) {
-                        boots = Item.get(Item.CHAIN_BOOTS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.CHAIN_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 4:
                     if (EntityUtils.rand(1, 100) < 3) {
-                        boots = Item.get(Item.IRON_BOOTS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.IRON_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 5:
                     if (EntityUtils.rand(1, 100) == 100) {
-                        boots = Item.get(Item.DIAMOND_BOOTS, 0, EntityUtils.rand(0, 1));
+                        if (EntityUtils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.DIAMOND_BOOTS, 0, 1);
+                            this.addHealth(2);
+                        }
                     }
                     break;
             }
@@ -402,5 +460,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         slots[3] = boots;
 
         return slots;
+    }
+
+    private void addHealth(int health) {
+        this.setMaxHealth(this.getMaxHealth() + health);
+        this.setHealth(this.getHealth() + health);
     }
 }

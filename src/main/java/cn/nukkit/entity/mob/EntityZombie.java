@@ -8,6 +8,8 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemShovelIron;
+import cn.nukkit.item.ItemSwordIron;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
@@ -141,6 +143,16 @@ public class EntityZombie extends EntityWalkingMob {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
 
+            if (this.tool != null) {
+                if (tool instanceof ItemSwordIron && EntityUtils.rand(1, 3) == 1) {
+                    drops.add(Item.get(Item.IRON_SWORD, EntityUtils.rand(200, 246), 1));
+                }
+
+                if (tool instanceof ItemShovelIron && EntityUtils.rand(1, 3) != 1) {
+                    drops.add(Item.get(Item.IRON_SHOVEL, EntityUtils.rand(200, 246), 1));
+                }
+            }
+
             if (EntityUtils.rand(1, 3) == 1) {
                 switch (EntityUtils.rand(1, 3)) {
                     case 1:
@@ -191,8 +203,10 @@ public class EntityZombie extends EntityWalkingMob {
     private void setRandomTool() {
         if (EntityUtils.rand(1, 3) == 1) {
             this.tool = Item.get(Item.IRON_SWORD, 0, 1);
+            this.setDamage(new int[] { 0, 4, 6, 8 });
         } else {
             this.tool = Item.get(Item.IRON_SHOVEL, 0, 1);
+            this.setDamage(new int[] { 0, 3, 4, 5 });
         }
     }
 }

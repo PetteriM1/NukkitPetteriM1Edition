@@ -332,11 +332,9 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Entity(FullChunk chunk, CompoundTag nbt) {
-        if (this instanceof Player) {
-            return;
+        if (!(this instanceof Player)) {
+            this.init(chunk, nbt);
         }
-
-        this.init(chunk, nbt);
     }
 
     protected void initEntity() {
@@ -386,7 +384,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.isPlayer = this instanceof Player;
         this.temporalVector = new Vector3();
 
-        this.id = Entity.entityCount++;
+        this.id = entityCount++;
         this.justCreated = true;
         this.namedTag = nbt;
 

@@ -33,7 +33,7 @@ public class SummonCommand extends Command {
         }
 
         String mob = args[0];
-        Player playerThatSpawns = null;
+        Player playerThatSpawns;
 
         if (args.length == 2) {
             playerThatSpawns = Server.getInstance().getPlayer(args[1].replace("@s", sender.getName()));
@@ -51,7 +51,7 @@ public class SummonCommand extends Command {
                 sender.sendMessage("\u00A7cUnable to spawn " + mob);
             }
         } else {
-            sender.sendMessage("\u00A7cUnknown player " + (args.length == 2 ? args[1] : ((Player) sender).getName()));
+            sender.sendMessage("\u00A7cUnknown player " + (args.length == 2 ? args[1] : sender.getName()));
         }
 
         return true;

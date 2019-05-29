@@ -60,16 +60,16 @@ public abstract class EntitySwimming extends BaseEntity {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
             this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
-        } else if (EntityUtils.rand(1, 410) == 1) {
+        } else if (EntityUtils.rand(1, 100) == 1) {
             x = EntityUtils.rand(10, 30);
             z = EntityUtils.rand(10, 30);
-            this.stayTime = EntityUtils.rand(100, 300);
+            this.stayTime = EntityUtils.rand(100, 200);
             this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
             x = EntityUtils.rand(20, 100);
             z = EntityUtils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(200, 1200);
+            this.moveTime = EntityUtils.rand(100, 200);
             this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
         }
     }
@@ -99,7 +99,7 @@ public abstract class EntitySwimming extends BaseEntity {
                     this.motionX = this.getSpeed() * 0.1 * (x / diff);
                     this.motionZ = this.getSpeed() * 0.1 * (z / diff);
                 }
-                this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || EntityUtils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
                 return this.followTarget;
             }
 
@@ -117,7 +117,7 @@ public abstract class EntitySwimming extends BaseEntity {
                     this.motionX = this.getSpeed() * 0.15 * (x / diff);
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                 }
-                this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || EntityUtils.rand()) if (this.stayTime <= 0 || EntityUtils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
             }
 
             double dx = this.motionX * tickDiff;

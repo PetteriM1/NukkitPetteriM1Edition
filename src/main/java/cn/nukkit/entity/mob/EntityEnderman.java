@@ -106,13 +106,9 @@ public class EntityEnderman extends EntityWalkingMob {
         if (!ev.isCancelled()) {
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
                 ev.setCancelled(true);
-                this.level.addSound(new EndermanTeleportSound(this));
-                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
-                this.level.addSound(new EndermanTeleportSound(this));
+                tp();
             } else if (EntityUtils.rand(1, 10) == 1) {
-                this.level.addSound(new EndermanTeleportSound(this));
-                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
-                this.level.addSound(new EndermanTeleportSound(this));
+                tp();
             }
         }
         return true;
@@ -142,9 +138,17 @@ public class EntityEnderman extends EntityWalkingMob {
     public boolean entityBaseTick(int tickDiff) {
         if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            this.move(EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20));
+            tp();
+        } else if (EntityUtils.rand(0, 500) == 20) {
+            tp();
         }
 
         return super.entityBaseTick(tickDiff);
+    }
+
+    private void tp() {
+        this.level.addSound(new EndermanTeleportSound(this));
+        this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
+        this.level.addSound(new EndermanTeleportSound(this));
     }
 }

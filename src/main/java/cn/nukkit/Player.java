@@ -1413,10 +1413,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (!ev.isCancelled()) {
                 if (!this.getLevel().getName().equals("end")) {
                     if (this.getServer().getLevelByName("end") != null) {
-                        this.teleport(this.getServer().getLevelByName("end").getSafeSpawn());
+                        this.teleport(this.getServer().getLevelByName("end").getSafeSpawn(), TeleportCause.END_PORTAL);
                     }
                 } else {
-                    this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
+                    this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.END_PORTAL);
                 }
             }
         }
@@ -1428,10 +1428,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (!ev.isCancelled()) {
                 if (!this.getLevel().getName().equals("nether")) {
                     if (this.getServer().getLevelByName("nether") != null) {
-                        this.teleport(this.getServer().getLevelByName("nether").getSafeSpawn());
+                        this.teleport(this.getServer().getLevelByName("nether").getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                     }
                 } else {
-                    this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn());
+                    this.getPlayer().teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                 }
             }
         }

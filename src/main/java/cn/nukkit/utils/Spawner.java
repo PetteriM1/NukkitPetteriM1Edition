@@ -66,7 +66,7 @@ public class Spawner extends Thread {
                     count++;
                 }
             }
-            return count < 1;
+            return count < 2;
         } catch (Exception e) {
             return false;
         }
