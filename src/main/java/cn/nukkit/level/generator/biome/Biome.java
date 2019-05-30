@@ -1,5 +1,6 @@
 package cn.nukkit.level.generator.biome;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.generator.populator.type.Populator;
@@ -11,7 +12,8 @@ import java.util.ArrayList;
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class Biome extends cn.nukkit.level.biome.Biome{
+@SuppressWarnings("unused") /* KEEP THIS CLASS FOR OLD API SUPPORT */
+public abstract class Biome extends cn.nukkit.level.biome.Biome {
 
     public static final int OCEAN = 0;
     public static final int PLAINS = 1;
@@ -47,44 +49,19 @@ public abstract class Biome extends cn.nukkit.level.biome.Biome{
     protected int grassColor = 0;
 
     protected static void register(int id, Biome biome) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         biome.setId(id);
         biomes[id] = biome;
     }
 
-    public static void init() {
-        register(OCEAN, new OceanBiome());
-        register(PLAINS, new PlainBiome());
-        register(DESERT, new DesertBiome());
-        register(MOUNTAINS, new MountainsBiome());
-        register(FOREST, new ForestBiome());
-        register(TAIGA, new TaigaBiome());
-        register(SWAMP, new SwampBiome());
-        register(RIVER, new RiverBiome());
-        register(ICE_PLAINS, new IcePlainsBiome());
-        register(SMALL_MOUNTAINS, new SmallMountainsBiome());
-        register(BIRCH_FOREST, new ForestBiome(ForestBiome.TYPE_BIRCH));
-        register(JUNGLE, new JungleBiome());
-        register(ROOFED_FOREST, new RoofedForestBiome());
-        register(MUSHROOM_ISLAND, new MushroomIsland());
-        register(SAVANNA, new SavannaBiome());
-        register(BEACH, new BeachBiome());
-        register(TUNDRA, new TundraBiome());
-        register(FLOWER_FOREST, new FlowerForestBiome());
-        register(HELL, new HellBiome());
-    }
-
     public static Biome getBiome(int id) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         Biome biome = biomes[id];
         return biome != null ? biome : biomes[OCEAN];
     }
 
-    /**
-     * Get Biome by name.
-     *
-     * @param name Name of biome. Name could contain symbol "_" instead of space
-     * @return Biome. Null - when biome was not found
-     */
     public static Biome getBiome(String name) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         for (Biome biome : biomes) {
             if (biome != null) {
                 if (biome.getName().equalsIgnoreCase(name.replace("_", " "))) return biome;
@@ -94,45 +71,55 @@ public abstract class Biome extends cn.nukkit.level.biome.Biome{
     }
 
     public void clearPopulators() {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         this.populators.clear();
     }
 
     public void addPopulator(Populator populator) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         this.populators.add(populator);
     }
 
     public void populateChunk(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         for (Populator populator : populators) {
             populator.populate(level, chunkX, chunkZ, random, level.getChunk(chunkX, chunkZ));
         }
     }
 
     public int getMinElevation() {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         return minElevation;
     }
 
     public int getMaxElevation() {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         return maxElevation;
     }
 
     public void setElevation(int min, int max) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         this.minElevation = min;
         this.maxElevation = max;
     }
 
     public Block[] getGroundCover() {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         return groundCover;
     }
 
     public void setGroundCover(Block[] covers) {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         this.groundCover = covers;
     }
 
     public double getTemperature() {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         return temperature;
     }
 
     public double getRainfall() {
+        Server.getInstance().getLogger().warning("A plugin is using the old biome class cn.nukkit.level.generator.biome.Biome");
         return rainfall;
     }
 

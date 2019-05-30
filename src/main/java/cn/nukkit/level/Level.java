@@ -3487,6 +3487,11 @@ public class Level implements ChunkManager, Metadatable {
         return true;
     }
 
+    public boolean isAnimalSpawningAllowedByTime() {
+        int time = this.getTime() % TIME_FULL;
+        return time < 13184 || time > 22800;
+    }
+
     public boolean isMobSpawningAllowedByTime() {
         int time = this.getTime() % TIME_FULL;
         return time > 13184 && time < 22800;

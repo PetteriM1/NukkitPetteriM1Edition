@@ -29,7 +29,7 @@ public class RabbitSpawner extends AbstractEntitySpawner {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
             result = SpawnResult.WRONG_BLOCK;
-        } else {
+        } else if (level.isAnimalSpawningAllowedByTime()) {
             this.spawnTask.createEntity("Rabbit", pos.add(0, 1, 0));
         }
 

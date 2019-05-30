@@ -15,8 +15,7 @@ import java.util.List;
  */
 public abstract class Biome implements BlockID {
 
-    public static final int MAX_BIOMES = 256;
-    public static final Biome[] biomes = new Biome[MAX_BIOMES];
+    public static final Biome[] biomes = new Biome[256];
     public static final List<Biome> unorderedBiomes = new ArrayList<>();
 
     private final ArrayList<Populator> populators = new ArrayList<>();

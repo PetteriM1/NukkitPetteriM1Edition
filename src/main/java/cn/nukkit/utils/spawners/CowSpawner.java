@@ -28,7 +28,7 @@ public class CowSpawner extends AbstractEntitySpawner {
             result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getName().equals("nether") || level.getName().equals("end")) {
             result = SpawnResult.WRONG_BIOME;
-        } else {
+        } else if (level.isAnimalSpawningAllowedByTime()) {
             BaseEntity entity = this.spawnTask.createEntity("Cow", pos.add(0, 1, 0));
             if (EntityUtils.rand(1, 20) == 1) {
                 entity.setBaby(true);

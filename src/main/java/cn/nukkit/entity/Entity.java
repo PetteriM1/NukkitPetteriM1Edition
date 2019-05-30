@@ -1376,7 +1376,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected void broadcastLinkPacket(Entity rider, byte type) {
         SetEntityLinkPacket pk = new SetEntityLinkPacket();
-        pk.vehicleUniqueId = getId();         // To the?
+        pk.vehicleUniqueId = getId();     // To the?
         pk.riderUniqueId = rider.getId(); // From who?
         pk.type = type;
 

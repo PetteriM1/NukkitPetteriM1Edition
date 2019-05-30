@@ -32,7 +32,6 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
 import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.generator.*;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.metadata.EntityMetadataStore;
 import cn.nukkit.metadata.LevelMetadataStore;
@@ -305,7 +304,7 @@ public class Server {
                 put("chunk-generation-population-queue-size", 8);
                 put("ticks-per-autosave", 6000);
                 put("ticks-per-entity-spawns", 200);
-                put("ticks-per-entity-despawns", 8000);
+                put("ticks-per-entity-despawns", 6000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
                 put("nether", true);
@@ -331,7 +330,7 @@ public class Server {
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang(this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 
-        Object poolSize = this.getProperty("async-workers", (Object) "auto");
+        Object poolSize = this.getProperty("async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);
@@ -410,7 +409,6 @@ public class Server {
         Block.init();
         Enchantment.init();
         Item.init();
-        Biome.init();
         EnumBiome.values();
         Effect.init();
         Potion.init();
@@ -522,7 +520,7 @@ public class Server {
                 String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
-                    this.getLogger().notice("[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                    this.getLogger().notice("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
                 }
 
                 this.getLogger().debug("Update check done");

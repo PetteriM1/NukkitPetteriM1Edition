@@ -34,7 +34,7 @@ public class ParrotSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BLOCK;
         } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else {
+        } else if (level.isAnimalSpawningAllowedByTime()) {
             this.spawnTask.createEntity("Parrot", pos.add(0, 1, 0));
         }
 
