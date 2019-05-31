@@ -291,7 +291,6 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                 continue;
             }
             int x = blockX;
-            int y = blockY;
             int z = blockZ;
             if (j == 0) {
                 --x;
@@ -302,12 +301,12 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
             } else if (j == 3) {
                 ++z;
             }
-            long hash = Level.blockHash(x, y, z);
+            long hash = Level.blockHash(x, blockY, z);
             if (!this.flowCostVisited.containsKey(hash)) {
-                Block blockSide = this.level.getBlock(x, y, z);
+                Block blockSide = this.level.getBlock(x, blockY, z);
                 if (!this.canFlowInto(blockSide)) {
                     this.flowCostVisited.put(hash, BLOCKED);
-                } else if (this.level.getBlock(x, y - 1, z).canBeFlowedInto()) {
+                } else if (this.level.getBlock(x, blockY - 1, z).canBeFlowedInto()) {
                     this.flowCostVisited.put(hash, CAN_FLOW_DOWN);
                 } else {
                     this.flowCostVisited.put(hash, CAN_FLOW);
@@ -322,7 +321,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
             if (accumulatedCost >= maxCost) {
                 continue;
             }
-            int realCost = this.calculateFlowCost(x, y, z, accumulatedCost + 1, maxCost, originOpposite, j ^ 0x01);
+            int realCost = this.calculateFlowCost(x, blockY, z, accumulatedCost + 1, maxCost, originOpposite, j ^ 0x01);
             if (realCost < cost) {
                 cost = realCost;
             }

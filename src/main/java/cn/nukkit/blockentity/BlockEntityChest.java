@@ -183,7 +183,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.namedTag.remove("CustomName");
             return;
         }

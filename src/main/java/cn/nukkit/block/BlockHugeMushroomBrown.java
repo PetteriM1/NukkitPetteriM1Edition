@@ -39,11 +39,6 @@ public class BlockHugeMushroomBrown extends BlockSolidMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 1;
-    }
-
-    @Override
     public Item[] getDrops(Item item) {
         if (new NukkitRandom().nextRange(1, 10) == 5) {
             return new Item[]{

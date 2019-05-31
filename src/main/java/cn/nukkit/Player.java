@@ -86,7 +86,6 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -237,7 +236,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private AsyncTask preLoginEventTask = null;
     protected boolean shouldLogin = false;
 
-    public AtomicBoolean hasInteracted = new AtomicBoolean();
+    public int lastInteraction = 5;
     
     public EntityFishingHook fishing = null;
 
@@ -398,11 +397,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned && player.spawned && this.isAlive() && player.isAlive() && player.getLevel() == this.level && player.canSee(this) && !this.isSpectator()) {
             super.spawnTo(player);
         }
-    }
-
-    @Override
-    public Server getServer() {
-        return this.server;
     }
 
     public boolean getRemoveFormat() {
@@ -855,7 +849,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.inventory.sendContents(this);
                 this.inventory.sendArmorContents(this);
 
-                if (playerJoinEvent.getJoinMessage().toString().trim().length() > 0) {
+                if (!playerJoinEvent.getJoinMessage().toString().trim().isEmpty()) {
                     this.server.broadcastMessage(playerJoinEvent.getJoinMessage());
                 }
         
@@ -1783,7 +1777,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.checkTeleportPosition();
         this.checkInteractNearby();
 
-        if (this.spawned && this.dummyBossBars.size() > 0 && currentTick % 100 == 0) {
+        if (this.spawned && !this.dummyBossBars.isEmpty() && currentTick % 100 == 0) {
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
         }
 
@@ -1830,7 +1824,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         }
                     }
                 }
-            } catch (Exception ex) {}
+            } catch (Exception ignored) {}
         }
 
         timing.stopTiming();
@@ -2846,7 +2840,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 							            graphics.fillRect(x, y, x, y);
 						            }
                                 }
-				            } catch (Exception ex) {}
+				            } catch (Exception ignored) {}
                             ((ItemMap) mapItem).setImage(image);
                             ((ItemMap) mapItem).sendImage(this);
                         }
@@ -3533,7 +3527,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void close(TextContainer message, String reason, boolean notify) {
         if (this.connected && !this.closed) {
-            if (notify && reason.length() > 0) {
+            if (notify && !reason.isEmpty()) {
                 DisconnectPacket pk = new DisconnectPacket();
                 pk.message = reason;
                 this.directDataPacket(pk);
@@ -3541,7 +3535,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.connected = false;
             PlayerQuitEvent ev = null;
-            if (this.getName() != null && this.getName().length() > 0) {
+            if (this.getName() != null && !this.getName().isEmpty()) {
                 this.server.getPluginManager().callEvent(ev = new PlayerQuitEvent(this, message, true, reason));
                 if (this.loggedIn && ev.getAutoSave()) {
                     this.save();
@@ -4795,7 +4789,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (inventory.getItemInHand().getEnchantment((short)Enchantment.ID_MENDING) != null) {
                     itemsWithMending.add(inventory.getHeldItemIndex());
                 }
-                if (itemsWithMending.size() > 0) {
+                if (!itemsWithMending.isEmpty()) {
                     Random rand = new Random();
                     Integer itemToRepair = itemsWithMending.get(rand.nextInt(itemsWithMending.size()));
                     Item toRepair = inventory.getItem(itemToRepair);

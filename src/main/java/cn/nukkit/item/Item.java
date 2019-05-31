@@ -824,7 +824,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public Item setCustomName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.clearCustomName();
         }
 

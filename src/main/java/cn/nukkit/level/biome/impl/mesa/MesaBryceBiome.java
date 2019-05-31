@@ -4,9 +4,6 @@ package cn.nukkit.level.biome.impl.mesa;
  * @author DaPorkchop_
  */
 public class MesaBryceBiome extends MesaBiome {
-    public MesaBryceBiome() {
-        super();
-    }
 
     @Override
     public String getName() {

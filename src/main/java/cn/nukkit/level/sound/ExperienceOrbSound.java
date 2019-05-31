@@ -7,6 +7,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
  * Created by Pub4Game on 28.06.2016.
  */
 public class ExperienceOrbSound extends LevelEventSound {
+
     public ExperienceOrbSound(Vector3 pos) {
         this(pos, 0);
     }

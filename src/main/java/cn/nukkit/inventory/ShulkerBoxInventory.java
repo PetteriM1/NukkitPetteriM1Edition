@@ -57,8 +57,4 @@ public class ShulkerBoxInventory extends ContainerInventory {
         super.onClose(who);
     }
 
-    @Override
-    public void sendSlot(int index, Player... players) {
-        super.sendSlot(index, players);
-    }
 }

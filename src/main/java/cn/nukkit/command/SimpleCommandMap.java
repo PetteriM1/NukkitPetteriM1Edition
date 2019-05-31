@@ -245,7 +245,7 @@ public class SimpleCommandMap implements CommandMap {
     @Override
     public boolean dispatch(CommandSender sender, String cmdLine) {
         ArrayList<String> parsed = parseArguments(cmdLine);
-        if (parsed.size() == 0) {
+        if (parsed.isEmpty()) {
             return false;
         }
 

@@ -49,11 +49,6 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
         return 0.49f;
     }
 
-    @Override
-    public boolean canCollide() {
-        return true;
-    }
-
     protected int fuse;
 
     protected Entity source;

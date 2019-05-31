@@ -26,7 +26,7 @@ public class ListTag<T extends Tag> extends Tag {
 
     @Override
     void write(NBTOutputStream dos) throws IOException {
-        if (list.size() > 0) type = list.get(0).getId();
+        if (!list.isEmpty()) type = list.get(0).getId();
         else type = 1;
 
         dos.writeByte(type);

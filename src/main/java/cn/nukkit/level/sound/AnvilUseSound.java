@@ -8,6 +8,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
  * Package cn.nukkit.level.sound in project Nukkit .
  */
 public class AnvilUseSound extends LevelEventSound {
+
     public AnvilUseSound(Vector3 pos) {
         this(pos, 0);
     }

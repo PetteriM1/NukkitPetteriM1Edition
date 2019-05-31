@@ -7,9 +7,6 @@ import cn.nukkit.item.ItemTool;
  */
 public class BlockChemicalHeat extends BlockSolid {
 
-    public BlockChemicalHeat() {
-    }
-
     @Override
     public int getId() {
         return CHEMICAL_HEAT;

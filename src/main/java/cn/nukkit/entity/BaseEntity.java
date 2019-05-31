@@ -50,7 +50,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean isMovement() {
-        return this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0 && this.movement;
+        return this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty() && this.movement;
     }
 
     public boolean isKnockback() {
@@ -195,7 +195,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0) {
+        if (this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty()) {
             super.setMotion(motion);
         }
         return true;

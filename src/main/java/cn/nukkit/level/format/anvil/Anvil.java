@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
  */
 public class Anvil extends BaseLevelProvider {
 
-    public static final int VERSION = 19133;
     static private final byte[] PAD_256 = new byte[256];
 
     public Anvil(Level level, String path) throws IOException {
@@ -88,7 +87,7 @@ public class Anvil extends BaseLevelProvider {
                 .putInt("SpawnZ", 128)
                 .putBoolean("thundering", false)
                 .putInt("thunderTime", 0)
-                .putInt("version", VERSION)
+                .putInt("version", 19133)
                 .putLong("Time", 0)
                 .putLong("SizeOnDisk", 0);
 

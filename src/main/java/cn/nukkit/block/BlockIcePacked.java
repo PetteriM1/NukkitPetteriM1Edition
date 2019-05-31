@@ -1,17 +1,13 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockIcePacked extends BlockIce {
-
-    public BlockIcePacked() {
-    }
 
     @Override
     public int getId() {
@@ -24,18 +20,13 @@ public class BlockIcePacked extends BlockIce {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
     public boolean onBreak(Item item) {
         return this.getLevel().setBlock(this, new BlockAir(), true);
     }
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)==true) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
             return new Item[]{
                     this.toItem()
             };
@@ -52,9 +43,5 @@ public class BlockIcePacked extends BlockIce {
     public boolean canHarvestWithHand() {
         return false;
     }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
+
 }

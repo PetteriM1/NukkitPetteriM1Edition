@@ -22,7 +22,6 @@ public class End extends Generator {
 
     private ChunkManager level;
     private NukkitRandom nukkitRandom;
-    private Random random;
     private final List<Populator> populators = new ArrayList<>();
     private List<Populator> generationPopulators = new ArrayList<>();
 
@@ -64,10 +63,7 @@ public class End extends Generator {
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
         this.nukkitRandom = random;
-        this.random = new Random();
         this.noiseBase = new Simplex(this.nukkitRandom, 4, 1 / 4f, 1 / 64f);
-        this.random.setSeed(this.level.getSeed());
-
         this.generationPopulators.add(new PopulatorEndPillar());
     }
 

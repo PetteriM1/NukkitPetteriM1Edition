@@ -30,7 +30,7 @@ public final class RandomItem {
         selectors.forEach((s, f) -> {
             if (s.getParent() == selector) child.put(s, f);
         });
-        if (child.size() == 0) return selector.select();
+        if (child.isEmpty()) return selector.select();
         return selectFrom(Selector.selectRandom(child));
     }
 }

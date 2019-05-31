@@ -45,7 +45,7 @@ public class DebugPasteCommand extends VanillaCommand {
                     b.append("\n# Server Information\n");
 
                     b.append("version.api: ").append(server.getApiVersion()).append('\n');
-                    b.append("version.nukkit: ").append("Nukkit PetteriM1 Edition " + server.getNukkitVersion()).append('\n');
+                    b.append("version.nukkit: ").append("Nukkit PetteriM1 Edition ").append(server.getNukkitVersion()).append('\n');
                     b.append("version.minecraft: ").append(server.getVersion()).append('\n');
                     b.append("version.protocol: ").append(ProtocolInfo.CURRENT_PROTOCOL).append('\n');
                     b.append("plugins:");

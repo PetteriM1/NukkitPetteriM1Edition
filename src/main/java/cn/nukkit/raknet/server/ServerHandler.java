@@ -93,12 +93,12 @@ public class ServerHandler {
         synchronized (this) {
             try {
                 this.wait(20);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
         try {
             this.server.join();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ignored) {
         }
     }
 

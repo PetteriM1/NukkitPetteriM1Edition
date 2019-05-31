@@ -8,6 +8,7 @@ import cn.nukkit.network.protocol.LevelSoundEventPacketV1;
  * @author Tee7even
  */
 public class LevelSoundEventSound extends Sound {
+
     protected final int type;
     protected int extraData;
     protected int pitch;

@@ -56,7 +56,7 @@ public abstract class Tag {
 
         out.print(prefix);
         out.print(getTagName(getId()));
-        if (name.length() > 0) {
+        if (!name.isEmpty()) {
             out.print("(\"" + name + "\")");
         }
         out.print(": ");

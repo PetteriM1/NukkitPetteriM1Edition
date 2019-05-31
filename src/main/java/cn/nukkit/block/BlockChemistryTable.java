@@ -7,9 +7,6 @@ import cn.nukkit.item.ItemTool;
  */
 public class BlockChemistryTable extends BlockSolid {
 
-    public BlockChemistryTable() {
-    }
-
     @Override
     public int getId() {
         return CHEMISTRY_TABLE;

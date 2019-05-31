@@ -1,17 +1,12 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
-import cn.nukkit.utils.BlockColor;
 
 /**
  * Created on 2015/11/22 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockGrassPath extends BlockGrass {
-
-    public BlockGrassPath() {
-    }
 
     @Override
     public int getId() {
@@ -21,11 +16,6 @@ public class BlockGrassPath extends BlockGrass {
     @Override
     public String getName() {
         return "Grass Path";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
     }
 
     @Override
@@ -45,13 +35,4 @@ public class BlockGrassPath extends BlockGrass {
         return 3.25;
     }
 
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GRASS_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
 }

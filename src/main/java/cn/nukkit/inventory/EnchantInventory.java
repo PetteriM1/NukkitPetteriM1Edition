@@ -22,7 +22,7 @@ public class EnchantInventory extends ContainerInventory {
     @Override
     public void onClose(Player who) {
         super.onClose(who);
-        if (this.getViewers().size() == 0) {
+        if (this.getViewers().isEmpty()) {
             for (int i = 0; i < 2; ++i) {
                 who.getInventory().addItem(this.getItem(i));
                 this.clear(i);

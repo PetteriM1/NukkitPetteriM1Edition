@@ -10,9 +10,6 @@ import cn.nukkit.level.Level;
  */
 public class BlockIceFrosted extends BlockIce {
 
-    public BlockIceFrosted() {
-    }
-
     @Override
     public int getId() {
         return FROSTED_ICE;
@@ -36,11 +33,6 @@ public class BlockIceFrosted extends BlockIce {
     @Override
     public boolean canHarvestWithHand() {
         return false;
-    }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 
     @Override

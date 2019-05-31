@@ -36,16 +36,6 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
     }
 
     @Override
-    public int getWeakPower(BlockFace side) {
-        return 0;
-    }
-
-    @Override
-    public int getStrongPower(BlockFace side) {
-        return 0;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(new BlockRedstoneTorch());
     }

@@ -90,7 +90,7 @@ public class Server {
     public static final String BROADCAST_CHANNEL_ADMINISTRATIVE = "nukkit.broadcast.admin";
     public static final String BROADCAST_CHANNEL_USERS = "nukkit.broadcast.user";
 
-    private static Server instance = null;
+    private static Server instance;
 
     private BanList banByName;
 
@@ -102,7 +102,7 @@ public class Server {
 
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    private boolean hasStopped = false;
+    private boolean hasStopped;
 
     private PluginManager pluginManager;
 
@@ -147,13 +147,12 @@ public class Server {
 
     private boolean networkCompressionAsync;
     public int networkCompressionLevel;
-    private int networkZlibProvider;
 
     private boolean autoTickRate;
     private int autoTickRateLimit;
     private boolean alwaysTickPlayers;
     private int baseTickRate;
-    private Boolean getAllowFlight = null;
+    private Boolean getAllowFlight;
     private int difficulty = Integer.MAX_VALUE;
     private int defaultGamemode = Integer.MAX_VALUE;
 
@@ -341,8 +340,7 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        this.networkZlibProvider = this.getPropertyInt("zlib-provider", 0);
-        Zlib.setProvider(this.networkZlibProvider);
+        Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
 
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 1);
         this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
@@ -356,7 +354,7 @@ public class Server {
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
             try {
-                this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+                this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().isEmpty()) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
             } catch (IllegalArgumentException e) {
                 log.error(getLanguage().translateString(e.getMessage(), e.getCause().getMessage()));
             }
@@ -389,7 +387,7 @@ public class Server {
             }
         }
 
-        log.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        log.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
 
         this.network = new Network(this);
@@ -482,7 +480,7 @@ public class Server {
             try {
                 String f = directory.getCanonicalPath();
                 dir2 = f + "/worlds/";
-            } catch (Exception localException) {}
+            } catch (Exception ignored) {}
             File var11 = new File(dir2);
             File[] fa = var11.listFiles();
             for (File fs : fa) {

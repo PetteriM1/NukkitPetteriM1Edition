@@ -13,7 +13,7 @@ public class BlockSlabRedSandstone extends BlockSlab {
     public static final int PURPUR = 1;
 
     public BlockSlabRedSandstone() {
-        this(0);
+        this(RED_SANDSTONE);
     }
 
     public BlockSlabRedSandstone(int meta) {

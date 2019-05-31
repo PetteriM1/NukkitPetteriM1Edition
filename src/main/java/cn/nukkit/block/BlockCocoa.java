@@ -34,11 +34,6 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public void setDamage(int meta) {
-        super.setDamage(meta);
-    }
-
-    @Override
     public int getId() {
         return COCOA;
     }
@@ -63,7 +58,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
 
         int damage = this.getDamage();
         if (damage > 11) {
-            this.setDamage(damage = 11);
+            this.setDamage(11);
         }
 
         switch (getDamage()) {

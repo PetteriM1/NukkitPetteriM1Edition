@@ -9,9 +9,6 @@ import cn.nukkit.item.ItemTool;
  */
 public class BlockOreGold extends BlockSolid {
 
-    public BlockOreGold() {
-    }
-
     @Override
     public int getId() {
         return GOLD_ORE;

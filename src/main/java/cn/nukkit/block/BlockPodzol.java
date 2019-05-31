@@ -6,9 +6,6 @@ package cn.nukkit.block;
  */
 public class BlockPodzol extends BlockDirt {
 
-    public BlockPodzol() {
-    }
-
     @Override
     public int getId() {
         return PODZOL;

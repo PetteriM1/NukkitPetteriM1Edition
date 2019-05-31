@@ -1999,7 +1999,7 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        final List<Integer> ignore = new ArrayList<Integer>(
+        final List<Integer> ignore = new ArrayList<>(
                 Arrays.asList(Block.ANVIL, Block.BEACON, Block.BED_BLOCK, Block.BREWING_STAND_BLOCK, Block.CAULDRON_BLOCK, Block.CHEST, Block.TRAPPED_CHEST,
                 Block.ENDER_CHEST, Block.DISPENSER, Block.DROPPER, Block.WOODEN_DOOR_BLOCK, Block.BIRCH_DOOR_BLOCK, Block.ACACIA_DOOR_BLOCK, Block.SPRUCE_DOOR_BLOCK,
                 Block.DARK_OAK_DOOR_BLOCK, Block.JUNGLE_DOOR_BLOCK, Block.TRAPDOOR, Block.ENCHANT_TABLE, Block.FURNACE, Block.LIT_FURNACE, Block.HOPPER_BLOCK,
@@ -2009,11 +2009,10 @@ public class Level implements ChunkManager, Metadatable {
                 Block.POWERED_COMPARATOR, Block.UNPOWERED_COMPARATOR, Block.OBSERVER, Block.FENCE_GATE_BIRCH, Block.FENCE_GATE_ACACIA, Block.FENCE_GATE_SPRUCE, Block.FENCE_GATE_JUNGLE,
                 Block.FENCE_GATE_DARK_OAK));
 
-        if (player != null && (!player.hasInteracted.get() || ignore.contains(target.getId()))) {
+        if (player != null && (!(this.server.getTick() - player.lastInteraction < 5) || ignore.contains(target.getId()))) {
             PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face, target.getId() == 0 ? Action.RIGHT_CLICK_AIR : Action.RIGHT_CLICK_BLOCK);
 
-            player.hasInteracted.set(true);
-            server.getScheduler().scheduleDelayedTask(() -> player.hasInteracted.compareAndSet(true, false), 5);
+            player.lastInteraction = this.server.getTick();
 
             if (player.getGamemode() > 2) {
                 ev.setCancelled();

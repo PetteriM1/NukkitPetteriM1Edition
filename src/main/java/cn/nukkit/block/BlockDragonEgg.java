@@ -8,9 +8,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockDragonEgg extends BlockFallable {
 
-    public BlockDragonEgg() {
-    }
-
     @Override
     public String getName() {
         return "Dragon Egg";

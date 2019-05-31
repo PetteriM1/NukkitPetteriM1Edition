@@ -8,9 +8,6 @@ import cn.nukkit.item.Item;
  */
 public class BlockBedrock extends BlockSolid {
 
-    public BlockBedrock() {
-    }
-
     @Override
     public int getId() {
         return BEDROCK;

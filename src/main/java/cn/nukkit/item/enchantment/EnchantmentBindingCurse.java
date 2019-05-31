@@ -17,11 +17,6 @@ public class EnchantmentBindingCurse extends Enchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    @Override
     public boolean isTreasure() {
         return true;
     }

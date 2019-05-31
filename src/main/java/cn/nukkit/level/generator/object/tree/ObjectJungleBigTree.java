@@ -32,10 +32,9 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
                 }
 
                 int j2 = 1 + rand.nextBoundedInt(2);
-                int j1 = j;
 
-                for (int k1 = j - j2; k1 <= j1; ++k1) {
-                    int l1 = k1 - j1;
+                for (int k1 = j - j2; k1 <= j; ++k1) {
+                    int l1 = k1 - j;
                     this.growLeavesLayer(level, new Vector3(k, k1, l), 1 - l1);
                 }
             }

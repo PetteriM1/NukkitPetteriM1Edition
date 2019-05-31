@@ -430,7 +430,7 @@ public class Binary {
     }
 
     public static byte[] hexStringToBytes(String hexString) {
-        if (hexString == null || hexString.equals("")) {
+        if (hexString == null || hexString.isEmpty()) {
             return null;
         }
         String str = "0123456789ABCDEF";

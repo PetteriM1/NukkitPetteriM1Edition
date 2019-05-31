@@ -7,9 +7,6 @@ import cn.nukkit.item.ItemTool;
 
 public class BlockNetherReactor extends BlockSolid {
 
-    public BlockNetherReactor() {
-    }
-
     @Override
     public int getId() {
         return NETHER_REACTOR;

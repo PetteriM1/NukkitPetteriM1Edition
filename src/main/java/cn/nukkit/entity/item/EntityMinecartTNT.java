@@ -24,7 +24,6 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
 
     public static final int NETWORK_ID = 97;
     private int fuse;
-    private boolean activated = false;
 
     public EntityMinecartTNT(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -53,8 +52,8 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     public boolean onUpdate(int currentTick) {
         this.timing.startTiming();
 
-        // Todo: Check why the TNT doesn't want to tick
-        if (activated || fuse < 80) {
+        // TODO: Check why the TNT doesn't want to tick
+        if (fuse < 80) {
             int tickDiff = currentTick - lastUpdate;
 
             lastUpdate = currentTick;

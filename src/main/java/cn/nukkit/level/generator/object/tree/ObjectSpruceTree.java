@@ -14,16 +14,6 @@ public class ObjectSpruceTree extends ObjectTree {
     protected int treeHeight = 15;
 
     @Override
-    public int getTrunkBlock() {
-        return Block.LOG;
-    }
-
-    @Override
-    public int getLeafBlock() {
-        return Block.LEAVES;
-    }
-
-    @Override
     public int getType() {
         return BlockWood.SPRUCE;
     }

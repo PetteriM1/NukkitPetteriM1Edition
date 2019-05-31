@@ -8,9 +8,6 @@ import cn.nukkit.utils.Faceable;
 
 public class BlockObserver extends BlockSolid implements Faceable {
 
-    public BlockObserver() {
-    }
-
     @Override
     public int getId() {
         return OBSERVER;

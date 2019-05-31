@@ -116,7 +116,7 @@ public class ItemCrossbow extends ItemBow {
             int diff = (Server.getInstance().getTick() - player.getStartActionTick());
             double p = (double) diff / 20;
 
-            double f = Math.min((p * p + p * 2) / 3, 1) * 4;
+            double f = Math.min((p * p + p * 2) / 3, 1) * 3.8;
             EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, false), f);
 
             if (f < 0.1 || diff < 5) {

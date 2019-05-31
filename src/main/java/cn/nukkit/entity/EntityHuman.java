@@ -7,7 +7,6 @@ import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
-import cn.nukkit.network.protocol.RemoveEntityPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.utils.Utils;
 
@@ -199,16 +198,6 @@ public class EntityHuman extends EntityHumanType {
             if (!(this instanceof Player)) {
                 this.server.removePlayerListData(this.getUniqueId(), new Player[]{player});
             }
-        }
-    }
-
-    @Override
-    public void despawnFrom(Player player) {
-        if (this.hasSpawned.containsKey(player.getLoaderId())) {
-            RemoveEntityPacket pk = new RemoveEntityPacket();
-            pk.eid = this.getId();
-            player.dataPacket(pk);
-            this.hasSpawned.remove(player.getLoaderId());
         }
     }
 

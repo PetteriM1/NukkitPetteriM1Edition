@@ -97,7 +97,7 @@ public class EffectCommand extends Command {
         }
         if (duration == 0) {
             if (!player.hasEffect(effect.getId())) {
-                if (player.getEffects().size() == 0) {
+                if (player.getEffects().isEmpty()) {
                     sender.sendMessage(new TranslationContainer("commands.effect.failure.notActive.all", player.getDisplayName()));
                 } else {
                     sender.sendMessage(new TranslationContainer("commands.effect.failure.notActive", effect.getName(), player.getDisplayName()));

@@ -118,7 +118,7 @@ public abstract class BlockEntity extends Position {
                         blockEntity = (BlockEntity) constructor.newInstance(objects);
 
                     }
-                } catch (Exception e) {}
+                } catch (Exception ignored) {}
             }
         }
 
@@ -154,7 +154,7 @@ public abstract class BlockEntity extends Position {
         this.saveNBT();
         CompoundTag tag = this.namedTag.clone();
         tag.remove("x").remove("y").remove("z").remove("id");
-        if (tag.getTags().size() > 0) {
+        if (!tag.getTags().isEmpty()) {
             return tag;
         } else {
             return null;

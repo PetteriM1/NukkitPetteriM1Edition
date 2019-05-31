@@ -15,9 +15,6 @@ import java.util.Random;
  */
 public class BlockOreRedstone extends BlockSolid {
 
-    public BlockOreRedstone() {
-    }
-
     @Override
     public int getId() {
         return REDSTONE_ORE;

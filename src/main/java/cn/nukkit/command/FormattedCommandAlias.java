@@ -120,7 +120,7 @@ public class FormattedCommandAlias extends Command {
                 replacement.append(args[position]);
             }
 
-            formatString = formatString.substring(0, start) + replacement.toString() + formatString.substring(end);
+            formatString = formatString.substring(0, start) + replacement + formatString.substring(end);
             // Move index past the replaced data so we don't process it again
             index = start + replacement.length();
 

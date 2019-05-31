@@ -143,14 +143,14 @@ public class QueryRegenerateEvent extends ServerEvent {
 
     public byte[] getLongQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
-        String plist = this.server_engine;
+        StringBuilder plist = new StringBuilder(this.server_engine);
         if (this.plugins.length > 0 && this.listPlugins) {
-            plist += ":";
+            plist.append(":");
             for (Plugin p : this.plugins) {
                 PluginDescription d = p.getDescription();
-                plist += " " + d.getName().replace(";", "").replace(":", "").replace(" ", "_") + " " + d.getVersion().replace(";", "").replace(":", "").replace(" ", "_") + ";";
+                plist.append(" ").append(d.getName().replace(";", "").replace(":", "").replace(" ", "_")).append(" ").append(d.getVersion().replace(";", "").replace(":", "").replace(" ", "_")).append(";");
             }
-            plist = plist.substring(0, plist.length() - 2);
+            plist = new StringBuilder(plist.substring(0, plist.length() - 2));
         }
 
         query.put("splitnum".getBytes());
@@ -164,7 +164,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         KVdata.put("game_id", "MINECRAFTPE");
         KVdata.put("version", this.version);
         KVdata.put("server_engine", this.server_engine);
-        KVdata.put("plugins", plist);
+        KVdata.put("plugins", plist.toString());
         KVdata.put("map", this.map);
         KVdata.put("numplayers", String.valueOf(this.numPlayers));
         KVdata.put("maxplayers", String.valueOf(this.maxPlayers));

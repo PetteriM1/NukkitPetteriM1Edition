@@ -15,9 +15,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockOreLapis extends BlockSolid {
 
-    public BlockOreLapis() {
-    }
-
     @Override
     public int getId() {
         return LAPIS_ORE;
@@ -55,7 +52,6 @@ public class BlockOreLapis extends BlockSolid {
                     i = 0;
                 }
 
-                count *= (i + 1);
             }
 
             return new Item[]{

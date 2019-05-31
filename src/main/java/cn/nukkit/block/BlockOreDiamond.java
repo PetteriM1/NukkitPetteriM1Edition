@@ -14,9 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockOreDiamond extends BlockSolid {
 
-    public BlockOreDiamond() {
-    }
-
     @Override
     public int getId() {
         return DIAMOND_ORE;

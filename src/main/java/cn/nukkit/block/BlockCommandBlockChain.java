@@ -4,9 +4,6 @@ import cn.nukkit.item.Item;
 
 public class BlockCommandBlockChain extends BlockSolid {
 
-    public BlockCommandBlockChain() {
-    }
-
     @Override
     public int getId() {
         return CHAIN_COMMAND_BLOCK;

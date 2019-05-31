@@ -1,15 +1,11 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
 
 /**
  * Created by PetteriM1
  */
 public class BlockStructureBlock extends BlockSolid {
-
-    public BlockStructureBlock() {
-    }
 
     @Override
     public int getId() {
@@ -24,11 +20,6 @@ public class BlockStructureBlock extends BlockSolid {
     @Override
     public double getResistance() {
         return 18000000;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_NONE;
     }
 
     @Override

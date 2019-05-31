@@ -319,8 +319,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile
             if (this.curr_ == this.hi_)
                 return -1;
         }
-        byte res = this.buff_[(int) (this.curr_++ - this.lo_)];
-        return res;
+        return this.buff_[(int) (this.curr_++ - this.lo_)];
     }
 
     @Override
@@ -364,8 +363,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile
             if (this.curr_ == this.hi_)
                 return -1;
         }
-        byte res = this.buff_[(int) (this.curr_ - this.lo_)];
-        return res;
+        return this.buff_[(int) (this.curr_ - this.lo_)];
     }
 
     public void writeCurrent(byte b) throws IOException {

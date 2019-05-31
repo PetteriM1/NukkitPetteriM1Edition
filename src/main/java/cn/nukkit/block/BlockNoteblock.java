@@ -16,9 +16,6 @@ import cn.nukkit.network.protocol.BlockEventPacket;
  */
 public class BlockNoteblock extends BlockSolid {
 
-    public BlockNoteblock() {
-    }
-
     @Override
     public String getName() {
         return "Note Block";

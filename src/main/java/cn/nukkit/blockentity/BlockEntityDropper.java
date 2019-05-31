@@ -51,7 +51,7 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.namedTag.remove("CustomName");
             return;
         }

@@ -52,8 +52,4 @@ public class PlayerMoveEvent extends PlayerEvent implements Cancellable {
         this.resetBlocksAround = value;
     }
 
-    @Override
-    public void setCancelled() {
-        super.setCancelled();
-    }
 }

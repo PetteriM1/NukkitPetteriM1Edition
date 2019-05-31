@@ -273,8 +273,4 @@ public class EntityItem extends Entity {
         return addEntity;
     }
 
-    @Override
-    public boolean doesTriggerPressurePlate() {
-        return true;
-    }
 }

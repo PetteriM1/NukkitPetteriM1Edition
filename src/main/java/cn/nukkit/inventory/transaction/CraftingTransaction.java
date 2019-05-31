@@ -57,7 +57,7 @@ public class CraftingTransaction extends InventoryTransaction {
             } else if (!inputs[y][x].equals(item)) {
                 if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ")");
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     public Item[][] getInputMap() {

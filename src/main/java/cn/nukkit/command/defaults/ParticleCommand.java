@@ -78,7 +78,7 @@ public class ParticleCommand extends VanillaCommand {
             try {
                 double c = Double.valueOf(args[4]);
                 count = (int) c;
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
         }
         count = Math.max(1, count);
 
@@ -87,7 +87,7 @@ public class ParticleCommand extends VanillaCommand {
             try {
                 double d = Double.valueOf(args[8]);
                 data = (int) d;
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
         }
         if (showParticleEffect(name, position, position.getLevel(), count)) {
             sender.sendMessage(new TranslationContainer("commands.particle.success", name, String.valueOf(count)));

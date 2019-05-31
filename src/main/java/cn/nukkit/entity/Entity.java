@@ -247,9 +247,6 @@ public abstract class Entity extends Location implements Metadatable {
     public double lastYaw;
     public double lastPitch;
 
-    public double pitchDelta;
-    public double yawDelta;
-
     public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
     public boolean onGround;
@@ -781,7 +778,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void saveNBT() {
         if (!(this instanceof Player)) {
             this.namedTag.putString("id", this.getSaveId());
-            if (!this.getNameTag().equals("")) {
+            if (!this.getNameTag().isEmpty()) {
                 this.namedTag.putString("CustomName", this.getNameTag());
                 this.namedTag.putBoolean("CustomNameVisible", this.isNameTagVisible());
             } else {
@@ -1517,8 +1514,6 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
     }
-
-    public void handleLavaMovement() {}
 
     public void moveFlying(float strafe, float forward, float friction) {
         // This is special for Nukkit! :)

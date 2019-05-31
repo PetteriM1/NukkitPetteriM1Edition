@@ -116,31 +116,6 @@ public abstract class ItemTool extends Item {
     }
 
     @Override
-    public boolean isPickaxe() {
-        return false;
-    }
-
-    @Override
-    public boolean isAxe() {
-        return false;
-    }
-
-    @Override
-    public boolean isSword() {
-        return false;
-    }
-
-    @Override
-    public boolean isShovel() {
-        return false;
-    }
-
-    @Override
-    public boolean isHoe() {
-        return false;
-    }
-
-    @Override
     public boolean isShears() {
         return (this.id == SHEARS);
     }

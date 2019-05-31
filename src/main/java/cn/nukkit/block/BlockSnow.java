@@ -7,9 +7,6 @@ import cn.nukkit.utils.BlockColor;
 
 public class BlockSnow extends BlockSolid {
 
-    public BlockSnow() {
-    }
-
     @Override
     public String getName() {
         return "Snow Block";
@@ -23,11 +20,6 @@ public class BlockSnow extends BlockSolid {
     @Override
     public double getHardness() {
         return 0.2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1;
     }
 
     @Override

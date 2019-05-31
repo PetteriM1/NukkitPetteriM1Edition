@@ -102,7 +102,7 @@ public class RCONServer extends Thread {
                         this.write(key);
                     }
                 }
-            } catch (BufferUnderflowException exception) {
+            } catch (BufferUnderflowException ignored) {
             } catch (Exception exception) {
                 Server.getInstance().getLogger().logException(exception);
             }

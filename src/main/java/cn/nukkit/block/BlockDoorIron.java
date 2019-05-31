@@ -31,11 +31,6 @@ public class BlockDoorIron extends BlockDoor {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
     public double getHardness() {
         return 5;
     }
