@@ -28,11 +28,14 @@ public class Watchdog extends Thread {
 
     @Override
     public void run() {
-        while (this.running && server.isRunning()) {
+        while (this.running) {
             long current = server.getNextTick();
             if (current != 0) {
                 long diff = System.currentTimeMillis() - current;
-                if (diff > time) {
+                if (!responding && diff > time * 2) {
+                    System.exit(1); // Kill the server if it gets stuck on shutdown
+                }
+                if (server.isRunning() && diff > time) {
                     if (responding) {
                         MainLogger logger = this.server.getLogger();
                         logger.emergency("--------- Server stopped responding ---------");
