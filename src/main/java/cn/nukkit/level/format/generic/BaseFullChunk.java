@@ -33,8 +33,9 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     protected Map<Integer, BlockEntity> tileList;
 
     /**
-     * encoded as
-     * (x << 4) | z
+     * encoded as:
+     *
+     * (x &lt;&lt; 4) | z
      */
     protected byte[] biomes;
 
