@@ -2139,7 +2139,7 @@ public class Level implements ChunkManager, Metadatable {
             if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
                 if (getServer().getPropertyBoolean("block-listener", true)) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
-                        Entity entity = EntityUtils.create("SnowGolem", target.add(0.5, -1, 0.5));
+                        Entity entity = Entity.createEntity("SnowGolem", target.add(0.5, -1, 0.5));
                         if (entity != null) {
                             entity.spawnToAll();
                         }
@@ -2157,7 +2157,7 @@ public class Level implements ChunkManager, Metadatable {
                             block.getLevel().setBlock(second, new BlockAir());
                         }
                         if (second != null) {
-                            Entity entity = EntityUtils.create("IronGolem", block.add(0.5, -1, 0.5));
+                            Entity entity = Entity.createEntity("IronGolem", block.add(0.5, -1, 0.5));
                             if (entity != null) {
                                 entity.spawnToAll();
                             }

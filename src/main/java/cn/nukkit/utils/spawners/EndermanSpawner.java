@@ -6,7 +6,7 @@ import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
@@ -19,7 +19,7 @@ public class EndermanSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (EntityUtils.rand(1, 4) != 1 && !level.getName().equals("end")) {
+        if (Utils.rand(1, 4) != 1 && !level.getName().equals("end")) {
             return SpawnResult.SPAWN_DENIED;
         }
 

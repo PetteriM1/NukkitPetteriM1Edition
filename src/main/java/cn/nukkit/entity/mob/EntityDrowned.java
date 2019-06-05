@@ -9,7 +9,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -126,11 +126,11 @@ public class EntityDrowned extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
 
-            drops.add(Item.get(Item.GOLD_INGOT, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.GOLD_INGOT, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

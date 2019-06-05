@@ -17,7 +17,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.Random;
 
@@ -114,7 +114,7 @@ public class ItemSpawnEgg extends Item {
 
             entity.spawnToAll();
 
-            if (EntityUtils.rand(1, 20) == 1 &&
+            if (Utils.rand(1, 20) == 1 &&
                     (entity instanceof EntityCow ||
                     entity instanceof EntityChicken ||
                     entity instanceof EntityPig ||

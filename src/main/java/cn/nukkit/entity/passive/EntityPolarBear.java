@@ -6,7 +6,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -152,8 +152,8 @@ public class EntityPolarBear extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.RAW_FISH, 0, EntityUtils.rand(0, 2)));
-            drops.add(Item.get(Item.RAW_SALMON, 0, EntityUtils.rand(0, 2)));
+            drops.add(Item.get(Item.RAW_FISH, 0, Utils.rand(0, 2)));
+            drops.add(Item.get(Item.RAW_SALMON, 0, Utils.rand(0, 2)));
         }
 
         return drops.toArray(new Item[0]);
@@ -161,7 +161,7 @@ public class EntityPolarBear extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 
     @Override

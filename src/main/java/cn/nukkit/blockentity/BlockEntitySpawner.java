@@ -7,7 +7,7 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ShortTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -83,7 +83,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             return false;
         }
 
-        if (this.delay++ >= EntityUtils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {
+        if (this.delay++ >= Utils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {
             this.delay = 0;
 
             ArrayList<Entity> list = new ArrayList<>();
@@ -100,13 +100,13 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             if (isValid && list.size() <= this.maxNearbyEntities) {
                 Position pos = new Position
                         (
-                                this.x + EntityUtils.rand(-this.spawnRange, this.spawnRange),
+                                this.x + Utils.rand(-this.spawnRange, this.spawnRange),
                                 this.y,
-                                this.z + EntityUtils.rand(-this.spawnRange, this.spawnRange),
+                                this.z + Utils.rand(-this.spawnRange, this.spawnRange),
                                 this.level
                         );
 
-                Entity entity = EntityUtils.create(this.entityId, pos);
+                Entity entity = Entity.createEntity(this.entityId, pos);
 
                 if (entity != null) {
                     entity.spawnToAll();

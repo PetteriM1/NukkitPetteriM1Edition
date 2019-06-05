@@ -3,7 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -110,11 +110,11 @@ public class EntityIronGolem extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(3, 5); i++) {
+            for (int i = 0; i < Utils.rand(3, 5); i++) {
                 drops.add(Item.get(Item.IRON_INGOT, 0, 1));
             }
 
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.POPPY, 0, 1));
             }
         }

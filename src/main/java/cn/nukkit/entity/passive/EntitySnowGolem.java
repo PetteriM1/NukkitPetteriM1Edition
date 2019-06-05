@@ -1,6 +1,6 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
@@ -56,15 +56,15 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 23 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
+        if (this.attackDelay > 23 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
 
             double f = 1.2;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
             Location location = new Location(this.x + (-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5), this.y + this.getEyeHeight(),
                     this.z + (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5), yaw, pitch, this.level);
-            Entity k = EntityUtils.create("Snowball", location, this);
+            Entity k = Entity.createEntity("Snowball", location, this);
             if (k == null) {
                 return;
             }
@@ -104,7 +104,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 15); i++) {
+            for (int i = 0; i < Utils.rand(0, 15); i++) {
                 drops.add(Item.get(Item.SNOWBALL, 0, 1));
             }
         }

@@ -7,7 +7,7 @@ import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class EntityGhastFireBall extends EntityProjectile {
 
@@ -73,7 +73,7 @@ public class EntityGhastFireBall extends EntityProjectile {
 
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500)));
+                    this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }

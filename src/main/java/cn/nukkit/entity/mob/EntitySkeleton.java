@@ -18,7 +18,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,16 +55,16 @@ public class EntitySkeleton extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 30 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
+        if (this.attackDelay > 30 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
 
             double f = 1.3;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             if (this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
-                Entity k = EntityUtils.create("Arrow", pos, this);
+                Entity k = Entity.createEntity("Arrow", pos, this);
                 if (!(k instanceof EntityArrow)) {
                     return;
                 }
@@ -134,11 +134,11 @@ public class EntitySkeleton extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.BONE, 0, 1));
             }
 
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ARROW, 0, 1));
             }
         }

@@ -10,7 +10,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -60,7 +60,7 @@ public class EntityHorse extends EntityWalkingAnimal implements EntityRideable {
     public void initEntity() {
         super.initEntity();
 
-        this.setMaxHealth(EntityUtils.rand(15, 30));
+        this.setMaxHealth(Utils.rand(15, 30));
 
         if (this.namedTag.contains("Variant")) {
             this.variant = this.namedTag.getInt("Variant");
@@ -100,7 +100,7 @@ public class EntityHorse extends EntityWalkingAnimal implements EntityRideable {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }
@@ -110,13 +110,13 @@ public class EntityHorse extends EntityWalkingAnimal implements EntityRideable {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 
     private int getRandomVariant() {
         int[] variantList = {0, 1, 2, 3, 4, 5, 6, 256, 257, 258, 259, 260, 261, 262, 512, 513, 514, 515, 516, 517, 518,
                 768, 769, 770, 771, 772, 773, 774, 1024, 1025, 1026, 1027, 1028, 1029, 1030};
-        return variantList[EntityUtils.rand(0, variantList.length - 1)];
+        return variantList[Utils.rand(0, variantList.length - 1)];
     }
 
     @Override

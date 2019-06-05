@@ -12,7 +12,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created by PetteriM1
@@ -128,7 +128,7 @@ public class EntityThrownTrident extends EntityProjectile {
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT);
         this.hadCollision = true;
         this.close();
-        EntityThrownTrident newTrident = (EntityThrownTrident) EntityUtils.create("ThrownTrident", this);
+        EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
         newTrident.setItem(trident);
         newTrident.spawnToAll();
     }

@@ -7,7 +7,6 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.level.Position;
 
 public class SummonCommand extends Command {
@@ -44,7 +43,7 @@ public class SummonCommand extends Command {
         if (playerThatSpawns != null) {
             Position pos = playerThatSpawns.getPosition();
             Entity ent;
-            if ((ent = EntityUtils.create(mob, pos)) != null) {
+            if ((ent = Entity.createEntity(mob, pos)) != null) {
                 ent.spawnToAll();
                 sender.sendMessage("\u00A76Spawned " + mob + " to " + playerThatSpawns.getName());
             } else {

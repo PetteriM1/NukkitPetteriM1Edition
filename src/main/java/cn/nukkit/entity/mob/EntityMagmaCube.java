@@ -2,7 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -108,7 +108,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.MAGMA_CREAM, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

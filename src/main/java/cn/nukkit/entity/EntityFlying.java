@@ -5,7 +5,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public abstract class EntityFlying extends BaseEntity {
 
@@ -50,39 +50,39 @@ public abstract class EntityFlying extends BaseEntity {
         int x, y, z;
         int maxY = Math.max(this.getLevel().getHighestBlockAt((int) this.x, (int) this.z) + 15, 120);
         if (this.stayTime > 0) {
-            if (EntityUtils.rand(1, 100) > 5) {
+            if (Utils.rand(1, 100) > 5) {
                 return;
             }
 
-            x = EntityUtils.rand(10, 30);
-            z = EntityUtils.rand(10, 30);
+            x = Utils.rand(10, 30);
+            z = Utils.rand(10, 30);
             if (this.y > maxY) {
-                y = EntityUtils.rand(-12, -4);
+                y = Utils.rand(-12, -4);
             } else {
-                y = EntityUtils.rand(-10, 10);
+                y = Utils.rand(-10, 10);
             }
-            this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
-        } else if (EntityUtils.rand(1, 100) == 1) {
-            x = EntityUtils.rand(10, 30);
-            z = EntityUtils.rand(10, 30);
+            this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
+        } else if (Utils.rand(1, 100) == 1) {
+            x = Utils.rand(10, 30);
+            z = Utils.rand(10, 30);
             if (this.y > maxY) {
-                y = EntityUtils.rand(-12, -4);
+                y = Utils.rand(-12, -4);
             } else {
-                y = EntityUtils.rand(-10, 10);
+                y = Utils.rand(-10, 10);
             }
-            this.stayTime = EntityUtils.rand(100, 200);
-            this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
+            this.stayTime = Utils.rand(100, 200);
+            this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || !(this.target instanceof Vector3)) {
-            x = EntityUtils.rand(20, 100);
-            z = EntityUtils.rand(20, 100);
+            x = Utils.rand(20, 100);
+            z = Utils.rand(20, 100);
             if (this.y > maxY) {
-                y = EntityUtils.rand(-12, -4);
+                y = Utils.rand(-12, -4);
             } else {
-                y = EntityUtils.rand(-10, 10);
+                y = Utils.rand(-10, 10);
             }
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(100, 200);
-            this.target = this.add(EntityUtils.rand() ? x : -x, y, EntityUtils.rand() ? z : -z);
+            this.moveTime = Utils.rand(100, 200);
+            this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
         }
     }
 
@@ -113,7 +113,7 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
-                if (this.stayTime <= 0 || EntityUtils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
             }
 
             Vector3 before = this.target;
@@ -132,7 +132,7 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
-                if (this.stayTime <= 0 || EntityUtils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
             }
 
             double dx = this.motionX * tickDiff;
@@ -153,9 +153,9 @@ public abstract class EntityFlying extends BaseEntity {
             }
 
             if (this.isOnGround()) {
-                this.motionY = EntityUtils.rand(0.15, 0.20);
+                this.motionY = Utils.rand(0.15, 0.20);
             } else {
-                this.motionY = EntityUtils.rand(-0.15, 0.15);
+                this.motionY = Utils.rand(-0.15, 0.15);
             }
 
             this.updateMovement();

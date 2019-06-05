@@ -2,7 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -109,7 +109,7 @@ public class EntitySlime extends EntityJumpingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.SLIMEBALL, 0, 1));
             }
         }

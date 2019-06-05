@@ -15,7 +15,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -139,30 +139,30 @@ public class EntityZombie extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
 
             if (this.tool != null) {
-                if (tool instanceof ItemSwordIron && EntityUtils.rand(1, 3) == 1) {
-                    drops.add(Item.get(Item.IRON_SWORD, EntityUtils.rand(200, 246), 1));
+                if (tool instanceof ItemSwordIron && Utils.rand(1, 3) == 1) {
+                    drops.add(Item.get(Item.IRON_SWORD, Utils.rand(200, 246), 1));
                 }
 
-                if (tool instanceof ItemShovelIron && EntityUtils.rand(1, 3) != 1) {
-                    drops.add(Item.get(Item.IRON_SHOVEL, EntityUtils.rand(200, 246), 1));
+                if (tool instanceof ItemShovelIron && Utils.rand(1, 3) != 1) {
+                    drops.add(Item.get(Item.IRON_SHOVEL, Utils.rand(200, 246), 1));
                 }
             }
 
-            if (EntityUtils.rand(1, 3) == 1) {
-                switch (EntityUtils.rand(1, 3)) {
+            if (Utils.rand(1, 3) == 1) {
+                switch (Utils.rand(1, 3)) {
                     case 1:
-                        drops.add(Item.get(Item.IRON_INGOT, 0, EntityUtils.rand(0, 1)));
+                        drops.add(Item.get(Item.IRON_INGOT, 0, Utils.rand(0, 1)));
                         break;
                     case 2:
-                        drops.add(Item.get(Item.CARROT, 0, EntityUtils.rand(0, 1)));
+                        drops.add(Item.get(Item.CARROT, 0, Utils.rand(0, 1)));
                         break;
                     case 3:
-                        drops.add(Item.get(Item.POTATO, 0, EntityUtils.rand(0, 1)));
+                        drops.add(Item.get(Item.POTATO, 0, Utils.rand(0, 1)));
                         break;
                 }
             }
@@ -191,7 +191,7 @@ public class EntityZombie extends EntityWalkingMob {
 
         player.dataPacket(pk);
 
-        if (this.tool != null && EntityUtils.rand(1, 10) == 1) {
+        if (this.tool != null && Utils.rand(1, 10) == 1) {
             MobEquipmentPacket pk2 = new MobEquipmentPacket();
             pk2.eid = this.getId();
             pk2.hotbarSlot = 0;
@@ -201,7 +201,7 @@ public class EntityZombie extends EntityWalkingMob {
     }
 
     private void setRandomTool() {
-        if (EntityUtils.rand(1, 3) == 1) {
+        if (Utils.rand(1, 3) == 1) {
             this.tool = Item.get(Item.IRON_SWORD, 0, 1);
             this.setDamage(new int[] { 0, 4, 6, 8 });
         } else {

@@ -11,7 +11,7 @@ import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,7 +107,7 @@ public class EntityEnderman extends EntityWalkingMob {
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
                 ev.setCancelled(true);
                 tp();
-            } else if (EntityUtils.rand(1, 10) == 1) {
+            } else if (Utils.rand(1, 10) == 1) {
                 tp();
             }
         }
@@ -123,7 +123,7 @@ public class EntityEnderman extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.ENDER_PEARL, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.ENDER_PEARL, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);
@@ -139,7 +139,7 @@ public class EntityEnderman extends EntityWalkingMob {
         if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
             tp();
-        } else if (EntityUtils.rand(0, 500) == 20) {
+        } else if (Utils.rand(0, 500) == 20) {
             tp();
         }
 
@@ -148,7 +148,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
     private void tp() {
         this.level.addSound(new EndermanTeleportSound(this));
-        this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
+        this.move(Utils.rand(-10, 10), 0, Utils.rand(-10, 10));
         this.level.addSound(new EndermanTeleportSound(this));
     }
 }

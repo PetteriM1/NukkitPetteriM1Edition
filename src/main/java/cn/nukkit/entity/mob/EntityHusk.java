@@ -2,7 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -88,7 +88,7 @@ public class EntityHusk extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
         }

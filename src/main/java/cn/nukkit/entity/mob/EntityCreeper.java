@@ -6,7 +6,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.item.ItemSkull;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.item.Item;
@@ -141,7 +141,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
                 this.motionX = this.getSpeed() * 0.15 * (x / diff);
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
             }
-            if (this.stayTime <= 0 || EntityUtils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+            if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
         }
 
         double dx = this.motionX * tickDiff;
@@ -187,14 +187,14 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
             }
 
             Entity killer = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
 
             if (killer instanceof EntitySkeleton || killer instanceof EntityStray) {
-                drops.add(Item.get(EntityUtils.rand(500, 511), 0, 1));
+                drops.add(Item.get(Utils.rand(500, 511), 0, 1));
             }
 
             if (killer instanceof EntityCreeper) {

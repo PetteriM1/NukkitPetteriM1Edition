@@ -10,7 +10,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,14 +76,14 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.COAL, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.COAL, 0, Utils.rand(0, 1)));
 
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.BONE, 0, 1));
             }
 
-            if (EntityUtils.rand(1, 3) == 1) {
-                drops.add(Item.get(Item.SKULL, 1, EntityUtils.rand(0, 1)));
+            if (Utils.rand(1, 3) == 1) {
+                drops.add(Item.get(Item.SKULL, 1, Utils.rand(0, 1)));
             }
         }
 

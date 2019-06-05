@@ -15,7 +15,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,16 +53,16 @@ public class EntityPillager extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 80 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 100) {
+        if (this.attackDelay > 80 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1.5;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             if (this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
-                Entity k = EntityUtils.create("Arrow", pos, this);
+                Entity k = Entity.createEntity("Arrow", pos, this);
                 if (!(k instanceof EntityArrow)) {
                     return;
                 }
@@ -102,12 +102,12 @@ public class EntityPillager extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ARROW, 0, 1));
             }
 
-            if (EntityUtils.rand(1, 12) == 1) {
-                drops.add(Item.get(Item.CROSSBOW, EntityUtils.rand(300, 380), EntityUtils.rand(0, 1)));
+            if (Utils.rand(1, 12) == 1) {
+                drops.add(Item.get(Item.CROSSBOW, Utils.rand(300, 380), Utils.rand(0, 1)));
             }
         }
 

@@ -73,7 +73,7 @@ public class Spawner extends Thread {
     }
 
     public BaseEntity createEntity(Object type, Position pos) {
-        BaseEntity entity = (BaseEntity) EntityUtils.create(type, pos);
+        BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
         if (entity != null) {
             entity.spawnToAll();
         }
@@ -81,16 +81,16 @@ public class Spawner extends Thread {
     }
 
     public int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
-        int addX = EntityUtils.rand(degree / 2 * -1, degree / 2);
+        int addX = Utils.rand(degree / 2 * -1, degree / 2);
         if (addX >= 0) {
             if (degree < safeDegree) {
                 addX = safeDegree;
-                addX += EntityUtils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
             }
         } else {
             if (degree > safeDegree) {
                 addX = -safeDegree;
-                addX += EntityUtils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
             }
         }
         return addX;

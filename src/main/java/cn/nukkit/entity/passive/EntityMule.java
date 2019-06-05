@@ -1,7 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
@@ -78,7 +78,7 @@ public class EntityMule extends EntityWalkingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }
@@ -88,6 +88,6 @@ public class EntityMule extends EntityWalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

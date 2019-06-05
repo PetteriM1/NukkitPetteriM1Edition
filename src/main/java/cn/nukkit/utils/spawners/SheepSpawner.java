@@ -7,7 +7,7 @@ import cn.nukkit.entity.passive.EntitySheep;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
@@ -28,7 +28,7 @@ public class SheepSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.isAnimalSpawningAllowedByTime()) {
             BaseEntity entity = this.spawnTask.createEntity("Sheep", pos.add(0, 1, 0));
-            if (EntityUtils.rand(1, 20) == 1) {
+            if (Utils.rand(1, 20) == 1) {
                 entity.setBaby(true);
             }
         }
