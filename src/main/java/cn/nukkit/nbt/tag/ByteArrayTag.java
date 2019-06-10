@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class ByteArrayTag extends Tag {
+
     public byte[] data;
 
     public ByteArrayTag(String name) {
@@ -36,6 +37,10 @@ public class ByteArrayTag extends Tag {
         dis.readFully(data);
     }
 
+    public byte[] getData() {
+        return data;
+    }
+
     @Override
     public byte getId() {
         return TAG_Byte_Array;
@@ -60,5 +65,10 @@ public class ByteArrayTag extends Tag {
         byte[] cp = new byte[data.length];
         System.arraycopy(data, 0, cp, 0, data.length);
         return new ByteArrayTag(getName(), cp);
+    }
+
+    @Override
+    public byte[] parseValue() {
+        return this.data;
     }
 }

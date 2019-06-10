@@ -6,6 +6,7 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.spawners.*;
 
 import java.util.Arrays;
@@ -58,11 +59,11 @@ public class Spawner extends Thread {
         }
     }
 
-    public boolean entitySpawnAllowed(Level level, int networkId) {
+    public boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
         try {
             int count = 0;
             for (Entity entity : level.getEntities()) {
-                if (entity.isAlive() && entity.getNetworkId() == networkId) {
+                if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distance(entity) < 100) {
                     count++;
                 }
             }

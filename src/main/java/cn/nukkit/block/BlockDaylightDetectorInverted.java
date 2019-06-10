@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.math.BlockFace;
 
 /**
  * Created on 2015/11/22 by CreeperFace.
@@ -31,4 +32,13 @@ public class BlockDaylightDetectorInverted extends BlockDaylightDetector {
         return new ItemBlock(new BlockDaylightDetector(), 0);
     }
 
+    @Override
+    public boolean isPowerSource() {
+        return !this.level.isAnimalSpawningAllowedByTime();
+    }
+
+    @Override
+    public int getWeakPower(BlockFace face) {
+        return this.level.isAnimalSpawningAllowedByTime() ? 0 : 15;
+    }
 }

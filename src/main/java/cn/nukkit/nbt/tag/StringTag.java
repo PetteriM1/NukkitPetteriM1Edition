@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class StringTag extends Tag {
+
     public String data;
 
     public StringTag(String name) {
@@ -26,6 +27,11 @@ public class StringTag extends Tag {
     @Override
     void load(NBTInputStream dis) throws IOException {
         data = dis.readUTF();
+    }
+
+    @Override
+    public String parseValue() {
+        return this.data;
     }
 
     @Override

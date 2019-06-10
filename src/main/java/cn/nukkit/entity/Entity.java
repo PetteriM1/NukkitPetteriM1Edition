@@ -634,7 +634,6 @@ public abstract class Entity extends Location implements Metadatable {
             Effect effect = this.effects.get(effectId);
             this.effects.remove(effectId);
             effect.remove(this);
-
             this.recalculateEffectColor();
         }
     }

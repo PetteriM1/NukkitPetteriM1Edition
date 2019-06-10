@@ -50,12 +50,12 @@ public class BlockDaylightDetector extends BlockTransparent {
     
     @Override
     public boolean isPowerSource() {
-        return true;
+        return this.level.isAnimalSpawningAllowedByTime();
     }
     
     @Override
     public int getWeakPower(BlockFace face) {
-        return 15;
+        return this.level.isAnimalSpawningAllowedByTime() ? 15 : 0;
     }
 
     @Override

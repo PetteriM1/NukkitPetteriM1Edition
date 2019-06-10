@@ -1,7 +1,7 @@
 package cn.nukkit.item;
 
-import cn.nukkit.Server;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockMobSpawner;
 import cn.nukkit.blockentity.BlockEntity;
@@ -9,7 +9,11 @@ import cn.nukkit.blockentity.BlockEntitySpawner;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntityZombie;
-import cn.nukkit.entity.passive.*;
+import cn.nukkit.entity.passive.EntityChicken;
+import cn.nukkit.entity.passive.EntityCow;
+import cn.nukkit.entity.passive.EntityPig;
+import cn.nukkit.entity.passive.EntitySheep;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
@@ -85,6 +89,13 @@ public class ItemSpawnEgg extends Item {
         FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
 
         if (chunk == null) {
+            return false;
+        }
+
+        CreatureSpawnEvent ev = new CreatureSpawnEvent(this.meta, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
+        level.getServer().getPluginManager().callEvent(ev);
+
+        if (ev.isCancelled()) {
             return false;
         }
 

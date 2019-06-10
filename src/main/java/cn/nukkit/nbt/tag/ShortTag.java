@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class ShortTag extends NumberTag<Integer> {
+
     public int data;
 
     @Override
@@ -35,6 +36,11 @@ public class ShortTag extends NumberTag<Integer> {
     @Override
     void load(NBTInputStream dis) throws IOException {
         data = dis.readUnsignedShort();
+    }
+
+    @Override
+    public Integer parseValue() {
+        return this.data;
     }
 
     @Override

@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class ByteTag extends NumberTag<Integer> {
+
     public int data;
 
     @Override
@@ -40,6 +41,11 @@ public class ByteTag extends NumberTag<Integer> {
     @Override
     public byte getId() {
         return TAG_Byte;
+    }
+
+    @Override
+    public Integer parseValue() {
+        return this.data;
     }
 
     @Override
