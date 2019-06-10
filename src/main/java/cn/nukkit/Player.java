@@ -2036,7 +2036,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.inventory.sendHeldItem(this);
                 this.server.sendRecipeList(this);
             } catch (Exception e) {
-                this.getServer().getLogger().error("doFirstSpawn() failed for " + this.getName());
                 this.close("", "Internal Server Error");
             }
         }, true);
