@@ -1451,7 +1451,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
                 if (this.checkMovement && !server.getAllowFlight() && (this.isSurvival() || this.isAdventure())) {
-                    if (!this.isSleeping() && this.riding == null) {
+                    if (!this.isSleeping() && this.riding == null && !this.hasEffect(Effect.LEVITATION)) {
                         if ((diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff)) > 0.5 ) {
                             PlayerInvalidMoveEvent ev;
                             this.getServer().getPluginManager().callEvent(ev = new PlayerInvalidMoveEvent(this, true));
@@ -1596,7 +1596,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean setMotion(Vector3 motion) {
         if (super.setMotion(motion)) {
             if (this.chunk != null) {
-                this.getLevel().addEntityMotion(this, this.motionX, this.motionY, this.motionZ);  // Send to others
+                this.addMotion(this.motionX, this.motionY, this.motionZ);  // Send to others
                 SetEntityMotionPacket pk = new SetEntityMotionPacket();
                 pk.eid = this.id;
                 pk.motionX = (float) motion.x;
@@ -1698,7 +1698,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inAirTicks = 0;
                     this.highestPosition = this.y;
                 } else {
-                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && !this.getAdventureSettings().get(Type.ALLOW_FLIGHT) && this.inAirTicks > 20 && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null) {
+                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && !this.getAdventureSettings().get(Type.ALLOW_FLIGHT) && this.inAirTicks > 20 && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null && !this.hasEffect(Effect.LEVITATION)) {
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
@@ -1981,7 +1981,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.yaw = (float) this.yaw;
         startGamePacket.pitch = (float) this.pitch;
         startGamePacket.seed = -1;
-        startGamePacket.dimension = (byte) (this.level.getDimension() & 0xff);
+        startGamePacket.dimension = /*(byte) (this.level.getDimension() & 0xff)*/0;
         startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) this.x;
@@ -2001,6 +2001,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.server.getLogger().debug("[" + this.id + "] Player " + this.username + " (" + this.ip + ":" + this.port + ") logged in with protocol " + this.protocol + " in " + this.level.getName());
 
+        this.getLevel().sendTime(this);
+        this.getLevel().sendWeather(this);
+
         this.getServer().getScheduler().scheduleTask(null, () -> {
             try {
                 if (this.protocol >= 313) {
@@ -2012,14 +2015,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 this.setImmobile(true);
-                this.getLevel().sendTime(this);
-                this.getLevel().sendWeather(this);
                 this.setMovementSpeed(DEFAULT_SPEED);
                 this.sendAttributes();
                 this.setNameTagVisible(true);
                 this.setNameTagAlwaysVisible(true);
                 this.setCanClimb(true);
-                this.setEnableClientCommand(true);
                 this.getAdventureSettings().update();
                 this.sendPotionEffects(this);
                 this.sendData(this);
@@ -2037,8 +2037,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.server.sendRecipeList(this);
             } catch (Exception e) {
                 this.close("", "Internal Server Error");
+                getServer().getLogger().logException(e);
             }
         }, true);
+
+        this.setEnableClientCommand(true);
 
         this.server.addOnlinePlayer(this);
         this.server.onPlayerCompleteLoginSequence(this);

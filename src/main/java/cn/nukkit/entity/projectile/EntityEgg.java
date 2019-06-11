@@ -60,9 +60,9 @@ public class EntityEgg extends EntityProjectile {
         }
 
         if (this.age > 1200) {
-            this.kill();
+            this.close();
         } else if (this.isCollided) {
-            this.kill();
+            this.close();
 
             if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
                 if (Utils.rand(1, 20) == 5) {

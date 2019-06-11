@@ -90,7 +90,7 @@ public class EntityGhastFireBall extends EntityProjectile {
                     explosion.explodeB();
                 }
             }
-            this.kill();
+            this.close();
         }
 
         return super.onUpdate(currentTick);
