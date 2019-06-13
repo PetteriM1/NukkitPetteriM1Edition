@@ -9,11 +9,14 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
+import cn.nukkit.entity.passive.EntityIronGolem;
+import cn.nukkit.entity.passive.EntitySnowGolem;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
 import cn.nukkit.event.block.BlockUpdateEvent;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.event.level.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
@@ -533,6 +536,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.y = (float) pos.y;
         pk.z = (float) pos.z;
         pk.isGlobal = isGlobal;
+        pk.isBabyMob = isBaby;
 
         this.addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
     }
@@ -2139,10 +2143,18 @@ public class Level implements ChunkManager, Metadatable {
             if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
                 if (getServer().getPropertyBoolean("block-listener", true)) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
+                        CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN);
+                        getServer().getPluginManager().callEvent(ev);
+
+                        if (ev.isCancelled()) {
+                            return null;
+                        }
+
                         Entity entity = Entity.createEntity("SnowGolem", target.add(0.5, -1, 0.5));
                         if (entity != null) {
                             entity.spawnToAll();
                         }
+
                         block.getLevel().setBlock(target, new BlockAir());
                         block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
                         return null;
@@ -2156,11 +2168,20 @@ public class Level implements ChunkManager, Metadatable {
                             block.getLevel().setBlock(first, new BlockAir());
                             block.getLevel().setBlock(second, new BlockAir());
                         }
+
                         if (second != null) {
+                            CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
+                            getServer().getPluginManager().callEvent(ev);
+
+                            if (ev.isCancelled()) {
+                                return null;
+                            }
+
                             Entity entity = Entity.createEntity("IronGolem", block.add(0.5, -1, 0.5));
                             if (entity != null) {
                                 entity.spawnToAll();
                             }
+
                             block.getLevel().setBlock(block, new BlockAir());
                             block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
                             return null;

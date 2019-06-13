@@ -317,6 +317,7 @@ public class Server {
                 put("allow-flight", false);
                 put("timeout-milliseconds", 15000);
                 put("multiversion-min-protocol", 0);
+                put("vanilla-bossbars", false);
             }
         });
 
@@ -518,7 +519,7 @@ public class Server {
                 String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
-                    this.getLogger().notice("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                    this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
                 }
 
                 this.getLogger().debug("Update check done");
@@ -1988,6 +1989,7 @@ public class Server {
         Entity.registerEntity("ZombieVillager", EntityZombieVillager.class);
         Entity.registerEntity("Zombie", EntityZombie.class);
         Entity.registerEntity("Pillager", EntityPillager.class);
+        Entity.registerEntity("ZombieVillagerV2", EntityZombieVillagerV2.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
@@ -2018,6 +2020,7 @@ public class Server {
         Entity.registerEntity("Villager", EntityVillager.class);
         Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
         Entity.registerEntity("WanderingTrader", EntityWanderingTrader.class);
+        Entity.registerEntity("VillagerV2", EntityVillagerV2.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("MinecartChest", EntityMinecartChest.class);

@@ -1,6 +1,8 @@
 package cn.nukkit.entity.projectile;
 
+import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.SmallExplosion;
@@ -103,7 +105,12 @@ public class EntityGhastFireBall extends EntityProjectile {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        this.close();
+        if (source instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) source).getDamager() instanceof Player) {
+                this.setMotion(((EntityDamageByEntityEvent) source).getDamager().getLocation().getDirectionVector());
+            }
+        }
+
         return true;
     }
 }

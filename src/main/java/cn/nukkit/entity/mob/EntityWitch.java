@@ -43,11 +43,6 @@ public class EntityWitch extends EntityWalkingMob {
     }
 
     @Override
-    public double getSpeed() {
-        return 1.0;
-    }
-
-    @Override
     protected void initEntity() {
         super.initEntity();
 

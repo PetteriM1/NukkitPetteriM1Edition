@@ -9,7 +9,7 @@ import cn.nukkit.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntitySkeletonHorse extends EntityWalkingAnimal {
+public class EntitySkeletonHorse extends EntityHorseBase {
 
     public static final int NETWORK_ID = 26;
 
@@ -39,11 +39,6 @@ public class EntitySkeletonHorse extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getMaxJumpHeight() {
-        return 2;
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
 
@@ -67,11 +62,6 @@ public class EntitySkeletonHorse extends EntityWalkingAnimal {
         }
 
         return drops.toArray(new Item[0]);
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 
     @Override

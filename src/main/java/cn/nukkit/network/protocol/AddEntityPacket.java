@@ -121,8 +121,8 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityPillager.NETWORK_ID, "minecraft:pillager")
             .put(EntityWanderingTrader.NETWORK_ID, "minecraft:wandering_trader")
             .put(EntityRavager.NETWORK_ID, "minecraft:ravager")
-            .put(115, "minecraft:villager_v2")
-            .put(116, "minecraft:zombie_villager_v2")
+            .put(EntityVillagerV2.NETWORK_ID, "minecraft:villager_v2")
+            .put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2")
             .build();
 
     @Override

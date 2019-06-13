@@ -2,13 +2,12 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemTool;
 
 /**
  * Created on 2015/11/22 by xtypr.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockObsidianGlowing extends BlockSolid {
+public class BlockObsidianGlowing extends BlockObsidian {
 
     @Override
     public int getId() {
@@ -16,23 +15,8 @@ public class BlockObsidianGlowing extends BlockSolid {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
     public String getName() {
         return "Glowing Obsidian";
-    }
-
-    @Override
-    public double getHardness() {
-        return 35;
-    }
-
-    @Override
-    public double getResistance() {
-        return 6000;
     }
 
     @Override
@@ -46,23 +30,7 @@ public class BlockObsidianGlowing extends BlockSolid {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() > ItemTool.DIAMOND_PICKAXE) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public boolean onBreak(Item item) {
+        return this.getLevel().setBlock(this, new BlockAir(), true, true);
     }
 }

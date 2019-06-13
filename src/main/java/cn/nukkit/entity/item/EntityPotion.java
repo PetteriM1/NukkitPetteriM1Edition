@@ -19,8 +19,6 @@ public class EntityPotion extends EntityProjectile {
 
     public static final int NETWORK_ID = 86;
 
-    public static final int DATA_POTION_ID = 37;
-
     public int potionId;
 
     public EntityPotion(FullChunk chunk, CompoundTag nbt) {

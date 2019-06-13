@@ -3,6 +3,7 @@ package cn.nukkit.blockentity;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -98,6 +99,13 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             }
 
             if (isValid && list.size() <= this.maxNearbyEntities) {
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(this.entityId, CreatureSpawnEvent.SpawnReason.SPAWNER);
+                level.getServer().getPluginManager().callEvent(ev);
+
+                if (ev.isCancelled()) {
+                    return true;
+                }
+
                 Position pos = new Position
                         (
                                 this.x + Utils.rand(-this.spawnRange, this.spawnRange),
@@ -113,6 +121,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                 }
             }
         }
+
         return true;
     }
 

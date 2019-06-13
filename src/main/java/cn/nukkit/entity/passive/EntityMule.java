@@ -11,7 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityMule extends EntityWalkingAnimal {
+public class EntityMule extends EntityHorseBase {
 
     public static final int NETWORK_ID = 25;
 
@@ -38,11 +38,6 @@ public class EntityMule extends EntityWalkingAnimal {
             return 0.8f;
         }
         return 1.6f;
-    }
-
-    @Override
-    public float getMaxJumpHeight() {
-        return 2;
     }
 
     @Override
@@ -84,10 +79,5 @@ public class EntityMule extends EntityWalkingAnimal {
         }
 
         return drops.toArray(new Item[0]);
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

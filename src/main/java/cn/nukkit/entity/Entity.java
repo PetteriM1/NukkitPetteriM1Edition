@@ -9,6 +9,8 @@ import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.entity.mob.EntityEnderDragon;
+import cn.nukkit.entity.mob.EntityWither;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -291,6 +293,7 @@ public abstract class Entity extends Location implements Metadatable {
     protected boolean isPlayer = false;
 
     private volatile boolean initialized;
+    private volatile boolean initialized2;
 
     public float getHeight() {
         return 0;
@@ -335,6 +338,13 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void initEntity() {
+        if (this.initialized2) {
+            // We've already initialized this entity
+            return;
+        }
+
+        this.initialized2 = true;
+
         if (this.namedTag.contains("ActiveEffects")) {
             ListTag<CompoundTag> effects = this.namedTag.getList("ActiveEffects", CompoundTag.class);
             for (CompoundTag e : effects.getAll()) {
@@ -865,6 +875,15 @@ public abstract class Entity extends Location implements Metadatable {
             pkk.immediate = 1;
 
             player.dataPacket(pkk);
+        }
+
+        if ((this instanceof EntityWither || this instanceof EntityEnderDragon) && this.getServer().getPropertyBoolean("vanilla-bossbars")) {
+            BossEventPacket pkBoss = new BossEventPacket();
+            pkBoss.bossEid = this.id;
+            pkBoss.type = BossEventPacket.TYPE_SHOW;
+            pkBoss.title = this.getName();
+            pkBoss.healthPercent = this.getHealth();
+            player.dataPacket(pkBoss);
         }
     }
     

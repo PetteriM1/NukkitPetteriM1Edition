@@ -2,12 +2,13 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.Utils;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,12 @@ import java.util.List;
 public class EntityMagmaCube extends EntityJumpingMob {
 
     public static final int NETWORK_ID = 42;
+
+    public static final int SIZE_SMALL = 1;
+    public static final int SIZE_MEDIUM = 2;
+    public static final int SIZE_BIG = 3;
+
+    protected int size = SIZE_BIG;
 
     public EntityMagmaCube(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -28,32 +35,61 @@ public class EntityMagmaCube extends EntityJumpingMob {
 
     @Override
     public float getWidth() {
-        return 0.51f;
+        return 0.51f + size * 0.51f;
     }
 
     @Override
     public float getHeight() {
-        return 0.51f;
+        return 0.51f + size * 0.51f;
     }
 
     @Override
-    public double getSpeed() {
-        return 1.0;
+    public float getLength() {
+        return 0.51f + size * 0.51f;
     }
 
     @Override
     public float getMaxJumpHeight() {
-        return 2;
+        return 2f;
     }
 
     @Override
     protected void initEntity() {
         super.initEntity();
 
-        this.setMaxHealth(16);
-        this.setDamage(new int[] { 0, 2, 3, 4 });
+        if (this.namedTag.contains("Size")) {
+            this.size = this.namedTag.getInt("Size");
+        } else {
+            this.size = Utils.rand(1, 3);
+        }
+
+        this.setScale(0.51f + size * 0.51f);
+
+        if (size == SIZE_BIG) {
+            this.setMaxHealth(16);
+        } else if (size == SIZE_MEDIUM) {
+            this.setMaxHealth(4);
+        } else if (size == SIZE_SMALL) {
+            this.setMaxHealth(1);
+        }
+
+        if (size == SIZE_BIG) {
+            this.setDamage(new int[] { 0, 3, 4, 6 });
+        } else if (size == SIZE_MEDIUM) {
+            this.setDamage(new int[] { 0, 2, 2, 3 });
+        } else {
+            this.setDamage(new int[] { 0, 0, 0, 0 });
+        }
     }
 
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putInt("Size", this.size);
+    }
+
+    @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 10 && this.distanceSquared(player) < 1) {
             this.attackDelay = 0;
@@ -101,22 +137,61 @@ public class EntityMagmaCube extends EntityJumpingMob {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
+        if (this.size == SIZE_BIG) {
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+            level.getServer().getPluginManager().callEvent(ev);
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
+            if (ev.isCancelled()) {
+                return new Item[0];
+            }
+
+            EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
+            entity.size = SIZE_MEDIUM;
+            entity.setScale(0.51f + entity.size * 0.51f);
+
+            if (entity != null) {
+                entity.spawnToAll();
+            }
+
+            return new Item[0];
+        } else if (this.size == SIZE_MEDIUM) {
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+            level.getServer().getPluginManager().callEvent(ev);
+
+            if (ev.isCancelled()) {
+                return new Item[0];
+            }
+
+            EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
+            entity.size = SIZE_SMALL;
+            entity.setScale(0.51f + entity.size * 0.51f);
+
+            if (entity != null) {
+                entity.spawnToAll();
+            }
+
+            return new Item[0];
+        } else {
+            List<Item> drops = new ArrayList<>();
+
+            if (this.hasCustomName()) {
+                drops.add(Item.get(Item.NAME_TAG, 0, 1));
+            }
+
+            if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+                drops.add(Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1)));
+            }
+
+            return drops.toArray(new Item[0]);
         }
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1)));
-        }
-
-        return drops.toArray(new Item[0]);
     }
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 3;
+        if (this.size == SIZE_BIG) return 4;
+        if (this.size == SIZE_MEDIUM) return 2;
+        if (this.size == SIZE_SMALL) return 1;
+        return 0;
     }
 
     @Override

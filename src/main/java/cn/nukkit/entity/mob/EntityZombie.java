@@ -184,7 +184,7 @@ public class EntityZombie extends EntityWalkingMob {
         pk.eid = this.getId();
 
         if (java.time.LocalDate.now().toString().contains("-10-31")) {
-            pk.slots[0] = new ItemBlock(Block.get(Block.PUMPKIN));
+            pk.slots[0] = new ItemBlock(Block.get(Block.JACK_O_LANTERN));
         } else {
             pk.slots = this.armor;
         }
@@ -208,5 +208,20 @@ public class EntityZombie extends EntityWalkingMob {
             this.tool = Item.get(Item.IRON_SHOVEL, 0, 1);
             this.setDamage(new int[] { 0, 3, 4, 5 });
         }
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
+
+        if (!ev.isCancelled() && ev.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
+            Entity ent = Entity.createEntity("Drowned", this);
+            if (ent != null) {
+                this.close();
+                ent.spawnToAll();
+            }
+        }
+
+        return true;
     }
 }

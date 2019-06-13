@@ -1,7 +1,6 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -84,11 +83,5 @@ public class EntityBlazeFireBall extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         this.isCollided = true;
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        this.close();
-        return true;
     }
 }

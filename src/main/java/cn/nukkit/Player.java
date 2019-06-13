@@ -2351,6 +2351,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             Block block = target.getSide(face);
                             if (block.getId() == Block.FIRE) {
                                 this.level.setBlock(block, new BlockAir(), true);
+                                this.level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_EXTINGUISH_FIRE);
                                 break;
                             }
                             if (!this.isCreative()) {
@@ -3642,14 +3643,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         boolean showMessages = this.level.getGameRules().getBoolean(GameRule.SHOW_DEATH_MESSAGE);
-        String message = "death.attack.generic";
-
+        String message = "";
         List<String> params = new ArrayList<>();
-        params.add(this.getDisplayName());
-        
         EntityDamageEvent cause = this.getLastDamageCause();
 
         if (showMessages) {
+            params.add(this.getDisplayName());
+
             switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
                 case ENTITY_ATTACK:
                     if (cause instanceof EntityDamageByEntityEvent) {
@@ -3683,9 +3683,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             params.add("Unknown");
                         }
                     }
-                    break;
-                case SUICIDE:
-                    message = "death.attack.generic";
                     break;
                 case VOID:
                     message = "death.attack.outOfWorld";
@@ -3759,11 +3756,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
 
                 default:
+                    message = "death.attack.generic";
                     break;
             }
-        } else {
-            message = "";
-            params.clear();
         }
 
         PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.toArray(new String[0])), this.getExperienceLevel());
