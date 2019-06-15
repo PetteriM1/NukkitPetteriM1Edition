@@ -415,6 +415,7 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     public static void clearCreativeItems() {
         Item.creative.clear();
+        Item.creative137.clear();
         Item.creative274.clear();
         Item.creative291.clear();
         Item.creative313.clear();
