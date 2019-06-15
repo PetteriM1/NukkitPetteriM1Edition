@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
@@ -76,7 +77,11 @@ public class Spawner extends Thread {
     public BaseEntity createEntity(Object type, Position pos) {
         BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
         if (entity != null && !entity.isInsideOfSolid()) {
-            entity.spawnToAll();
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
+            Server.getInstance().getPluginManager().callEvent(ev);
+            if (!ev.isCancelled()) {
+                entity.spawnToAll();
+            }
         }
         return entity;
     }

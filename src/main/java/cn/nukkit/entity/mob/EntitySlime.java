@@ -147,10 +147,10 @@ public class EntitySlime extends EntityJumpingMob {
             }
 
             EntitySlime entity = (EntitySlime) Entity.createEntity("Slime", this);
-            entity.size = SIZE_MEDIUM;
-            entity.setScale(0.51f + entity.size * 0.51f);
 
             if (entity != null) {
+                entity.size = SIZE_MEDIUM;
+                entity.setScale(0.51f + entity.size * 0.51f);
                 entity.spawnToAll();
             }
 
@@ -164,10 +164,10 @@ public class EntitySlime extends EntityJumpingMob {
             }
 
             EntitySlime entity = (EntitySlime) Entity.createEntity("Slime", this);
-            entity.size = SIZE_SMALL;
-            entity.setScale(0.51f + entity.size * 0.51f);
 
             if (entity != null) {
+                entity.size = SIZE_SMALL;
+                entity.setScale(0.51f + entity.size * 0.51f);
                 entity.spawnToAll();
             }
 

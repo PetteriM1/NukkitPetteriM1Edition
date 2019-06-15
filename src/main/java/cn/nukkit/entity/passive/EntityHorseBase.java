@@ -16,6 +16,9 @@ import java.util.Objects;
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_REMOVE;
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
 
+/**
+ * @author PetteriM1
+ */
 public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideable {
 
     public EntityHorseBase(FullChunk chunk, CompoundTag nbt) {

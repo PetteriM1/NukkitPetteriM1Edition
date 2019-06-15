@@ -723,7 +723,6 @@ public class Server {
         // First we need to check if this command is on the main thread or not, if not, warn the user
         if (!this.isPrimaryThread()) {
             getLogger().warning("Command Dispatched Async: " + commandLine);
-            getLogger().warning("Please notify author of plugin causing this execution to fix this bug!", new Throwable());
         }
         if (sender == null) {
             throw new ServerException("CommandSender is not valid");

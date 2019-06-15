@@ -131,6 +131,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
                 damage.put(EntityDamageEvent.DamageModifier.ARMOR,
                         (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
             }
+
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
         }
     }
@@ -146,10 +147,10 @@ public class EntityMagmaCube extends EntityJumpingMob {
             }
 
             EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
-            entity.size = SIZE_MEDIUM;
-            entity.setScale(0.51f + entity.size * 0.51f);
 
             if (entity != null) {
+                entity.size = SIZE_MEDIUM;
+                entity.setScale(0.51f + entity.size * 0.51f);
                 entity.spawnToAll();
             }
 
@@ -163,10 +164,10 @@ public class EntityMagmaCube extends EntityJumpingMob {
             }
 
             EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
-            entity.size = SIZE_SMALL;
-            entity.setScale(0.51f + entity.size * 0.51f);
 
             if (entity != null) {
+                entity.size = SIZE_SMALL;
+                entity.setScale(0.51f + entity.size * 0.51f);
                 entity.spawnToAll();
             }
 
