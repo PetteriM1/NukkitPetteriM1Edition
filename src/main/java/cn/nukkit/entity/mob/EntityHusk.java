@@ -73,7 +73,7 @@ public class EntityHusk extends EntityWalkingMob {
             player.attack(new EntityDamageByEntityEvent(this, player, DamageCause.ENTITY_ATTACK, getDamage()));
             EntityEventPacket pk = new EntityEventPacket();
             pk.eid = this.getId();
-            pk.event = 4;
+            pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
             player.addEffect(Effect.getEffectByName("HUNGER").setAmplifier(1).setDuration(140));
         }
