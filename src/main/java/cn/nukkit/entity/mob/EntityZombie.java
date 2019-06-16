@@ -191,7 +191,7 @@ public class EntityZombie extends EntityWalkingMob {
 
         player.dataPacket(pk);
 
-        if (this.tool != null && Utils.rand(1, 10) == 1) {
+        if (this.tool != null) {
             MobEquipmentPacket pk2 = new MobEquipmentPacket();
             pk2.eid = this.getId();
             pk2.hotbarSlot = 0;
@@ -201,12 +201,14 @@ public class EntityZombie extends EntityWalkingMob {
     }
 
     private void setRandomTool() {
-        if (Utils.rand(1, 3) == 1) {
-            this.tool = Item.get(Item.IRON_SWORD, 0, 1);
-            this.setDamage(new int[] { 0, 4, 6, 8 });
-        } else {
-            this.tool = Item.get(Item.IRON_SHOVEL, 0, 1);
-            this.setDamage(new int[] { 0, 3, 4, 5 });
+        if (Utils.rand(1, 10) == 5) {
+            if (Utils.rand(1, 3) == 1) {
+                this.tool = Item.get(Item.IRON_SWORD, 0, 1);
+                this.setDamage(new int[]{0, 4, 6, 8});
+            } else {
+                this.tool = Item.get(Item.IRON_SHOVEL, 0, 1);
+                this.setDamage(new int[]{0, 3, 4, 5});
+            }
         }
     }
 
