@@ -315,9 +315,10 @@ public class Server {
                 put("worlds-entity-spawning-disabled", "");
                 put("block-listener", true);
                 put("allow-flight", false);
-                put("timeout-milliseconds", 15000);
+                put("timeout-milliseconds", 12000);
                 put("multiversion-min-protocol", 0);
                 put("vanilla-bossbars", false);
+                put("dimensions", false);
             }
         });
 
