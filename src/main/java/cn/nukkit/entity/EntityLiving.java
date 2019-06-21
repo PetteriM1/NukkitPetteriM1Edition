@@ -214,7 +214,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         Timings.livingEntityBaseTickTimer.startTiming();
 
         boolean isBreathing = !this.isSubmerged();
-        if (this instanceof Player && ((Player) this).isCreative()) {
+        if (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator())) {
             isBreathing = true;
         }
 
@@ -254,7 +254,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof EntitySwimming || (this instanceof Player && ((Player) this).isCreative())) {
+                if (this instanceof EntitySwimming || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
                     this.setAirTicks(400);
                 } else {
                     if (turtleTicks == 0 || turtleTicks == 200) {
