@@ -14,11 +14,14 @@ import java.util.Map;
  * Nukkit Project
  */
 public class EntityDamageEvent extends EntityEvent implements Cancellable {
+
     private static final HandlerList handlers = new HandlerList();
 
     public static HandlerList getHandlers() {
         return handlers;
     }
+
+    private int attackCooldown = 10;
 
     private final DamageCause cause;
 
@@ -98,6 +101,14 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         }
 
         return damage;
+    }
+
+    public int getAttackCooldown() {
+        return this.attackCooldown;
+    }
+
+    public void setAttackCooldown(int attackCooldown) {
+        this.attackCooldown = attackCooldown;
     }
 
     public enum DamageModifier {
