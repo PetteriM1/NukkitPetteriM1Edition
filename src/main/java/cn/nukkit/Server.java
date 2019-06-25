@@ -800,12 +800,12 @@ public class Server {
                 this.rcon.close();
             }
 
-            this.getLogger().debug("Disabling all plugins...");
-            this.pluginManager.disablePlugins();
-
             for (Player player : new ArrayList<>(this.players.values())) {
                 player.close(player.getLeaveMessage(), reason);
             }
+
+            this.getLogger().debug("Disabling all plugins...");
+            this.pluginManager.disablePlugins();
 
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {

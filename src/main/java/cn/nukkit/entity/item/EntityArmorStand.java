@@ -18,10 +18,10 @@ public class EntityArmorStand extends Entity {
 
 	public static final int NETWORK_ID = 61;
 
-	public final String TAG_MAINHAND = "Mainhand";
-	public final String TAG_OFFHAND = "Offhand";
-	public final String TAG_POSE_INDEX = "PoseIndex";
-	public final String TAG_ARMOR = "Armor";
+	public static final String TAG_MAINHAND = "Mainhand";
+	public static final String TAG_OFFHAND = "Offhand";
+	public static final String TAG_POSE_INDEX = "PoseIndex";
+	public static final String TAG_ARMOR = "Armor";
 
 	@Override
 	public int getNetworkId() {

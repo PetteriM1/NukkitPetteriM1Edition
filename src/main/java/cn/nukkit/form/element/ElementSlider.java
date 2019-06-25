@@ -3,7 +3,7 @@ package cn.nukkit.form.element;
 public class ElementSlider extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "slider";
+    private static final String type = "slider";
     private String text = "";
     private float min = 0f;
     private float max = 100f;

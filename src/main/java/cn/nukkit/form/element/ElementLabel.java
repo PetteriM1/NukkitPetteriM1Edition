@@ -3,7 +3,7 @@ package cn.nukkit.form.element;
 public class ElementLabel extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "label";
+    private static final String type = "label";
     private String text = "";
 
     public ElementLabel(String text) {

@@ -6,7 +6,6 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.NukkitRandom;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -52,10 +51,11 @@ public class BlockOreLapis extends BlockSolid {
                     i = 0;
                 }
 
+                count = count + i;
             }
 
             return new Item[]{
-                    new ItemDye(4, new Random().nextInt(4) + 4)
+                    new ItemDye(4, count)
             };
         } else {
             return new Item[0];

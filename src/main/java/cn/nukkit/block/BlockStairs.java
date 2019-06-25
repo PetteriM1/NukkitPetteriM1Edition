@@ -98,49 +98,41 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
 
         if (side == 0) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x + 0.5,
                     this.y + f2,
                     this.z,
                     this.x + 1,
                     this.y + f3,
                     this.z + 1
-            ))) {
-                return true;
-            }
+            ));
         } else if (side == 1) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z,
                     this.x + 0.5,
                     this.y + f3,
                     this.z + 1
-            ))) {
-                return true;
-            }
+            ));
         } else if (side == 2) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z + 0.5,
                     this.x + 1,
                     this.y + f3,
                     this.z + 1
-            ))) {
-                return true;
-            }
+            ));
         } else if (side == 3) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z,
                     this.x + 1,
                     this.y + f3,
                     this.z + 0.5
-            ))) {
-                return true;
-            }
+            ));
         }
 
         return false;

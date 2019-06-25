@@ -3,7 +3,7 @@ package cn.nukkit.form.element;
 public class ElementInput extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "input";
+    private static final String type = "input";
     private String text = "";
     private String placeholder = "";
     private String defaultText = "";

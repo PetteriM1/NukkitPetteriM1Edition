@@ -22,9 +22,9 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public abstract class BlockLiquid extends BlockTransparentMeta {
 
-    private final byte CAN_FLOW_DOWN = 1;
-    private final byte CAN_FLOW = 0;
-    private final byte BLOCKED = -1;
+    private static final byte CAN_FLOW_DOWN = 1;
+    private static final byte CAN_FLOW = 0;
+    private static final byte BLOCKED = -1;
     public int adjacentSources = 0;
     protected Vector3 flowVector = null;
     private Long2ByteMap flowCostVisited = new Long2ByteOpenHashMap();
