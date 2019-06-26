@@ -32,11 +32,6 @@ public abstract class BlockPressurePlateBase extends BlockFlowable {
     }
 
     @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
     public boolean canHarvestWithHand() {
         return false;
     }

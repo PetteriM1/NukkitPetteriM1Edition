@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockBookshelf extends BlockSolid {
 
-    public BlockBookshelf() {
-    }
-
     @Override
     public String getName() {
         return "Bookshelf";

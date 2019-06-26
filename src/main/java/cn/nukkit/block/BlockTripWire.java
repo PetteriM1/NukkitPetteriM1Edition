@@ -32,21 +32,6 @@ public class BlockTripWire extends BlockFlowable {
     }
 
     @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
     public AxisAlignedBB getBoundingBox() {
         return null;
     }

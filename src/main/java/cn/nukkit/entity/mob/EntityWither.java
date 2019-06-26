@@ -15,7 +15,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
@@ -70,21 +70,21 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 20 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+    if (this.attackDelay > 20 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 
             Entity k;
             ProjectileLaunchEvent launch;
             EntityWitherSkull skull;
-            if (EntityUtils.rand(0, 200) > 180 || EntityUtils.rand(0, 200) < 20) {
+            if (Utils.rand(0, 200) > 180 || Utils.rand(0, 200) < 20) {
                 f = 0.8;
-                k = EntityUtils.create("BlueWitherSkull", pos, this);
+                k = Entity.createEntity("BlueWitherSkull", pos, this);
                 if (!(k instanceof EntityWitherSkull)) {
                     return;
                 }
@@ -96,7 +96,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
                 launch = new ProjectileLaunchEvent(skull);
             } else {
-                k = EntityUtils.create("WitherSkull", pos, this);
+                k = Entity.createEntity("WitherSkull", pos, this);
                 if (!(k instanceof EntityWitherSkull)) {
                     return;
                 }

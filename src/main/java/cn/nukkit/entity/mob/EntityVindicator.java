@@ -7,7 +7,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +104,7 @@ public class EntityVindicator extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.EMERALD, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.EMERALD, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

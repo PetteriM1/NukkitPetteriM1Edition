@@ -5,9 +5,6 @@ package cn.nukkit.block;
  */
 public class BlockReserved6 extends BlockSolid {
 
-    public BlockReserved6() {
-    }
-
     @Override
     public int getId() {
         return RESERVED6;

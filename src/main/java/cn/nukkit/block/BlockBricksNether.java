@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockBricksNether extends BlockSolid {
 
-    public BlockBricksNether() {
-    }
-
     @Override
     public String getName() {
         return "Nether Brick";

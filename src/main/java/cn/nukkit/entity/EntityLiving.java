@@ -137,7 +137,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             pk.event = this.getHealth() <= 0 ? EntityEventPacket.DEATH_ANIMATION : EntityEventPacket.HURT_ANIMATION;
             Server.broadcastPacket(this.hasSpawned.values(), pk);
 
-            this.attackTime = 10;
+            this.attackTime = source.getAttackCooldown();
 
             return true;
         } else {
@@ -214,7 +214,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         Timings.livingEntityBaseTickTimer.startTiming();
 
         boolean isBreathing = !this.isSubmerged();
-        if (this instanceof Player && ((Player) this).isCreative()) {
+        if (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator())) {
             isBreathing = true;
         }
 
@@ -249,12 +249,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
             }
 
-            if (this.isOnLadder()) {
+            if (this.isOnLadder() || this.hasEffect(Effect.LEVITATION)) {
                 this.resetFallDistance();
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof EntitySwimming || (this instanceof Player && ((Player) this).isCreative())) {
+                if (this instanceof EntitySwimming || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
                     this.setAirTicks(400);
                 } else {
                     if (turtleTicks == 0 || turtleTicks == 200) {

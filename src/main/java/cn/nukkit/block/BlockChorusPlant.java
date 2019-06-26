@@ -7,9 +7,6 @@ import cn.nukkit.math.BlockFace;
 
 public class BlockChorusPlant extends BlockTransparent {
 
-    public BlockChorusPlant() {
-    }
-
     @Override
     public int getId() {
         return CHORUS_PLANT;

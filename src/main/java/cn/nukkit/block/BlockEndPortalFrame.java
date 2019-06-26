@@ -83,10 +83,24 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if ((this.getDamage() & 0x04) == 0 && player instanceof Player && item.getId() == Item.ENDER_EYE) {
+        if ((this.getDamage() & 0x04) == 0 && player instanceof Player && item.getId() == Item.ENDER_EYE && !player.isSneaking()) {
             this.setDamage(this.getDamage() + 4);
             this.getLevel().setBlock(this, this, true, true);
-            player.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BLOCK_END_PORTAL_FRAME_FILL);
+            this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BLOCK_END_PORTAL_FRAME_FILL);
+            for (int i = 0; i < 4; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    Block t = this.getSide(BlockFace.fromHorizontalIndex(i), 2).getSide(BlockFace.fromHorizontalIndex((i + 1) % 4), j);
+                    if (isCompletedPortal(t)) {
+                        for (int k = -1; k <= 1; k++) {
+                            for (int l = -1; l <= 1; l++) {
+                                this.getLevel().setBlock(t.add(k, 0, l), Block.get(Block.END_PORTAL), true);
+                            }
+                        }
+                        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BLOCK_END_PORTAL_SPAWN);
+                        return true;
+                    }
+                }
+            }
             return true;
         }
         return false;
@@ -105,5 +119,25 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        int[] faces = {2, 3, 0, 1};
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
+    }
+
+    private static boolean isCompletedPortal(Block center) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Block block = center.getSide(BlockFace.fromHorizontalIndex(i), 2).getSide(BlockFace.fromHorizontalIndex((i + 1) % 4), j);
+                if (block.getId() != Block.END_PORTAL_FRAME || (block.getDamage() & 0x4) == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

@@ -36,11 +36,6 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
     }
 
     @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
     public boolean isBreakable(Item item) {
         return false;
     }
@@ -156,7 +151,6 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
 
 
             for (Vector3 blockpos = pos; pos.getY() > blockpos.getY() - 21 && pos.getY() > 0 && this.isEmptyBlock(getBlockId(pos.down())); pos = pos.down()) {
-                ;
             }
 
             int i = this.getDistanceUntilEdge(pos, this.leftDir) - 1;

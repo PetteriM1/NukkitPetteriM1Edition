@@ -32,7 +32,6 @@ import cn.nukkit.level.format.LevelProvider;
 import cn.nukkit.level.format.LevelProviderManager;
 import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.generator.*;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.metadata.EntityMetadataStore;
 import cn.nukkit.metadata.LevelMetadataStore;
@@ -95,7 +94,7 @@ public class Server {
     public static final String BROADCAST_CHANNEL_ADMINISTRATIVE = "nukkit.broadcast.admin";
     public static final String BROADCAST_CHANNEL_USERS = "nukkit.broadcast.user";
 
-    private static Server instance = null;
+    private static Server instance;
 
     private BanList banByName;
 
@@ -107,7 +106,7 @@ public class Server {
 
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    private boolean hasStopped = false;
+    private boolean hasStopped;
 
     private PluginManager pluginManager;
 
@@ -152,13 +151,12 @@ public class Server {
 
     private boolean networkCompressionAsync;
     public int networkCompressionLevel;
-    private int networkZlibProvider;
 
     private boolean autoTickRate;
     private int autoTickRateLimit;
     private boolean alwaysTickPlayers;
     private int baseTickRate;
-    private Boolean getAllowFlight = null;
+    private Boolean getAllowFlight;
     private int difficulty = Integer.MAX_VALUE;
     private int defaultGamemode = Integer.MAX_VALUE;
 
@@ -307,7 +305,7 @@ public class Server {
                 put("chunk-generation-population-queue-size", 8);
                 put("ticks-per-autosave", 6000);
                 put("ticks-per-entity-spawns", 200);
-                put("ticks-per-entity-despawns", 8000);
+                put("ticks-per-entity-despawns", 6000);
                 put("thread-watchdog", true);
                 put("thread-watchdog-tick", 50000);
                 put("nether", true);
@@ -319,8 +317,10 @@ public class Server {
                 put("worlds-entity-spawning-disabled", "");
                 put("block-listener", true);
                 put("allow-flight", false);
-                put("timeout-milliseconds", 15000);
+                put("timeout-milliseconds", 12000);
                 put("multiversion-min-protocol", 0);
+                put("vanilla-bossbars", false);
+                put("dimensions", false);
             }
         });
 
@@ -333,7 +333,7 @@ public class Server {
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang(this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 
-        Object poolSize = this.getProperty("async-workers", (Object) "auto");
+        Object poolSize = this.getProperty("async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);
@@ -344,8 +344,7 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        this.networkZlibProvider = this.getPropertyInt("zlib-provider", 0);
-        Zlib.setProvider(this.networkZlibProvider);
+        Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
 
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 1);
         this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
@@ -359,7 +358,7 @@ public class Server {
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
             try {
-                this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().equals("")) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
+                this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().isEmpty()) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
             } catch (IllegalArgumentException e) {
                 log.error(getLanguage().translateString(e.getMessage(), e.getCause().getMessage()));
             }
@@ -392,7 +391,7 @@ public class Server {
             }
         }
 
-        log.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        log.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
 
         this.network = new Network(this);
@@ -412,7 +411,6 @@ public class Server {
         Block.init();
         Enchantment.init();
         Item.init();
-        Biome.init();
         EnumBiome.values();
         Effect.init();
         Potion.init();
@@ -486,7 +484,7 @@ public class Server {
             try {
                 String f = directory.getCanonicalPath();
                 dir2 = f + "/worlds/";
-            } catch (Exception localException) {}
+            } catch (Exception ignored) {}
             File var11 = new File(dir2);
             File[] fa = var11.listFiles();
             for (File fs : fa) {
@@ -524,7 +522,7 @@ public class Server {
                 String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
-                    this.getLogger().notice("[Update] \u00A7eThere is a newer build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                    this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
                 }
 
                 this.getLogger().debug("Update check done");
@@ -724,7 +722,6 @@ public class Server {
         // First we need to check if this command is on the main thread or not, if not, warn the user
         if (!this.isPrimaryThread()) {
             getLogger().warning("Command Dispatched Async: " + commandLine);
-            getLogger().warning("Please notify author of plugin causing this execution to fix this bug!", new Throwable());
         }
         if (sender == null) {
             throw new ServerException("CommandSender is not valid");
@@ -803,12 +800,12 @@ public class Server {
                 this.rcon.close();
             }
 
-            this.getLogger().debug("Disabling all plugins...");
-            this.pluginManager.disablePlugins();
-
             for (Player player : new ArrayList<>(this.players.values())) {
                 player.close(player.getLeaveMessage(), reason);
             }
+
+            this.getLogger().debug("Disabling all plugins...");
+            this.pluginManager.disablePlugins();
 
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
@@ -1053,7 +1050,7 @@ public class Server {
                     }
                 }
             } catch (Exception e) {
-                log.error(this.getLanguage().translateString("nukkit.level.tickError"), e);
+                log.error(this.getLanguage().translateString("nukkit.level.tickError", level.getFolderName(), Utils.getExceptionMessage(e)));
             }
         }
     }
@@ -1239,6 +1236,10 @@ public class Server {
 
     public int getMaxPlayers() {
         return maxPlayers;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
     }
 
     public int getPort() {
@@ -1994,6 +1995,7 @@ public class Server {
         Entity.registerEntity("ZombieVillager", EntityZombieVillager.class);
         Entity.registerEntity("Zombie", EntityZombie.class);
         Entity.registerEntity("Pillager", EntityPillager.class);
+        Entity.registerEntity("ZombieVillagerV2", EntityZombieVillagerV2.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
@@ -2024,6 +2026,7 @@ public class Server {
         Entity.registerEntity("Villager", EntityVillager.class);
         Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
         Entity.registerEntity("WanderingTrader", EntityWanderingTrader.class);
+        Entity.registerEntity("VillagerV2", EntityVillagerV2.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("MinecartChest", EntityMinecartChest.class);

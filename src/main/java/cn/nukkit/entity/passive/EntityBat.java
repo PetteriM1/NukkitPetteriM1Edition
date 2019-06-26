@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.entity.passive.EntityFlyingAnimal;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 

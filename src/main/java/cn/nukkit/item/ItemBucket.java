@@ -14,7 +14,6 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.EntityUtils;
 
 /**
  * @author MagicDroidX
@@ -148,19 +147,19 @@ public class ItemBucket extends Item {
                 if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
                     switch (this.getDamage()) {
                         case 2:
-                            Entity e2 = EntityUtils.create("Cod", block);
+                            Entity e2 = Entity.createEntity("Cod", block);
                             if (e2 != null) e2.spawnToAll();
                             break;
                         case 3:
-                            Entity e3 = EntityUtils.create("Salmon", block);
+                            Entity e3 = Entity.createEntity("Salmon", block);
                             if (e3 != null) e3.spawnToAll();
                             break;
                         case 4:
-                            Entity e4 = EntityUtils.create("TropicalFish", block);
+                            Entity e4 = Entity.createEntity("TropicalFish", block);
                             if (e4 != null) e4.spawnToAll();
                             break;
                         case 5:
-                            Entity e5 = EntityUtils.create("Pufferfish", block);
+                            Entity e5 = Entity.createEntity("Pufferfish", block);
                             if (e5 != null) e5.spawnToAll();
                             break;
                     }

@@ -2,16 +2,15 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.event.entity.EntityShootBowEvent;
-import cn.nukkit.entity.projectile.EntityThrownTrident;
-import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.entity.projectile.EntityThrownTrident;
+import cn.nukkit.event.entity.EntityShootBowEvent;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.scheduler.NukkitRunnable;
 
 /**
  * Created by PetteriM1
@@ -88,11 +87,9 @@ public class ItemTrident extends ItemTool {
                     entityShootBowEvent.getProjectile().spawnToAll();
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THROW);
                     if (!player.isCreative()) {
-                        new NukkitRunnable() {
-                            public void run() {
-                                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-                            }
-                        }.runTaskLater(null, 1);
+                        if (!player.isCreative()) {
+                            this.count--;
+                        }
                     }
                 }
             }

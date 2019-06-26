@@ -87,13 +87,6 @@ public class BlockTallGrass extends BlockFlowable {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        //todo bonemeal
-
-        return false;
-    }
-
-    @Override
     public Item[] getDrops(Item item) {
         boolean dropSeeds = new Random().nextInt(10) == 0;
         if (item.isShears()) {

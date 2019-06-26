@@ -17,8 +17,4 @@ public class ItemCarrotOnAStick extends ItemTool {
         super(CARROT_ON_A_STICK, meta, count, "Carrot on a stick");
     }
 
-    @Override
-    public int getMaxStackSize() {
-        return 1;
-    }
 }

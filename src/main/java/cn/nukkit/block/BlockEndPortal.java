@@ -26,11 +26,6 @@ public class BlockEndPortal extends BlockFlowable {
     }
 
     @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
     public boolean isBreakable(Item item) {
         return false;
     }

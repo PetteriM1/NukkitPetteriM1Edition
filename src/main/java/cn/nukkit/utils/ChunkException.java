@@ -10,8 +10,11 @@ public class ChunkException extends RuntimeException {
         super(message);
     }
 
-    @Override
-    public Throwable fillInStackTrace() {
-        return this;
+    public ChunkException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ChunkException(Throwable cause) {
+        super(cause);
     }
 }

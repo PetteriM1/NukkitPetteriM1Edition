@@ -4,12 +4,12 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntitySkeletonHorse extends EntityWalkingAnimal {
+public class EntitySkeletonHorse extends EntityHorseBase {
 
     public static final int NETWORK_ID = 26;
 
@@ -39,11 +39,6 @@ public class EntitySkeletonHorse extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getMaxJumpHeight() {
-        return 2;
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
 
@@ -59,19 +54,14 @@ public class EntitySkeletonHorse extends EntityWalkingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
 
-            drops.add(Item.get(Item.BONE, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.BONE, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
     }
 
     @Override

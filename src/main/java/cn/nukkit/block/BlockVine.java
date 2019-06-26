@@ -38,11 +38,6 @@ public class BlockVine extends BlockTransparentMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 1;
-    }
-
-    @Override
     public boolean canPassThrough() {
         return true;
     }

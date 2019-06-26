@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 public class FormWindowModal extends FormWindow {
 
     @SuppressWarnings("unused")
-    private final String type = "modal";
+    private static final String type = "modal";
     private String title = "";
     private String content = "";
     private String button1 = "";

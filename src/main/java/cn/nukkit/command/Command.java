@@ -115,7 +115,7 @@ public abstract class Command {
             overload.input.parameters = par;
             customData.overloads.put(key, overload);
         });
-        if (customData.overloads.size() == 0) customData.overloads.put("default", new CommandOverload());
+        if (customData.overloads.isEmpty()) customData.overloads.put("default", new CommandOverload());
         CommandDataVersions versions = new CommandDataVersions();
         versions.versions.add(customData);
         return versions;
@@ -146,7 +146,7 @@ public abstract class Command {
 
         if (this.permissionMessage == null) {
             target.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.unknown", this.name));
-        } else if (!this.permissionMessage.equals("")) {
+        } else if (!this.permissionMessage.isEmpty()) {
             target.sendMessage(this.permissionMessage.replace("<permission>", this.permission));
         }
 
@@ -154,7 +154,7 @@ public abstract class Command {
     }
 
     public boolean testPermissionSilent(CommandSender target) {
-        if (this.permission == null || this.permission.equals("")) {
+        if (this.permission == null || this.permission.isEmpty()) {
             return true;
         }
 

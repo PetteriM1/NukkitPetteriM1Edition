@@ -6,11 +6,10 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -38,11 +37,6 @@ public class EntityDrowned extends EntityWalkingMob {
     @Override
     public float getHeight() {
         return 1.95f;
-    }
-
-    @Override
-    public double getSpeed() {
-        return 1.0;
     }
 
     @Override
@@ -98,7 +92,7 @@ public class EntityDrowned extends EntityWalkingMob {
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
             EntityEventPacket pk = new EntityEventPacket();
             pk.eid = this.getId();
-            pk.event = 4;
+            pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
         }
     }
@@ -110,8 +104,7 @@ public class EntityDrowned extends EntityWalkingMob {
 
         hasUpdate = super.entityBaseTick(tickDiff);
 
-        int time = this.getLevel().getTime() % Level.TIME_FULL;
-        if (!this.isOnFire() && !this.level.isRaining() && (time < 12567 || time > 23450) && !this.isInsideOfWater()) {
+        if (level.shouldMobBurn(this)) {
             this.setOnFire(100);
         }
 
@@ -128,11 +121,11 @@ public class EntityDrowned extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
 
-            drops.add(Item.get(Item.GOLD_INGOT, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.GOLD_INGOT, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

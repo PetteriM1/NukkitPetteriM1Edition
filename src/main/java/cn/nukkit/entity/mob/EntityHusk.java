@@ -2,8 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -74,7 +73,7 @@ public class EntityHusk extends EntityWalkingMob {
             player.attack(new EntityDamageByEntityEvent(this, player, DamageCause.ENTITY_ATTACK, getDamage()));
             EntityEventPacket pk = new EntityEventPacket();
             pk.eid = this.getId();
-            pk.event = 4;
+            pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
             player.addEffect(Effect.getEffectByName("HUNGER").setAmplifier(1).setDuration(140));
         }
@@ -89,7 +88,7 @@ public class EntityHusk extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
         }

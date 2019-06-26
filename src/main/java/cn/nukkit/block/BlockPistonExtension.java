@@ -1,12 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
 
 public class BlockPistonExtension extends BlockTransparent {
-
-    public BlockPistonExtension() {
-    }
 
     @Override
     public int getId() {
@@ -26,11 +22,6 @@ public class BlockPistonExtension extends BlockTransparent {
     @Override
     public double getResistance() {
         return 0.1;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_NONE;
     }
 
     @Override

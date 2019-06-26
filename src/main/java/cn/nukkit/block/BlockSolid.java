@@ -12,11 +12,6 @@ public abstract class BlockSolid extends Block {
     }
 
     @Override
-    public boolean isSolid() {
-        return true;
-    }
-
-    @Override
     public BlockColor getColor() {
         return BlockColor.STONE_BLOCK_COLOR;
     }

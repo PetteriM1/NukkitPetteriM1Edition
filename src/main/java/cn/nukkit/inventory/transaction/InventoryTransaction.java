@@ -205,7 +205,7 @@ public class InventoryTransaction {
                 }
             } while (sortedThisLoop > 0);
 
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 MainLogger.getLogger().debug("Failed to compact " + originalList.size() + " actions for " + this.source.getName());
                 return false;
             }
@@ -227,7 +227,7 @@ public class InventoryTransaction {
 
         List<Item> haveItems = new ArrayList<>();
         List<Item> needItems = new ArrayList<>();
-        return matchItems(needItems, haveItems) && this.actions.size() > 0 && haveItems.size() == 0 && needItems.size() == 0;
+        return matchItems(needItems, haveItems) && !this.actions.isEmpty() && haveItems.isEmpty() && needItems.isEmpty();
     }
 
     protected boolean callExecuteEvent() {

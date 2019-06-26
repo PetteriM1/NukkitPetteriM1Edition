@@ -4,8 +4,10 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.spawners.*;
 
 import java.util.Arrays;
@@ -51,46 +53,50 @@ public class Spawner extends Thread {
 
     @Override
     public void run() {
-        if (Server.getInstance().getOnlinePlayers().size() > 0) {
+        if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
             for (EntitySpawner spawner : entitySpawners) {
                 spawner.spawn(Server.getInstance().getOnlinePlayers().values());
             }
         }
     }
 
-    public boolean entitySpawnAllowed(Level level, int networkId) {
+    public boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
         try {
             int count = 0;
             for (Entity entity : level.getEntities()) {
-                if (entity.isAlive() && entity.getNetworkId() == networkId) {
+                if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distance(entity) < 100) {
                     count++;
                 }
             }
-            return count < 1;
+            return count < 2;
         } catch (Exception e) {
             return false;
         }
     }
 
     public BaseEntity createEntity(Object type, Position pos) {
-        BaseEntity entity = (BaseEntity) EntityUtils.create(type, pos);
-        if (entity != null) {
-            entity.spawnToAll();
+        BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
+        if (entity != null && !entity.isInsideOfSolid()) {
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
+            Server.getInstance().getPluginManager().callEvent(ev);
+            if (!ev.isCancelled()) {
+                entity.spawnToAll();
+            }
         }
         return entity;
     }
 
     public int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
-        int addX = EntityUtils.rand(degree / 2 * -1, degree / 2);
+        int addX = Utils.rand(degree / 2 * -1, degree / 2);
         if (addX >= 0) {
             if (degree < safeDegree) {
                 addX = safeDegree;
-                addX += EntityUtils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
             }
         } else {
             if (degree > safeDegree) {
                 addX = -safeDegree;
-                addX += EntityUtils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
             }
         }
         return addX;

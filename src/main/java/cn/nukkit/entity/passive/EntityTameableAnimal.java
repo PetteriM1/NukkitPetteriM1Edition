@@ -35,7 +35,7 @@ public abstract class EntityTameableAnimal extends EntityWalkingAnimal implement
                 ownerName = namedTag.getString("Owner");
             }
 
-            if (ownerName.length() > 0) {
+            if (!ownerName.isEmpty()) {
                 this.setOwnerName(ownerName);
                 this.setTamed(true);
             }

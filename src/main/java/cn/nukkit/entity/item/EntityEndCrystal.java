@@ -41,6 +41,10 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
             return false;
         }
 
+        if (source.getCause() == EntityDamageEvent.DamageCause.FIRE || source.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK || source.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+            return false;
+        }
+
         this.explode();
 
         return true;

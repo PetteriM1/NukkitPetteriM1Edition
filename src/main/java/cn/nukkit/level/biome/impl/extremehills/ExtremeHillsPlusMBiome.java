@@ -22,8 +22,4 @@ public class ExtremeHillsPlusMBiome extends ExtremeHillsMBiome {
         return "Extreme Hills+ M";
     }
 
-    @Override
-    public boolean doesOverhang() {
-        return false;
-    }
 }

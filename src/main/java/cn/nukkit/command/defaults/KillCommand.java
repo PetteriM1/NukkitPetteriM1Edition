@@ -9,10 +9,11 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
+import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
-import cn.nukkit.level.Level;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.Level;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.StringJoiner;
@@ -80,6 +81,18 @@ public class KillCommand extends VanillaCommand {
                         if (entity instanceof BaseEntity) {
                             joiner.add(entity.getName());
                             entity.attack(new EntityDamageEvent(entity, DamageCause.SUICIDE, 1000));
+                        }
+                    }
+                }
+                String entities = joiner.toString();
+                sender.sendMessage(new TranslationContainer("commands.kill.successful", entities.isEmpty() ? "0" : entities));
+            } else if (args[0].equals("@i")) {
+                StringJoiner joiner = new StringJoiner(", ");
+                for (Level level : Server.getInstance().getLevels().values()) {
+                    for (Entity entity : level.getEntities()) {
+                        if (entity instanceof EntityItem) {
+                            joiner.add(entity.getName());
+                            entity.close();
                         }
                     }
                 }

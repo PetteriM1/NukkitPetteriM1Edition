@@ -47,8 +47,4 @@ public class PlayerSettingsRespondedEvent extends PlayerEvent implements Cancell
         return window.wasClosed();
     }
 
-    @Override
-    public void setCancelled() {
-        super.setCancelled();
-    }
 }

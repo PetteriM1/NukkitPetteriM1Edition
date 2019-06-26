@@ -7,7 +7,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class EntityDolphin extends EntityWaterAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.RAW_FISH, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.RAW_FISH, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

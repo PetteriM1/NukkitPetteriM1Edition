@@ -7,9 +7,6 @@ import cn.nukkit.item.Item;
  */
 public class BlockHardGlass extends BlockTransparent {
 
-    public BlockHardGlass() {
-    }
-
     @Override
     public int getId() {
         return HARD_GLASS;

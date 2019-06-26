@@ -12,8 +12,6 @@ import cn.nukkit.utils.Utils;
 import io.netty.util.collection.CharObjectHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.zip.Deflater;
 
@@ -51,17 +49,7 @@ public class CraftingManager {
 
     @SuppressWarnings("unchecked")
     public CraftingManager() {
-        String path = Server.getInstance().getDataPath() + "recipes.json";
-
-        if (!new File(path).exists()) {
-            try {
-                Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("recipes.json"));
-            } catch (IOException e) {
-                MainLogger.getLogger().logException(e);
-            }
-        }
-
-        List<Map> recipes = new Config(path, Config.JSON).getMapList("recipes");
+        List<Map> recipes = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getMapList("recipes");
         MainLogger.getLogger().info("Loading recipes...");
         for (Map<String, Object> recipe : recipes) {
             try {

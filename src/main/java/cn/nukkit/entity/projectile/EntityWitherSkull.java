@@ -5,7 +5,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class EntityWitherSkull extends EntityProjectile {
 
@@ -77,9 +77,9 @@ public class EntityWitherSkull extends EntityProjectile {
         this.timing.startTiming();
 
         if (this.age > 1200 || this.isCollided) {
-            this.kill();
+            this.close();
         } else {
-            this.level.addParticle(new SmokeParticle(this.add(this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500)));
+            this.level.addParticle(new SmokeParticle(this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
         }
 
         this.timing.stopTiming();

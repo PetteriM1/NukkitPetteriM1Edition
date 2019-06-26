@@ -39,7 +39,7 @@ public class CompressBatchedPacket extends AsyncTask {
         try {
             this.finalData = Zlib.deflate(data, level);
             this.data = null;
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     @Override

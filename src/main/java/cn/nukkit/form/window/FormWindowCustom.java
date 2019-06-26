@@ -13,7 +13,7 @@ import java.util.List;
 public class FormWindowCustom extends FormWindow {
 
     @SuppressWarnings("unused")
-    private final String type = "custom_form";
+    private static final String type = "custom_form";
     private String title = "";
     private ElementButtonImageData icon;
     private List<Element> content;

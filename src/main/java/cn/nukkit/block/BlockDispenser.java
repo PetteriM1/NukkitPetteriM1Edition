@@ -46,11 +46,6 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         return new ItemBlock(this, 0);
     }
 
-    @Override
-    public int getComparatorInputOverride() {
-        return super.getComparatorInputOverride();
-    }
-
     public BlockFace getFacing() {
         return BlockFace.fromIndex(this.getDamage() & 7);
     }

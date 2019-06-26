@@ -2,7 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
@@ -72,10 +72,10 @@ public class EntityRabbit extends EntityJumpingAnimal {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.RABBIT_HIDE, 0, EntityUtils.rand(0, 1)));
-            drops.add(Item.get(this.isOnFire() ? Item.COOKED_RABBIT : Item.RAW_RABBIT, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.RABBIT_HIDE, 0, Utils.rand(0, 1)));
+            drops.add(Item.get(this.isOnFire() ? Item.COOKED_RABBIT : Item.RAW_RABBIT, 0, Utils.rand(0, 1)));
 
-            for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
+            for (int i = 0; i < (Utils.rand(0, 101) <= 9 ? 1 : 0); i++) {
                 drops.add(Item.get(Item.RABBIT_FOOT, 0, 1));
             }
         }
@@ -85,7 +85,7 @@ public class EntityRabbit extends EntityJumpingAnimal {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : EntityUtils.rand(1, 3);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
     
     @Override
@@ -93,7 +93,7 @@ public class EntityRabbit extends EntityJumpingAnimal {
         boolean hasUpdate = super.onUpdate(currentTick);
         try {
             if (this.isOnGround()) this.level.addParticle(new PunchBlockParticle(this, this.level.getBlock((int) x, (int) y - 1, (int) z), BlockFace.UP));
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         return hasUpdate;
     }
 }

@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class DoubleTag extends NumberTag<Double> {
+
     public double data;
 
     @Override
@@ -35,6 +36,11 @@ public class DoubleTag extends NumberTag<Double> {
     @Override
     void load(NBTInputStream dis) throws IOException {
         data = dis.readDouble();
+    }
+
+    @Override
+    public Double parseValue() {
+        return this.data;
     }
 
     @Override

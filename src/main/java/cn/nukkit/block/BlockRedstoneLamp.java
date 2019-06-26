@@ -13,9 +13,6 @@ import cn.nukkit.math.BlockFace;
  */
 public class BlockRedstoneLamp extends BlockSolid {
 
-    public BlockRedstoneLamp() {
-    }
-
     @Override
     public String getName() {
         return "Redstone Lamp";

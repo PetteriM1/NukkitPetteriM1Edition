@@ -26,7 +26,7 @@ public class ListTag<T extends Tag> extends Tag {
 
     @Override
     void write(NBTOutputStream dos) throws IOException {
-        if (list.size() > 0) type = list.get(0).getId();
+        if (!list.isEmpty()) type = list.get(0).getId();
         else type = 1;
 
         dos.writeByte(type);
@@ -85,6 +85,17 @@ public class ListTag<T extends Tag> extends Tag {
             list.set(index, tag);
         }
         return this;
+    }
+
+    @Override
+    public List<Object> parseValue() {
+        List<Object> value = new ArrayList<>(this.list.size());
+
+        for (T t : this.list) {
+            value.add(t.parseValue());
+        }
+
+        return value;
     }
 
     public T get(int index) {

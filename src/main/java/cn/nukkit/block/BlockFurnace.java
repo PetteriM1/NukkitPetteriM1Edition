@@ -33,11 +33,6 @@ public class BlockFurnace extends BlockFurnaceBurning implements Faceable {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }

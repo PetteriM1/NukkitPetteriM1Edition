@@ -264,19 +264,11 @@ public class BlockFire extends BlockFlowable {
             if (block.isSolid()) {
                 return true;
             } else {
-                if (block instanceof BlockStairs &&
-                        (block.getDamage() & 4) == 4) {
-
+                if (block instanceof BlockStairs && (block.getDamage() & 4) == 4) {
                     return true;
-                } else if (block instanceof BlockSlab &&
-                        (block.getDamage() & 8) == 8) {
-
+                } else if (block instanceof BlockSlab && (block.getDamage() & 8) == 8) {
                     return true;
-                } else if (block instanceof BlockSnowLayer &&
-                        (block.getDamage() & 7) == 7) {
-
-                    return true;
-                }
+                } else return block instanceof BlockSnowLayer && (block.getDamage() & 7) == 7;
             }
         }
 

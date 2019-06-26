@@ -23,7 +23,7 @@ public class ServerKiller extends Thread {
     public void run() {
         try {
             sleep(sleepTime);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException ignored) {}
         System.exit(1);
     }
 }

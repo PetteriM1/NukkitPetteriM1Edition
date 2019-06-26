@@ -12,9 +12,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class BlockMobSpawner extends BlockSolid {
 
-    public BlockMobSpawner() {
-    }
-
     @Override
     public String getName() {
         return "Monster Spawner";

@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockClay extends BlockSolid {
 
-    public BlockClay() {
-    }
-
     @Override
     public double getHardness() {
         return 0.6;

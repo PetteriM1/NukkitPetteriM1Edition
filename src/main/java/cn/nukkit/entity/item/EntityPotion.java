@@ -19,8 +19,6 @@ public class EntityPotion extends EntityProjectile {
 
     public static final int NETWORK_ID = 86;
 
-    public static final int DATA_POTION_ID = 37;
-
     public int potionId;
 
     public EntityPotion(FullChunk chunk, CompoundTag nbt) {
@@ -37,7 +35,7 @@ public class EntityPotion extends EntityProjectile {
 
         potionId = this.namedTag.getShort("PotionId");
 
-        this.dataProperties.putShort(DATA_POTION_ID, this.potionId);
+        this.dataProperties.putShort(DATA_POTION_AUX_VALUE, this.potionId);
 
         Effect effect = Potion.getEffect(potionId, true);
 

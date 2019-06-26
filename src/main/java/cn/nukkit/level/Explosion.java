@@ -28,13 +28,13 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Explosion {
 
-    private final int rays = 16;
+    private static final int rays = 16;
     private final Level level;
     private final Position source;
     private final double size;
 
     private List<Block> affectedBlocks = new ArrayList<>();
-    private final double stepLen = 0.3d;
+    private static final double stepLen = 0.3d;
 
     private final Object what;
 

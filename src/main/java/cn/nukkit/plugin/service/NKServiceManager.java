@@ -122,8 +122,7 @@ public class NKServiceManager implements ServiceManager {
         synchronized (handle) {
             List<RegisteredServiceProvider<?>> registered = handle.get(service);
             if (registered == null) {
-                ImmutableList<RegisteredServiceProvider<T>> empty = ImmutableList.of();
-                return empty;
+                return ImmutableList.of();
             }
             for (RegisteredServiceProvider<?> provider : registered) {
                 builder.add((RegisteredServiceProvider<T>)provider);

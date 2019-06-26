@@ -10,9 +10,6 @@ public abstract class BasicGenerator {
 
     public abstract boolean generate(ChunkManager level, NukkitRandom rand, Vector3 position);
 
-    public void setDecorationDefaults() {
-    }
-
     protected void setBlockAndNotifyAdequately(ChunkManager level, BlockVector3 pos, Block state) {
         setBlock(level, new Vector3(pos.x, pos.y, pos.z), state);
     }

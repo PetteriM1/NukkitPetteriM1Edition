@@ -8,7 +8,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public abstract class EntityJumping extends BaseEntity {
 
@@ -57,23 +57,23 @@ public abstract class EntityJumping extends BaseEntity {
 
         int x, z;
         if (this.stayTime > 0) {
-            if (EntityUtils.rand(1, 100) > 5) {
+            if (Utils.rand(1, 100) > 5) {
                 return;
             }
-            x = EntityUtils.rand(10, 30);
-            z = EntityUtils.rand(10, 30);
-            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
-        } else if (EntityUtils.rand(1, 410) == 1) {
-            x = EntityUtils.rand(10, 30);
-            z = EntityUtils.rand(10, 30);
-            this.stayTime = EntityUtils.rand(100, 300);
-            this.target = this.add(EntityUtils.rand() ? x : -x, EntityUtils.rand(-20.0, 20.0) / 10, EntityUtils.rand() ? z : -z);
+            x = Utils.rand(10, 30);
+            z = Utils.rand(10, 30);
+            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20.0, 20.0) / 10, Utils.rand() ? z : -z);
+        } else if (Utils.rand(1, 100) == 1) {
+            x = Utils.rand(10, 30);
+            z = Utils.rand(10, 30);
+            this.stayTime = Utils.rand(100, 200);
+            this.target = this.add(Utils.rand() ? x : -x, Utils.rand(-20.0, 20.0) / 10, Utils.rand() ? z : -z);
         } else if (this.moveTime <= 0 || this.target == null) {
-            x = EntityUtils.rand(20, 100);
-            z = EntityUtils.rand(20, 100);
+            x = Utils.rand(20, 100);
+            z = Utils.rand(20, 100);
             this.stayTime = 0;
-            this.moveTime = EntityUtils.rand(100, 200);
-            this.target = this.add(EntityUtils.rand() ? x : -x, 0, EntityUtils.rand() ? z : -z);
+            this.moveTime = Utils.rand(100, 200);
+            this.target = this.add(Utils.rand() ? x : -x, 0, Utils.rand() ? z : -z);
         }
     }
 
@@ -127,13 +127,13 @@ public abstract class EntityJumping extends BaseEntity {
                     if (this.isInsideOfWater()) {
                         this.motionX = this.getSpeed() * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.05 * (z / diff);
-                        this.level.addParticle(new BubbleParticle(this.add(EntityUtils.rand(-2.0,2.0),EntityUtils.rand(-0.5,0),EntityUtils.rand(-2.0,2.0))));
+                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0,2.0),Utils.rand(-0.5,0),Utils.rand(-2.0,2.0))));
                     } else {
                         this.motionX = this.getSpeed() * 0.1 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.1 * (z / diff);
                     }
                 }
-                this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
                 return this.followTarget;
             }
 
@@ -151,13 +151,13 @@ public abstract class EntityJumping extends BaseEntity {
                     if (this.isInsideOfWater()) {
                         this.motionX = this.getSpeed() * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.05 * (z / diff);
-                        this.level.addParticle(new BubbleParticle(this.add(EntityUtils.rand(-2.0,2.0),EntityUtils.rand(-0.5,0),EntityUtils.rand(-2.0,2.0))));
+                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0,2.0),Utils.rand(-0.5,0),Utils.rand(-2.0,2.0))));
                     } else {
                         this.motionX = this.getSpeed() * 0.15 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     }
                 }
-                this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
             }
 
             double dx = this.motionX * tickDiff;

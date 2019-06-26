@@ -3,7 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.entity.projectile.EntityGhastFireBall;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -64,15 +64,15 @@ public class EntityGhast extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 30 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 100) {
+        if (this.attackDelay > 30 && Utils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("GhastFireBall", pos, this);
+            Entity k = Entity.createEntity("GhastFireBall", pos, this);
             if (!(k instanceof EntityGhastFireBall)) {
                 return;
             }
@@ -102,11 +102,11 @@ public class EntityGhast extends EntityFlyingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
             }
 
-            drops.add(Item.get(Item.GHAST_TEAR, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.GHAST_TEAR, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

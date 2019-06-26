@@ -1,7 +1,9 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -10,6 +12,7 @@ import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 public class EntityEnderPearl extends EntityProjectile {
 
@@ -62,11 +65,31 @@ public class EntityEnderPearl extends EntityProjectile {
         this.timing.startTiming();
 
         if (this.isCollided && this.shootingEntity instanceof Player) {
+            this.close();
+
             teleport();
+
+            if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
+                if (Utils.rand(1, 20) == 5) {
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.ENDER_PEARL);
+                    level.getServer().getPluginManager().callEvent(ev);
+
+                    if (ev.isCancelled()) {
+                        return false;
+                    }
+
+                    Entity entity = Entity.createEntity("Endermite", this.add(0.5, 1, 0.5));
+                    if (entity != null) {
+                        entity.spawnToAll();
+                    }
+                }
+            }
+
+            return false;
         }
 
         if (this.age > 1200 || this.isCollided) {
-            this.kill();
+            this.close();
         }
 
         this.timing.stopTiming();
@@ -87,7 +110,7 @@ public class EntityEnderPearl extends EntityProjectile {
         this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
 
         if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {
-            this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.PROJECTILE, 5f, 0f));
+            this.shootingEntity.attack(new EntityDamageByEntityEvent(this, shootingEntity, EntityDamageEvent.DamageCause.FALL, 5f, 0f));
         }
 
         this.level.addSound(new EndermanTeleportSound(this));

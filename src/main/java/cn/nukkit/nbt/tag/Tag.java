@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public abstract class Tag {
+
     public static final byte TAG_End = 0;
     public static final byte TAG_Byte = 1;
     public static final byte TAG_Short = 2;
@@ -56,7 +57,7 @@ public abstract class Tag {
 
         out.print(prefix);
         out.print(getTagName(getId()));
-        if (name.length() > 0) {
+        if (!name.isEmpty()) {
             out.print("(\"" + name + "\")");
         }
         out.print(": ");
@@ -158,4 +159,6 @@ public abstract class Tag {
     }
 
     public abstract Tag copy();
+
+    public abstract Object parseValue();
 }

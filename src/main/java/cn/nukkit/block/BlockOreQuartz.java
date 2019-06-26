@@ -14,9 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class BlockOreQuartz extends BlockSolid {
 
-    public BlockOreQuartz() {
-    }
-
     @Override
     public String getName() {
         return "Quartz Ore";

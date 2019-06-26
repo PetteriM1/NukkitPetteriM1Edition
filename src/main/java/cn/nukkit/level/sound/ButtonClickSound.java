@@ -8,6 +8,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
  * Nukkit Project
  */
 public class ButtonClickSound extends LevelEventSound {
+
     public ButtonClickSound(Vector3 pos) {
         this(pos, 0);
     }

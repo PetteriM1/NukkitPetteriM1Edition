@@ -10,7 +10,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,15 +53,15 @@ public class EntityBlaze extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 20 && EntityUtils.rand(1, 32) < 4 && this.distance(player) <= 100) {
+        if (this.attackDelay > 20 && Utils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1.1;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("BlazeFireBall", pos, this);
+            Entity k = Entity.createEntity("BlazeFireBall", pos, this);
             if (!(k instanceof EntityBlazeFireBall)) {
                 return;
             }
@@ -91,7 +91,7 @@ public class EntityBlaze extends EntityFlyingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.BLAZE_ROD, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.BLAZE_ROD, 0, Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);

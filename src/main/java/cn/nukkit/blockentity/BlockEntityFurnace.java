@@ -28,10 +28,10 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
 
     protected FurnaceInventory inventory;
 
-    private int burnTime = 0;
-    private int burnDuration = 0;
-    private int cookTime = 0;
-    private int maxTime = 0;
+    protected int burnTime = 0;
+    protected int burnDuration = 0;
+    protected int cookTime = 0;
+    protected int maxTime = 0;
 
     public BlockEntityFurnace(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -92,7 +92,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.namedTag.remove("CustomName");
             return;
         }
@@ -188,6 +188,8 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
 
     protected void checkFuel(Item fuel) {
         FurnaceBurnEvent ev = new FurnaceBurnEvent(this, fuel, fuel.getFuelTime() == null ? 0 : fuel.getFuelTime());
+
+        this.server.getPluginManager().callEvent(ev);
 
         if (ev.isCancelled()) {
             return;

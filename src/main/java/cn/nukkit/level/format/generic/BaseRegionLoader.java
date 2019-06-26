@@ -15,7 +15,6 @@ import java.util.Map;
  */
 abstract public class BaseRegionLoader {
 
-    public static final int VERSION = 1;
     public static final byte COMPRESSION_GZIP = 1;
     public static final byte COMPRESSION_ZLIB = 2;
     public static final int MAX_SECTOR_LENGTH = 256 << 12;
@@ -57,10 +56,6 @@ abstract public class BaseRegionLoader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void compress() {
-        // TODO
     }
 
     public RandomAccessFile getRandomAccessFile() {

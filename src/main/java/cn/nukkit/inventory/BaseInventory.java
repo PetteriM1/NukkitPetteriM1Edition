@@ -355,7 +355,7 @@ public abstract class BaseInventory implements Inventory {
                 }
             }
 
-            if (itemSlots.size() == 0) {
+            if (itemSlots.isEmpty()) {
                 break;
             }
         }
@@ -466,7 +466,7 @@ public abstract class BaseInventory implements Inventory {
 
         for (Player player : players) {
             int id = player.getWindowId(this);
-            if (id == -1 || !player.spawned) {
+            if (id == -1) {
                 this.close(player);
                 continue;
             }

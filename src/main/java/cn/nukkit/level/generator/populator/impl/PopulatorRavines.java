@@ -14,8 +14,6 @@ public class PopulatorRavines extends Populator {
     protected int checkAreaSize = 8;
 
     private Random random;
-    private long worldLong1;
-    private long worldLong2;
 
     private int ravineRarity = 1;
     private int ravineMinAltitude = 20;
@@ -33,15 +31,13 @@ public class PopulatorRavines extends Populator {
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         this.random = new Random();
         this.random.setSeed(level.getSeed());
-        worldLong1 = this.random.nextLong();
-        worldLong2 = this.random.nextLong();
 
         int i = this.checkAreaSize;
 
         for (int x = chunkX - i; x <= chunkX + i; x++)
             for (int z = chunkZ - i; z <= chunkZ + i; z++) {
-                long l3 = x * worldLong1;
-                long l4 = z * worldLong2;
+                long l3 = x * this.random.nextLong();
+                long l4 = z * this.random.nextLong();
                 this.random.setSeed(l3 ^ l4 ^ level.getSeed());
                 generateChunk(chunkX, chunkZ, level.getChunk(chunkX, chunkZ));
             }

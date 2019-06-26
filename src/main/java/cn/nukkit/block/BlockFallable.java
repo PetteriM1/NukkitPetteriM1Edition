@@ -14,7 +14,7 @@ import cn.nukkit.nbt.tag.ListTag;
 public abstract class BlockFallable extends BlockSolid {
 
     protected BlockFallable() {
-    };
+    }
 
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {

@@ -113,7 +113,7 @@ public class TeleportCommand extends VanillaCommand {
 
             if (args.length == 6 || (args.length == 5 && pos == 3)) {
                 yaw = Integer.parseInt(args[pos++]);
-                pitch = Integer.parseInt(args[pos++]);
+                pitch = Integer.parseInt(args[pos]);
             }
             ((Player) target).teleport(new Location(x, y, z, yaw, pitch, ((Player) target).getLevel()), PlayerTeleportEvent.TeleportCause.COMMAND);
             Command.broadcastCommandMessage(sender, new TranslationContainer("commands.tp.success.coordinates", target.getName(), String.valueOf(NukkitMath.round(x, 2)), String.valueOf(NukkitMath.round(y, 2)), String.valueOf(NukkitMath.round(z, 2))));

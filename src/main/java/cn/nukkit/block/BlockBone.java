@@ -11,9 +11,6 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockBone extends BlockSolid implements Faceable {
 
-    public BlockBone() {
-    }
-
     @Override
     public int getId() {
         return BONE_BLOCK;

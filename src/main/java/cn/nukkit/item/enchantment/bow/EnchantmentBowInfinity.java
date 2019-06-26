@@ -21,8 +21,4 @@ public class EnchantmentBowInfinity extends EnchantmentBow {
         return 50;
     }
 
-    @Override
-    public int getMaxLevel() {
-        return 1;
-    }
 }

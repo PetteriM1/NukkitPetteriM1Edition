@@ -6,7 +6,7 @@ import java.util.List;
 public class ElementDropdown extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "dropdown";
+    private static final String type = "dropdown";
     private String text = "";
     private List<String> options;
     private int defaultOptionIndex = 0;

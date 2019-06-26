@@ -2,10 +2,11 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.passive.EntityChicken;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
@@ -60,13 +61,20 @@ public class EntityEgg extends EntityProjectile {
         }
 
         if (this.age > 1200) {
-            this.kill();
+            this.close();
         } else if (this.isCollided) {
-            this.kill();
+            this.close();
 
             if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
-                if (EntityUtils.rand(1, 20) == 5) {
-                    EntityChicken entity = (EntityChicken) EntityUtils.create("Chicken", this.add(0.5, 1, 0.5));
+                if (Utils.rand(1, 20) == 5) {
+                    CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.EGG);
+                    level.getServer().getPluginManager().callEvent(ev);
+
+                    if (ev.isCancelled()) {
+                        return false;
+                    }
+
+                    EntityChicken entity = (EntityChicken) Entity.createEntity("Chicken", this.add(0.5, 1, 0.5));
                     if (entity != null) {
                         entity.spawnToAll();
                         entity.setBaby(true);

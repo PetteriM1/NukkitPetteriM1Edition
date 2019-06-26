@@ -10,7 +10,7 @@ import cn.nukkit.item.ItemSwordGold;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,11 +160,11 @@ public class EntityZombiePigman extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.ROTTEN_FLESH, 0, EntityUtils.rand(0, 1)));
-            drops.add(Item.get(Item.GOLD_NUGGET, 0, EntityUtils.rand(0, 1)));
+            drops.add(Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 1)));
+            drops.add(Item.get(Item.GOLD_NUGGET, 0, Utils.rand(0, 1)));
 
-            for (int i = 0; i < (EntityUtils.rand(0, 101) <= 9 ? 1 : 0); i++) {
-                drops.add(Item.get(Item.GOLD_SWORD, EntityUtils.rand(20, 30), 1));
+            for (int i = 0; i < (Utils.rand(0, 101) <= 9 ? 1 : 0); i++) {
+                drops.add(Item.get(Item.GOLD_SWORD, Utils.rand(20, 30), 1));
             }
         }
 

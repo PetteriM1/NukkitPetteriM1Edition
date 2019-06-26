@@ -45,11 +45,6 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getResistance() {
-        return 1;
-    }
-
-    @Override
     public double getHardness() {
         return 0.2;
     }

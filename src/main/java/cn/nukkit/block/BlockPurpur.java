@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.BlockColor;
 
 public class BlockPurpur extends BlockSolidMeta {
 
@@ -12,7 +13,7 @@ public class BlockPurpur extends BlockSolidMeta {
     public static final int PURPUR_PILLAR = 2;
 
     public BlockPurpur() {
-        this(0);
+        this(PURPUR_NORMAL);
     }
 
     public BlockPurpur(int meta) {
@@ -84,5 +85,10 @@ public class BlockPurpur extends BlockSolidMeta {
     @Override
     public Item toItem() {
         return new ItemBlock(new BlockPurpur(), this.getDamage() & 0x03, 1);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 }

@@ -8,6 +8,7 @@ import cn.nukkit.lang.TextContainer;
  * @author Tee7even
  */
 public class RemoteConsoleCommandSender extends ConsoleCommandSender {
+
     private final StringBuilder messages = new StringBuilder();
 
     @Override

@@ -5,9 +5,6 @@ package cn.nukkit.block;
  */
 public class BlockInfoUpdate2 extends BlockSolid {
 
-    public BlockInfoUpdate2() {
-    }
-
     @Override
     public int getId() {
         return INFO_UPDATE2;

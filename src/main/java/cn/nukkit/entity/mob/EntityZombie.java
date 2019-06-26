@@ -8,12 +8,14 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemShovelIron;
+import cn.nukkit.item.ItemSwordIron;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -106,7 +108,7 @@ public class EntityZombie extends EntityWalkingMob {
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
             EntityEventPacket pk = new EntityEventPacket();
             pk.eid = this.getId();
-            pk.event = 4;
+            pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
         }
     }
@@ -137,20 +139,30 @@ public class EntityZombie extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
 
-            if (EntityUtils.rand(1, 3) == 1) {
-                switch (EntityUtils.rand(1, 3)) {
+            if (this.tool != null) {
+                if (tool instanceof ItemSwordIron && Utils.rand(1, 3) == 1) {
+                    drops.add(Item.get(Item.IRON_SWORD, Utils.rand(200, 246), 1));
+                }
+
+                if (tool instanceof ItemShovelIron && Utils.rand(1, 3) != 1) {
+                    drops.add(Item.get(Item.IRON_SHOVEL, Utils.rand(200, 246), 1));
+                }
+            }
+
+            if (Utils.rand(1, 3) == 1) {
+                switch (Utils.rand(1, 3)) {
                     case 1:
-                        drops.add(Item.get(Item.IRON_INGOT, 0, EntityUtils.rand(0, 1)));
+                        drops.add(Item.get(Item.IRON_INGOT, 0, Utils.rand(0, 1)));
                         break;
                     case 2:
-                        drops.add(Item.get(Item.CARROT, 0, EntityUtils.rand(0, 1)));
+                        drops.add(Item.get(Item.CARROT, 0, Utils.rand(0, 1)));
                         break;
                     case 3:
-                        drops.add(Item.get(Item.POTATO, 0, EntityUtils.rand(0, 1)));
+                        drops.add(Item.get(Item.POTATO, 0, Utils.rand(0, 1)));
                         break;
                 }
             }
@@ -172,14 +184,14 @@ public class EntityZombie extends EntityWalkingMob {
         pk.eid = this.getId();
 
         if (java.time.LocalDate.now().toString().contains("-10-31")) {
-            pk.slots[0] = new ItemBlock(Block.get(Block.PUMPKIN));
+            pk.slots[0] = new ItemBlock(Block.get(Block.JACK_O_LANTERN));
         } else {
             pk.slots = this.armor;
         }
 
         player.dataPacket(pk);
 
-        if (this.tool != null && EntityUtils.rand(1, 10) == 1) {
+        if (this.tool != null) {
             MobEquipmentPacket pk2 = new MobEquipmentPacket();
             pk2.eid = this.getId();
             pk2.hotbarSlot = 0;
@@ -189,10 +201,29 @@ public class EntityZombie extends EntityWalkingMob {
     }
 
     private void setRandomTool() {
-        if (EntityUtils.rand(1, 3) == 1) {
-            this.tool = Item.get(Item.IRON_SWORD, 0, 1);
-        } else {
-            this.tool = Item.get(Item.IRON_SHOVEL, 0, 1);
+        if (Utils.rand(1, 10) == 5) {
+            if (Utils.rand(1, 3) == 1) {
+                this.tool = Item.get(Item.IRON_SWORD, 0, 1);
+                this.setDamage(new int[]{0, 4, 6, 8});
+            } else {
+                this.tool = Item.get(Item.IRON_SHOVEL, 0, 1);
+                this.setDamage(new int[]{0, 3, 4, 5});
+            }
         }
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
+
+        if (!ev.isCancelled() && ev.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
+            Entity ent = Entity.createEntity("Drowned", this);
+            if (ent != null) {
+                this.close();
+                ent.spawnToAll();
+            }
+        }
+
+        return true;
     }
 }

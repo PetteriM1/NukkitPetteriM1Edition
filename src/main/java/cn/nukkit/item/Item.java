@@ -22,7 +22,6 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -314,30 +313,9 @@ public class Item implements Cloneable, BlockID, ItemID {
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
         clearCreativeItems();
-        Server server = Server.getInstance();
-        String path = server.getDataPath() + "creativeitems.json";
-        String path137 = server.getDataPath() + "creativeitems137.json";
-        String path274 = server.getDataPath() + "creativeitems274.json";
-        String path291 = server.getDataPath() + "creativeitems291.json";
-        String path313 = server.getDataPath() + "creativeitems313.json";
-        String path332 = server.getDataPath() + "creativeitems332.json";
-        String path340 = server.getDataPath() + "creativeitems340.json";
-
-        try {
-            if (!new File(path).exists()) Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("creativeitems.json"));
-            if (!new File(path137).exists()) Utils.writeFile(path137, Server.class.getClassLoader().getResourceAsStream("creativeitems137.json"));
-            if (!new File(path274).exists()) Utils.writeFile(path274, Server.class.getClassLoader().getResourceAsStream("creativeitems274.json"));
-            if (!new File(path291).exists()) Utils.writeFile(path291, Server.class.getClassLoader().getResourceAsStream("creativeitems291.json"));
-            if (!new File(path313).exists()) Utils.writeFile(path313, Server.class.getClassLoader().getResourceAsStream("creativeitems313.json"));
-            if (!new File(path332).exists()) Utils.writeFile(path332, Server.class.getClassLoader().getResourceAsStream("creativeitems332.json"));
-            if (!new File(path340).exists()) Utils.writeFile(path340, Server.class.getClassLoader().getResourceAsStream("creativeitems340.json"));
-        } catch (IOException e) {
-            MainLogger.getLogger().logException(e);
-            return;
-        }
 
         // Creative inventory for current protocol
-        for (Map map : new Config(path, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -351,7 +329,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         }
 
         // Creative inventory for 137
-        for (Map map : new Config(path137, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems137.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -365,7 +343,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         }
 
         // Creative inventory for 274
-        for (Map map : new Config(path274, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems274.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -379,7 +357,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         }
 
         // Creative inventory for 291
-        for (Map map : new Config(path291, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems291.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -393,7 +371,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         }
 
         // Creative inventory for 313
-        for (Map map : new Config(path313, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems313.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -407,7 +385,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         }
 
         // Creative inventory for 332
-        for (Map map : new Config(path332, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems332.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -421,7 +399,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         }
 
         // Creative inventory for 340
-        for (Map map : new Config(path340, Config.YAML).getMapList("items")) {
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems340.json")).getMapList("items")) {
             try {
                 int id = (int) map.get("id");
                 int damage = (int) map.getOrDefault("damage", 0);
@@ -437,6 +415,7 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     public static void clearCreativeItems() {
         Item.creative.clear();
+        Item.creative137.clear();
         Item.creative274.clear();
         Item.creative291.clear();
         Item.creative313.clear();
@@ -824,7 +803,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public Item setCustomName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.clearCustomName();
         }
 

@@ -5,9 +5,6 @@ import cn.nukkit.item.ItemTool;
 
 public class BlockBricksRedNether extends BlockNetherBrick {
 
-    public BlockBricksRedNether() {
-    }
-
     @Override
     public String getName() {
         return "Red Nether Bricks";

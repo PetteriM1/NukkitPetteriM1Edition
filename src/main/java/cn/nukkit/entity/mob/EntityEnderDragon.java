@@ -14,7 +14,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
@@ -71,12 +71,12 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 50 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 300) {
+    if (this.attackDelay > 50 && Utils.rand(1, 5) < 3 && this.distance(player) <= 300) {
             this.attackDelay = 0;
             double f = 1.1;
-            double yaw = this.yaw + EntityUtils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-75.0, 75.0) / 10;
-            Entity k = EntityUtils.create("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
+            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
+            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
+            Entity k = Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
             if (!(k instanceof EntityEnderCharge)) {
                 return;
             }

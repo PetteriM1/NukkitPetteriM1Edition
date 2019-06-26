@@ -15,9 +15,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockMycelium extends BlockSolid {
 
-    public BlockMycelium() {
-    }
-
     @Override
     public String getName() {
         return "Mycelium";

@@ -5,9 +5,6 @@ import cn.nukkit.item.ItemTool;
 
 public class BlockStonecutter extends BlockSolid {
 
-    public BlockStonecutter() {
-    }
-
     @Override
     public int getId() {
         return STONECUTTER;

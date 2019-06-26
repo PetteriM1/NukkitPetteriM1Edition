@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockEmerald extends BlockSolid {
 
-    public BlockEmerald() {
-    }
-
     @Override
     public String getName() {
         return "Emerald Block";

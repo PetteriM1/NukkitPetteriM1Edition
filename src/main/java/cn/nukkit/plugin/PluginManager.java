@@ -346,7 +346,7 @@ public class PluginManager {
     public void unsubscribeFromPermission(String permission, Permissible permissible) {
         if (this.permSubs.containsKey(permission)) {
             this.permSubs.get(permission).remove(permissible);
-            if (this.permSubs.get(permission).size() == 0) {
+            if (this.permSubs.get(permission).isEmpty()) {
                 this.permSubs.remove(permission);
             }
         }

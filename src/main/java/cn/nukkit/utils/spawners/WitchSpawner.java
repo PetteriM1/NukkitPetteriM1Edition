@@ -6,7 +6,7 @@ import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.SpawnResult;
 import cn.nukkit.utils.Spawner;
 
@@ -22,7 +22,7 @@ public class WitchSpawner extends AbstractEntitySpawner {
 
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (EntityUtils.rand(1, 4) != 1 && biomeId != 6 && biomeId != 134) {
+        if (Utils.rand(1, 4) != 1 && biomeId != 6 && biomeId != 134) {
             return SpawnResult.SPAWN_DENIED;
         }
 

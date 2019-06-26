@@ -16,9 +16,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockGrass extends BlockDirt {
 
-    public BlockGrass() {
-    }
-
     @Override
     public int getId() {
         return GRASS;

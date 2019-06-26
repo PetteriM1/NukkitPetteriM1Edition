@@ -7,6 +7,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -282,5 +283,25 @@ public class Utils {
         if ('A' <= ch && ch <= 'F')    return ch - 'A' + 10;
         if ('a' <= ch && ch <= 'f')    return ch - 'a' + 10;
         return -1;
+    }
+
+    private static final Random random = new Random(System.currentTimeMillis());
+
+    public static int rand(int min, int max) {
+        if (min == max) {
+            return max;
+        }
+        return random.nextInt(max + 1 - min) + min;
+    }
+
+    public static double rand(double min, double max) {
+        if (min == max) {
+            return max;
+        }
+        return min + Math.random() * (max-min);
+    }
+
+    public static boolean rand() {
+        return random.nextBoolean();
     }
 }

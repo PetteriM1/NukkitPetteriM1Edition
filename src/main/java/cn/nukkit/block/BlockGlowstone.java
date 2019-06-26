@@ -13,8 +13,6 @@ import java.util.Random;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockGlowstone extends BlockTransparent {
-    public BlockGlowstone() {
-    }
 
     @Override
     public String getName() {

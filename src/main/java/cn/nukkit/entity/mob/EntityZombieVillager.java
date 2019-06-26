@@ -9,7 +9,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class EntityZombieVillager extends EntityWalkingMob {
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
             EntityEventPacket pk = new EntityEventPacket();
             pk.eid = this.getId();
-            pk.event = 4;
+            pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
         }
     }
@@ -126,7 +126,7 @@ public class EntityZombieVillager extends EntityWalkingMob {
         }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
             }
         }

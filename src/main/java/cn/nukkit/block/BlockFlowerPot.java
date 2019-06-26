@@ -52,16 +52,6 @@ public class BlockFlowerPot extends BlockFlowable {
     }
 
     @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (face != BlockFace.UP) return false;
         CompoundTag nbt = new CompoundTag()

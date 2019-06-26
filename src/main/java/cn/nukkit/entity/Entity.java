@@ -9,6 +9,8 @@ import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.entity.mob.EntityEnderDragon;
+import cn.nukkit.entity.mob.EntityWither;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -247,9 +249,6 @@ public abstract class Entity extends Location implements Metadatable {
     public double lastYaw;
     public double lastPitch;
 
-    public double pitchDelta;
-    public double yawDelta;
-
     public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
     public boolean onGround;
@@ -294,6 +293,7 @@ public abstract class Entity extends Location implements Metadatable {
     protected boolean isPlayer = false;
 
     private volatile boolean initialized;
+    private volatile boolean initialized2;
 
     public float getHeight() {
         return 0;
@@ -332,14 +332,19 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Entity(FullChunk chunk, CompoundTag nbt) {
-        if (this instanceof Player) {
-            return;
+        if (!(this instanceof Player)) {
+            this.init(chunk, nbt);
         }
-
-        this.init(chunk, nbt);
     }
 
     protected void initEntity() {
+        if (this.initialized2) {
+            // We've already initialized this entity
+            return;
+        }
+
+        this.initialized2 = true;
+
         if (this.namedTag.contains("ActiveEffects")) {
             ListTag<CompoundTag> effects = this.namedTag.getList("ActiveEffects", CompoundTag.class);
             for (CompoundTag e : effects.getAll()) {
@@ -356,8 +361,13 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.namedTag.contains("CustomName")) {
             this.setNameTag(this.namedTag.getString("CustomName"));
+
             if (this.namedTag.contains("CustomNameVisible")) {
                 this.setNameTagVisible(this.namedTag.getBoolean("CustomNameVisible"));
+            }
+
+            if(this.namedTag.contains("CustomNameAlwaysVisible")){
+                this.setNameTagAlwaysVisible(this.namedTag.getBoolean("CustomNameAlwaysVisible"));
             }
         }
 
@@ -386,7 +396,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.isPlayer = this instanceof Player;
         this.temporalVector = new Vector3();
 
-        this.id = Entity.entityCount++;
+        this.id = entityCount++;
         this.justCreated = true;
         this.namedTag = nbt;
 
@@ -471,7 +481,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isNameTagAlwaysVisible() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_ALWAYS_SHOW_NAMETAG);
+        return this.getDataPropertyByte(DATA_ALWAYS_SHOW_NAMETAG) == 1;
     }
 
     public void setNameTag(String name) {
@@ -639,7 +649,6 @@ public abstract class Entity extends Location implements Metadatable {
             Effect effect = this.effects.get(effectId);
             this.effects.remove(effectId);
             effect.remove(this);
-
             this.recalculateEffectColor();
         }
     }
@@ -696,6 +705,14 @@ public abstract class Entity extends Location implements Metadatable {
             this.setDataProperty(new IntEntityData(Entity.DATA_POTION_COLOR, 0));
             this.setDataProperty(new ByteEntityData(Entity.DATA_POTION_AMBIENT, 0));
         }
+    }
+
+    public static Entity createEntity(String name, Position pos, Object... args) {
+        return createEntity(name, pos.getChunk(), getDefaultNBT(pos), args);
+    }
+
+    public static Entity createEntity(int type, Position pos, Object... args) {
+        return createEntity(String.valueOf(type), pos.getChunk(), getDefaultNBT(pos), args);
     }
 
     public static Entity createEntity(String name, FullChunk chunk, CompoundTag nbt, Object... args) {
@@ -783,12 +800,14 @@ public abstract class Entity extends Location implements Metadatable {
     public void saveNBT() {
         if (!(this instanceof Player)) {
             this.namedTag.putString("id", this.getSaveId());
-            if (!this.getNameTag().equals("")) {
+            if (!this.getNameTag().isEmpty()) {
                 this.namedTag.putString("CustomName", this.getNameTag());
                 this.namedTag.putBoolean("CustomNameVisible", this.isNameTagVisible());
+                this.namedTag.putBoolean("CustomNameAlwaysVisible", this.isNameTagAlwaysVisible());
             } else {
                 this.namedTag.remove("CustomName");
                 this.namedTag.remove("CustomNameVisible");
+                this.namedTag.remove("CustomNameAlwaysVisible");
             }
         }
 
@@ -863,6 +882,15 @@ public abstract class Entity extends Location implements Metadatable {
             pkk.immediate = 1;
 
             player.dataPacket(pkk);
+        }
+
+        if ((this instanceof EntityWither || this instanceof EntityEnderDragon) && this.getServer().getPropertyBoolean("vanilla-bossbars")) {
+            BossEventPacket pkBoss = new BossEventPacket();
+            pkBoss.bossEid = this.id;
+            pkBoss.type = BossEventPacket.TYPE_SHOW;
+            pkBoss.title = this.getName();
+            pkBoss.healthPercent = this.getHealth();
+            player.dataPacket(pkBoss);
         }
     }
     
@@ -1266,11 +1294,11 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void addMotion(double motionX, double motionY, double motionZ) {
         SetEntityMotionPacket pk = new SetEntityMotionPacket();
-        pk.eid = this.getId();
+        pk.eid = this.id;
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
-        this.level.addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
+        Server.broadcastPacket(this.hasSpawned.values(), pk);
     }
 
     public Vector3 getDirectionVector() {
@@ -1378,7 +1406,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected void broadcastLinkPacket(Entity rider, byte type) {
         SetEntityLinkPacket pk = new SetEntityLinkPacket();
-        pk.vehicleUniqueId = getId();         // To the?
+        pk.vehicleUniqueId = getId();     // To the?
         pk.riderUniqueId = rider.getId(); // From who?
         pk.type = type;
 
@@ -1519,8 +1547,6 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
     }
-
-    public void handleLavaMovement() {}
 
     public void moveFlying(float strafe, float forward, float friction) {
         // This is special for Nukkit! :)

@@ -24,7 +24,7 @@ public class CraftItemEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    private Item[] input = new Item[0];
+    private Item[] input;
 
     private final Recipe recipe;
 

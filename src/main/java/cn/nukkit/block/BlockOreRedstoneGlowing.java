@@ -10,9 +10,6 @@ import cn.nukkit.level.Level;
  */
 public class BlockOreRedstoneGlowing extends BlockOreRedstone {
 
-    public BlockOreRedstoneGlowing() {
-    }
-
     @Override
     public String getName() {
         return "Glowing Redstone Ore";
@@ -44,13 +41,4 @@ public class BlockOreRedstoneGlowing extends BlockOreRedstone {
         return 0;
     }
 
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
 }

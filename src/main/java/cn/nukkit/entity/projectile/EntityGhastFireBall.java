@@ -1,13 +1,15 @@
 package cn.nukkit.entity.projectile;
 
+import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class EntityGhastFireBall extends EntityProjectile {
 
@@ -73,7 +75,7 @@ public class EntityGhastFireBall extends EntityProjectile {
 
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + EntityUtils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + EntityUtils.rand(-100.0, 100.0) / 500)));
+                    this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }
@@ -90,7 +92,7 @@ public class EntityGhastFireBall extends EntityProjectile {
                     explosion.explodeB();
                 }
             }
-            this.kill();
+            this.close();
         }
 
         return super.onUpdate(currentTick);
@@ -103,7 +105,12 @@ public class EntityGhastFireBall extends EntityProjectile {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        this.close();
+        if (source instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) source).getDamager() instanceof Player) {
+                this.setMotion(((EntityDamageByEntityEvent) source).getDamager().getLocation().getDirectionVector());
+            }
+        }
+
         return true;
     }
 }

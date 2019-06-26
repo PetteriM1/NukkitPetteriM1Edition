@@ -2,7 +2,6 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -12,7 +11,7 @@ import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
@@ -51,7 +50,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean isMovement() {
-        return this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0 && this.movement;
+        return this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty() && this.movement;
     }
 
     public boolean isKnockback() {
@@ -119,8 +118,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this.namedTag.getBoolean("Baby")) {
             this.setBaby(true);
         }
-
-        this.setDataProperty(new ByteEntityData(DATA_FLAG_NO_AI, (byte) 1));
     }
 
     public void saveNBT() {
@@ -165,7 +162,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             this.inLoveTicks -= tickDiff;
             if (this.age % 20 == 0) {
                 for (int i = 0; i < 3; i++) {
-                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0, 1.0), this.getMountedYOffset() + EntityUtils.rand(-1.0, 1.0), EntityUtils.rand(-1.0, 1.0))));
+                    this.level.addParticle(new HeartParticle(this.add(Utils.rand(-1.0, 1.0), this.getMountedYOffset() + Utils.rand(-1.0, 1.0), Utils.rand(-1.0, 1.0))));
                 }
             }
         }
@@ -192,12 +189,13 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         super.attack(source);
 
         this.target = null;
+        this.stayTime = 0;
         return true;
     }
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0) {
+        if (this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty()) {
             super.setMotion(motion);
         }
         return true;
@@ -275,61 +273,91 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         Item leggings = new Item(0, 0, 0);
         Item boots = new Item(0, 0, 0);
 
-        switch (EntityUtils.rand(1, 5)) {
+        switch (Utils.rand(1, 5)) {
             case 1:
-                if (EntityUtils.rand(1, 100) < 39) {
-                    helmet = Item.get(Item.LEATHER_HELMET, 0, EntityUtils.rand(0, 1));
+                if (Utils.rand(1, 100) < 39) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.LEATHER_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 2:
-                if (EntityUtils.rand(1, 100) < 50) {
-                    helmet = Item.get(Item.GOLD_HELMET, 0, EntityUtils.rand(0, 1));
+                if (Utils.rand(1, 100) < 50) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.GOLD_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 3:
-                if (EntityUtils.rand(1, 100) < 14) {
-                    helmet = Item.get(Item.CHAIN_HELMET, 0, EntityUtils.rand(0, 1));
+                if (Utils.rand(1, 100) < 14) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.CHAIN_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 4:
-                if (EntityUtils.rand(1, 100) < 3) {
-                    helmet = Item.get(Item.IRON_HELMET, 0, EntityUtils.rand(0, 1));
+                if (Utils.rand(1, 100) < 3) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.IRON_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
                 }
                 break;
             case 5:
-                if (EntityUtils.rand(1, 100) == 100) {
-                    helmet = Item.get(Item.DIAMOND_HELMET, 0, EntityUtils.rand(0, 1));
+                if (Utils.rand(1, 100) == 100) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.DIAMOND_HELMET, 0, 1);
+                        this.addHealth(2);
+                    }
                 }
                 break;
         }
 
         slots[0] = helmet;
 
-        if (EntityUtils.rand(1, 4) != 1) {
-            switch (EntityUtils.rand(1, 5)) {
+        if (Utils.rand(1, 4) != 1) {
+            switch (Utils.rand(1, 5)) {
                 case 1:
-                    if (EntityUtils.rand(1, 100) < 39) {
-                        chestplate = Item.get(Item.LEATHER_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 39) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.LEATHER_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 2:
-                    if (EntityUtils.rand(1, 100) < 50) {
-                        chestplate = Item.get(Item.GOLD_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 50) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.GOLD_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 3:
-                    if (EntityUtils.rand(1, 100) < 14) {
-                        chestplate = Item.get(Item.CHAIN_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 14) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.CHAIN_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 4:
-                    if (EntityUtils.rand(1, 100) < 3) {
-                        chestplate = Item.get(Item.IRON_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 3) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.IRON_CHESTPLATE, 0, 1);
+                            this.addHealth(2);
+                        }
                     }
                     break;
                 case 5:
-                    if (EntityUtils.rand(1, 100) == 100) {
-                        chestplate = Item.get(Item.DIAMOND_CHESTPLATE, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) == 100) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.DIAMOND_CHESTPLATE, 0, 1);
+                            this.addHealth(3);
+                        }
                     }
                     break;
             }
@@ -337,31 +365,46 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         slots[1] = chestplate;
 
-        if (EntityUtils.rand(1, 2) == 2) {
-            switch (EntityUtils.rand(1, 5)) {
+        if (Utils.rand(1, 2) == 2) {
+            switch (Utils.rand(1, 5)) {
                 case 1:
-                    if (EntityUtils.rand(1, 100) < 39) {
-                        leggings = Item.get(Item.LEATHER_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 39) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.LEATHER_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 2:
-                    if (EntityUtils.rand(1, 100) < 50) {
-                        leggings = Item.get(Item.GOLD_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 50) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.GOLD_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 3:
-                    if (EntityUtils.rand(1, 100) < 14) {
-                        leggings = Item.get(Item.CHAIN_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 14) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.CHAIN_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 4:
-                    if (EntityUtils.rand(1, 100) < 3) {
-                        leggings = Item.get(Item.IRON_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 3) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.IRON_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 5:
-                    if (EntityUtils.rand(1, 100) == 100) {
-                        leggings = Item.get(Item.DIAMOND_LEGGINGS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) == 100) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.DIAMOND_LEGGINGS, 0, 1);
+                            this.addHealth(2);
+                        }
                     }
                     break;
             }
@@ -369,31 +412,46 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         slots[2] = leggings;
 
-        if (EntityUtils.rand(1, 5) < 3) {
-            switch (EntityUtils.rand(1, 5)) {
+        if (Utils.rand(1, 5) < 3) {
+            switch (Utils.rand(1, 5)) {
                 case 1:
-                    if (EntityUtils.rand(1, 100) < 39) {
-                        boots = Item.get(Item.LEATHER_BOOTS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 39) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.LEATHER_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 2:
-                    if (EntityUtils.rand(1, 100) < 50) {
-                        boots = Item.get(Item.GOLD_BOOTS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 50) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.GOLD_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 3:
-                    if (EntityUtils.rand(1, 100) < 14) {
-                        boots = Item.get(Item.CHAIN_BOOTS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 14) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.CHAIN_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 4:
-                    if (EntityUtils.rand(1, 100) < 3) {
-                        boots = Item.get(Item.IRON_BOOTS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) < 3) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.IRON_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
                     }
                     break;
                 case 5:
-                    if (EntityUtils.rand(1, 100) == 100) {
-                        boots = Item.get(Item.DIAMOND_BOOTS, 0, EntityUtils.rand(0, 1));
+                    if (Utils.rand(1, 100) == 100) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.DIAMOND_BOOTS, 0, 1);
+                            this.addHealth(2);
+                        }
                     }
                     break;
             }
@@ -402,5 +460,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         slots[3] = boots;
 
         return slots;
+    }
+
+    private void addHealth(int health) {
+        this.setMaxHealth(this.getMaxHealth() + health);
+        this.setHealth(this.getHealth() + health);
     }
 }

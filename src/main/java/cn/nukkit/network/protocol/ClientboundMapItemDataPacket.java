@@ -118,7 +118,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         }
     }
 
-    public class MapDecorator {
+    public static class MapDecorator {
         public byte rotation;
         public byte icon;
         public byte offsetX;

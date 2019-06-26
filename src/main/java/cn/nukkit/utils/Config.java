@@ -178,6 +178,21 @@ public class Config {
         return correct;
     }
 
+    public Config loadFromStream(InputStream inputStream) {
+        if (inputStream == null) return null;
+        if (this.correct) {
+            String content;
+            try {
+                content = Utils.readFile(inputStream);
+            } catch (IOException e) {
+                Server.getInstance().getLogger().logException(e);
+                return null;
+            }
+            this.parseContent(content);
+        }
+        return this;
+    }
+
     public boolean check() {
         return this.correct;
     }

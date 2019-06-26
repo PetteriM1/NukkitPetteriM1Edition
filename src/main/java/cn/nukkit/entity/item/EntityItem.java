@@ -20,8 +20,6 @@ public class EntityItem extends Entity {
 
     public static final int NETWORK_ID = 64;
 
-    public static final int DATA_SOURCE_ID = 17;
-
     public EntityItem(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -273,8 +271,4 @@ public class EntityItem extends Entity {
         return addEntity;
     }
 
-    @Override
-    public boolean doesTriggerPressurePlate() {
-        return true;
-    }
 }
