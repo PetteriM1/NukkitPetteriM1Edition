@@ -303,9 +303,7 @@ public class Session {
             if (this.splitPackets.size() >= MAX_SPLIT_COUNT) {
                 return;
             }
-            this.splitPackets.put(packet.splitID, new HashMap<Integer, EncapsulatedPacket>() {{
-                put(packet.splitIndex, packet);
-            }});
+            this.splitPackets.put(packet.splitID, new IntegerEncapsulatedPacketHashMap(packet));
         } else {
             this.splitPackets.get(packet.splitID).put(packet.splitIndex, packet);
         }
@@ -547,5 +545,12 @@ public class Session {
         byte[] data = new byte[]{0x60, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x15}; //CLIENT_DISCONNECT packet 0x15
         this.addEncapsulatedToQueue(EncapsulatedPacket.fromBinary(data));
         this.sessionManager = null;
+    }
+
+    private static class IntegerEncapsulatedPacketHashMap extends HashMap<Integer, EncapsulatedPacket> {
+
+        public IntegerEncapsulatedPacketHashMap(EncapsulatedPacket packet) {
+            put(packet.splitIndex, packet);
+        }
     }
 }

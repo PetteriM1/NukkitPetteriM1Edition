@@ -3,7 +3,7 @@ package cn.nukkit.form.element;
 public class ElementToggle extends Element {
 
     @SuppressWarnings("unused")
-    private static final String type = "toggle";
+    private final String type = "toggle";
     private String text = "";
     private boolean defaultValue = false;
 

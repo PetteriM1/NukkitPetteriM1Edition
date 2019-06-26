@@ -595,7 +595,7 @@ public class PluginManager {
             return clazz;
         } catch (NoSuchMethodException e) {
             if (clazz.getSuperclass() != null
-                    && !clazz.getSuperclass().equals(Event.class)
+                    && clazz.getSuperclass() != Event.class
                     && Event.class.isAssignableFrom(clazz.getSuperclass())) {
                 return getRegistrationClass(clazz.getSuperclass().asSubclass(Event.class));
             } else {

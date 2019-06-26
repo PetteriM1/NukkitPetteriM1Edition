@@ -170,12 +170,7 @@ public class Level implements ChunkManager, Metadatable {
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
     @SuppressWarnings("serial")
-    private final Map<Character, Object> changeBlocksFullMap = new HashMap<Character, Object>() {
-        @Override
-        public int size() {
-            return Character.MAX_VALUE;
-        }
-    };
+    private final Map<Character, Object> changeBlocksFullMap = new CharacterHashMap();
 
     private final BlockUpdateScheduler updateQueue;
     private final Queue<Block> normalUpdateQueue = new ConcurrentLinkedDeque<>();
@@ -3510,5 +3505,13 @@ public class Level implements ChunkManager, Metadatable {
     public boolean shouldMobBurn(Entity entity) {
         int time = this.getTime() % TIME_FULL;
         return !entity.isOnFire() && !this.isRaining() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
+    }
+
+    private static class CharacterHashMap extends HashMap<Character, Object> {
+
+        @Override
+        public int size() {
+            return Character.MAX_VALUE;
+        }
     }
 }

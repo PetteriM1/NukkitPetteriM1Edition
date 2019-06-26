@@ -13,7 +13,7 @@ import java.util.List;
 public class FormWindowCustom extends FormWindow {
 
     @SuppressWarnings("unused")
-    private static final String type = "custom_form";
+    private final String type = "custom_form";
     private String title = "";
     private ElementButtonImageData icon;
     private List<Element> content;
@@ -85,8 +85,7 @@ public class FormWindowCustom extends FormWindow {
             return;
         }
 
-        List<String> elementResponses = new Gson().fromJson(data, new TypeToken<List<String>>() {
-        }.getType());
+        List<String> elementResponses = new Gson().fromJson(data, new ListTypeToken().getType());
 
         int i = 0;
 
@@ -158,5 +157,8 @@ public class FormWindowCustom extends FormWindow {
                 }
             });
         }
+    }
+
+    private static class ListTypeToken extends TypeToken<List<String>> {
     }
 }

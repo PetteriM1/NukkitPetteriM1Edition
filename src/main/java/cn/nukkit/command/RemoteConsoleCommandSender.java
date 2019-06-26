@@ -15,6 +15,9 @@ public class RemoteConsoleCommandSender extends ConsoleCommandSender {
     public void sendMessage(String message) {
         message = this.getServer().getLanguage().translateString(message);
         this.messages.append(message.trim()).append("\n");
+        if (messages.length() > 50000) {
+            messages.delete(0, 49000);
+        }
     }
 
     @Override
