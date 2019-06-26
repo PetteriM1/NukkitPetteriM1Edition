@@ -212,7 +212,6 @@ public class Server {
     
     private boolean suomicraftMode;
 
-    @SuppressWarnings("serial")
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()

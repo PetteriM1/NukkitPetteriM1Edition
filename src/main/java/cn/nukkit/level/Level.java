@@ -169,7 +169,6 @@ public class Level implements ChunkManager, Metadatable {
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
-    @SuppressWarnings("serial")
     private final Map<Character, Object> changeBlocksFullMap = new CharacterHashMap();
 
     private final BlockUpdateScheduler updateQueue;

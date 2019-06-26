@@ -57,7 +57,6 @@ public class EntityCaveSpider extends EntityWalkingMob {
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
             if (player instanceof Player) {
-                @SuppressWarnings("serial")
                 HashMap<Integer, Float> armorValues = new ArmorPoints();
 
                 float points = 0;

@@ -293,7 +293,6 @@ public class Session {
         }
     }
 
-    @SuppressWarnings("serial")
     private void handleSplit(EncapsulatedPacket packet) throws Exception {
         if (packet.splitCount >= MAX_SPLIT_SIZE || packet.splitIndex >= MAX_SPLIT_SIZE || packet.splitIndex < 0) {
             return;
