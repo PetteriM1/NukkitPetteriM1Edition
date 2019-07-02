@@ -50,7 +50,9 @@ public class HastebinUtility {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                lines.add(line);
+                if (!line.contains("rcon.password=")) {
+                    lines.add(line);
+                }
             }
         }
         for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
