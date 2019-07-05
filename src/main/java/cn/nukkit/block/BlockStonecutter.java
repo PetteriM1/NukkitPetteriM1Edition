@@ -12,7 +12,7 @@ public class BlockStonecutter extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return 2;
+        return 3.5;
     }
 
     @Override
