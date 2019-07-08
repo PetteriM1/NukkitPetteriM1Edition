@@ -12,7 +12,7 @@ import cn.nukkit.level.Position;
 public class SummonCommand extends Command {
 
     public SummonCommand(String name) {
-        super(name, "nukkit.command.summon.description", "nukkit.command.summon.usage");
+        super(name, "%nukkit.command.summon.description", "%nukkit.command.summon.usage");
         this.setPermission("nukkit.command.summon");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{

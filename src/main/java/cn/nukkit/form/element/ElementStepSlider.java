@@ -6,7 +6,7 @@ import java.util.List;
 public class ElementStepSlider extends Element {
 
     @SuppressWarnings("unused")
-    private static final String type = "step_slider";
+    private final String type = "step_slider";
     private String text = "";
     private List<String> steps;
     private int defaultStepIndex = 0;

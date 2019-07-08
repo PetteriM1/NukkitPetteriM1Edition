@@ -10,7 +10,7 @@ import java.util.List;
 public class FormWindowSimple extends FormWindow {
 
     @SuppressWarnings("unused")
-    private static final String type = "form";
+    private final String type = "form";
     private String title = "";
     private String content = "";
     private List<ElementButton> buttons;

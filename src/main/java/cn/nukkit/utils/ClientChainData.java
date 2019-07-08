@@ -218,8 +218,7 @@ public final class ClientChainData implements LoginChainData {
 
     private void decodeChainData() {
         Map<String, List<String>> map = new Gson().fromJson(new String(bs.get(bs.getLInt()), StandardCharsets.UTF_8),
-                new TypeToken<Map<String, List<String>>>() {
-                }.getType());
+                new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
         List<String> chains = map.get("chain");
 
@@ -280,5 +279,8 @@ public final class ClientChainData implements LoginChainData {
     private boolean verify(PublicKey key, JWSObject object) throws JOSEException {
         JWSVerifier verifier = new DefaultJWSVerifierFactory().createJWSVerifier(object.getHeader(), key);
         return object.verify(verifier);
+    }
+
+    private static class MapTypeToken extends TypeToken<Map<String, List<String>>> {
     }
 }

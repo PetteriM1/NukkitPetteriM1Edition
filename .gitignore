@@ -38,3 +38,4 @@ resource_packs/*
 *.md
 .DS_Store
 .factorypath
+dependency-reduced-pom.xml

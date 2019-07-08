@@ -81,6 +81,9 @@ public class LevelEventPacket extends DataPacket {
     public static final int EVENT_STOP_RAIN = 3003;
     public static final int EVENT_STOP_THUNDER = 3004;
 
+    public static final int EVENT_PAUSE_GAME_NO_SCREEN = 3006;
+    public static final int EVENT_SET_GAME_SPEED = 3007;
+
     public static final int EVENT_SOUND_CAULDRON = 3501;
     public static final int EVENT_SOUND_CAULDRON_DYE_ARMOR = 3502;
     public static final int EVENT_SOUND_CAULDRON_FILL_POTION = 3504;

@@ -109,4 +109,35 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
         return super.onUpdate(currentTick);
     }
+
+    public void onPlayerInput(Player player, double strafe, double forward) {
+        this.stayTime = 0;
+        this.moveTime = 10;
+
+        strafe *= 0.4;
+
+        double f = strafe * strafe + forward * forward;
+        double friction = 0.6;
+
+        this.yaw = player.yaw;
+
+        if (f >= 1.0E-4) {
+            f = Math.sqrt(f);
+
+            if (f < 1) {
+                f = 1;
+            }
+
+            f = friction / f;
+            strafe = strafe * f;
+            forward = forward * f;
+            double f1 = Math.sin(this.yaw * 0.017453292);
+            double f2 = Math.cos(this.yaw * 0.017453292);
+            this.motionX = (strafe * f2 - forward * f1);
+            this.motionZ = (forward * f2 + strafe * f1);
+        } else {
+            this.motionX = 0;
+            this.motionZ = 0;
+        }
+    }
 }

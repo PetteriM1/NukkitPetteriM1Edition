@@ -11,6 +11,7 @@ import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
+import cn.nukkit.entity.passive.EntityHorseBase;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
@@ -161,7 +162,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String username;
     protected String iusername;
     protected String displayName;
+
     public int protocol = ProtocolInfo.CURRENT_PROTOCOL;
+    protected String version;
 
     protected int startAction = -1;
 
@@ -985,6 +988,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         packet.protocol = this.protocol;
+
+        if (packet instanceof StartGamePacket) {
+            ((StartGamePacket) packet).version = this.version;
+        }
 
         try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
@@ -1980,8 +1987,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.getAddress(),
                 String.valueOf(this.getPort())));
 
-        this.server.getLogger().debug("[" + this.id + "] Player " + this.username + " (" + this.getAddress() + ":" + this.getPort() + ") logged in with protocol " + this.protocol + " in " + this.level.getName());
-
         this.getLevel().sendTime(this);
         this.getLevel().sendWeather(this);
 
@@ -2060,11 +2065,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol)) {
                         this.close("", "You are running unsupported Minecraft version");
+                        this.server.getLogger().debug(this.getName() + " disconnected with protocol " + this.protocol);
                         break;
                     }
 
                     if (this.protocol < getServer().getPropertyInt("multiversion-min-protocol")) {
                         this.close("", "Multiversion support for this Minecraft version is disabled");
+                        this.server.getLogger().debug(this.getName() + " disconnected with protocol " + this.protocol);
                         break;
                     }
 
@@ -2082,6 +2089,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
                         break;
                     }
+
+                    this.version = getLoginChainData().getGameVersion();
+
+                    getServer().getLogger().debug("Name: " + this.getName() + " Protocol: " + this.protocol + " Version: " + this.version);
 
                     this.randomClientId = loginPacket.clientId;
 
@@ -2218,6 +2229,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     PlayerInputPacket ipk = (PlayerInputPacket) packet;
                     if (riding instanceof EntityMinecartAbstract) {
                         ((EntityMinecartAbstract) riding).setCurrentSpeed(ipk.motionY);
+                    } else if (riding instanceof EntityHorseBase) {
+                        ((EntityHorseBase) riding).onPlayerInput(this, ipk.motionX, ipk.motionY);
                     }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:

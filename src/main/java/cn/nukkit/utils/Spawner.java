@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
@@ -76,7 +77,7 @@ public class Spawner extends Thread {
 
     public BaseEntity createEntity(Object type, Position pos) {
         BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
-        if (entity != null && !entity.isInsideOfSolid()) {
+        if (entity != null && !entity.isInsideOfSolid() && !tooNearOfPlayer(pos)) {
             CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
             Server.getInstance().getPluginManager().callEvent(ev);
             if (!ev.isCancelled()) {
@@ -84,6 +85,15 @@ public class Spawner extends Thread {
             }
         }
         return entity;
+    }
+
+    private boolean tooNearOfPlayer(Position pos) {
+        for (Player p : pos.getLevel().getPlayers().values()) {
+            if (p.distance(pos) < 10) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {

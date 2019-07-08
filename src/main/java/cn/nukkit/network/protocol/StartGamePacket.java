@@ -18,6 +18,8 @@ public class StartGamePacket extends DataPacket {
         return ProtocolInfo.START_GAME_PACKET;
     }
 
+    public String version;
+
     public long entityUniqueId;
     public long entityRuntimeId;
     public int playerGamemode;
@@ -71,6 +73,7 @@ public class StartGamePacket extends DataPacket {
     public long currentTick;
     public int enchantmentSeed;
     public String multiplayerCorrelationId = "";
+    public boolean onlySpawnV1Villagers = false;
 
     @Override
     public void decode() {
@@ -153,6 +156,9 @@ public class StartGamePacket extends DataPacket {
         if (protocol > 274) {
             this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
             this.putString(this.multiplayerCorrelationId);
+            if (protocol > 354 || (protocol == 354 && version != null && version.startsWith("1.11.4"))) {
+                this.putBoolean(this.onlySpawnV1Villagers);
+            }
         }
     }
 }

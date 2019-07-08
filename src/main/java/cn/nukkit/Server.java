@@ -214,7 +214,6 @@ public class Server {
     
     private boolean suomicraftMode;
 
-    @SuppressWarnings("serial")
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
@@ -238,91 +237,7 @@ public class Server {
         this.console.setExecutingCommands(true);
 
         log.info("Loading server properties...");
-        this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
-            {
-                put("motd", "Minecraft Server");
-                put("sub-motd", "Powered by Nukkit");
-                put("server-port", 19132);
-                put("server-ip", "0.0.0.0");
-                put("view-distance", 8);
-                put("white-list", false);
-                put("achievements", true);
-                put("announce-player-achievements", false);
-                put("spawn-protection", 10);
-                put("max-players", 50);
-                put("gamemode", 0);
-                put("force-gamemode", true);
-                put("hardcore", false);
-                put("pvp", true);
-                put("difficulty", 2);
-                put("generator-settings", "");
-                put("level-name", "world");
-                put("level-seed", "");
-                put("level-type", "default");
-                put("enable-query", true);
-                put("enable-rcon", false);
-                put("rcon.password", Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(3, 13));
-                put("auto-save", true);
-                put("force-resources", false);
-                put("xbox-auth", true);
-                put("bed-spawnpoints", true);
-                put("explosion-break-blocks", true);
-                put("stop-in-game", false);
-                put("op-in-game", true);
-                put("xp-bottles-on-creative", true);
-                put("spawn-eggs", true);
-                put("mob-ai", true);
-                put("entity-auto-spawn-task", true);
-                put("entity-despawn-task", true);
-                put("language", "eng");
-                put("force-language", false);
-                put("shutdown-message", "§cServer closed");
-                put("save-player-data", true);
-                put("query-plugins", false);
-                put("debug-level", 1);
-                put("async-workers", "auto");
-                put("zlib-provider", 0);
-                put("async-compression", true);
-                put("compression-level", 1);
-                put("auto-tick-rate", true);
-                put("auto-tick-rate-limit", 20);
-                put("base-tick-rate", 1);
-                put("always-tick-players", false);
-                put("enable-timings", false);
-                put("timings-verbose", false);
-                put("timings-privacy", false);
-                put("timings-history-interval", 6000);
-                put("timings-history-length", 72000);
-                put("timings-bypass-max", false);
-                put("light-updates", true);
-                put("clear-chunk-tick-list", true);
-                put("cache-chunks", false);
-                put("spawn-threshold", 50);
-                put("chunk-sending-per-tick", 5);
-                put("chunk-ticking-per-tick", 40);
-                put("chunk-ticking-radius", 3);
-                put("chunk-generation-queue-size", 8);
-                put("chunk-generation-population-queue-size", 8);
-                put("ticks-per-autosave", 6000);
-                put("ticks-per-entity-spawns", 200);
-                put("ticks-per-entity-despawns", 6000);
-                put("thread-watchdog", true);
-                put("thread-watchdog-tick", 50000);
-                put("nether", true);
-                put("end", true);
-                put("suomicraft-mode", false);
-                put("do-not-tick-worlds", "");
-                put("load-all-worlds", true);
-                put("ansi-title", true);
-                put("worlds-entity-spawning-disabled", "");
-                put("block-listener", true);
-                put("allow-flight", false);
-                put("timeout-milliseconds", 12000);
-                put("multiversion-min-protocol", 0);
-                put("vanilla-bossbars", false);
-                put("dimensions", false);
-            }
-        });
+        this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ServerProperties());
 
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
 
@@ -2068,6 +1983,92 @@ public class Server {
 
     public boolean suomiCraftPEMode() {
         return suomicraftMode;
+    }
+
+    private static class ServerProperties extends ConfigSection {
+        {
+            put("motd", "Minecraft Server");
+            put("sub-motd", "Powered by Nukkit");
+            put("server-port", 19132);
+            put("server-ip", "0.0.0.0");
+            put("view-distance", 8);
+            put("white-list", false);
+            put("achievements", true);
+            put("announce-player-achievements", false);
+            put("spawn-protection", 10);
+            put("max-players", 50);
+            put("gamemode", 0);
+            put("force-gamemode", true);
+            put("hardcore", false);
+            put("pvp", true);
+            put("difficulty", 2);
+            put("generator-settings", "");
+            put("level-name", "world");
+            put("level-seed", "");
+            put("level-type", "default");
+            put("enable-query", true);
+            put("enable-rcon", false);
+            put("rcon.password", Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes()).substring(3, 13));
+            put("auto-save", true);
+            put("force-resources", false);
+            put("xbox-auth", true);
+            put("bed-spawnpoints", true);
+            put("explosion-break-blocks", true);
+            put("stop-in-game", false);
+            put("op-in-game", true);
+            put("xp-bottles-on-creative", true);
+            put("spawn-eggs", true);
+            put("mob-ai", true);
+            put("entity-auto-spawn-task", true);
+            put("entity-despawn-task", true);
+            put("language", "eng");
+            put("force-language", false);
+            put("shutdown-message", "§cServer closed");
+            put("save-player-data", true);
+            put("query-plugins", false);
+            put("debug-level", 1);
+            put("async-workers", "auto");
+            put("zlib-provider", 0);
+            put("async-compression", true);
+            put("compression-level", 1);
+            put("auto-tick-rate", true);
+            put("auto-tick-rate-limit", 20);
+            put("base-tick-rate", 1);
+            put("always-tick-players", false);
+            put("enable-timings", false);
+            put("timings-verbose", false);
+            put("timings-privacy", false);
+            put("timings-history-interval", 6000);
+            put("timings-history-length", 72000);
+            put("timings-bypass-max", false);
+            put("light-updates", true);
+            put("clear-chunk-tick-list", true);
+            put("cache-chunks", false);
+            put("spawn-threshold", 50);
+            put("chunk-sending-per-tick", 5);
+            put("chunk-ticking-per-tick", 40);
+            put("chunk-ticking-radius", 3);
+            put("chunk-generation-queue-size", 8);
+            put("chunk-generation-population-queue-size", 8);
+            put("ticks-per-autosave", 6000);
+            put("ticks-per-entity-spawns", 200);
+            put("ticks-per-entity-despawns", 6000);
+            put("thread-watchdog", true);
+            put("thread-watchdog-tick", 50000);
+            put("nether", true);
+            put("end", true);
+            put("suomicraft-mode", false);
+            put("do-not-tick-worlds", "");
+            put("load-all-worlds", true);
+            put("ansi-title", true);
+            put("worlds-entity-spawning-disabled", "");
+            put("block-listener", true);
+            put("allow-flight", false);
+            put("timeout-milliseconds", 12000);
+            put("multiversion-min-protocol", 0);
+            put("vanilla-bossbars", false);
+            put("dimensions", false);
+        }
     }
 
     private class ConsoleThread extends Thread implements InterruptibleThread {

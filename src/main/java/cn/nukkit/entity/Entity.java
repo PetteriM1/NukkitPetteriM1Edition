@@ -2,10 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockDirt;
-import cn.nukkit.block.BlockFire;
-import cn.nukkit.block.BlockWater;
+import cn.nukkit.block.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;

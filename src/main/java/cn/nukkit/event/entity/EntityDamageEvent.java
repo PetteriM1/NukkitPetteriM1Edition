@@ -29,11 +29,7 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
     private final Map<DamageModifier, Float> originals;
 
     public EntityDamageEvent(Entity entity, DamageCause cause, float damage) {
-        this(entity, cause, new EnumMap<DamageModifier, Float>(DamageModifier.class) {
-            {
-                put(DamageModifier.BASE, damage);
-            }
-        });
+        this(entity, cause, new DamageModifierFloatEnumMap(damage));
     }
 
     public EntityDamageEvent(Entity entity, DamageCause cause, Map<DamageModifier, Float> modifiers) {
@@ -213,5 +209,13 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
          * Damage caused by hunger
          */
         HUNGER
+    }
+
+    private static class DamageModifierFloatEnumMap extends EnumMap<DamageModifier, Float> {
+
+        public DamageModifierFloatEnumMap(float damage) {
+            super(DamageModifier.class);
+            put(DamageModifier.BASE, damage);
+        }
     }
 }
