@@ -27,12 +27,24 @@
 
     <repositories>
         <repository>
-            <id>aikar</id>
-            <url>http://ci.emc.gs/nexus/content/groups/aikar/</url>
+            <id>nukkitx-repo-release</id>
+            <url>https://repo.nukkitx.com/maven-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
-            <id>nukkitx</id>
-            <url>https://repo.nukkitx.com/main/</url>
+            <id>nukkitx-repo-snapshot</id>
+            <url>https://repo.nukkitx.com/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -40,7 +52,7 @@
         <dependency>
             <groupId>com.nukkitx.network</groupId>
             <artifactId>raknet</artifactId>
-            <version>1.6.3-SNAPSHOT</version>
+            <version>1.6.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
