@@ -12,6 +12,7 @@ import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.passive.EntityHorseBase;
+import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
@@ -2248,7 +2249,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     PlayerInputPacket ipk = (PlayerInputPacket) packet;
                     if (riding instanceof EntityMinecartAbstract) {
                         ((EntityMinecartAbstract) riding).setCurrentSpeed(ipk.motionY);
-                    } else if (riding instanceof EntityHorseBase) {
+                    } else if (riding instanceof EntityHorseBase && !(riding instanceof EntityLlama)) {
                         ((EntityHorseBase) riding).onPlayerInput(this, ipk.motionX, ipk.motionY);
                     }
                     break;

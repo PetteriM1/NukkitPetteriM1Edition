@@ -27,10 +27,6 @@
 
     <repositories>
         <repository>
-            <id>aikar</id>
-            <url>http://ci.emc.gs/nexus/content/groups/aikar/</url>
-        </repository>
-        <repository>
             <id>nukkitx</id>
             <url>https://repo.nukkitx.com/main/</url>
         </repository>

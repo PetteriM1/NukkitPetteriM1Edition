@@ -2,6 +2,8 @@ package cn.nukkit.entity;
 
 import cn.nukkit.block.*;
 import cn.nukkit.entity.passive.EntityAnimal;
+import cn.nukkit.entity.passive.EntityHorseBase;
+import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.NukkitMath;
@@ -145,7 +147,12 @@ public abstract class EntityWalking extends BaseEntity {
                         this.motionZ = this.getSpeed() * 0.1 * (z / diff);
                     }
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()){
+                    if (!this.passengers.isEmpty() && this instanceof EntityHorseBase && !(this instanceof EntityLlama)) {
+                        return this.followTarget;
+                    }
+                    this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                }
                 return this.followTarget;
             }
 
@@ -169,7 +176,12 @@ public abstract class EntityWalking extends BaseEntity {
                         this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     }
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()){
+                    if (!this.passengers.isEmpty() && this instanceof EntityHorseBase && !(this instanceof EntityLlama)) {
+                        return this.followTarget;
+                    }
+                    this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                }
             }
 
             double dx = this.motionX * tickDiff;
