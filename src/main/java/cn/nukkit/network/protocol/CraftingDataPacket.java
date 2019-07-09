@@ -54,10 +54,18 @@ public class CraftingDataPacket extends DataPacket {
     }
 
     private int writeShapelessRecipe(ShapelessRecipe recipe, BinaryStream stream) {
+        if (protocol >= 361) {
+            stream.putString(recipe.getId().toString());
+        }
+
         stream.putUnsignedVarInt(recipe.getIngredientCount());
 
         for (Item item : recipe.getIngredientList()) {
-            stream.putSlot(item);
+            if (protocol < 361) {
+                stream.putSlot(item);
+            } else {
+                stream.putRecipeIngredient(item);
+            }
         }
 
         stream.putUnsignedVarInt(1);
@@ -66,18 +74,29 @@ public class CraftingDataPacket extends DataPacket {
 
         if (protocol >= 354) {
             stream.putString(CRAFTING_TAG_CRAFTING_TABLE);
+            if (protocol >= 361) {
+                stream.putVarInt(0);
+            }
         }
 
         return CraftingDataPacket.ENTRY_SHAPELESS;
     }
 
     private int writeShapedRecipe(ShapedRecipe recipe, BinaryStream stream) {
+        if (protocol >= 361) {
+            stream.putString(recipe.getId().toString());
+        }
+
         stream.putVarInt(recipe.getWidth());
         stream.putVarInt(recipe.getHeight());
 
         for (int z = 0; z < recipe.getHeight(); ++z) {
             for (int x = 0; x < recipe.getWidth(); ++x) {
-                stream.putSlot(recipe.getIngredient(x, z));
+                if (protocol < 361) {
+                    stream.putSlot(recipe.getIngredient(x, z));
+                } else {
+                    stream.putRecipeIngredient(recipe.getIngredient(x, z));
+                }
             }
         }
 
@@ -88,6 +107,9 @@ public class CraftingDataPacket extends DataPacket {
 
         if (protocol >= 354) {
             stream.putString(CRAFTING_TAG_CRAFTING_TABLE);
+            if (protocol >= 361) {
+                stream.putVarInt(0);
+            }
         }
 
         return CraftingDataPacket.ENTRY_SHAPED;

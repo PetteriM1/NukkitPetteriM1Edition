@@ -59,7 +59,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_TYPE_INT = 2;
     public static final int DATA_TYPE_FLOAT = 3;
     public static final int DATA_TYPE_STRING = 4;
-    public static final int DATA_TYPE_SLOT = 5;
+    public static final int DATA_TYPE_NBT = 5, DATA_TYPE_SLOT = DATA_TYPE_NBT;
     public static final int DATA_TYPE_POS = 6;
     public static final int DATA_TYPE_LONG = 7;
     public static final int DATA_TYPE_VECTOR3F = 8;
@@ -67,7 +67,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAGS = 0;
     public static final int DATA_HEALTH = 1; //int (minecart/boat)
     public static final int DATA_VARIANT = 2; //int
-    public static final int DATA_COLOR = 3, DATA_COLOUR = 3; //byte
+    public static final int DATA_COLOR = 3, DATA_COLOUR = DATA_COLOR; //byte
     public static final int DATA_NAMETAG = 4; //string
     public static final int DATA_OWNER_EID = 5; //long
     public static final int DATA_TARGET_EID = 6; //long
@@ -134,7 +134,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_SCORE_TAG = 84; //String
     public static final int DATA_BALLOON_ATTACHED_ENTITY = 85; // long
     public static final int DATA_PUFFERFISH_SIZE = 86;
-    public static final int DATA_FLAGS2 = 92, DATA_FLAGS_EXTENDED = 92; //long (extended data flags)
+    public static final int DATA_FLAGS_EXTENDED = 92, DATA_FLAGS2 = DATA_FLAGS_EXTENDED; //long (extended data flags)
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -153,7 +153,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_CRITICAL = 13;
     public static final int DATA_FLAG_CAN_SHOW_NAMETAG = 14;
     public static final int DATA_FLAG_ALWAYS_SHOW_NAMETAG = 15;
-    public static final int DATA_FLAG_IMMOBILE = 16, DATA_FLAG_NO_AI = 16;
+    public static final int DATA_FLAG_IMMOBILE = 16, DATA_FLAG_NO_AI = DATA_FLAG_IMMOBILE;
     public static final int DATA_FLAG_SILENT = 17;
     public static final int DATA_FLAG_WALLCLIMBING = 18;
     public static final int DATA_FLAG_CAN_CLIMB = 19;
@@ -2191,6 +2191,10 @@ public abstract class Entity extends Location implements Metadatable {
 
     public Item getDataPropertySlot(int id) {
         return this.getDataProperties().getSlot(id);
+    }
+
+    public CompoundTag getDataPropertyNBT(int id) {
+        return this.getDataProperties().getNBT(id);
     }
 
     public Vector3 getDataPropertyPos(int id) {

@@ -1,8 +1,17 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.utils.BinaryStream;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import lombok.ToString;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 @ToString
 public class StartGamePacket extends DataPacket {
@@ -12,6 +21,22 @@ public class StartGamePacket extends DataPacket {
     public static final int GAME_PUBLISH_SETTING_FRIENDS_ONLY = 2;
     public static final int GAME_PUBLISH_SETTING_FRIENDS_OF_FRIENDS = 3;
     public static final int GAME_PUBLISH_SETTING_PUBLIC = 4;
+
+    private static final byte[] ITEM_DATA_PALETTE_361;
+
+    static {
+        // 361
+        InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtime_item_ids_361.json");
+        if (stream361 == null) throw new AssertionError("Unable to locate item RuntimeID table 361");
+        Collection<ItemData> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<ItemData>>() {}.getType());
+        BinaryStream paletteBuffer361 = new BinaryStream();
+        paletteBuffer361.putUnsignedVarInt(entries361.size());
+        for (ItemData data361 : entries361) {
+            paletteBuffer361.putString(data361.name);
+            paletteBuffer361.putLShort(data361.id);
+        }
+        ITEM_DATA_PALETTE_361 = paletteBuffer361.getBuffer();
+    }
 
     @Override
     public byte pid() {
@@ -73,7 +98,7 @@ public class StartGamePacket extends DataPacket {
     public long currentTick;
     public int enchantmentSeed;
     public String multiplayerCorrelationId = "";
-    public boolean onlySpawnV1Villagers = false;
+    public boolean isOnlySpawningV1Villagers = false;
 
     @Override
     public void decode() {
@@ -145,6 +170,9 @@ public class StartGamePacket extends DataPacket {
             if (protocol >= 313) {
                 this.putBoolean(this.isFromWorldTemplate);
                 this.putBoolean(this.isWorldTemplateOptionLocked);
+                if (protocol >= 361) {
+                    this.putBoolean(this.isOnlySpawningV1Villagers);
+                }
             }
         }
         this.putString(this.levelId);
@@ -155,10 +183,19 @@ public class StartGamePacket extends DataPacket {
         this.putVarInt(this.enchantmentSeed);
         if (protocol > 274) {
             this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+            if (protocol >= 361) {
+                this.put(ITEM_DATA_PALETTE_361);
+            }
             this.putString(this.multiplayerCorrelationId);
-            if (protocol > 354 || (protocol == 354 && version != null && version.startsWith("1.11.4"))) {
-                this.putBoolean(this.onlySpawnV1Villagers);
+            if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
+                this.putBoolean(this.isOnlySpawningV1Villagers);
             }
         }
+    }
+
+    @SuppressWarnings("unused")
+    private static class ItemData {
+        private String name;
+        private int id;
     }
 }

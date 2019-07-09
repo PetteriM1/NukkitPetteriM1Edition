@@ -24,6 +24,7 @@ public class CraftingManager {
     public final Collection<Recipe> recipes = new ArrayDeque<>();
 
     public static BatchPacket packet = null;
+    public static BatchPacket packet354 = null;
     public static BatchPacket packetPre354 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
@@ -104,6 +105,7 @@ public class CraftingManager {
 
         this.registerBrewing();
         this.rebuildPacket();
+        this.rebuild354Packet();
         this.rebuildPre354Packet();
 
         MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
@@ -171,6 +173,28 @@ public class CraftingManager {
         packet = pk.compress(Deflater.BEST_COMPRESSION);
     }
 
+    public void rebuild354Packet() {
+        CraftingDataPacket pk = new CraftingDataPacket();
+        pk.cleanRecipes = true;
+        pk.protocol = 354;
+
+        for (Recipe recipe : this.getRecipes()) {
+            if (recipe instanceof ShapedRecipe) {
+                pk.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+
+        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+            pk.addFurnaceRecipe(recipe);
+        }
+
+        pk.encode();
+
+        packet354 = pk.compress(Deflater.BEST_COMPRESSION);
+    }
+
     public void rebuildPre354Packet() {
         CraftingDataPacket pk = new CraftingDataPacket();
         pk.cleanRecipes = true;
@@ -187,6 +211,7 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
             pk.addFurnaceRecipe(recipe);
         }
+
         pk.encode();
 
         packetPre354 = pk.compress(Deflater.BEST_COMPRESSION);

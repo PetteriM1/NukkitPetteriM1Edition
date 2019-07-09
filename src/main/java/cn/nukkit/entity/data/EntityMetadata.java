@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
+import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +70,10 @@ public class EntityMetadata {
         return (Item) this.getOrDefault(id, new SlotEntityData(id, new ItemBlock(new BlockAir()))).getData();
     }
 
+    public CompoundTag getNBT(int id) {
+        return (CompoundTag) this.getOrDefault(id, new NBTEntityData(id, new CompoundTag())).getData();
+    }
+
     public String getString(int id) {
         return (String) this.getOrDefault(id, new StringEntityData(id, "")).getData();
     }
@@ -107,6 +112,10 @@ public class EntityMetadata {
 
     public EntityMetadata putSlot(int id, int blockId, int meta, int count) {
         return this.put(new SlotEntityData(id, blockId, (byte) meta, count));
+    }
+
+    public EntityMetadata putNBT(int id, CompoundTag tag) {
+        return this.put(new NBTEntityData(id, tag));
     }
 
     public EntityMetadata putSlot(int id, Item value) {
