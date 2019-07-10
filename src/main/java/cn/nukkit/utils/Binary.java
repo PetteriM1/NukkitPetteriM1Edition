@@ -108,14 +108,16 @@ public class Binary {
             EntityData d = map.get(id);
 
             // HACK: Multiversion entity data
-            if (protocol < 354) {
+            if (protocol < 361) {
                 if (protocol <= 201) {
                     if (id > 35) {
                         id = id + 1;
                     }
                 }
-                if (id > 40) {
-                    id = id - 1;
+                if (protocol == 354) {
+                    if (id > 40) {
+                        id = id + 1;
+                    }
                 }
             }
 
