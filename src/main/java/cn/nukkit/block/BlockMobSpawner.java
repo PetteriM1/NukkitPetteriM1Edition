@@ -58,4 +58,9 @@ public class BlockMobSpawner extends BlockSolid {
     public Item[] getDrops(Item item) {
         return new Item[0];
     }
+
+    @Override
+    public int getLightLevel() {
+        return 3;
+    }
 }

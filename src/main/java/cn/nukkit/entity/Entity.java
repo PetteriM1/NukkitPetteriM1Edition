@@ -2189,10 +2189,6 @@ public abstract class Entity extends Location implements Metadatable {
         return this.getDataProperties().getFloat(id);
     }
 
-    public Item getDataPropertySlot(int id) {
-        return this.getDataProperties().getSlot(id);
-    }
-
     public CompoundTag getDataPropertyNBT(int id) {
         return this.getDataProperties().getNBT(id);
     }

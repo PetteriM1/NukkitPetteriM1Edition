@@ -2,12 +2,16 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
-import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.NukkitMath;
+import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
@@ -106,23 +110,25 @@ public class Binary {
         stream.putUnsignedVarInt(map.size());
         for (int id : map.keySet()) {
             EntityData d = map.get(id);
+            int id2 = id;
 
             // HACK: Multiversion entity data
             if (protocol < 361) {
                 if (protocol <= 201) {
-                    if (id > 35) {
-                        id = id + 1;
+                    if (id2 > 35 && id2 < 400) {
+                        id2 = id2 + 1;
                     }
                 }
                 if (protocol == 354) {
-                    if (id > 40) {
-                        id = id + 1;
+                    if (id2 > 40 && id2 < 400) {
+                        id2 = id2 + 1;
                     }
                 }
             }
 
-            stream.putUnsignedVarInt(id);
+            stream.putUnsignedVarInt(id2);
             stream.putUnsignedVarInt(d.getType());
+
             switch (d.getType()) {
                 case Entity.DATA_TYPE_BYTE:
                     stream.putByte(((ByteEntityData) d).getData().byteValue());
@@ -141,9 +147,17 @@ public class Binary {
                     stream.putUnsignedVarInt(s.getBytes(StandardCharsets.UTF_8).length);
                     stream.put(s.getBytes(StandardCharsets.UTF_8));
                     break;
-                case Entity.DATA_TYPE_SLOT:
-                    SlotEntityData slot = (SlotEntityData) d;
-                    stream.putSlot(slot.getData());
+                case Entity.DATA_TYPE_NBT:
+                    NBTEntityData slot = (NBTEntityData) d;
+                    if (protocol < 361) {
+                        stream.putSlot(slot.item);
+                    } else {
+                        try {
+                            stream.put(NBTIO.write(slot.getData(), ByteOrder.LITTLE_ENDIAN, true));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                     break;
                 case Entity.DATA_TYPE_POS:
                     IntPositionEntityData pos = (IntPositionEntityData) d;
@@ -190,9 +204,18 @@ public class Binary {
                 case Entity.DATA_TYPE_STRING:
                     value = new StringEntityData(key, stream.getString());
                     break;
-                case Entity.DATA_TYPE_SLOT:
-                    Item item = stream.getSlot();
-                    value = new SlotEntityData(key, item.getId(), item.getDamage(), item.getCount());
+                case Entity.DATA_TYPE_NBT:
+                    try {
+                        int offset = stream.getOffset();
+                        FastByteArrayInputStream fbais = new FastByteArrayInputStream(stream.get());
+                        try {
+                            CompoundTag tag = NBTIO.read(fbais, ByteOrder.LITTLE_ENDIAN, true);
+                            value = new NBTEntityData(key, tag);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        stream.setOffset(offset + (int) fbais.position());
+                    } catch (Exception ignored) {}
                     break;
                 case Entity.DATA_TYPE_POS:
                     BlockVector3 v3 = stream.getSignedBlockPosition();

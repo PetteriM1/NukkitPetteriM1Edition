@@ -816,6 +816,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        this.noDamageTicks = 60;
+        this.setAirTicks(400);
+
         this.spawned = true;
         this.setImmobile(false);
 
@@ -854,8 +857,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (playerJoinEvent.getJoinMessage().toString().trim().length() > 0) {
             this.server.broadcastMessage(playerJoinEvent.getJoinMessage());
         }
-
-        this.noDamageTicks = 60;
 
         for (long index : this.usedChunks.keySet()) {
             int chunkX = Level.getHashX(index);

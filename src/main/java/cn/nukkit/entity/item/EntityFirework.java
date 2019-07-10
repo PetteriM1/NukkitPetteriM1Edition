@@ -1,7 +1,7 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.SlotEntityData;
+import cn.nukkit.entity.data.NBTEntityData;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -38,7 +38,7 @@ public class EntityFirework extends Entity {
 
         if (namedTag.contains("FireworkItem")) {
             firework = NBTIO.getItemHelper(namedTag.getCompound("FireworkItem"));
-            this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, firework));
+            this.setDataProperty(new NBTEntityData(Entity.DATA_DISPLAY_ITEM, firework));
         }
     }
 
@@ -114,7 +114,7 @@ public class EntityFirework extends Entity {
 
     public void setFirework(Item item) {
         this.firework = item;
-        this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, item));
+        this.setDataProperty(new NBTEntityData(Entity.DATA_DISPLAY_ITEM, firework));
     }
 
     @Override
