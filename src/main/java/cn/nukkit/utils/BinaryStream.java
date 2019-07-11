@@ -283,7 +283,7 @@ public class BinaryStream {
     public Item getSlot() {
         int id = this.getVarInt();
 
-        if (id <= 0) {
+        if (id == 0) {
             return Item.get(0, 0, 0);
         }
         int auxValue = this.getVarInt();
@@ -323,10 +323,6 @@ public class BinaryStream {
             canDestroy[i] = this.getString();
         }
 
-        if (id == 513) {
-            this.getVarLong(); //"blocking tick" (ffs mojang)
-        }
-
         Item item = Item.get(
                 id, data, cnt, nbt
         );
@@ -356,6 +352,10 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
+        if (item.getId() == 513) {
+            this.getVarLong();
+        }
+
         return item;
     }
 
@@ -368,9 +368,13 @@ public class BinaryStream {
         this.putVarInt(item.getId());
         int auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
         this.putVarInt(auxValue);
-        byte[] nbt = item.getCompoundTag();
-        this.putLShort(nbt.length);
-        this.put(nbt);
+        if (item.hasCompoundTag()) {
+            byte[] nbt = item.getCompoundTag();
+            this.putLShort(nbt.length);
+            this.put(nbt);
+        } else {
+            this.putLShort(0);
+        }
         List<String> canPlaceOn = extractStringList(item, "CanPlaceOn");
         List<String> canDestroy = extractStringList(item, "CanDestroy");
         this.putVarInt(canPlaceOn.size());
@@ -390,11 +394,12 @@ public class BinaryStream {
     public Item getRecipeIngredient() {
         int id = this.getVarInt();
 
-        if (id <= 0) {
+        if (id == 0) {
             return Item.get(0, 0, 0);
         }
 
         int damage = this.getVarInt();
+        if (damage == 0x7fff) damage = -1;
         int count = this.getVarInt();
 
         return Item.get(id, damage, count);
@@ -405,7 +410,14 @@ public class BinaryStream {
             this.putVarInt(0);
             return;
         }
-        this.putVarInt(ingredient.getDamage());
+        this.putVarInt(ingredient.getId());
+        int damage;
+        if (ingredient.hasMeta()) {
+            damage = ingredient.getDamage();
+        } else {
+            damage = 0x7fff;
+        }
+        this.putVarInt(damage);
         this.putVarInt(ingredient.getCount());
     }
 
