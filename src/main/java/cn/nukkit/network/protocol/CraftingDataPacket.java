@@ -64,13 +64,13 @@ public class CraftingDataPacket extends DataPacket {
                     this.putUnsignedVarInt(ingredients.size());
                     for (Item ingredient : ingredients) {
                         if (protocol < 361) {
-                            this.putSlot(ingredient);
+                            this.putSlot(protocol, ingredient);
                         } else {
                             this.putRecipeIngredient(ingredient);
                         }
                     }
                     this.putUnsignedVarInt(1);
-                    this.putSlot(shapeless.getResult());
+                    this.putSlot(protocol, shapeless.getResult());
                     this.putUUID(shapeless.getId());
                     if (protocol >= 354) {
                         this.putString(CRAFTING_TAG_CRAFTING_TABLE);
@@ -90,7 +90,7 @@ public class CraftingDataPacket extends DataPacket {
                     for (int z = 0; z < shaped.getHeight(); ++z) {
                         for (int x = 0; x < shaped.getWidth(); ++x) {
                             if (protocol < 361) {
-                                this.putSlot(shaped.getIngredient(x, z));
+                                this.putSlot(protocol, shaped.getIngredient(x, z));
                             } else {
                                 this.putRecipeIngredient(shaped.getIngredient(x, z));
                             }
@@ -101,7 +101,7 @@ public class CraftingDataPacket extends DataPacket {
                     outputs.addAll(shaped.getExtraResults());
                     this.putUnsignedVarInt(outputs.size());
                     for (Item output : outputs) {
-                        this.putSlot(output);
+                        this.putSlot(protocol, output);
                     }
                     this.putUUID(shaped.getId());
                     if (protocol >= 354) {
@@ -119,7 +119,7 @@ public class CraftingDataPacket extends DataPacket {
                     if (recipe.getType() == RecipeType.FURNACE_DATA) {
                         this.putVarInt(input.getDamage());
                     }
-                    this.putSlot(furnace.getResult());
+                    this.putSlot(protocol, furnace.getResult());
                     if (protocol >= 354) {
                         this.putString(CRAFTING_TAG_FURNACE);
                     }

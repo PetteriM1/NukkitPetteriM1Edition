@@ -150,7 +150,7 @@ public class Binary {
                 case Entity.DATA_TYPE_NBT:
                     NBTEntityData slot = (NBTEntityData) d;
                     if (protocol < 361) {
-                        stream.putSlot(slot.item);
+                        stream.putSlot(protocol, slot.item);
                     } else {
                         try {
                             stream.put(NBTIO.write(slot.getData(), ByteOrder.LITTLE_ENDIAN, true));

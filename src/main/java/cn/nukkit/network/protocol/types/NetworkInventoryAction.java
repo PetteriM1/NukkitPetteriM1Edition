@@ -117,8 +117,8 @@ public class NetworkInventoryAction {
         }
 
         packet.putUnsignedVarInt(this.inventorySlot);
-        packet.putSlot(this.oldItem);
-        packet.putSlot(this.newItem);
+        packet.putSlot(packet.protocol, this.oldItem);
+        packet.putSlot(packet.protocol, this.newItem);
     }
 
     public InventoryAction createInventoryAction(Player player) {

@@ -32,9 +32,9 @@ public class MobArmorEquipmentPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putEntityRuntimeId(this.eid);
-        this.putSlot(this.slots[0]);
-        this.putSlot(this.slots[1]);
-        this.putSlot(this.slots[2]);
-        this.putSlot(this.slots[3]);
+        this.putSlot(protocol, this.slots[0]);
+        this.putSlot(protocol, this.slots[1]);
+        this.putSlot(protocol, this.slots[2]);
+        this.putSlot(protocol, this.slots[3]);
     }
 }

@@ -70,7 +70,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putBlockVector3(useItemData.blockPos);
                 this.putBlockFace(useItemData.face);
                 this.putVarInt(useItemData.hotbarSlot);
-                this.putSlot(useItemData.itemInHand);
+                this.putSlot(protocol, useItemData.itemInHand);
                 this.putVector3f(useItemData.playerPos.asVector3f());
                 this.putVector3f(useItemData.clickPos);
                 if (protocol >= 354) { // Idk in which version this added
@@ -83,7 +83,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putEntityRuntimeId(useItemOnEntityData.entityRuntimeId);
                 this.putUnsignedVarInt(useItemOnEntityData.actionType);
                 this.putVarInt(useItemOnEntityData.hotbarSlot);
-                this.putSlot(useItemOnEntityData.itemInHand);
+                this.putSlot(protocol, useItemOnEntityData.itemInHand);
                 this.putVector3f(useItemOnEntityData.playerPos.asVector3f());
                 this.putVector3f(useItemOnEntityData.clickPos.asVector3f());
                 break;
@@ -92,7 +92,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
                 this.putUnsignedVarInt(releaseItemData.actionType);
                 this.putVarInt(releaseItemData.hotbarSlot);
-                this.putSlot(releaseItemData.itemInHand);
+                this.putSlot(protocol, releaseItemData.itemInHand);
                 this.putVector3f(releaseItemData.headRot.asVector3f());
                 break;
             default:
