@@ -2015,6 +2015,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.getServer().getScheduler().scheduleTask(null, () -> {
             try {
                 if (this.protocol >= 313) {
+                    if (this.protocol >= 361) {
+                        this.dataPacket(new BiomeDefinitionListPacket());
+                    }
                     this.dataPacket(new AvailableEntityIdentifiersPacket());
                 }
 
