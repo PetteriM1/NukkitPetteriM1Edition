@@ -253,10 +253,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void startAction() {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, true);
         this.startAction = this.server.getTick();
     }
 
     public void stopAction() {
+        this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
         this.startAction = -1;
     }
 
@@ -2543,8 +2545,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                     }
 
-                    this.startAction = -1;
-                    this.setDataFlag(Player.DATA_FLAGS, Player.DATA_FLAG_ACTION, false);
+                    this.stopAction();
                     break;
                 case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
                     this.formOpen = false;
@@ -3032,12 +3033,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         break packetswitch;
                                     }
 
-                                    if (item.onClickAir(this, directionVector) && this.isSurvival()) {
+                                    if (item.onClickAir(this, directionVector) && this.isSurvival() && !(item instanceof ItemCrossbow)) {
                                         this.inventory.setItemInHand(item);
                                     }
 
-                                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, true);
-                                    this.startAction = this.server.getTick();
+                                    if (item instanceof ItemCrossbow && this.getStartActionTick() == -1) {
+                                        this.inventory.setItemInHand(item);
+                                    }
+
+                                    this.startAction();
 
                                     break packetswitch;
                                 default:

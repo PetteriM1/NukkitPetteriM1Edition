@@ -39,6 +39,10 @@ public class ItemCrossbow extends ItemBow {
 
     @Override
     public boolean onReleaseUsing(Player player) {
+        if (player.getServer().getTick() - player.getStartActionTick() < 20 && player.getStartActionTick() != -1) {
+            return false;
+        }
+
         Item itemArrow = Item.get(Item.ARROW, 0, 1);
 
         if (!player.isCreative() && !player.getInventory().contains(itemArrow)) {
@@ -46,24 +50,28 @@ public class ItemCrossbow extends ItemBow {
             return false;
         }
 
-        if (!this.isUnbreakable()) {
-            Enchantment durability = this.getEnchantment(Enchantment.ID_DURABILITY);
-            if (!(durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100))) {
-                this.setDamage(this.getDamage() + 2);
-                if (this.getDamage() >= getMaxDurability()) {
-                    this.count--;
+        if (!this.isLoaded()) {
+            if (!player.isCreative()) {
+                if (!this.isUnbreakable()) {
+                    Enchantment durability = this.getEnchantment(Enchantment.ID_DURABILITY);
+                    if (!(durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100))) {
+                        this.setDamage(this.getDamage() + 2);
+                        if (this.getDamage() >= getMaxDurability()) {
+                            this.count--;
+                        }
+                    }
                 }
             }
-        }
 
-        if (!this.isLoaded()) {
-            player.getInventory().removeItem(itemArrow);
+            if (!player.isCreative()) {
+                player.getInventory().removeItem(itemArrow);
+            }
+
             this.loadArrow(player, itemArrow);
+            player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_LOADING_END);
         }
 
-        player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_LOADING_END);
-
-        return true;
+        return false; //HACK
     }
 
     @Override
@@ -72,20 +80,10 @@ public class ItemCrossbow extends ItemBow {
         return true;
     }
 
-    /*@Override
-    public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        this.launchArrow(player);
-        return true;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }*/
-
     public void loadArrow(Player player, Item arrow) {
         //this.getNamedTag().putCompound("chargedItem", new CompoundTag("chargedItem").putByte("Count", arrow.getCount()).putShort("Damage", arrow.getDamage()).putString("Name", "minecraft:arrow"));
         this.loaded = true;
+        player.getInventory().setItemInHand(this);
     }
 
     public boolean isLoaded() {
@@ -93,12 +91,13 @@ public class ItemCrossbow extends ItemBow {
             if (this.getNamedTag().getByte("Count") > 0 && this.getNamedTag().getString("Name") != null) {
                 return true;
             }
-        }*/
+        }
 
+        return false;*/
         return this.loaded;
     }
 
-    private void launchArrow(Player player) {
+    public void launchArrow(Player player) {
         if (this.isLoaded()) {
             CompoundTag nbt = new CompoundTag()
                     .putList(new ListTag<DoubleTag>("Pos")
@@ -113,15 +112,7 @@ public class ItemCrossbow extends ItemBow {
                             .add(new FloatTag("", (player.yaw > 180 ? 360 : 0) - (float) player.yaw))
                             .add(new FloatTag("", (float) -player.pitch)));
 
-            int diff = (Server.getInstance().getTick() - player.getStartActionTick());
-            double p = (double) diff / 20;
-
-            double f = Math.min((p * p + p * 2) / 3, 1) * 3.8;
-            EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, false), f);
-
-            if (f < 0.1 || diff < 5) {
-                entityShootBowEvent.setCancelled();
-            }
+            EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, false), 3.5);
 
             Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
             if (entityShootBowEvent.isCancelled()) {
@@ -139,9 +130,8 @@ public class ItemCrossbow extends ItemBow {
                         proj.spawnToAll();
                         player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_SHOOT);
                         this.loaded = false;
+                        //this.getNamedTag().remove("chargedItem");
                     }
-                } else {
-                    entityShootBowEvent.getProjectile().spawnToAll();
                 }
             }
         }
