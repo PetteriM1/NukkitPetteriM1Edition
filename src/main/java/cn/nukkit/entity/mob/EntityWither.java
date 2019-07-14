@@ -58,9 +58,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && player.isSurvival() && distance <= 100;
+            return player.spawned && player.isAlive() && !player.closed && (player.isSurvival() || player.isAdventure()) && distance <= 200;
         }
-        return creature.isAlive() && !creature.closed && distance <= 100;
+        return creature.isAlive() && !creature.closed && distance <= 200;
     }
 
     @Override
