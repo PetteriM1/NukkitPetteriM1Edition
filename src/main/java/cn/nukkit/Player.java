@@ -1239,7 +1239,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
             this.dataPacket(inventoryContentPacket);
         } else {
-            if (this.isSurvival()) {
+            if (this.isSurvival() || this.isAdventure()) {
                 this.getAdventureSettings().set(Type.FLYING, false);
             }
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
@@ -2989,7 +2989,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     Item oldItem = i.clone();
 
                                     if (this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7) && (i = this.level.useBreakOn(blockVector.asVector3(), face, i, this, true)) != null) {
-                                        if (this.isSurvival()) {
+                                        if (this.isSurvival() || this.isAdventure()) {
                                             this.getFoodData().updateFoodExpLevel(0.025);
                                             if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
                                                 inventory.setItemInHand(i);
@@ -3033,7 +3033,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         break packetswitch;
                                     }
 
-                                    if (item.onClickAir(this, directionVector) && this.isSurvival() && !(item instanceof ItemCrossbow)) {
+                                    if (item.onClickAir(this, directionVector) && (this.isSurvival() || this.isAdventure()) && !(item instanceof ItemCrossbow)) {
                                         this.inventory.setItemInHand(item);
                                     }
 
@@ -3074,7 +3074,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         break;
                                     }
 
-                                    if (target.onInteract(this, item) && this.isSurvival()) {
+                                    if (target.onInteract(this, item) && (this.isSurvival() || this.isAdventure())) {
                                         if (item.isTool()) {
                                             if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
                                                 item = new ItemBlock(new BlockAir());
@@ -3117,7 +3117,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     }
 
                                     if (!target.attack(entityDamageByEntityEvent)) {
-                                        if (item.isTool() && this.isSurvival()) {
+                                        if (item.isTool() && !this.isCreative()) {
                                             this.inventory.sendContents(this);
                                         }
                                         break;
@@ -3127,7 +3127,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         enchantment.doPostAttack(this, target);
                                     }
 
-                                    if (item.isTool() && this.isSurvival()) {
+                                    if (item.isTool() && !this.isCreative()) {
                                         if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
                                             this.inventory.setItemInHand(new ItemBlock(new BlockAir()));
                                         } else {
@@ -3194,7 +3194,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             this.dataPacket(eventPacket);
                                             Server.broadcastPacket(this.getViewers().values(), eventPacket);
 
-                                            if (this.isSurvival()) {
+                                            if (!this.isCreative()) {
                                                 itemInHand.count--;
                                                 this.inventory.setItemInHand(itemInHand);
                                                 this.inventory.addItem(new ItemBucket());
@@ -3829,7 +3829,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (!ev.getKeepExperience() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-            if (this.isSurvival() || this.isAdventure()) {
+            if (!this.isCreative()) {
                 int exp = ev.getExperience() * 7;
                 if (exp > 100) exp = 100;
                 int add = 1;
@@ -4684,7 +4684,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (near) {
             if (entity instanceof EntityArrow && ((EntityArrow) entity).hadCollision) {
                 ItemArrow item = new ItemArrow();
-                if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                if (!this.isCreative() && !this.inventory.canAddItem(item)) {
                     return false;
                 }
 
@@ -4711,7 +4711,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 return true;
             } else if (entity instanceof EntityThrownTrident && ((EntityThrownTrident) entity).hadCollision) {
                 Item item = ((EntityThrownTrident) entity).getItem();
-                if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                if (!this.isCreative() && !this.inventory.canAddItem(item)) {
                     return false;
                 }
 
@@ -4729,7 +4729,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Item item = ((EntityItem) entity).getItem();
 
                     if (item != null) {
-                        if (this.isSurvival() && !this.inventory.canAddItem(item)) {
+                        if (!this.isCreative() && !this.inventory.canAddItem(item)) {
                             return false;
                         }
 

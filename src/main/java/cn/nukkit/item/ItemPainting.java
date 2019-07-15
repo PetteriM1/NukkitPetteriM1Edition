@@ -114,10 +114,8 @@ public class ItemPainting extends Item {
 
         EntityPainting entity = new EntityPainting(chunk, nbt);
 
-        if (player.isSurvival()) {
-            Item item = player.getInventory().getItemInHand();
-            item.setCount(item.getCount() - 1);
-            player.getInventory().setItemInHand(item);
+        if (!player.isCreative()) {
+            this.count--;
         }
         entity.spawnToAll();
 

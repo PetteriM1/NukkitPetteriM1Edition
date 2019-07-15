@@ -100,7 +100,7 @@ public class ItemBow extends ItemTool {
             player.getInventory().sendContents(player);
         } else {
             entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
-            if (player.isSurvival()) {
+            if (!player.isCreative()) {
                 Enchantment infinity;
 
                 if (!this.hasEnchantments() || (infinity = this.getEnchantment(Enchantment.ID_BOW_INFINITY)) == null || infinity.getLevel() <= 0)

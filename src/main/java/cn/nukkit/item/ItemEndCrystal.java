@@ -59,7 +59,7 @@ public class ItemEndCrystal extends Item {
         Entity entity = Entity.createEntity("EndCrystal", chunk, nbt);
 
         if (entity != null) {
-            if (player.isSurvival()) {
+            if (!player.isCreative()) {
                 Item item = player.getInventory().getItemInHand();
                 item.setCount(item.getCount() - 1);
                 player.getInventory().setItemInHand(item);

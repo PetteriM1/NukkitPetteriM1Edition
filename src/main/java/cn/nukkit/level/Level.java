@@ -1862,7 +1862,7 @@ public class Level implements ChunkManager, Metadatable {
             BlockBreakEvent ev = new BlockBreakEvent(player, target, face, item, eventDrops, player.isCreative(),
                     (player.lastBreak + breakTime * 1000) > System.currentTimeMillis());
 
-            if (player.isSurvival() && !target.isBreakable(item)) {
+            if ((player.isSurvival() || player.isAdventure()) && !target.isBreakable(item)) {
                 ev.setCancelled();
             } else if (!player.isOp() && this.server.getSpawnRadius() > -1) {
                 Vector2 t = new Vector2(target.x, target.z);
@@ -1928,14 +1928,14 @@ public class Level implements ChunkManager, Metadatable {
             int dropExp = target.getDropExp();
             if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
                 player.addExperience(dropExp);
-                if (player.isSurvival()) {
+                if (player.isSurvival() || player.isAdventure()) {
                     for (int ii = 1; ii <= dropExp; ii++) {
                         this.dropExpOrb(target, 1);
                     }
                 }
             }
 
-            if (player == null || player.isSurvival()) {
+            if (player == null || player.isSurvival() || player.isAdventure()) {
                 for (Item drop : drops) {
                     if (drop.getCount() > 0) {
                         this.dropItem(vector.add(0.5, 0.5, 0.5), drop);
