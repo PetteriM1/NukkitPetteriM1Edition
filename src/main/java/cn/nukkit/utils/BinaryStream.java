@@ -3,8 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemArmor;
-import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.ItemDurable;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.math.BlockFace;
@@ -381,7 +380,7 @@ public class BinaryStream {
             return;
         }
 
-        boolean isDamageable = item instanceof ItemTool || item instanceof ItemArmor;
+        boolean isDurable = item instanceof ItemDurable;
 
         this.putVarInt(item.getId());
 
@@ -391,14 +390,14 @@ public class BinaryStream {
             auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
         } else {
             auxValue = item.getCount();
-            if (!isDamageable) {
+            if (!isDurable) {
                 auxValue |= (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8);
             }
         }
 
         this.putVarInt(auxValue);
 
-        if (item.hasCompoundTag() || (isDamageable && protocol >= 361)) {
+        if (item.hasCompoundTag() || (isDurable && protocol >= 361)) {
             if (protocol < 361) {
                 byte[] nbt = item.getCompoundTag();
                 this.putLShort(nbt.length);
@@ -416,7 +415,7 @@ public class BinaryStream {
                     if (tag.contains("Damage")) {
                         tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
                     }
-                    if (isDamageable) {
+                    if (isDurable) {
                         tag.putInt("Damage", item.getDamage());
                     }
 
