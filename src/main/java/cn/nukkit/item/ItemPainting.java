@@ -11,7 +11,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.MainLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +70,6 @@ public class ItemPainting extends Item {
             }
         }
         int direction = DIRECTION[face.getIndex() - 2];
-        MainLogger.getLogger().info("Direction: " + direction);
         EntityPainting.Motive motive = validMotives.get(ThreadLocalRandom.current().nextInt(validMotives.size()));
 
         Vector3 position = new Vector3(target.x + 0.5, target.y + 0.5, target.z + 0.5);
