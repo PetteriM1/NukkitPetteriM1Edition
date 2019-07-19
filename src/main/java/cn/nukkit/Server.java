@@ -1383,6 +1383,11 @@ public class Server {
         this.craftingManager.registerRecipe(recipe);
     }
 
+    public Optional<Player> getPlayer(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid");
+        return Optional.ofNullable(playerList.get(uuid));
+    }
+
     public IPlayer getOfflinePlayer(String name) {
         IPlayer result = this.getPlayerExact(name.toLowerCase());
         if (result == null) {
