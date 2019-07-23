@@ -130,4 +130,13 @@ public class EntityEnderman extends EntityWalkingMob {
         this.move(Utils.rand(-10, 10), 0, Utils.rand(-10, 10));
         this.level.addSound(new EndermanTeleportSound(this));
     }
+
+    @Override
+    public boolean canDespawn() {
+        if (this.getLevel().getName().equals("end")) {
+            return false;
+        }
+
+        return super.canDespawn();
+    }
 }

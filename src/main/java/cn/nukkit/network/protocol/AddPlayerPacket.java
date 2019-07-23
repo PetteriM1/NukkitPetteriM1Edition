@@ -59,7 +59,7 @@ public class AddPlayerPacket extends DataPacket {
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.yaw);
-        this.putSlot(this.item);
+        this.putSlot(protocol, this.item);
         this.put(Binary.writeMetadata(protocol, this.metadata));
         if (protocol > 274) {
             this.putUnsignedVarInt(0);

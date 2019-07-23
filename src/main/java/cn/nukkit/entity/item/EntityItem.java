@@ -270,5 +270,4 @@ public class EntityItem extends Entity {
         addEntity.item = this.getItem();
         return addEntity;
     }
-
 }

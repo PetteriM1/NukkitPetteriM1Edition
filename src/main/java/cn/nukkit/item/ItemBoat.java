@@ -51,10 +51,8 @@ public class ItemBoat extends Item {
                         .add(new FloatTag("", 0)))
         );
 
-        if (player.isSurvival()) {
-            Item item = player.getInventory().getItemInHand();
-            item.setCount(item.getCount() - 1);
-            player.getInventory().setItemInHand(item);
+        if (!player.isCreative()) {
+            this.count--;
         }
 
         boat.spawnToAll();

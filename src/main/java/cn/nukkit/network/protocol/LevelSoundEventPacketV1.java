@@ -5,7 +5,7 @@ import cn.nukkit.math.Vector3f;
 import lombok.ToString;
 
 @ToString
-public class LevelSoundEventPacketV1 extends DataPacket {
+public class LevelSoundEventPacketV1 extends LevelSoundEventPacket {
 
     public int sound;
     public float x;

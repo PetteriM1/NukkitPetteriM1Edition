@@ -104,12 +104,12 @@ public class TeleportCommand extends VanillaCommand {
                 return true;
             }
 
-            if (x < -10000000) x = -10000000;
-            if (x > 10000000) x = 10000000;
+            if (x < -30000000) x = -30000000;
+            if (x > 30000000) x = 30000000;
             if (y < 0) y = 0;
             if (y > 256) y = 256;
-            if (z < -10000000) z = -10000000;
-            if (z > 10000000) z = 10000000;
+            if (z < -30000000) z = -30000000;
+            if (z > 30000000) z = 30000000;
 
             if (args.length == 6 || (args.length == 5 && pos == 3)) {
                 yaw = Integer.parseInt(args[pos++]);

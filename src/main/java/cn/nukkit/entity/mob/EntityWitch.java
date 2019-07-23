@@ -53,7 +53,7 @@ public class EntityWitch extends EntityWalkingMob {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return !player.closed && player.spawned && player.isAlive() && player.isSurvival() && distance <= 80;
+            return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 80;
         }
         return creature.isAlive() && !creature.closed && distance <= 80;
     }

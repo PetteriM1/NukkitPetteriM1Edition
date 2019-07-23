@@ -106,7 +106,7 @@ public class BlockFlowerPot extends BlockFlowable {
         this.getLevel().setBlock(this, this, true);
         ((BlockEntityFlowerPot) blockEntity).spawnToAll();
 
-        if (player.isSurvival()) {
+        if (!player.isCreative()) {
             item.setCount(item.getCount() - 1);
             player.getInventory().setItemInHand(item.getCount() > 0 ? item : Item.get(Item.AIR));
         }

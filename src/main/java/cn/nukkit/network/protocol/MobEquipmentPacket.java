@@ -34,7 +34,7 @@ public class MobEquipmentPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putEntityRuntimeId(this.eid);
-        this.putSlot(this.item);
+        this.putSlot(protocol, this.item);
         this.putByte((byte) this.inventorySlot);
         this.putByte((byte) this.hotbarSlot);
         this.putByte((byte) this.windowId);

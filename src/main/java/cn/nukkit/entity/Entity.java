@@ -59,7 +59,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_TYPE_INT = 2;
     public static final int DATA_TYPE_FLOAT = 3;
     public static final int DATA_TYPE_STRING = 4;
-    public static final int DATA_TYPE_SLOT = 5;
+    public static final int DATA_TYPE_NBT = 5, DATA_TYPE_SLOT = DATA_TYPE_NBT;
     public static final int DATA_TYPE_POS = 6;
     public static final int DATA_TYPE_LONG = 7;
     public static final int DATA_TYPE_VECTOR3F = 8;
@@ -67,7 +67,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAGS = 0;
     public static final int DATA_HEALTH = 1; //int (minecart/boat)
     public static final int DATA_VARIANT = 2; //int
-    public static final int DATA_COLOR = 3, DATA_COLOUR = 3; //byte
+    public static final int DATA_COLOR = 3, DATA_COLOUR = DATA_COLOR; //byte
     public static final int DATA_NAMETAG = 4; //string
     public static final int DATA_OWNER_EID = 5; //long
     public static final int DATA_TARGET_EID = 6; //long
@@ -94,47 +94,47 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_LEAD_HOLDER_EID = 37; //long
     public static final int DATA_SCALE = 38; //float
     public static final int DATA_INTERACTIVE_TAG = 39; //string (button text)
-    public static final int DATA_SKIN_ID = 40; // int ???
-    public static final int DATA_NPC_SKIN_ID = 41; //string
-    public static final int DATA_URL_TAG = 42; //string
-    public static final int DATA_MAX_AIR = 43; //short
-    public static final int DATA_MARK_VARIANT = 44; //int
-    public static final int DATA_CONTAINER_TYPE = 45; //byte
-    public static final int DATA_CONTAINER_BASE_SIZE = 46; //int
-    public static final int DATA_CONTAINER_EXTRA_SLOTS_PER_STRENGTH = 47; //int
-    public static final int DATA_BLOCK_TARGET = 48; //block coords (ender crystal)
-    public static final int DATA_WITHER_INVULNERABLE_TICKS = 49; //int
-    public static final int DATA_WITHER_TARGET_1 = 50; //long
-    public static final int DATA_WITHER_TARGET_2 = 51; //long
-    public static final int DATA_WITHER_TARGET_3 = 52; //long
-    public static final int DATA_BOUNDING_BOX_WIDTH = 54; //float
-    public static final int DATA_BOUNDING_BOX_HEIGHT = 55; //float
-    public static final int DATA_FUSE_LENGTH = 56; //int
-    public static final int DATA_RIDER_SEAT_POSITION = 57; //vector3f
-    public static final int DATA_RIDER_ROTATION_LOCKED = 58; //byte
-    public static final int DATA_RIDER_MAX_ROTATION = 59; //float
-    public static final int DATA_RIDER_MIN_ROTATION = 60; //float
-    public static final int DATA_AREA_EFFECT_CLOUD_RADIUS = 61; //float
-    public static final int DATA_AREA_EFFECT_CLOUD_WAITING = 62; //int
-    public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE_ID = 63; //int
-    public static final int DATA_SHULKER_ATTACH_FACE = 65; //byte
-    public static final int DATA_SHULKER_ATTACH_POS = 67; //block coords
-    public static final int DATA_TRADING_PLAYER_EID = 68; //long
-    public static final int DATA_COMMAND_BLOCK_COMMAND = 71; //string
-    public static final int DATA_COMMAND_BLOCK_LAST_OUTPUT = 72; //string
-    public static final int DATA_COMMAND_BLOCK_TRACK_OUTPUT = 73; //byte
-    public static final int DATA_CONTROLLING_RIDER_SEAT_NUMBER = 74; //byte
-    public static final int DATA_STRENGTH = 75; //int
-    public static final int DATA_MAX_STRENGTH = 76; //int
-    public static final int DATA_LIMITED_LIFE = 78;
-    public static final int DATA_ARMOR_STAND_POSE_INDEX = 79; // int
-    public static final int DATA_ENDER_CRYSTAL_TIME_OFFSET = 80; // int
-    public static final int DATA_ALWAYS_SHOW_NAMETAG = 81; // byte
-    public static final int DATA_COLOR_2 = 82; // byte
-    public static final int DATA_SCORE_TAG = 84; //String
-    public static final int DATA_BALLOON_ATTACHED_ENTITY = 85; // long
-    public static final int DATA_PUFFERFISH_SIZE = 86;
-    public static final int DATA_FLAGS2 = 92, DATA_FLAGS_EXTENDED = 92; //long (extended data flags)
+    public static final int DATA_NPC_SKIN_ID = 40; //string
+    public static final int DATA_URL_TAG = 41; //string
+    public static final int DATA_MAX_AIR = 42; //short
+    public static final int DATA_MARK_VARIANT = 43; //int
+    public static final int DATA_CONTAINER_TYPE = 44; //byte
+    public static final int DATA_CONTAINER_BASE_SIZE = 45; //int
+    public static final int DATA_CONTAINER_EXTRA_SLOTS_PER_STRENGTH = 46; //int
+    public static final int DATA_BLOCK_TARGET = 47; //block coords (ender crystal)
+    public static final int DATA_WITHER_INVULNERABLE_TICKS = 48; //int
+    public static final int DATA_WITHER_TARGET_1 = 49; //long
+    public static final int DATA_WITHER_TARGET_2 = 50; //long
+    public static final int DATA_WITHER_TARGET_3 = 51; //long
+    public static final int DATA_BOUNDING_BOX_WIDTH = 53; //float
+    public static final int DATA_BOUNDING_BOX_HEIGHT = 54; //float
+    public static final int DATA_FUSE_LENGTH = 55; //int
+    public static final int DATA_RIDER_SEAT_POSITION = 56; //vector3f
+    public static final int DATA_RIDER_ROTATION_LOCKED = 57; //byte
+    public static final int DATA_RIDER_MAX_ROTATION = 58; //float
+    public static final int DATA_RIDER_MIN_ROTATION = 59; //float
+    public static final int DATA_AREA_EFFECT_CLOUD_RADIUS = 60; //float
+    public static final int DATA_AREA_EFFECT_CLOUD_WAITING = 61; //int
+    public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE_ID = 62; //int
+    public static final int DATA_SHULKER_ATTACH_FACE = 64; //byte
+    public static final int DATA_SHULKER_ATTACH_POS = 66; //block coords
+    public static final int DATA_TRADING_PLAYER_EID = 67; //long
+    public static final int DATA_COMMAND_BLOCK_COMMAND = 70; //string
+    public static final int DATA_COMMAND_BLOCK_LAST_OUTPUT = 71; //string
+    public static final int DATA_COMMAND_BLOCK_TRACK_OUTPUT = 72; //byte
+    public static final int DATA_CONTROLLING_RIDER_SEAT_NUMBER = 73; //byte
+    public static final int DATA_STRENGTH = 74; //int
+    public static final int DATA_MAX_STRENGTH = 75; //int
+    public static final int DATA_LIMITED_LIFE = 77;
+    public static final int DATA_ARMOR_STAND_POSE_INDEX = 78; // int
+    public static final int DATA_ENDER_CRYSTAL_TIME_OFFSET = 79; // int
+    public static final int DATA_ALWAYS_SHOW_NAMETAG = 80; // byte
+    public static final int DATA_COLOR_2 = 81; // byte
+    public static final int DATA_SCORE_TAG = 83; //String
+    public static final int DATA_BALLOON_ATTACHED_ENTITY = 84; // long
+    public static final int DATA_PUFFERFISH_SIZE = 85;
+    public static final int DATA_FLAGS_EXTENDED = 91, DATA_FLAGS2 = DATA_FLAGS_EXTENDED; //long (extended data flags)
+    public static final int DATA_SKIN_ID = 103; // int ???
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -153,7 +153,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_CRITICAL = 13;
     public static final int DATA_FLAG_CAN_SHOW_NAMETAG = 14;
     public static final int DATA_FLAG_ALWAYS_SHOW_NAMETAG = 15;
-    public static final int DATA_FLAG_IMMOBILE = 16, DATA_FLAG_NO_AI = 16;
+    public static final int DATA_FLAG_IMMOBILE = 16, DATA_FLAG_NO_AI = DATA_FLAG_IMMOBILE;
     public static final int DATA_FLAG_SILENT = 17;
     public static final int DATA_FLAG_WALLCLIMBING = 18;
     public static final int DATA_FLAG_CAN_CLIMB = 19;
@@ -337,6 +337,7 @@ public abstract class Entity extends Location implements Metadatable {
     protected void initEntity() {
         if (this.initialized2) {
             // We've already initialized this entity
+            this.getServer().getLogger().debug("[initEntity] Entity is already initialized: " + this.getName() + " (" + this.getId() + ")");
             return;
         }
 
@@ -383,6 +384,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.initialized) {
             // We've already initialized this entity
+            this.getServer().getLogger().debug("[init] Entity is already initialized: " + this.getName() + " (" + this.getId() + ")");
             return;
         }
 
@@ -1226,7 +1228,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
             if (this.fireTicks <= 0) {
                 this.extinguish();
-            } else if (!this.fireProof) {
+            } else if (!this.fireProof && (!(this instanceof Player) || !((Player) this).isSpectator())) {
                 this.setDataFlag(DATA_FLAGS, DATA_FLAG_ONFIRE, true);
                 hasUpdate = true;
             }
@@ -2189,8 +2191,8 @@ public abstract class Entity extends Location implements Metadatable {
         return this.getDataProperties().getFloat(id);
     }
 
-    public Item getDataPropertySlot(int id) {
-        return this.getDataProperties().getSlot(id);
+    public CompoundTag getDataPropertyNBT(int id) {
+        return this.getDataProperties().getNBT(id);
     }
 
     public Vector3 getDataPropertyPos(int id) {

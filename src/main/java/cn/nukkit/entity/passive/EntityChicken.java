@@ -3,6 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
@@ -159,6 +160,15 @@ public class EntityChicken extends EntityWalkingAnimal {
         }
 
         return drops.toArray(new Item[0]);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (ev.getCause() != EntityDamageEvent.DamageCause.FALL) {
+            return super.attack(ev);
+        }
+
+        return false;
     }
 
     public int getRandomEggLayTime() {

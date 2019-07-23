@@ -3,6 +3,7 @@ package cn.nukkit.utils;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDurable;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.math.BlockFace;
@@ -283,7 +284,7 @@ public class BinaryStream {
     public Item getSlot() {
         int id = this.getVarInt();
 
-        if (id <= 0) {
+        if (id == 0) {
             return Item.get(0, 0, 0);
         }
         int auxValue = this.getVarInt();
@@ -305,7 +306,17 @@ public class BinaryStream {
                 try {
                     // TODO: 05/02/2019 This hack is necessary because we keep the raw NBT tag. Try to remove it.
                     CompoundTag tag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN, true);
-                    nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, false);
+                    // Hack for tool damage
+                    if (tag.contains("Damage")) {
+                        data = tag.getInt("Damage");
+                        tag.remove("Damage");
+                    }
+                    if (tag.contains("__DamageConflict__")) {
+                        tag.put("Damage", tag.removeAndGet("__DamageConflict__"));
+                    }
+                    if (tag.getAllTags().size() > 0) {
+                        nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, false);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -321,10 +332,6 @@ public class BinaryStream {
         String[] canDestroy = new String[this.getVarInt()];
         for (int i = 0; i < canDestroy.length; ++i) {
             canDestroy[i] = this.getString();
-        }
-
-        if (id == 513) {
-            this.getVarLong(); //"blocking tick" (ffs mojang)
         }
 
         Item item = Item.get(
@@ -356,21 +363,72 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
+        if (item.getId() == 513) {
+            this.getVarLong();
+        }
+
         return item;
     }
 
     public void putSlot(Item item) {
+        this.putSlot(ProtocolInfo.CURRENT_PROTOCOL, item);
+    }
+
+    public void putSlot(int protocol, Item item) {
         if (item == null || item.getId() == 0) {
             this.putVarInt(0);
             return;
         }
 
+        boolean isDurable = item instanceof ItemDurable;
+
         this.putVarInt(item.getId());
-        int auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
+
+        int auxValue;
+
+        if (protocol < 361) {
+            auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
+        } else {
+            auxValue = item.getCount();
+            if (!isDurable) {
+                auxValue |= (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8);
+            }
+        }
+
         this.putVarInt(auxValue);
-        byte[] nbt = item.getCompoundTag();
-        this.putLShort(nbt.length);
-        this.put(nbt);
+
+        if (item.hasCompoundTag() || (isDurable && protocol >= 361)) {
+            if (protocol < 361) {
+                byte[] nbt = item.getCompoundTag();
+                this.putLShort(nbt.length);
+                this.put(nbt);
+            } else {
+                try {
+                    // Hack for tool damage
+                    byte[] nbt = item.getCompoundTag();
+                    CompoundTag tag;
+                    if (nbt == null || nbt.length == 0) {
+                        tag = new CompoundTag();
+                    } else {
+                        tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN, false);
+                    }
+                    if (tag.contains("Damage")) {
+                        tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
+                    }
+                    if (isDurable) {
+                        tag.putInt("Damage", item.getDamage());
+                    }
+
+                    this.putLShort(0xffff);
+                    this.putByte((byte) 1);
+                    this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            this.putLShort(0);
+        }
         List<String> canPlaceOn = extractStringList(item, "CanPlaceOn");
         List<String> canDestroy = extractStringList(item, "CanDestroy");
         this.putVarInt(canPlaceOn.size());
@@ -385,6 +443,36 @@ public class BinaryStream {
         if (item.getId() == 513) {
             this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
+    }
+
+    public Item getRecipeIngredient() {
+        int id = this.getVarInt();
+
+        if (id == 0) {
+            return Item.get(0, 0, 0);
+        }
+
+        int damage = this.getVarInt();
+        if (damage == 0x7fff) damage = -1;
+        int count = this.getVarInt();
+
+        return Item.get(id, damage, count);
+    }
+
+    public void putRecipeIngredient(Item ingredient) {
+        if (ingredient == null || ingredient.getId() == 0) {
+            this.putVarInt(0);
+            return;
+        }
+        this.putVarInt(ingredient.getId());
+        int damage;
+        if (ingredient.hasMeta()) {
+            damage = ingredient.getDamage();
+        } else {
+            damage = 0x7fff;
+        }
+        this.putVarInt(damage);
+        this.putVarInt(ingredient.getCount());
     }
 
     private List<String> extractStringList(Item item, String tagName) {

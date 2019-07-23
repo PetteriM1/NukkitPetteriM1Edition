@@ -28,22 +28,18 @@ public class ItemEmptyMap extends Item {
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
         if (!player.isCreative()) {
-            if (!player.isCreative()) {
-                this.count--;
-            }
-            player.getInventory().addItem(new ItemMap());
-        } else player.getInventory().addItem(new ItemMap());
+            this.count--;
+        }
+        player.getInventory().addItem(new ItemMap());
         return true;
     }
 
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         if (!player.isCreative()) {
-            if (!player.isCreative()) {
-                this.count--;
-            }
-            player.getInventory().addItem(new ItemMap());
-        } else player.getInventory().addItem(new ItemMap());
+            this.count--;
+        }
+        player.getInventory().addItem(new ItemMap());
         return true;
     }
 }

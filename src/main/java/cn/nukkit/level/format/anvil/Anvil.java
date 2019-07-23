@@ -15,11 +15,15 @@ import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.ThreadCache;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -100,7 +104,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
+    public AsyncTask requestChunkTask(int protocol, int x, int z) throws ChunkException {
         Chunk chunk = (Chunk) this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
@@ -148,15 +152,19 @@ public class Anvil extends BaseLevelProvider {
                 break;
             }
         }
-        stream.putByte((byte) count);
+        if (protocol < 361) {
+            stream.putByte((byte) count);
+        }
         for (int i = 0; i < count; i++) {
             stream.putByte((byte) 0);
             stream.put(sections[i].getBytes());
         }
-        for (byte height : chunk.getHeightMapArray()) {
-            stream.putByte(height);
+        if (protocol < 361) {
+            for (byte height : chunk.getHeightMapArray()) {
+                stream.putByte(height);
+            }
+            stream.put(PAD_256);
         }
-        stream.put(PAD_256);
         stream.put(chunk.getBiomeIdArray());
         stream.putByte((byte) 0);
         if (extraData != null) {
@@ -166,7 +174,7 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(timestamp, x, z, stream.getBuffer());
+        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, count, stream.getBuffer());
 
         return null;
     }

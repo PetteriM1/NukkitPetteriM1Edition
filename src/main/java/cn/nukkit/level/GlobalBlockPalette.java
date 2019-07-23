@@ -23,6 +23,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator332 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator340 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator361 = new AtomicInteger(0);
     private static final Int2IntArrayMap legacyToRuntimeId223 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId261 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId274 = new Int2IntArrayMap();
@@ -32,6 +33,7 @@ public class GlobalBlockPalette {
     private static final Int2IntArrayMap legacyToRuntimeId332 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId340 = new Int2IntArrayMap();
     private static final Int2IntArrayMap legacyToRuntimeId354 = new Int2IntArrayMap();
+    private static final Int2IntArrayMap legacyToRuntimeId361 = new Int2IntArrayMap();
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -39,6 +41,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable332;
     private static byte[] compiledTable340;
     private static byte[] compiledTable354;
+    private static byte[] compiledTable361;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -50,6 +53,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId332.defaultReturnValue(-1);
         legacyToRuntimeId340.defaultReturnValue(-1);
         legacyToRuntimeId354.defaultReturnValue(-1);
+        legacyToRuntimeId361.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
             // 223
@@ -160,6 +164,19 @@ public class GlobalBlockPalette {
                 table354.putLShort(entry354.data);
             }
             compiledTable354 = table354.getBuffer();
+            // 361
+            InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_361.json");
+            if (stream361 == null) throw new AssertionError("Unable to locate RuntimeID table 361");
+            Collection<TableEntry> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+            BinaryStream table361 = new BinaryStream();
+            table361.putUnsignedVarInt(entries361.size());
+            for (TableEntry entry361 : entries361) {
+                registerMapping(361, (entry361.id << 4) | entry361.data);
+                table361.putString(entry361.name);
+                table361.putLShort(entry361.data);
+                table361.putLShort(entry361.id);
+            }
+            compiledTable361 = table361.getBuffer();
         }, true);
     }
 
@@ -188,8 +205,10 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId332.get(legacyId);
             case 340:
                 return legacyToRuntimeId340.get(legacyId);
-            default: // Current protocol
+            case 354:
                 return legacyToRuntimeId354.get(legacyId);
+            default: // Current protocol
+                return legacyToRuntimeId361.get(legacyId);
         }
     }
 
@@ -219,6 +238,9 @@ public class GlobalBlockPalette {
             case 354:
                 legacyToRuntimeId354.put(legacyId, runtimeIdAllocator354.getAndIncrement());
                 break;
+            case 361:
+                legacyToRuntimeId361.put(legacyId, runtimeIdAllocator361.getAndIncrement());
+                break;
             default:
                 Server.getInstance().getLogger().alert("Tried to register mapping for unsupported protocol version: " + protocol);
                 break;
@@ -241,8 +263,13 @@ public class GlobalBlockPalette {
                 return compiledTable332;
             case 340:
                 return compiledTable340;
-            default: // Current protocol
+            case 354:
                 return compiledTable354;
+            case 361:
+                return compiledTable361;
+            default:
+                Server.getInstance().getLogger().alert("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
+                return null;
         }
     }
 

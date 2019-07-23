@@ -44,4 +44,8 @@ public class BlockIcePacked extends BlockIce {
         return false;
     }
 
+    @Override
+    public int getLightLevel() {
+        return 4;
+    }
 }

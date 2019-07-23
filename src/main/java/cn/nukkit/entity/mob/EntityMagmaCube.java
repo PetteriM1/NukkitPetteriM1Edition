@@ -57,6 +57,8 @@ public class EntityMagmaCube extends EntityJumpingMob {
     protected void initEntity() {
         super.initEntity();
 
+        this.fireProof = true;
+
         if (this.namedTag.contains("Size")) {
             this.size = this.namedTag.getInt("Size");
         } else {

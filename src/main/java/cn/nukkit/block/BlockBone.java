@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
@@ -48,5 +49,20 @@ public class BlockBone extends BlockSolid implements Faceable {
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        int[] faces = {
+                0,
+                0,
+                0b1000,
+                0b1000,
+                0b0100,
+                0b0100
+        };
+        this.setDamage(((this.getDamage() & 0x3) | faces[face.getIndex()]));
+        this.getLevel().setBlock(block, this, true);
+        return true;
     }
 }

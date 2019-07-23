@@ -296,7 +296,7 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkPopulationQueueSize = this.server.getPropertyInt("chunk-generation-population-queue-size", 8);
         this.chunkTickList.clear();
         this.clearChunksOnTick = this.server.getPropertyBoolean("clear-chunk-tick-list", true);
-        this.cacheChunks = this.server.getPropertyBoolean("cache-chunks", true);
+        this.cacheChunks = this.server.getPropertyBoolean("cache-chunks", false);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
 
@@ -1667,7 +1667,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public synchronized boolean setBlock(Vector3 pos, Block block, boolean direct, boolean update) {
-        return setBlock((int) pos.x, (int) pos.y, (int) pos.z, block, direct, update);
+        return setBlock(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), block, direct, update);
     }
 
     public synchronized boolean setBlock(int x, int y, int z, Block block, boolean direct, boolean update) {
@@ -1862,7 +1862,7 @@ public class Level implements ChunkManager, Metadatable {
             BlockBreakEvent ev = new BlockBreakEvent(player, target, face, item, eventDrops, player.isCreative(),
                     (player.lastBreak + breakTime * 1000) > System.currentTimeMillis());
 
-            if (player.isSurvival() && !target.isBreakable(item)) {
+            if ((player.isSurvival() || player.isAdventure()) && !target.isBreakable(item)) {
                 ev.setCancelled();
             } else if (!player.isOp() && this.server.getSpawnRadius() > -1) {
                 Vector2 t = new Vector2(target.x, target.z);
@@ -1928,14 +1928,14 @@ public class Level implements ChunkManager, Metadatable {
             int dropExp = target.getDropExp();
             if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
                 player.addExperience(dropExp);
-                if (player.isSurvival()) {
+                if (player.isSurvival() || player.isAdventure()) {
                     for (int ii = 1; ii <= dropExp; ii++) {
                         this.dropExpOrb(target, 1);
                     }
                 }
             }
 
-            if (player == null || player.isSurvival()) {
+            if (player == null || player.isSurvival() || player.isAdventure()) {
                 for (Item drop : drops) {
                     if (drop.getCount() > 0) {
                         this.dropItem(vector.add(0.5, 0.5, 0.5), drop);
@@ -2661,22 +2661,42 @@ public class Level implements ChunkManager, Metadatable {
                     continue;
                 }
             }
+
             this.timings.syncChunkSendPrepareTimer.startTiming();
-            AsyncTask task = this.provider.requestChunkTask(x, z);
-            if (task != null) {
-                this.server.getScheduler().scheduleAsyncTask(task);
+
+            boolean pk0 = false;
+            boolean pk361 = false;
+
+            for (Player p : this.getChunkPlayers(x, z).values()) {
+                if (p.protocol < 361) {
+                    pk0 = true;
+                } else {
+                    pk361 = true;
+                }
             }
+
+            if (pk0) {
+                AsyncTask task = this.provider.requestChunkTask(0, x, z);
+                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+            }
+
+            if (pk361) {
+                AsyncTask task = this.provider.requestChunkTask(361, x, z);
+                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+            }
+
             this.timings.syncChunkSendPrepareTimer.stopTiming();
         }
+
         this.timings.syncChunkSendTimer.stopTiming();
     }
 
-    public void chunkRequestCallback(long timestamp, int x, int z, byte[] payload) {
+    public void chunkRequestCallback(int protocol, long timestamp, int x, int z, int subChunkCount, byte[] payload) {
         this.timings.syncChunkSendTimer.startTiming();
         long index = Level.chunkHash(x, z);
 
         if (this.cacheChunks) {
-            BatchPacket data = Player.getChunkCacheFromData(x, z, payload);
+            BatchPacket data = Player.getChunkCacheFromData(x, z, subChunkCount, payload);
             BaseFullChunk chunk = getChunk(x, z, false);
             if (chunk != null && chunk.getChanges() <= timestamp) {
                 chunk.setChunkPacket(data);
@@ -2686,16 +2706,24 @@ public class Level implements ChunkManager, Metadatable {
             return;
         }
 
+        boolean no = false;
         if (this.chunkSendTasks.contains(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    player.sendChunk(x, z, payload);
+                    if (protocol == 0 && player.protocol >= 361) {
+                        no = true;
+                    } else {
+                        player.sendChunk(x, z, subChunkCount, payload);
+                    }
                 }
             }
 
-            this.chunkSendQueue.remove(index);
-            this.chunkSendTasks.remove(index);
+            if (!no) {
+                this.chunkSendQueue.remove(index);
+                this.chunkSendTasks.remove(index);
+            }
         }
+
         this.timings.syncChunkSendTimer.stopTiming();
     }
 

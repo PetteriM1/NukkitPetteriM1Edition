@@ -923,7 +923,13 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        player.dataPacket(player.protocol >= 354 ? CraftingManager.packet : CraftingManager.packetPre354);
+        if (player.protocol < 354) {
+            player.dataPacket(CraftingManager.packetPre354);
+        } else if (player.protocol < 361) {
+            player.dataPacket(CraftingManager.packet354);
+        } else {
+            player.dataPacket(CraftingManager.packet);
+        }
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -965,7 +971,7 @@ public class Server {
                     }
                 }
             } catch (Exception e) {
-                log.error(this.getLanguage().translateString("nukkit.level.tickError", level.getFolderName(), Utils.getExceptionMessage(e)));
+                log.error(this.getLanguage().translateString("nukkit.level.tickError", new String[]{level.getFolderName(), Utils.getExceptionMessage(e)}));
             }
         }
     }
@@ -982,9 +988,7 @@ public class Server {
             }
 
             for (Level level : this.levelArray) {
-                this.getScheduler().scheduleTask(null, () -> {
-                    level.save();
-                }, true);
+                this.getScheduler().scheduleTask(null, level::save, true);
             }
             Timings.levelSaveTimer.stopTiming();
         }
@@ -1387,6 +1391,11 @@ public class Server {
 
     public void addRecipe(Recipe recipe) {
         this.craftingManager.registerRecipe(recipe);
+    }
+
+    public Optional<Player> getPlayer(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid");
+        return Optional.ofNullable(playerList.get(uuid));
     }
 
     public IPlayer getOfflinePlayer(String name) {
