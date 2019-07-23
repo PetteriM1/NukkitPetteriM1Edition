@@ -16,14 +16,17 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockGrass extends BlockDirt {
 
-    @Override
-    public int getId() {
-        return GRASS;
+    public BlockGrass() {
+        this(0);
+    }
+
+    public BlockGrass(int meta) {
+        super(0);
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public int getId() {
+        return GRASS;
     }
 
     @Override
@@ -39,11 +42,6 @@ public class BlockGrass extends BlockDirt {
     @Override
     public String getName() {
         return "Grass";
-    }
-
-    @Override
-    public boolean onActivate(Item item) {
-        return this.onActivate(item, null);
     }
 
     @Override
@@ -102,5 +100,14 @@ public class BlockGrass extends BlockDirt {
     @Override
     public boolean canSilkTouch() {
         return true;
+    }
+
+    @Override
+    public int getFullId() {
+        return this.getId() << 4;
+    }
+
+    @Override
+    public void setDamage(int meta) {
     }
 }

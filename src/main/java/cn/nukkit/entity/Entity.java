@@ -337,6 +337,7 @@ public abstract class Entity extends Location implements Metadatable {
     protected void initEntity() {
         if (this.initialized2) {
             // We've already initialized this entity
+            this.getServer().getLogger().debug("[initEntity] Entity is already initialized: " + this.getName() + " (" + this.getId() + ")");
             return;
         }
 
@@ -383,6 +384,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.initialized) {
             // We've already initialized this entity
+            this.getServer().getLogger().debug("[init] Entity is already initialized: " + this.getName() + " (" + this.getId() + ")");
             return;
         }
 

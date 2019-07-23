@@ -4602,7 +4602,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.x = (float) this.x;
         pk.y = (float) this.y;
         pk.z = (float) this.z;
+        pk.respawn = false;
         this.directDataPacket(pk);
+
+        PlayerActionPacket pk2 = new PlayerActionPacket();
+        pk2.entityId = this.id;
+        pk2.action = PlayerActionPacket.ACTION_DIMENSION_CHANGE_ACK;
+        pk2.x = 0;
+        pk2.y = 0;
+        pk2.z = 0;
+        pk2.face = 0;
+        this.dataPacket(pk2);
     }
 
     @Override
