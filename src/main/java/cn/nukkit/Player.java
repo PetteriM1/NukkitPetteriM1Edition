@@ -4617,9 +4617,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             spawnPosition.z = spawn.getFloorZ();
             this.dataPacket(spawnPosition);
 
-            if (getServer().getPropertyBoolean("dimensions") && oldLevel.getDimension() != level.getDimension()) {
-                this.setDimension(level.getDimension());
-            }
+            this.forceSendEmptyChunks();
 
             // Remove old chunks
             for (long index : new ArrayList<>(this.usedChunks.keySet())) {
@@ -4633,6 +4631,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             level.sendTime(this);
             level.sendWeather(this);
+
+            if (getServer().getPropertyBoolean("dimensions") && oldLevel.getDimension() != level.getDimension()) {
+                this.setDimension(level.getDimension());
+            }
 
             return true;
         }

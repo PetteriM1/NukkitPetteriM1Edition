@@ -10,12 +10,11 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.Faceable;
 
 /**
  * Created by CreeperFace on 7.8.2017.
  */
-public class BlockJukebox extends BlockSolid implements Faceable {
+public class BlockJukebox extends BlockSolid {
 
     @Override
     public String getName() {
@@ -104,10 +103,5 @@ public class BlockJukebox extends BlockSolid implements Faceable {
                 .putInt("z", getFloorZ());
 
         return BlockEntity.createBlockEntity(BlockEntity.JUKEBOX, this.level.getChunk(getFloorX() >> 4, getFloorZ() >> 4), nbt);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

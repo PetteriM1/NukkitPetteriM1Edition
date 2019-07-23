@@ -187,7 +187,7 @@ public class CraftingManager {
 
     public void rebuildPacket() {
         CraftingDataPacket pk = new CraftingDataPacket();
-        pk.cleanRecipes = false;
+        pk.cleanRecipes = true;
 
         for (Recipe recipe : this.getRecipes()) {
             if (recipe instanceof ShapedRecipe) {
@@ -207,7 +207,7 @@ public class CraftingManager {
 
     public void rebuild354Packet() {
         CraftingDataPacket pk = new CraftingDataPacket();
-        pk.cleanRecipes = false;
+        pk.cleanRecipes = true;
         pk.protocol = 354;
 
         for (Recipe recipe : this.getRecipes()) {
@@ -229,7 +229,7 @@ public class CraftingManager {
 
     public void rebuildPre354Packet() {
         CraftingDataPacket pk = new CraftingDataPacket();
-        pk.cleanRecipes = false;
+        pk.cleanRecipes = true;
         pk.protocol = 0;
 
         for (Recipe recipe : this.getRecipes()) {

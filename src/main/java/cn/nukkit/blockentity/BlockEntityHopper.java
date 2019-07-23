@@ -257,7 +257,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
         boolean pickedUpItem = false;
 
         for (Entity entity : this.level.getCollidingEntities(this.pickupArea)) {
-            if (!entity.isClosed() && !(entity instanceof EntityItem)) {
+            if (entity.isClosed() || !(entity instanceof EntityItem)) {
                 continue;
             }
 
