@@ -84,7 +84,7 @@ public class EntitySpider extends EntityWalkingMob {
         int time = player.getLevel().getTime() % Level.TIME_FULL;
         if (!this.isFriendly() || !(player instanceof Player)) {
             if ((time > 13184 && time < 22800) || angry) {
-                if (this.attackDelay > 10 && this.distanceSquared(player) < 1.3) {
+                if (this.attackDelay > 30 && this.distanceSquared(player) < 1.3) {
                     this.attackDelay = 0;
                     HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
                     damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -120,10 +120,6 @@ public class EntitySpider extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.STRING, 0, 1));
@@ -140,5 +136,15 @@ public class EntitySpider extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : 5;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

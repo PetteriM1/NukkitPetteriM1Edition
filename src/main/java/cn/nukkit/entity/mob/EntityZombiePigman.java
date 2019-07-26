@@ -75,7 +75,7 @@ public class EntityZombiePigman extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 1.44) {
+        if (this.attackDelay > 30 && this.distanceSquared(player) < 1.44) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -131,10 +131,6 @@ public class EntityZombiePigman extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 1)));
             drops.add(Item.get(Item.GOLD_NUGGET, 0, Utils.rand(0, 1)));
@@ -155,5 +151,15 @@ public class EntityZombiePigman extends EntityWalkingMob {
     @Override
     public String getName() {
         return "Zombie Pigman";
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

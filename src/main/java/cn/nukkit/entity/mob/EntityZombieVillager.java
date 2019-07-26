@@ -54,7 +54,7 @@ public class EntityZombieVillager extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 1) {
+        if (this.attackDelay > 30 && this.distanceSquared(player) < 1) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -83,6 +83,11 @@ public class EntityZombieVillager extends EntityWalkingMob {
         boolean hasUpdate;
         Timings.entityBaseTickTimer.startTiming();
 
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
         hasUpdate = super.entityBaseTick(tickDiff);
 
         if (level.shouldMobBurn(this)) {
@@ -96,10 +101,6 @@ public class EntityZombieVillager extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < Utils.rand(0, 2); i++) {

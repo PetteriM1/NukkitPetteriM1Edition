@@ -53,7 +53,7 @@ public class EntityBlaze extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 20 && Utils.rand(1, 32) < 4 && this.distance(player) <= 100) {
+        if (this.attackDelay > 30 && Utils.rand(1, 32) < 4 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1.1;
@@ -86,10 +86,6 @@ public class EntityBlaze extends EntityFlyingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.BLAZE_ROD, 0, Utils.rand(0, 1)));
         }
@@ -100,5 +96,15 @@ public class EntityBlaze extends EntityFlyingMob {
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : 10;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

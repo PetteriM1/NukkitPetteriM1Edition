@@ -49,7 +49,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && player.distanceSquared(this) <= 1) {
+        if (this.attackDelay > 30 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, getDamage()));
             player.addEffect(Effect.getEffect(Effect.WITHER).setAmplifier(1).setDuration(200));
@@ -70,10 +70,6 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
 
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.COAL, 0, Utils.rand(0, 1)));
@@ -98,5 +94,15 @@ public class EntityWitherSkeleton extends EntityWalkingMob {
     @Override
     public String getName() {
         return "Wither Skeleton";
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

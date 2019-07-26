@@ -4597,20 +4597,29 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void setDimension(int dimension) {
-        ChangeDimensionPacket pk = new ChangeDimensionPacket();
-        pk.dimension = dimension;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.respawn = false;
-        this.directDataPacket(pk);
+        if (this.protocol >= 313) {
+            NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
+            pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
+            pk0.radius = 300;
+            this.directDataPacket(pk0);
+        }
+
+        ChangeDimensionPacket pk1 = new ChangeDimensionPacket();
+        pk1.dimension = dimension;
+        pk1.x = (float) this.x;
+        pk1.y = (float) this.y;
+        pk1.z = (float) this.z;
+        pk1.respawn = false;
+        this.directDataPacket(pk1);
+
+        this.forceSendEmptyChunks();
 
         PlayerActionPacket pk2 = new PlayerActionPacket();
         pk2.entityId = this.id;
         pk2.action = PlayerActionPacket.ACTION_DIMENSION_CHANGE_ACK;
-        pk2.x = 0;
-        pk2.y = 0;
-        pk2.z = 0;
+        pk2.x = (int) this.x;
+        pk2.y = (int) this.y;
+        pk2.z = (int) this.z;
         pk2.face = 0;
         this.dataPacket(pk2);
     }

@@ -50,7 +50,7 @@ public class EntityVex extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 1.44) {
+        if (this.attackDelay > 30 && this.distanceSquared(player) < 1.44) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -79,5 +79,15 @@ public class EntityVex extends EntityFlyingMob {
         pk.item = new ItemSwordIron();
         pk.hotbarSlot = 10;
         player.dataPacket(pk);
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

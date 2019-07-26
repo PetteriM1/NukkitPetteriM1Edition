@@ -153,7 +153,7 @@ public class EntityWolf extends EntityTameableMob {
     @Override
     public void attackEntity(Entity player) {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > 10 && this.distanceSquared(player) < 1.5) {
+            if (this.attackDelay > 30 && this.distanceSquared(player) < 1.5) {
                 this.attackDelay = 0;
                 HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
                 damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());

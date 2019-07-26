@@ -2,6 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.entity.mob.EntityEnderDragon;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -238,7 +239,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     @Override
     public boolean onInteract(Player player, Item item) {
         if (item.getId() == Item.NAME_TAG) {
-            if (item.hasCustomName()) {
+            if (item.hasCustomName() && !(this instanceof EntityEnderDragon)) {
                 this.setNameTag(item.getCustomName());
                 this.setNameTagVisible(true);
                 player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
@@ -247,14 +248,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         }
 
         return false;
-    }
-
-    @Override
-    public Item[] getDrops() {
-        if (this.hasCustomName()) {
-            return new Item[]{Item.get(Item.NAME_TAG, 0, 1)};
-        }
-        return new Item[0];
     }
 
     public void setInLove() {

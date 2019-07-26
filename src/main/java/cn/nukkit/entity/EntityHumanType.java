@@ -5,7 +5,6 @@ import cn.nukkit.block.BlockAir;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
-import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.inventory.PlayerEnderChestInventory;
 import cn.nukkit.inventory.PlayerInventory;
@@ -128,19 +127,23 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
         if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.CUSTOM && source.getCause() != DamageCause.MAGIC) {
             int points = 0;
             int epf = 0;
-            int toughness = 0;
+            //int toughness = 0;
 
             for (Item armor : inventory.getArmorContents()) {
                 points += armor.getArmorPoints();
                 epf += calculateEnchantmentReduction(armor, source);
-                toughness += armor.getToughness();
+                //toughness += armor.getToughness();
             }
 
             float originalDamage = source.getDamage();
-            float damage = (float) (originalDamage * (1 - Math.max(points / 5f, points - originalDamage / (2 + toughness / 4f)) / 25) * (1 - /*0.75 */ epf * 0.04)) - originalDamage;
-            if (damage < 0) damage = 0;
-
-            source.setDamage(damage, DamageModifier.ARMOR);
+            float r = (source.getDamage(EntityDamageEvent.DamageModifier.ARMOR) - (originalDamage - originalDamage * (1 - Math.max(points / 5, points - originalDamage / 2) / 25)));
+            originalDamage += r;
+            epf = Math.min(20, epf);
+            source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
+            source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
+            //float finalDamage = (float) (originalDamage * (1 - Math.max(points / 5f, points - originalDamage / (2 + toughness / 4f)) / 25) * (1 - /*0.75 */ epf * 0.04));
+            //source.setDamage(originalDamage - finalDamage, DamageModifier.ARMOR);
+            //source.setDamage(source.getDamage(EntityDamageEvent.MODIFIER_ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25)), EntityDamageEvent.MODIFIER_ARMOR_ENCHANTMENTS);
         }
 
         if (super.attack(source)) {

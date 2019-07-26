@@ -153,7 +153,7 @@ public class Server {
     private boolean alwaysTickPlayers;
     private int baseTickRate;
     private Boolean getAllowFlight;
-    private int difficulty = Integer.MAX_VALUE;
+    private int difficulty;
     private int defaultGamemode = Integer.MAX_VALUE;
 
     private int autoSaveTicker = 0;
@@ -292,7 +292,9 @@ public class Server {
         this.setAutoSave(this.getPropertyBoolean("auto-save", true));
 
         if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
-            this.setPropertyInt("difficulty", 3);
+            this.setDifficulty(3);
+        } else {
+            this.setDifficulty(this.getPropertyInt("difficulty", 2));
         }
 
         Nukkit.DEBUG = Math.max(this.getPropertyInt("debug-level", 1), 1);
@@ -674,7 +676,7 @@ public class Server {
         this.maxPlayers = this.getPropertyInt("max-players", 50);
 
         if (this.getPropertyBoolean("hardcore", false) && this.getDifficulty() < 3) {
-            this.setPropertyInt("difficulty", difficulty = 3);
+            this.setDifficulty(3);
         }
 
         this.banByIP.load();
@@ -1261,10 +1263,15 @@ public class Server {
     }
 
     public int getDifficulty() {
-        if (this.difficulty == Integer.MAX_VALUE) {
-            this.difficulty = this.getPropertyInt("difficulty", 2);
-        }
         return this.difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        int value = difficulty;
+        if (value < 0) value = 0;
+        if (value > 3) value = 3;
+        this.difficulty = value;
+        this.setPropertyInt("difficulty", value);
     }
 
     public boolean hasWhitelist() {

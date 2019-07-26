@@ -56,10 +56,6 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.PRISMARINE_SHARD, 0, 1));
@@ -77,5 +73,15 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     @Override
     public String getName() {
         return "Elder Guardian";
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

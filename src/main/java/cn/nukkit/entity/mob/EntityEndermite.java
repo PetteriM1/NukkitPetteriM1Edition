@@ -48,7 +48,7 @@ public class EntityEndermite extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 1) {
+        if (this.attackDelay > 30 && this.distanceSquared(player) < 1) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -71,5 +71,15 @@ public class EntityEndermite extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : 3;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

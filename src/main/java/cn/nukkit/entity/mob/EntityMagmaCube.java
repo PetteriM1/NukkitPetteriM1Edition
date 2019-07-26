@@ -93,7 +93,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 1) {
+        if (this.attackDelay > 30 && this.distanceSquared(player) < 1) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -153,10 +153,6 @@ public class EntityMagmaCube extends EntityJumpingMob {
         } else {
             List<Item> drops = new ArrayList<>();
 
-            if (this.hasCustomName()) {
-                drops.add(Item.get(Item.NAME_TAG, 0, 1));
-            }
-
             if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
                 drops.add(Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1)));
             }
@@ -176,5 +172,15 @@ public class EntityMagmaCube extends EntityJumpingMob {
     @Override
     public String getName() {
         return "Magma Cube";
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

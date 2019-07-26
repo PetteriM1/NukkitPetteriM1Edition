@@ -102,10 +102,6 @@ public class EntityWitch extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             if (Utils.rand(1, 4) == 1) {
                 drops.add(Item.get(Item.STICK, 0, Utils.rand(0, 2)));
@@ -141,5 +137,15 @@ public class EntityWitch extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : 5;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

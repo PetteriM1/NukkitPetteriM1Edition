@@ -60,7 +60,7 @@ public class EntityPhantom extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && player.distanceSquared(this) <= 1) {
+        if (this.attackDelay > 30 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -84,10 +84,6 @@ public class EntityPhantom extends EntityFlyingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
             drops.add(Item.get(Item.PHANTOM_MEMBRANE, 0, Utils.rand(0, 1)));
         }
@@ -98,5 +94,15 @@ public class EntityPhantom extends EntityFlyingMob {
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : 5;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }
