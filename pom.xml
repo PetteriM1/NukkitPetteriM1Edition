@@ -21,7 +21,7 @@
         <repository>
             <id>gdrive</id>
             <name>Google Drive</name>
-            <url>gdrive:/Public/build/Nukkit_PetteriM1_Edition/target</url>
+            <url>gdrive:/Public/build/Nukkit_PetteriM1_Edition</url>
         </repository>
     </distributionManagement>
 
