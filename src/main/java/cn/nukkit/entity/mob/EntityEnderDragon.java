@@ -1,7 +1,6 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.BlockDragonEgg;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
@@ -9,8 +8,6 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.item.EntityEndCrystal;
 import cn.nukkit.entity.projectile.EntityEnderCharge;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -138,10 +135,5 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(200).setValue(200)};
         return addEntity;
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{new ItemBlock(new BlockDragonEgg())};
     }
 }
