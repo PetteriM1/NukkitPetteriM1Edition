@@ -4600,7 +4600,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.protocol >= 313) {
             NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
             pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
-            pk0.radius = 300;
+            pk0.radius = viewDistance << 4;
             this.directDataPacket(pk0);
         }
 
@@ -4628,6 +4628,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean switchLevel(Level level) {
         Level oldLevel = this.level;
         if (super.switchLevel(level)) {
+            this.setImmobile(true);
+
             SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
             spawnPosition.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
             Position spawn = level.getSpawnLocation();
@@ -4655,6 +4657,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.setDimension(level.getDimension());
             }
 
+            this.setImmobile(false);
             return true;
         }
 
