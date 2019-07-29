@@ -72,7 +72,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 50 && Utils.rand(1, 5) < 3 && this.distance(player) <= 300) {
+    if (this.attackDelay > 60 && Utils.rand(1, 5) < 3 && this.distance(player) <= 300) {
             this.attackDelay = 0;
             double f = 1.1;
             double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;

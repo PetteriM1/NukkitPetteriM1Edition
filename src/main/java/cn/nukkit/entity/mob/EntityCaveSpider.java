@@ -51,7 +51,7 @@ public class EntityCaveSpider extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 30 && this.distanceSquared(player) < 1.32) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1.32) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());

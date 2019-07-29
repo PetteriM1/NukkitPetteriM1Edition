@@ -51,7 +51,7 @@ public class EntityVindicator extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 30 && player.distanceSquared(this) <= 1) {
+        if (this.attackDelay > 23 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());

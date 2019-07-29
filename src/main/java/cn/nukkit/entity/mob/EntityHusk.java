@@ -68,7 +68,7 @@ public class EntityHusk extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 30 && player.distanceSquared(this) <= 1) {
+        if (this.attackDelay > 23 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
             player.attack(new EntityDamageByEntityEvent(this, player, DamageCause.ENTITY_ATTACK, getDamage()));
             EntityEventPacket pk = new EntityEventPacket();

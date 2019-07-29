@@ -70,7 +70,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 30 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+    if (this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
