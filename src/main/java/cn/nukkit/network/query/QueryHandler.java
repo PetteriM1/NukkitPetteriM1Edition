@@ -6,7 +6,7 @@ import cn.nukkit.utils.Binary;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author MagicDroidX
@@ -43,7 +43,7 @@ public class QueryHandler {
         this.lastToken = this.token;
         byte[] token = new byte[16];
         for (int i = 0; i < 16; i++) {
-            token[i] = (byte) new Random().nextInt(255);
+            token[i] = (byte) new SplittableRandom().nextInt(255);
         }
         this.token = token;
     }
@@ -57,7 +57,7 @@ public class QueryHandler {
         try {
             return String.valueOf(Binary.readInt(Binary.subBytes(MessageDigest.getInstance("SHA-512").digest((salt + ":" + token).getBytes()), 7, 4)));
         } catch (NoSuchAlgorithmException e) {
-            return String.valueOf(new Random().nextInt());
+            return String.valueOf(new SplittableRandom().nextInt());
         }
     }
 

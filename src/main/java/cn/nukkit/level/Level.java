@@ -1956,8 +1956,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void dropExpOrb(Vector3 source, int exp, Vector3 motion, int delay) {
-        motion = (motion == null) ? new Vector3(new Random().nextDouble() * 0.2 - 0.1, 0.2,
-                new Random().nextDouble() * 0.2 - 0.1) : motion;
+        motion = (motion == null) ? new Vector3(new SplittableRandom().nextDouble() * 0.2 - 0.1, 0.2,
+                new SplittableRandom().nextDouble() * 0.2 - 0.1) : motion;
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", source.getX()))
                         .add(new DoubleTag("", source.getY())).add(new DoubleTag("", source.getZ())))

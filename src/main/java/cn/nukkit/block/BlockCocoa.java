@@ -13,7 +13,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * Created by CreeperFace on 27. 10. 2016.
@@ -125,7 +125,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (new Random().nextInt(2) == 1) {
+            if (new SplittableRandom().nextInt(2) == 1) {
                 if (this.getDamage() / 4 < 2) {
                     BlockCocoa block = (BlockCocoa) this.clone();
                     block.setDamage(block.getDamage() + 4);

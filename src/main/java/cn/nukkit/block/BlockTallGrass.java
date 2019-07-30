@@ -8,7 +8,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author Angelic47
@@ -88,7 +88,7 @@ public class BlockTallGrass extends BlockFlowable {
 
     @Override
     public Item[] getDrops(Item item) {
-        boolean dropSeeds = new Random().nextInt(10) == 0;
+        boolean dropSeeds = new SplittableRandom().nextInt(10) == 0;
         if (item.isShears()) {
             //todo enchantment
             if (dropSeeds) {

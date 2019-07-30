@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemCarrot;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author Nukkit Project Team
@@ -32,7 +32,7 @@ public class BlockCarrot extends BlockCrops {
     public Item[] getDrops(Item item) {
         if (getDamage() >= 0x07) {
             return new Item[]{
-                    new ItemCarrot(0, new Random().nextInt(3) + 1)
+                    new ItemCarrot(0, new SplittableRandom().nextInt(3) + 1)
             };
         }
         return new Item[]{

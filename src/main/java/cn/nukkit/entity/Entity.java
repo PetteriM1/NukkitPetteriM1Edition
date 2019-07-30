@@ -1117,7 +1117,7 @@ public abstract class Entity extends Location implements Metadatable {
                 direction = 5;
             }
 
-            double force = new Random().nextDouble() * 0.2 + 0.1;
+            double force = new SplittableRandom().nextDouble() * 0.2 + 0.1;
 
             if (direction == 0) {
                 this.motionX = -force;

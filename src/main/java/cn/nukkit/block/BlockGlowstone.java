@@ -6,7 +6,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.utils.BlockColor;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * Created on 2015/12/6 by xtypr.
@@ -41,7 +41,7 @@ public class BlockGlowstone extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
-        Random random = new Random();
+        SplittableRandom random = new SplittableRandom();
         int count = 2 + random.nextInt(3);
 
         Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);

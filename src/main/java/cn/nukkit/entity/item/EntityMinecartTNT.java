@@ -13,7 +13,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.MinecartType;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author Adam Matthew [larryTheCoder]
@@ -66,7 +66,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
 
             if (isAlive() && fuse <= 0) {
                 // Todo: Make gamerule for this
-                explode(new Random().nextInt(5));
+                explode(new SplittableRandom().nextInt(5));
                 kill();
             }
         }
@@ -92,7 +92,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
             root = 5.0D;
         }
 
-        EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, (4.0D + new Random().nextDouble() * 1.5D * root));
+        EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, (4.0D + new SplittableRandom().nextDouble() * 1.5D * root));
         server.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;

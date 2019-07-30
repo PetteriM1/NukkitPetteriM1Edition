@@ -5,7 +5,7 @@ import cn.nukkit.item.ItemFlint;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author MagicDroidX
@@ -40,7 +40,7 @@ public class BlockGravel extends BlockFallable {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (new Random().nextInt(9) == 0) {
+        if (new SplittableRandom().nextInt(9) == 0) {
             return new Item[]{
                     new ItemFlint()
             };

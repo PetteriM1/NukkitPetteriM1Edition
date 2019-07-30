@@ -1,8 +1,10 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
@@ -35,7 +37,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final String TAG_MAX_NEARBY_ENTITIES = "MaxNearbyEntities";
     public static final String TAG_REQUIRED_PLAYER_RANGE = "RequiredPlayerRange";
 
-    public static final short SPAWN_RANGE = 8;
+    public static final short SPAWN_RANGE = 5; //8
     public static final short MIN_SPAWN_DELAY = 200;
     public static final short MAX_SPAWN_DELAY = 5000;
     public static final short MAX_NEARBY_ENTITIES = 20;
@@ -108,15 +110,19 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
 
                 Position pos = new Position
                         (
-                                this.x + Utils.rand(-this.spawnRange, this.spawnRange),
+                                this.x + Utils.rand(-(Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange), Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange),
                                 this.y,
-                                this.z + Utils.rand(-this.spawnRange, this.spawnRange),
+                                this.z + Utils.rand(-(Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange), Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange),
                                 this.level
                         );
 
                 Entity entity = Entity.createEntity(this.entityId, pos);
 
                 if (entity != null) {
+                    if (entity instanceof EntityMob && this.level.getBlockLightAt((int) x, (int) y, (int) z) > 3) {
+                        entity.close();
+                        return true;
+                    }
                     entity.spawnToAll();
                 }
             }

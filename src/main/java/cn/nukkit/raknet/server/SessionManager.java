@@ -54,7 +54,7 @@ public class SessionManager {
         this.socket = socket;
         this.registerPackets();
 
-        this.serverId = new Random().nextLong();
+        this.serverId = new SplittableRandom().nextLong();
 
         this.run();
     }

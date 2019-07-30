@@ -9,7 +9,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * Created by Leonidius20 on 22.03.17.
@@ -42,7 +42,7 @@ public class BlockNetherWart extends BlockFlowable {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (new Random().nextInt(10) == 1) {
+            if (new SplittableRandom().nextInt(10) == 1) {
                 if (this.getDamage() < 0x03) {
                     BlockNetherWart block = (BlockNetherWart) this.clone();
                     block.setDamage(block.getDamage() + 1);

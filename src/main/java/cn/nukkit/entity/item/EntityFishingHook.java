@@ -26,6 +26,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 
 import java.util.Random;
+import java.util.SplittableRandom;
 
 
 /**
@@ -108,7 +109,7 @@ public class EntityFishingHook extends EntityProjectile {
 			hasUpdate = true;
 		}
 
-		Random random = new Random();
+		SplittableRandom random = new SplittableRandom();
 
 		if (this.isInsideOfWater()) {
 			if (!this.attracted) {
@@ -174,7 +175,7 @@ public class EntityFishingHook extends EntityProjectile {
 		teasePk.event = EntityEventPacket.FISH_HOOK_TEASE;
 		Server.broadcastPacket(this.level.getPlayers().values(), teasePk);
 
-		Random random = new Random();
+		SplittableRandom random = new SplittableRandom();
 		for (int i = 0; i < 5; i++) {
 			this.level.addParticle(new BubbleParticle(this.setComponents(
 					this.x + random.nextDouble() * 0.5 - 0.25,
@@ -185,7 +186,7 @@ public class EntityFishingHook extends EntityProjectile {
 	}
 
 	public void spawnFish() {
-		Random random = new Random();
+		SplittableRandom random = new SplittableRandom();
 		this.fish = new Vector3(
 				this.x + (random.nextDouble() * 1.2 + 1) * (random.nextBoolean() ? -1 : 1),
 				this.getWaterHeight(),
@@ -200,7 +201,7 @@ public class EntityFishingHook extends EntityProjectile {
 				this.fish.y,
 				this.fish.z + (this.z - this.fish.z) * multiply
 		);
-		if (new Random().nextInt(100) < 85) {
+		if (new SplittableRandom().nextInt(100) < 85) {
 			this.level.addParticle(new WaterParticle(this.fish));
 		}
 		double dist = Math.abs(Math.sqrt(this.x * this.x + this.z * this.z) - Math.sqrt(this.fish.x * this.fish.x + this.fish.z * this.fish.z));
@@ -210,7 +211,7 @@ public class EntityFishingHook extends EntityProjectile {
 	public void reelLine() {
 		if (this.shootingEntity instanceof Player && this.caught) {
 			Item item = Fishing.getFishingResult(this.rod);
-			int experience = new Random().nextInt((3 - 1) + 1) + 1;
+			int experience = new SplittableRandom().nextInt((3 - 1) + 1) + 1;
 			Vector3 motion;
 
 			if (this.shootingEntity != null) {

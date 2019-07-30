@@ -17,7 +17,7 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 public abstract class EntityHumanType extends EntityCreature implements InventoryHolder {
 
@@ -164,7 +164,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
                     }
 
                     Enchantment durability = armor.getEnchantment(Enchantment.ID_DURABILITY);
-                    if (durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100))
+                    if (durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new SplittableRandom().nextInt(100))
                         continue;
                 }
 

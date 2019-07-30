@@ -6,7 +6,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.Tag;
 
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author MagicDroidX
@@ -106,7 +106,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
         }
 
         Enchantment durability = getEnchantment(Enchantment.ID_DURABILITY);
-        return durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100);
+        return durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new SplittableRandom().nextInt(100);
     }
 
     @Override
