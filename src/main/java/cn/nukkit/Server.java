@@ -70,9 +70,13 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonParser;
+import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteOrder;
@@ -175,11 +179,9 @@ public class Server {
 
     private Config properties;
 
-    private final Map<String, Player> players = new HashMap<>();
+    private final Map<InetSocketAddress, Player> players = new HashMap<>();
 
     private final Map<UUID, Player> playerList = new HashMap<>();
-
-    private final Map<Integer, String> identifier = new HashMap<>();
 
     @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
@@ -548,10 +550,6 @@ public class Server {
                 player.dataPacket(packet);
             }
         }
-
-        if (packet.encapsulatedPacket != null) {
-            packet.encapsulatedPacket = null;
-        }
     }
 
     public void batchPackets(Player[] players, DataPacket[] packets) {
@@ -586,10 +584,10 @@ public class Server {
             size += payload[i * 2 + 1].length;
         }
 
-        List<String> targets = new ArrayList<>();
+        List<InetSocketAddress> targets = new ArrayList<>();
         for (Player p : players) {
             if (p.isConnected()) {
-                targets.add(this.identifier.get(p.rawHashCode()));
+                targets.add(p.getSocketAddress());
             }
         }
 
@@ -606,11 +604,11 @@ public class Server {
         Timings.playerNetworkSendTimer.stopTiming();
     }
 
-    public void broadcastPacketsCallback(byte[] data, List<String> identifiers) {
+    public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
         BatchPacket pk = new BatchPacket();
         pk.payload = data;
 
-        for (String i : identifiers) {
+        for (InetSocketAddress i : targets) {
             if (this.players.containsKey(i)) {
                 this.players.get(i).dataPacket(pk);
             }
@@ -685,7 +683,9 @@ public class Server {
         this.operators.reload();
 
         for (BanEntry entry : this.getIPBans().getEntires().values()) {
-            this.getNetwork().blockAddress(entry.getName(), -1);
+            try {
+                this.getNetwork().blockAddress(InetAddress.getByName(entry.getName()), -1);
+            } catch (UnknownHostException ignore) {}
         }
 
         this.pluginManager.registerInterface(JavaPluginLoader.class);
@@ -763,7 +763,9 @@ public class Server {
         }
 
         for (BanEntry entry : this.getIPBans().getEntires().values()) {
-            this.network.blockAddress(entry.getName(), -1);
+            try {
+                this.network.blockAddress(InetAddress.getByName(entry.getName()), -1);
+            } catch (UnknownHostException ignore) {}
         }
 
         this.tickCounter = 0;
@@ -774,15 +776,24 @@ public class Server {
         this.forceShutdown();
     }
 
-    public void handlePacket(String address, int port, byte[] payload) {
+    public void handlePacket(InetSocketAddress address, ByteBuf payload) {
         try {
-            if (payload.length > 2 && Arrays.equals(Binary.subBytes(payload, 0, 2), new byte[]{(byte) 0xfe, (byte) 0xfd}) && this.queryHandler != null) {
-                this.queryHandler.handle(address, port, payload);
+            if (!payload.isReadable(3)) {
+                return;
+            }
+            byte[] prefix = new byte[2];
+            payload.readBytes(prefix);
+
+            if (!Arrays.equals(prefix, new byte[]{(byte) 0xfe, (byte) 0xfd})) {
+                return;
+            }
+            if (this.queryHandler != null) {
+                this.queryHandler.handle(address, payload);
             }
         } catch (Exception e) {
             log.error("Error whilst handling packet", e);
 
-            this.getNetwork().blockAddress(address, 600);
+            this.network.blockAddress(address.getAddress(), -1);
         }
     }
 
@@ -835,9 +846,8 @@ public class Server {
         this.sendFullPlayerListData(player);
     }
 
-    public void addPlayer(String identifier, Player player) {
-        this.players.put(identifier, player);
-        this.identifier.put(player.rawHashCode(), identifier);
+    public void addPlayer(InetSocketAddress socketAddress, Player player) {
+        this.players.put(socketAddress, player);
     }
 
     public void addOnlinePlayer(Player player) {
@@ -1511,18 +1521,14 @@ public class Server {
     }
 
     public void removePlayer(Player player) {
-        if (this.identifier.containsKey(player.rawHashCode())) {
-            String identifier = this.identifier.get(player.rawHashCode());
-            this.players.remove(identifier);
-            this.identifier.remove(player.rawHashCode());
+        if (this.players.remove(player.getSocketAddress()) != null) {
             return;
         }
 
-        for (String identifier : new ArrayList<>(this.players.keySet())) {
-            Player p = this.players.get(identifier);
+        for (InetSocketAddress socketAddress : new ArrayList<>(this.players.keySet())) {
+            Player p = this.players.get(socketAddress);
             if (player == p) {
-                this.players.remove(identifier);
-                this.identifier.remove(player.rawHashCode());
+                this.players.remove(socketAddress);
                 break;
             }
         }

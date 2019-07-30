@@ -7,7 +7,7 @@ import lombok.ToString;
 public class ResourcePacksInfoPacket extends DataPacket {
 
     public boolean mustAccept;
-    public boolean unknownBool;
+    public boolean scripting;
     public ResourcePack[] behaviourPackEntries = new ResourcePack[0];
     public ResourcePack[] resourcePackEntries = new ResourcePack[0];
 
@@ -20,7 +20,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
         this.reset();
         this.putBoolean(this.mustAccept);
         if (protocol >= 332) {
-            this.putBoolean(this.unknownBool);
+            this.putBoolean(this.scripting);
         }
 
         encodePacks(this.resourcePackEntries);
@@ -38,7 +38,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
             if (protocol > 274) {
                 this.putString(""); // content identity
                 if (protocol >= 332) {
-                    this.putBoolean(false); // ???
+                    this.putBoolean(false); // scripting
                 }
             }
         }

@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.Zlib;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 
 /**
@@ -16,17 +17,17 @@ public class CompressBatchedTask extends AsyncTask {
     public byte[][] data;
     public byte[] finalData;
     public int channel;
-    public List<String> targets;
+    public List<InetSocketAddress> targets;
 
-    public CompressBatchedTask(byte[][] data, List<String> targets) {
-        this(data, targets, 5);
+    public CompressBatchedTask(byte[][] data, List<InetSocketAddress> targets) {
+        this(data, targets, 7);
     }
 
-    public CompressBatchedTask(byte[][] data, List<String> targets, int level) {
+    public CompressBatchedTask(byte[][] data, List<InetSocketAddress> targets, int level) {
         this(data, targets, level, 0);
     }
 
-    public CompressBatchedTask(byte[][] data, List<String> targets, int level, int channel) {
+    public CompressBatchedTask(byte[][] data, List<InetSocketAddress> targets, int level, int channel) {
         this.data = data;
         this.targets = targets;
         this.level = level;
