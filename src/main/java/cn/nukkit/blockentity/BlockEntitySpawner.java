@@ -3,6 +3,7 @@ package cn.nukkit.blockentity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
@@ -92,15 +93,17 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             ArrayList<Entity> list = new ArrayList<>();
             boolean isValid = false;
             for (Entity entity : this.level.getEntities()) {
-                if (entity.distance(this) <= this.requiredPlayerRange) {
-                    if (entity instanceof Player) {
-                        isValid = true;
+                if (entity instanceof Player || entity instanceof BaseEntity) {
+                    if (entity.distance(this) <= this.requiredPlayerRange) {
+                        if (entity instanceof Player) {
+                            isValid = true;
+                        }
+                        list.add(entity);
                     }
-                    list.add(entity);
                 }
             }
 
-            if (isValid && list.size() <= this.maxNearbyEntities) {
+            if (isValid && list.size() <= (Server.getInstance().suomiCraftPEMode() ? 10 : this.maxNearbyEntities)) {
                 CreatureSpawnEvent ev = new CreatureSpawnEvent(this.entityId, CreatureSpawnEvent.SpawnReason.SPAWNER);
                 level.getServer().getPluginManager().callEvent(ev);
 
