@@ -35,7 +35,7 @@ public class BlockMelon extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        SplittableRandom random = new SplittableRandom();
+        SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
         int count = 3 + random.nextInt(5);
 
         Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);

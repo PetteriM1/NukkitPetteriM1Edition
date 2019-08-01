@@ -65,18 +65,18 @@ public abstract class Generator implements BlockID {
     }
 
     public static String getGeneratorName(Class<? extends Generator> c) {
-        for (String key : Generator.nameList.keySet()) {
-            if (Generator.nameList.get(key) == c) {
-                return key;
+        for (Map.Entry<String, Class<? extends Generator>> entry : Generator.nameList.entrySet()) {
+            if (entry.getValue() == c) {
+                return entry.getKey();
             }
         }
         return "unknown";
     }
 
     public static int getGeneratorType(Class<? extends Generator> c) {
-        for (int key : Generator.typeList.keySet()) {
-            if (Generator.typeList.get(key) == c) {
-                return key;
+        for (Map.Entry<Integer, Class<? extends Generator>> entry : Generator.typeList.entrySet()) {
+            if (entry.getValue() == c) {
+                return entry.getKey();
             }
         }
         return Generator.TYPE_INFINITE;

@@ -50,7 +50,7 @@ public class DoubleTag extends NumberTag<Double> {
 
     @Override
     public String toString() {
-        return "DoubleTag " + this.getName() + " (data: " + data + ")";
+        return "DoubleTag " + this.getName() + " (data: " + data + ')';
     }
 
     @Override

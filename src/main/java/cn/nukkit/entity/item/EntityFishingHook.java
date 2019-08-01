@@ -25,8 +25,8 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 
-import java.util.Random;
 import java.util.SplittableRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -109,7 +109,7 @@ public class EntityFishingHook extends EntityProjectile {
 			hasUpdate = true;
 		}
 
-		SplittableRandom random = new SplittableRandom();
+		SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 
 		if (this.isInsideOfWater()) {
 			if (!this.attracted) {
@@ -175,7 +175,7 @@ public class EntityFishingHook extends EntityProjectile {
 		teasePk.event = EntityEventPacket.FISH_HOOK_TEASE;
 		Server.broadcastPacket(this.level.getPlayers().values(), teasePk);
 
-		SplittableRandom random = new SplittableRandom();
+		SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 		for (int i = 0; i < 5; i++) {
 			this.level.addParticle(new BubbleParticle(this.setComponents(
 					this.x + random.nextDouble() * 0.5 - 0.25,
@@ -186,7 +186,7 @@ public class EntityFishingHook extends EntityProjectile {
 	}
 
 	public void spawnFish() {
-		SplittableRandom random = new SplittableRandom();
+		SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 		this.fish = new Vector3(
 				this.x + (random.nextDouble() * 1.2 + 1) * (random.nextBoolean() ? -1 : 1),
 				this.getWaterHeight(),
@@ -236,7 +236,7 @@ public class EntityFishingHook extends EntityProjectile {
 									.add(new DoubleTag("", motion.y))
 									.add(new DoubleTag("", motion.z)))
 							.putList(new ListTag<FloatTag>("Rotation")
-									.add(new FloatTag("", new Random().nextFloat() * 360))
+									.add(new FloatTag("", ThreadLocalRandom.current().nextFloat() * 360))
 									.add(new FloatTag("", 0)))
 							.putShort("Health", 5).putCompound("Item", itemTag).putShort("PickupDelay", 1));
 

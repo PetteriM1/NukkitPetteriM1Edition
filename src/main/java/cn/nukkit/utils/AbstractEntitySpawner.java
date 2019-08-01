@@ -76,7 +76,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 		}
     }
 
-    protected boolean isSpawnAllowedByDifficulty() {
+    protected static boolean isSpawnAllowedByDifficulty() {
         int randomNumber = Utils.rand(0, 3);
 
         switch (Server.getInstance().getDifficulty()) {

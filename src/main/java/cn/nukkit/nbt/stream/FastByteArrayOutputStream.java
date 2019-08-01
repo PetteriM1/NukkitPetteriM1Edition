@@ -93,7 +93,7 @@ public class FastByteArrayOutputStream extends OutputStream {
     public static void ensureOffsetLength( final int arrayLength, final int offset, final int length ) {
         if ( offset < 0 ) throw new ArrayIndexOutOfBoundsException( "Offset (" + offset + ") is negative" );
         if ( length < 0 ) throw new IllegalArgumentException( "Length (" + length + ") is negative" );
-        if ( offset + length > arrayLength ) throw new ArrayIndexOutOfBoundsException( "Last index (" + ( offset + length ) + ") is greater than array length (" + arrayLength + ")" );
+        if ( offset + length > arrayLength ) throw new ArrayIndexOutOfBoundsException( "Last index (" + ( offset + length ) + ") is greater than array length (" + arrayLength + ')');
     }
 
     public static byte[] grow( final byte[] array, final int length ) {

@@ -58,7 +58,7 @@ public class JavaPluginLoader implements PluginLoader {
 
                     return plugin;
                 } catch (ClassCastException e) {
-                    throw new PluginException("Error whilst initializing main class `" + description.getMain() + "'", e);
+                    throw new PluginException("Error whilst initializing main class `" + description.getMain() + '\'', e);
                 } catch (InstantiationException | IllegalAccessException e) {
                     Server.getInstance().getLogger().logException(e);
                 }

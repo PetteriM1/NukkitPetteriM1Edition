@@ -117,7 +117,7 @@ public enum BlockFace {
             }
         }
 
-        throw new RuntimeException("Unable to get face from axis: " + axisDirection + " " + axis);
+        throw new RuntimeException("Unable to get face from axis: " + axisDirection + ' ' + axis);
     }
 
     /**

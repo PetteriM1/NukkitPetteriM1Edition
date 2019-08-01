@@ -1050,7 +1050,7 @@ public class Level implements ChunkManager, Metadatable {
         int randRange = 3 + chunksPerLoader / 30;
         randRange = randRange > this.chunkTickRadius ? this.chunkTickRadius : randRange;
 
-        ThreadLocalRandom random = ThreadLocalRandom.current();
+        SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
         if (!this.loaders.isEmpty()) {
             for (ChunkLoader loader : this.loaders.values()) {
                 int chunkX = (int) loader.getX() >> 4;
@@ -2626,7 +2626,7 @@ public class Level implements ChunkManager, Metadatable {
         Preconditions.checkState(player.getLoaderId() > 0, player.getName() + " has no chunk loader");
         long index = Level.chunkHash(x, z);
 
-        this.chunkSendQueue.putIfAbsent(index, new Int2ObjectOpenHashMap<>());
+        this.chunkSendQueue.computeIfAbsent(index, k -> new Int2ObjectOpenHashMap<>());
 
         this.chunkSendQueue.get(index).put(player.getLoaderId(), player);
     }

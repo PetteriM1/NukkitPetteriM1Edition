@@ -261,10 +261,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public Item[] getRandomArmor() {
         Item[] slots = new Item[4];
-        Item helmet = new Item(0, 0, 0);
-        Item chestplate = new Item(0, 0, 0);
-        Item leggings = new Item(0, 0, 0);
-        Item boots = new Item(0, 0, 0);
+        Item helmet = Item.get(0);
+        Item chestplate = Item.get(0);
+        Item leggings = Item.get(0);
+        Item boots = Item.get(0);
 
         switch (Utils.rand(1, 5)) {
             case 1:

@@ -15,7 +15,7 @@ import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
 import cn.nukkit.utils.TextFormat;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created on 2015/11/12 by xtypr.
@@ -101,7 +101,7 @@ public class ParticleCommand extends VanillaCommand {
 
             sender.sendMessage(new TranslationContainer("commands.particle.success", name, String.valueOf(count)));
 
-            Random random = new Random(System.currentTimeMillis());
+            ThreadLocalRandom random = ThreadLocalRandom.current();
 
             for (int i = 0; i < count; i++) {
                 particle.setComponents(

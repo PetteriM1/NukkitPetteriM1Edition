@@ -135,8 +135,8 @@ public class Config {
         } else {
             if (this.type == Config.DETECT) {
                 String extension = "";
-                if (this.file.getName().lastIndexOf(".") != -1 && this.file.getName().lastIndexOf(".") != 0) {
-                    extension = this.file.getName().substring(this.file.getName().lastIndexOf(".") + 1);
+                if (this.file.getName().lastIndexOf('.') != -1 && this.file.getName().lastIndexOf('.') != 0) {
+                    extension = this.file.getName().substring(this.file.getName().lastIndexOf('.') + 1);
                 }
                 if (format.containsKey(extension)) {
                     this.type = format.get(extension);
@@ -474,7 +474,7 @@ public class Config {
             if (v instanceof Boolean) {
                 v = (Boolean) v ? "on" : "off";
             }
-            content.append(k).append("=").append(v).append("\r\n");
+            content.append(k).append('=').append(v).append("\r\n");
         }
         return content.toString();
     }

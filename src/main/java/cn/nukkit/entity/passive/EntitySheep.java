@@ -148,8 +148,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     }
 
     private int randomColor() {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        int rand = random.nextInt(0, 2500);
+        int rand = ThreadLocalRandom.current().nextInt(0, 2500);
 
         if (rand < 125 && 0 <= rand) return DyeColor.BLACK.getDyeData();
         else if (rand < 250 && 125 <= rand) return DyeColor.GRAY.getDyeData();

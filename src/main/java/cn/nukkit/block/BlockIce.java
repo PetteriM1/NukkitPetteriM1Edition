@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
@@ -56,7 +57,11 @@ public class BlockIce extends BlockTransparent {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (!this.getLevel().getName().equals("nether")) {
                 if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) >= 12) {
-                    this.getLevel().setBlock(this, new BlockWater(), true);
+                    BlockFadeEvent event = new BlockFadeEvent(this, get(WATER));
+                    level.getServer().getPluginManager().callEvent(event);
+                    if (!event.isCancelled()) {
+                        level.setBlock(this, event.getNewState(), true);
+                    }
                     return Level.BLOCK_UPDATE_RANDOM;
                 }
             }

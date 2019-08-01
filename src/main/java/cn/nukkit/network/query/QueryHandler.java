@@ -61,7 +61,7 @@ public class QueryHandler {
     public static String getTokenString(String token, InetAddress address) {
         String salt = address.toString();
         try {
-            return String.valueOf(Binary.readInt(Binary.subBytes(MessageDigest.getInstance("SHA-512").digest((salt + ":" + token).getBytes()), 7, 4)));
+            return String.valueOf(Binary.readInt(Binary.subBytes(MessageDigest.getInstance("SHA-512").digest((salt + ':' + token).getBytes()), 7, 4)));
         } catch (NoSuchAlgorithmException e) {
             return String.valueOf(new SplittableRandom().nextInt());
         }

@@ -58,14 +58,14 @@ public class ShapedRecipe implements CraftingRecipe {
 
         for (String row : shape) {
             if (row.length() != columnCount) {
-                throw new RuntimeException("Shaped recipe rows must all have the same length (expected " + columnCount + ", got " + row.length() + ")");
+                throw new RuntimeException("Shaped recipe rows must all have the same length (expected " + columnCount + ", got " + row.length() + ')');
             }
 
             for (int x = 0; x < columnCount; ++x) {
                 char c = row.charAt(x);
 
                 if (c != ' ' && !ingredients.containsKey(c)) {
-                    throw new RuntimeException("No item specified for symbol '" + c + "'");
+                    throw new RuntimeException("No item specified for symbol '" + c + '\'');
                 }
             }
         }
@@ -261,7 +261,7 @@ public class ShapedRecipe implements CraftingRecipe {
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ");
 
-        ingredients.forEach((character, item) -> joiner.add(item.getName() + ":" + item.getDamage()));
+        ingredients.forEach((character, item) -> joiner.add(item.getName() + ':' + item.getDamage()));
         return joiner.toString();
     }
 

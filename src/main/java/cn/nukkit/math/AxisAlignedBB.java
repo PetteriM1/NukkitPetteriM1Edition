@@ -302,7 +302,7 @@ public class AxisAlignedBB implements Cloneable {
 
     @Override
     public String toString() {
-        return "AxisAlignedBB(" + this.minX + ", " + this.minY + ", " + this.minZ + ", " + this.maxX + ", " + this.maxY + ", " + this.maxZ + ")";
+        return "AxisAlignedBB(" + this.minX + ", " + this.minY + ", " + this.minZ + ", " + this.maxX + ", " + this.maxY + ", " + this.maxZ + ')';
     }
 
     @Override

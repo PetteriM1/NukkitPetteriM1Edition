@@ -226,13 +226,13 @@ public class CompoundTag extends Tag implements Cloneable {
 
     public void print(String prefix, PrintStream out) {
         super.print(prefix, out);
-        out.println(prefix + "{");
+        out.println(prefix + '{');
         String orgPrefix = prefix;
         prefix += "   ";
         for (Tag tag : tags.values()) {
             tag.print(prefix, out);
         }
-        out.println(orgPrefix + "}");
+        out.println(orgPrefix + '}');
     }
 
     public boolean isEmpty() {
@@ -241,8 +241,8 @@ public class CompoundTag extends Tag implements Cloneable {
 
     public CompoundTag copy() {
         CompoundTag tag = new CompoundTag(getName());
-        for (String key : tags.keySet()) {
-            tag.put(key, tags.get(key).copy());
+        for (Entry<String, Tag> entry : tags.entrySet()) {
+            tag.put(entry.getKey(), entry.getValue().copy());
         }
         return tag;
     }

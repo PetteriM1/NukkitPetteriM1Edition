@@ -63,11 +63,11 @@ public class ListTag<T extends Tag> extends Tag {
     public void print(String prefix, PrintStream out) {
         super.print(prefix, out);
 
-        out.println(prefix + "{");
+        out.println(prefix + '{');
         String orgPrefix = prefix;
         prefix += "   ";
         for (T aList : list) aList.print(prefix, out);
-        out.println(orgPrefix + "}");
+        out.println(orgPrefix + '}');
     }
 
     public ListTag<T> add(T tag) {

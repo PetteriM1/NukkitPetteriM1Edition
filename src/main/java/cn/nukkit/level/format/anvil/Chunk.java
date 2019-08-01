@@ -324,9 +324,9 @@ public class Chunk extends BaseChunk {
         BinaryStream extraData = new BinaryStream();
         Map<Integer, Integer> extraDataArray = this.getBlockExtraDataArray();
         extraData.putInt(extraDataArray.size());
-        for (Integer key : extraDataArray.keySet()) {
-            extraData.putInt(key);
-            extraData.putShort(extraDataArray.get(key));
+        for (Map.Entry<Integer, Integer> entry : extraDataArray.entrySet()) {
+            extraData.putInt(entry.getKey());
+            extraData.putShort(entry.getValue());
         }
 
         nbt.putByteArray("ExtraData", extraData.getBuffer());
@@ -415,9 +415,9 @@ public class Chunk extends BaseChunk {
         BinaryStream extraData = new BinaryStream();
         Map<Integer, Integer> extraDataArray = this.getBlockExtraDataArray();
         extraData.putInt(extraDataArray.size());
-        for (Integer key : extraDataArray.keySet()) {
-            extraData.putInt(key);
-            extraData.putShort(extraDataArray.get(key));
+        for (Map.Entry<Integer, Integer> entry : extraDataArray.entrySet()) {
+            extraData.putInt(entry.getKey());
+            extraData.putShort(entry.getValue());
         }
 
         nbt.putByteArray("ExtraData", extraData.getBuffer());

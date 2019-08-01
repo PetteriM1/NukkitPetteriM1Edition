@@ -2613,7 +2613,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     PlayerBlockPickEvent pickEvent = new PlayerBlockPickEvent(this, block, item);
                     if (!this.isCreative()) {
-                        this.server.getLogger().debug("Got block-pick request from " + this.getName() + " when not in creative mode (gamemode " + this.getGamemode() + ")");
+                        this.server.getLogger().debug("Got block-pick request from " + this.getName() + " when not in creative mode (gamemode " + this.getGamemode() + ')');
                         pickEvent.setCancelled();
                     }
 
@@ -4016,7 +4016,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (item.isNull()) {
-            this.server.getLogger().debug(this.getName() + " attempted to drop a null item (" + item + ")");
+            this.server.getLogger().debug(this.getName() + " attempted to drop a null item (" + item + ')');
             return true;
         }
 
@@ -4675,7 +4675,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.address = hostName;
         pk.port = port;
         this.dataPacket(pk);
-        String message = "Transferred to " + hostName + ":" + port;
+        String message = "Transferred to " + hostName + ':' + port;
         this.close(message, message, false);
     }
 
@@ -4789,7 +4789,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     itemsWithMending.add(inventory.getHeldItemIndex());
                 }
                 if (!itemsWithMending.isEmpty()) {
-                    SplittableRandom rand = new SplittableRandom();
+                    SplittableRandom rand = new SplittableRandom(System.currentTimeMillis());
                     Integer itemToRepair = itemsWithMending.get(rand.nextInt(itemsWithMending.size()));
                     Item toRepair = inventory.getItem(itemToRepair);
                     if (toRepair instanceof ItemTool || toRepair instanceof ItemArmor) {

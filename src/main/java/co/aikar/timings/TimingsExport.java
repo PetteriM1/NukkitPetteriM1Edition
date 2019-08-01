@@ -192,7 +192,7 @@ public class TimingsExport extends Thread {
         try {
             HttpURLConnection con = (HttpURLConnection) new URL("http://timings.aikar.co/post").openConnection();
             con.setDoOutput(true);
-            con.setRequestProperty("User-Agent", "Nukkit/" + Server.getInstance().getName() + "/" + InetAddress.getLocalHost().getHostName());
+            con.setRequestProperty("User-Agent", "Nukkit/" + Server.getInstance().getName() + '/' + InetAddress.getLocalHost().getHostName());
             con.setRequestMethod("POST");
             con.setInstanceFollowRedirects(false);
 

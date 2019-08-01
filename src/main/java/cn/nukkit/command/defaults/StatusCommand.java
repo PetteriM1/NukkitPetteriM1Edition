@@ -52,7 +52,7 @@ public class StatusCommand extends VanillaCommand {
 
         sender.sendMessage(TextFormat.GOLD + "Current TPS: " + tpsColor + NukkitMath.round(tps, 2));
 
-        sender.sendMessage(TextFormat.GOLD + "Load: " + tpsColor + server.getTickUsage() + "%");
+        sender.sendMessage(TextFormat.GOLD + "Load: " + tpsColor + server.getTickUsage() + '%');
 
         sender.sendMessage(TextFormat.GOLD + "Network upload: " + TextFormat.GREEN + NukkitMath.round((server.getNetwork().getUpload() / 1024 * 1000), 2) + " kB/s");
 
@@ -91,12 +91,12 @@ public class StatusCommand extends VanillaCommand {
 
         for (Level level : server.getLevels().values()) {
             sender.sendMessage(
-                    TextFormat.GOLD + "World \"" + level.getFolderName() + "\"" + (!Objects.equals(level.getFolderName(), level.getName()) ? " (" + level.getName() + ")" : "") + ": " +
+                    TextFormat.GOLD + "World \"" + level.getFolderName() + '"' + (!Objects.equals(level.getFolderName(), level.getName()) ? " (" + level.getName() + ')' : "") + ": " +
                             TextFormat.RED + level.getChunks().size() + TextFormat.GREEN + " chunks, " +
                             TextFormat.RED + level.getEntities().length + TextFormat.GREEN + " entities, " +
                             TextFormat.RED + level.getBlockEntities().size() + TextFormat.GREEN + " blockEntities." +
                             " Time " + ((level.getTickRate() > 1 || level.getTickRateTime() > 40) ? TextFormat.RED : TextFormat.YELLOW) + NukkitMath.round(level.getTickRateTime(), 2) + "ms" +
-                            (level.getTickRate() > 1 ? " (tick rate " + level.getTickRate() + ")" : "")
+                            (level.getTickRate() > 1 ? " (tick rate " + level.getTickRate() + ')' : "")
             );
         }
 

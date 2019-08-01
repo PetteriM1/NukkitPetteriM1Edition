@@ -30,6 +30,6 @@ public class PGZIPBlock implements Callable<byte[]> {
 
     @Override
     public String toString() {
-        return "Block" + "(" + in_length + "/" + in.length + " bytes)";
+        return "Block" + '(' + in_length + '/' + in.length + " bytes)";
     }
 }

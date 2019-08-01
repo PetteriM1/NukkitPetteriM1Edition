@@ -80,7 +80,7 @@ public class BaseLang {
                 String key = t[0];
                 StringBuilder value = new StringBuilder();
                 for (int i = 1; i < t.length - 1; i++) {
-                    value.append(t[i]).append("=");
+                    value.append(t[i]).append('=');
                 }
                 value.append(t[t.length - 1]);
                 if (value.length() == 0) {
@@ -111,7 +111,7 @@ public class BaseLang {
                 String key = t[0];
                 StringBuilder value = new StringBuilder();
                 for (int i = 1; i < t.length - 1; i++) {
-                    value.append(t[i]).append("=");
+                    value.append(t[i]).append('=');
                 }
                 value.append(t[t.length - 1]);
                 if (value.length() == 0) {
@@ -156,7 +156,7 @@ public class BaseLang {
         String baseText = this.get(str);
         baseText = this.parseTranslation((baseText != null && (onlyPrefix == null || str.indexOf(onlyPrefix) == 0)) ? baseText : str, onlyPrefix);
         for (int i = 0; i < params.length; i++) {
-            baseText = baseText.replace("{%" + i + "}", this.parseTranslation(String.valueOf(params[i])));
+            baseText = baseText.replace("{%" + i + '}', this.parseTranslation(String.valueOf(params[i])));
         }
 
         return baseText;
@@ -168,7 +168,7 @@ public class BaseLang {
             baseText = this.internalGet(c.getText());
             baseText = this.parseTranslation(baseText != null ? baseText : c.getText());
             for (int i = 0; i < ((TranslationContainer) c).getParameters().length; i++) {
-                baseText = baseText.replace("{%" + i + "}", this.parseTranslation(((TranslationContainer) c).getParameters()[i]));
+                baseText = baseText.replace("{%" + i + '}', this.parseTranslation(((TranslationContainer) c).getParameters()[i]));
             }
         }
         return baseText;

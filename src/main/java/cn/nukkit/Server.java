@@ -74,14 +74,9 @@ import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -228,8 +223,8 @@ public class Server {
             new File(pluginPath).mkdirs();
         }
 
-        this.dataPath = new File(dataPath).getAbsolutePath() + "/";
-        this.pluginPath = new File(pluginPath).getAbsolutePath() + "/";
+        this.dataPath = new File(dataPath).getAbsolutePath() + '/';
+        this.pluginPath = new File(pluginPath).getAbsolutePath() + '/';
 
         this.console = new NukkitConsole();
         this.consoleThread = new ConsoleThread();
@@ -410,11 +405,11 @@ public class Server {
                 }
             }
             if (this.getLevelByName("nether") == null && this.getPropertyBoolean("nether", false)) {
-                this.generateLevel("nether", 666 + ThreadLocalRandom.current().nextLong(10, 100), Generator.getGenerator(Generator.TYPE_NETHER));
+                this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
                 this.loadLevel("nether");
             }
             if (this.getLevelByName("end") == null && this.getPropertyBoolean("end", false)) {
-                this.generateLevel("end", 666 + ThreadLocalRandom.current().nextLong(10, 100), Generator.getGenerator(Generator.TYPE_END));
+                this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_END));
                 this.loadLevel("end");
             }
         }
@@ -1105,12 +1100,12 @@ public class Server {
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
         double max = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
         String title = (char) 0x1b + "]0;Nukkit Server " +
-                " | Online " + this.players.size() + "/" + this.getMaxPlayers() +
-                " | Memory " + Math.round(used / max * 100) + "%" +
+                " | Online " + this.players.size() + '/' + this.getMaxPlayers() +
+                " | Memory " + Math.round(used / max * 100) + '%' +
                 " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
                 " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +
                 " | TPS " + this.getTicksPerSecond() +
-                " | Load " + this.getTickUsage() + "%" + (char) 0x07;
+                " | Load " + this.getTickUsage() + '%' + (char) 0x07;
 
         System.out.print(title);
     }
@@ -1599,7 +1594,7 @@ public class Server {
         if (name.contains("/") || name.contains("\\")) {
             path = name;
         } else {
-            path = this.getDataPath() + "worlds/" + name + "/";
+            path = this.getDataPath() + "worlds/" + name + '/';
         }
 
         Class<? extends LevelProvider> provider = LevelProviderManager.getProvider(path);
@@ -1666,7 +1661,7 @@ public class Server {
         if (name.contains("/") || name.contains("\\")) {
             path = name;
         } else {
-            path = this.getDataPath() + "worlds/" + name + "/";
+            path = this.getDataPath() + "worlds/" + name + '/';
         }
 
         Level level;
@@ -1696,7 +1691,7 @@ public class Server {
             return false;
         }
 
-        String path = this.getDataPath() + "worlds/" + name + "/";
+        String path = this.getDataPath() + "worlds/" + name + '/';
         if (this.getLevelByName(name) == null) {
             return LevelProviderManager.getProvider(path) != null;
         }

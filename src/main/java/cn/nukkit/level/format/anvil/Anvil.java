@@ -237,7 +237,7 @@ public class Anvil extends BaseLevelProvider {
             try {
                 this.loadRegion(X >> 5, Z >> 5).writeChunk(chunk);
             } catch (Exception e) {
-                throw new ChunkException("Error saving chunk (" + X + ", " + Z + ")", e);
+                throw new ChunkException("Error saving chunk (" + X + ", " + Z + ')', e);
             }
         }
     }

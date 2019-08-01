@@ -20,6 +20,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
 
 import java.util.Random;
+import java.util.SplittableRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -101,7 +102,7 @@ public class BlockFire extends BlockFlowable {
     
             boolean forever = this.down().getId() == Block.NETHERRACK || this.down().getId() == Block.MAGMA;
             
-            ThreadLocalRandom random = ThreadLocalRandom.current();
+            SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 
             if (!forever && this.getLevel().isRaining() &&
                     (this.getLevel().canBlockSeeSky(this) ||
@@ -110,7 +111,7 @@ public class BlockFire extends BlockFlowable {
                             this.getLevel().canBlockSeeSky(this.south()) ||
                             this.getLevel().canBlockSeeSky(this.north()))
                     ) {
-            
+
                 this.getLevel().setBlock(this, new BlockAir(), true);
             }
 
@@ -118,7 +119,7 @@ public class BlockFire extends BlockFlowable {
                 if (forever) return 0;
                 if (!remove) this.getLevel().scheduleUpdate(this, random.nextInt(250, 300));
                 this.remove = true;
-                if (remove) this.getLevel().setBlock(this, new BlockAir(), true);        
+                if (remove) this.getLevel().setBlock(this, new BlockAir(), true);
                 return 0;
             }
 

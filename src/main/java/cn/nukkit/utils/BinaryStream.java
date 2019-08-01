@@ -229,7 +229,7 @@ public class BinaryStream {
                 attr.setMaxValue(this.getLFloat());
                 list.add(attr);
             } else {
-                throw new Exception("Unknown attribute type \"" + name + "\"");
+                throw new Exception("Unknown attribute type \"" + name + '"');
             }
         }
 

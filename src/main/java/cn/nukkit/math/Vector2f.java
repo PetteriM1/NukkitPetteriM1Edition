@@ -132,6 +132,6 @@ public class Vector2f {
 
     @Override
     public String toString() {
-        return "Vector2(x=" + this.x + ",y=" + this.y + ")";
+        return "Vector2(x=" + this.x + ",y=" + this.y + ')';
     }
 }

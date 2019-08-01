@@ -299,7 +299,7 @@ public class Vector3f implements Cloneable {
 
     @Override
     public String toString() {
-        return "Vector3(x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";
+        return "Vector3(x=" + this.x + ",y=" + this.y + ",z=" + this.z + ')';
     }
 
     @Override

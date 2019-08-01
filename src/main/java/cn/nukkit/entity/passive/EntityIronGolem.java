@@ -3,13 +3,14 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.Utils;
 import cn.nukkit.entity.mob.EntityWalkingMob;
+import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +75,7 @@ public class EntityIronGolem extends EntityWalkingMob {
     }
 
     public boolean targetOption(EntityCreature creature, double distance) {
-        return !(creature instanceof Player) && creature.isAlive() && distance <= 60;
+        return !(creature instanceof Player) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 60;
     }
 
     @Override

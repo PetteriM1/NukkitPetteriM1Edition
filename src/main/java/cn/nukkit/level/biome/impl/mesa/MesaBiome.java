@@ -8,7 +8,7 @@ import cn.nukkit.level.generator.populator.impl.PopulatorDeadBush;
 import cn.nukkit.math.NukkitRandom;
 
 import java.util.Arrays;
-import java.util.Random;
+import java.util.SplittableRandom;
 
 /**
  * @author DaPorkchop_
@@ -23,7 +23,7 @@ public class MesaBiome extends CoveredBiome {
     protected int moundHeight;
 
     static {
-        Random random = new Random(29864);
+        SplittableRandom random = new SplittableRandom(29864);
 
         Arrays.fill(colorLayer, -1); // hard clay, other values are stained clay
         setRandomLayerColor(random, 14, 1); // orange
@@ -43,7 +43,7 @@ public class MesaBiome extends CoveredBiome {
         }
     }
 
-    private static void setRandomLayerColor(Random random, int sliceCount, int color) {
+    private static void setRandomLayerColor(SplittableRandom random, int sliceCount, int color) {
         for (int i = 0; i < random.nextInt(4) + sliceCount; i++) {
             int j = random.nextInt(colorLayer.length);
             int k = 0;

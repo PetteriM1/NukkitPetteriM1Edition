@@ -92,9 +92,9 @@ public final class Timings {
         privacy = Server.getInstance().getPropertyBoolean("timings-privacy", false);
 
         Server.getInstance().getLogger().debug("Timings: \n" +
-                "Enabled - " + isTimingsEnabled() + "\n" +
-                "Verbose - " + isVerboseEnabled() + "\n" +
-                "History Interval - " + getHistoryInterval() + "\n" +
+                "Enabled - " + isTimingsEnabled() + '\n' +
+                "Verbose - " + isVerboseEnabled() + '\n' +
+                "History Interval - " + getHistoryInterval() + '\n' +
                 "History Length - " + getHistoryLength());
 
         fullServerTickTimer = new FullServerTickTiming();
@@ -204,7 +204,7 @@ public final class Timings {
     public static Timing getTaskTiming(TaskHandler handler, long period) {
         String repeating = " ";
         if (period > 0) {
-            repeating += "(interval:" + period + ")";
+            repeating += "(interval:" + period + ')';
         } else {
             repeating += "(Single)";
         }
@@ -222,9 +222,9 @@ public final class Timings {
     public static Timing getPluginEventTiming(Class<? extends Event> event, Listener listener, EventExecutor executor, Plugin plugin) {
         Timing group = TimingsManager.getTiming(plugin.getName(), "Combined Total", pluginEventTimer);
 
-        return TimingsManager.getTiming(plugin.getName(), "Event: " + listener.getClass().getName() + "."
+        return TimingsManager.getTiming(plugin.getName(), "Event: " + listener.getClass().getName() + '.'
                 + (executor instanceof MethodEventExecutor ? ((MethodEventExecutor) executor).getMethod().getName() : "???")
-                + " (" + event.getSimpleName() + ")", group);
+                + " (" + event.getSimpleName() + ')', group);
     }
 
     public static Timing getEntityTiming(Entity entity) {

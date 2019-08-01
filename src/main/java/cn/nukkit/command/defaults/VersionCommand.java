@@ -55,7 +55,7 @@ public class VersionCommand extends VanillaCommand {
             }
         } else {
             StringBuilder pluginName = new StringBuilder();
-            for (String arg : args) pluginName.append(arg).append(" ");
+            for (String arg : args) pluginName.append(arg).append(' ');
             pluginName = new StringBuilder(pluginName.toString().trim());
             final boolean[] found = {false};
             final Plugin[] exactPlugin = {sender.getServer().getPluginManager().getPlugin(pluginName.toString())};

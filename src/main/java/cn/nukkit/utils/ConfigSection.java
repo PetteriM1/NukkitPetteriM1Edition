@@ -722,7 +722,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
             keys.add(key);
             if (value instanceof ConfigSection) {
                 if (child)
-                    ((ConfigSection) value).getKeys(true).forEach(childKey -> keys.add(key + "." + childKey));
+                    ((ConfigSection) value).getKeys(true).forEach(childKey -> keys.add(key + '.' + childKey));
             }
         });
         return keys;

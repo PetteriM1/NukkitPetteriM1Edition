@@ -13,6 +13,6 @@ public class PlayerMetadataStore extends MetadataStore {
         if (!(player instanceof IPlayer)) {
             throw new IllegalArgumentException("Argument must be an IPlayer instance");
         }
-        return (((IPlayer) player).getName() + ":" + metadataKey).toLowerCase();
+        return (((IPlayer) player).getName() + ':' + metadataKey).toLowerCase();
     }
 }

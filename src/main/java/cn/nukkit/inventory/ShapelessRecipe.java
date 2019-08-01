@@ -36,7 +36,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
         for (Item item : ingredients) {
             if (item.getCount() < 1) {
-                throw new IllegalArgumentException("Recipe '" + recipeId + "' Ingredient amount was not 1 (value: " + item.getCount() + ")");
+                throw new IllegalArgumentException("Recipe '" + recipeId + "' Ingredient amount was not 1 (value: " + item.getCount() + ')');
             }
             this.ingredients.add(item.clone());
         }

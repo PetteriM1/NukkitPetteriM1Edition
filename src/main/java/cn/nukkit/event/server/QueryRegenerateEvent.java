@@ -137,10 +137,10 @@ public class QueryRegenerateEvent extends ServerEvent {
         ByteBuffer query = ByteBuffer.allocate(65536);
         StringBuilder plist = new StringBuilder(this.server_engine);
         if (this.plugins.length > 0 && this.listPlugins) {
-            plist.append(":");
+            plist.append(':');
             for (Plugin p : this.plugins) {
                 PluginDescription d = p.getDescription();
-                plist.append(" ").append(d.getName().replace(";", "").replace(":", "").replace(" ", "_")).append(" ").append(d.getVersion().replace(";", "").replace(":", "").replace(" ", "_")).append(";");
+                plist.append(' ').append(d.getName().replace(";", "").replace(":", "").replace(" ", "_")).append(' ').append(d.getVersion().replace(";", "").replace(":", "").replace(" ", "_")).append(';');
             }
             plist = new StringBuilder(plist.substring(0, plist.length() - 2));
         }

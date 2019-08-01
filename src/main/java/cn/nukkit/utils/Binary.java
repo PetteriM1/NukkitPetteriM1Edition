@@ -108,9 +108,9 @@ public class Binary {
         BinaryStream stream = new BinaryStream();
         Map<Integer, EntityData> map = metadata.getMap();
         stream.putUnsignedVarInt(map.size());
-        for (int id : map.keySet()) {
-            EntityData d = map.get(id);
-            int id2 = id;
+        for (Map.Entry<Integer, EntityData> entry : map.entrySet()) {
+            EntityData d = entry.getValue();
+            int id2 = entry.getKey();
 
             // HACK: Multiversion entity data
             if (protocol < 361) {
@@ -442,7 +442,7 @@ public class Binary {
 
         for (byte b : src) {
             if (!(stringBuilder.length() == 0) && blank) {
-                stringBuilder.append(" ");
+                stringBuilder.append(' ');
             }
             int v = b & 0xFF;
             String hv = Integer.toHexString(v);

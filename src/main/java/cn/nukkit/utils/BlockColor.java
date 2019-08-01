@@ -87,7 +87,7 @@ public class BlockColor  {
 
     @Override
     public String toString() {
-        return "BlockColor[r=" + this.red + ",g=" + this.green + ",b=" + this.blue + ",a=" + this.alpha + "]";
+        return "BlockColor[r=" + this.red + ",g=" + this.green + ",b=" + this.blue + ",a=" + this.alpha + ']';
     }
 
     public int getRed() {

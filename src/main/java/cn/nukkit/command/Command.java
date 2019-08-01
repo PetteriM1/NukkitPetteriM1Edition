@@ -64,7 +64,7 @@ public abstract class Command {
         this.nextLabel = name;
         this.label = name;
         this.description = description;
-        this.usageMessage = usageMessage == null ? "/" + name : usageMessage;
+        this.usageMessage = usageMessage == null ? '/' + name : usageMessage;
         this.aliases = aliases;
         this.activeAliases = aliases;
         this.timing = Timings.getCommandTiming(this);
@@ -279,7 +279,7 @@ public abstract class Command {
 
     public static void broadcastCommandMessage(CommandSender source, TextContainer message, boolean sendToSource) {
         TextContainer m = message.clone();
-        String resultStr = "[" + source.getName() + ": " + (!m.getText().equals(source.getServer().getLanguage().get(m.getText())) ? "%" : "") + m.getText() + "]";
+        String resultStr = '[' + source.getName() + ": " + (!m.getText().equals(source.getServer().getLanguage().get(m.getText())) ? "%" : "") + m.getText() + ']';
 
         Set<Permissible> users = source.getServer().getPluginManager().getPermissionSubscriptions(Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
 

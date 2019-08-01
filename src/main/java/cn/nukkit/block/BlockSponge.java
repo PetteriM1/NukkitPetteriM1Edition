@@ -62,8 +62,8 @@ public class BlockSponge extends BlockSolidMeta {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Level level = block.getLevel();
         boolean blockSet = level.setBlock(block, this);
-        if (blockSet && this.getDamage() == 0 && performWaterAbsorb(block)) {
-            level.setBlock(block, Block.get(BlockID.SPONGE, 1));
+        if (blockSet && this.getDamage() == DRY && performWaterAbsorb(block)) {
+            level.setBlock(block, Block.get(BlockID.SPONGE, WET));
 
             for (int i = 0; i < 4; i++) {
                 LevelEventPacket packet = new LevelEventPacket();

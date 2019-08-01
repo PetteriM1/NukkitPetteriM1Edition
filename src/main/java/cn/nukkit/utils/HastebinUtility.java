@@ -56,7 +56,7 @@ public class HastebinUtility {
             }
         }
         for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
-            content.append(lines.get(i)).append("\n");
+            content.append(lines.get(i)).append('\n');
         }
         return upload(content.toString());
     }

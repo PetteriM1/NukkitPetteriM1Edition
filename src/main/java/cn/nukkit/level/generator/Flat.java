@@ -128,8 +128,8 @@ public class Flat extends Generator {
                 if (Pattern.matches("^[0-9a-z_]+$", option)) {
                     this.options.put(option, true);
                 } else if (Pattern.matches("^[0-9a-z_]+\\([0-9a-z_ =]+\\)$", option)) {
-                    String name = option.substring(0, option.indexOf("("));
-                    String extra = option.substring(option.indexOf("(") + 1, option.indexOf(")"));
+                    String name = option.substring(0, option.indexOf('('));
+                    String extra = option.substring(option.indexOf('(') + 1, option.indexOf(')'));
                     Map<String, Float> map = new HashMap<>();
                     for (String kv : extra.split(" ")) {
                         String[] data = kv.split("=");

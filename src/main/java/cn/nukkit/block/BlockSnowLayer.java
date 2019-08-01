@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSnowball;
 import cn.nukkit.item.ItemTool;
@@ -69,7 +70,11 @@ public class BlockSnowLayer extends BlockFallableMeta {
         super.onUpdate(type);
         if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) >= 10) {
-                this.getLevel().setBlock(this, new BlockAir(), true);
+                BlockFadeEvent event = new BlockFadeEvent(this, get(AIR));
+                level.getServer().getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    level.setBlock(this, event.getNewState(), true);
+                }
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         }

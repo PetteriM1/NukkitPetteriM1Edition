@@ -52,9 +52,9 @@ public class ByteTag extends NumberTag<Integer> {
     public String toString() {
         String hex = Integer.toHexString(this.data);
         if (hex.length() < 2) {
-            hex = "0" + hex;
+            hex = '0' + hex;
         }
-        return "ByteTag " + this.getName() + " (data: 0x" + hex + ")";
+        return "ByteTag " + this.getName() + " (data: 0x" + hex + ')';
     }
 
     @Override

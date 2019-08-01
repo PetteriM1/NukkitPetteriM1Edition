@@ -55,13 +55,13 @@ public class FormattedCommandAlias extends Command {
     }
 
     private String buildCommand(String formatString, String[] args) {
-        int index = formatString.indexOf("$");
+        int index = formatString.indexOf('$');
         while (index != -1) {
             int start = index;
 
             if (index > 0 && formatString.charAt(start - 1) == '\\') {
                 formatString = formatString.substring(0, start - 1) + formatString.substring(start);
-                index = formatString.indexOf("$", index);
+                index = formatString.indexOf('$', index);
                 continue;
             }
 
@@ -125,7 +125,7 @@ public class FormattedCommandAlias extends Command {
             index = start + replacement.length();
 
             // Move to the next replacement token
-            index = formatString.indexOf("$", index);
+            index = formatString.indexOf('$', index);
         }
 
         return formatString;

@@ -41,7 +41,7 @@ public class BlockGlowstone extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
-        SplittableRandom random = new SplittableRandom();
+        SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
         int count = 2 + random.nextInt(3);
 
         Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);

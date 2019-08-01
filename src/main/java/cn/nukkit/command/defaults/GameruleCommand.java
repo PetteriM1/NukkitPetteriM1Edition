@@ -57,7 +57,7 @@ public class GameruleCommand extends VanillaCommand {
                 Optional<GameRule> optionalRule = GameRule.parseString(args[0]);
 
                 if (!optionalRule.isPresent()) {
-                    sender.sendMessage(new TranslationContainer("commands.generic.syntax", "/gamerule ", args[0], " " + String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
+                    sender.sendMessage(new TranslationContainer("commands.generic.syntax", "/gamerule ", args[0], ' ' + String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
                     return true;
                 }
 
@@ -65,7 +65,7 @@ public class GameruleCommand extends VanillaCommand {
                     rules.setGameRules(optionalRule.get(), args[1]);
                     sender.sendMessage(new TranslationContainer("commands.gamerule.success", optionalRule.get().getName(), args[1]));
                 } catch (IllegalArgumentException e) {
-                    sender.sendMessage(new TranslationContainer("commands.generic.syntax", "/gamerule "  + args[0] + " ", args[1], " " + String.join(" ", Arrays.copyOfRange(args, 2, args.length))));
+                    sender.sendMessage(new TranslationContainer("commands.generic.syntax", "/gamerule "  + args[0] + ' ', args[1], ' ' + String.join(" ", Arrays.copyOfRange(args, 2, args.length))));
                 }
                 return true;
         }
