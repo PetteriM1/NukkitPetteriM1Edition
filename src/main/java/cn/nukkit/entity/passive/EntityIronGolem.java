@@ -104,4 +104,9 @@ public class EntityIronGolem extends EntityWalkingMob {
     public String getName() {
         return "Iron Golem";
     }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
 }

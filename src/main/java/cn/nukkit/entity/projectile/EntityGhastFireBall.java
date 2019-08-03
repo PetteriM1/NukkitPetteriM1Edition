@@ -2,16 +2,18 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
-public class EntityGhastFireBall extends EntityProjectile {
+public class EntityGhastFireBall extends EntityProjectile implements EntityExplosive {
 
     public static final int NETWORK_ID = 85;
 
@@ -82,15 +84,7 @@ public class EntityGhastFireBall extends EntityProjectile {
 
         if (this.age > 1200 || this.isCollided) {
             if (this.isCollided && this.canExplode) {
-                ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1);
-                this.server.getPluginManager().callEvent(ev);
-                if (!ev.isCancelled()) {
-                    SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);
-                    if (ev.isBlockBreaking()) {
-                        explosion.explodeA();
-                    }
-                    explosion.explodeB();
-                }
+                this.explode();
             }
             this.close();
         }
@@ -112,5 +106,18 @@ public class EntityGhastFireBall extends EntityProjectile {
         }
 
         return true;
+    }
+
+    @Override
+    public void explode() {
+        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1);
+        this.server.getPluginManager().callEvent(ev);
+        if (!ev.isCancelled()) {
+            SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);
+            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+                explosion.explodeA();
+            }
+            explosion.explodeB();
+        }
     }
 }

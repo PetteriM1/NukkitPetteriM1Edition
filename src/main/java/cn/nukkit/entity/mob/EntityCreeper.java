@@ -5,12 +5,12 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
-import cn.nukkit.item.ItemSkull;
-import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.ExplosionPrimeEvent;
+import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemSkull;
 import cn.nukkit.level.Explosion;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.TNTPrimeSound;
 import cn.nukkit.math.NukkitMath;
@@ -18,6 +18,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +65,13 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     }
 
     public void explode() {
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, this.isPowered() ? 3 : 2.8);
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, this.isPowered() ? 3 : 2.8);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
             Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
 
-            if (ev.isBlockBreaking()) {
+            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
                 explosion.explodeA();
             }
 
