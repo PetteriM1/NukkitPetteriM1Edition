@@ -75,8 +75,8 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     if (this.attackDelay > 60 && Utils.rand(1, 5) < 3 && this.distance(player) <= 300) {
             this.attackDelay = 0;
             double f = 1.1;
-            double yaw = this.yaw + Utils.rand(-150.0, 150.0) / 10;
-            double pitch = this.pitch + Utils.rand(-75.0, 75.0) / 10;
+            double yaw = this.yaw + Utils.rand(-120.0, 120.0) / 10;
+            double pitch = this.pitch + Utils.rand(-70.0, 70.0) / 10;
             Entity k = Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
             if (!(k instanceof EntityEnderCharge)) {
                 return;

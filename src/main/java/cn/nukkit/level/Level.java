@@ -201,7 +201,7 @@ public class Level implements ChunkManager, Metadatable {
     private int chunksPerTicks;
     private boolean clearChunksOnTick;
 
-    private int updateLCG = ThreadLocalRandom.current().nextInt();
+    private int updateLCG = Utils.random.nextInt();
 
     private static final int LCG_CONSTANT = 1013904223;
 
@@ -278,13 +278,13 @@ public class Level implements ChunkManager, Metadatable {
         this.raining = this.provider.isRaining();
         this.rainTime = this.provider.getRainTime();
         if (this.rainTime <= 0) {
-            setRainTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
+            setRainTime(Utils.random.nextInt(168000) + 12000);
         }
 
         this.thundering = this.provider.isThundering();
         this.thunderTime = this.provider.getThunderTime();
         if (this.thunderTime <= 0) {
-            setThunderTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
+            setThunderTime(Utils.random.nextInt(168000) + 12000);
         }
 
         this.levelCurrentTick = this.provider.getCurrentTick();
@@ -750,9 +750,9 @@ public class Level implements ChunkManager, Metadatable {
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
                     if (this.raining) {
-                        setRainTime(ThreadLocalRandom.current().nextInt(12000) + 12000);
+                        setRainTime(Utils.random.nextInt(12000) + 12000);
                     } else {
-                        setRainTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
+                        setRainTime(Utils.random.nextInt(168000) + 12000);
                     }
                 }
             }
@@ -761,9 +761,9 @@ public class Level implements ChunkManager, Metadatable {
             if (this.thunderTime <= 0) {
                 if (!this.setThundering(!this.thundering)) {
                     if (this.thundering) {
-                        setThunderTime(ThreadLocalRandom.current().nextInt(12000) + 3600);
+                        setThunderTime(Utils.random.nextInt(12000) + 3600);
                     } else {
-                        setThunderTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
+                        setThunderTime(Utils.random.nextInt(168000) + 12000);
                     }
                 }
             }
@@ -891,7 +891,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void performThunder(long index, FullChunk chunk) {
         if (areNeighboringChunksLoaded(index)) return;
-        if (ThreadLocalRandom.current().nextInt(10000) == 0) {
+        if (Utils.random.nextInt(10000) == 0) {
             int LCG = this.getUpdateLCG() >> 2;
 
             int chunkX = chunk.getX() * 16;
@@ -935,7 +935,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (!list.isEmpty()) {
-            return list.get(ThreadLocalRandom.current().nextInt(list.size())).getPosition();
+            return list.get(Utils.random.nextInt(list.size())).getPosition();
         } else {
             if (pos.getY() == -1) {
                 pos = pos.up(2);
@@ -1048,9 +1048,8 @@ public class Level implements ChunkManager, Metadatable {
 
         int chunksPerLoader = Math.min(200, Math.max(1, (int) (((double) (this.chunksPerTicks - this.loaders.size()) / this.loaders.size() + 0.5))));
         int randRange = 3 + chunksPerLoader / 30;
-        randRange = randRange > this.chunkTickRadius ? this.chunkTickRadius : randRange;
+        randRange = Math.min(randRange, this.chunkTickRadius);
 
-        SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
         if (!this.loaders.isEmpty()) {
             for (ChunkLoader loader : this.loaders.values()) {
                 int chunkX = (int) loader.getX() >> 4;
@@ -1060,8 +1059,8 @@ public class Level implements ChunkManager, Metadatable {
                 int existingLoaders = Math.max(0, this.chunkTickList.getOrDefault(index, 0));
                 this.chunkTickList.put(index, existingLoaders + 1);
                 for (int chunk = 0; chunk < chunksPerLoader; ++chunk) {
-                    int dx = random.nextInt(2 * randRange) - randRange;
-                    int dz = random.nextInt(2 * randRange) - randRange;
+                    int dx = Utils.random.nextInt(2 * randRange) - randRange;
+                    int dz = Utils.random.nextInt(2 * randRange) - randRange;
                     long hash = Level.chunkHash(dx + chunkX, dz + chunkZ);
                     if (!this.chunkTickList.containsKey(hash) && provider.isChunkLoaded(hash)) {
                         this.chunkTickList.put(hash, -1);
@@ -1956,8 +1955,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void dropExpOrb(Vector3 source, int exp, Vector3 motion, int delay) {
-        motion = (motion == null) ? new Vector3(new SplittableRandom().nextDouble() * 0.2 - 0.1, 0.2,
-                new SplittableRandom().nextDouble() * 0.2 - 0.1) : motion;
+        motion = (motion == null) ? new Vector3(Utils.random.nextDouble() * 0.2 - 0.1, 0.2,
+                Utils.random.nextDouble() * 0.2 - 0.1) : motion;
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", source.getX()))
                         .add(new DoubleTag("", source.getY())).add(new DoubleTag("", source.getZ())))
@@ -3316,11 +3315,11 @@ public class Level implements ChunkManager, Metadatable {
 
         if (raining) {
             pk.evid = LevelEventPacket.EVENT_START_RAIN;
-            pk.data = ThreadLocalRandom.current().nextInt(50000) + 10000;
-            setRainTime(ThreadLocalRandom.current().nextInt(12000) + 12000);
+            pk.data = Utils.random.nextInt(50000) + 10000;
+            setRainTime(Utils.random.nextInt(12000) + 12000);
         } else {
             pk.evid = LevelEventPacket.EVENT_STOP_RAIN;
-            setRainTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
+            setRainTime(Utils.random.nextInt(168000) + 12000);
         }
 
         Server.broadcastPacket(this.getPlayers().values(), pk);
@@ -3358,11 +3357,11 @@ public class Level implements ChunkManager, Metadatable {
         // These numbers are from Minecraft
         if (thundering) {
             pk.evid = LevelEventPacket.EVENT_START_THUNDER;
-            pk.data = ThreadLocalRandom.current().nextInt(50000) + 10000;
-            setThunderTime(ThreadLocalRandom.current().nextInt(12000) + 3600);
+            pk.data = Utils.random.nextInt(50000) + 10000;
+            setThunderTime(Utils.random.nextInt(12000) + 3600);
         } else {
             pk.evid = LevelEventPacket.EVENT_STOP_THUNDER;
-            setThunderTime(ThreadLocalRandom.current().nextInt(168000) + 12000);
+            setThunderTime(Utils.random.nextInt(168000) + 12000);
         }
 
         Server.broadcastPacket(this.getPlayers().values(), pk);
@@ -3387,7 +3386,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (this.isRaining()) {
             pk.evid = LevelEventPacket.EVENT_START_RAIN;
-            pk.data = ThreadLocalRandom.current().nextInt(50000) + 10000;
+            pk.data = Utils.random.nextInt(50000) + 10000;
         } else {
             pk.evid = LevelEventPacket.EVENT_STOP_RAIN;
         }
@@ -3396,7 +3395,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (this.isThundering()) {
             pk.evid = LevelEventPacket.EVENT_START_THUNDER;
-            pk.data = ThreadLocalRandom.current().nextInt(50000) + 10000;
+            pk.data = Utils.random.nextInt(50000) + 10000;
         } else {
             pk.evid = LevelEventPacket.EVENT_STOP_THUNDER;
         }

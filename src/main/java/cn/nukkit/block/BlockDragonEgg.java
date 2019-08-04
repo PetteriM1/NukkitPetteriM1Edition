@@ -3,8 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.utils.BlockColor;
-
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 public class BlockDragonEgg extends BlockFallable {
 
@@ -54,7 +53,7 @@ public class BlockDragonEgg extends BlockFallable {
     public void teleport() {
         if (!level.randomTickingEnabled()) return;
         for (int i = 0; i < 1000; ++i) {
-            Block t = this.getLevel().getBlock(this.add(ThreadLocalRandom.current().nextInt(-16, 16), ThreadLocalRandom.current().nextInt(-16, 16), ThreadLocalRandom.current().nextInt(-16, 16)));
+            Block t = this.getLevel().getBlock(this.add(Utils.random.nextInt(-16, 16), Utils.random.nextInt(-16, 16), Utils.random.nextInt(-16, 16)));
             if (t.getId() == AIR) {
                 int diffX = this.getFloorX() - t.getFloorX();
                 int diffY = this.getFloorY() - t.getFloorY();

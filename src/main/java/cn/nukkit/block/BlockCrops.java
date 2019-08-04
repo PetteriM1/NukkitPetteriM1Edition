@@ -8,8 +8,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
-
-import java.util.SplittableRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
@@ -46,7 +45,7 @@ public abstract class BlockCrops extends BlockFlowable {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
             BlockCrops block = (BlockCrops) this.clone();
             if (this.getDamage() < 7) {
-                block.setDamage(block.getDamage() + new SplittableRandom().nextInt(3) + 2);
+                block.setDamage(block.getDamage() + Utils.random.nextInt(3) + 2);
                 if (block.getDamage() > 7) {
                     block.setDamage(7);
                 }
@@ -76,7 +75,7 @@ public abstract class BlockCrops extends BlockFlowable {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (new SplittableRandom().nextInt(2) == 1) {
+            if (Utils.random.nextInt(2) == 1) {
                 if (this.getDamage() < 0x07) {
                     BlockCrops block = (BlockCrops) this.clone();
                     block.setDamage(block.getDamage() + 1);

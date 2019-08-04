@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Utils {
 
+    public static final SplittableRandom random = new SplittableRandom();
+
     public static void writeFile(String fileName, String content) throws IOException {
         writeFile(fileName, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
     }
@@ -284,8 +286,6 @@ public class Utils {
         if ('a' <= ch && ch <= 'f')    return ch - 'a' + 10;
         return -1;
     }
-
-    private static final SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 
     public static int rand(int min, int max) {
         if (min == max) {

@@ -8,8 +8,7 @@ import cn.nukkit.item.ItemNetherWart;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
-
-import java.util.SplittableRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created by Leonidius20 on 22.03.17.
@@ -42,7 +41,7 @@ public class BlockNetherWart extends BlockFlowable {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (new SplittableRandom().nextInt(10) == 1) {
+            if (Utils.random.nextInt(10) == 1) {
                 if (this.getDamage() < 0x03) {
                     BlockNetherWart block = (BlockNetherWart) this.clone();
                     block.setDamage(block.getDamage() + 1);

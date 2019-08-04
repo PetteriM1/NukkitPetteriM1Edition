@@ -33,6 +33,7 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.MainLogger;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
@@ -1117,7 +1118,7 @@ public abstract class Entity extends Location implements Metadatable {
                 direction = 5;
             }
 
-            double force = new SplittableRandom().nextDouble() * 0.2 + 0.1;
+            double force = Utils.random.nextDouble() * 0.2 + 0.1;
 
             if (direction == 0) {
                 this.motionX = -force;

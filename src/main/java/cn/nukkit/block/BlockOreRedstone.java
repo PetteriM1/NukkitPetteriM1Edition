@@ -6,8 +6,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.NukkitRandom;
-
-import java.util.SplittableRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
@@ -43,11 +42,11 @@ public class BlockOreRedstone extends BlockSolid {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_IRON) {
-            int count = new SplittableRandom().nextInt(2) + 4;
+            int count = Utils.random.nextInt(2) + 4;
 
             Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
             if (fortune != null && fortune.getLevel() >= 1) {
-                count += new SplittableRandom().nextInt(fortune.getLevel() + 1);
+                count += Utils.random.nextInt(fortune.getLevel() + 1);
             }
 
             return new Item[]{

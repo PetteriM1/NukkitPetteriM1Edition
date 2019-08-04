@@ -17,10 +17,11 @@ import cn.nukkit.math.*;
 import cn.nukkit.network.protocol.ExplodePacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Hash;
+import cn.nukkit.utils.Utils;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Angelic47
@@ -66,19 +67,19 @@ public class Explosion {
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
 
-        int mRays = this.rays - 1;
-        for (int i = 0; i < this.rays; ++i) {
-            for (int j = 0; j < this.rays; ++j) {
-                for (int k = 0; k < this.rays; ++k) {
+        int mRays = rays - 1;
+        for (int i = 0; i < rays; ++i) {
+            for (int j = 0; j < rays; ++j) {
+                for (int k = 0; k < rays; ++k) {
                     if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
                         vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
                         double len = vector.length();
-                        vector.setComponents((vector.x / len) * this.stepLen, (vector.y / len) * this.stepLen, (vector.z / len) * this.stepLen);
+                        vector.setComponents((vector.x / len) * stepLen, (vector.y / len) * stepLen, (vector.z / len) * stepLen);
                         double pointerX = this.source.x;
                         double pointerY = this.source.y;
                         double pointerZ = this.source.z;
 
-                        for (double blastForce = this.size * (ThreadLocalRandom.current().nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= this.stepLen * 0.75d) {
+                        for (double blastForce = this.size * (Utils.random.nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= stepLen * 0.75d) {
                             int x = (int) pointerX;
                             int y = (int) pointerY;
                             int z = (int) pointerZ;
@@ -91,7 +92,7 @@ public class Explosion {
                             Block block = this.level.getBlock(vBlock);
 
                             if (block.getId() != 0 && block.getId() != 7) {
-                                blastForce -= (block.getResistance() / 5 + 0.3d) * this.stepLen;
+                                blastForce -= (block.getResistance() / 5 + 0.3d) * stepLen;
                                 if (blastForce > 0) {
                                     if (level.getServer().getPropertyBoolean("explosion-break-blocks", true)) {
                                         if (!this.affectedBlocks.contains(block)) {

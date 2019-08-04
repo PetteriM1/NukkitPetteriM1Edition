@@ -24,8 +24,8 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.utils.Utils;
 
-import java.util.SplittableRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -109,16 +109,14 @@ public class EntityFishingHook extends EntityProjectile {
 			hasUpdate = true;
 		}
 
-		SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
-
 		if (this.isInsideOfWater()) {
 			if (!this.attracted) {
 				if (this.waitChance > 0) {
 					--this.waitChance;
 				}
 				if (this.waitChance == 0) {
-					if (random.nextInt(100) < 90) {
-						this.attractTimer = (random.nextInt(40) + 20);
+					if (Utils.random.nextInt(100) < 90) {
+						this.attractTimer = (Utils.random.nextInt(40) + 20);
 						this.spawnFish();
 						this.caught = false;
 						this.attracted = true;
@@ -128,7 +126,7 @@ public class EntityFishingHook extends EntityProjectile {
 				}
 			} else if (!this.caught) {
 				if (this.attractFish()) {
-					this.coughtTimer = (random.nextInt(20) + 30);
+					this.coughtTimer = (Utils.random.nextInt(20) + 30);
 					this.fishBites();
 					this.caught = true;
 				}
@@ -175,22 +173,20 @@ public class EntityFishingHook extends EntityProjectile {
 		teasePk.event = EntityEventPacket.FISH_HOOK_TEASE;
 		Server.broadcastPacket(this.level.getPlayers().values(), teasePk);
 
-		SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 		for (int i = 0; i < 5; i++) {
 			this.level.addParticle(new BubbleParticle(this.setComponents(
-					this.x + random.nextDouble() * 0.5 - 0.25,
+					this.x + Utils.random.nextDouble() * 0.5 - 0.25,
 					this.getWaterHeight(),
-					this.z + random.nextDouble() * 0.5 - 0.25
+					this.z + Utils.random.nextDouble() * 0.5 - 0.25
 			)));
 		}
 	}
 
 	public void spawnFish() {
-		SplittableRandom random = new SplittableRandom(System.currentTimeMillis());
 		this.fish = new Vector3(
-				this.x + (random.nextDouble() * 1.2 + 1) * (random.nextBoolean() ? -1 : 1),
+				this.x + (Utils.random.nextDouble() * 1.2 + 1) * (Utils.random.nextBoolean() ? -1 : 1),
 				this.getWaterHeight(),
-				this.z + (random.nextDouble() * 1.2 + 1) * (random.nextBoolean() ? -1 : 1)
+				this.z + (Utils.random.nextDouble() * 1.2 + 1) * (Utils.random.nextBoolean() ? -1 : 1)
 		);
 	}
 
@@ -201,7 +197,7 @@ public class EntityFishingHook extends EntityProjectile {
 				this.fish.y,
 				this.fish.z + (this.z - this.fish.z) * multiply
 		);
-		if (new SplittableRandom().nextInt(100) < 85) {
+		if (Utils.random.nextInt(100) < 85) {
 			this.level.addParticle(new WaterParticle(this.fish));
 		}
 		double dist = Math.abs(Math.sqrt(this.x * this.x + this.z * this.z) - Math.sqrt(this.fish.x * this.fish.x + this.fish.z * this.fish.z));
@@ -211,7 +207,7 @@ public class EntityFishingHook extends EntityProjectile {
 	public void reelLine() {
 		if (this.shootingEntity instanceof Player && this.caught) {
 			Item item = Fishing.getFishingResult(this.rod);
-			int experience = new SplittableRandom().nextInt((3 - 1) + 1) + 1;
+			int experience = Utils.random.nextInt((3 - 1) + 1) + 1;
 			Vector3 motion;
 
 			if (this.shootingEntity != null) {

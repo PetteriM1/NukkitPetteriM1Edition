@@ -3,6 +3,7 @@ package cn.nukkit.network.query;
 import cn.nukkit.Server;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 
@@ -11,7 +12,6 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.SplittableRandom;
 
 /**
  * @author MagicDroidX
@@ -48,7 +48,7 @@ public class QueryHandler {
         this.lastToken = this.token;
         byte[] token = new byte[16];
         for (int i = 0; i < 16; i++) {
-            token[i] = (byte) new SplittableRandom().nextInt(255);
+            token[i] = (byte) Utils.random.nextInt(255);
         }
         this.token = token;
     }
@@ -63,7 +63,7 @@ public class QueryHandler {
         try {
             return String.valueOf(Binary.readInt(Binary.subBytes(MessageDigest.getInstance("SHA-512").digest((salt + ':' + token).getBytes()), 7, 4)));
         } catch (NoSuchAlgorithmException e) {
-            return String.valueOf(new SplittableRandom().nextInt());
+            return String.valueOf(Utils.random.nextInt());
         }
     }
 

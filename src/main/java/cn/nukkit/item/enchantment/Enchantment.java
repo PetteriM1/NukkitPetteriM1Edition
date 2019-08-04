@@ -14,11 +14,14 @@ import cn.nukkit.item.enchantment.loot.EnchantmentLootDigging;
 import cn.nukkit.item.enchantment.loot.EnchantmentLootFishing;
 import cn.nukkit.item.enchantment.loot.EnchantmentLootWeapon;
 import cn.nukkit.item.enchantment.protection.*;
-import cn.nukkit.item.enchantment.trident.*;
+import cn.nukkit.item.enchantment.trident.EnchantmentTridentChanneling;
+import cn.nukkit.item.enchantment.trident.EnchantmentTridentImpaling;
+import cn.nukkit.item.enchantment.trident.EnchantmentTridentLoyalty;
+import cn.nukkit.item.enchantment.trident.EnchantmentTridentRiptide;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author MagicDroidX
@@ -248,10 +251,9 @@ public abstract class Enchantment implements Cloneable {
     public static final String[] words = {"the", "elder", "scrolls", "klaatu", "berata", "niktu", "xyzzy", "bless", "curse", "light", "darkness", "fire", "air", "earth", "water", "hot", "dry", "cold", "wet", "ignite", "snuff", "embiggen", "twist", "shorten", "stretch", "fiddle", "destroy", "imbue", "galvanize", "enchant", "free", "limited", "range", "of", "towards", "inside", "sphere", "cube", "self", "other", "ball", "mental", "physical", "grow", "shrink", "demon", "elemental", "spirit", "animal", "creature", "beast", "humanoid", "undead", "fresh", "stale"};
 
     public static String getRandomName() {
-        int count = ThreadLocalRandom.current().nextInt(3, 6);
         HashSet<String> set = new HashSet<>();
-        while (set.size() < count) {
-            set.add(Enchantment.words[ThreadLocalRandom.current().nextInt(0, Enchantment.words.length)]);
+        while (set.size() < Utils.random.nextInt(3, 6)) {
+            set.add(Enchantment.words[Utils.random.nextInt(0, Enchantment.words.length)]);
         }
 
         String[] words = set.toArray(new String[0]);

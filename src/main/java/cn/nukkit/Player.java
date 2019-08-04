@@ -1802,9 +1802,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.batchedPackets.isEmpty()) {
             Player[] pArr = new Player[]{this};
-            Iterator<Entry<Integer, List<DataPacket>>> iter = this.batchedPackets.entrySet().iterator();
-            while (iter.hasNext()) {
-                Entry<Integer, List<DataPacket>> entry = iter.next();
+            for (Entry<Integer, List<DataPacket>> entry : this.batchedPackets.entrySet()) {
                 List<DataPacket> packets = entry.getValue();
                 DataPacket[] arr = packets.toArray(new DataPacket[0]);
                 packets.clear();
@@ -4789,8 +4787,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     itemsWithMending.add(inventory.getHeldItemIndex());
                 }
                 if (!itemsWithMending.isEmpty()) {
-                    SplittableRandom rand = new SplittableRandom(System.currentTimeMillis());
-                    Integer itemToRepair = itemsWithMending.get(rand.nextInt(itemsWithMending.size()));
+                    Integer itemToRepair = itemsWithMending.get(Utils.random.nextInt(itemsWithMending.size()));
                     Item toRepair = inventory.getItem(itemToRepair);
                     if (toRepair instanceof ItemTool || toRepair instanceof ItemArmor) {
                         if (toRepair.getDamage() > 0) {

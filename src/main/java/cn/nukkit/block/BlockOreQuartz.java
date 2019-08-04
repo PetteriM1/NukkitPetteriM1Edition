@@ -5,8 +5,7 @@ import cn.nukkit.item.ItemQuartz;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.NukkitRandom;
-
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created on 2015/12/26 by xtypr.
@@ -45,7 +44,7 @@ public class BlockOreQuartz extends BlockSolid {
             int count = 1;
             Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
             if (fortune != null && fortune.getLevel() >= 1) {
-                int i = ThreadLocalRandom.current().nextInt(fortune.getLevel() + 2) - 1;
+                int i = Utils.random.nextInt(fortune.getLevel() + 2) - 1;
 
                 if (i < 0) {
                     i = 0;

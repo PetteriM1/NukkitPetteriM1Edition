@@ -65,7 +65,7 @@ public class Spawner extends Thread {
         try {
             int count = 0;
             for (Entity entity : level.getEntities()) {
-                if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distance(entity) < 100) {
+                if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
                     count++;
                 }
             }
@@ -77,11 +77,17 @@ public class Spawner extends Thread {
 
     public BaseEntity createEntity(Object type, Position pos) {
         BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
-        if (entity != null && !entity.isInsideOfSolid() && !tooNearOfPlayer(pos)) {
-            CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
-            Server.getInstance().getPluginManager().callEvent(ev);
-            if (!ev.isCancelled()) {
-                entity.spawnToAll();
+        if (entity != null) {
+            if (!entity.isInsideOfSolid() && !tooNearOfPlayer(pos)) {
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
+                Server.getInstance().getPluginManager().callEvent(ev);
+                if (!ev.isCancelled()) {
+                    entity.spawnToAll();
+                } else {
+                    entity.close();
+                }
+            } else {
+                entity.close();
             }
         }
         return entity;
@@ -89,7 +95,7 @@ public class Spawner extends Thread {
 
     private boolean tooNearOfPlayer(Position pos) {
         for (Player p : pos.getLevel().getPlayers().values()) {
-            if (p.distance(pos) < 10) {
+            if (p.distanceSquared(pos) < 144) { // 12 blocks
                 return true;
             }
         }

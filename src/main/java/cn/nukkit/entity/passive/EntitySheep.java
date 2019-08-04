@@ -17,7 +17,6 @@ import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class EntitySheep extends EntityWalkingAnimal {
 
@@ -148,7 +147,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     }
 
     private int randomColor() {
-        int rand = ThreadLocalRandom.current().nextInt(0, 2500);
+        int rand = Utils.random.nextInt(0, 2500);
 
         if (rand < 125 && 0 <= rand) return DyeColor.BLACK.getDyeData();
         else if (rand < 250 && 125 <= rand) return DyeColor.GRAY.getDyeData();
