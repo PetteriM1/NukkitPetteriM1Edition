@@ -632,7 +632,7 @@ public class Server {
 
     public boolean dispatchCommand(CommandSender sender, String commandLine) throws ServerException {
         // First we need to check if this command is on the main thread or not, if not, warn the user
-        if (!this.isPrimaryThread()) {
+        if (!this.isPrimaryThread() && !this.suomiCraftPEMode()) {
             getLogger().warning("Command Dispatched Async: " + commandLine);
         }
         if (sender == null) {
