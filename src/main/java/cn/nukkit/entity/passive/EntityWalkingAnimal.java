@@ -2,15 +2,19 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityWalking;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 public abstract class EntityWalkingAnimal extends EntityWalking implements EntityAnimal {
 
     public EntityWalkingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+
+    private int panicTicks = 0;
 
     @Override
     public boolean onUpdate(int currentTick) {
@@ -24,6 +28,13 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
                 return false;
             }
             return true;
+        }
+
+        if (this.panicTicks > 0) {
+            this.panicTicks--;
+            if (panicTicks == 0) {
+                doPanic(false);
+            }
         }
 
         int tickDiff = currentTick - this.lastUpdate;
@@ -43,5 +54,28 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         }
 
         return true;
+    }
+
+    public void doPanic(boolean panic) {
+        if (panic) {
+            int time = Utils.rand(60, 100);
+            this.panicTicks = time;
+            this.stayTime = 0;
+            this.moveTime = time;
+            this.moveMultifier = 1.8d;
+        } else {
+            this.moveMultifier = 1.0d;
+        }
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        boolean result = super.attack(ev);
+
+        if (result && !ev.isCancelled()) {
+            this.doPanic(true);
+        }
+
+        return result;
     }
 }
