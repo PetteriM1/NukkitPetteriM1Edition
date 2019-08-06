@@ -141,7 +141,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
             source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
             //float finalDamage = (float) (originalDamage * (1 - Math.max(points / 5f, points - originalDamage / (2 + toughness / 4f)) / 25) * (1 - /*0.75 */ epf * 0.04));
-            //source.setDamage(originalDamage - finalDamage, DamageModifier.ARMOR);
+            //source.setDamage(Math.max(0, finalDamage - originalDamage), DamageModifier.ARMOR);
             //source.setDamage(source.getDamage(EntityDamageEvent.MODIFIER_ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25)), EntityDamageEvent.MODIFIER_ARMOR_ENCHANTMENTS);
         }
 

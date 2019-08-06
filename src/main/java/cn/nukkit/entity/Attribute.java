@@ -21,11 +21,15 @@ public class Attribute implements Cloneable {
     public static final int MAX_HEALTH = 4;
     public static final int MOVEMENT_SPEED = 5;
     public static final int FOLLOW_RANGE = 6;
-    public static final int MAX_HUNGER = 7;
-    public static final int FOOD = 7;
+    public static final int FOOD = 7, MAX_HUNGER = FOOD;
     public static final int ATTACK_DAMAGE = 8;
     public static final int EXPERIENCE_LEVEL = 9;
     public static final int EXPERIENCE = 10;
+    public static final int UNDERWATER_MOVEMENT = 11;
+    public static final int LUCK = 12;
+    public static final int FALL_DAMAGE = 13;
+    public static final int HORSE_JUMP_STRENGTH = 14;
+    public static final int ZOMBIE_SPAWN_REINFORCEMENTS = 15;
 
     protected static Map<Integer, Attribute> attributes = new HashMap<>();
 
@@ -50,7 +54,7 @@ public class Attribute implements Cloneable {
     public static void init() {
         addAttribute(ABSORPTION, "minecraft:absorption", 0.00f, 340282346638528859811704183484516925440.00f, 0.00f);
         addAttribute(SATURATION, "minecraft:player.saturation", 0.00f, 20.00f, 5.00f);
-        addAttribute(EXHAUSTION, "minecraft:player.exhaustion", 0.00f, 5.00f, 0.41f);
+        addAttribute(EXHAUSTION, "minecraft:player.exhaustion", 0.00f, 5.00f, 0.00f, false);
         addAttribute(KNOCKBACK_RESISTANCE, "minecraft:knockback_resistance", 0.00f, 1.00f, 0.00f);
         addAttribute(MAX_HEALTH, "minecraft:health", 0.00f, 20.00f, 20.00f);
         addAttribute(MOVEMENT_SPEED, "minecraft:movement", 0.00f, 340282346638528859811704183484516925440.00f, 0.10f);
@@ -59,6 +63,11 @@ public class Attribute implements Cloneable {
         addAttribute(ATTACK_DAMAGE, "minecraft:attack_damage", 0.00f, 340282346638528859811704183484516925440.00f, 1.00f, false);
         addAttribute(EXPERIENCE_LEVEL, "minecraft:player.level", 0.00f, 24791.00f, 0.00f);
         addAttribute(EXPERIENCE, "minecraft:player.experience", 0.00f, 1.00f, 0.00f);
+        addAttribute(UNDERWATER_MOVEMENT, "minecraft:underwater_movement", 0.0f, 340282346638528859811704183484516925440.0f, 0.02f);
+        addAttribute(LUCK, "minecraft:luck", -1024.0f, 1024.0f, 0.0f);
+        addAttribute(FALL_DAMAGE, "minecraft:fall_damage", 0.0f, 340282346638528859811704183484516925440.0f, 1.0f);
+        addAttribute(HORSE_JUMP_STRENGTH, "minecraft:horse.jump_strength", 0.0f, 2.0f, 0.7f);
+        addAttribute(ZOMBIE_SPAWN_REINFORCEMENTS, "minecraft:zombie.spawn_reinforcements", 0.0f, 1.0f, 0.0f);
     }
 
     public static Attribute addAttribute(int id, String name, float minValue, float maxValue, float defaultValue) {

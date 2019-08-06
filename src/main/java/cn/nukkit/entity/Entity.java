@@ -2,12 +2,13 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockDirt;
+import cn.nukkit.block.BlockFire;
+import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
-import cn.nukkit.entity.mob.EntityEnderDragon;
-import cn.nukkit.entity.mob.EntityWither;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -884,7 +885,7 @@ public abstract class Entity extends Location implements Metadatable {
             player.dataPacket(pkk);
         }
 
-        if ((this instanceof EntityWither || this instanceof EntityEnderDragon) && this.getServer().getPropertyBoolean("vanilla-bossbars")) {
+        if (this instanceof EntityBoss && this.getServer().getPropertyBoolean("vanilla-bossbars")) {
             BossEventPacket pkBoss = new BossEventPacket();
             pkBoss.bossEid = this.id;
             pkBoss.type = BossEventPacket.TYPE_SHOW;
@@ -1168,9 +1169,10 @@ public abstract class Entity extends Location implements Metadatable {
         Timings.entityBaseTickTimer.startTiming();
 
         if (!this.isPlayer) {
-            this.blocksAround = null;
+            //this.blocksAround = null; // Use only when entity moves for better performance
             this.collisionBlocks = null;
         }
+
         this.justCreated = false;
 
         if (!this.isAlive()) {
@@ -1609,6 +1611,10 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        return onInteract(player, item);
+    }
+
     public boolean onInteract(Player player, Item item) {
         return false;
     }
@@ -1696,6 +1702,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean fastMove(double dx, double dy, double dz) {
+        if (!(this instanceof Player)) {
+            this.blocksAround = null;
+        }
+
         if (dx == 0 && dy == 0 && dz == 0) {
             return true;
         }
@@ -1727,6 +1737,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean move(double dx, double dy, double dz) {
+        if (!(this instanceof Player)) {
+            this.blocksAround = null;
+        }
+
         if (dx == 0 && dz == 0 && dy == 0) {
             return true;
         }
@@ -2001,6 +2015,10 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.boundingBox.setBounds(pos.x - radius, pos.y, pos.z - radius, pos.x + radius, pos.y + (this.getHeight() * this.scale), pos.z
                 + radius);
+
+        if (!(this instanceof Player)) {
+            this.blocksAround = null;
+        }
 
         this.checkChunks();
 

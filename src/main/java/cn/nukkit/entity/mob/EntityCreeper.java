@@ -210,8 +210,8 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
 
         if (item.getId() == Item.FLINT_AND_STEEL) {
             level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);

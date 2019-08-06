@@ -6,6 +6,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
@@ -63,8 +64,8 @@ public class EntityPig extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.CARROT,0)) && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));

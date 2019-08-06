@@ -4,13 +4,14 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemArmorStand;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.RemoveEntityPacket;
 
@@ -123,7 +124,7 @@ public class EntityArmorStand extends Entity {
     }
 
 	@Override
-	public boolean onInteract(Player player, Item item) {
+	public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
 		if (player.isSneaking()) {
 			if (this.getPose() >= 12) {
 				this.setPose(0);

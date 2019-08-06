@@ -1,5 +1,7 @@
 package cn.nukkit.form.element;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ElementSlider extends Element {
 
     @SuppressWarnings("unused")
@@ -8,6 +10,7 @@ public class ElementSlider extends Element {
     private float min = 0f;
     private float max = 100f;
     private int step;
+    @SerializedName("default")
     private float defaultValue;
 
     public ElementSlider(String text, float min, float max) {

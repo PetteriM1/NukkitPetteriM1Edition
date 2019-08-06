@@ -153,7 +153,7 @@ public class PlayerFood {
                     EntityDamageEvent ev = new EntityDamageEvent(this.getPlayer(), DamageCause.HUNGER, 1);
                     float now = this.getPlayer().getHealth();
                     if (diff == 1) {
-                        if (now > 10) this.getPlayer().attack(ev);
+                        /*if (now > 10)*/ this.getPlayer().attack(ev);
                     } else if (diff == 2) {
                         if (now > 1) this.getPlayer().attack(ev);
                     } else {

@@ -6,6 +6,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
@@ -81,8 +82,8 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     }
     
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.BOWL, 0), true)) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));

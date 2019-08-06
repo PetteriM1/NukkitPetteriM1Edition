@@ -7,6 +7,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
@@ -106,8 +107,8 @@ public class EntityChicken extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
         if ((item.equals(Item.get(Item.SEEDS, 0))) && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(

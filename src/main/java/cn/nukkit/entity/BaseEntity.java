@@ -206,6 +206,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public boolean move(double dx, double dy, double dz) {
         Timings.entityMoveTimer.startTiming();
 
+        this.blocksAround = null;
+
         double movX = dx * moveMultifier;
         double movY = dy;
         double movZ = dz * moveMultifier;
@@ -237,7 +239,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (item.getId() == Item.NAME_TAG) {
             if (item.hasCustomName() && !(this instanceof EntityEnderDragon)) {
                 this.setNameTag(item.getCustomName());

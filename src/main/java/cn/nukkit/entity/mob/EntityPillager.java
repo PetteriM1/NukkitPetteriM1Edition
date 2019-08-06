@@ -85,7 +85,7 @@ public class EntityPillager extends EntityWalkingMob {
                     } else {
                         projectile.namedTag.putDouble("damage", 4);
                         projectile.spawnToAll();
-                        projectile.namedTag.putBoolean("canNotPickup", true);
+                        ((EntityArrow) projectile).setPickupMode(EntityArrow.PICKUP_NONE);
                         this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_CROSSBOW_SHOOT);
                     }
                 }

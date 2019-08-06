@@ -113,7 +113,7 @@ public class EntityStray extends EntityWalkingMob {
                         projectile.kill();
                     } else {
                         projectile.spawnToAll();
-                        projectile.namedTag.putBoolean("canNotPickup", true);
+                        ((EntityArrow) projectile).setPickupMode(EntityArrow.PICKUP_NONE);
                         this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW);
                     }
                 }

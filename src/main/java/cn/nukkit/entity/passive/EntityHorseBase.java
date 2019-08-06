@@ -6,6 +6,7 @@ import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
@@ -75,14 +76,14 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (this.passengers.isEmpty() && !this.isBaby() && !player.isSneaking()) {
             if (player.riding == null) {
                 this.mountEntity(player);
             }
         }
 
-        return super.onInteract(player, item);
+        return super.onInteract(player, item, clickedPos);
     }
 
     @Override

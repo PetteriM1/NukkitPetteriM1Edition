@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -99,8 +100,8 @@ public class EntityWolf extends EntityTameableMob {
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.BONE))) {
             if (!this.hasOwner() && !this.isAngry()) {
                 player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
