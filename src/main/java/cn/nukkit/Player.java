@@ -1503,30 +1503,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.teleport(ev.getTo(), null);
                     } else {
                         this.addMovement(this.x, this.y + this.getEyeHeight(), this.z, this.yaw, this.pitch, this.yaw);
-
-                        // Frost Walker
-                        if (inventory.getBoots() != null) {
-                            Enchantment[] enchantments = inventory.getBoots().getEnchantments();
-                            for (Enchantment enchantment : enchantments) {
-                                if (enchantment.getId() == Enchantment.ID_FROST_WALKER && this.y >= 1 && this.y <= 255) {
-                                    int lvl = 2 + enchantment.getLevel();
-                                    int floorX = this.getFloorX();
-                                    int coordX1 = floorX - lvl;
-                                    int coordX2 = floorX + lvl;
-                                    int floorZ = this.getFloorZ();
-                                    int coordZ1 = floorZ - lvl;
-                                    int coordZ2 = floorZ + lvl;
-                                    int floorY = this.getFloorY();
-                                    for (int coordX = coordX1; coordX < coordX2 + 1; coordX++) {
-                                        for (int coordZ = coordZ1; coordZ < coordZ2 + 1; coordZ++) {
-                                            if (level.getBlockIdAt(coordX, floorY - 1, coordZ) == Block.STILL_WATER && level.getBlockIdAt(coordX, floorY, coordZ) == Block.AIR) {
-                                                level.setBlockAt(coordX, floorY - 1, coordZ, Block.FROSTED_ICE);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                 } else {
                     this.blocksAround = blocksAround;
@@ -1558,6 +1534,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             jump = 0.2;
                         }
                         this.getFoodData().updateFoodExpLevel(0.01 * distance + jump + swimming);
+                    }
+                }
+            }
+        }
+
+        // Frost Walker
+        if (!revert && delta > 0.0001d) {
+            Enchantment frostWalker = inventory.getBoots().getEnchantment(Enchantment.ID_FROST_WALKER);
+            if (frostWalker != null && frostWalker.getLevel() > 0 && !this.isSpectator() && this.y >= 1 && this.y <= 255) {
+                int radius = 2 + frostWalker.getLevel();
+                for (int coordX = this.getFloorX() - radius; coordX < this.getFloorX() + radius + 1; coordX++) {
+                    for (int coordZ = this.getFloorZ() - radius; coordZ < this.getFloorZ() + radius + 1; coordZ++) {
+                        Block block = level.getBlock(coordX, this.getFloorY() - 1, coordZ);
+                        if ((block.getId() == Block.STILL_WATER || block.getId() == Block.WATER && block.getDamage() == 0) && block.up().getId() == Block.AIR) {
+                            level.setBlock(block, Block.get(Block.ICE_FROSTED), true, false);
+                            level.scheduleUpdate(level.getBlock(block), Utils.random.nextInt(20, 40));
+                        }
                     }
                 }
             }
@@ -1837,7 +1830,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected void processLogin() {
         if (!this.server.isWhitelisted((this.getName()).toLowerCase())) {
-            this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
+            this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason", "Server is white-listed").replace("§n", "\n"));
 
             return;
         } else if (this.isBanned()) {
@@ -1848,24 +1841,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        Player oldPlayer = null;
         for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
-            if (p != this && p.getName() != null && p.getName().equalsIgnoreCase(this.getName())) {
-                if (!p.kick(PlayerKickEvent.Reason.NEW_CONNECTION, "logged in from another location")) {
-                    this.close(this.getLeaveMessage(), "Already connected");
-                    return;
-                }
-            } else if (p.loggedIn && this.getUniqueId().equals(p.getUniqueId())) {
-                if (!p.kick(PlayerKickEvent.Reason.NEW_CONNECTION, "logged in from another location")) {
-                    this.close(this.getLeaveMessage(), "Already connected");
-                    return;
-                }
+            if (p != this && p.getName() != null && (p.getName().equalsIgnoreCase(this.getName()) || this.getUniqueId().equals(p.getUniqueId()))) {
+                oldPlayer = p;
+                break;
             }
         }
 
-        CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
+        CompoundTag nbt;
+        if (oldPlayer != null) {
+            oldPlayer.saveNBT();
+            nbt = oldPlayer.namedTag;
+            oldPlayer.close("", "disconnectionScreen.loggedinOtherLocation");
+        } else {
+            nbt = this.server.getOfflinePlayerData(this.username);
+        }
+
         if (nbt == null) {
             this.close(this.getLeaveMessage(), "Invalid data");
-
             return;
         }
 

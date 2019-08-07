@@ -2079,6 +2079,7 @@ public class Server {
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
             put("dimensions", false);
+            put("whitelist-reason", "§cServer is white-listed");
         }
     }
 

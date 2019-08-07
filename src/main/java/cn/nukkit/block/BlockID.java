@@ -268,6 +268,7 @@ public interface BlockID {
     int UNDYED_SHULKER_BOX = 205;
     int END_BRICKS = 206;
     int FROSTED_ICE = 207;
+    int ICE_FROSTED = 207;
     int END_ROD = 208;
     int END_GATEWAY = 209;
     // 210 Allow in Education Edition

@@ -141,4 +141,13 @@ public class EntityPolarBear extends EntityWalkingMob {
     public String getName() {
         return "Polar Bear";
     }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (this.angry > 0) {
+            this.angry--;
+        }
+
+        return super.entityBaseTick(tickDiff);
+    }
 }

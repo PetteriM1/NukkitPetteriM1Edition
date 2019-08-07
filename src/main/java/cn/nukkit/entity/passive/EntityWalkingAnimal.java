@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityWalking;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -70,12 +71,14 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
 
     @Override
     public boolean attack(EntityDamageEvent ev) {
-        boolean result = super.attack(ev);
+        super.attack(ev);
 
-        if (result && !ev.isCancelled()) {
-            this.doPanic(true);
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.doPanic(true);
+            }
         }
 
-        return result;
+        return true;
     }
 }

@@ -160,6 +160,10 @@ public class EntityZombiePigman extends EntityWalkingMob {
             return true;
         }
 
+        if (this.angry > 0) {
+            this.angry--;
+        }
+
         return super.entityBaseTick(tickDiff);
     }
 }

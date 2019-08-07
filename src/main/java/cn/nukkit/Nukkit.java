@@ -3,6 +3,7 @@ package cn.nukkit;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.ServerKiller;
 import com.google.common.base.Preconditions;
+import io.netty.util.ResourceLeakDetector;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import lombok.extern.log4j.Log4j2;
@@ -54,7 +55,11 @@ public class Nukkit {
         System.setProperty("java.net.preferIPv4Stack" , "true");
         System.setProperty("log4j.skipJansi", "false");
 
-        InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
+        if (args.length > 0 && args[0].equalsIgnoreCase("-DEBUG")) {
+            InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
+            System.out.print("Debug stuff enabled!\n");
+        }
 
         try {
             if (TITLE) {

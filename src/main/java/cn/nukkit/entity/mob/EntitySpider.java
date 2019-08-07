@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -21,8 +22,8 @@ import java.util.List;
 public class EntitySpider extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 35;
-    
-    private boolean angry = false;
+
+    private int angry = 0;
 
     public EntitySpider(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -83,7 +84,7 @@ public class EntitySpider extends EntityWalkingMob {
     public void attackEntity(Entity player) {
         int time = player.getLevel().getTime() % Level.TIME_FULL;
         if (!this.isFriendly() || !(player instanceof Player)) {
-            if ((time > 13184 && time < 22800) || angry) {
+            if ((time > 13184 && time < 22800) || isAngry()) {
                 if (this.attackDelay > 23 && this.distanceSquared(player) < 1.3) {
                     this.attackDelay = 0;
                     HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
@@ -109,8 +110,10 @@ public class EntitySpider extends EntityWalkingMob {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (!ev.isCancelled()) {
-            this.angry = true;
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.setAngry(1000);
+            }
         }
 
         return true;
@@ -145,6 +148,26 @@ public class EntitySpider extends EntityWalkingMob {
             return true;
         }
 
+        if (this.angry > 0) {
+            this.angry--;
+        }
+
         return super.entityBaseTick(tickDiff);
+    }
+
+    public boolean isAngry() {
+        return this.angry > 0;
+    }
+
+    public void setAngry(int val) {
+        this.angry = val;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (distance <= 100 && this.isAngry() && creature instanceof EntitySpider && !((EntitySpider) creature).isAngry()) {
+            ((EntitySpider) creature).setAngry(1000);
+        }
+        return this.isAngry() && super.targetOption(creature, distance);
     }
 }

@@ -13,6 +13,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemSkull;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -124,25 +125,29 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
         }
 
         if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.CUSTOM && source.getCause() != DamageCause.MAGIC) {
-            int points = 0;
+            int armorPoints = 0;
             int epf = 0;
-            //int toughness = 0;
 
             for (Item armor : inventory.getArmorContents()) {
-                points += armor.getArmorPoints();
-                epf += calculateEnchantmentReduction(armor, source);
-                //toughness += armor.getToughness();
+                armorPoints += armor.getArmorPoints();
+                epf += calculateEnchantmentProtectionFactor(armor, source);
             }
 
-            float originalDamage = source.getDamage();
-            float r = (source.getDamage(EntityDamageEvent.DamageModifier.ARMOR) - (originalDamage - originalDamage * (1 - Math.max(points / 5, points - originalDamage / 2) / 25)));
-            originalDamage += r;
-            epf = Math.min(20, epf);
-            source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
-            source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
-            //float finalDamage = (float) (originalDamage * (1 - Math.max(points / 5f, points - originalDamage / (2 + toughness / 4f)) / 25) * (1 - /*0.75 */ epf * 0.04));
-            //source.setDamage(Math.max(0, finalDamage - originalDamage), DamageModifier.ARMOR);
-            //source.setDamage(source.getDamage(EntityDamageEvent.MODIFIER_ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25)), EntityDamageEvent.MODIFIER_ARMOR_ENCHANTMENTS);
+            //float originalDamage = source.getDamage();
+            //float r = (source.getDamage(EntityDamageEvent.DamageModifier.ARMOR) - (originalDamage - originalDamage * (1 - Math.max(armorPoints / 5, armorPoints - originalDamage / 2) / 25)));
+            //originalDamage += r;
+            //epf = Math.min(20, epf);
+            //source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
+            //source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
+
+            if (source.canBeReducedByArmor()) {
+                source.setDamage(-source.getFinalDamage() * armorPoints * 0.04f, EntityDamageEvent.DamageModifier.ARMOR);
+            }
+
+            source.setDamage(-source.getFinalDamage() * Math.min(NukkitMath.ceilFloat(Math.min(epf, 25) * ((float) Utils.random.nextInt(50, 100) / 100)), 20) * 0.04f,
+                    EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
+
+            source.setDamage(-Math.min(this.getAbsorption(), source.getFinalDamage()), EntityDamageEvent.DamageModifier.ABSORPTION);
         }
 
         if (super.attack(source)) {
@@ -186,18 +191,18 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
         }
     }
 
-    protected double calculateEnchantmentReduction(Item item, EntityDamageEvent source) {
+    protected double calculateEnchantmentProtectionFactor(Item item, EntityDamageEvent source) {
         if (!item.hasEnchantments()) {
             return 0;
         }
 
-        double reduction = 0;
+        double epf  = 0;
 
         for (Enchantment ench : item.getEnchantments()) {
-            reduction += ench.getDamageProtection(source);
+            epf  += ench.getProtectionFactor(source);
         }
 
-        return reduction;
+        return epf ;
     }
 
     @Override
