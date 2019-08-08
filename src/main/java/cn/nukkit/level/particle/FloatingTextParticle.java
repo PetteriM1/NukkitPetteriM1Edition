@@ -8,11 +8,11 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.*;
+import cn.nukkit.utils.Utils;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created on 2015/11/21 by xtypr.
@@ -112,7 +112,7 @@ public class FloatingTextParticle extends Particle {
         ArrayList<DataPacket> packets = new ArrayList<>();
 
         if (this.entityId == -1) {
-            this.entityId = 1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL);
+            this.entityId = 1095216660480L + Utils.random.nextLong(0, 0x7fffffffL);
         } else {
             RemoveEntityPacket pk = new RemoveEntityPacket();
             pk.eid = this.entityId;

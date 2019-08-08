@@ -3818,7 +3818,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 int add = 1;
                 for (int ii = 1; ii < exp; ii += add) {
                     this.getLevel().dropExpOrb(this, add);
-                    add = new NukkitRandom().nextRange(1, 3);
+                    add = Utils.rand(1, 3);
                 }
             }
             this.setExperience(0, 0);

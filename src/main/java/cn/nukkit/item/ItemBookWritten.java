@@ -2,8 +2,7 @@ package cn.nukkit.item;
 
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 public class ItemBookWritten extends Item {
 
@@ -49,7 +48,7 @@ public class ItemBookWritten extends Item {
         tag.putList(pages);
 
         tag.putInt(TAG_GENERATION, GENERATION_ORIGINAL);
-        long randomId = 1095216660480L + ThreadLocalRandom.current().nextLong(0L, 2147483647L);
+        long randomId = 1095216660480L + Utils.random.nextLong(0L, 2147483647L);
         tag.putLong("id", randomId);
 
         this.isWritten = true;

@@ -1752,8 +1752,7 @@ public class Level implements ChunkManager, Metadatable {
 
                 motion = new Vector3(-MathHelper.sin(f1) * f, 0.20000000298023224, MathHelper.cos(f1) * f);
             } else {
-                motion = new Vector3(new java.util.Random().nextDouble() * 0.2 - 0.1, 0.2,
-                        new java.util.Random().nextDouble() * 0.2 - 0.1);
+                motion = new Vector3(Utils.random.nextDouble() * 0.2 - 0.1, 0.2, Utils.random.nextDouble() * 0.2 - 0.1);
             }
         }
 
@@ -1926,10 +1925,13 @@ public class Level implements ChunkManager, Metadatable {
         if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
             int dropExp = target.getDropExp();
             if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
-                player.addExperience(dropExp);
                 if (player.isSurvival() || player.isAdventure()) {
-                    for (int ii = 1; ii <= dropExp; ii++) {
-                        this.dropExpOrb(target, 1);
+                    if (this.getServer().suomiCraftPEMode()) {
+                        this.dropExpOrb(target, dropExp);
+                    } else {
+                        for (int ii = 1; ii <= dropExp; ii++) {
+                            this.dropExpOrb(target, 1);
+                        }
                     }
                 }
             }

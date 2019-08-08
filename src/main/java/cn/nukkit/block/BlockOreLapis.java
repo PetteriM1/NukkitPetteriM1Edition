@@ -4,7 +4,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -63,7 +62,7 @@ public class BlockOreLapis extends BlockSolid {
 
     @Override
     public int getDropExp() {
-        return new NukkitRandom().nextRange(2, 5);
+        return Utils.rand(2, 5);
     }
 
     @Override

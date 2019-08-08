@@ -4,7 +4,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemQuartz;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
-import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -63,7 +62,7 @@ public class BlockOreQuartz extends BlockSolid {
 
     @Override
     public int getDropExp() {
-        return new NukkitRandom().nextRange(1, 5);
+        return Utils.rand(1, 5);
     }
 
     @Override
