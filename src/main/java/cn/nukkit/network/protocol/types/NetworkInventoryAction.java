@@ -10,6 +10,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import lombok.ToString;
 
+import java.util.Optional;
+
 /**
  * @author CreeperFace
  */
@@ -166,7 +168,12 @@ public class NetworkInventoryAction {
                     case SOURCE_TYPE_CRAFTING_REMOVE_INGREDIENT:
                         return new SlotChangeAction(player.getCraftingGrid(), this.inventorySlot, this.oldItem, this.newItem);
                     case SOURCE_TYPE_CONTAINER_DROP_CONTENTS:
-                        return new SlotChangeAction(player.getCraftingGrid(), this.inventorySlot, this.oldItem, this.newItem);
+                        Optional<Inventory> inventory = player.getTopWindow();
+                        if (!inventory.isPresent()) {
+                            // No window open?
+                            return null;
+                        }
+                        return new SlotChangeAction(inventory.get(), this.inventorySlot, this.oldItem, this.newItem);
                     case SOURCE_TYPE_CRAFTING_RESULT:
                         return new CraftingTakeResultAction(this.oldItem, this.newItem);
                     case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:

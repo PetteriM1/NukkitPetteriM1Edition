@@ -2,7 +2,6 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
@@ -44,11 +43,6 @@ public class BlockIceFrosted extends BlockTransparentMeta {
     @Override
     public double getFrictionFactor() {
         return 0.98;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_NONE;
     }
 
     @Override

@@ -1,7 +1,9 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.blockentity.BlockEntityShulkerBox;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.network.protocol.BlockEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
@@ -57,4 +59,12 @@ public class ShulkerBoxInventory extends ContainerInventory {
         super.onClose(who);
     }
 
+    @Override
+    public boolean canAddItem(Item item) {
+        if (item.getId() == BlockID.SHULKER_BOX || item.getId() == BlockID.UNDYED_SHULKER_BOX) {
+            // Do not allow nested shulker boxes
+            return false;
+        }
+        return super.canAddItem(item);
+    }
 }

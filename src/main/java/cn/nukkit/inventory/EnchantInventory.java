@@ -29,4 +29,10 @@ public class EnchantInventory extends ContainerInventory {
             }
         }
     }
+
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        who.craftingType = Player.CRAFTING_ENCHANT;
+    }
 }

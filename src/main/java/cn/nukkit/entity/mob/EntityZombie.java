@@ -102,7 +102,9 @@ public class EntityZombie extends EntityWalkingMob {
         hasUpdate = super.entityBaseTick(tickDiff);
 
         if (level.shouldMobBurn(this)) {
-            if (this.armor[0] == null || this.armor[0].getId() == 0) {
+            if (this.armor[0] == null) {
+                this.setOnFire(100);
+            } else if (this.armor[0].getId() == 0) {
                 this.setOnFire(100);
             }
         }
