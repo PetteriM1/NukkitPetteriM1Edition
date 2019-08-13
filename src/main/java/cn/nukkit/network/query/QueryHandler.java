@@ -64,7 +64,7 @@ public class QueryHandler {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             digest.update(address.toString().getBytes(StandardCharsets.UTF_8));
             digest.update(token);
-            return Arrays.copyOfRange(digest.digest(), 7, 4);
+            return Arrays.copyOf(digest.digest(), 4);
         } catch (NoSuchAlgorithmException e) {
             return ByteBuffer.allocate(4).putInt(Utils.random.nextInt()).array();
         }
