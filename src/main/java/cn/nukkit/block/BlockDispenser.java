@@ -172,10 +172,10 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         }
 
         if (target == null) {
-//            this.level.addLevelSoundEvent(this); //TODO: sound
+            //this.level.addLevelSoundEvent(this); //TODO: sound
             return;
         }
-        Item origin = target;
+        //Item origin = target;
         target = target.clone();
 
         DispenseBehavior behavior = DispenseBehaviorRegister.getBehavior(target.getId());
@@ -185,7 +185,7 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
             target.count--;
             inv.setItem(slot, target);
         } else {
-            if (result.getId() != origin.getId() || result.getDamage() != origin.getDamage()) {
+            /*if (result.getId() != origin.getId() || result.getDamage() != origin.getDamage()) {
                 Item[] fit = inv.addItem(result);
 
                 if (fit.length > 0) {
@@ -195,7 +195,8 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
                 }
             } else {
                 inv.setItem(slot, result);
-            }
+            }*/
+            inv.setItem(slot, result);
         }
     }
 

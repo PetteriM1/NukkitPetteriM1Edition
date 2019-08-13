@@ -80,9 +80,7 @@ public class ItemFirework extends Item {
             this.spawnFirework(player.getLevel(), player);
 
             if (!player.isCreative()) {
-                if (!player.isCreative()) {
-                    this.count--;
-                }
+                this.count--;
             }
 
             player.setMotion(new Vector3(
