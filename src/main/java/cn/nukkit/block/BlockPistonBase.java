@@ -8,6 +8,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Faceable;
 
@@ -56,14 +57,14 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
         }
         this.level.setBlock(block, this, true, false);
 
-        /*CompoundTag nbt = new CompoundTag("")
+        CompoundTag nbt = new CompoundTag("")
                 .putString("id", BlockEntity.PISTON_ARM)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z)
                 .putBoolean("Sticky", this.sticky);
 
-        BlockEntityPistonArm be = new BlockEntityPistonArm(this.level.getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);*/
+        new BlockEntityPistonArm(this.level.getChunk(getChunkX(), getChunkZ()), nbt);
 
         this.checkState();
         return true;
@@ -226,9 +227,11 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
     }
 
     public static boolean canPush(Block block, BlockFace face, boolean destroyBlocks) {
-        if (block.canBePushed() && block.getY() >= 0 && (face != BlockFace.DOWN || block.getY() != 0) &&
-                block.getY() <= 255 && (face != BlockFace.UP || block.getY() != 255)) {
+        if (block.canBePushed() && block.getY() >= 0 && (face != BlockFace.DOWN || block.getY() != 0) && block.getY() <= 255 && (face != BlockFace.UP || block.getY() != 255)) {
             if (!(block instanceof BlockPistonBase)) {
+                if (block.breakWhenPushed()) {
+                    block.level.useBreakOn(block);
+                }
                 if (block instanceof BlockFlowable) {
                     return destroyBlocks;
                 }

@@ -4,11 +4,11 @@ import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.network.protocol.*;
-import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
 import io.netty.buffer.ByteBuf;
+import lombok.extern.log4j.Log4j2;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -21,6 +21,7 @@ import java.util.Set;
  * @author MagicDroidX
  * Nukkit Project
  */
+@Log4j2
 @SuppressWarnings("unchecked")
 public class Network {
 
@@ -86,7 +87,7 @@ public class Network {
 
                 interfaz.emergencyShutdown();
                 this.unregisterInterface(interfaz);
-                this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.server.networkError", new String[]{interfaz.getClass().getName(), Utils.getExceptionMessage(e)}));
+                log.fatal(this.server.getLanguage().translateString("nukkit.server.networkError", new String[]{interfaz.getClass().getName(), Utils.getExceptionMessage(e)}));
             }
         }
     }
@@ -180,9 +181,8 @@ public class Network {
             processPackets(player, packets);
 
         } catch (Exception e) {
-            if (Nukkit.DEBUG > 0) {
-                this.server.getLogger().debug("BatchPacket 0x" + Binary.bytesToHexString(packet.payload));
-                this.server.getLogger().logException(e);
+            if (log.isDebugEnabled()) {
+                log.debug("Error whilst decoding batch packet", e);
             }
         }
     }

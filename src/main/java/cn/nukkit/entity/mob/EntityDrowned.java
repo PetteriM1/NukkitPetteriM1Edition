@@ -7,6 +7,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -49,7 +50,11 @@ public class EntityDrowned extends EntityWalkingMob {
         this.setMaxHealth(20);
         this.setDamage(new int[] { 0, 2, 3, 4 });
 
-        this.setRandomTool();
+        if (this.namedTag.contains("Item")) {
+            this.tool = NBTIO.getItemHelper(this.namedTag.getCompound("Item"));
+        } else {
+            this.setRandomTool();
+        }
     }
 
     @Override
@@ -153,6 +158,15 @@ public class EntityDrowned extends EntityWalkingMob {
             pk.hotbarSlot = 0;
             pk.item = this.tool;
             player.dataPacket(pk);
+        }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        if (tool != null) {
+            this.namedTag.put("Item", NBTIO.putItemHelper(tool));
         }
     }
 }

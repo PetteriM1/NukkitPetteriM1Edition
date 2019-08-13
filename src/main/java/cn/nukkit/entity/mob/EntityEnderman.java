@@ -3,6 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -20,6 +21,8 @@ import java.util.List;
 public class EntityEnderman extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 38;
+
+    private boolean angry = false;
 
     public EntityEnderman(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -50,7 +53,7 @@ public class EntityEnderman extends EntityWalkingMob {
         super.initEntity();
 
         this.setMaxHealth(40);
-        this.setDamage(new int[] { 0, 4, 7, 10 });
+        this.setDamage(new int[]{0, 4, 7, 10});
     }
 
     @Override
@@ -80,9 +83,19 @@ public class EntityEnderman extends EntityWalkingMob {
         super.attack(ev);
 
         if (!ev.isCancelled()) {
+            if (ev.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                if (!isAngry()) {
+                    setAngry(true);
+                }
+            }
+
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                if (!isAngry()) {
+                    setAngry(true);
+                }
                 ev.setCancelled(true);
                 tp();
+                return false;
             } else if (Utils.rand(1, 10) == 1) {
                 tp();
             }
@@ -115,11 +128,22 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
+            if (isAngry()) {
+                setAngry(false);
+            }
             tp();
         } else if (this.getLevel().isRaining() && this.getLevel().canBlockSeeSky(this) && Utils.rand(1, 5) == 1) {
             this.attack(1f);
             tp();
         } else if (Utils.rand(0, 500) == 20) {
+            tp();
+        }
+
+        if (this.age % 20 == 0 && (this.level.isRaining() || this.level.isThundering())) {
+            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
+            if (isAngry()) {
+                setAngry(false);
+            }
             tp();
         }
 
@@ -139,5 +163,30 @@ public class EntityEnderman extends EntityWalkingMob {
         }
 
         return super.canDespawn();
+    }
+
+    public void makeVibrating(boolean bool) {
+        this.setDataFlag(DATA_FLAGS, 67, bool);
+    }
+
+    public boolean isAngry() {
+        return angry;
+    }
+
+    public void setAngry(boolean bool) {
+        this.angry = bool;
+        makeVibrating(bool);
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (!angry) return false;
+        return super.targetOption(creature, distance);
+    }
+
+    public void stareToAngry() {
+        if (!isAngry()) {
+            setAngry(true);
+        }
     }
 }

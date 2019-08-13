@@ -85,12 +85,12 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.BOWL, 0), true)) {
-            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             return true;
         } else if (item.equals(Item.get(Item.BUCKET, 0), true)) {
-            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
             return true;
         } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {

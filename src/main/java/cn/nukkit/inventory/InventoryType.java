@@ -24,7 +24,9 @@ public enum InventoryType {
     SHULKER_BOX(27, "Shulker Box", 0), //27 CONTAINER
     BEACON(1, "Beacon", 13), //1 INPUT
     ENTITY_ARMOR(4, "Entity Armor", -1), //4 ARMOR
-    ENTITY_EQUIPMENT(36, "Entity Equipment", -1); //36 CONTAINER
+    ENTITY_EQUIPMENT(36, "Entity Equipment", -1), //36 CONTAINER
+    MINECART_CHEST(27, "Minecart with Chest", 0), //27 CONTAINER
+    MINECART_HOPPER(5, "Minecart with Hopper", 8); //5 CONTAINER
 
     private final int size;
     private final String title;

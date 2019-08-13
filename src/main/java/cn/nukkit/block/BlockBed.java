@@ -73,7 +73,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (this.level.getDimension() == Level.DIMENSION_NETHER) {
+        if (this.level.getDimension() == Level.DIMENSION_NETHER || this.level.getDimension() == Level.DIMENSION_THE_END) {
             this.level.useBreakOn(this);
             CompoundTag nbt = new CompoundTag()
                     .putList(new ListTag<DoubleTag>("Pos")

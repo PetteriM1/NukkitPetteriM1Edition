@@ -11,6 +11,7 @@ import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.*;
+import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.entity.passive.EntityHorseBase;
 import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.entity.projectile.EntityArrow;
@@ -1500,6 +1501,28 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.server.getPluginManager().callEvent(ev);
 
                 if (!(revert = ev.isCancelled())) {
+                    if (this.level.getCurrentTick() % 20 == 0) {
+                        AxisAlignedBB aab = new AxisAlignedBB(
+                                this.getX() - 0.6f,
+                                this.getY() + 1.45f,
+                                this.getZ() - 0.6f,
+                                this.getX() + 0.6f,
+                                this.getY() + 2.9f,
+                                this.getZ() + 0.6f
+                        );
+                        for (int i = 0; i < 8; i++) {
+                            aab.offset(-Math.sin(this.getYaw() * Math.PI / 180) * i, i * (Math.tan(this.getPitch() * -1 * Math.PI / 180)), Math.cos(this.getYaw() * Math.PI / 180) * i);
+                            Entity[] entities = this.level.getCollidingEntities(aab);
+                            if (entities.length > 0) {
+                                for (Entity e : entities) {
+                                    if (e instanceof EntityEnderman) {
+                                        ((EntityEnderman) e).stareToAngry();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     if (!to.equals(ev.getTo())) {
                         this.teleport(ev.getTo(), null);
                     } else {
@@ -3747,6 +3770,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             message = "death.attack.explosion.player";
                             params.add(!Objects.equals(e.getNameTag(), "") ? e.getNameTag() : e.getName());
                             break;
+                        } else {
+                            message = "death.attack.explosion";
                         }
                     } else {
                         message = "death.attack.explosion";

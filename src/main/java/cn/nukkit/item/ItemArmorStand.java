@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityArmorStand;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
@@ -37,6 +38,14 @@ public class ItemArmorStand extends Item {
 
         if (chunk == null) {
             return false;
+        }
+
+        for (Entity e : chunk.getEntities().values()) {
+            if (e instanceof EntityArmorStand) {
+                if (e.getY() == block.getY() && e.getX() == (block.getX() + 0.5) && e.getZ() == (block.getZ() + 0.5)) {
+                    return false;
+                }
+            }
         }
 
         CompoundTag nbt = new CompoundTag()

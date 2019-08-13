@@ -499,6 +499,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return this.level.getBlockEntity(this) == null;
     }
 
+    public boolean breakWhenPushed() {
+        return false;
+    }
+
     public boolean hasComparatorInputOverride() {
         return false;
     }

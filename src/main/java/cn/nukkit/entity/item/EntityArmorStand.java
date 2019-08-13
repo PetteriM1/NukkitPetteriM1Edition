@@ -324,7 +324,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 		return this.armorInventory;
 	}
 
-	/*@Override
+	@Override
 	public boolean onUpdate(int currentTick) {
 		if (this.closed) {
 			return false;
@@ -345,5 +345,5 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 		this.timing.stopTiming();
 
 		return hasUpdate;
-	}*/
+	}
 }

@@ -132,7 +132,7 @@ public class EntityFallingBlock extends Entity {
             if (onGround) {
                 close();
                 Block block = level.getBlock(pos);
-                if (block.getId() > 0 && block.isTransparent() && !block.canBeReplaced()) {
+                if (block.isTransparent() && !block.canBeReplaced()) {
                     if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
                         getLevel().dropItem(this, Item.get(this.getBlock(), this.getDamage(), 1));
                     }

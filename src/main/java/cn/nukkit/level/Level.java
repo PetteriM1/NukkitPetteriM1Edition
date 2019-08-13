@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
@@ -3533,9 +3534,9 @@ public class Level implements ChunkManager, Metadatable {
         return time > 13184 && time < 22800;
     }
 
-    public boolean shouldMobBurn(Entity entity) {
+    public boolean shouldMobBurn(BaseEntity entity) {
         int time = this.getTime() % TIME_FULL;
-        return !entity.isOnFire() && !this.isRaining() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
+        return !entity.isOnFire() && !this.isRaining() && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

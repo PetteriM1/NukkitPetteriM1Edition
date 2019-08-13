@@ -12,12 +12,12 @@ import cn.nukkit.nbt.tag.ListTag;
  */
 public class BlockEntityPistonArm extends BlockEntity {
 
-    public float progress = 1.0F;
-    public float lastProgress = 1.0F;
+    public float progress;
+    public float lastProgress;
     public BlockFace facing;
     public boolean extending = false;
     public boolean sticky = false;
-    public byte state = 1;
+    public byte state;
     public byte newState = 1;
     public Vector3 attachedBlock = null;
     public boolean isMovable = true;
@@ -76,6 +76,12 @@ public class BlockEntityPistonArm extends BlockEntity {
     }
 
     public CompoundTag getSpawnCompound() {
-        return (new CompoundTag()).putString("id", "PistonArm").putInt("x", (int) this.x).putInt("y", (int) this.y).putInt("z", (int) this.z);
+        return new CompoundTag()
+                .putString("id", "PistonArm")
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putFloat("Progress", this.progress)
+                .putByte("State", this.state);
     }
 }

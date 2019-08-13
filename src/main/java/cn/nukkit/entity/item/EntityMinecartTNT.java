@@ -2,6 +2,7 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockTNT;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
@@ -137,5 +138,10 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         }
 
         return interact;
+    }
+
+    @Override
+    public boolean mountEntity(Entity entity, byte mode) {
+        return false;
     }
 }

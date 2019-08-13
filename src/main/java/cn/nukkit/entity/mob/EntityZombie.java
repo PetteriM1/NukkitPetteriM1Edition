@@ -11,6 +11,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemShovelIron;
 import cn.nukkit.item.ItemSwordIron;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
@@ -60,7 +61,17 @@ public class EntityZombie extends EntityWalkingMob {
         this.setMaxHealth(20);
 
         this.armor = getRandomArmor();
-        this.setRandomTool();
+
+        if (this.namedTag.contains("Item")) {
+            this.tool = NBTIO.getItemHelper(this.namedTag.getCompound("Item"));
+            if (tool instanceof ItemSwordIron) {
+                this.setDamage(new int[]{0, 4, 6, 8});
+            } else if (tool instanceof ItemShovelIron) {
+                this.setDamage(new int[]{0, 3, 4, 5});
+            }
+        } else {
+            this.setRandomTool();
+        }
     }
 
     @Override
@@ -204,5 +215,14 @@ public class EntityZombie extends EntityWalkingMob {
         }
 
         return true;
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        if (tool != null) {
+            this.namedTag.put("Item", NBTIO.putItemHelper(tool));
+        }
     }
 }

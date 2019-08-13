@@ -82,9 +82,8 @@ public class EntitySpider extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        int time = player.getLevel().getTime() % Level.TIME_FULL;
         if (!this.isFriendly() || !(player instanceof Player)) {
-            if ((time > 13184 && time < 22800) || isAngry()) {
+            if (this.isAngry()) {
                 if (this.attackDelay > 23 && this.distanceSquared(player) < 1.3) {
                     this.attackDelay = 0;
                     HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
@@ -156,7 +155,8 @@ public class EntitySpider extends EntityWalkingMob {
     }
 
     public boolean isAngry() {
-        return this.angry > 0;
+        int time = this.level.getTime() % Level.TIME_FULL;
+        return this.angry > 0 || (time > 13184 && time < 22800);
     }
 
     public void setAngry(int val) {

@@ -297,31 +297,17 @@ public class Item implements Cloneable, BlockID, ItemID {
         Server.getInstance().getScheduler().scheduleTask(null, Item::initCreativeItems, true);
     }
 
-    private static final ArrayList<Item> creative = new ArrayList<>(); // Current protocol
     private static final ArrayList<Item> creative137 = new ArrayList<>();
     private static final ArrayList<Item> creative274 = new ArrayList<>();
     private static final ArrayList<Item> creative291 = new ArrayList<>();
     private static final ArrayList<Item> creative313 = new ArrayList<>();
     private static final ArrayList<Item> creative332 = new ArrayList<>();
     private static final ArrayList<Item> creative340 = new ArrayList<>();
+    private static final ArrayList<Item> creative354 = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
         clearCreativeItems();
-
-        // Creative inventory for current protocol
-        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems.json")).getMapList("items")) {
-            try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(Item.get(id, damage, 1, nbt));
-            } catch (Exception e) {
-                MainLogger.getLogger().logException(e);
-            }
-        }
 
         // Creative inventory for 137
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems137.json")).getMapList("items")) {
@@ -406,16 +392,32 @@ public class Item implements Cloneable, BlockID, ItemID {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // Creative inventory for 354
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems354.json")).getMapList("items")) {
+            try {
+                int id = (int) map.get("id");
+                int damage = (int) map.getOrDefault("damage", 0);
+                String hex = (String) map.get("nbt_hex");
+                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
+
+                addCreativeItem(354, Item.get(id, damage, 1, nbt));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
+
+        // TODO: Update creative items for 361
     }
 
     public static void clearCreativeItems() {
-        Item.creative.clear();
         Item.creative137.clear();
         Item.creative274.clear();
         Item.creative291.clear();
         Item.creative313.clear();
         Item.creative332.clear();
         Item.creative340.clear();
+        Item.creative354.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -447,7 +449,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             case 340:
                 return new ArrayList<>(Item.creative340);
             default: // Current protocol
-                return new ArrayList<>(Item.creative);
+                return new ArrayList<>(Item.creative354);
         }
     }
 
@@ -474,7 +476,7 @@ public class Item implements Cloneable, BlockID, ItemID {
                 Item.creative340.add(item.clone());
                 break;
             default: // Current protocol
-                Item.creative.add(item.clone());
+                Item.creative354.add(item.clone());
                 break;
         }
     }
@@ -482,12 +484,12 @@ public class Item implements Cloneable, BlockID, ItemID {
     public static void removeCreativeItem(Item item) {
         int index = getCreativeItemIndex(item);
         if (index != -1) {
-            Item.creative.remove(index);
+            Item.creative354.remove(index);
         }
     }
 
     public static boolean isCreativeItem(Item item) {
-        for (Item aCreative : Item.creative) {
+        for (Item aCreative : Item.creative354) {
             if (item.equals(aCreative, !item.isTool())) {
                 return true;
             }
@@ -496,12 +498,12 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static Item getCreativeItem(int index) {
-        return (index >= 0 && index < Item.creative.size()) ? Item.creative.get(index) : null;
+        return (index >= 0 && index < Item.creative354.size()) ? Item.creative354.get(index) : null;
     }
 
     public static int getCreativeItemIndex(Item item) {
-        for (int i = 0; i < Item.creative.size(); i++) {
-            if (item.equals(Item.creative.get(i), !item.isTool())) {
+        for (int i = 0; i < Item.creative354.size(); i++) {
+            if (item.equals(Item.creative354.get(i), !item.isTool())) {
                 return i;
             }
         }
@@ -952,8 +954,9 @@ public class Item implements Cloneable, BlockID, ItemID {
         return count;
     }
 
-    public void setCount(int count) {
+    public Item setCount(int count) {
         this.count = count;
+        return this;
     }
 
     public boolean isNull() {

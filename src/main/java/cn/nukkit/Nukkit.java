@@ -57,7 +57,7 @@ public class Nukkit {
 
         if (args.length > 0 && args[0].equalsIgnoreCase("-DEBUG")) {
             InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
-            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.ADVANCED);
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
             System.out.print("Debug stuff enabled!\n");
         }
 
