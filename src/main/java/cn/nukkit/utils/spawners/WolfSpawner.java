@@ -21,7 +21,7 @@ public class WolfSpawner extends AbstractEntitySpawner {
 
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.getName().equals("nether") || level.getName().equals("end")) {
+        if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 4 && biomeId != 5 && biomeId != 20 && biomeId != 27 && biomeId != 30 && biomeId != 32 && biomeId != 133 && biomeId != 158) {
             result = SpawnResult.WRONG_BIOME;

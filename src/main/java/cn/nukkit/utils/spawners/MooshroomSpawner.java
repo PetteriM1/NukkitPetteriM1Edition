@@ -26,7 +26,7 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
 
         if (level.getBiomeId((int) pos.x, (int) pos.z) != 14) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.MYCELIUM) {
             result = SpawnResult.WRONG_BLOCK;

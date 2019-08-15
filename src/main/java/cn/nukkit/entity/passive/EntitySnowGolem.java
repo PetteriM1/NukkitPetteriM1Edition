@@ -1,13 +1,13 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.utils.Utils;
-import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -15,6 +15,8 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,5 +118,14 @@ public class EntitySnowGolem extends EntityWalkingMob {
     @Override
     public String getName() {
         return "Snow Golem";
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (this.level.isNether && this.age % 20 == 0) {
+            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.FIRE_TICK, 1));
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

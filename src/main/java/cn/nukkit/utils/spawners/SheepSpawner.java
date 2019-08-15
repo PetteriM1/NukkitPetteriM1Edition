@@ -24,7 +24,7 @@ public class SheepSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BLOCK;
         } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.isAnimalSpawningAllowedByTime()) {
             BaseEntity entity = this.spawnTask.createEntity("Sheep", pos.add(0, 1, 0));

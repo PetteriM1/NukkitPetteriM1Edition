@@ -23,7 +23,7 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
 
         if (level.getBiomeId((int) pos.x, (int) pos.z) != 12) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;

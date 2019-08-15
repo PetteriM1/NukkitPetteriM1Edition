@@ -21,7 +21,7 @@ public class ZombiePigmanSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (!level.getName().equals("nether")) {
+        if (!level.isNether) {
             result = SpawnResult.WRONG_BIOME;
         } else if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.NETHERRACK) {
             result = SpawnResult.WRONG_BLOCK;

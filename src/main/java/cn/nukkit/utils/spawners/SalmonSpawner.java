@@ -28,7 +28,7 @@ public class SalmonSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else {
             if (level.getBlock(pos.add(0, -1, 0)) instanceof BlockWater) {

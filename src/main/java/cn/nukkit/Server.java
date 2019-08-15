@@ -2086,6 +2086,7 @@ public class Server {
             put("vanilla-bossbars", false);
             put("dimensions", false);
             put("whitelist-reason", "§cServer is white-listed");
+            put("chemistry-resources-enabled", false);
         }
     }
 

@@ -121,7 +121,7 @@ public class ItemBucket extends Item {
             PlayerBucketEmptyEvent ev;
             player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
 
-            if (player.getLevel().getName().equals("nether") && this.getDamage() != 10) {
+            if (player.getLevel().isNether && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
 

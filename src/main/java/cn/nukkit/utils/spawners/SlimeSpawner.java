@@ -25,7 +25,7 @@ public class SlimeSpawner extends AbstractEntitySpawner {
             result = SpawnResult.WRONG_BLOCK;
         } else if (biomeId != 6 && biomeId != 134) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 70 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;

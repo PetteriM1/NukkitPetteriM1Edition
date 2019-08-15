@@ -20,7 +20,7 @@ public class CreeperSpawner extends AbstractEntitySpawner {
 
         if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
             result = SpawnResult.WRONG_BLOCK;

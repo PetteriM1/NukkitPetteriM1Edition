@@ -28,7 +28,7 @@ public class WitchSpawner extends AbstractEntitySpawner {
 
         if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;

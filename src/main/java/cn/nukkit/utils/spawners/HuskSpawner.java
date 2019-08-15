@@ -23,7 +23,7 @@ public class HuskSpawner extends AbstractEntitySpawner {
 
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.getName().equals("nether") || level.getName().equals("end")) {
+        if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 2 && biomeId != 130) {
             result = SpawnResult.WRONG_BIOME;

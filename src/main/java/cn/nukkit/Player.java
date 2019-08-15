@@ -1359,7 +1359,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getServer().getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
-                if (!this.getLevel().getName().equals("end")) {
+                if (!this.getLevel().isEnd) {
                     if (this.getServer().getLevelByName("end") != null) {
                         this.teleport(this.getServer().getLevelByName("end").getSafeSpawn(), TeleportCause.END_PORTAL);
                     }
@@ -1374,7 +1374,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.getServer().getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
-                if (!this.getLevel().getName().equals("nether")) {
+                if (!this.getLevel().isNether) {
                     if (this.getServer().getLevelByName("nether") != null) {
                         this.teleport(this.getServer().getLevelByName("nether").getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                     }
@@ -2592,7 +2592,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow || targetEntity instanceof EntityXPOrb) {
-                        this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to interact with an invalid entity");
+                        //this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to interact with an invalid entity");
                         this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.getName()));
                         break;
                     }

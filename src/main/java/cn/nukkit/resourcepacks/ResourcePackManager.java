@@ -47,6 +47,12 @@ public class ResourcePackManager {
             }
         }
 
+        if (Server.getInstance().getPropertyBoolean("chemistry-resources-enabled")) {
+            ChemistryResourcePack crp = new ChemistryResourcePack();
+            loadedResourcePacks.add(crp);
+            this.resourcePacksById.put(UUID.fromString("0fba4063-dba1-4281-9b89-ff9390653530"), crp);
+        }
+
         this.resourcePacks = loadedResourcePacks.toArray(new ResourcePack[0]);
         Server.getInstance().getLogger().info(Server.getInstance().getLanguage()
                 .translateString("nukkit.resources.success", String.valueOf(this.resourcePacks.length)));

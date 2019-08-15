@@ -21,7 +21,7 @@ public class StraySpawner extends AbstractEntitySpawner {
 
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.getName().equals("nether") || level.getName().equals("end")) {
+        if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 12 && biomeId != 30) {
             result = SpawnResult.WRONG_BIOME;

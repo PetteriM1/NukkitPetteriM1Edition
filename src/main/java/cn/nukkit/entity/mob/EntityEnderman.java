@@ -158,16 +158,16 @@ public class EntityEnderman extends EntityWalkingMob {
 
     @Override
     public boolean canDespawn() {
-        if (this.getLevel().getName().equals("end")) {
+        if (this.getLevel().isEnd) {
             return false;
         }
 
         return super.canDespawn();
     }
 
-    public void makeVibrating(boolean bool) {
-        this.setDataFlag(DATA_FLAGS, 67, bool);
-    }
+    /*public void makeVibrating(boolean bool) {
+        this.setDataFlag(DATA_FLAGS, TODO_ID, bool);
+    }*/
 
     public boolean isAngry() {
         return angry;
@@ -175,7 +175,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
     public void setAngry(boolean bool) {
         this.angry = bool;
-        makeVibrating(bool);
+        //makeVibrating(bool);
     }
 
     @Override

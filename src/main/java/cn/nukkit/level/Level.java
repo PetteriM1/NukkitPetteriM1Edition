@@ -212,6 +212,9 @@ public class Level implements ChunkManager, Metadatable {
     public int tickRateTime = 0;
     public int tickRateCounter = 0;
 
+    public final boolean isNether;
+    public final boolean isEnd;
+
     private Class<? extends Generator> generatorClass;
     private IterableThreadLocal<Generator> generators = new IterableThreadLocal<Generator>() {
 
@@ -302,6 +305,9 @@ public class Level implements ChunkManager, Metadatable {
         this.tickRate = 1;
 
         this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
+
+        this.isNether = name.equals("nether");
+        this.isEnd = name.equals("end");
 
         String list = Server.getInstance().getPropertyString("do-not-tick-worlds");
         if (!list.trim().isEmpty()) {
@@ -746,7 +752,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         // Tick Weather
-        if (this.getGameRules().getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName()) && !this.getName().equals("nether") && !this.getName().equals("end")) {
+        if (this.getGameRules().getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName()) && !this.isNether && !this.isEnd) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -1991,7 +1997,7 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (block.y > 127 && this.getName().equals("nether")) {
+        if (block.y > 127 && this.isNether) {
             return null;
         }
 
@@ -2406,7 +2412,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public synchronized int getBlockLightAt(int x, int y, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getBlockLight(x & 0x0f, y & 0xff, z & 0x0f);
+        return this.getChunkIfLoaded(x >> 4, z >> 4) == null ? 0 : this.getChunkIfLoaded(x >> 4, z >> 4).getBlockLight(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     public synchronized void setBlockLightAt(int x, int y, int z, int level) {
@@ -2460,8 +2466,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public BaseFullChunk getChunkIfLoaded(int chunkX, int chunkZ) {
-        long index = Level.chunkHash(chunkX, chunkZ);
-        return this.provider.getLoadedChunk(index);
+        return this.provider.getLoadedChunk(Level.chunkHash(chunkX, chunkZ));
     }
 
     public void generateChunkCallback(int x, int z, BaseFullChunk chunk) {

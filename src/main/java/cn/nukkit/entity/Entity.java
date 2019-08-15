@@ -1247,7 +1247,7 @@ public abstract class Entity extends Location implements Metadatable {
             this.getServer().getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
-                if (this.getLevel().getName().equals("nether")) {
+                if (this.getLevel().isNether) {
                     this.switchLevel(getServer().getDefaultLevel());
                 } else {
                     this.switchLevel(getServer().getLevelByName("nether"));
@@ -1760,7 +1760,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             AxisAlignedBB axisalignedbb = this.boundingBox.clone();
 
-            AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.level.getTickRate() > 1 ? this.boundingBox.getOffsetBoundingBox(dx, dy, dz) : this.boundingBox.addCoord(dx, dy, dz), false);
+            AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
 
             for (AxisAlignedBB bb : list) {
                 dy = bb.calculateYOffset(this.boundingBox, dy);

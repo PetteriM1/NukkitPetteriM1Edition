@@ -21,7 +21,7 @@ public class RabbitSpawner extends AbstractEntitySpawner {
 
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.getName().equals("nether") || level.getName().equals("end")) {
+        if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 2 && biomeId != 130 && biomeId != 30 && biomeId != 5 && biomeId != 12) {
             result = SpawnResult.WRONG_BIOME;

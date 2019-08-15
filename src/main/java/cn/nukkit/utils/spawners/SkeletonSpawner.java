@@ -19,7 +19,7 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (level.getName().equals("nether") || level.getName().equals("end")) {
+        if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;

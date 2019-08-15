@@ -18,7 +18,7 @@ public class GhastSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (!level.getName().equals("nether")) {
+        if (!level.isNether) {
             result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 127 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
