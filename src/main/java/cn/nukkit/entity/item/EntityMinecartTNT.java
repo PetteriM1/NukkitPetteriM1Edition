@@ -17,8 +17,6 @@ import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.MinecartType;
 import cn.nukkit.utils.Utils;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * @author Adam Matthew [larryTheCoder]
  * 
@@ -98,7 +96,7 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
             root = 5.0D;
         }
 
-        EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, (4.0D + ThreadLocalRandom.current().nextDouble() * 1.5D * root));
+        EntityExplosionPrimeEvent event = new EntityExplosionPrimeEvent(this, (4.0D + Utils.random.nextDouble() * 1.5D * root));
         server.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
