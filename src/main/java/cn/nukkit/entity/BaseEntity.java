@@ -199,7 +199,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty()) {
             super.setMotion(motion);
         }
-        return true;
+        return false;
     }
 
     @Override

@@ -723,7 +723,7 @@ public class Server {
             }
 
             this.getLogger().debug("Disabling all plugins...");
-            this.pluginManager.disablePlugins();
+            this.disablePlugins();
 
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
