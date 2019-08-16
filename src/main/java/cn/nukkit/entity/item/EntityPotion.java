@@ -147,7 +147,8 @@ public class EntityPotion extends EntityProjectile {
         this.timing.startTiming();
 
         if (this.age > 1200) {
-            this.kill();
+            this.close();
+            return false;
         } else if (this.isCollided) {
             this.splash(null);
         }

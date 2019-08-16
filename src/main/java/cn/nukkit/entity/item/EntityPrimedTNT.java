@@ -147,9 +147,11 @@ public class EntityPrimedTNT extends Entity implements EntityExplosive {
             fuse -= tickDiff;
 
             if (fuse <= 0) {
-                if (this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES))
-                    explode();
-                kill();
+                if (this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) {
+                    this.explode();
+                }
+                this.close();
+                return false;
             }
         }
 

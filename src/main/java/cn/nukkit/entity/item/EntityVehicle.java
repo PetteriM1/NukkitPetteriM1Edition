@@ -65,7 +65,7 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
 
         // A killer task
         if (y < -16) {
-            kill();
+            this.close();
         }
         // Movement code
         updateMovement();

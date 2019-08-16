@@ -66,7 +66,6 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     @Override
     public void explode() {
         this.close();
-        this.kill();
         if (this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) {
             ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
             this.server.getPluginManager().callEvent(ev);
