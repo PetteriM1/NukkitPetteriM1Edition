@@ -93,7 +93,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
             Player p = entry.getValue();
 
             //If the player is in range
-            if (p.distanceSquared(this) < 100 + getPowerLevel() * 10) {
+            if (p.distance(this) < 10 + getPowerLevel() * 10) {
                 Effect e;
 
                 if (getPrimaryPower() != 0) {
