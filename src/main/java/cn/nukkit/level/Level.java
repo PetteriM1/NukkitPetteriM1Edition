@@ -123,8 +123,8 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.SUGARCANE_BLOCK] = true;
         randomTickBlocks[Block.NETHER_WART_BLOCK] = true;
         if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.FIRE] = true;
+        randomTickBlocks[Block.GLOWING_REDSTONE_ORE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
-        randomTickBlocks[Block.FROSTED_ICE] = true;
     }
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
@@ -202,7 +202,7 @@ public class Level implements ChunkManager, Metadatable {
     private int chunksPerTicks;
     private boolean clearChunksOnTick;
 
-    private int updateLCG = Utils.random.nextInt();
+    private int updateLCG = ThreadLocalRandom.current().nextInt();
 
     private static final int LCG_CONSTANT = 1013904223;
 
@@ -1055,7 +1055,7 @@ public class Level implements ChunkManager, Metadatable {
 
         int chunksPerLoader = Math.min(200, Math.max(1, (int) (((double) (this.chunksPerTicks - this.loaders.size()) / this.loaders.size() + 0.5))));
         int randRange = 3 + chunksPerLoader / 30;
-        randRange = Math.min(randRange, this.chunkTickRadius);
+        randRange = randRange > this.chunkTickRadius ? this.chunkTickRadius : randRange;
 
         if (!this.loaders.isEmpty()) {
             for (ChunkLoader loader : this.loaders.values()) {
@@ -1776,7 +1776,7 @@ public class Level implements ChunkManager, Metadatable {
                                     .add(new DoubleTag("", motion.y)).add(new DoubleTag("", motion.z)))
 
                             .putList(new ListTag<FloatTag>("Rotation")
-                                    .add(new FloatTag("", new java.util.Random().nextFloat() * 360))
+                                    .add(new FloatTag("", ThreadLocalRandom.current().nextFloat() * 360))
                                     .add(new FloatTag("", 0)))
 
                             .putShort("Health", 5).putCompound("Item", itemTag).putShort("PickupDelay", delay));
