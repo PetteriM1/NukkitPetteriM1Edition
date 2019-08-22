@@ -8,6 +8,7 @@ import cn.nukkit.item.ItemBucket;
  * Package cn.nukkit.item.food in project nukkit.
  */
 public class FoodMilk extends Food {
+
     @Override
     protected boolean onEatenBy(Player player) {
         super.onEatenBy(player);

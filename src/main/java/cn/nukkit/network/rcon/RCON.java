@@ -16,13 +16,13 @@ import java.io.IOException;
  * @author Tee7even
  */
 public class RCON {
-    private Server server;
-    private RCONServer serverThread;
+
+    private final Server server;
+    private final RCONServer serverThread;
 
     public RCON(Server server, String password, String address, int port) {
         if (password.isEmpty()) {
-            server.getLogger().critical(server.getLanguage().translateString("nukkit.server.rcon.emptyPasswordError"));
-            return;
+            throw new IllegalArgumentException("nukkit.server.rcon.emptyPasswordError");
         }
 
         this.server = server;
@@ -30,9 +30,8 @@ public class RCON {
         try {
             this.serverThread = new RCONServer(address, port, password);
             this.serverThread.start();
-        } catch (IOException exception) {
-            this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.server.rcon.startupError", exception.getMessage()));
-            return;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("nukkit.server.rcon.startupError", e);
         }
 
         this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.server.rcon.running", new String[]{address, String.valueOf(port)}));
@@ -65,7 +64,6 @@ public class RCON {
                 serverThread.close();
                 serverThread.wait(5000);
             }
-        } catch (InterruptedException exception) {
-        }
+        } catch (InterruptedException ignored) {}
     }
 }

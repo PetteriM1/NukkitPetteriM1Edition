@@ -7,6 +7,7 @@ import cn.nukkit.block.Block;
  * Nukkit Project
  */
 public class ItemBlock extends Item {
+
     public ItemBlock(Block block) {
         this(block, 0, 1);
     }

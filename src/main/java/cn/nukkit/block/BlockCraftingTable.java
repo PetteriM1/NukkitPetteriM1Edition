@@ -11,8 +11,6 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockCraftingTable extends BlockSolid {
-    public BlockCraftingTable() {
-    }
 
     @Override
     public String getName() {
@@ -47,8 +45,8 @@ public class BlockCraftingTable extends BlockSolid {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            player.setCraftingGrid(new BigCraftingGrid(player));
             player.craftingType = Player.CRAFTING_BIG;
+            player.setCraftingGrid(new BigCraftingGrid(player));
         }
         return true;
     }

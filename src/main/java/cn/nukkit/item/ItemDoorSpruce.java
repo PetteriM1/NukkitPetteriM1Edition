@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockDoorSpruce;
 
 public class ItemDoorSpruce extends Item {
+
     public ItemDoorSpruce() {
         this(0, 1);
     }
@@ -15,5 +16,4 @@ public class ItemDoorSpruce extends Item {
         super(SPRUCE_DOOR, 0, count, "Spruce Door");
         this.block = new BlockDoorSpruce();
     }
-
 }

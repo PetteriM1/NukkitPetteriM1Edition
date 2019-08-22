@@ -9,6 +9,7 @@ import java.util.zip.CRC32;
  * Nukkit Project
  */
 public class NukkitRandom {
+
     protected long seed;
 
     public NukkitRandom() {
@@ -73,6 +74,6 @@ public class NukkitRandom {
     }
 
     public int nextBoundedInt(int bound) {
-        return this.nextInt() % bound;
+        return bound == 0 ? 0 : this.nextInt() % bound;
     }
 }

@@ -52,16 +52,6 @@ public class BlockFlowerPot extends BlockFlowable {
     }
 
     @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (face != BlockFace.UP) return false;
         CompoundTag nbt = new CompoundTag()
@@ -116,7 +106,7 @@ public class BlockFlowerPot extends BlockFlowable {
         this.getLevel().setBlock(this, this, true);
         ((BlockEntityFlowerPot) blockEntity).spawnToAll();
 
-        if (player.isSurvival()) {
+        if (!player.isCreative()) {
             item.setCount(item.getCount() - 1);
             player.getInventory().setItemInHand(item.getCount() > 0 ? item : Item.get(Item.AIR));
         }

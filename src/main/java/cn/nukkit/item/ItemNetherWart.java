@@ -19,5 +19,4 @@ public class ItemNetherWart extends Item {
         super(NETHER_WART, meta, count, "Nether Wart");
         this.block = new BlockNetherWart(meta);
     }
-
 }

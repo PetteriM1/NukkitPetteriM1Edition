@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class StringTag extends Tag {
+
     public String data;
 
     public StringTag(String name) {
@@ -29,13 +30,18 @@ public class StringTag extends Tag {
     }
 
     @Override
+    public String parseValue() {
+        return this.data;
+    }
+
+    @Override
     public byte getId() {
         return TAG_String;
     }
 
     @Override
     public String toString() {
-        return "StringTag " + this.getName() + " (data: " + data + ")";
+        return "StringTag " + this.getName() + " (data: " + data + ')';
     }
 
     @Override

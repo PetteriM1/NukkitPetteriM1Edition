@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
  * Nukkit Project
  */
 public class NBTOutputStream implements DataOutput, AutoCloseable {
+
     private final DataOutputStream stream;
     private final ByteOrder endianness;
     private final boolean network;
@@ -46,7 +47,7 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
     }
 
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         this.stream.write(b, off, len);
     }
 
@@ -107,12 +108,20 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
 
     @Override
     public void writeFloat(float v) throws IOException {
-        this.writeInt(Float.floatToIntBits(v));
+        int i = Float.floatToIntBits(v);
+        if (endianness == ByteOrder.LITTLE_ENDIAN) {
+            i = Integer.reverseBytes(i);
+        }
+        this.stream.writeInt(i);
     }
 
     @Override
     public void writeDouble(double v) throws IOException {
-        this.writeLong(Double.doubleToLongBits(v));
+        long l = Double.doubleToLongBits(v);
+        if (endianness == ByteOrder.LITTLE_ENDIAN) {
+            l = Long.reverseBytes(l);
+        }
+        this.stream.writeLong(l);
     }
 
     @Override

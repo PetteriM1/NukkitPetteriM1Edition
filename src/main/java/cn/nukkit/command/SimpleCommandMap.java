@@ -63,6 +63,8 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new WorldCommand("world"));
         this.register("nukkit", new GenerateWorldCommand("genworld"));
         this.register("nukkit", new WhitelistCommand("whitelist"));
+        this.register("nukkit", new GameruleCommand("gamerule"));
+        this.register("nukkit", new SpawnCommand("spawn"));
         if (!Server.getInstance().suomiCraftPEMode()) {
             this.register("nukkit", new DefaultGamemodeCommand("defaultgamemode"));
             this.register("nukkit", new SayCommand("say"));
@@ -76,6 +78,7 @@ public class SimpleCommandMap implements CommandMap {
             this.register("nukkit", new TransferServerCommand("transfer"));
             this.register("nukkit", new SeedCommand("seed"));
             this.register("nukkit", new PlaySoundCommand("playsound"));
+            this.register("nukkit", new DebugPasteCommand("debugpaste"));
         }
     }
 
@@ -109,10 +112,10 @@ public class SimpleCommandMap implements CommandMap {
                 iterator.remove();
             }
         }
-        command.setAliases(aliases.stream().toArray(String[]::new));
+        command.setAliases(aliases.toArray(new String[0]));
 
         if (!registered) {
-            command.setLabel(fallbackPrefix + ":" + label);
+            command.setLabel(fallbackPrefix + ':' + label);
         }
 
         command.register(this);
@@ -159,7 +162,7 @@ public class SimpleCommandMap implements CommandMap {
     }
 
     private boolean registerAlias(Command command, boolean isAlias, String fallbackPrefix, String label) {
-        this.knownCommands.put(fallbackPrefix + ":" + label, command);
+        this.knownCommands.put(fallbackPrefix + ':' + label, command);
 
         //if you're registering a command alias that is already registered, then return false
         boolean alreadyRegistered = this.knownCommands.containsKey(label);
@@ -185,7 +188,7 @@ public class SimpleCommandMap implements CommandMap {
         }
 
         // Then we need to check if there isn't any command conflicts with vanilla commands
-        ArrayList<String> toRemove = new ArrayList<String>();
+        ArrayList<String> toRemove = new ArrayList<>();
 
         for (Entry<String, Command> entry : knownCommands.entrySet()) {
             Command cmd = entry.getValue();
@@ -242,12 +245,12 @@ public class SimpleCommandMap implements CommandMap {
     @Override
     public boolean dispatch(CommandSender sender, String cmdLine) {
         ArrayList<String> parsed = parseArguments(cmdLine);
-        if (parsed.size() == 0) {
+        if (parsed.isEmpty()) {
             return false;
         }
 
         String sentCommandLabel = parsed.remove(0).toLowerCase();
-        String[] args = parsed.toArray(new String[parsed.size()]);
+        String[] args = parsed.toArray(new String[0]);
         Command target = this.getCommand(sentCommandLabel);
 
         if (target == null) {

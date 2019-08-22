@@ -2,6 +2,7 @@ package cn.nukkit.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
@@ -19,8 +20,8 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     public AbstractEntitySpawner(Spawner spawnTask) {
         this.spawnTask = spawnTask;
         String disabledWorlds = Server.getInstance().getPropertyString("worlds-entity-spawning-disabled");
-        if (disabledWorlds != null && !disabledWorlds.trim().isEmpty()) {
-            StringTokenizer tokenizer = new StringTokenizer(disabledWorlds, ",");
+        if (!disabledWorlds.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(disabledWorlds, ", ");
             while (tokenizer.hasMoreTokens()) {
                 disabledSpawnWorlds.add(tokenizer.nextToken());
             }
@@ -30,7 +31,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     @Override
     public void spawn(Collection<Player> onlinePlayers) {
         if (isSpawnAllowedByDifficulty()) {
-            SpawnResult lastSpawnResult = null;
+            SpawnResult lastSpawnResult;
             for (Player player : onlinePlayers) {
                 if (isWorldSpawnAllowed (player.getLevel())) {
                     lastSpawnResult = spawn(player);
@@ -42,27 +43,26 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         }
     }
 
-    private boolean isWorldSpawnAllowed (Level level) {
-        for (String worldName : this.disabledSpawnWorlds) {
-            if (level.getName().toLowerCase().equals(worldName.toLowerCase())) {
+    protected boolean isWorldSpawnAllowed(Level level) {
+        for (String name : this.disabledSpawnWorlds) {
+            if (level.getName().equalsIgnoreCase(name)) {
                 return false;
             }
         }
-        return true;
+        return level.getGameRules().getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
     protected SpawnResult spawn(Player player) {
-        Position pos = ((Player) player).getPosition();
-        Level level = ((Player) player).getLevel();
+        Position pos = player.getPosition();
+        Level level = player.getLevel();
 
-        if (this.spawnTask.entitySpawnAllowed(level, getEntityNetworkId())) {
+        if (this.spawnTask.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
             if (pos != null) {
                 pos.x += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
                 pos.z += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
+                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return SpawnResult.ERROR;
                 pos.y = this.spawnTask.getSafeYCoord(level, pos, 3);
-            }
-
-            if (pos == null) {
+            } else {
                 return SpawnResult.POSITION_MISMATCH;
             }
         } else {
@@ -76,8 +76,8 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 		}
     }
 
-    protected boolean isSpawnAllowedByDifficulty() {
-        int randomNumber = EntityUtils.rand(0, 4);
+    protected static boolean isSpawnAllowedByDifficulty() {
+        int randomNumber = Utils.rand(0, 3);
 
         switch (Server.getInstance().getDifficulty()) {
             case 0:
@@ -86,8 +86,6 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
                 return randomNumber <= 1;
             case 2:
                 return randomNumber <= 2;
-            case 3:
-                return true;
             default:
                 return true;
         }

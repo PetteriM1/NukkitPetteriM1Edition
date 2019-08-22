@@ -16,9 +16,6 @@ import cn.nukkit.network.protocol.BlockEventPacket;
  */
 public class BlockNoteblock extends BlockSolid {
 
-    public BlockNoteblock() {
-    }
-
     @Override
     public String getName() {
         return "Note Block";
@@ -57,18 +54,14 @@ public class BlockNoteblock extends BlockSolid {
     }
 
     public int getStrength() {
-        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
-        if (blockEntity instanceof BlockEntityMusic) return Math.abs(blockEntity.namedTag.getByte("note")) % 25;
-        this.createBlockEntity();
-        return 0;
+        BlockEntityMusic blockEntity = this.getBlockEntity();
+        return blockEntity != null ? blockEntity.getPitch() : 0;
     }
 
     public void increaseStrength() {
-        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
-        if (blockEntity instanceof BlockEntityMusic) {
-            ((BlockEntityMusic) blockEntity).changePitch();
-        } else {
-            this.createBlockEntity();
+        BlockEntityMusic blockEntity = this.getBlockEntity();
+        if (blockEntity != null) {
+            blockEntity.changePitch();
         }
     }
 
@@ -205,11 +198,12 @@ public class BlockNoteblock extends BlockSolid {
         pk.case2 = this.getStrength();
         this.getLevel().addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
 
-        this.getLevel().addSound(this, instrument.getSound(), 1, (float) Math.pow(2d, (double) (this.getStrength() - 12d) / 12d));
+        this.getLevel().addSound(this, instrument.getSound(), 1, (float) Math.pow(2d, (this.getStrength() - 12d) / 12d));
     }
 
     @Override
     public boolean onActivate(Item item, Player player) {
+        if (player.isSneaking()) return false;
         this.increaseStrength();
         this.emitSound();
         return true;
@@ -218,15 +212,31 @@ public class BlockNoteblock extends BlockSolid {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_REDSTONE) {
-            if (this.getLevel().isBlockPowered(this)) this.emitSound();
+            BlockEntityMusic blockEntity = this.getBlockEntity();
+            if (blockEntity != null) {
+                if (this.getLevel().isBlockPowered(this)) {
+                    if (!blockEntity.isPowered()) {
+                        this.emitSound();
+                    }
+                    blockEntity.setPowered(true);
+                } else {
+                    blockEntity.setPowered(false);
+                }
+            }
         }
-        return 0;
+        return super.onUpdate(type);
+    }
+
+    private BlockEntityMusic getBlockEntity() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (blockEntity instanceof BlockEntityMusic) {
+            return (BlockEntityMusic) blockEntity;
+        }
+        return null;
     }
 
     private BlockEntityMusic createBlockEntity() {
-        return new BlockEntityMusic(this.getLevel().getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4),
-                                        BlockEntity.getDefaultCompound(this, BlockEntity.MUSIC)
-                                                .putByte("note", 0));
+        return new BlockEntityMusic(this.getLevel().getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4), BlockEntity.getDefaultCompound(this, BlockEntity.MUSIC));
     }
 
     public enum Instrument {

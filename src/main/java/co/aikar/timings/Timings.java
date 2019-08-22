@@ -46,7 +46,7 @@ public final class Timings {
 
     private static boolean timingsEnabled = false;
     private static boolean verboseEnabled = false;
-    private static boolean privacy = false;
+    private static boolean privacy;
     private static Set<String> ignoredConfigSections = new HashSet<>();
 
     private static final int MAX_HISTORY_FRAMES = 12;
@@ -85,16 +85,16 @@ public final class Timings {
     public static final Timing permissionDefaultTimer;
 
     static {
-        setTimingsEnabled((boolean) Server.getInstance().getPropertyBoolean("enable-timings", false));
-        setVerboseEnabled((boolean) Server.getInstance().getPropertyBoolean("timings-verbose", false));
-        setHistoryInterval((int) Server.getInstance().getPropertyInt("timings-history-interval", 6000));
-        setHistoryLength((int) Server.getInstance().getPropertyInt("timings-history-length", 72000));
-        privacy = (boolean) Server.getInstance().getPropertyBoolean("timings-privacy", false);
+        setTimingsEnabled(Server.getInstance().getPropertyBoolean("enable-timings", false));
+        setVerboseEnabled(Server.getInstance().getPropertyBoolean("timings-verbose", false));
+        setHistoryInterval(Server.getInstance().getPropertyInt("timings-history-interval", 6000));
+        setHistoryLength(Server.getInstance().getPropertyInt("timings-history-length", 72000));
+        privacy = Server.getInstance().getPropertyBoolean("timings-privacy", false);
 
         Server.getInstance().getLogger().debug("Timings: \n" +
-                "Enabled - " + isTimingsEnabled() + "\n" +
-                "Verbose - " + isVerboseEnabled() + "\n" +
-                "History Interval - " + getHistoryInterval() + "\n" +
+                "Enabled - " + isTimingsEnabled() + '\n' +
+                "Verbose - " + isVerboseEnabled() + '\n' +
+                "History Interval - " + getHistoryInterval() + '\n' +
                 "History Length - " + getHistoryLength());
 
         fullServerTickTimer = new FullServerTickTiming();
@@ -184,7 +184,7 @@ public final class Timings {
             Server.getInstance().getLogger().warning(
                     "Timings Length too high. Requested " + length + ", max is " + maxLength
                             + ". To get longer history, you must increase your interval. Set Interval to "
-                            + Math.ceil(length / MAX_HISTORY_FRAMES)
+                            + Math.ceil((float) length / MAX_HISTORY_FRAMES)
                             + " to achieve this length.");
         }
 
@@ -204,7 +204,7 @@ public final class Timings {
     public static Timing getTaskTiming(TaskHandler handler, long period) {
         String repeating = " ";
         if (period > 0) {
-            repeating += "(interval:" + period + ")";
+            repeating += "(interval:" + period + ')';
         } else {
             repeating += "(Single)";
         }
@@ -222,9 +222,9 @@ public final class Timings {
     public static Timing getPluginEventTiming(Class<? extends Event> event, Listener listener, EventExecutor executor, Plugin plugin) {
         Timing group = TimingsManager.getTiming(plugin.getName(), "Combined Total", pluginEventTimer);
 
-        return TimingsManager.getTiming(plugin.getName(), "Event: " + listener.getClass().getName() + "."
+        return TimingsManager.getTiming(plugin.getName(), "Event: " + listener.getClass().getName() + '.'
                 + (executor instanceof MethodEventExecutor ? ((MethodEventExecutor) executor).getMethod().getName() : "???")
-                + " (" + event.getSimpleName() + ")", group);
+                + " (" + event.getSimpleName() + ')', group);
     }
 
     public static Timing getEntityTiming(Entity entity) {

@@ -4,13 +4,13 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.block.LeavesDecayEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemApple;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Hash;
+import cn.nukkit.utils.Utils;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
@@ -19,6 +19,7 @@ import it.unimi.dsi.fastutil.longs.LongSet;
  * Nukkit Project
  */
 public class BlockLeaves extends BlockTransparentMeta {
+
     public static final int OAK = 0;
     public static final int SPRUCE = 1;
     public static final int BIRCH = 2;
@@ -89,15 +90,21 @@ public class BlockLeaves extends BlockTransparentMeta {
                     toItem()
             };
         } else {
-            if ((int) ((Math.random()) * 200) == 0 && (this.getDamage() & 0x03) == OAK) {
+            if (this.canDropApple() && Utils.random.nextInt(200) == 0) {
                 return new Item[]{
-                        new ItemApple()
+                        Item.get(Item.APPLE)
                 };
             }
-            if ((int) ((Math.random()) * 20) == 0) {
-                return new Item[]{
-                        new ItemBlock(new BlockSapling(), this.getDamage() & 0x03, 1)
-                };
+            if (Utils.random.nextInt(20) == 0) {
+                if (Utils.random.nextBoolean()) {
+                    return new Item[]{
+                            Item.get(Item.STICK, 0, Utils.random.nextInt(1, 2))
+                    };
+                } else if ((this.getDamage() & 0x03) != JUNGLE || Utils.random.nextInt(20) == 0) {
+                    return new Item[]{
+                            this.getSapling()
+                    };
+                }
             }
         }
         return new Item[0];
@@ -135,16 +142,16 @@ public class BlockLeaves extends BlockTransparentMeta {
         ++check;
         long index = Hash.hashBlock((int) pos.x, (int) pos.y, (int) pos.z);
         if (visited.contains(index)) return false;
-        if (pos.getId() == Block.WOOD) return true;
-        if (pos.getId() == Block.LEAVES && distance < 6) {
+        if (pos.getId() == WOOD || pos.getId() == WOOD2) return true;
+        if ((pos.getId() == LEAVES || pos.getId() == LEAVES2) && distance < 6) {
             visited.add(index);
-            Integer down = pos.down().getId();
-            if (down == Item.WOOD) {
+            int down = pos.down().getId();
+            if (down == WOOD || down == WOOD2) {
                 return true;
             }
             if (fromSide == null) {
                 //North, East, South, West
-                for (Integer side = 2; side <= 5; ++side) {
+                for (int side = 2; side <= 5; ++side) {
                     if (this.findLog(pos.getSide(BlockFace.fromIndex(side)), visited, distance + 1, check, BlockFace.fromIndex(side)))
                         return true;
                 }
@@ -199,9 +206,17 @@ public class BlockLeaves extends BlockTransparentMeta {
     public BlockColor getColor() {
         return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;
+    }
+
+    protected boolean canDropApple() {
+        return (this.getDamage() & 0x03) == OAK;
+    }
+
+    protected Item getSapling() {
+        return new ItemBlock(get(SAPLING), this.getDamage() & 0x03);
     }
 }

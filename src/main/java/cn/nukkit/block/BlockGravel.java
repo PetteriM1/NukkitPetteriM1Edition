@@ -4,17 +4,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemFlint;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
-
-import java.util.Random;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockGravel extends BlockFallable {
-
-    public BlockGravel() {
-    }
 
     @Override
     public int getId() {
@@ -43,7 +39,7 @@ public class BlockGravel extends BlockFallable {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (new Random().nextInt(9) == 0) {
+        if (Utils.random.nextInt(9) == 0) {
             return new Item[]{
                     new ItemFlint()
             };

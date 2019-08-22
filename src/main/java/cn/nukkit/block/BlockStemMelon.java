@@ -8,6 +8,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created by Pub4Game on 15.01.2016.
@@ -40,8 +41,7 @@ public class BlockStemMelon extends BlockCrops {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            NukkitRandom random = new NukkitRandom();
-            if (random.nextRange(1, 2) == 1) {
+            if (Utils.rand(1, 2) == 1) {
                 if (this.getDamage() < 0x07) {
                     Block block = this.clone();
                     block.setDamage(block.getDamage() + 1);
@@ -58,6 +58,7 @@ public class BlockStemMelon extends BlockCrops {
                             return Level.BLOCK_UPDATE_RANDOM;
                         }
                     }
+                    NukkitRandom random = new NukkitRandom();
                     Block side = this.getSide(Plane.HORIZONTAL.random(random));
                     Block d = side.down();
                     if (side.getId() == AIR && (d.getId() == FARMLAND || d.getId() == GRASS || d.getId() == DIRT)) {
@@ -81,9 +82,8 @@ public class BlockStemMelon extends BlockCrops {
 
     @Override
     public Item[] getDrops(Item item) {
-        NukkitRandom random = new NukkitRandom();
         return new Item[]{
-                new ItemSeedsMelon(0, random.nextRange(0, 3))
+                new ItemSeedsMelon(0, Utils.rand(0, 3))
         };
     }
 }

@@ -1,13 +1,17 @@
 package cn.nukkit.form.element;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ElementDropdown extends Element {
 
-    private final String type = "dropdown"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "dropdown";
     private String text = "";
     private List<String> options;
+    @SerializedName("default")
     private int defaultOptionIndex = 0;
 
     public ElementDropdown(String text) {

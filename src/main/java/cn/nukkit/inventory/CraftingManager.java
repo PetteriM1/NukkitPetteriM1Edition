@@ -12,8 +12,6 @@ import cn.nukkit.utils.Utils;
 import io.netty.util.collection.CharObjectHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.zip.Deflater;
 
@@ -26,6 +24,9 @@ public class CraftingManager {
     public final Collection<Recipe> recipes = new ArrayDeque<>();
 
     public static BatchPacket packet = null;
+    public static BatchPacket packet354 = null;
+    public static BatchPacket packetPre354 = null;
+
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
 
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -49,38 +50,45 @@ public class CraftingManager {
 
     @SuppressWarnings("unchecked")
     public CraftingManager() {
-        String path = Server.getInstance().getDataPath() + "recipes.json";
-
-        if (!new File(path).exists()) {
-            try {
-                Utils.writeFile(path, Server.class.getClassLoader().getResourceAsStream("recipes.json"));
-            } catch (IOException e) {
-                MainLogger.getLogger().logException(e);
-            }
-        }
-
-        List<Map> recipes = new Config(path, Config.JSON).getMapList("recipes");
+        List<Map> recipes = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection().getMapList("recipes");
         MainLogger.getLogger().info("Loading recipes...");
         for (Map<String, Object> recipe : recipes) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
                     case 0:
-                        Map<String, Object> first = ((List<Map>) recipe.get("output")).get(0);
+                        String craftingBlock = (String) recipe.get("block");
+                        if (!"crafting_table".equals(craftingBlock)) {
+                            // Ignore other recipes than crafting table ones
+                            continue;
+                        }
+                        List<Map> outputs = ((List<Map>) recipe.get("output"));
+                        if (outputs.size() > 1) {
+                            continue;
+                        }
+                        Map<String, Object> first = outputs.get(0);
                         List<Item> sorted = new ArrayList<>();
                         for (Map<String, Object> ingredient : ((List<Map>) recipe.get("input"))) {
                             sorted.add(Item.fromJson(ingredient));
                         }
                         sorted.sort(recipeComparator);
 
-                        ShapelessRecipe result = new ShapelessRecipe(Item.fromJson(first), sorted);
+                        String recipeId = (String) recipe.get("id");
+                        int priority = Utils.toInt(recipe.get("priority"));
+
+                        ShapelessRecipe result = new ShapelessRecipe(recipeId, priority, Item.fromJson(first), sorted);
 
                         this.registerRecipe(result);
                         break;
                     case 1:
-                        List<Map> output = (List<Map>) recipe.get("output");
+                        craftingBlock = (String) recipe.get("block");
+                        if (!"crafting_table".equals(craftingBlock)) {
+                            // Ignore other recipes than crafting table ones
+                            continue;
+                        }
+                        outputs = (List<Map>) recipe.get("output");
 
-                        first = output.remove(0);
-                        String[] shape = ((List<String>) recipe.get("shape")).stream().toArray(String[]::new);
+                        first = outputs.remove(0);
+                        String[] shape = ((List<String>) recipe.get("shape")).toArray(new String[0]);
                         Map<Character, Item> ingredients = new CharObjectHashMap<>();
                         List<Item> extraResults = new ArrayList<>();
 
@@ -92,17 +100,32 @@ public class CraftingManager {
                             ingredients.put(ingredientChar, ingredient);
                         }
 
-                        for (Map<String, Object> data : output) {
+                        for (Map<String, Object> data : outputs) {
                             extraResults.add(Item.fromJson(data));
                         }
 
-                        this.registerRecipe(new ShapedRecipe(Item.fromJson(first), shape, ingredients, extraResults));
+                        recipeId = (String) recipe.get("id");
+                        priority = Utils.toInt(recipe.get("priority"));
+
+                        this.registerRecipe(new ShapedRecipe(recipeId, priority, Item.fromJson(first), shape, ingredients, extraResults));
                         break;
                     case 2:
                     case 3:
+                        craftingBlock = (String) recipe.get("block");
+                        if (!"furnace".equals(craftingBlock)) {
+                            // Ignore other recipes than furnaces
+                            continue;
+                        }
                         Map<String, Object> resultMap = (Map) recipe.get("output");
                         Item resultItem = Item.fromJson(resultMap);
-                        this.registerRecipe(new FurnaceRecipe(resultItem, Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : -1, 1)));
+                        Item inputItem;
+                        try {
+                            Map<String, Object> inputMap = (Map) recipe.get("input");
+                            inputItem = Item.fromJson(inputMap);
+                        } catch (Exception old) {
+                            inputItem = Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : -1, 1);
+                        }
+                        this.registerRecipe(new FurnaceRecipe(resultItem, inputItem));
                         break;
                     default:
                         break;
@@ -114,6 +137,8 @@ public class CraftingManager {
 
         this.registerBrewing();
         this.rebuildPacket();
+        this.rebuild354Packet();
+        this.rebuildPre354Packet();
 
         MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
     }
@@ -178,6 +203,50 @@ public class CraftingManager {
         pk.encode();
 
         packet = pk.compress(Deflater.BEST_COMPRESSION);
+    }
+
+    public void rebuild354Packet() {
+        CraftingDataPacket pk = new CraftingDataPacket();
+        pk.cleanRecipes = true;
+        pk.protocol = 354;
+
+        for (Recipe recipe : this.getRecipes()) {
+            if (recipe instanceof ShapedRecipe) {
+                pk.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+
+        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+            pk.addFurnaceRecipe(recipe);
+        }
+
+        pk.encode();
+
+        packet354 = pk.compress(Deflater.BEST_COMPRESSION);
+    }
+
+    public void rebuildPre354Packet() {
+        CraftingDataPacket pk = new CraftingDataPacket();
+        pk.cleanRecipes = true;
+        pk.protocol = 0;
+
+        for (Recipe recipe : this.getRecipes()) {
+            if (recipe instanceof ShapedRecipe) {
+                pk.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+
+        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+            pk.addFurnaceRecipe(recipe);
+        }
+
+        pk.encode();
+
+        packetPre354 = pk.compress(Deflater.BEST_COMPRESSION);
     }
 
     public Collection<Recipe> getRecipes() {

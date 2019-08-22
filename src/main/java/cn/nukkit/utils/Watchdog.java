@@ -9,7 +9,7 @@ public class Watchdog extends Thread {
 
     private final Server server;
     private final long time;
-    public boolean running = true;
+    public boolean running;
     private boolean responding = true;
 
     public Watchdog(Server server, long time) {
@@ -28,15 +28,18 @@ public class Watchdog extends Thread {
 
     @Override
     public void run() {
-        while (this.running && server.isRunning()) {
+        while (this.running) {
             long current = server.getNextTick();
             if (current != 0) {
                 long diff = System.currentTimeMillis() - current;
-                if (diff > time) {
+                if (!responding && diff > time * 2) {
+                    System.exit(1); // Kill the server if it gets stuck on shutdown
+                }
+                if (server.isRunning() && diff > time) {
                     if (responding) {
                         MainLogger logger = this.server.getLogger();
                         logger.emergency("--------- Server stopped responding ---------");
-                        logger.emergency(diff / 1000d + "s");
+                        logger.emergency(Math.round(diff / 1000d) + "s");
                         logger.emergency("---------------- Main thread ----------------");
 
                         dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger);
@@ -49,7 +52,7 @@ public class Watchdog extends Thread {
                         }
                         logger.emergency("---------------------------------------------");
                         responding = false;
-                        this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + diff / 1000d + " seconds");
+                        this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
                     }
                 } else {
                     responding = true;

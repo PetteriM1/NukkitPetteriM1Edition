@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class DoubleTag extends NumberTag<Double> {
+
     public double data;
 
     @Override
@@ -38,13 +39,18 @@ public class DoubleTag extends NumberTag<Double> {
     }
 
     @Override
+    public Double parseValue() {
+        return this.data;
+    }
+
+    @Override
     public byte getId() {
         return TAG_Double;
     }
 
     @Override
     public String toString() {
-        return "DoubleTag " + this.getName() + " (data: " + data + ")";
+        return "DoubleTag " + this.getName() + " (data: " + data + ')';
     }
 
     @Override

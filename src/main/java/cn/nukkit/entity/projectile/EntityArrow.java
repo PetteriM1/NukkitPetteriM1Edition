@@ -4,8 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
@@ -16,6 +15,12 @@ public class EntityArrow extends EntityProjectile {
     public static final int NETWORK_ID = 80;
 
     public static final int DATA_SOURCE_ID = 17;
+
+    public static final int PICKUP_NONE = 0;
+    public static final int PICKUP_ANY = 1;
+    public static final int PICKUP_CREATIVE = 2;
+
+    protected int pickupMode;
 
     @Override
     public int getNetworkId() {
@@ -47,9 +52,6 @@ public class EntityArrow extends EntityProjectile {
         return 0.01f;
     }
 
-    protected float gravity = 0.03f;
-    protected float drag = 0.01f;
-
     public EntityArrow(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }
@@ -68,10 +70,7 @@ public class EntityArrow extends EntityProjectile {
         super.initEntity();
 
         this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 2;
-
-        if (!this.namedTag.contains("canNotPickup")) {
-            this.namedTag.putBoolean("canNotPickup", false);
-        }
+        this.pickupMode = namedTag.contains("pickup") ? namedTag.getByte("pickup") : PICKUP_ANY;
     }
 
     public void setCritical() {
@@ -91,7 +90,7 @@ public class EntityArrow extends EntityProjectile {
         int base = super.getResultDamage();
 
         if (this.isCritical()) {
-            base += ThreadLocalRandom.current().nextInt(base / 2 + 2);
+            base += Utils.random.nextInt(base / 2 + 2);
         }
 
         return base;
@@ -110,8 +109,6 @@ public class EntityArrow extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
             if (this.firstTickOnGround) {
@@ -122,11 +119,25 @@ public class EntityArrow extends EntityProjectile {
 
         if (this.age > 1200) {
             this.close();
-            hasUpdate = true;
         }
 
         this.timing.stopTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putByte("pickup", this.pickupMode);
+    }
+
+    public int getPickupMode() {
+        return this.pickupMode;
+    }
+
+    public void setPickupMode(int pickupMode) {
+        this.pickupMode = pickupMode;
     }
 }

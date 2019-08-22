@@ -325,7 +325,7 @@ public abstract class BaseInventory implements Inventory {
             }
         }
 
-        return itemSlots.stream().toArray(Item[]::new);
+        return itemSlots.toArray(new Item[0]);
     }
 
     @Override
@@ -352,16 +352,15 @@ public abstract class BaseInventory implements Inventory {
                     if (slot.getCount() <= 0) {
                         itemSlots.remove(slot);
                     }
-
                 }
             }
 
-            if (itemSlots.size() == 0) {
+            if (itemSlots.isEmpty()) {
                 break;
             }
         }
 
-        return itemSlots.stream().toArray(Item[]::new);
+        return itemSlots.toArray(new Item[0]);
     }
 
     @Override
@@ -467,7 +466,7 @@ public abstract class BaseInventory implements Inventory {
 
         for (Player player : players) {
             int id = player.getWindowId(this);
-            if (id == -1 || !player.spawned) {
+            if (id == -1) {
                 this.close(player);
                 continue;
             }
@@ -526,7 +525,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public void sendContents(Collection<Player> players) {
-        this.sendContents(players.stream().toArray(Player[]::new));
+        this.sendContents(players.toArray(new Player[0]));
     }
 
     @Override
@@ -553,7 +552,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public void sendSlot(int index, Collection<Player> players) {
-        this.sendSlot(index, players.stream().toArray(Player[]::new));
+        this.sendSlot(index, players.toArray(new Player[0]));
     }
 
     @Override

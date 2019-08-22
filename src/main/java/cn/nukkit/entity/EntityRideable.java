@@ -13,4 +13,6 @@ public interface EntityRideable {
      * @return {@code true} if the mounting successful
      */
     boolean mountEntity(Entity entity);
+
+    boolean dismountEntity(Entity entity);
 }

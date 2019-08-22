@@ -1,11 +1,9 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
-import cn.nukkit.block.BlockLava;
-import cn.nukkit.block.BlockLiquid;
-import cn.nukkit.block.BlockWater;
+import cn.nukkit.Server;
+import cn.nukkit.block.*;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.level.Level;
@@ -52,7 +50,7 @@ public class ItemBucket extends Item {
         }
     }
 
-    protected int getDamageByTarget(int target) {
+    public static int getDamageByTarget(int target) {
         switch (target) {
             case 2:
             case 3:
@@ -85,7 +83,7 @@ public class ItemBucket extends Item {
 
         if (targetBlock instanceof BlockAir) {
             if (target instanceof BlockLiquid && target.getDamage() == 0) {
-                Item result = Item.get(BUCKET, this.getDamageByTarget(target.getId()), 1);
+                Item result = Item.get(BUCKET, getDamageByTarget(target.getId()), 1);
                 PlayerBucketFillEvent ev;
                 player.getServer().getPluginManager().callEvent(ev = new PlayerBucketFillEvent(player, block, face, this, result));
                 if (!ev.isCancelled()) {
@@ -123,7 +121,7 @@ public class ItemBucket extends Item {
             PlayerBucketEmptyEvent ev;
             player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
 
-            if (player.getLevel().getName().equals("nether") && this.getDamage() != 10) {
+            if (player.getLevel().isNether && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
 
@@ -140,6 +138,27 @@ public class ItemBucket extends Item {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_LAVA);
                 } else {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
+                }
+
+                if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
+                    switch (this.getDamage()) {
+                        case 2:
+                            Entity e2 = Entity.createEntity("Cod", block);
+                            if (e2 != null) e2.spawnToAll();
+                            break;
+                        case 3:
+                            Entity e3 = Entity.createEntity("Salmon", block);
+                            if (e3 != null) e3.spawnToAll();
+                            break;
+                        case 4:
+                            Entity e4 = Entity.createEntity("TropicalFish", block);
+                            if (e4 != null) e4.spawnToAll();
+                            break;
+                        case 5:
+                            Entity e5 = Entity.createEntity("Pufferfish", block);
+                            if (e5 != null) e5.spawnToAll();
+                            break;
+                    }
                 }
 
                 return true;

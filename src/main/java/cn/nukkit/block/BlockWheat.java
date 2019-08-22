@@ -3,7 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSeedsWheat;
 import cn.nukkit.item.ItemWheat;
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created on 2015/12/2 by xtypr.
@@ -39,7 +39,7 @@ public class BlockWheat extends BlockCrops {
         if (this.getDamage() >= 0x07) {
             return new Item[]{
                     new ItemWheat(),
-                    new ItemSeedsWheat(0, ThreadLocalRandom.current().nextInt(1, 3))
+                    new ItemSeedsWheat(0, Utils.random.nextInt(1, 3))
             };
         } else {
             return new Item[]{

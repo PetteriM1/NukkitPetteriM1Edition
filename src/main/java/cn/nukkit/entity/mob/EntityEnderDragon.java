@@ -1,22 +1,20 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-import cn.nukkit.level.Location;
-import cn.nukkit.event.entity.ProjectileLaunchEvent;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.math.Vector3;
-import cn.nukkit.entity.projectile.EntityEnderCharge;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityFlyingMob;
+import cn.nukkit.entity.item.EntityEndCrystal;
+import cn.nukkit.entity.projectile.EntityEnderCharge;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.utils.Utils;
 
 public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
@@ -33,12 +31,12 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public float getWidth() {
-        return 13f;
+        return 16f;
     }
 
     @Override
     public float getHeight() {
-        return 4f;
+        return 8f;
     }
 
     @Override
@@ -50,7 +48,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     public void initEntity() {
         super.initEntity();
 
-        this.setHealth(200);
+        this.fireProof = true;
         this.setMaxHealth(200);
     }
 
@@ -67,22 +65,19 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && player.isSurvival() && distance <= 300 && distance > 20;
+            return player.spawned && player.isAlive() && !player.closed && (player.isSurvival() || player.isAdventure()) && distance <= 800 && distance > 50;
         }
-        return creature.isAlive() && !creature.closed && distance <= 300 && distance > 20;
+        return creature.isAlive() && !creature.closed && distance <= 800 && distance > 50;
     }
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 50 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 300) {
+    if (this.attackDelay > 60 && Utils.rand(1, 5) < 3 && this.distance(player) <= 300) {
             this.attackDelay = 0;
-
             double f = 1.1;
-            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
-            Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
-                    this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("EnderCharge", pos, this);
+            double yaw = this.yaw + Utils.rand(-120.0, 120.0) / 10;
+            double pitch = this.pitch + Utils.rand(-70.0, 70.0) / 10;
+            Entity k = Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
             if (!(k instanceof EntityEnderCharge)) {
                 return;
             }
@@ -103,17 +98,18 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (this.level.getName().equals("end")) {
-            float health = this.getHealth();
-
-            if (!(health > this.getMaxHealth()) && health != 0) {
-                this.setHealth(health + (float) 0.1);
+        for (Entity e : this.getLevel().getEntities()) {
+            if (e instanceof EntityEndCrystal) {
+                if (e.distanceSquared(this) <= 32) {
+                    float health = this.getHealth();
+                    if (!(health > this.getMaxHealth()) && health != 0) {
+                        this.setHealth(health + 0.1f);
+                    }
+                }
             }
         }
 
-        return hasUpdate;
+        return super.entityBaseTick(tickDiff);
     }
 
     @Override
@@ -122,7 +118,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     }
 
     @Override
-    protected DataPacket createAddEntityPacket(int protocol) {
+    protected DataPacket createAddEntityPacket() {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
         addEntity.entityUniqueId = this.getId();
@@ -139,18 +135,5 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(200).setValue(200)};
         return addEntity;
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent ev) {
-        if (ev instanceof EntityDamageByEntityEvent) {
-            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof EntityEnderCharge) {
-                ev.setCancelled(true);
-            }
-        } else {
-            super.attack(ev);
-        }
-
-        return true;
     }
 }

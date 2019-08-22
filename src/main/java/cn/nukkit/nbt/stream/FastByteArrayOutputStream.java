@@ -28,10 +28,10 @@ import java.util.Arrays;
 
 /** Simple, fast byte-array output stream that exposes the backing array.
  *
- * {@link java.io.ByteArrayOutputStream} is nice, but to get its content you
+ * <P>{@link java.io.ByteArrayOutputStream} is nice, but to get its content you
  * must generate each time a new object. This doesn't happen here.
  *
- * This class will automatically enlarge the backing array, doubling its
+ * <P>This class will automatically enlarge the backing array, doubling its
  * size whenever new space is needed. The {@link #reset()} method will
  * mark the content as empty, but will not decrease the capacity
  *
@@ -93,14 +93,13 @@ public class FastByteArrayOutputStream extends OutputStream {
     public static void ensureOffsetLength( final int arrayLength, final int offset, final int length ) {
         if ( offset < 0 ) throw new ArrayIndexOutOfBoundsException( "Offset (" + offset + ") is negative" );
         if ( length < 0 ) throw new IllegalArgumentException( "Length (" + length + ") is negative" );
-        if ( offset + length > arrayLength ) throw new ArrayIndexOutOfBoundsException( "Last index (" + ( offset + length ) + ") is greater than array length (" + arrayLength + ")" );
+        if ( offset + length > arrayLength ) throw new ArrayIndexOutOfBoundsException( "Last index (" + ( offset + length ) + ") is greater than array length (" + arrayLength + ')');
     }
 
     public static byte[] grow( final byte[] array, final int length ) {
         if ( length > array.length ) {
             final int newLength = (int)Math.min( Math.max( ( ONEOVERPHI * array.length ) >>> 16, length ), Integer.MAX_VALUE );
-            final byte t[] =
-                    new byte[ newLength ];
+            final byte[] t = new byte[ newLength ];
             System.arraycopy( array, 0, t, 0, array.length );
             return t;
         }
@@ -110,8 +109,7 @@ public class FastByteArrayOutputStream extends OutputStream {
     public static byte[] grow( final byte[] array, final int length, final int preserve ) {
         if ( length > array.length ) {
             final int newLength = (int)Math.min( Math.max( ( ONEOVERPHI * array.length ) >>> 16, length ), Integer.MAX_VALUE );
-            final byte t[] =
-                    new byte[ newLength ];
+            final byte[] t = new byte[ newLength ];
             System.arraycopy( array, 0, t, 0, preserve );
             return t;
         }

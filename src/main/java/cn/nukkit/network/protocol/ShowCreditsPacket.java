@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class ShowCreditsPacket extends DataPacket {
 
     public static final int STATUS_START_CREDITS = 0;
@@ -15,6 +18,8 @@ public class ShowCreditsPacket extends DataPacket {
 
     @Override
     public void decode() {
+        this.eid = this.getEntityRuntimeId();
+        this.status = this.getVarInt();
     }
 
     @Override

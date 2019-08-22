@@ -2,26 +2,20 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.data.ByteEntityData;
+import cn.nukkit.entity.mob.EntityEnderDragon;
+import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
-
-    EntityDamageEvent source;
 
     protected int stayTime = 0;
     protected int moveTime = 0;
@@ -32,20 +26,20 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     protected Vector3 target = null;
     protected Entity followTarget = null;
     protected int attackDelay = 0;
+    protected int inLoveTicks = 0;
 
     protected boolean baby = false;
     private boolean movement = true;
     private boolean friendly = false;
-    private boolean wallcheck = true;
 
-    protected List<Block> blocksAround = new ArrayList<>();
-    protected List<Block> collisionBlocks = new ArrayList<>();
+    public Item[] armor;
 
-    private boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
-    private int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 10000);
+    private static final boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
+    private static final int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 8000);
 
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        this.setHealth(this.getMaxHealth());
     }
 
     public abstract Vector3 updateMove(int tickDiff);
@@ -57,15 +51,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean isMovement() {
-        return this.movement;
+        return this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty() && this.movement;
     }
 
     public boolean isKnockback() {
         return this.attackTime > 0;
-    }
-
-    public boolean isWallCheck() {
-        return this.wallcheck;
     }
 
     public void setFriendly(boolean bool) {
@@ -74,10 +64,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public void setMovement(boolean value) {
         this.movement = value;
-    }
-
-    public void setWallCheck(boolean value) {
-        this.wallcheck = value;
     }
 
     public double getSpeed() {
@@ -113,8 +99,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public void setBaby(boolean baby) {
-        this.baby = true;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BABY, true);
+        this.baby = baby;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BABY, baby);
         this.setScale((float) 0.5);
     }
 
@@ -126,10 +112,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             this.setMovement(this.namedTag.getBoolean("Movement"));
         }
 
-        if (this.namedTag.contains("WallCheck")) {
-            this.setWallCheck(this.namedTag.getBoolean("WallCheck"));
-        }
-
         if (this.namedTag.contains("Age")) {
             this.age = this.namedTag.getShort("Age");
         }
@@ -137,8 +119,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this.namedTag.getBoolean("Baby")) {
             this.setBaby(true);
         }
-
-        this.setDataProperty(new ByteEntityData(DATA_FLAG_NO_AI, (byte) 1));
     }
 
     public void saveNBT() {
@@ -146,7 +126,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         this.namedTag.putBoolean("Baby", this.isBaby());
         this.namedTag.putBoolean("Movement", this.isMovement());
-        this.namedTag.putBoolean("WallCheck", this.isWallCheck());
         this.namedTag.putShort("Age", this.age);
     }
 
@@ -154,7 +133,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this instanceof EntityMob) {
             if (creature instanceof Player) {
                 Player player = (Player) creature;
-                return !player.closed && player.spawned && player.isAlive() && player.isSurvival() && distance <= 80;
+                return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 80;
             }
             return creature.isAlive() && !creature.closed && distance <= 80;
         }
@@ -165,12 +144,12 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public boolean entityBaseTick(int tickDiff) {
         Timings.entityBaseTickTimer.startTiming();
 
-        if (this.despawn && this.age > this.despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
+        if (this.canDespawn() && this.age > despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
             return true;
         }
 
-        if (this instanceof EntityMob && this.attackDelay < 500) {
+        if (this instanceof EntityMob && this.attackDelay < 400) {
             this.attackDelay++;
         }
 
@@ -178,6 +157,15 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         if (this.moveTime > 0) {
             this.moveTime -= tickDiff;
+        }
+
+        if (this.isInLove()) {
+            this.inLoveTicks -= tickDiff;
+            if (this.age % 20 == 0) {
+                for (int i = 0; i < 3; i++) {
+                    this.level.addParticle(new HeartParticle(this.add(Utils.rand(-1.0, 1.0), this.getMountedYOffset() + Utils.rand(-1.0, 1.0), Utils.rand(-1.0, 1.0))));
+                }
+            }
         }
 
         Timings.entityBaseTickTimer.stopTiming();
@@ -195,64 +183,68 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return false;
         }
 
+        if (source instanceof EntityDamageByEntityEvent) {
+            ((EntityDamageByEntityEvent) source).setKnockBack(0.25f);
+        }
+
         super.attack(source);
 
         this.target = null;
+        this.stayTime = 0;
         return true;
     }
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0) {
+        if (this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty()) {
             super.setMotion(motion);
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean move(double dx, double dy, double dz) {
-        if (this.getServer().getMobAiEnabled() && this.getServer().getOnlinePlayers().size() > 0) {
-            Timings.entityMoveTimer.startTiming();
+        Timings.entityMoveTimer.startTiming();
 
-            double movX = dx * moveMultifier;
-            double movY = dy;
-            double movZ = dz * moveMultifier;
+        this.blocksAround = null;
 
-            AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.getOffsetBoundingBox(dx, dy, dz));
-            if (this.isWallCheck()) {
-                for (AxisAlignedBB bb : list) {
-                    dx = bb.calculateXOffset(this.boundingBox, dx);
-                }
-                this.boundingBox.offset(dx, 0, 0);
+        double movX = dx * moveMultifier;
+        double movY = dy;
+        double movZ = dz * moveMultifier;
 
-                for (AxisAlignedBB bb : list) {
-                    dz = bb.calculateZOffset(this.boundingBox, dz);
-                }
-                this.boundingBox.offset(0, 0, dz);
-            }
-            for (AxisAlignedBB bb : list) {
-                dy = bb.calculateYOffset(this.boundingBox, dy);
-            }
-            this.boundingBox.offset(0, dy, 0);
-
-            this.setComponents(this.x + dx, this.y + dy, this.z + dz);
-            this.checkChunks();
-
-            this.checkGroundState(movX, movY, movZ, dx, dy, dz);
-            this.updateFallState(this.onGround);
-
-            Timings.entityMoveTimer.stopTiming();
+        AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.getOffsetBoundingBox(dx, dy, dz));
+        for (AxisAlignedBB bb : list) {
+            dx = bb.calculateXOffset(this.boundingBox, dx);
         }
+        this.boundingBox.offset(dx, 0, 0);
+
+        for (AxisAlignedBB bb : list) {
+            dz = bb.calculateZOffset(this.boundingBox, dz);
+        }
+        this.boundingBox.offset(0, 0, dz);
+
+        for (AxisAlignedBB bb : list) {
+            dy = bb.calculateYOffset(this.boundingBox, dy);
+        }
+        this.boundingBox.offset(0, dy, 0);
+
+        this.setComponents(this.x + dx, this.y + dy, this.z + dz);
+        this.checkChunks();
+
+        this.checkGroundState(movX, movY, movZ, dx, dy, dz);
+        this.updateFallState(this.onGround);
+
+        Timings.entityMoveTimer.stopTiming();
         return true;
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (item.getId() == Item.NAME_TAG) {
-            if (item.hasCustomName()) {
+            if (item.hasCustomName() && !(this instanceof EntityEnderDragon)) {
                 this.setNameTag(item.getCustomName());
                 this.setNameTagVisible(true);
-                player.getInventory().removeItem(item);
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                 return true;
             }
         }
@@ -260,12 +252,217 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         return false;
     }
 
-    @Override
-    public Item[] getDrops() {
-        if (this.hasCustomName()) {
-            return new Item[]{Item.get(Item.NAME_TAG, 0, 1)};
-        } else {
-            return new Item[0];
+    public void setInLove() {
+        this.inLoveTicks = 600;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
+    }
+
+    public boolean isInLove() {
+        return inLoveTicks > 0;
+    }
+
+    public Item[] getRandomArmor() {
+        Item[] slots = new Item[4];
+        Item helmet = Item.get(0);
+        Item chestplate = Item.get(0);
+        Item leggings = Item.get(0);
+        Item boots = Item.get(0);
+
+        switch (Utils.rand(1, 5)) {
+            case 1:
+                if (Utils.rand(1, 100) < 39) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.LEATHER_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
+                }
+                break;
+            case 2:
+                if (Utils.rand(1, 100) < 50) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.GOLD_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
+                }
+                break;
+            case 3:
+                if (Utils.rand(1, 100) < 14) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.CHAIN_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
+                }
+                break;
+            case 4:
+                if (Utils.rand(1, 100) < 3) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.IRON_HELMET, 0, 1);
+                        this.addHealth(1);
+                    }
+                }
+                break;
+            case 5:
+                if (Utils.rand(1, 100) == 100) {
+                    if (Utils.rand(0, 1) == 0) {
+                        helmet = Item.get(Item.DIAMOND_HELMET, 0, 1);
+                        this.addHealth(2);
+                    }
+                }
+                break;
         }
+
+        slots[0] = helmet;
+
+        if (Utils.rand(1, 4) != 1) {
+            switch (Utils.rand(1, 5)) {
+                case 1:
+                    if (Utils.rand(1, 100) < 39) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.LEATHER_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 2:
+                    if (Utils.rand(1, 100) < 50) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.GOLD_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 3:
+                    if (Utils.rand(1, 100) < 14) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.CHAIN_CHESTPLATE, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 4:
+                    if (Utils.rand(1, 100) < 3) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.IRON_CHESTPLATE, 0, 1);
+                            this.addHealth(2);
+                        }
+                    }
+                    break;
+                case 5:
+                    if (Utils.rand(1, 100) == 100) {
+                        if (Utils.rand(0, 1) == 0) {
+                            chestplate = Item.get(Item.DIAMOND_CHESTPLATE, 0, 1);
+                            this.addHealth(3);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        slots[1] = chestplate;
+
+        if (Utils.rand(1, 2) == 2) {
+            switch (Utils.rand(1, 5)) {
+                case 1:
+                    if (Utils.rand(1, 100) < 39) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.LEATHER_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 2:
+                    if (Utils.rand(1, 100) < 50) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.GOLD_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 3:
+                    if (Utils.rand(1, 100) < 14) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.CHAIN_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 4:
+                    if (Utils.rand(1, 100) < 3) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.IRON_LEGGINGS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 5:
+                    if (Utils.rand(1, 100) == 100) {
+                        if (Utils.rand(0, 1) == 0) {
+                            leggings = Item.get(Item.DIAMOND_LEGGINGS, 0, 1);
+                            this.addHealth(2);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        slots[2] = leggings;
+
+        if (Utils.rand(1, 5) < 3) {
+            switch (Utils.rand(1, 5)) {
+                case 1:
+                    if (Utils.rand(1, 100) < 39) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.LEATHER_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 2:
+                    if (Utils.rand(1, 100) < 50) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.GOLD_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 3:
+                    if (Utils.rand(1, 100) < 14) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.CHAIN_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 4:
+                    if (Utils.rand(1, 100) < 3) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.IRON_BOOTS, 0, 1);
+                            this.addHealth(1);
+                        }
+                    }
+                    break;
+                case 5:
+                    if (Utils.rand(1, 100) == 100) {
+                        if (Utils.rand(0, 1) == 0) {
+                            boots = Item.get(Item.DIAMOND_BOOTS, 0, 1);
+                            this.addHealth(2);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        slots[3] = boots;
+
+        return slots;
+    }
+
+    private void addHealth(int health) {
+        this.setMaxHealth(this.getMaxHealth() + health);
+        this.setHealth(this.getHealth() + health);
+    }
+
+    public boolean canDespawn() {
+        return despawn;
     }
 }

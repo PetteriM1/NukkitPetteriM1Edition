@@ -1,20 +1,16 @@
 package cn.nukkit.block;
 
-import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.Player;
-import cn.nukkit.math.BlockFace;
 import cn.nukkit.blockentity.BlockEntitySpawner;
-import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
  * Created by Pub4Game on 27.12.2015.
  */
 public class BlockMobSpawner extends BlockSolid {
-
-    public BlockMobSpawner() {
-    }
 
     @Override
     public String getName() {
@@ -44,15 +40,8 @@ public class BlockMobSpawner extends BlockSolid {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (!super.place(item, block, target, face, fx, fy, fz, player)) return false;
-        CompoundTag nbt = new CompoundTag();
-        new BlockEntitySpawner(block.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+        new BlockEntitySpawner(block.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), new CompoundTag());
         return true;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) == null) return new Item[0];
-        return new Item[]{Item.get(Item.MONSTER_SPAWNER)};
     }
 
     @Override
@@ -63,5 +52,15 @@ public class BlockMobSpawner extends BlockSolid {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 3;
     }
 }

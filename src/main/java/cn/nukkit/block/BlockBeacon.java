@@ -14,9 +14,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class BlockBeacon extends BlockTransparent {
 
-    public BlockBeacon() {
-    }
-
     @Override
     public int getId() {
         return BEACON;
@@ -57,16 +54,13 @@ public class BlockBeacon extends BlockTransparent {
         if (player != null) {
 
             BlockEntity t = this.getLevel().getBlockEntity(this);
-            BlockEntityBeacon beacon;
-            if (t instanceof BlockEntityBeacon) {
-                beacon = (BlockEntityBeacon) t;
-            } else {
+            if (!(t instanceof BlockEntityBeacon)) {
                 CompoundTag nbt = new CompoundTag("")
                         .putString("id", BlockEntity.BEACON)
                         .putInt("x", (int) this.x)
                         .putInt("y", (int) this.y)
                         .putInt("z", (int) this.z);
-                beacon = new BlockEntityBeacon(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+                new BlockEntityBeacon(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
             }
 
             player.addWindow(new BeaconInventory(this), Player.BEACON_WINDOW_ID);

@@ -2,7 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -58,7 +58,7 @@ public class EntityOcelot extends EntityTameableAnimal {
     }
 
     public int getKillExperience() {
-        return EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 
     public String getOwnerUUID() {

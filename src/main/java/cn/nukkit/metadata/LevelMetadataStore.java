@@ -13,6 +13,6 @@ public class LevelMetadataStore extends MetadataStore {
         if (!(level instanceof Level)) {
             throw new IllegalArgumentException("Argument must be a Level instance");
         }
-        return (((Level) level).getName() + ":" + metadataKey).toLowerCase();
+        return (((Level) level).getName() + ':' + metadataKey).toLowerCase();
     }
 }

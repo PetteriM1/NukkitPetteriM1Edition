@@ -6,6 +6,7 @@ import java.util.Arrays;
  * @author https://github.com/boy0001/
  */
 public class BytePalette {
+
     private static byte[] BYTE0 = new byte[0];
     private byte[] keys = BYTE0;
     private byte lastIndex = Byte.MIN_VALUE;

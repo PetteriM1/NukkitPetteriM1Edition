@@ -7,6 +7,7 @@ import java.util.Arrays;
  * @author https://github.com/boy0001/
  */
 public final class DataPalette implements Cloneable {
+
     protected static final ThreadLocal<boolean[]> countCache = new ThreadLocal<boolean[]>() {
         @Override
         protected boolean[] initialValue() {
@@ -96,7 +97,6 @@ public final class DataPalette implements Cloneable {
                 setPaletteFullBlock(index, (char) ((fullId & 0xFFF0) | data));
             }
         }
-
     }
 
     public int getFullBlock(int x, int y, int z) {

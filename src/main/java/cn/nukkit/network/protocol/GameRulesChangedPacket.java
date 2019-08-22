@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.utils.RuleData;
+import cn.nukkit.level.GameRules;
+import lombok.ToString;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class GameRulesChangedPacket extends DataPacket {
 
     @Override
@@ -13,7 +15,7 @@ public class GameRulesChangedPacket extends DataPacket {
         return ProtocolInfo.GAME_RULES_CHANGED_PACKET;
     }
 
-    public RuleData[] ruleDatas = new RuleData[0];
+    public GameRules gameRules;
 
     @Override
     public void decode() {
@@ -22,9 +24,6 @@ public class GameRulesChangedPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putInt(this.ruleDatas.length);
-        for (RuleData rule : this.ruleDatas) {
-            this.putRuleData(rule);
-        }
+        putGameRules(gameRules);
     }
 }

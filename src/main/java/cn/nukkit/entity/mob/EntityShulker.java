@@ -1,11 +1,9 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.projectile.EntityShulkerBullet;
-import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -14,6 +12,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,15 +56,15 @@ public class EntityShulker extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 23 && EntityUtils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
+    if (this.attackDelay > 23 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
             this.attackDelay = 0;
 
             double f = 0.5;
-            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
+        double yaw = this.yaw + Utils.rand(-120.0, 120.0) / 10;
+        double pitch = this.pitch + Utils.rand(-70.0, 70.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("ShulkerBullet", pos, this);
+            Entity k = Entity.createEntity("ShulkerBullet", pos, this);
             if (!(k instanceof EntityShulkerBullet)) {
                 return;
             }
@@ -91,9 +90,9 @@ public class EntityShulker extends EntityWalkingMob {
         super.attack(ev);
 
         if (!ev.isCancelled()) {
-            if (EntityUtils.rand(1, 15) == 5) {
+            if (Utils.rand(1, 10) == 1) {
                 this.level.addSound(new EndermanTeleportSound(this));
-                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
+                this.move(Utils.rand(-10, 10), 0, Utils.rand(-10, 10));
             }
         }
 
@@ -104,23 +103,29 @@ public class EntityShulker extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && EntityUtils.rand(1, 2) == 1) {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby() && Utils.rand(1, 2) == 1) {
             drops.add(Item.get(Item.SHULKER_SHELL, 0, 1));
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override
     public int getKillExperience() {
-        return 5;
+        return this.isBaby() ? 0 : 5;
     }
 
     @Override
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

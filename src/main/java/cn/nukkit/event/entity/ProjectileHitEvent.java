@@ -34,5 +34,4 @@ public class ProjectileHitEvent extends EntityEvent implements Cancellable {
     public void setMovingObjectPosition(MovingObjectPosition movingObjectPosition) {
         this.movingObjectPosition = movingObjectPosition;
     }
-
 }

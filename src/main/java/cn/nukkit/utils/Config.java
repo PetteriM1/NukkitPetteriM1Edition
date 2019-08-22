@@ -46,8 +46,8 @@ public class Config {
         format.put("json", Config.JSON);
         format.put("yml", Config.YAML);
         format.put("yaml", Config.YAML);
-        //format.put("sl", Config.SERIALIZED);
-        //format.put("serialize", Config.SERIALIZED);
+        format.put("sl", Config.SERIALIZED);
+        format.put("serialize", Config.SERIALIZED);
         format.put("txt", Config.ENUM);
         format.put("list", Config.ENUM);
         format.put("enum", Config.ENUM);
@@ -119,7 +119,6 @@ public class Config {
         return this.load(file, type, new ConfigSection());
     }
 
-    @SuppressWarnings("unchecked")
     public boolean load(String file, int type, ConfigSection defaultMap) {
         this.correct = true;
         this.type = type;
@@ -136,8 +135,8 @@ public class Config {
         } else {
             if (this.type == Config.DETECT) {
                 String extension = "";
-                if (this.file.getName().lastIndexOf(".") != -1 && this.file.getName().lastIndexOf(".") != 0) {
-                    extension = this.file.getName().substring(this.file.getName().lastIndexOf(".") + 1);
+                if (this.file.getName().lastIndexOf('.') != -1 && this.file.getName().lastIndexOf('.') != 0) {
+                    extension = this.file.getName().substring(this.file.getName().lastIndexOf('.') + 1);
                 }
                 if (format.containsKey(extension)) {
                     this.type = format.get(extension);
@@ -179,6 +178,21 @@ public class Config {
         return correct;
     }
 
+    public Config loadFromStream(InputStream inputStream) {
+        if (inputStream == null) return null;
+        if (this.correct) {
+            String content;
+            try {
+                content = Utils.readFile(inputStream);
+            } catch (IOException e) {
+                Server.getInstance().getLogger().logException(e);
+                return null;
+            }
+            this.parseContent(content);
+        }
+        return this;
+    }
+
     public boolean check() {
         return this.correct;
     }
@@ -211,33 +225,33 @@ public class Config {
     public boolean save(Boolean async) {
         if (this.file == null) throw new IllegalStateException("Failed to save Config. File object is undefined.");
         if (this.correct) {
-            String content = "";
+            StringBuilder content = new StringBuilder();
             switch (this.type) {
                 case Config.PROPERTIES:
-                    content = this.writeProperties();
+                    content = new StringBuilder(this.writeProperties());
                     break;
                 case Config.JSON:
-                    content = new GsonBuilder().setPrettyPrinting().create().toJson(this.config);
+                    content = new StringBuilder(new GsonBuilder().setPrettyPrinting().create().toJson(this.config));
                     break;
                 case Config.YAML:
                     DumperOptions dumperOptions = new DumperOptions();
                     dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
                     Yaml yaml = new Yaml(dumperOptions);
-                    content = yaml.dump(this.config);
+                    content = new StringBuilder(yaml.dump(this.config));
                     break;
                 case Config.ENUM:
                     for (Object o : this.config.entrySet()) {
                         Map.Entry entry = (Map.Entry) o;
-                        content += String.valueOf(entry.getKey()) + "\r\n";
+                        content.append(entry.getKey()).append("\r\n");
                     }
                     break;
             }
             if (async) {
-                Server.getInstance().getScheduler().scheduleAsyncTask(new FileWriteTask(this.file, content));
+                Server.getInstance().getScheduler().scheduleAsyncTask(new FileWriteTask(this.file, content.toString()));
 
             } else {
                 try {
-                    Utils.writeFile(this.file, content);
+                    Utils.writeFile(this.file, content.toString());
                 } catch (IOException e) {
                     Server.getInstance().getLogger().logException(e);
                 }
@@ -256,7 +270,6 @@ public class Config {
         return this.get(key, null);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T get(String key, T defaultValue) {
         return this.correct ? this.config.get(key, defaultValue) : defaultValue;
     }
@@ -453,7 +466,7 @@ public class Config {
     }
 
     private String writeProperties() {
-        String content = "#Properties Config File\r\n";
+        StringBuilder content = new StringBuilder("#Properties Config File\r\n");
         for (Object o : this.config.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
             Object v = entry.getValue();
@@ -461,14 +474,14 @@ public class Config {
             if (v instanceof Boolean) {
                 v = (Boolean) v ? "on" : "off";
             }
-            content += String.valueOf(k) + "=" + String.valueOf(v) + "\r\n";
+            content.append(k).append('=').append(v).append("\r\n");
         }
-        return content;
+        return content.toString();
     }
 
     private void parseProperties(String content) {
         for (String line : content.split("\n")) {
-            if (Pattern.compile("[a-zA-Z0-9\\-_\\.]*+=+[^\\r\\n]*").matcher(line).matches()) {
+            if (Pattern.compile("[a-zA-Z0-9\\-_.]*+=+[^\\r\\n]*").matcher(line).matches()) {
                 String[] b = line.split("=", -1);
                 String k = b[0];
                 String v = b[1].trim();
@@ -512,6 +525,7 @@ public class Config {
         remove(key);
     }
 
+    @SuppressWarnings("unchecked")
     private void parseContent(String content) {
         switch (this.type) {
             case Config.PROPERTIES:
@@ -520,8 +534,7 @@ public class Config {
             case Config.JSON:
                 GsonBuilder builder = new GsonBuilder();
                 Gson gson = builder.create();
-                this.config = new ConfigSection(gson.fromJson(content, new TypeToken<LinkedHashMap<String, Object>>() {
-                }.getType()));
+                this.config = new ConfigSection(gson.fromJson(content, new LinkedHashMapTypeToken().getType()));
                 break;
             case Config.YAML:
                 DumperOptions dumperOptions = new DumperOptions();
@@ -545,5 +558,8 @@ public class Config {
     public Set<String> getKeys(boolean child) {
         if (this.correct) return config.getKeys(child);
         return new HashSet<>();
+    }
+
+    private static class LinkedHashMapTypeToken extends TypeToken<LinkedHashMap<String, Object>> {
     }
 }

@@ -2,6 +2,7 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.item.EntityBoat;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -39,7 +40,7 @@ public class ItemBoat extends Item {
                 level.getChunk(block.getFloorX() >> 4, block.getFloorZ() >> 4), new CompoundTag("")
                 .putList(new ListTag<DoubleTag>("Pos")
                         .add(new DoubleTag("", block.getX() + 0.5))
-                        .add(new DoubleTag("", block.getY() - 0.0625))
+                        .add(new DoubleTag("", block.getY() - (target instanceof BlockWater ? 0.0625 : 0)))
                         .add(new DoubleTag("", block.getZ() + 0.5)))
                 .putList(new ListTag<DoubleTag>("Motion")
                         .add(new DoubleTag("", 0))
@@ -50,10 +51,8 @@ public class ItemBoat extends Item {
                         .add(new FloatTag("", 0)))
         );
 
-        if (player.isSurvival()) {
-            Item item = player.getInventory().getItemInHand();
-            item.setCount(item.getCount() - 1);
-            player.getInventory().setItemInHand(item);
+        if (!player.isCreative()) {
+            this.count--;
         }
 
         boat.spawnToAll();

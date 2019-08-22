@@ -1,6 +1,7 @@
 package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.LevelException;
@@ -78,7 +79,7 @@ public class Position extends Vector3 {
 
     @Override
     public String toString() {
-        return "Position(level=" + (this.isValid() ? this.getLevel().getName() : "null") + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";
+        return "Position(level=" + (this.isValid() ? this.getLevel().getName() : "null") + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ')';
     }
 
     @Override
@@ -177,5 +178,9 @@ public class Position extends Vector3 {
     @Override
     public Position clone() {
         return (Position) super.clone();
+    }
+
+    public FullChunk getChunk() {
+        return isValid() ? level.getChunk(getChunkX(), getChunkZ()) : null;
     }
 }

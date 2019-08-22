@@ -8,6 +8,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
  * Nukkit Project
  */
 public abstract class EntityCreature extends EntityLiving {
+
     public EntityCreature(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }

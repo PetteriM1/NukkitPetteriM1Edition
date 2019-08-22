@@ -14,8 +14,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class ZippedResourcePack extends AbstractResourcePack {
+
     private File file;
-    private byte[] sha256 = null;
+    private byte[] sha256;
 
     public ZippedResourcePack(File file) {
         if (!file.exists()) {

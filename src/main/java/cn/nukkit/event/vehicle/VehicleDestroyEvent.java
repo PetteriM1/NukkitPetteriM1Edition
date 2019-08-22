@@ -23,5 +23,4 @@ public class VehicleDestroyEvent extends VehicleEvent implements Cancellable {
     public Entity getAttacker() {
         return attacker;
     }
-
 }

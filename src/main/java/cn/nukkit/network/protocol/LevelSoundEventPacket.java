@@ -1,7 +1,9 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.math.Vector3f;
+import lombok.ToString;
 
+@ToString
 public class LevelSoundEventPacket extends DataPacket {
 
     public static final int SOUND_ITEM_USE_ON = 0;
@@ -190,6 +192,7 @@ public class LevelSoundEventPacket extends DataPacket {
     public static final int SOUND_ITEM_TRIDENT_THUNDER = 184;
     public static final int SOUND_ITEM_TRIDENT_HIT_GROUND = 185;
     public static final int SOUND_DEFAULT = 186;
+    public static final int SOUND_BLOCK_FLETCHING_TABLE_USE = 187;
     public static final int SOUND_ELEMCONSTRUCT_OPEN = 188;
     public static final int SOUND_ICEBOMB_HIT = 189;
     public static final int SOUND_BALLOONPOP = 190;
@@ -251,7 +254,33 @@ public class LevelSoundEventPacket extends DataPacket {
     public static final int SOUND_AMBIENT_AGGRESSIVE = 252;
     public static final int SOUND_AMBIENT_WORRIED = 253;
     public static final int SOUND_CANT_BREED = 254;
-    public static final int SOUND_UNDEFINED = 255;
+    public static final int SOUND_ITEM_SHIELD_BLOCK = 255;
+    public static final int SOUND_ITEM_BOOK_PUT = 256;
+    public static final int SOUND_BLOCK_GRINDSTONE_USE = 257;
+    public static final int SOUND_BLOCK_BELL_HIT = 258;
+    public static final int SOUND_BLOCK_CAMPFIRE_CRACKLE = 259;
+    public static final int SOUND_ROAR = 260;
+    public static final int SOUND_STUN = 261;
+    public static final int SOUND_BLOCK_SWEET_BERRY_BUSH_HURT = 262;
+    public static final int SOUND_BLOCK_SWEET_BERRY_BUSH_PICK = 263;
+    public static final int SOUND_BLOCK_CARTOGRAPHY_TABLE_USE = 264;
+    public static final int SOUND_BLOCK_STONECUTTER_USE = 265;
+    public static final int SOUND_BLOCK_COMPOSTER_EMPTY = 266;
+    public static final int SOUND_BLOCK_COMPOSTER_FILL = 267;
+    public static final int SOUND_BLOCK_COMPOSTER_FILL_SUCCESS = 268;
+    public static final int SOUND_BLOCK_COMPOSTER_READY = 269;
+    public static final int SOUND_BLOCK_BARREL_OPEN = 270;
+    public static final int SOUND_BLOCK_BARREL_CLOSE = 271;
+    public static final int SOUND_RAID_HORN = 272;
+    public static final int SOUND_BLOCK_LOOM_USE = 273;
+    public static final int SOUND_AMBIENT_IN_RAID = 274;
+    public static final int SOUND_UI_CARTOGRAPHY_TABLE_TAKE_RESULT = 275;
+    public static final int SOUND_UI_STONECUTTER_TAKE_RESULT = 276;
+    public static final int SOUND_UI_LOOM_TAKE_RESULT = 277;
+    public static final int SOUND_BLOCK_SMOKER_SMOKE = 278;
+    public static final int SOUND_BLOCK_BLASTFURNACE_FIRE_CRACKLE = 279;
+    public static final int SOUND_BLOCK_SMITHING_TABLE_USE = 280;
+    public static final int SOUND_UNDEFINED = 281;
 
     public int sound;
     public float x;
@@ -264,7 +293,7 @@ public class LevelSoundEventPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.sound = this.getByte();
+        this.sound = (int) this.getUnsignedVarInt();
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
@@ -278,7 +307,7 @@ public class LevelSoundEventPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putByte((byte) this.sound);
+        this.putUnsignedVarInt(this.sound);
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.extraData);
         this.putString(this.entityIdentifier);

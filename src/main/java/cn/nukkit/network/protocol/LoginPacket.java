@@ -4,6 +4,7 @@ import cn.nukkit.entity.data.Skin;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import lombok.ToString;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@ToString
 public class LoginPacket extends DataPacket {
 
     public String username;
@@ -46,8 +48,7 @@ public class LoginPacket extends DataPacket {
 
     private void decodeChainData() {
         Map<String, List<String>> map = new Gson().fromJson(new String(this.get(getLInt()), StandardCharsets.UTF_8),
-                new TypeToken<Map<String, List<String>>>() {
-                }.getType());
+                new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
         List<String> chains = map.get("chain");
         for (String c : chains) {
@@ -89,5 +90,8 @@ public class LoginPacket extends DataPacket {
         String[] base = token.split("\\.");
         if (base.length < 2) return null;
         return new Gson().fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
+    }
+
+    private static class MapTypeToken extends TypeToken<Map<String, List<String>>> {
     }
 }

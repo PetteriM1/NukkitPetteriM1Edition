@@ -4,7 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public class BlockEntityMusic extends BlockEntitySpawnable {
+public class BlockEntityMusic extends BlockEntity {
 
     public BlockEntityMusic(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -16,6 +16,10 @@ public class BlockEntityMusic extends BlockEntitySpawnable {
             this.namedTag.putByte("note", 0);
         }
 
+        if (!this.namedTag.contains("powered")) {
+            this.namedTag.putBoolean("note", false);
+        }
+
         super.initBlockEntity();
     }
 
@@ -24,14 +28,19 @@ public class BlockEntityMusic extends BlockEntitySpawnable {
         return this.getBlock().getId() == Block.NOTEBLOCK;
     }
 
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return getDefaultCompound(this, MUSIC)
-                .putByte("note", this.namedTag.getByte("note"));
+    public void changePitch() {
+        this.namedTag.putByte("note", (this.namedTag.getByte("note") + 1) % 25);
     }
 
-    public void changePitch() {
-        this.namedTag.putByte("note", Math.abs(this.namedTag.getByte("note") + 1) % 25);
-        setDirty();
+    public int getPitch() {
+        return this.namedTag.getByte("note");
+    }
+
+    public void setPowered(boolean powered) {
+        this.namedTag.putBoolean("powered", powered);
+    }
+
+    public boolean isPowered() {
+        return this.namedTag.getBoolean("powered");
     }
 }

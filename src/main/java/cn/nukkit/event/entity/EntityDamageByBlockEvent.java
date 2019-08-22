@@ -19,5 +19,4 @@ public class EntityDamageByBlockEvent extends EntityDamageEvent {
     public Block getDamager() {
         return damager;
     }
-
 }

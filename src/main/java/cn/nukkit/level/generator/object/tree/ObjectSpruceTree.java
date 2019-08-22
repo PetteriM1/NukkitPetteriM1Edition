@@ -10,17 +10,8 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public class ObjectSpruceTree extends ObjectTree {
-    private int treeHeight = 15;
 
-    @Override
-    public int getTrunkBlock() {
-        return Block.LOG;
-    }
-
-    @Override
-    public int getLeafBlock() {
-        return Block.LEAVES;
-    }
+    protected int treeHeight = 15;
 
     @Override
     public int getType() {
@@ -41,6 +32,10 @@ public class ObjectSpruceTree extends ObjectTree {
 
         this.placeTrunk(level, x, y, z, random, this.getTreeHeight() - random.nextBoundedInt(2));
 
+        this.placeLeaves(level, topSize, lRadius, x, y, z, random);
+    }
+
+    public void placeLeaves(ChunkManager level, int topSize, int lRadius, int x, int y, int z, NukkitRandom random)   {
         int radius = random.nextBoundedInt(2);
         int maxR = 1;
         int minR = 0;

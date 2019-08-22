@@ -1,5 +1,7 @@
 package cn.nukkit.block;
 
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Rail;
@@ -163,5 +165,17 @@ public class BlockRailActivator extends BlockRail {
                 && base != Rail.Orientation.ASCENDING_EAST
                 && base != Rail.Orientation.ASCENDING_WEST)
                 && (level.isBlockPowered(pos) || checkSurrounding(pos, relative, power + 1));
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, 0);
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                Item.get(Item.ACTIVATOR_RAIL, 0, 1)
+        };
     }
 }

@@ -24,7 +24,7 @@ public final class VarInt {
      */
     public static long encodeZigZag32(int v) {
         // Note:  the right-shift must be arithmetic
-        return (long) ((v << 1) ^ (v >> 31));
+        return ((v << 1) ^ (v >> 31)) & 0xFFFFFFFFL;
     }
 
     /**

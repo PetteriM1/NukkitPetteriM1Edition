@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.block.BlockDoorDarkOak;
 
 public class ItemDoorDarkOak extends Item {
+
     public ItemDoorDarkOak() {
         this(0, 1);
     }
@@ -15,5 +16,4 @@ public class ItemDoorDarkOak extends Item {
         super(DARK_OAK_DOOR, 0, count, "Dark Oak Door");
         this.block = new BlockDoorDarkOak();
     }
-
 }

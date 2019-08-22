@@ -2,8 +2,10 @@ package cn.nukkit.network.protocol;
 
 
 import cn.nukkit.math.Vector3f;
+import lombok.ToString;
 
-public class LevelSoundEventPacketV1 extends DataPacket {
+@ToString
+public class LevelSoundEventPacketV1 extends LevelSoundEventPacket {
 
     public int sound;
     public float x;

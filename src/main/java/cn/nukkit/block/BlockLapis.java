@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockLapis extends BlockSolid {
 
-    public BlockLapis() {
-    }
-
     @Override
     public int getId() {
         return LAPIS_BLOCK;

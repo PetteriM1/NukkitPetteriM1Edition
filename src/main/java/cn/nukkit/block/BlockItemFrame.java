@@ -13,8 +13,7 @@ import cn.nukkit.level.sound.ItemFrameRemovedSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
-
-import java.util.Random;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created by Pub4Game on 03.07.2016.
@@ -126,7 +125,7 @@ public class BlockItemFrame extends BlockTransparentMeta {
     public Item[] getDrops(Item item) {
         BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
         BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntity;
-        int chance = new Random().nextInt(100) + 1;
+        int chance = Utils.random.nextInt(100) + 1;
         if (itemFrame != null && chance <= (itemFrame.getItemDropChance() * 100)) {
             return new Item[]{
                     toItem(), Item.get(itemFrame.getItem().getId(), itemFrame.getItem().getDamage(), 1)

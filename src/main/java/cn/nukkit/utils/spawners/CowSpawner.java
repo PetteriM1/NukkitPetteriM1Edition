@@ -7,7 +7,7 @@ import cn.nukkit.entity.passive.EntityCow;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Spawner;
 import cn.nukkit.utils.SpawnResult;
 
@@ -24,13 +24,13 @@ public class CowSpawner extends AbstractEntitySpawner {
 
         if (blockId != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
-        } else {
-            BaseEntity entity = this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.3, 0));
-            if (EntityUtils.rand(0, 500) > 480) {
+        } else if (level.isAnimalSpawningAllowedByTime()) {
+            BaseEntity entity = this.spawnTask.createEntity("Cow", pos.add(0, 1, 0));
+            if (Utils.rand(1, 20) == 1) {
                 entity.setBaby(true);
             }
         }
@@ -41,10 +41,5 @@ public class CowSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityCow.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Cow";
     }
 }

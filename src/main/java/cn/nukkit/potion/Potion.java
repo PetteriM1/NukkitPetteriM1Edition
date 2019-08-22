@@ -129,7 +129,7 @@ public class Potion implements Cloneable {
 
     protected final int level;
 
-    protected boolean splash = false;
+    protected boolean splash;
 
     public Potion(int id) {
         this(id, 1);
@@ -182,7 +182,7 @@ public class Potion implements Cloneable {
         }
 
         if (entity instanceof Player) {
-            if (!((Player) entity).isSurvival() && applyEffect.isBad()) {
+            if (!((Player) entity).isSurvival() && !((Player) entity).isAdventure() && applyEffect.isBad()) {
                 return;
             }
         }

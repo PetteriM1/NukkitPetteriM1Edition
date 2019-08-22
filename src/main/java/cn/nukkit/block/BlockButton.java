@@ -6,12 +6,12 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.ButtonClickSound;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.Faceable;
 
 /**
  * Created by CreeperFace on 27. 11. 2016.
  */
-public abstract class BlockButton extends BlockFlowable {
+public abstract class BlockButton extends BlockFlowable implements Faceable {
 
     public BlockButton() {
         this(0);
@@ -58,10 +58,9 @@ public abstract class BlockButton extends BlockFlowable {
         this.level.setBlock(this, this, true, false);
         this.level.addSound(new ButtonClickSound(this.add(0.5, 0.5, 0.5)));
         this.level.scheduleUpdate(this, 30);
-        Vector3 pos = getLocation();
 
-        level.updateAroundRedstone(pos, null);
-        level.updateAroundRedstone(pos.getSide(getFacing().getOpposite()), null);
+        level.updateAroundRedstone(getLocation(), null);
+        level.updateAroundRedstone(getLocation().getSide(getFacing().getOpposite()), null);
         return true;
     }
 
@@ -80,9 +79,8 @@ public abstract class BlockButton extends BlockFlowable {
                 this.level.setBlock(this, this, true, false);
                 this.level.addSound(new ButtonClickSound(this.add(0.5, 0.5, 0.5)));
 
-                Vector3 pos = getLocation();
-                level.updateAroundRedstone(pos, null);
-                level.updateAroundRedstone(pos.getSide(getFacing().getOpposite()), null);
+                level.updateAroundRedstone(getLocation(), null);
+                level.updateAroundRedstone(getLocation().getSide(getFacing().getOpposite()), null);
             }
 
             return Level.BLOCK_UPDATE_SCHEDULED;
@@ -124,6 +122,11 @@ public abstract class BlockButton extends BlockFlowable {
 
     @Override
     public Item toItem() {
-        return Item.get(this.getId(), 0, 1);
+        return Item.get(this.getId(), 5);
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

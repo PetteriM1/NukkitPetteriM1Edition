@@ -6,8 +6,7 @@ import cn.nukkit.item.ItemSeedsWheat;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
-
-import java.util.Random;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created on 2015/11/23 by xtypr.
@@ -108,7 +107,7 @@ public class BlockDoublePlant extends BlockFlowable {
             switch (this.getDamage() & 0x07) {
                 case 2:
                 case 3:
-                    boolean dropSeeds = new Random().nextInt(10) == 0;
+                    boolean dropSeeds = Utils.random.nextInt(10) == 0;
                     if (item.isShears()) {
                         //todo enchantment
                         if (dropSeeds) {

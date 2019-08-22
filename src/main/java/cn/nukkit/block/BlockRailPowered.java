@@ -1,5 +1,7 @@
 package cn.nukkit.block;
 
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Rail;
@@ -40,14 +42,16 @@ public class BlockRailPowered extends BlockRail {
         //          When updating the block state. Espicially on the world with many rails. 
         //          Trust me, I tested this on my server.
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE || type == Level.BLOCK_UPDATE_SCHEDULED) {
-            super.onUpdate(type);
-            boolean wasPowered = isActive();
+            if (super.onUpdate(type) == Level.BLOCK_UPDATE_NORMAL) {
+                return 0; // Already broken
+            }
+
             boolean isPowered = level.isBlockPowered(this.getLocation())
                     || checkSurrounding(this, true, 0)
                     || checkSurrounding(this, false, 0);
 
             // Avoid Block minstake
-            if (wasPowered != isPowered) {
+            if (isActive() != isPowered) {
                 setActive(isPowered);
                 level.updateAround(down());
                 if (getOrientation().isAscending()) {
@@ -177,5 +181,17 @@ public class BlockRailPowered extends BlockRail {
                 && base != Rail.Orientation.ASCENDING_EAST
                 && base != Rail.Orientation.ASCENDING_WEST)
                 && (level.isBlockPowered(pos) || checkSurrounding(pos, relative, power + 1));
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, 0);
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                Item.get(Item.POWERED_RAIL, 0, 1)
+        };
     }
 }

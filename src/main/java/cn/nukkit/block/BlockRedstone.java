@@ -11,9 +11,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockRedstone extends BlockSolid {
 
-    public BlockRedstone() {
-    }
-
     @Override
     public int getId() {
         return REDSTONE_BLOCK;

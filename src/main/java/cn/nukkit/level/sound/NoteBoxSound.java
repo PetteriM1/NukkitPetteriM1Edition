@@ -9,6 +9,7 @@ import cn.nukkit.network.protocol.LevelSoundEventPacket;
  */
 
 public class NoteBoxSound extends LevelSoundEventSound {
+
     public static final int INSTRUMENT_PIANO = 0;
     public static final int INSTRUMENT_BASS_DRUM = 1;
     public static final int INSTRUMENT_CLICK = 2;

@@ -85,7 +85,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             namedTag.remove("CustomName");
             return;
         }
@@ -129,7 +129,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
 
     @Override
     public int getSize() {
-        return 4;
+        return 5;
     }
 
     protected int getSlotIndex(int index) {

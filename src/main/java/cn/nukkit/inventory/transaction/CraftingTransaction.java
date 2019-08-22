@@ -7,7 +7,6 @@ import cn.nukkit.inventory.BigCraftingGrid;
 import cn.nukkit.inventory.CraftingRecipe;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.item.Item;
-import cn.nukkit.math.NukkitMath;
 import cn.nukkit.network.protocol.ContainerClosePacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.scheduler.Task;
@@ -49,16 +48,16 @@ public class CraftingTransaction extends InventoryTransaction {
     }
 
     public void setInput(int index, Item item) {
-        int y = NukkitMath.floorDouble((double) index / this.gridSize);
+        int y = index / this.gridSize;
         int x = index % this.gridSize;
 
         try {
             if (this.inputs[y][x].isNull()) {
                 inputs[y][x] = item.clone();
             } else if (!inputs[y][x].equals(item)) {
-                if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ")");
+                if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Input " + index + " has already been set and does not match the current item (expected " + inputs[y][x] + ", got " + item + ')');
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     public Item[][] getInputMap() {
@@ -72,7 +71,7 @@ public class CraftingTransaction extends InventoryTransaction {
         if (secondaryOutputs[y][x].isNull()) {
             secondaryOutputs[y][x] = item.clone();
         } else if (!secondaryOutputs[y][x].equals(item)) {
-            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Output " + index + " has already been set and does not match the current item (expected " + secondaryOutputs[y][x] + ", got " + item + ")");
+            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Output " + index + " has already been set and does not match the current item (expected " + secondaryOutputs[y][x] + ", got " + item + ')');
         }
     }
 
@@ -84,7 +83,7 @@ public class CraftingTransaction extends InventoryTransaction {
         if (primaryOutput == null) {
             primaryOutput = item.clone();
         } else if (!primaryOutput.equals(item)) {
-            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Primary result item has already been set and does not match the current item (expected " + primaryOutput + ", got " + item + ")");
+            if (!Server.getInstance().suomiCraftPEMode()) throw new RuntimeException("Primary result item has already been set and does not match the current item (expected " + primaryOutput + ", got " + item + ')');
         }
     }
 

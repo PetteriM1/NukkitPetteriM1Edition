@@ -1,6 +1,6 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -36,6 +36,6 @@ public class EntityTurtle extends EntityWaterAnimal {
 
     @Override
     public int getKillExperience() {
-        return EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class ShortTag extends NumberTag<Integer> {
+
     public int data;
 
     @Override
@@ -38,13 +39,18 @@ public class ShortTag extends NumberTag<Integer> {
     }
 
     @Override
+    public Integer parseValue() {
+        return this.data;
+    }
+
+    @Override
     public byte getId() {
         return TAG_Short;
     }
 
     @Override
     public String toString() {
-        return "" + data;
+        return String.valueOf(data);
     }
 
     @Override

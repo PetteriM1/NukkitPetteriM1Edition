@@ -58,7 +58,6 @@ public final class BitArray {
         final long[] data = this.data;
         final int dataLength = data.length;
         final int bitsPerEntry = this.bitsPerEntry;
-        final int maxEntryValue = this.maxEntryValue;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
 
         int localStart = 0;

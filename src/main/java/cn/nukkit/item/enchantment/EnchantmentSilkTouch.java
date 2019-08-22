@@ -23,11 +23,6 @@ public class EnchantmentSilkTouch extends Enchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    @Override
     public boolean isCompatibleWith(Enchantment enchantment) {
         return super.isCompatibleWith(enchantment) && enchantment.id != ID_FORTUNE_DIGGING;
     }

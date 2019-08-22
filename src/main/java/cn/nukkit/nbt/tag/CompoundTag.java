@@ -8,9 +8,11 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringJoiner;
 
 public class CompoundTag extends Tag implements Cloneable {
+
     private final Map<String, Tag> tags = new HashMap<>();
 
     public CompoundTag() {
@@ -23,9 +25,10 @@ public class CompoundTag extends Tag implements Cloneable {
 
     @Override
     public void write(NBTOutputStream dos) throws IOException {
-        for (Tag tag : tags.values()) {
-            Tag.writeNamedTag(tag, dos);
+        for (Map.Entry<String, Tag> entry : this.tags.entrySet()) {
+            Tag.writeNamedTag(entry.getValue(), entry.getKey(), dos);
         }
+
         dos.writeByte(Tag.TAG_End);
     }
 
@@ -183,7 +186,6 @@ public class CompoundTag extends Tag implements Cloneable {
         return (CompoundTag) tags.get(name);
     }
 
-    @SuppressWarnings("unchecked")
     public ListTag<? extends Tag> getList(String name) {
         if (!tags.containsKey(name)) return new ListTag<>(name);
         return (ListTag<? extends Tag>) tags.get(name);
@@ -201,25 +203,36 @@ public class CompoundTag extends Tag implements Cloneable {
         return new HashMap<>(this.tags);
     }
 
+    @Override
+    public Map<String, Object> parseValue() {
+        Map<String, Object> value = new HashMap<>(this.tags.size());
+
+        for (Entry<String, Tag> entry : this.tags.entrySet()) {
+            value.put(entry.getKey(), entry.getValue().parseValue());
+        }
+
+        return value;
+    }
+
     public boolean getBoolean(String name) {
         return getByte(name) != 0;
     }
 
     public String toString() {
         StringJoiner joiner = new StringJoiner(",\n\t");
-        tags.forEach((key, tag) -> joiner.add(key + " : " + tag.toString()));
+        tags.forEach((key, tag) -> joiner.add('\'' + key + "' : " + tag.toString().replace("\n", "\n\t")));
         return "CompoundTag '" + this.getName() + "' (" + tags.size() + " entries) {\n\t" + joiner.toString() + "\n}";
     }
 
     public void print(String prefix, PrintStream out) {
         super.print(prefix, out);
-        out.println(prefix + "{");
+        out.println(prefix + '{');
         String orgPrefix = prefix;
         prefix += "   ";
         for (Tag tag : tags.values()) {
             tag.print(prefix, out);
         }
-        out.println(orgPrefix + "}");
+        out.println(orgPrefix + '}');
     }
 
     public boolean isEmpty() {
@@ -228,8 +241,8 @@ public class CompoundTag extends Tag implements Cloneable {
 
     public CompoundTag copy() {
         CompoundTag tag = new CompoundTag(getName());
-        for (String key : tags.keySet()) {
-            tag.put(key, tags.get(key).copy());
+        for (Entry<String, Tag> entry : tags.entrySet()) {
+            tag.put(entry.getKey(), entry.getValue().copy());
         }
         return tag;
     }

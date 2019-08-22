@@ -1,14 +1,49 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.utils.RuleData;
+import cn.nukkit.Server;
+import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.utils.BinaryStream;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import lombok.ToString;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+
+@ToString
 public class StartGamePacket extends DataPacket {
+
+    public static final int GAME_PUBLISH_SETTING_NO_MULTI_PLAY = 0;
+    public static final int GAME_PUBLISH_SETTING_INVITE_ONLY = 1;
+    public static final int GAME_PUBLISH_SETTING_FRIENDS_ONLY = 2;
+    public static final int GAME_PUBLISH_SETTING_FRIENDS_OF_FRIENDS = 3;
+    public static final int GAME_PUBLISH_SETTING_PUBLIC = 4;
+
+    private static final byte[] ITEM_DATA_PALETTE_361;
+
+    static {
+        // 361
+        InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtime_item_ids_361.json");
+        if (stream361 == null) throw new AssertionError("Unable to locate item RuntimeID table 361");
+        Collection<ItemData> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<ItemData>>() {}.getType());
+        BinaryStream paletteBuffer361 = new BinaryStream();
+        paletteBuffer361.putUnsignedVarInt(entries361.size());
+        for (ItemData data361 : entries361) {
+            paletteBuffer361.putString(data361.name);
+            paletteBuffer361.putLShort(data361.id);
+        }
+        ITEM_DATA_PALETTE_361 = paletteBuffer361.getBuffer();
+    }
 
     @Override
     public byte pid() {
         return ProtocolInfo.START_GAME_PACKET;
     }
+
+    public String version;
 
     public long entityUniqueId;
     public long entityRuntimeId;
@@ -32,12 +67,15 @@ public class StartGamePacket extends DataPacket {
     public boolean hasEduFeaturesEnabled = false;
     public float rainLevel;
     public float lightningLevel;
+    public boolean hasConfirmedPlatformLockedContent = false;
     public boolean multiplayerGame = true;
     public boolean broadcastToLAN = true;
     public boolean broadcastToXboxLive = true;
+    public int xblBroadcastIntent = GAME_PUBLISH_SETTING_PUBLIC;
+    public int platformBroadcastIntent = GAME_PUBLISH_SETTING_PUBLIC;
     public boolean commandsEnabled;
     public boolean isTexturePacksRequired = false;
-    public RuleData[] ruleDatas = new RuleData[0];
+    public GameRules gameRules;
     public boolean bonusChest = false;
     public boolean hasStartWithMapEnabled = false;
     public boolean trustPlayers = false;
@@ -46,7 +84,7 @@ public class StartGamePacket extends DataPacket {
     public int serverChunkTickRange = 4;
     public boolean broadcastToPlatform;
     public int platformBroadcastMode = 4;
-    public boolean xblBroadcastIntent = true;
+    public boolean xblBroadcastIntentOld = true;
     public boolean hasLockedBehaviorPack = false;
     public boolean hasLockedResourcePack = false;
     public boolean isFromLockedWorldTemplate = false;
@@ -60,6 +98,7 @@ public class StartGamePacket extends DataPacket {
     public long currentTick;
     public int enchantmentSeed;
     public String multiplayerCorrelationId = "";
+    public boolean isOnlySpawningV1Villagers = false;
 
     @Override
     public void decode() {
@@ -83,35 +122,57 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.hasAchievementsDisabled);
         this.putVarInt(this.dayCycleStopTime);
         this.putBoolean(this.eduMode);
-        this.putBoolean(this.hasEduFeaturesEnabled);
+        if (protocol > 224) {
+            this.putBoolean(this.hasEduFeaturesEnabled);
+        }
         this.putLFloat(this.rainLevel);
         this.putLFloat(this.lightningLevel);
+        if (protocol >= 332) {
+            this.putBoolean(this.hasConfirmedPlatformLockedContent);
+        }
         this.putBoolean(this.multiplayerGame);
         this.putBoolean(this.broadcastToLAN);
-        this.putBoolean(this.broadcastToXboxLive);
+        if (protocol >= 332) {
+            this.putVarInt(this.xblBroadcastIntent);
+            this.putVarInt(this.platformBroadcastIntent);
+        } else {
+            this.putBoolean(this.broadcastToXboxLive);
+        }
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
-        this.putUnsignedVarInt(this.ruleDatas.length);
-        for (RuleData rule : this.ruleDatas) {
-            this.putRuleData(rule);
-        }
+        this.putGameRules(gameRules);
         this.putBoolean(this.bonusChest);
-        this.putBoolean(this.hasStartWithMapEnabled);
-        this.putBoolean(this.trustPlayers);
+        if (protocol > 201) {
+            this.putBoolean(this.hasStartWithMapEnabled);
+        }
+        if (protocol < 332) {
+            this.putBoolean(this.trustPlayers);
+        }
         this.putVarInt(this.permissionLevel);
-        this.putVarInt(this.gamePublish);
-        this.putLInt(this.serverChunkTickRange);
-        this.putBoolean(this.broadcastToPlatform);
-        this.putVarInt(this.platformBroadcastMode);
-        this.putBoolean(this.xblBroadcastIntent);
-        this.putBoolean(this.hasLockedBehaviorPack);
-        this.putBoolean(this.hasLockedResourcePack);
-        this.putBoolean(this.isFromLockedWorldTemplate);
+        if (protocol < 332) {
+            this.putVarInt(this.gamePublish);
+        }
+        if (protocol >= 201) {
+            this.putLInt(this.serverChunkTickRange);
+        }
+        if (protocol >= 223 && protocol < 332) {
+            this.putBoolean(this.broadcastToPlatform);
+            this.putVarInt(this.platformBroadcastMode);
+            this.putBoolean(this.xblBroadcastIntentOld);
+        }
+        if (protocol > 224) {
+            this.putBoolean(this.hasLockedBehaviorPack);
+            this.putBoolean(this.hasLockedResourcePack);
+            this.putBoolean(this.isFromLockedWorldTemplate);
+        }
         if (protocol >= 291) {
             this.putBoolean(this.isUsingMsaGamertagsOnly);
             if (protocol >= 313) {
                 this.putBoolean(this.isFromWorldTemplate);
                 this.putBoolean(this.isWorldTemplateOptionLocked);
+                if (protocol >= 361) {
+                    this.putBoolean(this.isOnlySpawningV1Villagers);
+                }
             }
         }
         this.putString(this.levelId);
@@ -120,7 +181,21 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTrial);
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
-        this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
-        this.putString(this.multiplayerCorrelationId);
+        if (protocol > 274) {
+            this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+            if (protocol >= 361) {
+                this.put(ITEM_DATA_PALETTE_361);
+            }
+            this.putString(this.multiplayerCorrelationId);
+            if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
+                this.putBoolean(this.isOnlySpawningV1Villagers);
+            }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class ItemData {
+        private String name;
+        private int id;
     }
 }

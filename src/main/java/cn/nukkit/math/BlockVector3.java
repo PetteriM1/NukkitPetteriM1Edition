@@ -1,6 +1,7 @@
 package cn.nukkit.math;
 
 public class BlockVector3 implements Cloneable {
+
     public int x;
     public int y;
     public int z;
@@ -205,7 +206,7 @@ public class BlockVector3 implements Cloneable {
 
     @Override
     public String toString() {
-        return "BlockPosition(level=" + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";
+        return "BlockPosition(level=" + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ')';
     }
 
     @Override

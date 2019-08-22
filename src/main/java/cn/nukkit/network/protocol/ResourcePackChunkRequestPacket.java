@@ -1,20 +1,25 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+import java.util.UUID;
+
+@ToString
 public class ResourcePackChunkRequestPacket extends DataPacket {
 
-    public String packId;
+    public UUID packId;
     public int chunkIndex;
 
     @Override
     public void decode() {
-        this.packId = this.getString();
+        this.packId = UUID.fromString(this.getString());
         this.chunkIndex = this.getLInt();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putString(this.packId);
+        this.putString(this.packId.toString());
         this.putLInt(this.chunkIndex);
     }
 

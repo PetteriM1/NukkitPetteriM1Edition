@@ -3,19 +3,19 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.event.block.BlockIgniteEvent;
 import cn.nukkit.event.entity.EntityCombustByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
-
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
@@ -49,18 +49,19 @@ public class BlockLava extends BlockLiquid {
     @Override
     public void onEntityCollide(Entity entity) {
         entity.highestPosition -= (entity.highestPosition - entity.y) * 0.5;
-        if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
-            entity.attack(new EntityDamageByBlockEvent(this, entity, DamageCause.LAVA, 4));
-        }
 
         // Always setting the duration to 15 seconds? TODO
         EntityCombustByBlockEvent ev = new EntityCombustByBlockEvent(this, entity, 15);
         Server.getInstance().getPluginManager().callEvent(ev);
         if (!ev.isCancelled()
-                // Making sure the entity is acutally alive and not invulnerable.
+                // Making sure the entity is actually alive and not invulnerable
                 && entity.isAlive()
                 && entity.noDamageTicks == 0) {
             entity.setOnFire(ev.getDuration());
+        }
+
+        if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
+            entity.attack(new EntityDamageByBlockEvent(this, entity, DamageCause.LAVA, 4));
         }
 
         super.onEntityCollide(entity);
@@ -78,14 +79,12 @@ public class BlockLava extends BlockLiquid {
     public int onUpdate(int type) {
         int result = super.onUpdate(type);
 
-        if (type == Level.BLOCK_UPDATE_RANDOM && this.level.gameRules.getBoolean("doFireTick")) {
-            Random random = ThreadLocalRandom.current();
-
-            int i = random.nextInt(3);
+        if (type == Level.BLOCK_UPDATE_RANDOM && this.level.gameRules.getBoolean(GameRule.DO_FIRE_TICK)) {
+            int i = Utils.random.nextInt(3);
 
             if (i > 0) {
                 for (int k = 0; k < i; ++k) {
-                    Vector3 v = this.add(random.nextInt(3) - 1, 1, random.nextInt(3) - 1);
+                    Vector3 v = this.add(Utils.random.nextInt(3) - 1, 1, Utils.random.nextInt(3) - 1);
                     Block block = this.getLevel().getBlock(v);
 
                     if (block.getId() == AIR) {
@@ -108,7 +107,7 @@ public class BlockLava extends BlockLiquid {
                 }
             } else {
                 for (int k = 0; k < 3; ++k) {
-                    Vector3 v = this.add(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
+                    Vector3 v = this.add(Utils.random.nextInt(3) - 1, 0, Utils.random.nextInt(3) - 1);
                     Block block = this.getLevel().getBlock(v);
 
                     if (block.up().getId() == AIR && block.getBurnChance() > 0) {
@@ -186,6 +185,13 @@ public class BlockLava extends BlockLiquid {
             ((BlockLiquid) block).liquidCollide(this, new BlockStone());
         } else {
             super.flowIntoBlock(block, newFlowDecay);
+        }
+    }
+
+    @Override
+    public void addVelocityToEntity(Entity entity, Vector3 vector) {
+        if (!(entity instanceof EntityPrimedTNT)) {
+            super.addVelocityToEntity(entity, vector);
         }
     }
 }

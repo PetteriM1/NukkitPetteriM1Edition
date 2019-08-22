@@ -4,18 +4,20 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBanner;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBanner;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.IntTag;
+import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.utils.Faceable;
 
 /**
  * Created by PetteriM1
  */
-public class BlockBanner extends BlockTransparentMeta {
+public class BlockBanner extends BlockTransparentMeta implements Faceable {
 
     public BlockBanner() {
         this(0);
@@ -71,13 +73,16 @@ public class BlockBanner extends BlockTransparentMeta {
                 this.getLevel().setBlock(block, new BlockWallBanner(this.getDamage()), true);
             }
 
-            CompoundTag nbt = new CompoundTag("")
-                    .putString("id", BlockEntity.BANNER)
-                    .putInt("x", (int) this.x)
-                    .putInt("y", (int) this.y)
-                    .putInt("z", (int) this.z)
-                    .putInt("Base", item.getDamage() & 0x0f);
-            new BlockEntityBanner(this.level.getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+            CompoundTag nbt = BlockEntity.getDefaultCompound(this, BlockEntity.BANNER)
+                    .putInt("Base", item.getDamage() & 0xf);
+
+            Tag type = item.getNamedTagEntry("Type");
+
+            if (type instanceof IntTag) {
+                nbt.put("Type", type);
+            }
+
+            new BlockEntityBanner(this.getChunk(), nbt);
 
             return true;
         }
@@ -99,6 +104,21 @@ public class BlockBanner extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBanner(this.getDamage() & 0x0f);
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        Item item = Item.get(Item.BANNER);
+        if (blockEntity instanceof BlockEntityBanner) {
+            BlockEntityBanner banner = (BlockEntityBanner) blockEntity;
+            item.setDamage(banner.getBaseColor() & 0xf);
+            int type = banner.namedTag.getInt("Type");
+            if (type > 0) {
+                item.setNamedTag(new CompoundTag() .putInt("Type", banner.namedTag.getInt("Type")));
+            }
+        }
+        return item;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

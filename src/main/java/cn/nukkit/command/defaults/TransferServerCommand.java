@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 
@@ -16,7 +17,7 @@ public class TransferServerCommand extends VanillaCommand {
         this.setPermission("nukkit.command.transferserver");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                new CommandParameter("serverAddress", CommandParameter.ARG_TYPE_STRING, false)
+                new CommandParameter("serverAddress", CommandParamType.STRING, false)
         });
     }
 

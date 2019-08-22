@@ -3,8 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -13,6 +12,7 @@ import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,8 @@ import java.util.List;
 public class EntityEnderman extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 38;
+
+    private boolean angry = false;
 
     public EntityEnderman(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -51,42 +53,18 @@ public class EntityEnderman extends EntityWalkingMob {
         super.initEntity();
 
         this.setMaxHealth(40);
-        this.setDamage(new int[] { 0, 4, 7, 10 });
+        this.setDamage(new int[]{0, 4, 7, 10});
     }
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 1) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
             if (player instanceof Player) {
-                @SuppressWarnings("serial")
-                HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-                    {
-                        put(Item.LEATHER_CAP, 1f);
-                        put(Item.LEATHER_TUNIC, 3f);
-                        put(Item.LEATHER_PANTS, 2f);
-                        put(Item.LEATHER_BOOTS, 1f);
-                        put(Item.CHAIN_HELMET, 1f);
-                        put(Item.CHAIN_CHESTPLATE, 5f);
-                        put(Item.CHAIN_LEGGINGS, 4f);
-                        put(Item.CHAIN_BOOTS, 1f);
-                        put(Item.GOLD_HELMET, 1f);
-                        put(Item.GOLD_CHESTPLATE, 5f);
-                        put(Item.GOLD_LEGGINGS, 3f);
-                        put(Item.GOLD_BOOTS, 1f);
-                        put(Item.IRON_HELMET, 2f);
-                        put(Item.IRON_CHESTPLATE, 6f);
-                        put(Item.IRON_LEGGINGS, 5f);
-                        put(Item.IRON_BOOTS, 2f);
-                        put(Item.DIAMOND_HELMET, 3f);
-                        put(Item.DIAMOND_CHESTPLATE, 8f);
-                        put(Item.DIAMOND_LEGGINGS, 6f);
-                        put(Item.DIAMOND_BOOTS, 3f);
-                    }
-                };
+                HashMap<Integer, Float> armorValues = new ArmorPoints();
 
                 float points = 0;
                 for (Item i : ((Player) player).getInventory().getArmorContents()) {
@@ -105,14 +83,21 @@ public class EntityEnderman extends EntityWalkingMob {
         super.attack(ev);
 
         if (!ev.isCancelled()) {
+            if (ev.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+                if (!isAngry()) {
+                    setAngry(true);
+                }
+            }
+
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-                this.level.addSound(new EndermanTeleportSound(this));
-                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
-                this.level.addSound(new EndermanTeleportSound(this));
-            } else if (EntityUtils.rand(1, 15) == 5) {
-                this.level.addSound(new EndermanTeleportSound(this));
-                this.move(EntityUtils.rand(-10, 10), 0, EntityUtils.rand(-10, 10));
-                this.level.addSound(new EndermanTeleportSound(this));
+                if (!isAngry()) {
+                    setAngry(true);
+                }
+                ev.setCancelled(true);
+                tp();
+                return false;
+            } else if (Utils.rand(1, 10) == 1) {
+                tp();
             }
         }
         return true;
@@ -122,31 +107,86 @@ public class EntityEnderman extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.ENDER_PEARL, 0, 1));
-            }
+            drops.add(Item.get(Item.ENDER_PEARL, 0, Utils.rand(0, 1)));
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override
     public int getKillExperience() {
-        return 5;
+        return this.isBaby() ? 0 : 5;
     }
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
         if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            this.move(EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20), EntityUtils.rand(-20, 20));
+            if (isAngry()) {
+                setAngry(false);
+            }
+            tp();
+        } else if (this.getLevel().isRaining() && this.getLevel().canBlockSeeSky(this) && Utils.rand(1, 5) == 1) {
+            this.attack(1f);
+            tp();
+        } else if (Utils.rand(0, 500) == 20) {
+            tp();
+        }
+
+        if (this.age % 20 == 0 && (this.level.isRaining() || this.level.isThundering())) {
+            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
+            if (isAngry()) {
+                setAngry(false);
+            }
+            tp();
         }
 
         return super.entityBaseTick(tickDiff);
+    }
+
+    private void tp() {
+        this.level.addSound(new EndermanTeleportSound(this));
+        this.move(Utils.rand(-10, 10), 0, Utils.rand(-10, 10));
+        this.level.addSound(new EndermanTeleportSound(this));
+    }
+
+    @Override
+    public boolean canDespawn() {
+        if (this.getLevel().isEnd) {
+            return false;
+        }
+
+        return super.canDespawn();
+    }
+
+    /*public void makeVibrating(boolean bool) {
+        this.setDataFlag(DATA_FLAGS, TODO_ID, bool);
+    }*/
+
+    public boolean isAngry() {
+        return angry;
+    }
+
+    public void setAngry(boolean bool) {
+        this.angry = bool;
+        //makeVibrating(bool);
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (!angry) return false;
+        return super.targetOption(creature, distance);
+    }
+
+    public void stareToAngry() {
+        if (!isAngry()) {
+            setAngry(true);
+        }
     }
 }

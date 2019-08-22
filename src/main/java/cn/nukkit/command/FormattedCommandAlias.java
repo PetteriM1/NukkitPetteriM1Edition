@@ -23,7 +23,7 @@ public class FormattedCommandAlias extends Command {
 
     public FormattedCommandAlias(String alias, List<String> formatStrings) {
         super(alias);
-        this.formatStrings = formatStrings.toArray(new String[formatStrings.size()]);
+        this.formatStrings = formatStrings.toArray(new String[0]);
     }
 
     @Override
@@ -55,13 +55,13 @@ public class FormattedCommandAlias extends Command {
     }
 
     private String buildCommand(String formatString, String[] args) {
-        int index = formatString.indexOf("$");
+        int index = formatString.indexOf('$');
         while (index != -1) {
             int start = index;
 
             if (index > 0 && formatString.charAt(start - 1) == '\\') {
                 formatString = formatString.substring(0, start - 1) + formatString.substring(start);
-                index = formatString.indexOf("$", index);
+                index = formatString.indexOf('$', index);
                 continue;
             }
 
@@ -120,12 +120,12 @@ public class FormattedCommandAlias extends Command {
                 replacement.append(args[position]);
             }
 
-            formatString = formatString.substring(0, start) + replacement.toString() + formatString.substring(end);
+            formatString = formatString.substring(0, start) + replacement + formatString.substring(end);
             // Move index past the replaced data so we don't process it again
             index = start + replacement.length();
 
             // Move to the next replacement token
-            index = formatString.indexOf("$", index);
+            index = formatString.indexOf('$', index);
         }
 
         return formatString;

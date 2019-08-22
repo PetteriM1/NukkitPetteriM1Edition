@@ -9,6 +9,7 @@ import co.aikar.timings.Timings;
  * @author MagicDroidX
  */
 public class TaskHandler {
+
     private final int taskId;
     private final boolean asynchronous;
 

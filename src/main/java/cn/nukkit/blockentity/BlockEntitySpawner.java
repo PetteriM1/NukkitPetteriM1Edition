@@ -1,15 +1,17 @@
 package cn.nukkit.blockentity;
 
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.blockentity.BlockEntitySpawnable;
+import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityMob;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ShortTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -36,7 +38,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public static final String TAG_MAX_NEARBY_ENTITIES = "MaxNearbyEntities";
     public static final String TAG_REQUIRED_PLAYER_RANGE = "RequiredPlayerRange";
 
-    public static final short SPAWN_RANGE = 8;
+    public static final short SPAWN_RANGE = 5; //8
     public static final short MIN_SPAWN_DELAY = 200;
     public static final short MAX_SPAWN_DELAY = 5000;
     public static final short MAX_NEARBY_ENTITIES = 20;
@@ -85,33 +87,50 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             return false;
         }
 
-        if (this.delay++ >= EntityUtils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {
+        if (this.delay++ >= Utils.rand(this.minSpawnDelay, this.maxSpawnDelay)) {
             this.delay = 0;
 
             ArrayList<Entity> list = new ArrayList<>();
             boolean isValid = false;
             for (Entity entity : this.level.getEntities()) {
-                if (entity.distance(this) <= this.requiredPlayerRange) {
-                    if (entity instanceof Player) {
-                        isValid = true;
+                if (entity instanceof Player || entity instanceof BaseEntity) {
+                    if (entity.distance(this) <= this.requiredPlayerRange) {
+                        if (entity instanceof Player) {
+                            isValid = true;
+                        }
+                        list.add(entity);
                     }
-                    list.add(entity);
                 }
             }
 
-            if (isValid && list.size() <= this.maxNearbyEntities) {
+            if (isValid && list.size() <= (Server.getInstance().suomiCraftPEMode() ? 10 : this.maxNearbyEntities)) {
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(this.entityId, CreatureSpawnEvent.SpawnReason.SPAWNER);
+                level.getServer().getPluginManager().callEvent(ev);
+
+                if (ev.isCancelled()) {
+                    return true;
+                }
+
                 Position pos = new Position
                         (
-                                this.x + EntityUtils.rand(-this.spawnRange, this.spawnRange),
+                                this.x + Utils.rand(-(Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange), Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange),
                                 this.y,
-                                this.z + EntityUtils.rand(-this.spawnRange, this.spawnRange),
+                                this.z + Utils.rand(-(Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange), Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange),
                                 this.level
                         );
-                Entity entity = EntityUtils.create(this.entityId, pos);
-                if (entity == null) return true;
-                entity.spawnToAll();
+
+                Entity entity = Entity.createEntity(this.entityId, pos);
+
+                if (entity != null) {
+                    if (entity instanceof EntityMob && this.level.getBlockLightAt((int) x, (int) y, (int) z) > 3) {
+                        entity.close();
+                        return true;
+                    }
+                    entity.spawnToAll();
+                }
             }
         }
+
         return true;
     }
 
@@ -146,6 +165,10 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
     public void setSpawnEntityType(int entityId) {
         this.entityId = entityId;
         this.spawnToAll();
+    }
+
+    public int getSpawnEntityType() {
+        return this.entityId;
     }
 
     public void setMinSpawnDelay(int minDelay) {

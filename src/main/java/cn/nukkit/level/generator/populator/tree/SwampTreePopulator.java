@@ -3,26 +3,24 @@ package cn.nukkit.level.generator.populator.tree;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.ChunkManager;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.object.tree.ObjectSwampTree;
-import cn.nukkit.level.generator.populator.Populator;
+import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
 public class SwampTreePopulator extends Populator {
+
     private ChunkManager level;
     private int randomAmount;
     private int baseAmount;
-
-    private final int type;
 
     public SwampTreePopulator() {
         this(BlockSapling.OAK);
     }
 
-    public SwampTreePopulator(int type) {
-        this.type = type;
-    }
+    public SwampTreePopulator(int type) {}
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;
@@ -33,7 +31,7 @@ public class SwampTreePopulator extends Populator {
     }
 
     @Override
-    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
+    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         this.level = level;
         int amount = random.nextBoundedInt(this.randomAmount + 1) + this.baseAmount;
         Vector3 v = new Vector3();

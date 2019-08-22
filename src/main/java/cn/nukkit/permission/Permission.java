@@ -47,7 +47,7 @@ public class Permission {
 
     private String description;
 
-    private Map<String, Boolean> children = new HashMap<>();
+    private Map<String, Boolean> children;
 
     private String defaultValue;
 

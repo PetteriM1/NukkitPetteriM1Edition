@@ -7,13 +7,16 @@ import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.*;
 import cn.nukkit.entity.weather.EntityLightning;
+import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.utils.Binary;
 import com.google.common.collect.ImmutableMap;
+import lombok.ToString;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class AddEntityPacket extends DataPacket {
 
     public static final ImmutableMap<Integer, String> LEGACY_IDS = ImmutableMap.<Integer, String>builder()
@@ -99,8 +102,8 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityPotion.NETWORK_ID, "minecraft:splash_potion")
             .put(EntityEnderPearl.NETWORK_ID, "minecraft:ender_pearl")
             .put(88, "minecraft:leash_knot")
-            .put(EntityBlueWitherSkull.NETWORK_ID, "minecraft:wither_skull")
-            .put(91, "minecraft:wither_skull_dangerous")
+            .put(EntityWitherSkull.NETWORK_ID, "minecraft:wither_skull")
+            .put(EntityBlueWitherSkull.NETWORK_ID, "minecraft:wither_skull_dangerous")
             .put(EntityBoat.NETWORK_ID, "minecraft:boat")
             .put(EntityLightning.NETWORK_ID, "minecraft:lightning_bolt")
             .put(EntityBlazeFireBall.NETWORK_ID, "minecraft:small_fireball")
@@ -115,6 +118,11 @@ public class AddEntityPacket extends DataPacket {
             .put(106, "minecraft:ice_bomb")
             .put(EntityPhantom.NETWORK_ID, "minecraft:phantom")
             .put(62, "minecraft:tripod_camera")
+            .put(EntityPillager.NETWORK_ID, "minecraft:pillager")
+            .put(EntityWanderingTrader.NETWORK_ID, "minecraft:wandering_trader")
+            .put(EntityRavager.NETWORK_ID, "minecraft:ravager")
+            .put(EntityVillagerV2.NETWORK_ID, "minecraft:villager_v2")
+            .put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2")
             .build();
 
     @Override
@@ -137,7 +145,7 @@ public class AddEntityPacket extends DataPacket {
     public float headYaw;
     public EntityMetadata metadata = new EntityMetadata();
     public Attribute[] attributes = new Attribute[0];
-    public final Object[][] links = new Object[0][3];
+    public EntityLink[] links = new EntityLink[0];
 
     @Override
     public void decode() {
@@ -160,14 +168,14 @@ public class AddEntityPacket extends DataPacket {
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
-        this.putLFloat(this.headYaw);
+        if (protocol >= 274) {
+            this.putLFloat(this.headYaw);
+        }
         this.putAttributeList(this.attributes);
-        this.put(Binary.writeMetadata(this.metadata));
+        this.put(Binary.writeMetadata(protocol, this.metadata));
         this.putUnsignedVarInt(this.links.length);
-        for (Object[] link : this.links) {
-            this.putVarLong((long) link[0]);
-            this.putVarLong((long) link[1]);
-            this.putByte((byte) link[2]);
+        for (EntityLink link : links) {
+            putEntityLink(link);
         }
     }
 }

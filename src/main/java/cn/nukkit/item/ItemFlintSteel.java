@@ -7,14 +7,14 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
 public class ItemFlintSteel extends ItemTool {
+
     /**
      * The maximum possible size of the outside of a nether portal
      * 23x23 in vanilla
@@ -92,25 +92,24 @@ public class ItemFlintSteel extends ItemTool {
                     //find pillar or end of portal to start scan
                     int scanX = targX;
                     int scanY = targY + 1;
-                    int scanZ = targZ;
                     for (int i = 0; i < sizePosX + 1; i++) {
                         //this must be air
-                        if (level.getBlockIdAt(scanX + i, scanY, scanZ) != AIR) {
+                        if (level.getBlockIdAt(scanX + i, scanY, targZ) != AIR) {
                             break PORTAL;
                         }
-                        if (level.getBlockIdAt(scanX + i + 1, scanY, scanZ) == OBSIDIAN) {
+                        if (level.getBlockIdAt(scanX + i + 1, scanY, targZ) == OBSIDIAN) {
                             scanX += i;
                             break;
                         }
                     }
                     //make sure that the above loop finished
-                    if (level.getBlockIdAt(scanX + 1, scanY, scanZ) != OBSIDIAN) {
+                    if (level.getBlockIdAt(scanX + 1, scanY, targZ) != OBSIDIAN) {
                         break PORTAL;
                     }
 
                     int innerWidth = 0;
                     LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
-                        int id = level.getBlockIdAt(scanX - i, scanY, scanZ);
+                        int id = level.getBlockIdAt(scanX - i, scanY, targZ);
                         switch (id) {
                             case AIR:
                                 innerWidth++;
@@ -123,7 +122,7 @@ public class ItemFlintSteel extends ItemTool {
                     }
                     int innerHeight = 0;
                     LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
-                        int id = level.getBlockIdAt(scanX, scanY + i, scanZ);
+                        int id = level.getBlockIdAt(scanX, scanY + i, targZ);
                         switch (id) {
                             case AIR:
                                 innerHeight++;
@@ -144,18 +143,18 @@ public class ItemFlintSteel extends ItemTool {
                     for (int height = 0; height < innerHeight + 1; height++)    {
                         if (height == innerHeight) {
                             for (int width = 0; width < innerWidth; width++) {
-                                if (level.getBlockIdAt(scanX - width, scanY + height, scanZ) != OBSIDIAN) {
+                                if (level.getBlockIdAt(scanX - width, scanY + height, targZ) != OBSIDIAN) {
                                     break PORTAL;
                                 }
                             }
                         } else {
-                            if (level.getBlockIdAt(scanX + 1, scanY + height, scanZ) != OBSIDIAN
-                                    || level.getBlockIdAt(scanX - innerWidth, scanY + height, scanZ) != OBSIDIAN) {
+                            if (level.getBlockIdAt(scanX + 1, scanY + height, targZ) != OBSIDIAN
+                                    || level.getBlockIdAt(scanX - innerWidth, scanY + height, targZ) != OBSIDIAN) {
                                 break PORTAL;
                             }
 
                             for (int width = 0; width < innerWidth; width++) {
-                                if (level.getBlockIdAt(scanX - width, scanY + height, scanZ) != AIR) {
+                                if (level.getBlockIdAt(scanX - width, scanY + height, targZ) != AIR) {
                                     break PORTAL;
                                 }
                             }
@@ -164,35 +163,35 @@ public class ItemFlintSteel extends ItemTool {
 
                     for (int height = 0; height < innerHeight; height++)    {
                         for (int width = 0; width < innerWidth; width++)    {
-                            level.setBlock(new Vector3(scanX - width, scanY + height, scanZ), new BlockNetherPortal());
+                            level.setBlock(new Vector3(scanX - width, scanY + height, targZ), new BlockNetherPortal());
                         }
                     }
 
+                    level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_IGNITE);
                     return true;
                 } else if (sizeZ >= 2 && sizeZ <= MAX_PORTAL_SIZE) {
                     //start scan from 1 block above base
                     //find pillar or end of portal to start scan
-                    int scanX = targX;
                     int scanY = targY + 1;
                     int scanZ = targZ;
                     for (int i = 0; i < sizePosZ + 1; i++) {
                         //this must be air
-                        if (level.getBlockIdAt(scanX, scanY, scanZ + i) != AIR) {
+                        if (level.getBlockIdAt(targX, scanY, scanZ + i) != AIR) {
                             break PORTAL;
                         }
-                        if (level.getBlockIdAt(scanX, scanY, scanZ + i + 1) == OBSIDIAN) {
+                        if (level.getBlockIdAt(targX, scanY, scanZ + i + 1) == OBSIDIAN) {
                             scanZ += i;
                             break;
                         }
                     }
                     //make sure that the above loop finished
-                    if (level.getBlockIdAt(scanX, scanY, scanZ + 1) != OBSIDIAN) {
+                    if (level.getBlockIdAt(targX, scanY, scanZ + 1) != OBSIDIAN) {
                         break PORTAL;
                     }
 
                     int innerWidth = 0;
                     LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
-                        int id = level.getBlockIdAt(scanX, scanY, scanZ - i);
+                        int id = level.getBlockIdAt(targX, scanY, scanZ - i);
                         switch (id) {
                             case AIR:
                                 innerWidth++;
@@ -205,7 +204,7 @@ public class ItemFlintSteel extends ItemTool {
                     }
                     int innerHeight = 0;
                     LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
-                        int id = level.getBlockIdAt(scanX, scanY + i, scanZ);
+                        int id = level.getBlockIdAt(targX, scanY + i, scanZ);
                         switch (id) {
                             case AIR:
                                 innerHeight++;
@@ -226,18 +225,18 @@ public class ItemFlintSteel extends ItemTool {
                     for (int height = 0; height < innerHeight + 1; height++)    {
                         if (height == innerHeight) {
                             for (int width = 0; width < innerWidth; width++) {
-                                if (level.getBlockIdAt(scanX, scanY + height, scanZ - width) != OBSIDIAN) {
+                                if (level.getBlockIdAt(targX, scanY + height, scanZ - width) != OBSIDIAN) {
                                     break PORTAL;
                                 }
                             }
                         } else {
-                            if (level.getBlockIdAt(scanX, scanY + height, scanZ + 1) != OBSIDIAN
-                                    || level.getBlockIdAt(scanX, scanY + height, scanZ - innerWidth) != OBSIDIAN) {
+                            if (level.getBlockIdAt(targX, scanY + height, scanZ + 1) != OBSIDIAN
+                                    || level.getBlockIdAt(targX, scanY + height, scanZ - innerWidth) != OBSIDIAN) {
                                 break PORTAL;
                             }
 
                             for (int width = 0; width < innerWidth; width++) {
-                                if (level.getBlockIdAt(scanX, scanY + height, scanZ - width) != AIR) {
+                                if (level.getBlockIdAt(targX, scanY + height, scanZ - width) != AIR) {
                                     break PORTAL;
                                 }
                             }
@@ -246,13 +245,15 @@ public class ItemFlintSteel extends ItemTool {
 
                     for (int height = 0; height < innerHeight; height++)    {
                         for (int width = 0; width < innerWidth; width++)    {
-                            level.setBlock(new Vector3(scanX, scanY + height, scanZ - width), new BlockNetherPortal());
+                            level.setBlock(new Vector3(targX, scanY + height, scanZ - width), new BlockNetherPortal());
                         }
                     }
 
+                    level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_IGNITE);
                     return true;
                 }
             }
+
             BlockFire fire = new BlockFire();
             fire.x = block.x;
             fire.y = block.y;
@@ -265,8 +266,9 @@ public class ItemFlintSteel extends ItemTool {
 
                 if (!e.isCancelled()) {
                     level.setBlock(fire, fire, true);
-                    level.scheduleUpdate(fire, fire.tickRate() + ThreadLocalRandom.current().nextInt(10));
+                    level.scheduleUpdate(fire, fire.tickRate() + Utils.random.nextInt(10));
                 }
+
                 level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_IGNITE);
                 return true;
             }

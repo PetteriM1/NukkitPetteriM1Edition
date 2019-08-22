@@ -5,9 +5,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.mob.EntityFlyingMob;
-import cn.nukkit.utils.EntityUtils;
-import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
+import cn.nukkit.entity.projectile.EntityWitherSkull;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -17,6 +15,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.utils.Utils;
 
 public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
@@ -51,7 +50,6 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
         super.initEntity();
 
         this.fireProof = true;
-        this.setHealth(600);
         this.setMaxHealth(600);
         this.setDamage(new int[]{0, 2, 4, 6});
     }
@@ -60,9 +58,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && player.isSurvival() && distance <= 100;
+            return player.spawned && player.isAlive() && !player.closed && (player.isSurvival() || player.isAdventure()) && distance <= 200;
         }
-        return creature.isAlive() && !creature.closed && distance <= 100;
+        return creature.isAlive() && !creature.closed && distance <= 200;
     }
 
     @Override
@@ -72,30 +70,49 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 20 && EntityUtils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+    if (this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
-            double yaw = this.yaw + EntityUtils.rand(-220, 220) / 10;
-            double pitch = this.pitch + EntityUtils.rand(-120, 120) / 10;
+            double yaw = this.yaw + Utils.rand(-120.0, 120.0) / 10;
+            double pitch = this.pitch + Utils.rand(-70.0, 70.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = EntityUtils.create("BlueWitherSkull", pos, this);
-            if (!(k instanceof EntityBlueWitherSkull)) {
-                return;
+
+            Entity k;
+            ProjectileLaunchEvent launch;
+            EntityWitherSkull skull;
+            if (Utils.rand(0, 200) > 180 || Utils.rand(0, 200) < 20) {
+                f = 0.8;
+                k = Entity.createEntity("BlueWitherSkull", pos, this);
+                if (!(k instanceof EntityWitherSkull)) {
+                    return;
+                }
+
+                skull = (EntityWitherSkull) k;
+                skull.setExplode(true);
+                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+
+                launch = new ProjectileLaunchEvent(skull);
+            } else {
+                k = Entity.createEntity("WitherSkull", pos, this);
+                if (!(k instanceof EntityWitherSkull)) {
+                    return;
+                }
+
+                skull = (EntityWitherSkull) k;
+                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+
+                launch = new ProjectileLaunchEvent(skull);
             }
 
-            EntityBlueWitherSkull blueskull = (EntityBlueWitherSkull) k;
-            blueskull.setExplode(true);
-            blueskull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
-            ProjectileLaunchEvent launch = new ProjectileLaunchEvent(blueskull);
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                blueskull.kill();
+                skull.kill();
             } else {
-                blueskull.spawnToAll();
+                skull.spawnToAll();
                 this.level.addSound(this, Sound.MOB_WITHER_SHOOT);
             }
         }
@@ -107,7 +124,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
     }
 
     @Override
-    protected DataPacket createAddEntityPacket(int protocol) {
+    protected DataPacket createAddEntityPacket() {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
         addEntity.entityUniqueId = this.getId();
@@ -124,5 +141,15 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(600).setValue(600)};
         return addEntity;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        return super.entityBaseTick(tickDiff);
     }
 }

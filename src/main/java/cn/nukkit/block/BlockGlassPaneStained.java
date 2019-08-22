@@ -52,8 +52,4 @@ public class BlockGlassPaneStained extends BlockGlassPane {
         this.meta = meta;
     }
 
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
 }

@@ -8,11 +8,9 @@ import java.util.Collection;
 
 public interface EntitySpawner {
 
-    public void spawn(Collection<Player> onlinePlayers);
+    void spawn(Collection<Player> onlinePlayers);
 
-    public SpawnResult spawn(Player player, Position pos, Level level);
+    SpawnResult spawn(Player player, Position pos, Level level);
 
-    public int getEntityNetworkId();
-
-    public String getEntityName();
+    int getEntityNetworkId();
 }

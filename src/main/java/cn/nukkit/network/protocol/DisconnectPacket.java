@@ -1,8 +1,8 @@
 package cn.nukkit.network.protocol;
 
-/**
- * Created by on 15-10-12.
- */
+import lombok.ToString;
+
+@ToString
 public class DisconnectPacket extends DataPacket {
 
     public boolean hideDisconnectionScreen = false;

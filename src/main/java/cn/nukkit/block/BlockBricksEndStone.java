@@ -5,9 +5,6 @@ import cn.nukkit.item.ItemTool;
 
 public class BlockBricksEndStone extends BlockSolid {
 
-    public BlockBricksEndStone() {
-    }
-
     @Override
     public String getName() {
         return "End Stone Bricks";

@@ -1,36 +1,52 @@
 package cn.nukkit.utils;
 
-import java.util.Arrays;
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.level.Position;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.spawners.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Spawner extends Thread {
 
     private final List<EntitySpawner> entitySpawners = Arrays.asList(
+            new BlazeSpawner(this),
             new ChickenSpawner(this),
+            new CodSpawner(this),
             new CowSpawner(this),
             new CreeperSpawner(this),
+            new DolphinSpawner(this),
+            new DonkeySpawner(this),
             new EndermanSpawner(this),
+            new GhastSpawner(this),
             new HorseSpawner(this),
             new HuskSpawner(this),
+            new MagmaCubeSpawner(this),
             new MooshroomSpawner(this),
             new OcelotSpawner(this),
+            new ParrotSpawner(this),
             new PigSpawner(this),
             new PolarBearSpawner(this),
-            new ZombiePigmanSpawner(this),
+            new PufferfishSpawner(this),
             new RabbitSpawner(this),
+            new SalmonSpawner(this),
             new SheepSpawner(this),
             new SkeletonSpawner(this),
+            new SlimeSpawner(this),
             new SpiderSpawner(this),
+            new SquidSpawner(this),
             new StraySpawner(this),
+            new TropicalFishSpawner(this),
+            new TurtleSpawner(this),
             new ZombieSpawner(this),
+            new ZombiePigmanSpawner(this),
             new WitchSpawner(this),
             new WitherSkeletonSpawner(this),
             new WolfSpawner(this)
@@ -38,50 +54,65 @@ public class Spawner extends Thread {
 
     @Override
     public void run() {
-        if (Server.getInstance().getOnlinePlayers().size() > 0) {
+        if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
             for (EntitySpawner spawner : entitySpawners) {
                 spawner.spawn(Server.getInstance().getOnlinePlayers().values());
             }
         }
     }
 
-    public boolean entitySpawnAllowed(Level level, int networkId) {
+    public boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
         try {
-            return countEntity(level, networkId) < 1;
+            int count = 0;
+            for (Entity entity : level.getEntities()) {
+                if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
+                    count++;
+                }
+            }
+            return count < 2;
         } catch (Exception e) {
             return false;
         }
     }
 
-    private int countEntity(Level level, int networkId) {
-        int count = 0;
-        for (Entity entity : level.getEntities()) {
-            if (entity.isAlive() && entity.getNetworkId() == networkId) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     public BaseEntity createEntity(Object type, Position pos) {
-        BaseEntity entity = (BaseEntity) EntityUtils.create(type, pos);
+        BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
         if (entity != null) {
-            entity.spawnToAll();
+            if (!entity.isInsideOfSolid() && !tooNearOfPlayer(pos)) {
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
+                Server.getInstance().getPluginManager().callEvent(ev);
+                if (!ev.isCancelled()) {
+                    entity.spawnToAll();
+                } else {
+                    entity.close();
+                }
+            } else {
+                entity.close();
+            }
         }
         return entity;
     }
 
+    private boolean tooNearOfPlayer(Position pos) {
+        for (Player p : pos.getLevel().getPlayers().values()) {
+            if (p.distanceSquared(pos) < 144) { // 12 blocks
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
-        int addX = EntityUtils.rand(degree / 2 * -1, degree / 2);
+        int addX = Utils.rand(degree / 2 * -1, degree / 2);
         if (addX >= 0) {
             if (degree < safeDegree) {
                 addX = safeDegree;
-                addX += EntityUtils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
             }
         } else {
             if (degree > safeDegree) {
                 addX = -safeDegree;
-                addX += EntityUtils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
             }
         }
         return addX;
@@ -112,7 +143,6 @@ public class Spawner extends Thread {
                         if (checkY > 255 || checkY < 1 || level.getBlockIdAt(x, checkY, z) != Block.AIR) {
                             break;
                         }
-
                         if (checkNeedDegree <= 0) {
                             return y;
                         }
@@ -126,12 +156,10 @@ public class Spawner extends Thread {
                     y = 256;
                     break;
                 }
-
                 if (y < 1) {
                     y = 0;
                     break;
                 }
-
                 if (level.getBlockIdAt(x, y, z) != Block.AIR) {
                     int checkNeedDegree = needDegree;
                     int checkY = y;
@@ -141,7 +169,6 @@ public class Spawner extends Thread {
                         if (checkY > 255 || checkY < 1 || level.getBlockIdAt(x, checkY, z) != Block.AIR) {
                             break;
                         }
-
                         if (checkNeedDegree <= 0) {
                             return y;
                         }

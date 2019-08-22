@@ -27,11 +27,7 @@ public class NKServiceManager implements ServiceManager {
 
     protected <T> boolean provide(Class<T> service, T instance, Plugin plugin, ServicePriority priority) {
         synchronized (handle) {
-            List<RegisteredServiceProvider<?>> list = handle.get(service);
-
-            if (list == null) {
-                handle.put(service, list = new ArrayList<>());
-            }
+            List<RegisteredServiceProvider<?>> list = handle.computeIfAbsent(service, k -> new ArrayList<>());
 
             RegisteredServiceProvider<T> registered = new RegisteredServiceProvider<>(service, instance, priority, plugin);
 
@@ -63,7 +59,6 @@ public class NKServiceManager implements ServiceManager {
                         builder.add(registered);
                     }
                 }
-
             }
         }
 
@@ -71,6 +66,7 @@ public class NKServiceManager implements ServiceManager {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> RegisteredServiceProvider<T> cancel(Class<T> service, T provider) {
         RegisteredServiceProvider<T> result = null;
 
@@ -85,13 +81,13 @@ public class NKServiceManager implements ServiceManager {
                     result = next;
                 }
             }
-
         }
 
         return result;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> RegisteredServiceProvider<T> getProvider(Class<T> service) {
         synchronized (handle) {
             List<RegisteredServiceProvider<?>> list = handle.get(service);
@@ -103,5 +99,42 @@ public class NKServiceManager implements ServiceManager {
     @Override
     public List<Class<?>> getKnownService() {
         return ImmutableList.copyOf(handle.keySet());
+    }
+
+    @Override
+    public List<RegisteredServiceProvider<?>> getRegistrations(Plugin plugin) {
+        ImmutableList.Builder<RegisteredServiceProvider<?>> builder = ImmutableList.builder();
+        synchronized (handle) {
+            for (List<RegisteredServiceProvider<?>> registered : handle.values()) {
+                for (RegisteredServiceProvider<?> provider : registered) {
+                    if (provider.getPlugin().equals(plugin)) {
+                        builder.add(provider);
+                    }
+                }
+            }
+        }
+        return builder.build();
+    }
+
+    @Override
+    public <T> List<RegisteredServiceProvider<T>> getRegistrations(Class<T> service) {
+        ImmutableList.Builder<RegisteredServiceProvider<T>> builder = ImmutableList.builder();
+        synchronized (handle) {
+            List<RegisteredServiceProvider<?>> registered = handle.get(service);
+            if (registered == null) {
+                return ImmutableList.of();
+            }
+            for (RegisteredServiceProvider<?> provider : registered) {
+                builder.add((RegisteredServiceProvider<T>)provider);
+            }
+        }
+        return builder.build();
+    }
+
+    @Override
+    public <T> boolean isProvidedFor(Class<T> service) {
+        synchronized (handle) {
+            return handle.containsKey(service);
+        }
     }
 }

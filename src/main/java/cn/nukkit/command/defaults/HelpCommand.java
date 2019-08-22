@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.ConsoleCommandSender;
+import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
@@ -21,7 +22,7 @@ public class HelpCommand extends VanillaCommand {
         this.setPermission("nukkit.command.help");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                new CommandParameter("page", CommandParameter.ARG_TYPE_INT, true)
+                new CommandParameter("page", CommandParamType.INT, true)
         });
     }
 
@@ -30,7 +31,7 @@ public class HelpCommand extends VanillaCommand {
         if (!this.testPermission(sender)) {
             return true;
         }
-        String command = "";
+        StringBuilder command = new StringBuilder();
         int pageNumber = 1;
         int pageHeight = 5;
         if (args.length != 0) {
@@ -49,18 +50,18 @@ public class HelpCommand extends VanillaCommand {
                     args = new String[0];
                 }*/
                 for (String arg : args) {
-                    if (!command.equals("")) {
-                        command += " ";
+                    if (command.length() > 0) {
+                        command.append(' ');
                     }
-                    command += arg;
+                    command.append(arg);
                 }
             } catch (NumberFormatException e) {
                 pageNumber = 1;
                 for (String arg : args) {
-                    if (!command.equals("")) {
-                        command += " ";
+                    if (command.length() > 0) {
+                        command.append(' ');
                     }
-                    command += arg;
+                    command.append(arg);
                 }
             }
         }
@@ -69,7 +70,7 @@ public class HelpCommand extends VanillaCommand {
             pageHeight = Integer.MAX_VALUE;
         }
 
-        if (command.equals("")) {
+        if (command.length() == 0) {
             Map<String, Command> commands = new TreeMap<>();
             for (Command cmd : sender.getServer().getCommandMap().getCommands().values()) {
                 if (cmd.testPermissionSilent(sender)) {
@@ -82,7 +83,7 @@ public class HelpCommand extends VanillaCommand {
                 pageNumber = 1;
             }
 
-            sender.sendMessage(new TranslationContainer("commands.help.header", new String[]{String.valueOf(pageNumber), String.valueOf(totalPage)}));
+            sender.sendMessage(new TranslationContainer("commands.help.header", String.valueOf(pageNumber), String.valueOf(totalPage)));
             int i = 1;
             for (Command command1 : commands.values()) {
                 if (i >= (pageNumber - 1) * pageHeight + 1 && i <= Math.min(commands.size(), pageNumber * pageHeight)) {
@@ -93,26 +94,26 @@ public class HelpCommand extends VanillaCommand {
 
             return true;
         } else {
-            Command cmd = sender.getServer().getCommandMap().getCommand(command.toLowerCase());
+            Command cmd = sender.getServer().getCommandMap().getCommand(command.toString().toLowerCase());
             if (cmd != null) {
                 if (cmd.testPermissionSilent(sender)) {
                     String message = TextFormat.YELLOW + "--------- " + TextFormat.WHITE + " Help: /" + cmd.getName() + TextFormat.YELLOW + " ---------\n";
-                    message += TextFormat.GOLD + "Description: " + TextFormat.WHITE + cmd.getDescription() + "\n";
-                    String usage = "";
+                    message += TextFormat.GOLD + "Description: " + TextFormat.WHITE + cmd.getDescription() + '\n';
+                    StringBuilder usage = new StringBuilder();
                     String[] usages = cmd.getUsage().split("\n");
                     for (String u : usages) {
-                        if (!usage.equals("")) {
-                            usage += "\n" + TextFormat.WHITE;
+                        if (usage.length() > 0) {
+                            usage.append("\n" + TextFormat.WHITE);
                         }
-                        usage += u;
+                        usage.append(u);
                     }
-                    message += TextFormat.GOLD + "Usage: " + TextFormat.WHITE + usage + "\n";
+                    message += TextFormat.GOLD + "Usage: " + TextFormat.WHITE + usage + '\n';
                     sender.sendMessage(message);
                     return true;
                 }
             }
 
-            sender.sendMessage(TextFormat.RED + "No help for " + command.toLowerCase());
+            sender.sendMessage(TextFormat.RED + "No help for " + command.toString().toLowerCase());
             return true;
         }
     }

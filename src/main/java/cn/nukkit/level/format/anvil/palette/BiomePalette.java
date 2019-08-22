@@ -5,6 +5,7 @@ import cn.nukkit.utils.ThreadCache;
 import java.util.Arrays;
 
 public final class BiomePalette {
+
     private int biome;
     private BitArray256 encodedData;
     private IntPalette palette;
@@ -93,7 +94,6 @@ public final class BiomePalette {
                 encodedData.fromRaw(raw);
             }
         }
-
     }
 
     public synchronized int[] toRaw() {

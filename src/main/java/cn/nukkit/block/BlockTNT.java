@@ -21,9 +21,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockTNT extends BlockSolid {
 
-    public BlockTNT() {
-    }
-
     @Override
     public String getName() {
         return "TNT";

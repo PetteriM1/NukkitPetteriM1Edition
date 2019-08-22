@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class SimpleEventPacket extends DataPacket {
 
     public static final int TYPE_ENABLE_COMMANDS = 1;

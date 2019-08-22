@@ -1,8 +1,11 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class SetDifficultyPacket extends DataPacket {
 
     public int difficulty;

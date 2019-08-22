@@ -17,5 +17,4 @@ public class ItemPotatoBaked extends Item {
     public ItemPotatoBaked(Integer meta, int count) {
         super(BAKED_POTATO, meta, count, "Baked Potato");
     }
-
 }

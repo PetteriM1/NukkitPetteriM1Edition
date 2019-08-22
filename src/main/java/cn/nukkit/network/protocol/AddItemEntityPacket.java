@@ -3,11 +3,13 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.item.Item;
 import cn.nukkit.utils.Binary;
+import lombok.ToString;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class AddItemEntityPacket extends DataPacket {
 
     @Override
@@ -36,10 +38,12 @@ public class AddItemEntityPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        this.putSlot(this.item);
+        this.putSlot(protocol, this.item);
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
-        this.put(Binary.writeMetadata(metadata));
-        this.putBoolean(this.isFromFishing);
+        this.put(Binary.writeMetadata(protocol, metadata));
+        if (protocol >= 223) {
+            this.putBoolean(this.isFromFishing);
+        }
     }
 }

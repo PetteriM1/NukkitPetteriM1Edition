@@ -52,7 +52,7 @@ public abstract class BlockEntity extends Position {
     public String name;
     public long id;
 
-    public boolean movable = true;
+    public boolean movable;
 
     public boolean closed = false;
     public CompoundTag namedTag;
@@ -118,7 +118,7 @@ public abstract class BlockEntity extends Position {
                         blockEntity = (BlockEntity) constructor.newInstance(objects);
 
                     }
-                } catch (Exception e) {}
+                } catch (Exception ignored) {}
             }
         }
 
@@ -154,7 +154,7 @@ public abstract class BlockEntity extends Position {
         this.saveNBT();
         CompoundTag tag = this.namedTag.clone();
         tag.remove("x").remove("y").remove("z").remove("id");
-        if (tag.getTags().size() > 0) {
+        if (!tag.getTags().isEmpty()) {
             return tag;
         } else {
             return null;
@@ -203,7 +203,7 @@ public abstract class BlockEntity extends Position {
     }
 
     public static CompoundTag getDefaultCompound(Vector3 pos, String id) {
-        return new CompoundTag("")
+        return new CompoundTag()
                 .putString("id", id)
                 .putInt("x", pos.getFloorX())
                 .putInt("y", pos.getFloorY())

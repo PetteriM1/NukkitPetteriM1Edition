@@ -3,8 +3,7 @@ package cn.nukkit.item.enchantment.damage;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
 import cn.nukkit.potion.Effect;
-
-import java.util.concurrent.ThreadLocalRandom;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
@@ -38,7 +37,7 @@ public class EnchantmentDamageArthropods extends EnchantmentDamage {
     @Override
     public void doPostAttack(Entity attacker, Entity entity) {
         if (entity instanceof EntityArthropod) {
-            int duration = 20 + ThreadLocalRandom.current().nextInt(10 * this.level);
+            int duration = 20 + Utils.random.nextInt(10 * this.level);
             entity.addEffect(Effect.getEffect(Effect.SLOWNESS).setDuration(duration).setAmplifier(3));
         }
     }

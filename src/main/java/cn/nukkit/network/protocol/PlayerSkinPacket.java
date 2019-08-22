@@ -1,9 +1,11 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.entity.data.Skin;
+import lombok.ToString;
 
 import java.util.UUID;
 
+@ToString
 public class PlayerSkinPacket extends DataPacket {
 
     public UUID uuid;
@@ -42,6 +44,8 @@ public class PlayerSkinPacket extends DataPacket {
         putByteArray(skin.getCapeData());
         putString(skin.getGeometryName());
         putString(skin.getGeometryData());
-        putBoolean(premium);
+        if (protocol > 274) {
+            putBoolean(premium);
+        }
     }
 }

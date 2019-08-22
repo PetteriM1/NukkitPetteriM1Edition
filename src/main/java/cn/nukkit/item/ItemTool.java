@@ -5,14 +5,14 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.Tag;
-
-import java.util.Random;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class ItemTool extends Item {
+public abstract class ItemTool extends Item implements ItemDurable {
+
     public static final int TIER_WOODEN = 1;
     public static final int TIER_GOLD = 2;
     public static final int TIER_STONE = 3;
@@ -105,38 +105,13 @@ public abstract class ItemTool extends Item {
         }
 
         Enchantment durability = getEnchantment(Enchantment.ID_DURABILITY);
-        return durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100);
+        return durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= Utils.random.nextInt(100);
     }
 
     @Override
     public boolean isUnbreakable() {
         Tag tag = this.getNamedTagEntry("Unbreakable");
         return tag instanceof ByteTag && ((ByteTag) tag).data > 0;
-    }
-
-    @Override
-    public boolean isPickaxe() {
-        return false;
-    }
-
-    @Override
-    public boolean isAxe() {
-        return false;
-    }
-
-    @Override
-    public boolean isSword() {
-        return false;
-    }
-
-    @Override
-    public boolean isShovel() {
-        return false;
-    }
-
-    @Override
-    public boolean isHoe() {
-        return false;
     }
 
     @Override

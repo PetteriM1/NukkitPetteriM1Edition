@@ -44,13 +44,12 @@ public enum EnchantmentType {
                 case ARMOR_FEET:
                     return item.isBoots();
                 case WEARABLE:
-                    return item instanceof ItemArmor || item instanceof ItemElytra || item instanceof ItemSkull || item.getBlock() instanceof BlockPumpkin;
+                    return item instanceof ItemArmor || item instanceof ItemSkull || item.getBlock() instanceof BlockPumpkin;
                 case TRIDENT:
                     return item instanceof ItemTrident;
                 default:
                     return false;
             }
-
         } else {
             switch (this) {
                 case SWORD:

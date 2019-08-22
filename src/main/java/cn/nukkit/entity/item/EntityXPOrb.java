@@ -114,7 +114,9 @@ public class EntityXPOrb extends Entity {
                 }
             }
 
-            this.motionY -= this.getGravity();
+            if (!this.isOnGround()) {
+                this.motionY -= this.getGravity();
+            }
 
             if (this.checkObstruction(this.x, this.y, this.z)) {
                 hasUpdate = true;
@@ -167,10 +169,9 @@ public class EntityXPOrb extends Entity {
             this.updateMovement();
 
             if (this.age > 6000) {
-                this.kill();
-                hasUpdate = true;
+                this.close();
+                return false;
             }
-
         }
 
         return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;

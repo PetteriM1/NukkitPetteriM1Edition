@@ -19,5 +19,4 @@ public class BlockFormEvent extends BlockGrowEvent implements Cancellable {
     public BlockFormEvent(Block block, Block newState) {
         super(block, newState);
     }
-
 }

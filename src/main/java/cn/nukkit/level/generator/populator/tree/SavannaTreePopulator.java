@@ -3,8 +3,9 @@ package cn.nukkit.level.generator.populator.tree;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.ChunkManager;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.object.tree.ObjectSavannaTree;
-import cn.nukkit.level.generator.populator.Populator;
+import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
@@ -15,15 +16,11 @@ public class SavannaTreePopulator extends Populator {
     private int randomAmount;
     private int baseAmount;
 
-    private final int type;
-
     public SavannaTreePopulator() {
         this(BlockSapling.ACACIA);
     }
 
-    public SavannaTreePopulator(int type) {
-        this.type = type;
-    }
+    public SavannaTreePopulator(int type) {}
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;
@@ -34,7 +31,7 @@ public class SavannaTreePopulator extends Populator {
     }
 
     @Override
-    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
+    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         this.level = level;
         int amount = random.nextBoundedInt(this.randomAmount + 1) + this.baseAmount;
         Vector3 v = new Vector3();

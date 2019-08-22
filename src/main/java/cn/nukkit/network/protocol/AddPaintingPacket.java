@@ -1,15 +1,18 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author Nukkit Project Team
  */
+@ToString
 public class AddPaintingPacket extends DataPacket {
 
     public long entityUniqueId;
     public long entityRuntimeId;
-    public int x;
-    public int y;
-    public int z;
+    public float x;
+    public float y;
+    public float z;
     public int direction;
     public String title;
 
@@ -22,7 +25,11 @@ public class AddPaintingPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        this.putBlockVector3(this.x, this.y, this.z);
+        if (protocol < 361) {
+            this.putBlockVector3((int) this.x, (int) this.y, (int) this.z);
+        } else {
+            this.putVector3f(this.x, this.y, this.z);
+        }
         this.putVarInt(this.direction);
         this.putString(this.title);
     }

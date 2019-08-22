@@ -9,7 +9,6 @@ import cn.nukkit.inventory.ShulkerBoxInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -18,10 +17,14 @@ import java.util.HashSet;
 
 public class BlockEntityShulkerBox extends BlockEntitySpawnable implements InventoryHolder, BlockEntityContainer, BlockEntityNameable {
 
-    protected final ShulkerBoxInventory inventory;
+    protected ShulkerBoxInventory inventory;
 
     public BlockEntityShulkerBox(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    protected void initBlockEntity() {
         this.inventory = new ShulkerBoxInventory(this);
 
         if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
@@ -33,6 +36,12 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
             Item item = NBTIO.getItemHelper(compound);
             this.inventory.slots.put(compound.getByte("Slot"), item);
         }
+
+        if (!this.namedTag.contains("facing")) {
+            this.namedTag.putByte("facing", 0);
+        }
+
+        super.initBlockEntity();
     }
 
     @Override
@@ -59,7 +68,8 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
     @Override
     public boolean isBlockEntityValid() {
-        return getBlock().getId() == Block.SHULKER_BOX;
+        int blockID = this.getBlock().getId();
+        return blockID == Block.SHULKER_BOX || blockID == Block.UNDYED_SHULKER_BOX;
     }
 
     @Override
@@ -108,8 +118,6 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
     @Override
     public BaseInventory getInventory() {
-        this.checkPairing();
-
         return this.inventory;
     }
 
@@ -117,22 +125,9 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
         return inventory;
     }
 
-    protected void checkPairing() {
-        BlockEntityShulkerBox pair = this.getPair();
-        if (pair != null) {
-            if (!pair.isPaired()) {
-                pair.createPair(this);
-                pair.checkPairing();
-            }
-
-            this.namedTag.remove("pairx");
-            this.namedTag.remove("pairz");
-        }
-    }
-
     @Override
     public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Chest";
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Shulker Box";
     }
 
     @Override
@@ -142,7 +137,7 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.namedTag.remove("CustomName");
             return;
         }
@@ -150,83 +145,10 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
         this.namedTag.putString("CustomName", name);
     }
 
-    public boolean isPaired() {
-        return this.namedTag.contains("pairx") && this.namedTag.contains("pairz");
-    }
-
-    public BlockEntityShulkerBox getPair() {
-        if (this.isPaired()) {
-            BlockEntity blockEntity = this.getLevel().getBlockEntity(new Vector3(this.namedTag.getInt("pairx"), this.y, this.namedTag.getInt("pairz")));
-            if (blockEntity instanceof BlockEntityShulkerBox) {
-                return (BlockEntityShulkerBox) blockEntity;
-            }
-        }
-
-        return null;
-    }
-
-    public boolean pairWith(BlockEntityShulkerBox chest) {
-        if (this.isPaired() || chest.isPaired()) {
-            return false;
-        }
-
-        this.createPair(chest);
-
-        chest.spawnToAll();
-        this.spawnToAll();
-        this.checkPairing();
-
-        return true;
-    }
-
-    public void createPair(BlockEntityShulkerBox chest) {
-        this.namedTag.putInt("pairx", (int) chest.x);
-        this.namedTag.putInt("pairz", (int) chest.z);
-        chest.namedTag.putInt("pairx", (int) this.x);
-        chest.namedTag.putInt("pairz", (int) this.z);
-    }
-
-    public boolean unpair() {
-        if (!this.isPaired()) {
-            return false;
-        }
-
-        BlockEntityShulkerBox chest = this.getPair();
-
-        this.namedTag.remove("pairx");
-        this.namedTag.remove("pairz");
-
-        this.spawnToAll();
-
-        if (chest != null) {
-            chest.namedTag.remove("pairx");
-            chest.namedTag.remove("pairz");
-            chest.checkPairing();
-            chest.spawnToAll();
-        }
-        this.checkPairing();
-
-        return true;
-    }
-
     @Override
     public CompoundTag getSpawnCompound() {
-        CompoundTag c;
-        if (this.isPaired()) {
-            c = new CompoundTag()
-                    .putString("id", BlockEntity.SHULKER_BOX)
-                    .putInt("x", (int) this.x)
-                    .putInt("y", (int) this.y)
-                    .putInt("z", (int) this.z)
-                    .putInt("pairx", this.namedTag.getInt("pairx"))
-                    .putInt("pairz", this.namedTag.getInt("pairz"));
-        } else {
-            c = new CompoundTag()
-                    .putString("id", BlockEntity.SHULKER_BOX)
-                    .putInt("x", (int) this.x)
-                    .putInt("y", (int) this.y)
-                    .putInt("z", (int) this.z);
-        }
+        CompoundTag c = getDefaultCompound(this, SHULKER_BOX)
+                .putByte("facing", this.namedTag.getByte("facing"));
 
         if (this.hasName()) {
             c.put("CustomName", this.namedTag.get("CustomName"));
@@ -234,5 +156,4 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
 
         return c;
     }
-
 }

@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class MoveEntityDeltaPacket extends DataPacket {
 
     public static final int FLAG_HAS_X = 0b1;
@@ -9,6 +12,7 @@ public class MoveEntityDeltaPacket extends DataPacket {
     public static final int FLAG_HAS_HEAD_YAW = 0b10000;
     public static final int FLAG_HAS_PITCH = 0b100000;
 
+    public long eid;
     public int flags = 0;
     public int xDelta = 0;
     public int yDelta = 0;
@@ -24,6 +28,7 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     @Override
     public void decode() {
+        this.getEntityRuntimeId();
         this.flags = this.getByte();
         this.xDelta = getCoordinate(FLAG_HAS_X);
         this.yDelta = getCoordinate(FLAG_HAS_Y);
@@ -35,6 +40,8 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
+        this.putEntityRuntimeId(this.eid);
         this.putByte((byte) flags);
         putCoordinate(FLAG_HAS_X, this.xDelta);
         putCoordinate(FLAG_HAS_Y, this.yDelta);

@@ -36,16 +36,6 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
     }
 
     @Override
-    public int getWeakPower(BlockFace side) {
-        return 0;
-    }
-
-    @Override
-    public int getStrongPower(BlockFace side) {
-        return 0;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(new BlockRedstoneTorch());
     }
@@ -72,7 +62,7 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
     }
 
     protected boolean checkState() {
-        BlockFace face = getFacing().getOpposite();
+        BlockFace face = getBlockFace().getOpposite();
         Vector3 pos = getLocation();
 
         if (!this.level.isSidePowered(pos.getSide(face), face)) {

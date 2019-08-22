@@ -5,9 +5,6 @@ package cn.nukkit.block;
  */
 public class BlockSlime extends BlockSolid {
 
-    public BlockSlime() {
-    }
-
     @Override
     public double getHardness() {
         return 0;

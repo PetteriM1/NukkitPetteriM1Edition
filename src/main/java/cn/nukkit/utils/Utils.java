@@ -7,6 +7,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.SplittableRandom;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Nukkit Project
  */
 public class Utils {
+
+    public static final SplittableRandom random = new SplittableRandom();
 
     public static void writeFile(String fileName, String content) throws IOException {
         writeFile(fileName, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
@@ -71,7 +74,7 @@ public class Utils {
             temp = br.readLine();
             while (temp != null) {
                 if (stringBuilder.length() != 0) {
-                    stringBuilder.append("\n");
+                    stringBuilder.append('\n');
                 }
                 stringBuilder.append(temp);
                 temp = br.readLine();
@@ -223,7 +226,7 @@ public class Utils {
     public static <T,U,V> Map<U,V> getOrCreate(Map<T, Map<U, V>> map, T key) {
         Map<U, V> existing = map.get(key);
         if (existing == null) {
-            ConcurrentHashMap<U, V> toPut = new ConcurrentHashMap<U, V>();
+            ConcurrentHashMap<U, V> toPut = new ConcurrentHashMap<>();
             existing = map.putIfAbsent(key, toPut);
             if (existing == null) {
                 existing = toPut;
@@ -282,5 +285,23 @@ public class Utils {
         if ('A' <= ch && ch <= 'F')    return ch - 'A' + 10;
         if ('a' <= ch && ch <= 'f')    return ch - 'a' + 10;
         return -1;
+    }
+
+    public static int rand(int min, int max) {
+        if (min == max) {
+            return max;
+        }
+        return random.nextInt(max + 1 - min) + min;
+    }
+
+    public static double rand(double min, double max) {
+        if (min == max) {
+            return max;
+        }
+        return min + Math.random() * (max-min);
+    }
+
+    public static boolean rand() {
+        return random.nextBoolean();
     }
 }

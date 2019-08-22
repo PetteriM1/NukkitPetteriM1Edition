@@ -346,7 +346,7 @@ public class PluginManager {
     public void unsubscribeFromPermission(String permission, Permissible permissible) {
         if (this.permSubs.containsKey(permission)) {
             this.permSubs.get(permission).remove(permissible);
-            if (this.permSubs.get(permission).size() == 0) {
+            if (this.permSubs.get(permission).isEmpty()) {
                 this.permSubs.remove(permission);
             }
         }
@@ -412,6 +412,7 @@ public class PluginManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected List<PluginCommand> parseYamlCommands(Plugin plugin) {
         List<PluginCommand> pluginCmds = new ArrayList<>();
 
@@ -445,7 +446,7 @@ public class PluginManager {
                             aliasList.add(alias);
                         }
 
-                        newCmd.setAliases(aliasList.stream().toArray(String[]::new));
+                        newCmd.setAliases(aliasList.toArray(new String[0]));
                     }
                 }
 
@@ -583,6 +584,8 @@ public class PluginManager {
             Method method = getRegistrationClass(type).getDeclaredMethod("getHandlers");
             method.setAccessible(true);
             return (HandlerList) method.invoke(null);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("getHandlers method in " + type.getName() + " was not static!");
         } catch (Exception e) {
             throw new IllegalAccessException(Utils.getExceptionMessage(e));
         }
@@ -594,7 +597,7 @@ public class PluginManager {
             return clazz;
         } catch (NoSuchMethodException e) {
             if (clazz.getSuperclass() != null
-                    && !clazz.getSuperclass().equals(Event.class)
+                    && clazz.getSuperclass() != Event.class
                     && Event.class.isAssignableFrom(clazz.getSuperclass())) {
                 return getRegistrationClass(clazz.getSuperclass().asSubclass(Event.class));
             } else {

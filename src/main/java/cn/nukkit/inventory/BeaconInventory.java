@@ -8,11 +8,6 @@ import cn.nukkit.level.Position;
  */
 public class BeaconInventory extends ContainerInventory {
 
-    @Override
-    public int getSize() {
-        return 1;
-    }
-
     public BeaconInventory(Position position) {
         super(null, InventoryType.BEACON);
         this.holder = new FakeBlockMenu(this, position);

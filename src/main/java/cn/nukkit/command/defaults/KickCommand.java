@@ -3,6 +3,7 @@ package cn.nukkit.command.defaults;
 import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.event.player.PlayerKickEvent;
 import cn.nukkit.lang.TranslationContainer;
@@ -19,8 +20,8 @@ public class KickCommand extends VanillaCommand {
         this.setPermission("nukkit.command.kick");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("reason", CommandParameter.ARG_TYPE_STRING, true)
+                new CommandParameter("player", CommandParamType.TARGET, false),
+                new CommandParameter("reason", CommandParamType.STRING, false),
         });
     }
 
@@ -36,20 +37,20 @@ public class KickCommand extends VanillaCommand {
 
         String name = args[0].replace("@s", sender.getName());
 
-        String reason = "";
+        StringBuilder reason = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
-            reason += args[i] + " ";
+            reason.append(args[i]).append(' ');
         }
 
         if (reason.length() > 0) {
-            reason = reason.substring(0, reason.length() - 1);
+            reason = new StringBuilder(reason.substring(0, reason.length() - 1));
         }
 
         Player player = sender.getServer().getPlayer(name);
         if (player != null) {
-            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN, reason);
+            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN, reason.toString());
             if (reason.length() >= 1) {
-                Command.broadcastCommandMessage(sender, new TranslationContainer("commands.kick.success.reason", new String[]{player.getName(), reason})
+                Command.broadcastCommandMessage(sender, new TranslationContainer("commands.kick.success.reason", player.getName(), reason.toString())
                 );
             } else {
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.kick.success", player.getName()));

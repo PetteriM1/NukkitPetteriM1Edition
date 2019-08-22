@@ -3,13 +3,14 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.mob.EntityWalkingMob;
+import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,37 +55,13 @@ public class EntityIronGolem extends EntityWalkingMob {
     }
 
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 10 && this.distanceSquared(player) < 4) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 4) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
             if (player instanceof Player) {
-                @SuppressWarnings("serial")
-                HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-                    {
-                        put(Item.LEATHER_CAP, 1f);
-                        put(Item.LEATHER_TUNIC, 3f);
-                        put(Item.LEATHER_PANTS, 2f);
-                        put(Item.LEATHER_BOOTS, 1f);
-                        put(Item.CHAIN_HELMET, 1f);
-                        put(Item.CHAIN_CHESTPLATE, 5f);
-                        put(Item.CHAIN_LEGGINGS, 4f);
-                        put(Item.CHAIN_BOOTS, 1f);
-                        put(Item.GOLD_HELMET, 1f);
-                        put(Item.GOLD_CHESTPLATE, 5f);
-                        put(Item.GOLD_LEGGINGS, 3f);
-                        put(Item.GOLD_BOOTS, 1f);
-                        put(Item.IRON_HELMET, 2f);
-                        put(Item.IRON_CHESTPLATE, 6f);
-                        put(Item.IRON_LEGGINGS, 5f);
-                        put(Item.IRON_BOOTS, 2f);
-                        put(Item.DIAMOND_HELMET, 3f);
-                        put(Item.DIAMOND_CHESTPLATE, 8f);
-                        put(Item.DIAMOND_LEGGINGS, 6f);
-                        put(Item.DIAMOND_BOOTS, 3f);
-                    }
-                };
+                HashMap<Integer, Float> armorValues = new ArmorPoints();
 
                 float points = 0;
                 for (Item i : ((Player) player).getInventory().getArmorContents()) {
@@ -98,28 +75,24 @@ public class EntityIronGolem extends EntityWalkingMob {
     }
 
     public boolean targetOption(EntityCreature creature, double distance) {
-        return !(creature instanceof Player) && creature.isAlive() && distance <= 60;
+        return !(creature instanceof Player) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 60;
     }
 
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(3, 6); i++) {
+            for (int i = 0; i < Utils.rand(3, 5); i++) {
                 drops.add(Item.get(Item.IRON_INGOT, 0, 1));
             }
 
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.POPPY, 0, 1));
             }
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override
@@ -130,5 +103,10 @@ public class EntityIronGolem extends EntityWalkingMob {
     @Override
     public String getName() {
         return "Iron Golem";
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
     }
 }

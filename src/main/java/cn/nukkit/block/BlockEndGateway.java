@@ -9,9 +9,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockEndGateway extends BlockSolid {
 
-    public BlockEndGateway() {
-    }
-
     @Override
     public String getName() {
         return "End Gateway";

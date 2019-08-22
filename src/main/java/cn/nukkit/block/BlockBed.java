@@ -18,12 +18,13 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.Faceable;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
-public class BlockBed extends BlockTransparentMeta {
+public class BlockBed extends BlockTransparentMeta implements Faceable {
 
     public BlockBed() {
         this(0);
@@ -41,11 +42,6 @@ public class BlockBed extends BlockTransparentMeta {
     @Override
     public boolean canBeActivated() {
         return true;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1;
     }
 
     @Override
@@ -77,7 +73,7 @@ public class BlockBed extends BlockTransparentMeta {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (this.level.getDimension() == Level.DIMENSION_NETHER) {
+        if (this.level.getDimension() == Level.DIMENSION_NETHER || this.level.getDimension() == Level.DIMENSION_THE_END) {
             this.level.useBreakOn(this);
             CompoundTag nbt = new CompoundTag()
                     .putList(new ListTag<DoubleTag>("Pos")
@@ -221,5 +217,10 @@ public class BlockBed extends BlockTransparentMeta {
         }
 
         return DyeColor.WHITE;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

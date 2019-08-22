@@ -10,6 +10,8 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Utils;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -72,7 +74,7 @@ public class BlockSapling extends BlockFlowable {
 
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0F) { //BoneMeal
-            if ((player.gamemode & 0x01) == 0) {
+            if (player != null && (player.gamemode & 0x01) == 0) {
                 item.count--;
             }
 
@@ -101,7 +103,7 @@ public class BlockSapling extends BlockFlowable {
                     }
 
                     if (!bigTree) {
-                        generator = new NewJungleTree(4 + ThreadLocalRandom.current().nextInt(7));
+                        generator = new NewJungleTree(4, 7);
                     }
                     break;
                 case ACACIA:
@@ -163,7 +165,7 @@ public class BlockSapling extends BlockFlowable {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) { //Growth
-            if (new NukkitRandom().nextRange(1, 7) == 1) {
+            if (Utils.rand(1, 7) == 1) {
                 if ((this.getDamage() & 0x08) == 0x08) {
                     ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
                 } else {

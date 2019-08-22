@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 public enum BlockFace {
+
     DOWN(0, 1, -1, "down", AxisDirection.NEGATIVE, new Vector3(0, -1, 0)),
     UP(1, 0, -1, "up", AxisDirection.POSITIVE, new Vector3(0, 1, 0)),
     NORTH(2, 3, 2, "north", AxisDirection.NEGATIVE, new Vector3(0, 0, -1)),
@@ -116,7 +117,7 @@ public enum BlockFace {
             }
         }
 
-        throw new RuntimeException("Unable to get face from axis: " + axisDirection + " " + axis);
+        throw new RuntimeException("Unable to get face from axis: " + axisDirection + ' ' + axis);
     }
 
     /**

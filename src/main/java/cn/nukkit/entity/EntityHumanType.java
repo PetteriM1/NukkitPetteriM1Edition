@@ -5,19 +5,19 @@ import cn.nukkit.block.BlockAir;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
-import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.inventory.PlayerEnderChestInventory;
 import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemSkull;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.NukkitMath;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-
-import java.util.Random;
+import cn.nukkit.utils.Utils;
 
 public abstract class EntityHumanType extends EntityCreature implements InventoryHolder {
 
@@ -71,10 +71,12 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
     public void saveNBT() {
         super.saveNBT();
 
-        this.namedTag.putList(new ListTag<CompoundTag>("Inventory"));
         if (this.inventory != null) {
+            ListTag<CompoundTag> inventoryTag = new ListTag<>("Inventory");
+            this.namedTag.putList(inventoryTag);
+
             for (int slot = 0; slot < 9; ++slot) {
-                this.namedTag.getList("Inventory", CompoundTag.class).add(new CompoundTag()
+                inventoryTag.add(new CompoundTag()
                         .putByte("Count", 0)
                         .putShort("Damage", 0)
                         .putByte("Slot", slot)
@@ -86,13 +88,13 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             int slotCount = Player.SURVIVAL_SLOTS + 9;
             for (int slot = 9; slot < slotCount; ++slot) {
                 Item item = this.inventory.getItem(slot - 9);
-                this.namedTag.getList("Inventory", CompoundTag.class).add(NBTIO.putItemHelper(item, slot));
+                inventoryTag.add(NBTIO.putItemHelper(item, slot));
             }
 
             for (int slot = 100; slot < 104; ++slot) {
                 Item item = this.inventory.getItem(this.inventory.getSize() + slot - 100);
                 if (item != null && item.getId() != Item.AIR) {
-                    this.namedTag.getList("Inventory", CompoundTag.class).add(NBTIO.putItemHelper(item, slot));
+                    inventoryTag.add(NBTIO.putItemHelper(item, slot));
                 }
             }
         }
@@ -111,33 +113,41 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
     @Override
     public Item[] getDrops() {
         if (this.inventory != null) {
-            return this.inventory.getContents().values().stream().toArray(Item[]::new);
+            return this.inventory.getContents().values().toArray(new Item[0]);
         }
         return new Item[0];
     }
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        if (!this.isAlive()) {
+        if (!this.isAlive() || closed) {
             return false;
         }
 
         if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.CUSTOM && source.getCause() != DamageCause.MAGIC) {
-            int points = 0;
+            int armorPoints = 0;
             int epf = 0;
-            int toughness = 0;
 
             for (Item armor : inventory.getArmorContents()) {
-                points += armor.getArmorPoints();
-                epf += calculateEnchantmentReduction(armor, source);
-                toughness += armor.getToughness();
+                armorPoints += armor.getArmorPoints();
+                epf += calculateEnchantmentProtectionFactor(armor, source);
             }
 
-            float originalDamage = source.getDamage();
+            //float originalDamage = source.getDamage();
+            //float r = (source.getDamage(EntityDamageEvent.DamageModifier.ARMOR) - (originalDamage - originalDamage * (1 - Math.max(armorPoints / 5, armorPoints - originalDamage / 2) / 25)));
+            //originalDamage += r;
+            //epf = Math.min(20, epf);
+            //source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
+            //source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
 
-            float finalDamage = (float) (originalDamage * (1 - Math.max(points / 5, points - originalDamage / (2 + toughness / 4)) / 25) * (1 - /*0.75 */ epf * 0.04));
+            if (source.canBeReducedByArmor()) {
+                source.setDamage(-source.getFinalDamage() * armorPoints * 0.04f, EntityDamageEvent.DamageModifier.ARMOR);
+            }
 
-            source.setDamage(finalDamage - originalDamage, DamageModifier.ARMOR);
+            source.setDamage(-source.getFinalDamage() * Math.min(NukkitMath.ceilFloat(Math.min(epf, 25) * ((float) Utils.random.nextInt(50, 100) / 100)), 20) * 0.04f,
+                    EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
+
+            source.setDamage(-Math.min(this.getAbsorption(), source.getFinalDamage()), EntityDamageEvent.DamageModifier.ABSORPTION);
         }
 
         if (super.attack(source)) {
@@ -158,9 +168,14 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
                     }
 
                     Enchantment durability = armor.getEnchantment(Enchantment.ID_DURABILITY);
-                    if (durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= new Random().nextInt(100))
+                    if (durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= Utils.random.nextInt(100))
                         continue;
                 }
+
+                if (armor.isUnbreakable() || armor instanceof ItemSkull) {
+                    continue;
+                }
+
                 armor.setDamage(armor.getDamage() + 1);
 
                 if (armor.getDamage() >= armor.getMaxDurability()) {
@@ -176,18 +191,18 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
         }
     }
 
-    protected double calculateEnchantmentReduction(Item item, EntityDamageEvent source) {
+    protected double calculateEnchantmentProtectionFactor(Item item, EntityDamageEvent source) {
         if (!item.hasEnchantments()) {
             return 0;
         }
 
-        double reduction = 0;
+        double epf  = 0;
 
         for (Enchantment ench : item.getEnchantments()) {
-            reduction += ench.getDamageProtection(source);
+            epf  += ench.getProtectionFactor(source);
         }
 
-        return reduction;
+        return epf ;
     }
 
     @Override

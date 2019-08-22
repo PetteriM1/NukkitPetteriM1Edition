@@ -10,7 +10,8 @@ import cn.nukkit.math.NukkitRandom;
  * Nukkit Project
  */
 public abstract class ObjectTree {
-    private boolean overridable(int id) {
+
+    protected boolean overridable(int id) {
         switch (id) {
             case Block.AIR:
             case Block.SAPLING:
@@ -49,25 +50,21 @@ public abstract class ObjectTree {
         ObjectTree tree;
         switch (type) {
             case BlockSapling.SPRUCE:
-                if (random.nextBoundedInt(39) == 0) {
-                    tree = new ObjectSpruceTree();
-                } else {
-                    tree = new ObjectSpruceTree();
-                }
+                tree = new ObjectSpruceTree();
                 break;
             case BlockSapling.BIRCH:
-                if (random.nextBoundedInt(39) == 0) {
-                    tree = new ObjectTallBirchTree();
-                } else {
-                    tree = new ObjectBirchTree();
-                }
+                tree = new ObjectBirchTree();
                 break;
             case BlockSapling.JUNGLE:
                 tree = new ObjectJungleTree();
                 break;
+            case BlockSapling.BIRCH_TALL:
+                tree = new ObjectTallBirchTree();
+                break;
             case BlockSapling.OAK:
             default:
                 tree = new ObjectOakTree();
+                //todo: more complex treeeeeeeeeeeeeeeee
                 break;
         }
 

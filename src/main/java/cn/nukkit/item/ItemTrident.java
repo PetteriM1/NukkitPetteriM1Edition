@@ -2,16 +2,15 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.event.entity.EntityShootBowEvent;
-import cn.nukkit.entity.projectile.EntityThrownTrident;
-import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.entity.projectile.EntityThrownTrident;
+import cn.nukkit.event.entity.EntityShootBowEvent;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.DoubleTag;
+import cn.nukkit.nbt.tag.FloatTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.scheduler.NukkitRunnable;
 
 /**
  * Created by PetteriM1
@@ -65,7 +64,7 @@ public class ItemTrident extends ItemTool {
         double p = (double) diff / 20;
 
         double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
-        EntityThrownTrident trident = new EntityThrownTrident(player.chunk, nbt, player, f == 2);
+        EntityThrownTrident trident = new EntityThrownTrident(player.chunk, nbt, player);
         trident.setItem(this);
 
         EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, trident, f);
@@ -88,11 +87,7 @@ public class ItemTrident extends ItemTool {
                     entityShootBowEvent.getProjectile().spawnToAll();
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THROW);
                     if (!player.isCreative()) {
-                        new NukkitRunnable() {
-                            public void run() {
-                                player.getInventory().removeItem(Item.get(Item.TRIDENT, meta, 1));
-                            }
-                        }.runTaskLater(null, 1);
+                        this.count--;
                     }
                 }
             }

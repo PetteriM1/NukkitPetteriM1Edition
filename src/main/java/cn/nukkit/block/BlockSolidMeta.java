@@ -9,11 +9,6 @@ public abstract class BlockSolidMeta extends BlockMeta {
     }
 
     @Override
-    public boolean isSolid() {
-        return true;
-    }
-
-    @Override
     public BlockColor getColor() {
         return BlockColor.STONE_BLOCK_COLOR;
     }

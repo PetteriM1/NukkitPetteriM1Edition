@@ -9,6 +9,7 @@ import java.util.Map;
  * Nukkit Project
  */
 public abstract class CustomInventory extends ContainerInventory {
+
     public CustomInventory(InventoryHolder holder, InventoryType type) {
         super(holder, type);
     }

@@ -18,5 +18,4 @@ public class LevelLoadEvent extends LevelEvent {
     public LevelLoadEvent(Level level) {
         super(level);
     }
-
 }

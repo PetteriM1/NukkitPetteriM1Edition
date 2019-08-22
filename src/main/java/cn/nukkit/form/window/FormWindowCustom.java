@@ -12,7 +12,8 @@ import java.util.List;
 
 public class FormWindowCustom extends FormWindow {
 
-    private final String type = "custom_form"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "custom_form";
     private String title = "";
     private ElementButtonImageData icon;
     private List<Element> content;
@@ -24,13 +25,17 @@ public class FormWindowCustom extends FormWindow {
     }
 
     public FormWindowCustom(String title, List<Element> contents) {
-        this(title, contents, "");
+        this(title, contents, (ElementButtonImageData) null);
     }
 
     public FormWindowCustom(String title, List<Element> contents, String icon) {
+        this(title, contents, icon.isEmpty() ? null : new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon));
+    }
+
+    public FormWindowCustom(String title, List<Element> contents, ElementButtonImageData icon) {
         this.title = title;
         this.content = contents;
-        if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
+        this.icon = icon;
     }
 
     public String getTitle() {
@@ -57,13 +62,8 @@ public class FormWindowCustom extends FormWindow {
         if (!icon.isEmpty()) this.icon = new ElementButtonImageData(ElementButtonImageData.IMAGE_DATA_TYPE_URL, icon);
     }
 
-    public String getJSONData() {
-        String toModify = new Gson().toJson(this);
-        // We need to replace this due to Java not supporting declaring class field 'default'
-        return toModify.replace("defaultOptionIndex", "default")
-                .replace("defaultText", "default")
-                .replace("defaultValue", "default")
-                .replace("defaultStepIndex", "default");
+    public void setIcon(ElementButtonImageData icon) {
+        this.icon = icon;
     }
 
     public FormResponseCustom getResponse() {
@@ -76,8 +76,7 @@ public class FormWindowCustom extends FormWindow {
             return;
         }
 
-        List<String> elementResponses = new Gson().fromJson(data, new TypeToken<List<String>>() {
-        }.getType());
+        List<String> elementResponses = new Gson().fromJson(data, new ListTypeToken().getType());
 
         int i = 0;
 
@@ -87,6 +86,7 @@ public class FormWindowCustom extends FormWindow {
         HashMap<Integer, FormResponseData> stepSliderResponses = new HashMap<>();
         HashMap<Integer, Boolean> toggleResponses = new HashMap<>();
         HashMap<Integer, Object> responses = new HashMap<>();
+        HashMap<Integer, String> labelResponses = new HashMap<>();
 
         for (String elementData : elementResponses) {
             if (i >= content.size()) {
@@ -96,10 +96,9 @@ public class FormWindowCustom extends FormWindow {
             Element e = content.get(i);
             if (e == null) break;
             if (e instanceof ElementLabel) {
-                i++;
-                continue;
-            }
-            if (e instanceof ElementDropdown) {
+                labelResponses.put(i, ((ElementLabel) e).getText());
+                responses.put(i, ((ElementLabel) e).getText());
+            } else if (e instanceof ElementDropdown) {
                 String answer = ((ElementDropdown) e).getOptions().get(Integer.parseInt(elementData));
                 dropdownResponses.put(i, new FormResponseData(Integer.parseInt(elementData), answer));
                 responses.put(i, answer);
@@ -123,7 +122,7 @@ public class FormWindowCustom extends FormWindow {
         }
 
         this.response = new FormResponseCustom(responses, dropdownResponses, inputResponses,
-                sliderResponses, stepSliderResponses, toggleResponses);
+                sliderResponses, stepSliderResponses, toggleResponses, labelResponses);
     }
 
     /**
@@ -149,5 +148,8 @@ public class FormWindowCustom extends FormWindow {
                 }
             });
         }
+    }
+
+    private static class ListTypeToken extends TypeToken<List<String>> {
     }
 }

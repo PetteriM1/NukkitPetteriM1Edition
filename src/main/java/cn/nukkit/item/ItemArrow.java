@@ -17,5 +17,4 @@ public class ItemArrow extends Item {
     public ItemArrow(Integer meta, int count) {
         super(ARROW, meta, count, "Arrow");
     }
-
 }

@@ -1,52 +1,21 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.entity.EntityWalking;
-import cn.nukkit.item.Item;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.HeartParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import co.aikar.timings.Timings;
+import cn.nukkit.utils.Utils;
 
 public abstract class EntityWalkingAnimal extends EntityWalking implements EntityAnimal {
-
-    protected int inLoveTicks = 0;
-    protected int spawnBabyDelay = 0;
 
     public EntityWalkingAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-
-        if (this.getDataFlag(DATA_FLAG_BABY, 0)) {
-            this.setDataFlag(DATA_FLAG_BABY, DATA_TYPE_BYTE);
-        }
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        boolean hasUpdate = false;
-        Timings.entityBaseTickTimer.startTiming();
-
-        hasUpdate = super.entityBaseTick(tickDiff);
-
-        if (this.isInLove()) {
-            this.inLoveTicks -= tickDiff;
-            if (this.age % 20 == 0) {
-                for (int i = 0; i < 3; i++) {
-                    this.level.addParticle(new HeartParticle(this.add(EntityUtils.rand(-1.0, 1.0), this.getMountedYOffset() + EntityUtils.rand(-1.0, 1.0), EntityUtils.rand(-1.0, 1.0))));
-                }
-            }
-        }
-
-        Timings.entityBaseTickTimer.stopTiming();
-        return hasUpdate;
-    }
+    private int panicTicks = 0;
 
     @Override
     public boolean onUpdate(int currentTick) {
@@ -60,6 +29,13 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
                 return false;
             }
             return true;
+        }
+
+        if (this.panicTicks > 0) {
+            this.panicTicks--;
+            if (panicTicks == 0) {
+                doPanic(false);
+            }
         }
 
         int tickDiff = currentTick - this.lastUpdate;
@@ -81,16 +57,28 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         return true;
     }
 
-    public void setInLove() {
-        this.inLoveTicks = 600;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
+    public void doPanic(boolean panic) {
+        if (panic) {
+            int time = Utils.rand(60, 100);
+            this.panicTicks = time;
+            this.stayTime = 0;
+            this.moveTime = time;
+            this.moveMultifier = 1.8d;
+        } else {
+            this.moveMultifier = 1.0d;
+        }
     }
 
-    public boolean isInLove() {
-        return inLoveTicks > 0;
-    }
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
 
-    public boolean isBreedingItem(Item item) {
-        return item != null && item.getId() == Item.WHEAT;
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.doPanic(true);
+            }
+        }
+
+        return true;
     }
 }

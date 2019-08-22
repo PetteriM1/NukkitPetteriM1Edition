@@ -2,6 +2,7 @@ package cn.nukkit.command.defaults;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.utils.TextFormat;
@@ -19,8 +20,8 @@ public class TellCommand extends VanillaCommand {
         this.setPermission("nukkit.command.tell");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                new CommandParameter("player", CommandParameter.ARG_TYPE_TARGET, false),
-                new CommandParameter("message", CommandParameter.ARG_TYPE_RAW_TEXT, false)
+                new CommandParameter("player", CommandParamType.TARGET, false),
+                new CommandParameter("message", CommandParamType.TEXT, false)
         });
     }
 
@@ -49,20 +50,20 @@ public class TellCommand extends VanillaCommand {
             return true;
         }
 
-        String msg = "";
+        StringBuilder msg = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
-            msg += args[i] + " ";
+            msg.append(args[i]).append(' ');
         }
         if (msg.length() > 0) {
-            msg = msg.substring(0, msg.length() - 1);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 1));
         }
 
         String displayName = (sender instanceof Player ? ((Player) sender).getDisplayName() : sender.getName());
 
-        sender.sendMessage("[" + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
-        player.sendMessage("[" + displayName + " -> " + player.getName() + "] " + msg);
+        sender.sendMessage('[' + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
+        player.sendMessage('[' + displayName + " -> " + player.getName() + "] " + msg);
         if (sender instanceof Player) {
-            sender.getServer().getLogger().info("[" + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
+            sender.getServer().getLogger().info('[' + sender.getName() + " -> " + player.getDisplayName() + "] " + msg);
         }
 
         return true;

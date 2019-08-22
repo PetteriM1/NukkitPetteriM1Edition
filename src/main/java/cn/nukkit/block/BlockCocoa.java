@@ -10,13 +10,14 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
-
-import java.util.Random;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created by CreeperFace on 27. 10. 2016.
  */
-public class BlockCocoa extends BlockTransparentMeta {
+public class BlockCocoa extends BlockTransparentMeta implements Faceable {
 
     protected static final AxisAlignedBB[] EAST = new AxisAlignedBB[]{new AxisAlignedBB(0.6875D, 0.4375D, 0.375D, 0.9375D, 0.75D, 0.625D), new AxisAlignedBB(0.5625D, 0.3125D, 0.3125D, 0.9375D, 0.75D, 0.6875D), new AxisAlignedBB(0.5625D, 0.3125D, 0.3125D, 0.9375D, 0.75D, 0.6875D)};
     protected static final AxisAlignedBB[] WEST = new AxisAlignedBB[]{new AxisAlignedBB(0.0625D, 0.4375D, 0.375D, 0.3125D, 0.75D, 0.625D), new AxisAlignedBB(0.0625D, 0.3125D, 0.3125D, 0.4375D, 0.75D, 0.6875D), new AxisAlignedBB(0.0625D, 0.3125D, 0.3125D, 0.4375D, 0.75D, 0.6875D)};
@@ -29,11 +30,6 @@ public class BlockCocoa extends BlockTransparentMeta {
 
     public BlockCocoa(int meta) {
         super(meta);
-    }
-
-    @Override
-    public void setDamage(int meta) {
-        super.setDamage(meta);
     }
 
     @Override
@@ -61,7 +57,7 @@ public class BlockCocoa extends BlockTransparentMeta {
 
         int damage = this.getDamage();
         if (damage > 11) {
-            this.setDamage(damage = 11);
+            this.setDamage(11);
         }
 
         switch (getDamage()) {
@@ -128,7 +124,7 @@ public class BlockCocoa extends BlockTransparentMeta {
                 return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            if (new Random().nextInt(2) == 1) {
+            if (Utils.random.nextInt(2) == 1) {
                 if (this.getDamage() / 4 < 2) {
                     BlockCocoa block = (BlockCocoa) this.clone();
                     block.setDamage(block.getDamage() + 4);
@@ -194,7 +190,7 @@ public class BlockCocoa extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemDye(ItemDye.BROWN);
+        return new ItemDye(DyeColor.BROWN.getDyeData());
     }
 
     @Override
@@ -208,5 +204,10 @@ public class BlockCocoa extends BlockTransparentMeta {
                     new ItemDye(3, 1)
             };
         }
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

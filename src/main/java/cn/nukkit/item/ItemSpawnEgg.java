@@ -1,14 +1,19 @@
 package cn.nukkit.item;
 
-import cn.nukkit.Server;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockMobSpawner;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawner;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.passive.*;
+import cn.nukkit.entity.mob.EntityZombie;
+import cn.nukkit.entity.passive.EntityChicken;
+import cn.nukkit.entity.passive.EntityCow;
+import cn.nukkit.entity.passive.EntityPig;
+import cn.nukkit.entity.passive.EntitySheep;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
@@ -16,9 +21,9 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author MagicDroidX
@@ -52,12 +57,19 @@ public class ItemSpawnEgg extends Item {
 
         if (target instanceof BlockMobSpawner) {
             BlockEntity blockEntity = level.getBlockEntity(target);
-            if (blockEntity != null && blockEntity instanceof BlockEntitySpawner) {
-                ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
+            if (blockEntity instanceof BlockEntitySpawner) {
+                if (((BlockEntitySpawner) blockEntity).getSpawnEntityType() != this.getDamage()) {
+                    ((BlockEntitySpawner) blockEntity).setSpawnEntityType(this.getDamage());
+
+                    if (!player.isCreative()) {
+                        player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                    }
+                }
             } else {
                 if (blockEntity != null) {
                     blockEntity.close();
                 }
+
                 CompoundTag nbt = new CompoundTag()
                         .putString("id", BlockEntity.MOB_SPAWNER)
                         .putInt("EntityId", this.getDamage())
@@ -65,7 +77,12 @@ public class ItemSpawnEgg extends Item {
                         .putInt("y", (int) target.y)
                         .putInt("z", (int) target.z);
                 new BlockEntitySpawner(level.getChunk((int) target.x >> 4, (int) target.z >> 4), nbt);
+
+                if (!player.isCreative()) {
+                    player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                }
             }
+
             return true;
         }
 
@@ -75,17 +92,24 @@ public class ItemSpawnEgg extends Item {
             return false;
         }
 
+        CreatureSpawnEvent ev = new CreatureSpawnEvent(this.meta, CreatureSpawnEvent.SpawnReason.SPAWN_EGG);
+        level.getServer().getPluginManager().callEvent(ev);
+
+        if (ev.isCancelled()) {
+            return false;
+        }
+
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos")
                         .add(new DoubleTag("", block.getX() + 0.5))
-                        .add(new DoubleTag("", block.getY()))
+                        .add(new DoubleTag("", target.getBoundingBox() == null ? block.getY() : target.getBoundingBox().maxY + 0.0001f))
                         .add(new DoubleTag("", block.getZ() + 0.5)))
                 .putList(new ListTag<DoubleTag>("Motion")
                         .add(new DoubleTag("", 0))
                         .add(new DoubleTag("", 0))
                         .add(new DoubleTag("", 0)))
                 .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", new Random().nextFloat() * 360))
+                        .add(new FloatTag("", ThreadLocalRandom.current().nextFloat() * 360))
                         .add(new FloatTag("", 0)));
 
         if (this.hasCustomName()) {
@@ -95,20 +119,18 @@ public class ItemSpawnEgg extends Item {
         Entity entity = Entity.createEntity(this.meta, chunk, nbt);
 
         if (entity != null) {
-            if (player.isSurvival()) {
-                Item item = player.getInventory().getItemInHand();
-                item.setCount(item.getCount() - 1);
-                player.getInventory().setItemInHand(item);
+            if (!player.isCreative()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             }
 
             entity.spawnToAll();
 
-            if (EntityUtils.rand(0, 500) > 480 &&
-                    entity instanceof BaseEntity &&
+            if (Utils.rand(1, 20) == 1 &&
                     (entity instanceof EntityCow ||
                     entity instanceof EntityChicken ||
                     entity instanceof EntityPig ||
-                    entity instanceof EntitySheep)) {
+                    entity instanceof EntitySheep ||
+                    entity instanceof EntityZombie)) {
 
                 ((BaseEntity) entity).setBaby(true);
             }

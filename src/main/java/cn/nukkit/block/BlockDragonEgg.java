@@ -1,16 +1,11 @@
 package cn.nukkit.block;
 
-import cn.nukkit.Player;
-import cn.nukkit.item.Item;
-import cn.nukkit.level.particle.PortalParticle;
-import cn.nukkit.math.Vector3;
+import cn.nukkit.level.Level;
+import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class BlockDragonEgg extends BlockFallable {
-
-    public BlockDragonEgg() {
-    }
 
     @Override
     public String getName() {
@@ -48,23 +43,32 @@ public class BlockDragonEgg extends BlockFallable {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_TOUCH) {
+            this.teleport();
+        }
+        return super.onUpdate(type);
     }
 
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        int x = EntityUtils.rand((int) this.x - 8, (int) this.x + 8);
-        int z = EntityUtils.rand((int) this.z - 8, (int) this.z + 8);
-        Vector3 loc = new Vector3(x, this.level.getHeightMap(x, z) + 1, z);
-        this.getLevel().setBlock(this, Block.get(AIR), true, true);
-        this.getLevel().addParticle(new PortalParticle(this));
-        this.getLevel().addParticle(new PortalParticle(this));
-        this.getLevel().addParticle(new PortalParticle(this));
-        this.getLevel().setBlock(loc, Block.get(DRAGON_EGG), true, true);
-        this.getLevel().addParticle(new PortalParticle(loc));
-        this.getLevel().addParticle(new PortalParticle(loc));
-        this.getLevel().addParticle(new PortalParticle(loc));
-        return true;
+    public void teleport() {
+        if (!level.randomTickingEnabled()) return;
+        for (int i = 0; i < 1000; ++i) {
+            Block t = this.getLevel().getBlock(this.add(Utils.random.nextInt(-16, 16), Utils.random.nextInt(-16, 16), Utils.random.nextInt(-16, 16)));
+            if (t.getId() == AIR) {
+                int diffX = this.getFloorX() - t.getFloorX();
+                int diffY = this.getFloorY() - t.getFloorY();
+                int diffZ = this.getFloorZ() - t.getFloorZ();
+                LevelEventPacket pk = new LevelEventPacket();
+                pk.evid = LevelEventPacket.EVENT_PARTICLE_DRAGON_EGG_TELEPORT;
+                pk.data = (((((Math.abs(diffX) << 16) | (Math.abs(diffY) << 8)) | Math.abs(diffZ)) | ((diffX < 0 ? 1 : 0) << 24)) | ((diffY < 0 ? 1 : 0) << 25)) | ((diffZ < 0 ? 1 : 0) << 26);
+                pk.x = this.getFloorX();
+                pk.y = this.getFloorY();
+                pk.z = this.getFloorZ();
+                this.getLevel().addChunkPacket(this.getFloorX() >> 4, this.getFloorZ() >> 4, pk);
+                this.getLevel().setBlock(this, get(AIR), true);
+                this.getLevel().setBlock(t, this, true);
+                return;
+            }
+        }
     }
 }

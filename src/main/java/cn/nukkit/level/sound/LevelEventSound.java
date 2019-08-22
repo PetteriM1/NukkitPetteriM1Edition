@@ -9,8 +9,9 @@ import cn.nukkit.network.protocol.LevelEventPacket;
  * Package cn.nukkit.level.sound in project Nukkit .
  */
 public class LevelEventSound extends Sound {
+
     protected final int id;
-    protected float pitch = 0f;
+    protected float pitch;
 
     public LevelEventSound(Vector3 pos, int id) {
         this(pos, id, 0);
@@ -41,5 +42,4 @@ public class LevelEventSound extends Sound {
 
         return new DataPacket[]{pk};
     }
-
 }

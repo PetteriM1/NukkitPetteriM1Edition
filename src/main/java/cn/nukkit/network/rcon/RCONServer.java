@@ -102,7 +102,7 @@ public class RCONServer extends Thread {
                         this.write(key);
                     }
                 }
-            } catch (BufferUnderflowException exception) {
+            } catch (BufferUnderflowException ignored) {
             } catch (Exception exception) {
                 Server.getInstance().getLogger().logException(exception);
             }
@@ -132,24 +132,16 @@ public class RCONServer extends Thread {
         } catch (IOException exception) {
             key.cancel();
             channel.close();
-            if (this.rconSessions.contains(channel)) {
-                this.rconSessions.remove(channel);
-            }
-            if (this.sendQueues.containsKey(channel)) {
-                this.sendQueues.remove(channel);
-            }
+            this.rconSessions.remove(channel);
+            this.sendQueues.remove(channel);
             return;
         }
 
         if (bytesRead == -1) {
             key.cancel();
             channel.close();
-            if (this.rconSessions.contains(channel)) {
-                this.rconSessions.remove(channel);
-            }
-            if (this.sendQueues.containsKey(channel)) {
-                this.sendQueues.remove(channel);
-            }
+            this.rconSessions.remove(channel);
+            this.sendQueues.remove(channel);
             return;
         }
 
@@ -161,14 +153,15 @@ public class RCONServer extends Thread {
         switch (packet.getType()) {
             case SERVERDATA_AUTH:
                 byte[] payload = new byte[1];
-                payload[0] = 0;
 
                 if (new String(packet.getPayload(), Charset.forName("UTF-8")).equals(this.password)) {
                     this.rconSessions.add(channel);
                     this.send(channel, new RCONPacket(packet.getId(), SERVERDATA_AUTH_RESPONSE, payload));
+                    try { Server.getInstance().getLogger().info("[RCON] " + channel.getRemoteAddress().toString() + " connected"); } catch (Exception ignored) {}
                     return;
                 }
 
+                try { Server.getInstance().getLogger().info("[RCON] Authentication failed for " + channel.getRemoteAddress().toString()); } catch (Exception ignored) {}
                 this.send(channel, new RCONPacket(-1, SERVERDATA_AUTH_RESPONSE, payload));
                 break;
             case SERVERDATA_EXECCOMMAND:
@@ -197,12 +190,8 @@ public class RCONServer extends Thread {
             } catch (IOException exception) {
                 key.cancel();
                 channel.close();
-                if (this.rconSessions.contains(channel)) {
-                    this.rconSessions.remove(channel);
-                }
-                if (this.sendQueues.containsKey(channel)) {
-                    this.sendQueues.remove(channel);
-                }
+                this.rconSessions.remove(channel);
+                this.sendQueues.remove(channel);
                 return;
             }
 

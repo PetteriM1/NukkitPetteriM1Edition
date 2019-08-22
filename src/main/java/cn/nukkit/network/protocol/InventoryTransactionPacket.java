@@ -5,7 +5,9 @@ import cn.nukkit.inventory.transaction.data.TransactionData;
 import cn.nukkit.inventory.transaction.data.UseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
 import cn.nukkit.network.protocol.types.NetworkInventoryAction;
+import lombok.ToString;
 
+@ToString
 public class InventoryTransactionPacket extends DataPacket {
 
     public static final int TYPE_NORMAL = 0;
@@ -68,9 +70,12 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putBlockVector3(useItemData.blockPos);
                 this.putBlockFace(useItemData.face);
                 this.putVarInt(useItemData.hotbarSlot);
-                this.putSlot(useItemData.itemInHand);
+                this.putSlot(protocol, useItemData.itemInHand);
                 this.putVector3f(useItemData.playerPos.asVector3f());
                 this.putVector3f(useItemData.clickPos);
+                if (protocol >= 354) { // Idk in which version this added
+                    this.putUnsignedVarInt(useItemData.blockRuntimeId);
+                }
                 break;
             case TYPE_USE_ITEM_ON_ENTITY:
                 UseItemOnEntityData useItemOnEntityData = (UseItemOnEntityData) this.transactionData;
@@ -78,7 +83,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putEntityRuntimeId(useItemOnEntityData.entityRuntimeId);
                 this.putUnsignedVarInt(useItemOnEntityData.actionType);
                 this.putVarInt(useItemOnEntityData.hotbarSlot);
-                this.putSlot(useItemOnEntityData.itemInHand);
+                this.putSlot(protocol, useItemOnEntityData.itemInHand);
                 this.putVector3f(useItemOnEntityData.playerPos.asVector3f());
                 this.putVector3f(useItemOnEntityData.clickPos.asVector3f());
                 break;
@@ -87,7 +92,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
                 this.putUnsignedVarInt(releaseItemData.actionType);
                 this.putVarInt(releaseItemData.hotbarSlot);
-                this.putSlot(releaseItemData.itemInHand);
+                this.putSlot(protocol, releaseItemData.itemInHand);
                 this.putVector3f(releaseItemData.headRot.asVector3f());
                 break;
             default:
@@ -119,6 +124,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 itemData.itemInHand = this.getSlot();
                 itemData.playerPos = this.getVector3f().asVector3();
                 itemData.clickPos = this.getVector3f();
+                try { itemData.blockRuntimeId = (int) this.getUnsignedVarInt(); } catch (Exception ignore) {}
 
                 this.transactionData = itemData;
                 break;

@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
@@ -11,9 +12,6 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockDaylightDetector extends BlockTransparent {
-
-    public BlockDaylightDetector() {
-    }
 
     @Override
     public int getId() {
@@ -53,16 +51,28 @@ public class BlockDaylightDetector extends BlockTransparent {
     
     @Override
     public boolean isPowerSource() {
-        return true;
+        return this.level.isAnimalSpawningAllowedByTime();
     }
     
     @Override
     public int getWeakPower(BlockFace face) {
-        return 15;
+        return this.level.isAnimalSpawningAllowedByTime() ? 15 : 0;
     }
 
     @Override
     public boolean canBePushed() {
         return false;
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return new AxisAlignedBB(
+                this.x,
+                this.y,
+                this.z,
+                this.x + 1,
+                this.y + 0.625,
+                this.z + 1
+        );
     }
 }

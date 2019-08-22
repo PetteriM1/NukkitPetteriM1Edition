@@ -4,9 +4,6 @@ import cn.nukkit.item.Item;
 
 public class BlockCommandBlock extends BlockSolid {
 
-    public BlockCommandBlock() {
-    }
-
     @Override
     public int getId() {
         return COMMAND_BLOCK;

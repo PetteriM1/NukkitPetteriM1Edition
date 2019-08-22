@@ -1,11 +1,11 @@
 package cn.nukkit.form.window;
 
 import cn.nukkit.form.response.FormResponseModal;
-import com.google.gson.Gson;
 
 public class FormWindowModal extends FormWindow {
 
-    private final String type = "modal"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "modal";
     private String title = "";
     private String content = "";
     private String button1 = "";
@@ -13,10 +13,10 @@ public class FormWindowModal extends FormWindow {
 
     private FormResponseModal response = null;
 
-    public FormWindowModal(String title, String content, String trueButonText, String falseButtonText) {
+    public FormWindowModal(String title, String content, String trueButtonText, String falseButtonText) {
         this.title = title;
         this.content = content;
-        this.button1 = trueButonText;
+        this.button1 = trueButtonText;
         this.button2 = falseButtonText;
     }
 
@@ -50,10 +50,6 @@ public class FormWindowModal extends FormWindow {
 
     public void setButton2(String button2) {
         this.button2 = button2;
-    }
-
-    public String getJSONData() {
-        return new Gson().toJson(this);
     }
 
     public FormResponseModal getResponse() {

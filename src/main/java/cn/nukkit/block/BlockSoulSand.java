@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockSoulSand extends BlockSolid {
 
-    public BlockSoulSand() {
-    }
-
     @Override
     public String getName() {
         return "Soul Sand";
@@ -45,7 +42,7 @@ public class BlockSoulSand extends BlockSolid {
                 this.y,
                 this.z,
                 this.x + 1,
-                this.y + 1 - 0.125,
+                this.y + 0.875,
                 this.z + 1
         );
     }
@@ -65,5 +62,4 @@ public class BlockSoulSand extends BlockSolid {
     public BlockColor getColor() {
         return BlockColor.SAND_BLOCK_COLOR;
     }
-
 }

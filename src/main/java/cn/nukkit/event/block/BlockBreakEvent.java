@@ -24,10 +24,10 @@ public class BlockBreakEvent extends BlockEvent implements Cancellable {
     protected final Item item;
     protected final BlockFace face;
 
-    protected boolean instaBreak = false;
-    protected Item[] blockDrops = new Item[0];
+    protected boolean instaBreak;
+    protected Item[] blockDrops;
 
-    protected boolean fastBreak = false;
+    protected boolean fastBreak;
 
     public BlockBreakEvent(Player player, Block block, Item item, Item[] drops) {
         this(player, block, item, drops, false, false);

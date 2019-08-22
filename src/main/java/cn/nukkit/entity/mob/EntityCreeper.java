@@ -5,12 +5,12 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
-import cn.nukkit.entity.mob.EntityWalkingMob;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.ExplosionPrimeEvent;
+import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemSkull;
 import cn.nukkit.level.Explosion;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.TNTPrimeSound;
 import cn.nukkit.math.NukkitMath;
@@ -18,6 +18,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +65,13 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     }
 
     public void explode() {
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 3);
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, this.isPowered() ? 3 : 2.8);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
             Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
 
-            if (ev.isBlockBreaking()) {
+            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
                 explosion.explodeA();
             }
 
@@ -115,37 +116,33 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
         if (this.target instanceof EntityCreature || before != this.target) {
             double x = this.target.x - this.x;
-            double y = this.target.y - this.y;
             double z = this.target.z - this.z;
 
             double diff = Math.abs(x) + Math.abs(z);
             double distance = target.distance(this);
-            if (distance <= 4.5) {
+            if (distance <= 4) {
                 if (target instanceof EntityCreature) {
                     if (bombTime == 0) {
                         this.level.addSound(new TNTPrimeSound(this.add(0, getEyeHeight())));
                         this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
                     }
                     this.bombTime += tickDiff;
-                    if (this.bombTime >= 64) {
+                    if (this.bombTime >= 30) {
                         this.explode();
                         return false;
                     }
-                } else if (Math.pow(this.x - target.x, 2) + Math.pow(this.z - target.z, 2) <= 1) {
-                    this.moveTime = 0;
+                    if (distance <= 1) {
+                        this.stayTime = 10;
+                    }
                 }
             } else {
-                this.bombTime -= tickDiff;
-                if (this.bombTime < 0) {
-                    this.bombTime = 0;
-                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
-                }
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
+                this.bombTime = 0;
 
                 this.motionX = this.getSpeed() * 0.15 * (x / diff);
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
             }
-            this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
-            this.pitch = y == 0 ? 0 : Math.toDegrees(-Math.atan2(y, Math.sqrt(x * x + z * z)));
+            if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
         }
 
         double dx = this.motionX * tickDiff;
@@ -186,27 +183,35 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.GUNPOWDER, 0, 1));
+            }
+
+            Entity killer = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
+
+            if (killer instanceof EntitySkeleton || killer instanceof EntityStray) {
+                drops.add(Item.get(Utils.rand(500, 511), 0, 1));
+            }
+
+            if (killer instanceof EntityCreeper) {
+                if (((EntityCreeper) killer).isPowered()) {
+                    drops.add(Item.get(Item.SKULL, ItemSkull.CREEPER_HEAD, 1));
+                }
             }
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override
     public int getKillExperience() {
-        return 5;
+        return this.isBaby() ? 0 : 5;
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
 
         if (item.getId() == Item.FLINT_AND_STEEL) {
             level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
@@ -216,5 +221,13 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         }
 
         return false;
+    }
+
+    public boolean isPowered() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_POWERED);
+    }
+
+    public void setPowered(boolean charged) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_POWERED, charged);
     }
 }

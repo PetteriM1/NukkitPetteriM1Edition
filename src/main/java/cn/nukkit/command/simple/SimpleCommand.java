@@ -37,7 +37,7 @@ public class SimpleCommand extends Command {
     }
 
     public void sendUsageMessage(CommandSender sender) {
-        if (!this.usageMessage.equals("")) {
+        if (!this.usageMessage.isEmpty()) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
         }
     }

@@ -1,21 +1,28 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
-import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created by PetteriM1
  */
-public class BlockIceFrosted extends BlockIce {
+public class BlockIceFrosted extends BlockTransparentMeta {
 
     public BlockIceFrosted() {
+        this(0);
+    }
+
+    public BlockIceFrosted(int meta) {
+        super(meta);
     }
 
     @Override
     public int getId() {
-        return FROSTED_ICE;
+        return ICE_FROSTED;
     }
 
     @Override
@@ -24,31 +31,92 @@ public class BlockIceFrosted extends BlockIce {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_NONE;
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
+    }
+
+    @Override
+    public double getFrictionFactor() {
+        return 0.98;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        boolean success = super.place(item, block, target, face, fx, fy, fz, player);
+        if (success) {
+            level.scheduleUpdate(this, Utils.random.nextInt(20, 40));
+        }
+        return success;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        level.setBlock(this, get(WATER), true);
+        return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            if ((this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) >= 12 || (level.getTime() % Level.TIME_FULL < 13184 || level.getTime() % Level.TIME_FULL > 22800)) && (Utils.random.nextInt(3) == 0 || countNeighbors() < 4)) {
+                slightlyMelt(true);
+            } else {
+                level.scheduleUpdate(this, Utils.random.nextInt(20, 40));
+            }
+        } else if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (countNeighbors() < 2) {
+                level.setBlock(this, get(WATER), true);
+            }
+        }
+        return super.onUpdate(type);
     }
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockAir());
+        return Item.get(AIR);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.ICE_BLOCK_COLOR;
     }
 
     @Override
     public boolean canHarvestWithHand() {
         return false;
     }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
+
+    protected void slightlyMelt(boolean isSource) {
+        int age = getDamage();
+        if (age < 3) {
+            setDamage(age + 1);
+            level.setBlock(this, this, true);
+            level.scheduleUpdate(level.getBlock(this), Utils.random.nextInt(20, 40));
+        } else {
+            level.setBlock(this, get(WATER), true);
+            if (isSource) {
+                for (BlockFace face : BlockFace.values()) {
+                    Block block = getSide(face);
+                    if (block instanceof BlockIceFrosted) {
+                        ((BlockIceFrosted) block).slightlyMelt(false);
+                    }
+                }
+            }
+        }
     }
 
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_RANDOM) {
-            this.getLevel().setBlock(this, new BlockWater(), true);
-            return Level.BLOCK_UPDATE_RANDOM;
+    private int countNeighbors() {
+        int neighbors = 0;
+        for (BlockFace face : BlockFace.values()) {
+            if (getSide(face).getId() == ICE_FROSTED && ++neighbors >= 4) {
+                return neighbors;
+            }
         }
-        return 0;
+        return neighbors;
     }
 }

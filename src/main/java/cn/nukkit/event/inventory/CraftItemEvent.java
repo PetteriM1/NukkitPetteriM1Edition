@@ -24,7 +24,7 @@ public class CraftItemEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    private Item[] input = new Item[0];
+    private Item[] input;
 
     private final Recipe recipe;
 
@@ -42,7 +42,7 @@ public class CraftItemEvent extends Event implements Cancellable {
             merged.addAll(Arrays.asList(items));
         }
         this.player = transaction.getSource();
-        this.input = merged.stream().toArray(Item[]::new);
+        this.input = merged.toArray(new Item[0]);
         this.recipe = transaction.getRecipe();
     }
 

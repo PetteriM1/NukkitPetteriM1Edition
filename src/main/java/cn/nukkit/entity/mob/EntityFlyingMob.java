@@ -3,7 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityFlying;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -35,7 +35,7 @@ public abstract class EntityFlyingMob extends EntityFlying implements EntityMob 
     }
 
     public int getDamage(Integer difficulty) {
-        return EntityUtils.rand(this.getMinDamage(difficulty), this.getMaxDamage(difficulty));
+        return Utils.rand(this.getMinDamage(difficulty), this.getMaxDamage(difficulty));
     }
 
     public int getMinDamage() {

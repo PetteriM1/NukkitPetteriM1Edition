@@ -3,6 +3,8 @@ package cn.nukkit.inventory;
 import cn.nukkit.Player;
 import cn.nukkit.level.Position;
 
+import java.util.Collections;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
@@ -10,7 +12,7 @@ import cn.nukkit.level.Position;
 public class EnchantInventory extends ContainerInventory {
 
     public EnchantInventory(Position position) {
-        super(null, InventoryType.ENCHANT_TABLE);
+        super(null, InventoryType.ENCHANT_TABLE, Collections.emptyMap(), 4);
         this.holder = new FakeBlockMenu(this, position);
     }
 
@@ -22,11 +24,17 @@ public class EnchantInventory extends ContainerInventory {
     @Override
     public void onClose(Player who) {
         super.onClose(who);
-        if (this.getViewers().size() == 0) {
+        if (this.getViewers().isEmpty()) {
             for (int i = 0; i < 2; ++i) {
                 who.getInventory().addItem(this.getItem(i));
                 this.clear(i);
             }
         }
+    }
+
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        who.craftingType = Player.CRAFTING_ENCHANT;
     }
 }

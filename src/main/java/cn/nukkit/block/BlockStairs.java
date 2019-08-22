@@ -5,12 +5,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.Faceable;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class BlockStairs extends BlockSolidMeta {
+public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
     protected BlockStairs(int meta) {
         super(meta);
@@ -97,51 +98,48 @@ public abstract class BlockStairs extends BlockSolidMeta {
 
 
         if (side == 0) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x + 0.5,
                     this.y + f2,
                     this.z,
                     this.x + 1,
                     this.y + f3,
                     this.z + 1
-            ))) {
-                return true;
-            }
+            ));
         } else if (side == 1) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z,
                     this.x + 0.5,
                     this.y + f3,
                     this.z + 1
-            ))) {
-                return true;
-            }
+            ));
         } else if (side == 2) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z + 0.5,
                     this.x + 1,
                     this.y + f3,
                     this.z + 1
-            ))) {
-                return true;
-            }
+            ));
         } else if (side == 3) {
-            if (bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new AxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z,
                     this.x + 1,
                     this.y + f3,
                     this.z + 0.5
-            ))) {
-                return true;
-            }
+            ));
         }
 
         return false;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

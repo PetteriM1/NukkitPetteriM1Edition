@@ -6,6 +6,7 @@ import java.util.Arrays;
  * @author https://github.com/boy0001/
  */
 public class IntPalette {
+
     private static int[] INT0 = new int[0];
     private int[] keys = INT0;
     private int lastIndex = Integer.MIN_VALUE;
@@ -69,7 +70,7 @@ public class IntPalette {
         if (index >= keys.length || index < 0) {
             return lastIndex = Integer.MIN_VALUE;
         } else {
-            return lastIndex = (int) index;
+            return lastIndex = index;
         }
     }
 

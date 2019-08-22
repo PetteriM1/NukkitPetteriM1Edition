@@ -5,6 +5,7 @@ package cn.nukkit.math;
  * Nukkit Project
  */
 public class Vector2f {
+
     public final float x;
     public final float y;
 
@@ -131,6 +132,6 @@ public class Vector2f {
 
     @Override
     public String toString() {
-        return "Vector2(x=" + this.x + ",y=" + this.y + ")";
+        return "Vector2(x=" + this.x + ",y=" + this.y + ')';
     }
 }

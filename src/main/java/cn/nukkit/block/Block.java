@@ -30,6 +30,7 @@ import java.util.Optional;
  */
 public abstract class Block extends Position implements Metadatable, Cloneable, BlockID {
 
+    @SuppressWarnings("rawtypes")
     public static Class[] list = null;
     public static Block[] fullList = null;
     public static int[] light = null;
@@ -259,7 +260,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[COLORED_TORCH_RG] = BlockColoredTorchRG.class; //202
             list[PURPUR_STAIRS] = BlockStairsPurpur.class; //203
             list[COLORED_TORCH_BP] = BlockColoredTorchBP.class; //204
-            list[UNDYED_SHULKER_BOX] = BlockShulkerBox.class; //205
+            list[UNDYED_SHULKER_BOX] = BlockUndyedShulkerBox.class; //205
             list[END_BRICKS] = BlockBricksEndStone.class; //206
             list[FROSTED_ICE] = BlockIceFrosted.class; //207
             list[END_ROD] = BlockEndRod.class; //208
@@ -311,12 +312,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[RESERVED6] = BlockReserved6.class; //255
 
             for (int id = 0; id < 256; id++) {
+                @SuppressWarnings("rawtypes")
                 Class c = list[id];
                 if (c != null) {
                     Block block;
                     try {
                         block = (Block) c.newInstance();
                         try {
+                            @SuppressWarnings("rawtypes")
                             Constructor constructor = c.getDeclaredConstructor(int.class);
                             constructor.setAccessible(true);
                             for (int data = 0; data < 16; ++data) {
@@ -493,7 +496,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public boolean canBePushed() {
-        return true;
+        return this.level.getBlockEntity(this) == null;
+    }
+
+    public boolean breakWhenPushed() {
+        return false;
     }
 
     public boolean hasComparatorInputOverride() {
@@ -745,7 +752,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     @Override
     public String toString() {
-        return "Block[" + this.getName() + "] (" + this.getId() + ":" + this.getDamage() + ")";
+        return "Block[" + this.getName() + "] (" + this.getId() + ':' + this.getDamage() + ')';
     }
 
     public boolean collidesWithBB(AxisAlignedBB bb) {
@@ -873,7 +880,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public String getSaveId() {
         String name = getClass().getName();
-        return name.substring(16, name.length());
+        return name.substring(16);
     }
 
     @Override
@@ -921,7 +928,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public String getLocationHash() {
-        return this.getFloorX() + ":" + this.getFloorY() + ":" + this.getFloorZ();
+        return this.getFloorX() + ":" + this.getFloorY() + ':' + this.getFloorZ();
     }
 
     public int getDropExp() {
@@ -946,5 +953,29 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public boolean canSilkTouch() {
        return false;
+    }
+
+    public double getMinX() {
+        return this.x;
+    }
+
+    public double getMinY() {
+        return this.y;
+    }
+
+    public double getMinZ() {
+        return this.z;
+    }
+
+    public double getMaxX() {
+        return this.x + 1;
+    }
+
+    public double getMaxY() {
+        return this.y + 1;
+    }
+
+    public double getMaxZ() {
+        return this.z + 1;
     }
 }

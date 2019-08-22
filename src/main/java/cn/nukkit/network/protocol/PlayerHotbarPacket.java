@@ -1,7 +1,9 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.network.protocol.types.ContainerIds;
+import lombok.ToString;
 
+@ToString
 public class PlayerHotbarPacket extends DataPacket {
 
     public int selectedHotbarSlot;
@@ -25,6 +27,9 @@ public class PlayerHotbarPacket extends DataPacket {
         this.reset();
         this.putUnsignedVarInt(this.selectedHotbarSlot);
         this.putByte((byte) this.windowId);
+        if (protocol == 201) {
+            this.putUnsignedVarInt(0);
+        }
         this.putBoolean(this.selectHotbarSlot);
     }
 }

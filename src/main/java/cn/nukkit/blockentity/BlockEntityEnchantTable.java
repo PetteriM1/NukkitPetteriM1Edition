@@ -31,7 +31,7 @@ public class BlockEntityEnchantTable extends BlockEntitySpawnable implements Blo
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.namedTag.remove("CustomName");
             return;
         }
@@ -53,5 +53,4 @@ public class BlockEntityEnchantTable extends BlockEntitySpawnable implements Blo
 
         return c;
     }
-
 }

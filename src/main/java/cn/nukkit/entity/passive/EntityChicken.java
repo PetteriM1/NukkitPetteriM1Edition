@@ -2,14 +2,15 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.entity.passive.EntityWalkingAnimal;
-import cn.nukkit.utils.EntityUtils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,30 +107,30 @@ public class EntityChicken extends EntityWalkingAnimal {
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
         if ((item.equals(Item.get(Item.SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
-                    this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
+                    this.add(Utils.rand(-0.5, 0.5), this.getMountedYOffset(), Utils.rand(-0.5, 0.5)),
                     Item.get(Item.SEEDS)));
             this.setInLove();
         } else if ((item.equals(Item.get(Item.BEETROOT_SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.BEETROOT_SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
-                    this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
+                    this.add(Utils.rand(-0.5, 0.5), this.getMountedYOffset(), Utils.rand(-0.5, 0.5)),
                     Item.get(Item.BEETROOT_SEEDS)));
             this.setInLove();
         } else if ((item.equals(Item.get(Item.MELON_SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.MELON_SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
-                    this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
+                    this.add(Utils.rand(-0.5, 0.5), this.getMountedYOffset(), Utils.rand(-0.5, 0.5)),
                     Item.get(Item.MELON_SEEDS)));
             this.setInLove();
         } else if ((item.equals(Item.get(Item.PUMPKIN_SEEDS, 0))) && !this.isBaby()) {
-            player.getInventory().removeItem(Item.get(Item.PUMPKIN_SEEDS, 0, 1));
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
-                    this.add(EntityUtils.rand(-0.5, 0.5), this.getMountedYOffset(), EntityUtils.rand(-0.5, 0.5)),
+                    this.add(Utils.rand(-0.5, 0.5), this.getMountedYOffset(), Utils.rand(-0.5, 0.5)),
                     Item.get(Item.PUMPKIN_SEEDS)));
             this.setInLove();
         }
@@ -147,23 +148,28 @@ public class EntityChicken extends EntityWalkingAnimal {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.FEATHER, 0, 1));
             }
 
             drops.add(Item.get(this.isOnFire() ? Item.COOKED_CHICKEN : Item.RAW_CHICKEN, 0, 1));
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (ev.getCause() != EntityDamageEvent.DamageCause.FALL) {
+            return super.attack(ev);
+        }
+
+        return false;
     }
 
     public int getRandomEggLayTime() {
-        return EntityUtils.rand(6000, 12000);
+        return Utils.rand(6000, 12000);
     }
 
     public boolean isChickenJockey() {
@@ -176,6 +182,6 @@ public class EntityChicken extends EntityWalkingAnimal {
 
     @Override
     public int getKillExperience() {
-        return EntityUtils.rand(1, 4);
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

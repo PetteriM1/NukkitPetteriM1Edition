@@ -1,19 +1,19 @@
 package cn.nukkit.entity.mob;
 
-import cn.nukkit.entity.passive.EntitySquid;
 import cn.nukkit.Player;
-import cn.nukkit.entity.data.LongEntityData;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import java.util.HashMap;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.entity.data.LongEntityData;
+import cn.nukkit.entity.passive.EntitySquid;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EntityGuardian extends EntitySwimmingMob {
@@ -53,7 +53,7 @@ public class EntityGuardian extends EntitySwimmingMob {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return (!player.closed) && player.spawned && player.isAlive() && player.isSurvival() && distance <= 80;
+            return (!player.closed) && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 80;
         } else if (creature instanceof EntitySquid) {
             return creature.isAlive() && this.distanceSquared(creature) <= 80;
         }
@@ -64,31 +64,7 @@ public class EntityGuardian extends EntitySwimmingMob {
     public void attackEntity(Entity player) {
         HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
         damage.put(EntityDamageEvent.DamageModifier.BASE, 1F);
-        @SuppressWarnings("serial")
-        HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-            {
-                put(Item.LEATHER_CAP, 1f);
-                put(Item.LEATHER_TUNIC, 3f);
-                put(Item.LEATHER_PANTS, 2f);
-                put(Item.LEATHER_BOOTS, 1f);
-                put(Item.CHAIN_HELMET, 1f);
-                put(Item.CHAIN_CHESTPLATE, 5f);
-                put(Item.CHAIN_LEGGINGS, 4f);
-                put(Item.CHAIN_BOOTS, 1f);
-                put(Item.GOLD_HELMET, 1f);
-                put(Item.GOLD_CHESTPLATE, 5f);
-                put(Item.GOLD_LEGGINGS, 3f);
-                put(Item.GOLD_BOOTS, 1f);
-                put(Item.IRON_HELMET, 2f);
-                put(Item.IRON_CHESTPLATE, 6f);
-                put(Item.IRON_LEGGINGS, 5f);
-                put(Item.IRON_BOOTS, 2f);
-                put(Item.DIAMOND_HELMET, 3f);
-                put(Item.DIAMOND_CHESTPLATE, 8f);
-                put(Item.DIAMOND_LEGGINGS, 6f);
-                put(Item.DIAMOND_BOOTS, 3f);
-            }
-        };
+        HashMap<Integer, Float> armorValues = new ArmorPoints();
 
         float points = 0;
         for (Item i : ((Player) player).getInventory().getArmorContents()) {
@@ -103,6 +79,11 @@ public class EntityGuardian extends EntitySwimmingMob {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
         boolean hasUpdate = super.entityBaseTick(tickDiff);
         if (followTarget != null) {
             if (laserTargetEid != followTarget.getId()) {
@@ -127,21 +108,17 @@ public class EntityGuardian extends EntitySwimmingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.hasCustomName()) {
-            drops.add(Item.get(Item.NAME_TAG, 0, 1));
-        }
-
         if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < EntityUtils.rand(0, 3); i++) {
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.PRISMARINE_SHARD, 0, 1));
             }
         }
 
-        return drops.toArray(new Item[drops.size()]);
+        return drops.toArray(new Item[0]);
     }
 
     @Override
     public int getKillExperience() {
-        return 10;
+        return this.isBaby() ? 0 : 10;
     }
 }

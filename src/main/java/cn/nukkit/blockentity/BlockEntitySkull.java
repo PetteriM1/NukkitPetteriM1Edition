@@ -46,5 +46,4 @@ public class BlockEntitySkull extends BlockEntitySpawnable {
                 .putInt("z", (int) this.z)
                 .put("Rot", this.namedTag.get("Rot"));
     }
-
 }

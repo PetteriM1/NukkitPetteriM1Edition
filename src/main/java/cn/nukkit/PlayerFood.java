@@ -13,9 +13,9 @@ import cn.nukkit.potion.Effect;
  */
 public class PlayerFood {
 
-    private int foodLevel = 20;
+    private int foodLevel;
     private final int maxFoodLevel;
-    private float foodSaturationLevel = 20f;
+    private float foodSaturationLevel;
     private int foodTickTimer = 0;
     private double foodExpLevel = 0;
 
@@ -150,10 +150,10 @@ public class PlayerFood {
             } else if (this.getLevel() == 0) {
                 this.foodTickTimer += tickDiff;
                 if (this.foodTickTimer >= 80) {
-                    EntityDamageEvent ev = new EntityDamageEvent(this.getPlayer(), DamageCause.VOID, 1);
+                    EntityDamageEvent ev = new EntityDamageEvent(this.getPlayer(), DamageCause.HUNGER, 1);
                     float now = this.getPlayer().getHealth();
                     if (diff == 1) {
-                        if (now > 10) this.getPlayer().attack(ev);
+                        /*if (now > 10)*/ this.getPlayer().attack(ev);
                     } else if (diff == 2) {
                         if (now > 1) this.getPlayer().attack(ev);
                     } else {

@@ -1,7 +1,6 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -53,17 +52,10 @@ public class EntityEvocationFangs extends EntityProjectile {
             return false;
         }
 
-        this.timing.startTiming();
-
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.age > 1200 || this.isCollided) {
-            this.kill();
-            hasUpdate = true;
+            this.close();
         }
 
-        this.timing.startTiming();
-
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
 }

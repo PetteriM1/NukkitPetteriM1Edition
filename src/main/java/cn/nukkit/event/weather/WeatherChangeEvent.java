@@ -31,5 +31,4 @@ public class WeatherChangeEvent extends WeatherEvent implements Cancellable {
     public boolean toWeatherState() {
         return to;
     }
-
 }

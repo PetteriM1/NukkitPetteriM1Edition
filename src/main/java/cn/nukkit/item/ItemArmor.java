@@ -2,13 +2,15 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.nbt.tag.ByteTag;
+import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
-abstract public class ItemArmor extends Item {
+abstract public class ItemArmor extends Item implements ItemDurable {
 
     public static final int TIER_LEATHER = 1;
     public static final int TIER_IRON = 2;
@@ -106,5 +108,11 @@ abstract public class ItemArmor extends Item {
         }
 
         return 0;
+    }
+
+    @Override
+    public boolean isUnbreakable() {
+        Tag tag = this.getNamedTagEntry("Unbreakable");
+        return tag instanceof ByteTag && ((ByteTag) tag).data > 0;
     }
 }

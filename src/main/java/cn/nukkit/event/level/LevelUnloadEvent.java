@@ -19,5 +19,4 @@ public class LevelUnloadEvent extends LevelEvent implements Cancellable {
     public LevelUnloadEvent(Level level) {
         super(level);
     }
-
 }

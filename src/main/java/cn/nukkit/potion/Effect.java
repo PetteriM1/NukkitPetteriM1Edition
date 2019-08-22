@@ -25,7 +25,6 @@ public class Effect implements Cloneable {
     public static final int HARMING = 7;
     public static final int JUMP = 8;
     public static final int NAUSEA = 9;
-    public static final int CONFUSION = 9;
     public static final int REGENERATION = 10;
     public static final int DAMAGE_RESISTANCE = 11;
     public static final int FIRE_RESISTANCE = 12;
@@ -43,6 +42,9 @@ public class Effect implements Cloneable {
     public static final int LEVITATION = 24;
     public static final int FATAL_POISON = 25;
     public static final int COUNDIT_POWER = 26;
+    public static final int SLOW_FALLING = 27;
+    public static final int BAD_OMEN = 28;
+    public static final int VILLAGE_HERO = 29;
 
     protected static Effect[] effects;
 
@@ -72,9 +74,12 @@ public class Effect implements Cloneable {
         effects[Effect.HEALTH_BOOST] = new Effect(Effect.HEALTH_BOOST, "%potion.healthBoost", 248, 125, 35);
         effects[Effect.ABSORPTION] = new Effect(Effect.ABSORPTION, "%potion.absorption", 36, 107, 251);
         effects[Effect.SATURATION] = new Effect(Effect.SATURATION, "%potion.saturation", 255, 0, 255);
-        effects[Effect.LEVITATION] = new Effect(Effect.LEVITATION, "%potion.levitation", 255, 255, 255);
+        effects[Effect.LEVITATION] = new Effect(Effect.LEVITATION, "%potion.levitation", 206, 255, 255);
         effects[Effect.FATAL_POISON] = new Effect(Effect.FATAL_POISON, "%potion.poison", 78, 147, 49, true);
-        effects[Effect.COUNDIT_POWER] = new Effect(Effect.COUNDIT_POWER, "%potion.conduitPower", 0, 0, 0);
+        effects[Effect.COUNDIT_POWER] = new Effect(Effect.COUNDIT_POWER, "%potion.conduitPower", 29, 194, 209);
+        effects[Effect.SLOW_FALLING] = new Effect(Effect.SLOW_FALLING, "%potion.slowFalling", 206, 255, 255);
+        effects[Effect.BAD_OMEN] = new Effect(Effect.BAD_OMEN, "%potion.badOmen", 0, 0, 0);
+        effects[Effect.VILLAGE_HERO] = new Effect(Effect.VILLAGE_HERO, "%potion.villageHero", 0, 0, 0);
     }
 
     public static Effect getEffect(int id) {

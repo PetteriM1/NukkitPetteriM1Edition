@@ -6,6 +6,7 @@ import cn.nukkit.nbt.stream.NBTOutputStream;
 import java.io.IOException;
 
 public class IntTag extends NumberTag<Integer> {
+
     public int data;
 
     @Override
@@ -38,13 +39,18 @@ public class IntTag extends NumberTag<Integer> {
     }
 
     @Override
+    public Integer parseValue() {
+        return this.data;
+    }
+
+    @Override
     public byte getId() {
         return TAG_Int;
     }
 
     @Override
     public String toString() {
-        return "IntTag " + this.getName() + "(data: " + data + ")";
+        return "IntTag " + this.getName() + "(data: " + data + ')';
     }
 
     @Override

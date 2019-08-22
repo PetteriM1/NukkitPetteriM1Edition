@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockIron extends BlockSolid {
 
-    public BlockIron() {
-    }
-
     @Override
     public int getId() {
         return IRON_BLOCK;

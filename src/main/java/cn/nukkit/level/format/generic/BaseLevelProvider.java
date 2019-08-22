@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Nukkit Project
  */
 public abstract class BaseLevelProvider implements LevelProvider {
+
     protected Level level;
 
     protected final String path;
@@ -246,7 +247,7 @@ public abstract class BaseLevelProvider implements LevelProvider {
 
     @Override
     public GameRules getGamerules() {
-        GameRules rules = new GameRules();
+        GameRules rules = GameRules.getDefault();
 
         if (this.levelData.contains("GameRules"))
             rules.readNBT(this.levelData.getCompound("GameRules"));
@@ -280,7 +281,6 @@ public abstract class BaseLevelProvider implements LevelProvider {
                     lastRegion.set(null);
                     iter.remove();
                 }
-
             }
         }
     }

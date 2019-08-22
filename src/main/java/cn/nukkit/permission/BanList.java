@@ -106,8 +106,7 @@ public class BanList {
                 this.save();
             } else {
 
-                LinkedList<TreeMap<String, String>> list = new Gson().fromJson(Utils.readFile(this.file), new TypeToken<LinkedList<TreeMap<String, String>>>() {
-                }.getType());
+                LinkedList<TreeMap<String, String>> list = new Gson().fromJson(Utils.readFile(this.file), new LinkedListTypeToken().getType());
                 for (TreeMap<String, String> map : list) {
                     BanEntry entry = BanEntry.fromMap(map);
                     this.list.put(entry.getName(), entry);
@@ -135,5 +134,8 @@ public class BanList {
         } catch (IOException e) {
             MainLogger.getLogger().error("Could not save ban list ", e);
         }
+    }
+
+    private static class LinkedListTypeToken extends TypeToken<LinkedList<TreeMap<String, String>>> {
     }
 }

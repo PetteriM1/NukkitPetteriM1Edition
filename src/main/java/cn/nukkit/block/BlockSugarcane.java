@@ -75,7 +75,7 @@ public class BlockSugarcane extends BlockFlowable {
                 }
             }
 
-            if ((player.gamemode & 0x01) == 0) {
+            if (player != null && (player.gamemode & 0x01) == 0) {
                 item.count--;
             }
             this.level.addParticle(new BoneMealParticle(this.add(0.5, 0.5, 0.5)));

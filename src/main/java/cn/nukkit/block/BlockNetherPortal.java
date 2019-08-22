@@ -8,13 +8,14 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Axis;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Faceable;
 
 /**
  * Created on 2016/1/5 by xtypr.
  * Package cn.nukkit.block in project nukkit .
  * The name NetherPortalBlock comes from minecraft wiki.
  */
-public class BlockNetherPortal extends BlockFlowable {
+public class BlockNetherPortal extends BlockFlowable implements Faceable {
 
     public BlockNetherPortal() {
         this(0);
@@ -32,11 +33,6 @@ public class BlockNetherPortal extends BlockFlowable {
     @Override
     public int getId() {
         return NETHER_PORTAL;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
     }
 
     @Override
@@ -155,7 +151,6 @@ public class BlockNetherPortal extends BlockFlowable {
 
 
             for (Vector3 blockpos = pos; pos.getY() > blockpos.getY() - 21 && pos.getY() > 0 && this.isEmptyBlock(getBlockId(pos.down())); pos = pos.down()) {
-                ;
             }
 
             int i = this.getDistanceUntilEdge(pos, this.leftDir) - 1;
@@ -267,5 +262,10 @@ public class BlockNetherPortal extends BlockFlowable {
                 }
             }
         }
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

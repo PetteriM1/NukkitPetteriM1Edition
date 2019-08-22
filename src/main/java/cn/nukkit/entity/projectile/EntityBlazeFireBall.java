@@ -1,14 +1,10 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.entity.ExplosionPrimeEvent;
-import cn.nukkit.level.SmallExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.utils.Utils;
 
 public class EntityBlazeFireBall extends EntityProjectile {
 
@@ -51,8 +47,9 @@ public class EntityBlazeFireBall extends EntityProjectile {
         return 0.01f;
     }
 
-    public boolean isExplode() {
-        return this.canExplode;
+    @Override
+    public double getDamage() {
+        return 4;
     }
 
     public void setExplode(boolean bool) {
@@ -67,44 +64,24 @@ public class EntityBlazeFireBall extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (!this.hadCollision && this.critical) {
             this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500, this.getHeight() / 2 + EntityUtils.rand(-100, 100) / 500, this.getWidth() / 2 + EntityUtils.rand(-100, 100) / 500)));
+                    this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
         } else if (this.onGround) {
             this.critical = false;
         }
 
         if (this.age > 1200 || this.isCollided) {
-            if (this.isCollided && this.canExplode) {
-                ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1.8);
-                this.server.getPluginManager().callEvent(ev);
-                if (!ev.isCancelled()) {
-                    SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);
-                    if (ev.isBlockBreaking()) {
-                        explosion.explodeA();
-                    }
-                    explosion.explodeB();
-                }
-            }
-            this.kill();
-            hasUpdate = true;
+            this.close();
         }
 
         this.timing.startTiming();
 
-        return hasUpdate;
+        return super.onUpdate(currentTick);
     }
     
     @Override
     public void onCollideWithEntity(Entity entity) {
         this.isCollided = true;
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        this.close();
-        return true;
     }
 }

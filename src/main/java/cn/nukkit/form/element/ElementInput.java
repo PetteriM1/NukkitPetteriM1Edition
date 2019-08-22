@@ -1,10 +1,14 @@
 package cn.nukkit.form.element;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ElementInput extends Element {
 
-    private final String type = "input"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    @SuppressWarnings("unused")
+    private final String type = "input";
     private String text = "";
     private String placeholder = "";
+    @SerializedName("default")
     private String defaultText = "";
 
     public ElementInput(String text) {

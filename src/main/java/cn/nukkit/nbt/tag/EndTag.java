@@ -33,4 +33,9 @@ public class EndTag extends Tag {
     public Tag copy() {
         return new EndTag();
     }
+
+    @Override
+    public Object parseValue() {
+        return null;
+    }
 }

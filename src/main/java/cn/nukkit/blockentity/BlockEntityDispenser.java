@@ -1,7 +1,7 @@
 package cn.nukkit.blockentity;
 
-import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.inventory.DispenserInventory;
 import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
@@ -16,11 +16,14 @@ import cn.nukkit.nbt.tag.ListTag;
  */
 public class BlockEntityDispenser extends BlockEntitySpawnable implements InventoryHolder, BlockEntityContainer, BlockEntityNameable {
 
-    protected final DispenserInventory inventory;
+    protected DispenserInventory inventory;
 
     public BlockEntityDispenser(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
 
+    @Override
+    protected void initBlockEntity() {
         this.inventory = new DispenserInventory(this);
 
         if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
@@ -31,12 +34,12 @@ public class BlockEntityDispenser extends BlockEntitySpawnable implements Invent
             this.inventory.setItem(i, this.getItem(i));
         }
 
-        this.scheduleUpdate();
+        super.initBlockEntity();
     }
 
     @Override
     public boolean isBlockEntityValid() {
-        return this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ()) == Block.DISPENSER;
+        return this.getLevelBlock().getId() == BlockID.DISPENSER;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class BlockEntityDispenser extends BlockEntitySpawnable implements Invent
 
     @Override
     public void setName(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             this.namedTag.remove("CustomName");
             return;
         }
@@ -109,6 +112,8 @@ public class BlockEntityDispenser extends BlockEntitySpawnable implements Invent
         for (int index = 0; index < this.getSize(); index++) {
             this.setItem(index, this.inventory.getItem(index));
         }
+
+        super.saveNBT();
     }
 
     @Override
@@ -129,5 +134,12 @@ public class BlockEntityDispenser extends BlockEntitySpawnable implements Invent
         }
 
         return c;
+    }
+
+    @Override
+    public void onBreak() {
+        for (Item content : inventory.getContents().values()) {
+            level.dropItem(this, content);
+        }
     }
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class IntArrayTag extends Tag {
+
     public int[] data;
 
     public IntArrayTag(String name) {
@@ -33,6 +34,15 @@ public class IntArrayTag extends Tag {
         for (int i = 0; i < length; i++) {
             data[i] = dis.readInt();
         }
+    }
+
+    public int[] getData() {
+        return data;
+    }
+
+    @Override
+    public int[] parseValue() {
+        return this.data;
     }
 
     @Override

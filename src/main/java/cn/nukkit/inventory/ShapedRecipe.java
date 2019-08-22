@@ -12,12 +12,18 @@ import java.util.*;
  */
 public class ShapedRecipe implements CraftingRecipe {
 
+    private String recipeId;
     private Item primaryResult;
     private List<Item> extraResults = new ArrayList<>();
 
     private long least,most;
 
     private final String[] shape;
+    private final int priority;
+
+    public ShapedRecipe(Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
+        this(null, 1, primaryResult, shape, ingredients, extraResults);
+    }
 
     private final CharObjectHashMap<Item> ingredients = new CharObjectHashMap<>();
 
@@ -36,7 +42,9 @@ public class ShapedRecipe implements CraftingRecipe {
      *                         
      *                         Note: Recipes **do not** need to be square. Do NOT add padding for empty rows/columns.
      */
-    public ShapedRecipe(Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
+    public ShapedRecipe(String recipeId, int priority, Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
+        this.recipeId = recipeId;
+        this.priority = priority;
         int rowCount = shape.length;
         if (rowCount > 3 || rowCount <= 0) {
             throw new RuntimeException("Shaped recipes may only have 1, 2 or 3 rows, not " + rowCount);
@@ -48,18 +56,16 @@ public class ShapedRecipe implements CraftingRecipe {
         }
 
 
-        for (int y = 0; y < rowCount; y++) {
-            String row = shape[y];
-
+        for (String row : shape) {
             if (row.length() != columnCount) {
-                throw new RuntimeException("Shaped recipe rows must all have the same length (expected " + columnCount + ", got " + row.length() + ")");
+                throw new RuntimeException("Shaped recipe rows must all have the same length (expected " + columnCount + ", got " + row.length() + ')');
             }
 
             for (int x = 0; x < columnCount; ++x) {
                 char c = row.charAt(x);
 
                 if (c != ' ' && !ingredients.containsKey(c)) {
-                    throw new RuntimeException("No item specified for symbol '" + c + "'");
+                    throw new RuntimeException("No item specified for symbol '" + c + '\'');
                 }
             }
         }
@@ -88,6 +94,11 @@ public class ShapedRecipe implements CraftingRecipe {
     }
 
     @Override
+    public String getRecipeId() {
+        return this.recipeId;
+    }
+
+    @Override
     public UUID getId() {
         return new UUID(least, most);
     }
@@ -96,6 +107,10 @@ public class ShapedRecipe implements CraftingRecipe {
     public void setId(UUID uuid) {
         this.least = uuid.getLeastSignificantBits();
         this.most = uuid.getMostSignificantBits();
+
+        if (this.recipeId == null) {
+            this.recipeId = getId().toString();
+        }
     }
 
     public ShapedRecipe setIngredient(String key, Item item) {
@@ -153,6 +168,11 @@ public class ShapedRecipe implements CraftingRecipe {
     }
 
     @Override
+    public RecipeType getType() {
+        return RecipeType.SHAPED;
+    }
+
+    @Override
     public List<Item> getExtraResults() {
         return extraResults;
     }
@@ -163,6 +183,11 @@ public class ShapedRecipe implements CraftingRecipe {
         list.add(primaryResult);
 
         return list;
+    }
+
+    @Override
+    public int getPriority() {
+        return this.priority;
     }
 
     @Override
@@ -236,7 +261,7 @@ public class ShapedRecipe implements CraftingRecipe {
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ");
 
-        ingredients.forEach((character, item) -> joiner.add(item.getName() + ":" + item.getDamage()));
+        ingredients.forEach((character, item) -> joiner.add(item.getName() + ':' + item.getDamage()));
         return joiner.toString();
     }
 

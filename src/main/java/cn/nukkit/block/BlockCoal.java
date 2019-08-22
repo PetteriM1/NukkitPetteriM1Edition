@@ -9,9 +9,6 @@ import cn.nukkit.item.ItemTool;
  */
 public class BlockCoal extends BlockSolid {
 
-    public BlockCoal() {
-    }
-
     @Override
     public int getId() {
         return COAL_BLOCK;

@@ -5,6 +5,7 @@ package cn.nukkit.nbt.tag;
  * Nukkit Project
  */
 public abstract class NumberTag<T extends Number> extends Tag {
+
     protected NumberTag(String name) {
         super(name);
     }

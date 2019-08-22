@@ -1,7 +1,7 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.data.SlotEntityData;
+import cn.nukkit.entity.data.NBTEntityData;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -11,7 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author CreeperFace
@@ -29,7 +29,7 @@ public class EntityFirework extends Entity {
 
     @Override
     public void initEntity() {
-        Random rand = new Random();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
         this.lifetime = 30 + rand.nextInt(6) + rand.nextInt(7);
 
         this.motionX = rand.nextGaussian() * 0.001D;
@@ -38,7 +38,7 @@ public class EntityFirework extends Entity {
 
         if (namedTag.contains("FireworkItem")) {
             firework = NBTIO.getItemHelper(namedTag.getCompound("FireworkItem"));
-            this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, firework));
+            this.setDataProperty(new NBTEntityData(Entity.DATA_DISPLAY_ITEM, firework));
         }
     }
 
@@ -114,7 +114,7 @@ public class EntityFirework extends Entity {
 
     public void setFirework(Item item) {
         this.firework = item;
-        this.setDataProperty(new SlotEntityData(Entity.DATA_DISPLAY_ITEM, item));
+        this.setDataProperty(new NBTEntityData(Entity.DATA_DISPLAY_ITEM, firework));
     }
 
     @Override

@@ -4,9 +4,6 @@ import cn.nukkit.item.Item;
 
 public class BlockCommandBlockRepeating extends BlockSolid {
 
-    public BlockCommandBlockRepeating() {
-    }
-
     @Override
     public int getId() {
         return REPEATING_COMMAND_BLOCK;

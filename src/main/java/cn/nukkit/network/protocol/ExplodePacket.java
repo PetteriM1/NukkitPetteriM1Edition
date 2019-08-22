@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.math.Vector3;
+import lombok.ToString;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class ExplodePacket extends DataPacket {
 
     public float x;

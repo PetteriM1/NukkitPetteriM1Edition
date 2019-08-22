@@ -5,10 +5,10 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.SpawnResult;
+import cn.nukkit.utils.Spawner;
 
 public class WitchSpawner extends AbstractEntitySpawner {
 
@@ -20,23 +20,22 @@ public class WitchSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        final int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
-        final int time = level.getTime() % Level.TIME_FULL;
-        final int light = level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z);
 
-        if (blockId != Block.GRASS) {
+        if (Utils.rand(1, 4) != 1 && biomeId != 6 && biomeId != 134) {
+            return SpawnResult.SPAWN_DENIED;
+        }
+
+        if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
             result = SpawnResult.WRONG_BLOCK;
-        } else if (biomeId != Biome.SWAMP) {
+        } else if (level.isNether || level.isEnd) {
             result = SpawnResult.WRONG_BIOME;
-        } else if (level.getName().equals("nether") || level.getName().equals("end")) {
-            result = SpawnResult.WRONG_BIOME;
-        } else if (pos.y > 127 || pos.y < 1 || blockId == Block.AIR) {
+        } else if (pos.y > 255 || pos.y < 1) {
             result = SpawnResult.POSITION_MISMATCH;
-        } else if (light > 7) {
+        } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
             result = SpawnResult.WRONG_LIGHTLEVEL;
-        } else if (time > 13184 && time < 22800) {
-            this.spawnTask.createEntity(getEntityName(), pos.add(0, 2.8, 0));
+        } else if (level.isMobSpawningAllowedByTime()) {
+            this.spawnTask.createEntity("Witch", pos.add(0, 1, 0));
         }
 
         return result;
@@ -45,10 +44,5 @@ public class WitchSpawner extends AbstractEntitySpawner {
     @Override
     public final int getEntityNetworkId() {
         return EntityWitch.NETWORK_ID;
-    }
-
-    @Override
-    public final String getEntityName() {
-        return "Witch";
     }
 }

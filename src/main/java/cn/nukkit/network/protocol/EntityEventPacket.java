@@ -1,9 +1,12 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
+@ToString
 public class EntityEventPacket extends DataPacket {
 
     public static final int HURT_ANIMATION = 2;
@@ -54,7 +57,7 @@ public class EntityEventPacket extends DataPacket {
     public static final int PLAYER_CHECK_TREASURE_HUNTER_ACHIEVEMENT = 66;
     public static final int ENTITY_SPAWN = 67;
     public static final int DRAGON_PUKE = 68;
-    public static final int ITEM_ENTITY_MERGE = 69;
+    public static final int MERGE_ITEMS = 69;
 
     @Override
     public byte pid() {

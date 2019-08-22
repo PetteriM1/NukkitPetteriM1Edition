@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import lombok.ToString;
+
+@ToString
 public class RiderJumpPacket extends DataPacket {
 
     public int jumpStrength;

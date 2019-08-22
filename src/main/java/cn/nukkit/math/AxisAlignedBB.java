@@ -302,7 +302,7 @@ public class AxisAlignedBB implements Cloneable {
 
     @Override
     public String toString() {
-        return "AxisAlignedBB(" + this.minX + ", " + this.minY + ", " + this.minZ + ", " + this.maxX + ", " + this.maxY + ", " + this.maxZ + ")";
+        return "AxisAlignedBB(" + this.minX + ", " + this.minY + ", " + this.minZ + ", " + this.maxX + ", " + this.maxY + ", " + this.maxZ + ')';
     }
 
     @Override
@@ -313,5 +313,33 @@ public class AxisAlignedBB implements Cloneable {
             Server.getInstance().getLogger().logException(e);
         }
         return null;
+    }
+
+    public void forEach(BBConsumer action) {
+        int minX = NukkitMath.floorDouble(this.minX);
+        int minY = NukkitMath.floorDouble(this.minY);
+        int minZ = NukkitMath.floorDouble(this.minZ);
+
+        int maxX = NukkitMath.floorDouble(this.maxX);
+        int maxY = NukkitMath.floorDouble(this.maxY);
+        int maxZ = NukkitMath.floorDouble(this.maxZ);
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    action.accept(x, y, z);
+                }
+            }
+        }
+    }
+
+
+    public interface BBConsumer<T> {
+
+        void accept(int x, int y, int z);
+
+        default T get() {
+            return null;
+        }
     }
 }

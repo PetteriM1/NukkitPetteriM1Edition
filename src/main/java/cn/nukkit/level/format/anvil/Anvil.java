@@ -15,11 +15,15 @@ import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.ThreadCache;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -27,7 +31,7 @@ import java.util.regex.Pattern;
  * Nukkit Project
  */
 public class Anvil extends BaseLevelProvider {
-    public static final int VERSION = 19133;
+
     static private final byte[] PAD_256 = new byte[256];
 
     public Anvil(Level level, String path) throws IOException {
@@ -70,11 +74,10 @@ public class Anvil extends BaseLevelProvider {
 
         CompoundTag levelData = new CompoundTag("Data")
                 .putCompound("GameRules", new CompoundTag())
-
                 .putLong("DayTime", 0)
                 .putInt("GameType", 0)
                 .putString("generatorName", Generator.getGeneratorName(generator))
-                .putString("generatorOptions", options.containsKey("preset") ? options.get("preset") : "")
+                .putString("generatorOptions", options.getOrDefault("preset", ""))
                 .putInt("generatorVersion", 1)
                 .putBoolean("hardcore", false)
                 .putBoolean("initialized", true)
@@ -88,7 +91,7 @@ public class Anvil extends BaseLevelProvider {
                 .putInt("SpawnZ", 128)
                 .putBoolean("thundering", false)
                 .putInt("thunderTime", 0)
-                .putInt("version", VERSION)
+                .putInt("version", 19133)
                 .putLong("Time", 0)
                 .putLong("SizeOnDisk", 0);
 
@@ -101,7 +104,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public AsyncTask requestChunkTask(int x, int z) throws ChunkException {
+    public AsyncTask requestChunkTask(int protocol, int x, int z) throws ChunkException {
         Chunk chunk = (Chunk) this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
@@ -149,15 +152,19 @@ public class Anvil extends BaseLevelProvider {
                 break;
             }
         }
-        stream.putByte((byte) count);
+        if (protocol < 361) {
+            stream.putByte((byte) count);
+        }
         for (int i = 0; i < count; i++) {
             stream.putByte((byte) 0);
             stream.put(sections[i].getBytes());
         }
-        for (byte height : chunk.getHeightMapArray()) {
-            stream.putByte(height);
+        if (protocol < 361) {
+            for (byte height : chunk.getHeightMapArray()) {
+                stream.putByte(height);
+            }
+            stream.put(PAD_256);
         }
-        stream.put(PAD_256);
         stream.put(chunk.getBiomeIdArray());
         stream.putByte((byte) 0);
         if (extraData != null) {
@@ -167,7 +174,7 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(timestamp, x, z, stream.getBuffer());
+        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, count, stream.getBuffer());
 
         return null;
     }
@@ -217,11 +224,7 @@ public class Anvil extends BaseLevelProvider {
                 putChunk(index, chunk);
             }
         } else {
-            try {
-                putChunk(index, chunk);
-            } catch (Exception e) {
-                this.getServer().getLogger().debug("[Anvil] putChunk failed");
-            }
+            putChunk(index, chunk);
         }
         this.level.timings.syncChunkLoadDataTimer.stopTiming();
         return chunk;
@@ -234,7 +237,7 @@ public class Anvil extends BaseLevelProvider {
             try {
                 this.loadRegion(X >> 5, Z >> 5).writeChunk(chunk);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new ChunkException("Error saving chunk (" + X + ", " + Z + ')', e);
             }
         }
     }

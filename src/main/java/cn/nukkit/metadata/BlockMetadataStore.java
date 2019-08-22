@@ -11,6 +11,7 @@ import java.util.List;
  * Nukkit Project
  */
 public class BlockMetadataStore extends MetadataStore {
+
     private final Level owningLevel;
 
     public BlockMetadataStore(Level owningLevel) {
@@ -22,7 +23,7 @@ public class BlockMetadataStore extends MetadataStore {
         if (!(block instanceof Block)) {
             throw new IllegalArgumentException("Argument must be a Block instance");
         }
-        return ((Block) block).x + ":" + ((Block) block).y + ":" + ((Block) block).z + ":" + metadataKey;
+        return ((Block) block).x + ":" + ((Block) block).y + ':' + ((Block) block).z + ':' + metadataKey;
     }
 
     @Override

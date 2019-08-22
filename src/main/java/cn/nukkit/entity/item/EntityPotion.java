@@ -5,7 +5,6 @@ import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.potion.PotionCollideEvent;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.InstantSpellParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.particle.SpellParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -19,8 +18,6 @@ import cn.nukkit.potion.Potion;
 public class EntityPotion extends EntityProjectile {
 
     public static final int NETWORK_ID = 86;
-
-    public static final int DATA_POTION_ID = 37;
 
     public int potionId;
 
@@ -38,7 +35,7 @@ public class EntityPotion extends EntityProjectile {
 
         potionId = this.namedTag.getShort("PotionId");
 
-        this.dataProperties.putShort(DATA_POTION_ID, this.potionId);
+        this.dataProperties.putShort(DATA_POTION_AUX_VALUE, this.potionId);
 
         Effect effect = Potion.getEffect(potionId, true);
 
@@ -77,7 +74,7 @@ public class EntityPotion extends EntityProjectile {
 
     @Override
     protected float getGravity() {
-        return 0.04f;
+        return 0.05f;
     }
 
     @Override
@@ -85,7 +82,7 @@ public class EntityPotion extends EntityProjectile {
         return 0.01f;
     }
 
-    private void splash() {
+    private void splash(Entity collidedWith) {
         Potion potion = Potion.getPotion(this.potionId);
         PotionCollideEvent event = new PotionCollideEvent(potion, this);
         this.server.getPluginManager().callEvent(event);
@@ -93,6 +90,7 @@ public class EntityPotion extends EntityProjectile {
         if (event.isCancelled()) {
             return;
         }
+
         this.close();
 
         potion = event.getPotion();
@@ -120,22 +118,16 @@ public class EntityPotion extends EntityProjectile {
             b = colors[2];
         }
 
-        if (Potion.isInstant(potion.getId())) {
-            particle = new InstantSpellParticle(this, r, g, b);
-        } else {
-            particle = new SpellParticle(this, r, g, b);
-        }
+        particle = new SpellParticle(this, r, g, b);
 
         this.getLevel().addParticle(particle);
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_GLASS);
 
-        Entity[] entities = this.getLevel().getNearbyEntities(this.getBoundingBox().grow(8.25, 4.24, 8.25));
+        Entity[] entities = this.getLevel().getNearbyEntities(this.getBoundingBox().grow(4.125, 2.125, 4.125));
         for (Entity anEntity : entities) {
             double distance = anEntity.distanceSquared(this);
-
             if (distance < 16) {
-                double d = 1 - Math.sqrt(distance) / 4;
-
+                double d = anEntity.equals(collidedWith) ? 1 : 1 - Math.sqrt(distance) / 4;
                 potion.applyPotion(anEntity, d);
             }
         }
@@ -143,7 +135,7 @@ public class EntityPotion extends EntityProjectile {
 
     @Override
     public void onCollideWithEntity(Entity entity) {
-        this.splash();
+        this.splash(entity);
     }
 
     @Override
@@ -154,17 +146,15 @@ public class EntityPotion extends EntityProjectile {
 
         this.timing.startTiming();
 
-        boolean hasUpdate = super.onUpdate(currentTick);
-
         if (this.age > 1200) {
-            this.kill();
-            hasUpdate = true;
+            this.close();
+            return false;
         } else if (this.isCollided) {
-            this.splash();
-            hasUpdate = true;
+            this.splash(null);
         }
 
         this.timing.stopTiming();
-        return hasUpdate;
+
+        return super.onUpdate(currentTick);
     }
 }

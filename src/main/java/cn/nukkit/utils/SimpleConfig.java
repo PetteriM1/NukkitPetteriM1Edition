@@ -123,11 +123,6 @@ public abstract class SimpleConfig {
         return field.getAnnotation(Skip.class).skipSave();
     }
 
-    private boolean skipLoad(Field field) {
-        if (!field.isAnnotationPresent(Skip.class)) return false;
-        return field.getAnnotation(Skip.class).skipLoad();
-    }
-
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public @interface Path {

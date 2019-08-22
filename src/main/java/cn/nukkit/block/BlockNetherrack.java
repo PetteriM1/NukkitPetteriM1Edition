@@ -10,9 +10,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockNetherrack extends BlockSolid {
 
-    public BlockNetherrack() {
-    }
-
     @Override
     public int getId() {
         return NETHERRACK;

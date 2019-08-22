@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
@@ -9,9 +10,6 @@ import cn.nukkit.level.Level;
  * Package cn.nukkit.block in project Nukkit .
  */
 public class BlockOreRedstoneGlowing extends BlockOreRedstone {
-
-    public BlockOreRedstoneGlowing() {
-    }
 
     @Override
     public String getName() {
@@ -36,21 +34,15 @@ public class BlockOreRedstoneGlowing extends BlockOreRedstone {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_SCHEDULED || type == Level.BLOCK_UPDATE_RANDOM) {
-            this.getLevel().setBlock(this, new BlockOreRedstone(), false, false);
+            BlockFadeEvent event = new BlockFadeEvent(this, get(REDSTONE_ORE));
+            level.getServer().getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                level.setBlock(this, event.getNewState(), false, false);
+            }
 
             return Level.BLOCK_UPDATE_WEAK;
         }
 
         return 0;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 }

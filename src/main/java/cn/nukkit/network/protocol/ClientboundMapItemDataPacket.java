@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.utils.Utils;
+import lombok.ToString;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -8,6 +9,7 @@ import java.awt.image.BufferedImage;
 /**
  * Created by CreeperFace on 5.3.2017.
  */
+@ToString
 public class ClientboundMapItemDataPacket extends DataPacket {
 
     public int[] eids = new int[0];
@@ -15,6 +17,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
     public long mapId;
     public int update;
     public byte scale;
+    public boolean isLocked;
     public int width;
     public int height;
     public int offsetX;
@@ -59,6 +62,9 @@ public class ClientboundMapItemDataPacket extends DataPacket {
 
         this.putUnsignedVarInt(update);
         this.putByte(this.dimensionId);
+        if (protocol >= 354) {
+            this.putBoolean(this.isLocked);
+        }
 
         if ((update & 0x08) != 0) {
             this.putUnsignedVarInt(eids.length);
@@ -112,7 +118,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         }
     }
 
-    public class MapDecorator {
+    public static class MapDecorator {
         public byte rotation;
         public byte icon;
         public byte offsetX;

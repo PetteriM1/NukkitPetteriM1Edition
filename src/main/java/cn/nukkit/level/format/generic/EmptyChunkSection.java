@@ -11,6 +11,7 @@ import java.util.Arrays;
  * Nukkit Project
  */
 public class EmptyChunkSection implements ChunkSection {
+
     public static final EmptyChunkSection[] EMPTY = new EmptyChunkSection[16];
     static {
         for (int y = 0; y < EMPTY.length; y++) {

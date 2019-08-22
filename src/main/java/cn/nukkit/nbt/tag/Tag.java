@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public abstract class Tag {
+
     public static final byte TAG_End = 0;
     public static final byte TAG_Byte = 1;
     public static final byte TAG_Short = 2;
@@ -40,7 +41,7 @@ public abstract class Tag {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Tag)) {
+        if (!(obj instanceof Tag)) {
             return false;
         }
         Tag o = (Tag) obj;
@@ -56,7 +57,7 @@ public abstract class Tag {
 
         out.print(prefix);
         out.print(getTagName(getId()));
-        if (name.length() > 0) {
+        if (!name.isEmpty()) {
             out.print("(\"" + name + "\")");
         }
         out.print(": ");
@@ -90,9 +91,13 @@ public abstract class Tag {
     }
 
     public static void writeNamedTag(Tag tag, NBTOutputStream dos) throws IOException {
+        writeNamedTag(tag, tag.getName(), dos);
+    }
+
+    public static void writeNamedTag(Tag tag, String name, NBTOutputStream dos) throws IOException {
         dos.writeByte(tag.getId());
         if (tag.getId() == Tag.TAG_End) return;
-        dos.writeUTF(tag.getName());
+        dos.writeUTF(name);
 
         tag.write(dos);
     }
@@ -158,4 +163,6 @@ public abstract class Tag {
     }
 
     public abstract Tag copy();
+
+    public abstract Object parseValue();
 }

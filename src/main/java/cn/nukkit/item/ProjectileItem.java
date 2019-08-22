@@ -2,8 +2,8 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.projectile.EntityEgg;
 import cn.nukkit.entity.item.EntityExpBottle;
+import cn.nukkit.entity.projectile.EntityEnderPearl;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.math.Vector3;
@@ -30,7 +30,7 @@ public abstract class ProjectileItem extends Item {
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos")
                         .add(new DoubleTag("", player.x))
-                        .add(new DoubleTag("", player.y + player.getEyeHeight() - 0.10000000149011612))
+                        .add(new DoubleTag("", player.y + player.getEyeHeight()))
                         .add(new DoubleTag("", player.z)))
                 .putList(new ListTag<DoubleTag>("Motion")
                         .add(new DoubleTag("", directionVector.x))
@@ -44,31 +44,39 @@ public abstract class ProjectileItem extends Item {
 
         Entity projectile = Entity.createEntity(this.getProjectileEntityType(), player.getLevel().getChunk(player.getFloorX() >> 4, player.getFloorZ() >> 4), nbt, player);
         if (projectile != null) {
+            if (projectile instanceof EntityEnderPearl) {
+                if (player.getServer().getTick() - player.getLastEnderPearlThrowingTick() < 20) {
+                    projectile.kill();
+                    return false;
+                }
+            }
+
             projectile.setMotion(projectile.getMotion().multiply(this.getThrowForce()));
-            this.count--;
 
             if (projectile instanceof EntityProjectile) {
                 ProjectileLaunchEvent ev = new ProjectileLaunchEvent((EntityProjectile) projectile);
 
                 player.getServer().getPluginManager().callEvent(ev);
+
                 if (ev.isCancelled()) {
                     projectile.kill();
                 } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle && !player.getServer().getPropertyBoolean("xp-bottles-on-creative", false)) {
+                    ev.setCancelled(true);
                     projectile.kill();
                     player.sendMessage("\u00A7cXP bottles are disabled on creative");
-                } else if (player.getGamemode() == 1 && projectile instanceof EntityEgg && !player.getServer().getPropertyBoolean("spawn-eggs", false)) {
-                    projectile.kill();
-                    player.sendMessage("\u00A7cEggs are disabled on creative");
                 } else {
+                    if (!player.isCreative()) {
+                        this.count--;
+                    }
+                    if (projectile instanceof EntityEnderPearl) {
+                        player.onThrowEnderPearl();
+                    }
                     projectile.spawnToAll();
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);
                 }
-            } else {
-                projectile.spawnToAll();
             }
-        } else {
-            return false;
         }
+
         return true;
     }
 

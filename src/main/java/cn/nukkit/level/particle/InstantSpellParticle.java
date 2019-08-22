@@ -8,6 +8,7 @@ import cn.nukkit.utils.BlockColor;
  * Package cn.nukkit.level.particle in project nukkit .
  */
 public class InstantSpellParticle extends SpellParticle {
+
     protected int data;
 
     public InstantSpellParticle(Vector3 pos) {
@@ -27,5 +28,4 @@ public class InstantSpellParticle extends SpellParticle {
         //this 0x01 is the only difference between instant spell and non-instant one
         super(pos, r, g, b, 0x01);
     }
-
 }

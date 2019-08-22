@@ -15,7 +15,7 @@ public class ItemShovelGold extends ItemTool {
     }
 
     public ItemShovelGold(Integer meta, int count) {
-        super(GOLD_SHOVEL, meta, count, "Gold Shovel");
+        super(GOLD_SHOVEL, meta, count, "Golden Shovel");
     }
 
     @Override
@@ -33,8 +33,4 @@ public class ItemShovelGold extends ItemTool {
         return ItemTool.TIER_GOLD;
     }
 
-    @Override
-    public int getAttackDamage() {
-        return 1;
-    }
 }

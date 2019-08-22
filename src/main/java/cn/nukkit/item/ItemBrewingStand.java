@@ -16,5 +16,4 @@ public class ItemBrewingStand extends Item {
         super(BREWING_STAND, 0, count, "Brewing Stand");
         this.block = new BlockBrewingStand();
     }
-
 }

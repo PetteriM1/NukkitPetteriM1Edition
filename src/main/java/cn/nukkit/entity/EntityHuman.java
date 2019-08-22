@@ -1,12 +1,12 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.IntPositionEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
-import cn.nukkit.network.protocol.RemoveEntityPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.utils.Utils;
 
@@ -34,22 +34,22 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getWidth() {
-        return 0.6f;
+        return 0.58f;
     }
 
     @Override
     public float getLength() {
-        return 0.6f;
+        return 0.58f;
     }
 
     @Override
     public float getHeight() {
-        return 1.8f;
+        return isSwimming() || isGliding() ? 0.6f : 1.8f;
     }
 
     @Override
     public float getEyeHeight() {
-        return 1.62f - (this.isSwimming() || this.isGliding() ? 1 : 0);
+        return isSwimming() || isGliding() ? 0.58f : 1.62f;
     }
 
     @Override
@@ -86,6 +86,13 @@ public class EntityHuman extends EntityHumanType {
     protected void initEntity() {
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY);
+
+        // HACK: Fix gravity on 1.2.11 and lower
+        if (this instanceof Player) {
+            if (((Player) this).protocol <= 201) {
+                this.setDataFlag(DATA_FLAGS, 46);
+            }
+        }
 
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0), false);
 
@@ -174,17 +181,16 @@ public class EntityHuman extends EntityHumanType {
             pk.pitch = (float) this.pitch;
             pk.item = this.getInventory().getItemInHand();
             pk.metadata = this.dataProperties;
-            pk.protocol = player.protocol;
             player.dataPacket(pk);
 
             this.inventory.sendArmorContents(player);
 
             if (this.riding != null) {
                 SetEntityLinkPacket pkk = new SetEntityLinkPacket();
-                pkk.rider = this.riding.getId();
-                pkk.riding = this.getId();
+                pkk.vehicleUniqueId = this.riding.getId();
+                pkk.riderUniqueId = this.getId();
                 pkk.type = 1;
-                pkk.unknownByte = 1;
+                pkk.immediate = 1;
 
                 player.dataPacket(pkk);
             }
@@ -192,16 +198,6 @@ public class EntityHuman extends EntityHumanType {
             if (!(this instanceof Player)) {
                 this.server.removePlayerListData(this.getUniqueId(), new Player[]{player});
             }
-        }
-    }
-
-    @Override
-    public void despawnFrom(Player player) {
-        if (this.hasSpawned.containsKey(player.getLoaderId())) {
-            RemoveEntityPacket pk = new RemoveEntityPacket();
-            pk.eid = this.getId();
-            player.dataPacket(pk);
-            this.hasSpawned.remove(player.getLoaderId());
         }
     }
 
@@ -215,6 +211,15 @@ public class EntityHuman extends EntityHumanType {
             }
 
             super.close();
+        }
+    }
+
+    @Override
+    public void setSwimming(boolean value) {
+        boolean oldValue = isSwimming();
+        super.setSwimming(value);
+        if (value != oldValue) {
+            setDataProperty(new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight()), true);
         }
     }
 }

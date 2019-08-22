@@ -6,13 +6,14 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.Faceable;
 
 /**
  * http://minecraft.gamepedia.com/End_Rod
  *
  * @author PikyCZ
  */
-public class BlockEndRod extends BlockTransparentMeta {
+public class BlockEndRod extends BlockTransparentMeta implements Faceable {
 
     public BlockEndRod() {
         this(0);
@@ -48,11 +49,6 @@ public class BlockEndRod extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean canBePushed() {
-        return true;
-    }
-
-    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
@@ -80,5 +76,10 @@ public class BlockEndRod extends BlockTransparentMeta {
     @Override
     public Item toItem() {
         return new ItemBlock(this, 0);
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 }

@@ -4,8 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
-import cn.nukkit.entity.mob.EntityTameableMob;
-import cn.nukkit.utils.EntityUtils;
+import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -100,12 +100,12 @@ public class EntityWolf extends EntityTameableMob {
     }
 
     @Override
-    public boolean onInteract(Player player, Item item) {
-        super.onInteract(player, item);
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.BONE))) {
             if (!this.hasOwner() && !this.isAngry()) {
                 player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
-                if (EntityUtils.rand(0, 3) == 3) {
+                if (Utils.rand(0, 3) == 3) {
                     EntityEventPacket packet = new EntityEventPacket();
                     packet.eid = this.getId();
                     packet.event = EntityEventPacket.TAME_SUCCESS;
@@ -154,37 +154,13 @@ public class EntityWolf extends EntityTameableMob {
     @Override
     public void attackEntity(Entity player) {
         if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > 10 && this.distanceSquared(player) < 1.5) {
+            if (this.attackDelay > 23 && this.distanceSquared(player) < 1.5) {
                 this.attackDelay = 0;
                 HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
                 damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
                 if (player instanceof Player) {
-                    @SuppressWarnings("serial")
-                    HashMap<Integer, Float> armorValues = new HashMap<Integer, Float>() {
-                        {
-                            put(Item.LEATHER_CAP, 1f);
-                            put(Item.LEATHER_TUNIC, 3f);
-                            put(Item.LEATHER_PANTS, 2f);
-                            put(Item.LEATHER_BOOTS, 1f);
-                            put(Item.CHAIN_HELMET, 1f);
-                            put(Item.CHAIN_CHESTPLATE, 5f);
-                            put(Item.CHAIN_LEGGINGS, 4f);
-                            put(Item.CHAIN_BOOTS, 1f);
-                            put(Item.GOLD_HELMET, 1f);
-                            put(Item.GOLD_CHESTPLATE, 5f);
-                            put(Item.GOLD_LEGGINGS, 3f);
-                            put(Item.GOLD_BOOTS, 1f);
-                            put(Item.IRON_HELMET, 2f);
-                            put(Item.IRON_CHESTPLATE, 6f);
-                            put(Item.IRON_LEGGINGS, 5f);
-                            put(Item.IRON_BOOTS, 2f);
-                            put(Item.DIAMOND_HELMET, 3f);
-                            put(Item.DIAMOND_CHESTPLATE, 8f);
-                            put(Item.DIAMOND_LEGGINGS, 6f);
-                            put(Item.DIAMOND_BOOTS, 3f);
-                        }
-                    };
+                    HashMap<Integer, Float> armorValues = new ArmorPoints();
 
                     float points = 0;
                     for (Item i : ((Player) player).getInventory().getArmorContents()) {
@@ -202,7 +178,7 @@ public class EntityWolf extends EntityTameableMob {
 
     @Override
     public int getKillExperience() {
-        return 3;
+        return this.isBaby() ? 0 : 3;
     }
 
     public void setCollarColor(DyeColor color) {

@@ -158,7 +158,7 @@ abstract public class PluginBase implements Plugin {
     public PluginIdentifiableCommand getCommand(String name) {
         PluginIdentifiableCommand command = this.getServer().getPluginCommand(name);
         if (command == null || !command.getPlugin().equals(this)) {
-            command = this.getServer().getPluginCommand(this.description.getName().toLowerCase() + ":" + name);
+            command = this.getServer().getPluginCommand(this.description.getName().toLowerCase() + ':' + name);
         }
 
         if (command != null && command.getPlugin().equals(this)) {
@@ -191,7 +191,7 @@ abstract public class PluginBase implements Plugin {
     @Override
     public boolean saveResource(String filename, String outputName, boolean replace) {
         Preconditions.checkArgument(filename != null && outputName != null, "Filename can not be null!");
-        Preconditions.checkArgument(filename.trim().length() != 0 && outputName.trim().length() != 0, "Filename can not be empty!");
+        Preconditions.checkArgument(!filename.trim().isEmpty() && !outputName.trim().isEmpty(), "Filename can not be empty!");
 
         File out = new File(dataFolder, outputName);
         if (!out.exists() || replace) {
