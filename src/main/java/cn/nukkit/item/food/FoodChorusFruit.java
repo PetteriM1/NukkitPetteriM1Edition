@@ -6,8 +6,8 @@ import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.EndermanTeleportSound;
-import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.Utils;
 
 public class FoodChorusFruit extends FoodNormal {
 
@@ -30,10 +30,9 @@ public class FoodChorusFruit extends FoodNormal {
         if (level == null) return false;
 
         for (int attempts = 0; attempts < 16; attempts++) {
-            NukkitRandom random = new NukkitRandom(-1);
-            int x = random.nextRange(minX, maxX);
-            int y = random.nextRange(minY, maxY);
-            int z = random.nextRange(minZ, maxZ);
+            int x = Utils.rand(minX, maxX);
+            int y = Utils.rand(minY, maxY);
+            int z = Utils.rand(minZ, maxZ);
 
             while (y >= 0 && !level.getBlock(new Vector3(x, y + 1, z)).isSolid()) {
                 y--;

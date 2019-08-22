@@ -31,7 +31,7 @@ public class BlockDiamond extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Diamond Block";
+        return "Block of Diamond";
     }
 
     @Override

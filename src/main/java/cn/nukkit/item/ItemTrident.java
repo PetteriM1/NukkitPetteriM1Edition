@@ -2,7 +2,6 @@ package cn.nukkit.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -60,25 +59,25 @@ public class ItemTrident extends ItemTool {
                         .add(new FloatTag("", (player.yaw > 180 ? 360 : 0) - (float) player.yaw))
                         .add(new FloatTag("", (float) -player.pitch)));
 
-        int diff = (Server.getInstance().getTick() - player.getStartActionTick());
-        double p = (double) diff / 20;
-
-        double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
         EntityThrownTrident trident = new EntityThrownTrident(player.chunk, nbt, player);
-        trident.setItem(this);
+        if (trident != null) {
+            trident.setItem(this);
 
-        EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, trident, f);
+            int diff = (Server.getInstance().getTick() - player.getStartActionTick());
+            double p = (double) diff / 20;
+            double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
 
-        if (f < 0.1 || diff < 5) {
-            entityShootBowEvent.setCancelled();
-        }
+            EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, trident, f);
 
-        Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
-        if (entityShootBowEvent.isCancelled()) {
-            entityShootBowEvent.getProjectile().kill();
-        } else {
-            entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
-            if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
+            if (f < 0.1 || diff < 5) {
+                entityShootBowEvent.setCancelled();
+            }
+
+            Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
+            if (entityShootBowEvent.isCancelled()) {
+                entityShootBowEvent.getProjectile().kill();
+            } else {
+                entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
                 ProjectileLaunchEvent ev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
                 Server.getInstance().getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {

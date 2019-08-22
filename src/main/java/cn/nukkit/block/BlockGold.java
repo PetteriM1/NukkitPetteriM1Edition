@@ -17,7 +17,7 @@ public class BlockGold extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Gold Block";
+        return "Block of Gold";
     }
 
     @Override
