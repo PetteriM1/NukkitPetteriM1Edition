@@ -17,7 +17,7 @@ public class BlockIron extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Iron Block";
+        return "Block of Iron";
     }
 
     @Override

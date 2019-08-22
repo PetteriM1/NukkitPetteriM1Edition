@@ -258,7 +258,7 @@ public class Server {
 
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
 
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 1);
+        this.networkCompressionLevel = this.getPropertyInt("compression-level", 5);
         this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
 
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
@@ -593,8 +593,7 @@ public class Server {
             this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
         } else {
             try {
-                byte[] data = Binary.appendBytes(payload);
-                this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
+                this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -2047,7 +2046,7 @@ public class Server {
             put("async-workers", "auto");
             put("zlib-provider", 0);
             put("async-compression", true);
-            put("compression-level", 1);
+            put("compression-level", 5);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);
             put("base-tick-rate", 1);

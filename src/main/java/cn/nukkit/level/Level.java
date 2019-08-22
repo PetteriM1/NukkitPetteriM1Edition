@@ -2159,6 +2159,13 @@ public class Level implements ChunkManager, Metadatable {
 
                         block.getLevel().setBlock(target, new BlockAir());
                         block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
+
+                        if (player != null) {
+                            if (!player.isCreative()) {
+                                item.setCount(item.getCount() - 1);
+                                player.getInventory().setItemInHand(item);
+                            }
+                        }
                         return null;
                     } else if (block.getSide(BlockFace.DOWN).getId() == Item.IRON_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.IRON_BLOCK) {
                         block = block.getSide(BlockFace.DOWN);
@@ -2186,6 +2193,13 @@ public class Level implements ChunkManager, Metadatable {
 
                             block.getLevel().setBlock(block, new BlockAir());
                             block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+
+                            if (player != null) {
+                                if (!player.isCreative()) {
+                                    item.setCount(item.getCount() - 1);
+                                    player.getInventory().setItemInHand(item);
+                                }
+                            }
                             return null;
                         }
                     }

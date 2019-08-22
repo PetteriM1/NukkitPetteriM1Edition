@@ -26,7 +26,7 @@ public class BlockSugarcane extends BlockFlowable {
 
     @Override
     public String getName() {
-        return "Sugarcane";
+        return "Sugar Cane";
     }
 
     @Override

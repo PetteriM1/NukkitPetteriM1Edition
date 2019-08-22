@@ -16,22 +16,12 @@ public class CompressBatchedTask extends AsyncTask {
     public int level;
     public byte[][] data;
     public byte[] finalData;
-    public int channel;
     public List<InetSocketAddress> targets;
 
-    public CompressBatchedTask(byte[][] data, List<InetSocketAddress> targets) {
-        this(data, targets, 7);
-    }
-
     public CompressBatchedTask(byte[][] data, List<InetSocketAddress> targets, int level) {
-        this(data, targets, level, 0);
-    }
-
-    public CompressBatchedTask(byte[][] data, List<InetSocketAddress> targets, int level, int channel) {
         this.data = data;
         this.targets = targets;
         this.level = level;
-        this.channel = channel;
     }
 
     @Override
