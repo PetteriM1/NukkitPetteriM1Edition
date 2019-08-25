@@ -20,7 +20,7 @@ public class BlockGlassPaneStained extends BlockGlassPane {
 
     @Override
     public int getFullId() {
-        return (getId() << 4) + getDamage();
+        return (STAINED_GLASS_PANE << 4) + meta;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class BlockGlassPaneStained extends BlockGlassPane {
     }
 
     public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(getDamage());
+        return DyeColor.getByWoolData(meta);
     }
 
     @Override

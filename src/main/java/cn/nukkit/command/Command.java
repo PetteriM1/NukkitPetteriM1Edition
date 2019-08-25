@@ -109,7 +109,7 @@ public abstract class Command {
         }
 
         CommandData customData = this.commandData.clone();
-        customData.description = player.getServer().getLanguage().translateString(this.getDescription());
+        customData.description = player.getServer().getLanguage().translateString(this.description);
         this.commandParameters.forEach((key, par) -> {
             CommandOverload overload = new CommandOverload();
             overload.input.parameters = par;

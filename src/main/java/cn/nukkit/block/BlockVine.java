@@ -154,7 +154,7 @@ public class BlockVine extends BlockTransparentMeta {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (!this.getSide(getFace()).isSolid()) {
                 Block up = this.up();
-                if (up.getId() != this.getId() || up.getDamage() != this.getDamage()) {
+                if (up.getId() != VINE || up.getDamage() != this.getDamage()) {
                     this.getLevel().useBreakOn(this, null, null, true);
                     return Level.BLOCK_UPDATE_NORMAL;
                 }

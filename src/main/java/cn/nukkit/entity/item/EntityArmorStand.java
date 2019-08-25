@@ -184,15 +184,8 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			} else {
 				this.equipmentInventory.setItem(slot, handItem);
 			}
-			Server.getInstance().getScheduler().scheduleDelayedTask(new Task() {
-				@Override
-				public void onRun(int i) {
-					player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-					player.getInventory().addItem(item);
-				}
-			}, 1);
+			Server.getInstance().getScheduler().scheduleDelayedTask(new Hack(player, item), 1);
 		}
-
 	}
 
 	private int getPose() {
@@ -345,5 +338,22 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 		this.timing.stopTiming();
 
 		return hasUpdate;
+	}
+
+	private static class Hack extends Task {
+
+		private final Player player;
+		private final Item item;
+
+		public Hack(Player player, Item item) {
+			this.player = player;
+			this.item = item;
+		}
+
+		@Override
+		public void onRun(int i) {
+			player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+			player.getInventory().addItem(item);
+		}
 	}
 }

@@ -95,7 +95,7 @@ public class Attribute implements Cloneable {
      */
     public static Attribute getAttributeByName(String name) {
         for (Attribute a : attributes.values()) {
-            if (Objects.equals(a.getName(), name)) {
+            if (Objects.equals(a.name, name)) {
                 return a.clone();
             }
         }
@@ -107,7 +107,7 @@ public class Attribute implements Cloneable {
     }
 
     public Attribute setMinValue(float minValue) {
-        if (minValue > this.getMaxValue()) {
+        if (minValue > this.maxValue) {
             throw new IllegalArgumentException("Value " + minValue + " is bigger than the maxValue!");
         }
         this.minValue = minValue;
@@ -119,7 +119,7 @@ public class Attribute implements Cloneable {
     }
 
     public Attribute setMaxValue(float maxValue) {
-        if (maxValue < this.getMinValue()) {
+        if (maxValue < this.minValue) {
             throw new IllegalArgumentException("Value " + maxValue + " is bigger than the minValue!");
         }
         this.maxValue = maxValue;
@@ -131,7 +131,7 @@ public class Attribute implements Cloneable {
     }
 
     public Attribute setDefaultValue(float defaultValue) {
-        if (defaultValue > this.getMaxValue() || defaultValue < this.getMinValue()) {
+        if (defaultValue > this.maxValue || defaultValue < this.minValue) {
             throw new IllegalArgumentException("Value " + defaultValue + " exceeds the range!");
         }
         this.defaultValue = defaultValue;
@@ -147,11 +147,11 @@ public class Attribute implements Cloneable {
     }
 
     public Attribute setValue(float value, boolean fit) {
-        if (value > this.getMaxValue() || value < this.getMinValue()) {
+        if (value > this.maxValue || value < this.minValue) {
             if (!fit) {
                 throw new IllegalArgumentException("Value " + value + " exceeds the range!");
             }
-            value = Math.min(Math.max(value, this.getMinValue()), this.getMaxValue());
+            value = Math.min(Math.max(value, this.minValue), this.maxValue);
         }
         this.currentValue = value;
         return this;

@@ -210,7 +210,7 @@ public class Chunk extends BaseChunk {
         tag.put("V", new ByteTag("V", (byte) 1));
 
         tag.put("TerrainGenerated", new ByteTag("TerrainGenerated", (byte) (isGenerated() ? 1 : 0)));
-        tag.put("TerrainPopulated", new ByteTag("TerrainPopulated", (byte) (isPopulated() ? 1 : 0)));
+        tag.put("TerrainPopulated", new ByteTag("TerrainPopulated", (byte) (terrainPopulated ? 1 : 0)));
 
         return tag;
     }

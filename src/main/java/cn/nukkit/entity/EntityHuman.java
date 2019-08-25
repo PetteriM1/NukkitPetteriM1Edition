@@ -125,7 +125,7 @@ public class EntityHuman extends EntityHumanType {
                 this.setSkin(newSkin);
             }
 
-            this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.getSkin()
+            this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.skin
                     .getSkinData(), this.getNameTag().getBytes(StandardCharsets.UTF_8));
         }
 
@@ -143,11 +143,11 @@ public class EntityHuman extends EntityHumanType {
 
         if (skin != null) {
             this.namedTag.putCompound("Skin", new CompoundTag()
-                    .putByteArray("Data", this.getSkin().getSkinData())
-                    .putString("ModelId", this.getSkin().getSkinId())
-                    .putByteArray("CapeData", this.getSkin().getCapeData())
-                    .putString("GeometryName", this.getSkin().getGeometryName())
-                    .putByteArray("GeometryData", this.getSkin().getGeometryData().getBytes(StandardCharsets.UTF_8))
+                    .putByteArray("Data", this.skin.getSkinData())
+                    .putString("ModelId", this.skin.getSkinId())
+                    .putByteArray("CapeData", this.skin.getCapeData())
+                    .putString("GeometryName", this.skin.getGeometryName())
+                    .putByteArray("GeometryData", this.skin.getGeometryData().getBytes(StandardCharsets.UTF_8))
             );
         }
     }
@@ -164,10 +164,10 @@ public class EntityHuman extends EntityHumanType {
             if (this instanceof Player)
                 this.server.sendFullPlayerListData(player);
             else
-                this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getName(), this.skin, new Player[]{player});
+                this.server.updatePlayerListData(this.uuid, this.getId(), this.getName(), this.skin, new Player[]{player});
 
             AddPlayerPacket pk = new AddPlayerPacket();
-            pk.uuid = this.getUniqueId();
+            pk.uuid = this.uuid;
             pk.username = this.getName();
             pk.entityUniqueId = this.getId();
             pk.entityRuntimeId = this.getId();
@@ -196,7 +196,7 @@ public class EntityHuman extends EntityHumanType {
             }
 
             if (!(this instanceof Player)) {
-                this.server.removePlayerListData(this.getUniqueId(), new Player[]{player});
+                this.server.removePlayerListData(this.uuid, new Player[]{player});
             }
         }
     }

@@ -1138,7 +1138,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public final boolean equals(Item item, boolean checkDamage, boolean checkCompound) {
-        if (this.getId() == item.getId() && (!checkDamage || this.getDamage() == item.getDamage())) {
+        if (this.id == item.id && (!checkDamage || this.meta == item.meta)) {
             if (checkCompound) {
                 if (Arrays.equals(this.getCompoundTag(), item.getCompoundTag())) {
                     return true;

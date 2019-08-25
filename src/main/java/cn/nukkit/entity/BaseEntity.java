@@ -67,7 +67,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public double getSpeed() {
-        if (this.isBaby()) {
+        if (this.baby) {
             return 1.2;
         }
         return 1;
@@ -124,7 +124,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public void saveNBT() {
         super.saveNBT();
 
-        this.namedTag.putBoolean("Baby", this.isBaby());
+        this.namedTag.putBoolean("Baby", this.baby);
         this.namedTag.putBoolean("Movement", this.isMovement());
         this.namedTag.putShort("Age", this.age);
     }

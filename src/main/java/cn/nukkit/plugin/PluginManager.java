@@ -466,7 +466,7 @@ public class PluginManager {
     }
 
     public void disablePlugins() {
-        ListIterator<Plugin> plugins = new ArrayList<>(this.getPlugins().values()).listIterator(this.getPlugins().size());
+        ListIterator<Plugin> plugins = new ArrayList<>(this.plugins.values()).listIterator(this.plugins.size());
 
         while (plugins.hasPrevious()) {
             this.disablePlugin(plugins.previous());

@@ -72,7 +72,7 @@ public class OfflinePlayer implements IPlayer {
 
     @Override
     public boolean isOp() {
-        return this.server.isOp(this.getName().toLowerCase());
+        return this.server.isOp(this.name.toLowerCase());
     }
 
     @Override
@@ -82,43 +82,43 @@ public class OfflinePlayer implements IPlayer {
         }
 
         if (value) {
-            this.server.addOp(this.getName().toLowerCase());
+            this.server.addOp(this.name.toLowerCase());
         } else {
-            this.server.removeOp(this.getName().toLowerCase());
+            this.server.removeOp(this.name.toLowerCase());
         }
     }
 
     @Override
     public boolean isBanned() {
-        return this.server.getNameBans().isBanned(this.getName());
+        return this.server.getNameBans().isBanned(this.name);
     }
 
     @Override
     public void setBanned(boolean value) {
         if (value) {
-            this.server.getNameBans().addBan(this.getName(), null, null, null);
+            this.server.getNameBans().addBan(this.name, null, null, null);
         } else {
-            this.server.getNameBans().remove(this.getName());
+            this.server.getNameBans().remove(this.name);
         }
     }
 
     @Override
     public boolean isWhitelisted() {
-        return this.server.isWhitelisted(this.getName().toLowerCase());
+        return this.server.isWhitelisted(this.name.toLowerCase());
     }
 
     @Override
     public void setWhitelisted(boolean value) {
         if (value) {
-            this.server.addWhitelist(this.getName().toLowerCase());
+            this.server.addWhitelist(this.name.toLowerCase());
         } else {
-            this.server.removeWhitelist(this.getName().toLowerCase());
+            this.server.removeWhitelist(this.name.toLowerCase());
         }
     }
 
     @Override
     public Player getPlayer() {
-        return this.server.getPlayerExact(this.getName());
+        return this.server.getPlayerExact(this.name);
     }
 
     @Override

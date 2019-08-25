@@ -92,7 +92,7 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
 
     @Override
     public Vector3 updateMove(int tickDiff) {
-        if (this.isSitting()) {
+        if (this.sitting) {
             return this.target;
         }
 

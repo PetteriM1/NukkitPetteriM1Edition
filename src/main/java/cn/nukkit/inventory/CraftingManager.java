@@ -189,7 +189,7 @@ public class CraftingManager {
         CraftingDataPacket pk = new CraftingDataPacket();
         pk.cleanRecipes = true;
 
-        for (Recipe recipe : this.getRecipes()) {
+        for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
@@ -197,7 +197,7 @@ public class CraftingManager {
             }
         }
 
-        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk.addFurnaceRecipe(recipe);
         }
         pk.encode();
@@ -210,7 +210,7 @@ public class CraftingManager {
         pk.cleanRecipes = true;
         pk.protocol = 354;
 
-        for (Recipe recipe : this.getRecipes()) {
+        for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
@@ -218,7 +218,7 @@ public class CraftingManager {
             }
         }
 
-        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk.addFurnaceRecipe(recipe);
         }
 
@@ -232,7 +232,7 @@ public class CraftingManager {
         pk.cleanRecipes = true;
         pk.protocol = 0;
 
-        for (Recipe recipe : this.getRecipes()) {
+        for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
@@ -240,7 +240,7 @@ public class CraftingManager {
             }
         }
 
-        for (FurnaceRecipe recipe : this.getFurnaceRecipes().values()) {
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk.addFurnaceRecipe(recipe);
         }
 

@@ -36,7 +36,7 @@ public enum BlockFace {
         for (BlockFace face : values()) {
             VALUES[face.index] = face;
 
-            if (face.getAxis().isHorizontal()) {
+            if (face.axis.isHorizontal()) {
                 HORIZONTALS[face.horizontalIndex] = face;
             }
         }
@@ -112,7 +112,7 @@ public enum BlockFace {
 
     public static BlockFace fromAxis(AxisDirection axisDirection, Axis axis) {
         for (BlockFace face : VALUES) {
-            if (face.getAxisDirection() == axisDirection && face.getAxis() == axis) {
+            if (face.axisDirection == axisDirection && face.axis == axis) {
                 return face;
             }
         }

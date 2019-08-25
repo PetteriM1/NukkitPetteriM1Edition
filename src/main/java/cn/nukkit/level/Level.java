@@ -415,7 +415,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void close() {
-        if (this.getAutoSave()) {
+        if (this.autoSave) {
             this.save(true);
         }
 
@@ -720,7 +720,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void checkTime() {
-        if (!this.stopTime && this.getGameRules().getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
+        if (!this.stopTime && this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
             this.time += tickRate;
         }
     }
@@ -747,12 +747,12 @@ public class Level implements ChunkManager, Metadatable {
         updateBlockLight(lightQueue);
         this.checkTime();
         
-        if (stopTime || !this.getGameRules().getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
+        if (stopTime || !this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
             this.sendTime();
         }
 
         // Tick Weather
-        if (this.getGameRules().getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName()) && !this.isNether && !this.isEnd) {
+        if (this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName()) && !this.isNether && !this.isEnd) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -800,7 +800,7 @@ public class Level implements ChunkManager, Metadatable {
         this.unloadChunks();
         this.timings.doTickPending.startTiming();
 
-        this.updateQueue.tick(this.getCurrentTick());
+        this.updateQueue.tick(this.levelCurrentTick);
         this.timings.doTickPending.stopTiming();
         
         Block block;
@@ -918,7 +918,7 @@ public class Level implements ChunkManager, Metadatable {
 
             EntityLightning bolt = new EntityLightning(chunk, nbt);
             LightningStrikeEvent ev = new LightningStrikeEvent(this, bolt);
-            getServer().getPluginManager().callEvent(ev);
+            server.getPluginManager().callEvent(ev);
             if (!ev.isCancelled()) {
                 bolt.spawnToAll();
             } else {
@@ -1110,7 +1110,7 @@ public class Level implements ChunkManager, Metadatable {
                         for (ChunkSection section : ((Chunk) chunk).getSections()) {
                             if (!(section instanceof EmptyChunkSection)) {
                                 int Y = section.getY();
-                                for (int i = 0; i < getGameRules().getInteger(GameRule.RANDOM_TICK_SPEED); ++i) {
+                                for (int i = 0; i < gameRules.getInteger(GameRule.RANDOM_TICK_SPEED); ++i) {
                                     int lcg = this.getUpdateLCG();
                                     int x = lcg & 0x0f;
                                     int y = lcg >>> 8 & 0x0f;
@@ -1128,7 +1128,7 @@ public class Level implements ChunkManager, Metadatable {
                     } else {
                         for (int Y = 0; Y < 8 && (Y < 3 || blockTest != 0); ++Y) {
                             blockTest = 0;
-                            for (int i = 0; i < getGameRules().getInteger(GameRule.RANDOM_TICK_SPEED); ++i) {
+                            for (int i = 0; i < gameRules.getInteger(GameRule.RANDOM_TICK_SPEED); ++i) {
                                 int lcg = this.getUpdateLCG();
                                 int x = lcg & 0x0f;
                                 int y = lcg >>> 8 & 0x0f;
@@ -1158,7 +1158,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean save(boolean force) {
-        if (!this.getAutoSave() && !force) {
+        if (!this.autoSave && !force) {
             return false;
         }
 
@@ -1274,7 +1274,7 @@ public class Level implements ChunkManager, Metadatable {
             return;
         }
 
-        BlockUpdateEntry entry = new BlockUpdateEntry(pos.floor(), block, ((long) delay) + getCurrentTick(), priority);
+        BlockUpdateEntry entry = new BlockUpdateEntry(pos.floor(), block, ((long) delay) + levelCurrentTick, priority);
 
         if (!this.updateQueue.contains(entry)) {
             this.updateQueue.add(entry);
@@ -1446,7 +1446,7 @@ public class Level implements ChunkManager, Metadatable {
         float light = 1 - (MathHelper.cos(angle * ((float) Math.PI * 2F)) * 2 + 0.5f);
         light = light < 0 ? 0 : light > 1 ? 1 : light;
         light = 1 - light;
-        light = (float) ((double) light * ((isRaining() ? 1 : 0) - (double) 5f / 16d));
+        light = (float) ((double) light * ((raining ? 1 : 0) - (double) 5f / 16d));
         light = (float) ((double) light * ((isThundering() ? 1 : 0) - (double) 5f / 16d));
         light = 1 - light;
         return (int) (light * 11f);
@@ -1933,7 +1933,7 @@ public class Level implements ChunkManager, Metadatable {
             int dropExp = target.getDropExp();
             if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
                 if (player.isSurvival() || player.isAdventure()) {
-                    if (this.getServer().suomiCraftPEMode()) {
+                    if (this.server.suomiCraftPEMode()) {
                         this.dropExpOrb(target, dropExp);
                     } else {
                         for (int ii = 1; ii <= dropExp; ii++) {
@@ -2143,10 +2143,10 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
-                if (getServer().getPropertyBoolean("block-listener", true)) {
+                if (server.getPropertyBoolean("block-listener", true)) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN);
-                        getServer().getPluginManager().callEvent(ev);
+                        server.getPluginManager().callEvent(ev);
 
                         if (ev.isCancelled()) {
                             return null;
@@ -2180,7 +2180,7 @@ public class Level implements ChunkManager, Metadatable {
 
                         if (second != null) {
                             CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
-                            getServer().getPluginManager().callEvent(ev);
+                            server.getPluginManager().callEvent(ev);
 
                             if (ev.isCancelled()) {
                                 return null;
@@ -2841,8 +2841,8 @@ public class Level implements ChunkManager, Metadatable {
         chunk.initChunk();
 
         if (!chunk.isLightPopulated() && chunk.isPopulated()
-                && this.getServer().getPropertyBoolean("light-updates", true)) {
-            this.getServer().getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
+                && this.server.getPropertyBoolean("light-updates", true)) {
+            this.server.getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
         }
 
         if (this.isChunkInUse(index)) {
@@ -2916,7 +2916,7 @@ public class Level implements ChunkManager, Metadatable {
 
         try {
             if (chunk != null) {
-                if (trySave && this.getAutoSave()) {
+                if (trySave && this.autoSave) {
                     int entities = 0;
                     for (Entity e : chunk.getEntities().values()) {
                         if (e instanceof Player) {
@@ -2949,7 +2949,7 @@ public class Level implements ChunkManager, Metadatable {
     public boolean isSpawnChunk(int X, int Z) {
         Vector3 spawn = this.getSpawnLocation();
 
-        if (this.getServer().suomiCraftPEMode() && noTickingWorlds.contains(this.getName())) {
+        if (this.server.suomiCraftPEMode() && noTickingWorlds.contains(this.getName())) {
             if (this.getName().equals("lobby")) {
                 return Math.abs(X - (spawn.getFloorX() >> 4)) <= 8 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 8;
             }
@@ -3324,7 +3324,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean setRaining(boolean raining) {
         WeatherChangeEvent ev = new WeatherChangeEvent(this, raining);
-        this.getServer().getPluginManager().callEvent(ev);
+        this.server.getPluginManager().callEvent(ev);
 
         if (ev.isCancelled()) {
             return false;
@@ -3358,18 +3358,18 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isThundering() {
-        return isRaining() && this.thundering;
+        return raining && this.thundering;
     }
 
     public boolean setThundering(boolean thundering) {
         ThunderChangeEvent ev = new ThunderChangeEvent(this, thundering);
-        this.getServer().getPluginManager().callEvent(ev);
+        this.server.getPluginManager().callEvent(ev);
 
         if (ev.isCancelled()) {
             return false;
         }
 
-        if (thundering && !isRaining()) {
+        if (thundering && !raining) {
             setRaining(true);
         }
 
@@ -3406,7 +3406,7 @@ public class Level implements ChunkManager, Metadatable {
 
         LevelEventPacket pk = new LevelEventPacket();
 
-        if (this.isRaining()) {
+        if (this.raining) {
             pk.evid = LevelEventPacket.EVENT_START_RAIN;
             pk.data = Utils.random.nextInt(50000) + 10000;
         } else {
@@ -3555,7 +3555,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean shouldMobBurn(BaseEntity entity) {
         int time = this.getTime() % TIME_FULL;
-        return !entity.isOnFire() && !this.isRaining() && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
+        return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

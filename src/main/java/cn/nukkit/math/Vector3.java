@@ -93,7 +93,7 @@ public class Vector3 implements Cloneable {
     }
 
     public Vector3 add(Vector3 x) {
-        return new Vector3(this.x + x.getX(), this.y + x.getY(), this.z + x.getZ());
+        return new Vector3(this.x + x.x, this.y + x.y, this.z + x.z);
     }
 
     public Vector3 subtract() {
@@ -113,7 +113,7 @@ public class Vector3 implements Cloneable {
     }
 
     public Vector3 subtract(Vector3 x) {
-        return this.add(-x.getX(), -x.getY(), -x.getZ());
+        return this.add(-x.x, -x.y, -x.z);
     }
 
     public Vector3 multiply(double number) {
@@ -145,7 +145,7 @@ public class Vector3 implements Cloneable {
     }
 
     public Vector3 getSide(BlockFace face, int step) {
-        return new Vector3(this.getX() + face.getXOffset() * step, this.getY() + face.getYOffset() * step, this.getZ() + face.getZOffset() * step);
+        return new Vector3(this.x + face.getXOffset() * step, this.y + face.getYOffset() * step, this.z + face.getZOffset() * step);
     }
 
     public Vector3 up() {

@@ -91,7 +91,7 @@ public class BinaryStream {
             this.offset = this.count - 1;
             return new byte[0];
         }
-        len = Math.min(len, this.getCount() - this.offset);
+        len = Math.min(len, this.count - this.offset);
         this.offset += len;
         return Arrays.copyOfRange(this.buffer, this.offset - len, this.offset);
     }
@@ -300,7 +300,7 @@ public class BinaryStream {
             nbt = this.get(nbtLen);
         } else if (nbtLen == 65535) {
             int nbtTagCount = (int) getUnsignedVarInt();
-            int offset = getOffset();
+            int offset = this.offset;
             FastByteArrayInputStream stream = new FastByteArrayInputStream(get());
             for (int i = 0; i < nbtTagCount; i++) {
                 try {

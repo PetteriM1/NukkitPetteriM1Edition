@@ -42,7 +42,7 @@ public class BanList {
     }
 
     public boolean isBanned(String name) {
-        if (!this.isEnable() || name == null) {
+        if (!this.enable || name == null) {
             return false;
         } else {
             this.removeExpired();

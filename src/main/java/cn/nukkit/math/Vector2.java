@@ -47,7 +47,7 @@ public class Vector2 {
     }
 
     public Vector2 add(Vector2 x) {
-        return this.add(x.getX(), x.getY());
+        return this.add(x.x, x.y);
     }
 
     public Vector2 subtract(double x) {
@@ -59,7 +59,7 @@ public class Vector2 {
     }
 
     public Vector2 subtract(Vector2 x) {
-        return this.add(-x.getX(), -x.getY());
+        return this.add(-x.x, -x.y);
     }
 
     public Vector2 ceil() {
@@ -95,7 +95,7 @@ public class Vector2 {
     }
 
     public double distance(Vector2 vector) {
-        return Math.sqrt(this.distanceSquared(vector.getX(), vector.getY()));
+        return Math.sqrt(this.distanceSquared(vector.x, vector.y));
     }
 
     public double distanceSquared(double x) {
@@ -107,7 +107,7 @@ public class Vector2 {
     }
 
     public double distanceSquared(Vector2 vector) {
-        return this.distanceSquared(vector.getX(), vector.getY());
+        return this.distanceSquared(vector.x, vector.y);
     }
 
     public double length() {

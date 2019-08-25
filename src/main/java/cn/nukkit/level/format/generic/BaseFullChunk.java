@@ -128,7 +128,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                         continue;
                     }
                     ListTag pos = nbt.getList("Pos");
-                    if ((((NumberTag) pos.get(0)).getData().intValue() >> 4) != this.getX() || ((((NumberTag) pos.get(2)).getData().intValue() >> 4) != this.getZ())) {
+                    if ((((NumberTag) pos.get(0)).getData().intValue() >> 4) != this.x || ((((NumberTag) pos.get(2)).getData().intValue() >> 4) != this.z)) {
                         changed = true;
                         continue;
                     }
@@ -149,7 +149,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                             changed = true;
                             continue;
                         }
-                        if ((nbt.getInt("x") >> 4) != this.getX() || ((nbt.getInt("z") >> 4) != this.getZ())) {
+                        if ((nbt.getInt("x") >> 4) != this.x || ((nbt.getInt("z") >> 4) != this.z)) {
                             changed = true;
                             continue;
                         }
@@ -193,12 +193,12 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     public final void setX(int x) {
         this.x = x;
-        this.hash = Level.chunkHash(x, getZ());
+        this.hash = Level.chunkHash(x, z);
     }
 
     public final void setZ(int z) {
         this.z = z;
-        this.hash = Level.chunkHash(getX(), z);
+        this.hash = Level.chunkHash(x, z);
     }
 
     @Override
@@ -397,7 +397,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public boolean isLoaded() {
-        return this.getProvider() != null && this.getProvider().isChunkLoaded(this.getX(), this.getZ());
+        return this.getProvider() != null && this.getProvider().isChunkLoaded(this.x, this.z);
     }
 
     @Override
@@ -407,7 +407,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public boolean load(boolean generate) throws IOException {
-        return this.getProvider() != null && this.getProvider().getChunk(this.getX(), this.getZ(), true) != null;
+        return this.getProvider() != null && this.getProvider().getChunk(this.x, this.z, true) != null;
     }
 
     @Override
@@ -427,7 +427,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
             return true;
         }
         if (save && this.changes != 0) {
-            provider.saveChunk(this.getX(), this.getZ());
+            provider.saveChunk(this.x, this.z);
         }
         if (safe) {
             for (Entity entity : this.getEntities().values()) {
@@ -531,7 +531,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public int getBlockIdAt(int x, int y, int z) {
-        if (x >> 4 == getX() && z >> 4 == getZ()) {
+        if (x >> 4 == this.x && z >> 4 == this.z) {
             return getBlockId(x & 15, y, z & 15);
         }
         return 0;
@@ -539,28 +539,28 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public void setBlockFullIdAt(int x, int y, int z, int fullId) {
-        if (x >> 4 == getX() && z >> 4 == getZ()) {
+        if (x >> 4 == this.x && z >> 4 == this.z) {
             setFullBlockId(x & 15, y, z & 15, fullId);
         }
     }
 
     @Override
     public void setBlockIdAt(int x, int y, int z, int id) {
-        if (x >> 4 == getX() && z >> 4 == getZ()) {
+        if (x >> 4 == this.x && z >> 4 == this.z) {
             setBlockId(x & 15, y, z & 15, id);
         }
     }
     
     @Override
     public void setBlockAt(int x, int y, int z, int id, int data) {
-        if (x >> 4 == getX() && z >> 4 == getZ()) {
+        if (x >> 4 == this.x && z >> 4 == this.z) {
             setBlock(x & 15, y, z & 15, id, data);
         }
     }
 
     @Override
     public int getBlockDataAt(int x, int y, int z) {
-        if (x >> 4 == getX() && z >> 4 == getZ()) {
+        if (x >> 4 == this.x && z >> 4 == this.z) {
             return getBlockIdAt(x & 15, y, z & 15);
         }
         return 0;
@@ -568,14 +568,14 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public void setBlockDataAt(int x, int y, int z, int data) {
-        if (x >> 4 == getX() && z >> 4 == getZ()) {
+        if (x >> 4 == this.x && z >> 4 == this.z) {
             setBlockData(x & 15, y, z & 15, data);
         }
     }
 
     @Override
     public BaseFullChunk getChunk(int chunkX, int chunkZ) {
-        if (chunkX == getX() && chunkZ == getZ()) return this;
+        if (chunkX == x && chunkZ == z) return this;
         return null;
     }
 

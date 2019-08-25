@@ -92,10 +92,10 @@ public final class Timings {
         privacy = Server.getInstance().getPropertyBoolean("timings-privacy", false);
 
         Server.getInstance().getLogger().debug("Timings: \n" +
-                "Enabled - " + isTimingsEnabled() + '\n' +
-                "Verbose - " + isVerboseEnabled() + '\n' +
-                "History Interval - " + getHistoryInterval() + '\n' +
-                "History Length - " + getHistoryLength());
+                "Enabled - " + timingsEnabled + '\n' +
+                "Verbose - " + verboseEnabled + '\n' +
+                "History Interval - " + historyInterval + '\n' +
+                "History Length - " + historyLength);
 
         fullServerTickTimer = new FullServerTickTiming();
         timingsTickTimer = TimingsManager.getTiming(DEFAULT_GROUP.name, "Timings Tick", fullServerTickTimer);
@@ -179,7 +179,7 @@ public final class Timings {
         historyLength = Math.max(Math.min(maxLength, length), historyInterval);
 
         Queue<TimingsHistory> oldQueue = TimingsManager.HISTORY;
-        int frames = (getHistoryLength() / getHistoryInterval());
+        int frames = (historyLength / historyInterval);
         if (length > maxLength) {
             Server.getInstance().getLogger().warning(
                     "Timings Length too high. Requested " + length + ", max is " + maxLength

@@ -114,7 +114,7 @@ public class Permission {
     }
 
     public void addParent(Permission permission, boolean value) {
-        this.getChildren().put(this.getName(), value);
+        this.children.put(this.name, value);
         permission.recalculatePermissibles();
     }
 

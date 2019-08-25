@@ -26,7 +26,7 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
         CompoundTag nbt = Entity.getDefaultNBT(dispensePos);
         this.correctNBT(nbt);
 
-        Entity projectile = Entity.createEntity(getEntityType(), source.level.getChunk(dispensePos.getChunkX(), dispensePos.getChunkZ()), nbt);
+        Entity projectile = Entity.createEntity(entityType, source.level.getChunk(dispensePos.getChunkX(), dispensePos.getChunkZ()), nbt);
 
         if (!(projectile instanceof EntityProjectile)) {
             return super.dispense(source, face, item);

@@ -50,11 +50,11 @@ public abstract class AsyncTask implements Runnable {
     }
 
     public Object getFromThreadStore(String identifier) {
-        return this.isFinished() ? null : ThreadStore.store.get(identifier);
+        return this.finished ? null : ThreadStore.store.get(identifier);
     }
 
     public void saveToThreadStore(String identifier, Object value) {
-        if (!this.isFinished()) {
+        if (!this.finished) {
             if (value == null) {
                 ThreadStore.store.remove(identifier);
             } else {
@@ -83,7 +83,7 @@ public abstract class AsyncTask implements Runnable {
                 task.onCompletion(Server.getInstance());
             } catch (Exception e) {
                 Server.getInstance().getLogger().critical("Exception while async task "
-                        + task.getTaskId()
+                        + task.taskId
                         + " invoking onCompletion", e);
             }
         }

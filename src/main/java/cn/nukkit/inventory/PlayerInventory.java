@@ -113,7 +113,7 @@ public class PlayerInventory extends BaseInventory {
     }
 
     public Item getItemInHand() {
-        Item item = this.getItem(this.getHeldItemIndex());
+        Item item = this.getItem(this.itemInHandIndex);
         if (item != null) {
             return item;
         } else {
@@ -122,7 +122,7 @@ public class PlayerInventory extends BaseInventory {
     }
 
     public boolean setItemInHand(Item item) {
-        return this.setItem(this.getHeldItemIndex(), item);
+        return this.setItem(this.itemInHandIndex, item);
     }
 
     public int getHeldItemSlot() {
@@ -148,13 +148,13 @@ public class PlayerInventory extends BaseInventory {
 
         MobEquipmentPacket pk = new MobEquipmentPacket();
         pk.item = item;
-        pk.inventorySlot = pk.hotbarSlot = this.getHeldItemIndex();
+        pk.inventorySlot = pk.hotbarSlot = this.itemInHandIndex;
 
         for (Player player : players) {
             pk.eid = this.getHolder().getId();
             if (player.equals(this.getHolder())) {
                 pk.eid = player.getId();
-                this.sendSlot(this.getHeldItemIndex(), player);
+                this.sendSlot(this.itemInHandIndex, player);
             }
 
             player.dataPacket(pk);

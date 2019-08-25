@@ -24,7 +24,7 @@ public class TextContainer implements Cloneable {
 
     @Override
     public String toString() {
-        return this.getText();
+        return this.text;
     }
 
     @Override

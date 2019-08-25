@@ -44,7 +44,7 @@ public class BlockPodzol extends BlockDirt {
 
     @Override
     public int getFullId() {
-        return this.getId() << 4;
+        return PODZOL << 4;
     }
 
     @Override

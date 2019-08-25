@@ -86,7 +86,7 @@ public class EntityFallingBlock extends Entity {
             return;
         }
 
-        setDataProperty(new IntEntityData(DATA_VARIANT, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, this.getBlock(), this.getDamage())));
+        setDataProperty(new IntEntityData(DATA_VARIANT, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, this.blockId, this.damage)));
     }
 
     public boolean canCollideWith(Entity entity) {
@@ -134,10 +134,10 @@ public class EntityFallingBlock extends Entity {
                 Block block = level.getBlock(pos);
                 if (block.isTransparent() && !block.canBeReplaced()) {
                     if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-                        getLevel().dropItem(this, Item.get(this.getBlock(), this.getDamage(), 1));
+                        getLevel().dropItem(this, Item.get(this.blockId, this.damage, 1));
                     }
                 } else {
-                    EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(getBlock(), getDamage()));
+                    EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(blockId, damage));
                     server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
                         getLevel().setBlock(pos, event.getTo(), true, true);
