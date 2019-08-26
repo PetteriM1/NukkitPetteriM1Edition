@@ -132,7 +132,7 @@ public class EntityItem extends Entity {
 
         this.timing.startTiming();
 
-        if (this.onGround && this.item != null && this.isAlive()) {
+        if (this.age % 100 == 0 && this.onGround && this.item != null && this.isAlive()) {
             if (this.item.getCount() < this.item.getMaxStackSize()) {
                 for (Entity entity : this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false)) {
                     if (entity instanceof EntityItem) {

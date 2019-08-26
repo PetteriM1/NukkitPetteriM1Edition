@@ -21,7 +21,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     protected int moveTime = 0;
 
     public float maxJumpHeight = 1.2f;
-    public double moveMultifier = 1.0d;
+    public float moveMultifier = 1.0f;
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
