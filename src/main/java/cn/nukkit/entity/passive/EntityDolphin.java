@@ -61,7 +61,6 @@ public class EntityDolphin extends EntityWaterAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.RAW_FISH,0,1)) && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
@@ -69,6 +68,6 @@ public class EntityDolphin extends EntityWaterAnimal {
             this.setInLove();
             return true;
         }
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 }

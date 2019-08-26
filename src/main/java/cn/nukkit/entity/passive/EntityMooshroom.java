@@ -83,7 +83,6 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.BOWL, 0), true)) {
             player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
@@ -98,6 +97,6 @@ public class EntityMooshroom extends EntityWalkingAnimal {
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
             this.setInLove();
         }
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 }

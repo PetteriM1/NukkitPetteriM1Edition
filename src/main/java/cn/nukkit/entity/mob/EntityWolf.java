@@ -101,7 +101,6 @@ public class EntityWolf extends EntityTameableMob {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.BONE))) {
             if (!this.hasOwner() && !this.isAngry()) {
                 player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
@@ -135,7 +134,7 @@ public class EntityWolf extends EntityTameableMob {
             }
         }
 
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 
     @Override
