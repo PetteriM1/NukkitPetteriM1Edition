@@ -96,8 +96,8 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
     @Override
     public void close() {
         if (!closed) {
-            for (Player player : new HashSet<>(getInventory().getViewers())) {
-                player.removeWindow(getInventory());
+            for (Player player : new HashSet<>(inventory.getViewers())) {
+                player.removeWindow(inventory);
             }
             super.close();
         }
@@ -191,7 +191,7 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
         Item ingredient = this.inventory.getIngredient();
         boolean canBrew = false;
 
-        Item fuel = this.getInventory().getFuel();
+        Item fuel = this.inventory.getFuel();
         if (this.fuelAmount <= 0 && fuel.getId() == Item.BLAZE_POWDER && fuel.getCount() > 0) {
             fuel.count--;
             this.fuelAmount = 20;

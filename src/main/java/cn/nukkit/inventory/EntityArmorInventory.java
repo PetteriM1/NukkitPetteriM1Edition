@@ -86,7 +86,7 @@ public class EntityArmorInventory extends BaseInventory {
         mobArmorEquipmentPacket.eid = this.entityLiving.getId();
         mobArmorEquipmentPacket.slots = new Item[]{this.getHelmet(), this.getChestplate(), this.getLeggings(), this.getBoots()};
 
-        if (player == this.getHolder()) {
+        if (player == this.holder) {
             InventorySlotPacket inventorySlotPacket = new InventorySlotPacket();
             inventorySlotPacket.inventoryId = player.getWindowId(this);
             inventorySlotPacket.slot = index;
@@ -110,7 +110,7 @@ public class EntityArmorInventory extends BaseInventory {
         mobArmorEquipmentPacket.eid = this.entityLiving.getId();
         mobArmorEquipmentPacket.slots = new Item[]{this.getHelmet(), this.getChestplate(), this.getLeggings(), this.getBoots()};
 
-        if (player == this.getHolder()) {
+        if (player == this.holder) {
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
             inventoryContentPacket.inventoryId = player.getWindowId(this);
             inventoryContentPacket.slots = new Item[]{this.getHelmet(), this.getChestplate(), this.getLeggings(), this.getBoots()};

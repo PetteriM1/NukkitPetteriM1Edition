@@ -120,7 +120,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
     @Override
     protected DataPacket createAddEntityPacket() {
         AddEntityPacket addEntity = new AddEntityPacket();
-        addEntity.type = this.getNetworkId();
+        addEntity.type = NETWORK_ID;
         addEntity.entityUniqueId = this.getId();
         addEntity.entityRuntimeId = this.getId();
         addEntity.yaw = (float) this.yaw;

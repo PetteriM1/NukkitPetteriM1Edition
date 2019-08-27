@@ -186,7 +186,7 @@ public class BlockSapling extends BlockFlowable {
 
     public boolean isSameType(Vector3 pos, int type) {
         Block block = this.level.getBlock(pos);
-        return block.getId() == this.getId() && block.getDamage() == type;
+        return block.getId() == SAPLING && block.getDamage() == type;
     }
 
     @Override

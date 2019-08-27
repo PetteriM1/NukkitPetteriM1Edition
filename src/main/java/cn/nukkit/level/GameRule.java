@@ -36,7 +36,7 @@ public enum GameRule {
 
     public static Optional<GameRule> parseString(String gameRuleString) {
         for (GameRule gameRule: values()) {
-            if (gameRule.getName().equalsIgnoreCase(gameRuleString)) {
+            if (gameRule.name.equalsIgnoreCase(gameRuleString)) {
                 return Optional.of(gameRule);
             }
         }
@@ -47,7 +47,7 @@ public enum GameRule {
         String[] stringValues = new String[values().length];
 
         for (int i = 0; i < values().length; i++) {
-            stringValues[i] = values()[i].getName();
+            stringValues[i] = values()[i].name;
         }
         return stringValues;
     }

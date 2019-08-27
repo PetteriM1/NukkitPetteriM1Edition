@@ -339,7 +339,7 @@ public abstract class Entity extends Location implements Metadatable {
     protected void initEntity() {
         if (this.initialized2) {
             // We've already initialized this entity
-            this.getServer().getLogger().debug("[initEntity] Entity is already initialized: " + this.getName() + " (" + this.getId() + ')');
+            this.server.getLogger().debug("[initEntity] Entity is already initialized: " + this.getName() + " (" + this.id + ')');
             return;
         }
 
@@ -374,7 +374,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
         this.dataProperties.putFloat(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
         this.dataProperties.putFloat(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
-        this.dataProperties.putInt(DATA_HEALTH, (int) this.getHealth());
+        this.dataProperties.putInt(DATA_HEALTH, (int) this.health);
 
         this.scheduleUpdate();
     }
@@ -386,7 +386,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.initialized) {
             // We've already initialized this entity
-            this.getServer().getLogger().debug("[init] Entity is already initialized: " + this.getName() + " (" + this.getId() + ')');
+            this.server.getLogger().debug("[init] Entity is already initialized: " + this.getName() + " (" + this.id + ')');
             return;
         }
 
@@ -674,7 +674,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.recalculateEffectColor();
 
         if (effect.getId() == Effect.HEALTH_BOOST) {
-            this.setHealth(this.getHealth() + 4 * (effect.getAmplifier() + 1));
+            this.setHealth(this.health + 4 * (effect.getAmplifier() + 1));
         }
     }
 
@@ -877,20 +877,20 @@ public abstract class Entity extends Location implements Metadatable {
             this.riding.spawnTo(player);
 
             SetEntityLinkPacket pkk = new SetEntityLinkPacket();
-            pkk.vehicleUniqueId = this.riding.getId();
-            pkk.riderUniqueId = this.getId();
+            pkk.vehicleUniqueId = this.riding.id;
+            pkk.riderUniqueId = this.id;
             pkk.type = 1;
             pkk.immediate = 1;
 
             player.dataPacket(pkk);
         }
 
-        if (this instanceof EntityBoss && this.getServer().getPropertyBoolean("vanilla-bossbars")) {
+        if (this instanceof EntityBoss && this.server.getPropertyBoolean("vanilla-bossbars")) {
             BossEventPacket pkBoss = new BossEventPacket();
             pkBoss.bossEid = this.id;
             pkBoss.type = BossEventPacket.TYPE_SHOW;
             pkBoss.title = this.getName();
-            pkBoss.healthPercent = this.getHealth();
+            pkBoss.healthPercent = this.health;
             player.dataPacket(pkBoss);
         }
     }
@@ -898,8 +898,8 @@ public abstract class Entity extends Location implements Metadatable {
     protected DataPacket createAddEntityPacket() {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
-        addEntity.entityUniqueId = this.getId();
-        addEntity.entityRuntimeId = this.getId();
+        addEntity.entityUniqueId = this.id;
+        addEntity.entityRuntimeId = this.id;
         addEntity.yaw = (float) this.yaw;
         addEntity.headYaw = (float) this.yaw;
         addEntity.pitch = (float) this.pitch;
@@ -913,7 +913,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         addEntity.links = new EntityLink[this.passengers.size()];
         for (int i = 0; i < addEntity.links.length; i++) {
-            addEntity.links[i] = new EntityLink(this.getId(), this.passengers.get(i).getId(), i == 0 ? EntityLink.TYPE_RIDER : TYPE_PASSENGER, false);
+            addEntity.links[i] = new EntityLink(this.id, this.passengers.get(i).id, i == 0 ? EntityLink.TYPE_RIDER : TYPE_PASSENGER, false);
         }
 
         return addEntity;
@@ -926,7 +926,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendPotionEffects(Player player) {
         for (Effect effect : this.effects.values()) {
             MobEffectPacket pk = new MobEffectPacket();
-            pk.eid = this.getId();
+            pk.eid = this.id;
             pk.effectId = effect.getId();
             pk.amplifier = effect.getAmplifier();
             pk.particles = effect.isVisible();
@@ -943,7 +943,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void sendData(Player player, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
-        pk.eid = this.getId();
+        pk.eid = this.id;
         pk.metadata = data == null ? this.dataProperties : data;
 
         player.dataPacket(pk);
@@ -955,7 +955,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void sendData(Player[] players, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
-        pk.eid = this.getId();
+        pk.eid = this.id;
         pk.metadata = data == null ? this.dataProperties : data;
 
         for (Player player : players) {
@@ -972,7 +972,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void despawnFrom(Player player) {
         if (this.hasSpawned.containsKey(player.getLoaderId())) {
             RemoveEntityPacket pk = new RemoveEntityPacket();
-            pk.eid = this.getId();
+            pk.eid = this.id;
             player.dataPacket(pk);
             this.hasSpawned.remove(player.getLoaderId());
         }
@@ -986,15 +986,15 @@ public abstract class Entity extends Location implements Metadatable {
             return false;
         }
 
-        getServer().getPluginManager().callEvent(source);
+        server.getPluginManager().callEvent(source);
         if (source.isCancelled()) {
             return false;
         }
         if (this.absorption > 0) { // Damage Absorption
-            this.setAbsorption(Math.max(0, this.getAbsorption() + source.getDamage(EntityDamageEvent.DamageModifier.ABSORPTION)));
+            this.setAbsorption(Math.max(0, this.absorption + source.getDamage(EntityDamageEvent.DamageModifier.ABSORPTION)));
         }
         setLastDamageCause(source);
-        setHealth(getHealth() - source.getFinalDamage());
+        setHealth(health - source.getFinalDamage());
         return true;
     }
 
@@ -1007,7 +1007,7 @@ public abstract class Entity extends Location implements Metadatable {
         if (source.isCancelled()) {
             return;
         }
-        this.setHealth(this.getHealth() + source.getAmount());
+        this.setHealth(this.health + source.getAmount());
     }
 
     public void heal(float amount) {
@@ -1065,7 +1065,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected boolean checkObstruction(double x, double y, double z) {
-        if (this.level.getCollisionCubes(this, this.getBoundingBox(), false).length == 0) {
+        if (this.level.getCollisionCubes(this, this.boundingBox, false).length == 0) {
             return false;
         }
 
@@ -1244,13 +1244,13 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.inPortalTicks == 80 && Server.getInstance().getPropertyBoolean("nether", true) && this instanceof BaseEntity) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
-            this.getServer().getPluginManager().callEvent(ev);
+            this.server.getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
                 if (this.getLevel().isNether) {
-                    this.switchLevel(getServer().getDefaultLevel());
+                    this.switchLevel(server.getDefaultLevel());
                 } else {
-                    this.switchLevel(getServer().getLevelByName("nether"));
+                    this.switchLevel(server.getLevelByName("nether"));
                 }
             }
         }
@@ -1406,8 +1406,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected void broadcastLinkPacket(Entity rider, byte type) {
         SetEntityLinkPacket pk = new SetEntityLinkPacket();
-        pk.vehicleUniqueId = getId();     // To the?
-        pk.riderUniqueId = rider.getId(); // From who?
+        pk.vehicleUniqueId = id;     // To the?
+        pk.riderUniqueId = rider.id; // From who?
         pk.type = type;
 
         Server.broadcastPacket(this.hasSpawned.values(), pk);
@@ -1685,7 +1685,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         AxisAlignedBB bb = block.getBoundingBox();
 
-        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.getBoundingBox());
+        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.boundingBox);
 
     }
 
@@ -1888,7 +1888,7 @@ public abstract class Entity extends Location implements Metadatable {
             this.collisionBlocks = new ArrayList<>();
 
             for (Block b : getBlocksAround()) {
-                if (b.collidesWithBB(this.getBoundingBox(), true)) {
+                if (b.collidesWithBB(this.boundingBox, true)) {
                     this.collisionBlocks.add(b);
                 }
             }
@@ -2162,8 +2162,8 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean setDataProperty(EntityData data, boolean send) {
-        if (!Objects.equals(data, this.getDataProperties().get(data.getId()))) {
-            this.getDataProperties().put(data);
+        if (!Objects.equals(data, this.dataProperties.get(data.getId()))) {
+            this.dataProperties.put(data);
             if (send) {
                 this.sendData(this.hasSpawned.values().toArray(new Player[0]), new EntityMetadata().put(this.dataProperties.get(data.getId())));
             }
@@ -2177,51 +2177,51 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public EntityData getDataProperty(int id) {
-        return this.getDataProperties().get(id);
+        return this.dataProperties.get(id);
     }
 
     public int getDataPropertyInt(int id) {
-        return this.getDataProperties().getInt(id);
+        return this.dataProperties.getInt(id);
     }
 
     public int getDataPropertyShort(int id) {
-        return this.getDataProperties().getShort(id);
+        return this.dataProperties.getShort(id);
     }
 
     public int getDataPropertyByte(int id) {
-        return this.getDataProperties().getByte(id);
+        return this.dataProperties.getByte(id);
     }
 
     public boolean getDataPropertyBoolean(int id) {
-        return this.getDataProperties().getBoolean(id);
+        return this.dataProperties.getBoolean(id);
     }
 
     public long getDataPropertyLong(int id) {
-        return this.getDataProperties().getLong(id);
+        return this.dataProperties.getLong(id);
     }
 
     public String getDataPropertyString(int id) {
-        return this.getDataProperties().getString(id);
+        return this.dataProperties.getString(id);
     }
 
     public float getDataPropertyFloat(int id) {
-        return this.getDataProperties().getFloat(id);
+        return this.dataProperties.getFloat(id);
     }
 
     public CompoundTag getDataPropertyNBT(int id) {
-        return this.getDataProperties().getNBT(id);
+        return this.dataProperties.getNBT(id);
     }
 
     public Vector3 getDataPropertyPos(int id) {
-        return this.getDataProperties().getPosition(id);
+        return this.dataProperties.getPosition(id);
     }
 
     public Vector3f getDataPropertyVector3f(int id) {
-        return this.getDataProperties().getFloatPosition(id);
+        return this.dataProperties.getFloatPosition(id);
     }
 
     public int getDataPropertyType(int id) {
-        return this.getDataProperties().exists(id) ? this.getDataProperty(id).getType() : -1;
+        return this.dataProperties.exists(id) ? this.getDataProperty(id).getType() : -1;
     }
 
     public void setDataFlag(int propertyId, int id) {
@@ -2287,13 +2287,13 @@ public abstract class Entity extends Location implements Metadatable {
             return false;
         }
         Entity other = (Entity) obj;
-        return this.getId() == other.getId();
+        return this.id == other.id;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = (int) (29 * hash + this.getId());
+        hash = (int) (29 * hash + this.id);
         return hash;
     }
 

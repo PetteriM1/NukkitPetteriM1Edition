@@ -108,7 +108,6 @@ public class EntityChicken extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        super.onInteract(player, item, clickedPos);
         if ((item.equals(Item.get(Item.SEEDS, 0))) && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(
@@ -134,7 +133,7 @@ public class EntityChicken extends EntityWalkingAnimal {
                     Item.get(Item.PUMPKIN_SEEDS)));
             this.setInLove();
         }
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 
     public void saveNBT() {

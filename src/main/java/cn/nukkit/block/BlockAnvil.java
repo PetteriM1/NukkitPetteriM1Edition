@@ -40,7 +40,7 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
 
     @Override
     public int getFullId() {
-        return (getId() << 4) + getDamage();
+        return (ANVIL << 4) + getDamage();
     }
 
     @Override

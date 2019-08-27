@@ -110,7 +110,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public boolean canDoInteraction() {
-        return passengers.isEmpty() && this.getDisplayBlock() == null;
+        return passengers.isEmpty() && this.blockInside == null;
     }
 
     @Override
@@ -389,8 +389,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     private boolean hasUpdated = false;
 
     private void setFalling() {
-        motionX = NukkitMath.clamp(motionX, -getMaxSpeed(), getMaxSpeed());
-        motionZ = NukkitMath.clamp(motionZ, -getMaxSpeed(), getMaxSpeed());
+        motionX = NukkitMath.clamp(motionX, -maxSpeed, maxSpeed);
+        motionZ = NukkitMath.clamp(motionZ, -maxSpeed, maxSpeed);
 
         if (!hasUpdated) {
             for (cn.nukkit.entity.Entity linked : passengers) {
@@ -535,8 +535,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             motX *= 0.75D;
             motZ *= 0.75D;
         }
-        motX = NukkitMath.clamp(motX, -getMaxSpeed(), getMaxSpeed());
-        motZ = NukkitMath.clamp(motZ, -getMaxSpeed(), getMaxSpeed());
+        motX = NukkitMath.clamp(motX, -maxSpeed, maxSpeed);
+        motZ = NukkitMath.clamp(motZ, -maxSpeed, maxSpeed);
 
         move(motX, 0, motZ);
         if (facing[0][1] != 0 && MathHelper.floor(x) - dx == facing[0][0] && MathHelper.floor(z) - dz == facing[0][2]) {

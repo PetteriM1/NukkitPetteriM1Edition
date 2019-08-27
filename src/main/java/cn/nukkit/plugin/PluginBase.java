@@ -156,9 +156,9 @@ abstract public class PluginBase implements Plugin {
      * TODO: FINISH JAVADOC
      */
     public PluginIdentifiableCommand getCommand(String name) {
-        PluginIdentifiableCommand command = this.getServer().getPluginCommand(name);
+        PluginIdentifiableCommand command = this.server.getPluginCommand(name);
         if (command == null || !command.getPlugin().equals(this)) {
-            command = this.getServer().getPluginCommand(this.description.getName().toLowerCase() + ':' + name);
+            command = this.server.getPluginCommand(this.description.getName().toLowerCase() + ':' + name);
         }
 
         if (command != null && command.getPlugin().equals(this)) {
@@ -223,7 +223,7 @@ abstract public class PluginBase implements Plugin {
     @Override
     public void saveConfig() {
         if (!this.getConfig().save()) {
-            this.getLogger().critical("Could not save config to " + this.configFile.toString());
+            this.logger.critical("Could not save config to " + this.configFile.toString());
         }
     }
 

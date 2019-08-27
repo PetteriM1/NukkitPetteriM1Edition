@@ -54,7 +54,7 @@ public abstract class BaseLevelProvider implements LevelProvider {
         if (!file_path.exists()) {
             file_path.mkdirs();
         }
-        CompoundTag levelData = NBTIO.readCompressed(new FileInputStream(new File(this.getPath() + "level.dat")), ByteOrder.BIG_ENDIAN);
+        CompoundTag levelData = NBTIO.readCompressed(new FileInputStream(new File(this.path + "level.dat")), ByteOrder.BIG_ENDIAN);
         if (levelData.get("Data") instanceof CompoundTag) {
             this.levelData = levelData.getCompound("Data");
         } else {
@@ -304,7 +304,7 @@ public abstract class BaseLevelProvider implements LevelProvider {
     @Override
     public void saveLevelData() {
         try {
-            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), new FileOutputStream(this.getPath() + "level.dat"));
+            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), new FileOutputStream(this.path + "level.dat"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

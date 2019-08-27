@@ -58,7 +58,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
             }
 
             for (Player player : new HashSet<>(this.getInventory().getViewers())) {
-                player.removeWindow(this.getRealInventory());
+                player.removeWindow(this.inventory);
             }
             super.close();
         }

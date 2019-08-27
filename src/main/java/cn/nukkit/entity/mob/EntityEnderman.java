@@ -84,13 +84,13 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (!ev.isCancelled()) {
             if (ev.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                if (!isAngry()) {
+                if (!angry) {
                     setAngry(true);
                 }
             }
 
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-                if (!isAngry()) {
+                if (!angry) {
                     setAngry(true);
                 }
                 ev.setCancelled(true);
@@ -128,7 +128,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            if (isAngry()) {
+            if (angry) {
                 setAngry(false);
             }
             tp();
@@ -141,7 +141,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (this.age % 20 == 0 && (this.level.isRaining() || this.level.isThundering())) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            if (isAngry()) {
+            if (angry) {
                 setAngry(false);
             }
             tp();
@@ -185,7 +185,7 @@ public class EntityEnderman extends EntityWalkingMob {
     }
 
     public void stareToAngry() {
-        if (!isAngry()) {
+        if (!angry) {
             setAngry(true);
         }
     }

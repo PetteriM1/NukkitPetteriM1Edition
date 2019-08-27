@@ -41,7 +41,7 @@ public class TradeInventory extends ContainerInventory {
     public void onClose(Player who) {
         super.onClose(who);
         for (int i = 0; i < 2; ++i) {
-            this.getHolder().getLevel().dropItem(this.getHolder().add(0.5, 0.5, 0.5), this.getItem(i));
+            this.holder.getLevel().dropItem(this.holder.add(0.5, 0.5, 0.5), this.getItem(i));
             this.clear(i);
         }
     }

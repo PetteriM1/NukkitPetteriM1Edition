@@ -82,7 +82,6 @@ public class EntitySheep extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        super.onInteract(player, item, clickedPos);
         if (item.getId() == Item.DYE) {
             this.setColor(((ItemDye) item).getDyeColor().getWoolData());
             return true;
@@ -98,7 +97,7 @@ public class EntitySheep extends EntityWalkingAnimal {
             player.getInventory().getItemInHand().setDamage(item.getDamage() + 1);
             return true;
         }
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 
     public void shear(boolean shear) {

@@ -301,8 +301,8 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
     @Override
     public void close() {
         if (!closed) {
-            for (Player player : new HashSet<>(this.getInventory().getViewers())) {
-                player.removeWindow(this.getInventory());
+            for (Player player : new HashSet<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
             }
             super.close();
         }

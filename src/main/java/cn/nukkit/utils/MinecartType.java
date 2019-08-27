@@ -50,7 +50,7 @@ public enum MinecartType {
 
     static {
         for (MinecartType var3 : values()) {
-            TYPES.put(var3.getId(), var3);
+            TYPES.put(var3.type, var3);
         }
     }
 

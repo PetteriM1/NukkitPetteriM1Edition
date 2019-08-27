@@ -150,7 +150,7 @@ public class BlockRedstoneWire extends BlockFlowable {
     }
 
     private int getMaxCurrentStrength(Vector3 pos, int maxStrength) {
-        if (this.level.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()) != this.getId()) {
+        if (this.level.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()) != REDSTONE_WIRE) {
             return maxStrength;
         } else {
             int strength = this.level.getBlockDataAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ());

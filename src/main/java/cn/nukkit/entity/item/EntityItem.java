@@ -132,27 +132,27 @@ public class EntityItem extends Entity {
 
         this.timing.startTiming();
 
-        if (this.onGround && this.getItem() != null && this.isAlive()) {
-            if (this.getItem().getCount() < this.getItem().getMaxStackSize()) {
+        if (this.age % 100 == 0 && this.onGround && this.item != null && this.isAlive()) {
+            if (this.item.getCount() < this.item.getMaxStackSize()) {
                 for (Entity entity : this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false)) {
                     if (entity instanceof EntityItem) {
                         if (!entity.isAlive()) {
                             continue;
                         }
-                        Item closeItem = ((EntityItem) entity).getItem();
-                        if (!closeItem.equals(getItem(), true, true)) {
+                        Item closeItem = ((EntityItem) entity).item;
+                        if (!closeItem.equals(item, true, true)) {
                             continue;
                         }
                         if (!entity.isOnGround()) {
                             continue;
                         }
-                        int newAmount = this.getItem().getCount() + closeItem.getCount();
-                        if (newAmount > this.getItem().getMaxStackSize()) {
+                        int newAmount = this.item.getCount() + closeItem.getCount();
+                        if (newAmount > this.item.getMaxStackSize()) {
                             continue;
                         }
                         closeItem.setCount(0);
                         entity.close();
-                        this.getItem().setCount(newAmount);
+                        this.item.setCount(newAmount);
                         EntityEventPacket packet = new EntityEventPacket();
                         packet.eid = getId();
                         packet.data = newAmount;
@@ -300,7 +300,7 @@ public class EntityItem extends Entity {
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
-        addEntity.item = this.getItem();
+        addEntity.item = this.item;
         return addEntity;
     }
 }

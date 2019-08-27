@@ -83,7 +83,7 @@ public class TaskHandler {
     }
 
     public void cancel() {
-        if (!this.isCancelled() && this.task instanceof Task) {
+        if (!this.cancelled && this.task instanceof Task) {
             ((Task) this.task).onCancel();
         }
         this.cancelled = true;
@@ -96,7 +96,7 @@ public class TaskHandler {
     public void run(int currentTick) {
         try {
             setLastRunTick(currentTick);
-            getTask().run();
+            task.run();
         } catch (RuntimeException ex) {
             Server.getInstance().getLogger().critical("Exception while invoking run", ex);
         }

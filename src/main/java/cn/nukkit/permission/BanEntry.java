@@ -73,11 +73,11 @@ public class BanEntry {
 
     public LinkedHashMap<String, String> getMap() {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put("name", getName());
-        map.put("creationDate", new SimpleDateFormat(format).format(getCreationDate()));
-        map.put("source", this.getSource());
-        map.put("expireDate", getExpirationDate() != null ? new SimpleDateFormat(format).format(getExpirationDate()) : "Forever");
-        map.put("reason", this.getReason());
+        map.put("name", name);
+        map.put("creationDate", new SimpleDateFormat(format).format(creationDate));
+        map.put("source", this.source);
+        map.put("expireDate", expirationDate != null ? new SimpleDateFormat(format).format(expirationDate) : "Forever");
+        map.put("reason", this.reason);
         return map;
     }
 

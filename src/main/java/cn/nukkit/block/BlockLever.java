@@ -213,7 +213,7 @@ public class BlockLever extends BlockFlowable implements Faceable {
 
         static {
             for (LeverOrientation face : values()) {
-                META_LOOKUP[face.getMetadata()] = face;
+                META_LOOKUP[face.meta] = face;
             }
         }
     }

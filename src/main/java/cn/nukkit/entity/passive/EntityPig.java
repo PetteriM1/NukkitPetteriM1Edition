@@ -65,7 +65,6 @@ public class EntityPig extends EntityWalkingAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        super.onInteract(player, item, clickedPos);
         if (item.equals(Item.get(Item.CARROT,0)) && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.CARROT)));
@@ -82,7 +81,7 @@ public class EntityPig extends EntityWalkingAnimal {
             this.setInLove();
             return true;
         }
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 
     @Override

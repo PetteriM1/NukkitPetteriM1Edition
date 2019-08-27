@@ -274,7 +274,7 @@ public class ItemFlintSteel extends ItemTool {
             }
 
             if ((player.gamemode & 0x01) == 0 && this.useOn(block)) {
-                if (this.getDamage() >= this.getMaxDurability()) {
+                if (this.getDamage() >= DURABILITY_FLINT_STEEL) {
                     this.count = 0;
                 } else {
                     this.meta++;

@@ -103,8 +103,8 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     @Override
     public void close() {
         if (!closed) {
-            for (Player player : new HashSet<>(this.getInventory().getViewers())) {
-                player.removeWindow(this.getInventory());
+            for (Player player : new HashSet<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
             }
 
             super.close();
@@ -275,8 +275,8 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
             burnDuration = 0;
         }
 
-        for (Player player : this.getInventory().getViewers()) {
-            int windowId = player.getWindowId(this.getInventory());
+        for (Player player : this.inventory.getViewers()) {
+            int windowId = player.getWindowId(this.inventory);
             if (windowId > 0) {
                 ContainerSetDataPacket pk = new ContainerSetDataPacket();
                 pk.windowId = windowId;

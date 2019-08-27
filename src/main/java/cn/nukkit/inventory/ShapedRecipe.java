@@ -210,7 +210,7 @@ public class ShapedRecipe implements CraftingRecipe {
             haveItems.addAll(Arrays.asList(items));
         }
 
-        List<Item> needItems = this.getExtraResults();
+        List<Item> needItems = this.extraResults;
 
         for (Item haveItem : new ArrayList<>(haveItems)) {
             if (haveItem.isNull()) {

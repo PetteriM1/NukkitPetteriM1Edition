@@ -32,6 +32,6 @@ public class ConstantItemSelector extends Selector {
     }
 
     public Object select() {
-        return getItem();
+        return item;
     }
 }

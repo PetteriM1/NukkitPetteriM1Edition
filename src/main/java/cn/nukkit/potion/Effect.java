@@ -224,10 +224,10 @@ public class Effect implements Cloneable {
     }
 
     public void add(Entity entity) {
-        Effect oldEffect = entity.getEffect(getId());
-        if (oldEffect != null && (Math.abs(this.getAmplifier()) < Math.abs(oldEffect.getAmplifier()) ||
-                Math.abs(this.getAmplifier()) == Math.abs(oldEffect.getAmplifier())
-                        && this.getDuration() < oldEffect.getDuration())) {
+        Effect oldEffect = entity.getEffect(id);
+        if (oldEffect != null && (Math.abs(this.amplifier) < Math.abs(oldEffect.amplifier) ||
+                Math.abs(this.amplifier) == Math.abs(oldEffect.amplifier)
+                        && this.duration < oldEffect.duration)) {
             return;
         }
         if (entity instanceof Player) {
@@ -235,10 +235,10 @@ public class Effect implements Cloneable {
 
             MobEffectPacket pk = new MobEffectPacket();
             pk.eid = entity.getId();
-            pk.effectId = this.getId();
-            pk.amplifier = this.getAmplifier();
-            pk.particles = this.isVisible();
-            pk.duration = this.getDuration();
+            pk.effectId = this.id;
+            pk.amplifier = this.amplifier;
+            pk.particles = this.show;
+            pk.duration = this.duration;
             if (oldEffect != null) {
                 pk.eventId = MobEffectPacket.EVENT_MODIFY;
             } else {
@@ -277,7 +277,7 @@ public class Effect implements Cloneable {
         if (entity instanceof Player) {
             MobEffectPacket pk = new MobEffectPacket();
             pk.eid = entity.getId();
-            pk.effectId = this.getId();
+            pk.effectId = this.id;
             pk.eventId = MobEffectPacket.EVENT_REMOVE;
 
             ((Player) entity).dataPacket(pk);

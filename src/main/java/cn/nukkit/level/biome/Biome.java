@@ -96,7 +96,7 @@ public abstract class Biome implements BlockID {
 
     @Override
     public int hashCode() {
-        return getId();
+        return id;
     }
 
     @Override

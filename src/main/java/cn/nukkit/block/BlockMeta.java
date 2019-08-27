@@ -10,7 +10,7 @@ public abstract class BlockMeta extends Block {
 
     @Override
     public int getFullId() {
-        return (getId() << 4) + getDamage();
+        return (getId() << 4) + meta;
     }
 
     @Override
