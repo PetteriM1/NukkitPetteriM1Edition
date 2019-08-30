@@ -23,7 +23,7 @@ public enum BlockFace {
     /**
      * All faces with horizontal axis in order S-W-N-E
      */
-    private static final BlockFace[] HORIZONTALS = new BlockFace[4];
+    public static final BlockFace[] HORIZONTALS = new BlockFace[4];
 
     static {
         DOWN.axis = Axis.Y;

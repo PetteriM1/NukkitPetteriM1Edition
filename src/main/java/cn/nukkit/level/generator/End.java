@@ -3,17 +3,15 @@ package cn.nukkit.level.generator;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.Level;
-import cn.nukkit.level.biome.Biome;
 import cn.nukkit.level.biome.EnumBiome;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.noise.Noise;
 import cn.nukkit.level.generator.noise.Simplex;
-import cn.nukkit.level.generator.populator.impl.PopulatorEndPillar;
-import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by PetteriM1
@@ -22,8 +20,8 @@ public class End extends Generator {
 
     private ChunkManager level;
     private NukkitRandom nukkitRandom;
-    private final List<Populator> populators = new ArrayList<>();
-    private List<Populator> generationPopulators = new ArrayList<>();
+    //private final List<Populator> populators = new ArrayList<>();
+    //private List<Populator> generationPopulators = new ArrayList<>();
 
     private Simplex noiseBase;
 
@@ -36,7 +34,7 @@ public class End extends Generator {
 
     @Override
     public int getId() {
-        return Generator.TYPE_END;
+        return Generator.TYPE_THE_END;
     }
 
     @Override
@@ -64,7 +62,6 @@ public class End extends Generator {
         this.level = level;
         this.nukkitRandom = random;
         this.noiseBase = new Simplex(this.nukkitRandom, 4, 1 / 4f, 1 / 64f);
-        this.generationPopulators.add(new PopulatorEndPillar());
     }
 
     @Override
@@ -77,10 +74,10 @@ public class End extends Generator {
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
-                chunk.setBiomeId(x, z, EnumBiome.THE_END.biome.getId());
+                chunk.setBiomeId(x, z, EnumBiome.END.biome.getId());
 
                 for (int y = 12; y < 64; ++y) {
-                    double noiseValue = (Math.abs(64 - y) / 64) * 1 - noise[x][z][y];
+                    double noiseValue = (Math.abs(64 - y) / 64) - noise[x][z][y];
                     noiseValue -= 1 - 0.5;
 
                     double distance = new Vector3(0, 64, 0).distance(new Vector3(chunkX * 16 + x, y / 1.3, chunkZ * 16 + z));
@@ -91,21 +88,22 @@ public class End extends Generator {
                 }
             }
         }
-        for (Populator populator : this.generationPopulators) {
+
+        /*for (Populator populator : this.generationPopulators) {
             populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
-        }
+        }*/
     }
 
     @Override
     public void populateChunk(int chunkX, int chunkZ) {
-        BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
+        /*BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
         this.nukkitRandom.setSeed(0xa6fe78dc ^ (chunkX << 8) ^ chunkZ ^ this.level.getSeed());
         for (Populator populator : this.populators) {
             populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
         }
 
         Biome biome = EnumBiome.getBiome(chunk.getBiomeId(7, 7));
-        biome.populateChunk(this.level, chunkX, chunkZ, this.nukkitRandom);
+        biome.populateChunk(this.level, chunkX, chunkZ, this.nukkitRandom);*/
     }
 
     public Vector3 getSpawn() {

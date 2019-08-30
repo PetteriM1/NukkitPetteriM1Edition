@@ -160,7 +160,7 @@ public final class Timings {
     }
 
     public static void setHistoryInterval(int interval) {
-        historyInterval = Math.max(20 * 60, interval);
+        historyInterval = Math.max(1200, interval);
         if (historyLength != -1) {
             setHistoryLength(historyLength);
         }
