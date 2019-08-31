@@ -10,11 +10,10 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <junit.jupiter.version>5.0.0-M4</junit.jupiter.version>
         <junit.platform.version>1.0.0-M4</junit.platform.version>
-        <log4j2.version>2.11.1</log4j2.version>
+        <log4j2.version>2.12.1</log4j2.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jline.version>3.9.0</jline.version>
+        <jline.version>3.12.1</jline.version>
         <netty.version>4.1.39.Final</netty.version>
     </properties>
     
@@ -58,7 +57,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>21.0</version>
+            <version>28.1-jre</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -68,7 +67,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.16</version>
+            <version>1.25</version>
         </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
@@ -91,7 +90,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.4</version>
+            <version>1.18.8</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -189,7 +188,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -197,7 +196,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
+                <version>2.22.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.platform</groupId>
@@ -215,7 +214,7 @@
                         <id>enforce</id>
                         <configuration>
                             <rules>
-                                <DependencyConvergence />
+                                <DependencyConvergence/>
                             </rules>
                         </configuration>
                         <goals>
@@ -227,7 +226,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>2.4.3</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.github.edwgiz</groupId>
@@ -262,7 +261,7 @@
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.4</version>
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
