@@ -3801,8 +3801,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.extinguish();
                 this.setHealth(1);
 
-                this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(20 * 40).setAmplifier(2));
-                this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(20 * 5).setAmplifier(2));
+                this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(2));
+                this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(2));
 
                 EntityEventPacket pk = new EntityEventPacket();
                 pk.eid = this.getId();

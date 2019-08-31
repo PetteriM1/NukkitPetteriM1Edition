@@ -354,7 +354,7 @@ public class Server {
         Generator.addGenerator(Normal.class, "normal", Generator.TYPE_INFINITE);
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         Generator.addGenerator(Nether.class, "nether", Generator.TYPE_NETHER);
-        Generator.addGenerator(End.class, "end", Generator.TYPE_END);
+        Generator.addGenerator(End.class, "end", Generator.TYPE_THE_END);
         Generator.addGenerator(cn.nukkit.level.generator.Void.class, "void", Generator.TYPE_VOID);
 
         if (this.defaultLevel == null) {
@@ -412,7 +412,7 @@ public class Server {
                 this.loadLevel("nether");
             }
             if (this.getLevelByName("end") == null && this.getPropertyBoolean("end", false)) {
-                this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_END));
+                this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
                 this.loadLevel("end");
             }
         }
@@ -1684,7 +1684,7 @@ public class Server {
 
             level.setTickRate(this.baseTickRate);
         } catch (Exception e) {
-            log.error(this.baseLang.translateString("nukkit.level.generationError", new String[]{name, e.getMessage()}));
+            log.error(this.baseLang.translateString("nukkit.level.generationError", new String[]{name, Utils.getExceptionMessage(e)}));
             return false;
         }
 
