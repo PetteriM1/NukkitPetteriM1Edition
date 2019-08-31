@@ -36,7 +36,7 @@ public class SetWorldSpawnCommand extends VanillaCommand {
         if (args.length == 0) {
             if (sender instanceof Player) {
                 level = ((Player) sender).getLevel();
-                pos = ((Player) sender).round();
+                pos = new Vector3(((Player) sender).x, ((Player) sender).y, ((Player) sender).z);
             } else {
                 sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
                 return true;
@@ -44,7 +44,7 @@ public class SetWorldSpawnCommand extends VanillaCommand {
         } else if (args.length == 3) {
             level = sender.getServer().getDefaultLevel();
             try {
-                pos = new Vector3(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+                pos = new Vector3(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]));
             } catch (NumberFormatException e1) {
                 sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
                 return true;
