@@ -33,11 +33,10 @@ public class SetWorldSpawnCommand extends VanillaCommand {
         }
         Level level;
         Vector3 pos;
-        DecimalFormat round2 = new DecimalFormat("##0.00");
         if (args.length == 0) {
             if (sender instanceof Player) {
                 level = ((Player) sender).getLevel();
-                pos = new Vector3(Double.parseDouble(round2.format(((Player) sender).x).replace(',', '.')), Double.parseDouble(round2.format(((Player) sender).y).replace(',', '.')), Double.parseDouble(round2.format(((Player) sender).z).replace(',', '.')));
+                pos = ((Player) sender).round();
             } else {
                 sender.sendMessage(new TranslationContainer("commands.generic.ingame"));
                 return true;
@@ -45,7 +44,7 @@ public class SetWorldSpawnCommand extends VanillaCommand {
         } else if (args.length == 3) {
             level = sender.getServer().getDefaultLevel();
             try {
-                pos = new Vector3(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]));
+                pos = new Vector3(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
             } catch (NumberFormatException e1) {
                 sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
                 return true;
@@ -55,7 +54,8 @@ public class SetWorldSpawnCommand extends VanillaCommand {
             return true;
         }
         level.setSpawnLocation(pos);
-        Command.broadcastCommandMessage(sender, new TranslationContainer("commands.setworldspawn.success", String.valueOf(pos.x), String.valueOf(pos.y), String.valueOf(pos.z)));
+        DecimalFormat round2 = new DecimalFormat("##0.00");
+        Command.broadcastCommandMessage(sender, new TranslationContainer("commands.setworldspawn.success", round2.format(pos.x), round2.format(pos.y), round2.format(pos.z)));
         return true;
     }
 }
