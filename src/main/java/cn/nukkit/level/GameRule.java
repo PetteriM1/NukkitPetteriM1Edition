@@ -9,6 +9,7 @@ public enum GameRule {
     DO_DAYLIGHT_CYCLE("doDaylightCycle"),
     DO_ENTITY_DROPS("doEntityDrops"),
     DO_FIRE_TICK("doFireTick"),
+    DO_IMMEDIATE_RESPAWN("doImmediateRespawn"),
     DO_INSOMNIA("doInsomnia"),
     DO_MOB_LOOT("doMobLoot"),
     DO_MOB_SPAWNING("doMobSpawning"),
