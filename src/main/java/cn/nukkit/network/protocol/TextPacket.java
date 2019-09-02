@@ -50,6 +50,7 @@ public class TextPacket extends DataPacket {
             }
         } else {
             switch (type) {
+                case TYPE_POPUP:
                 case TYPE_WHISPER:
                 case TYPE_ANNOUNCEMENT:
                     this.source = this.getString();
@@ -61,7 +62,6 @@ public class TextPacket extends DataPacket {
                     break;
 
                 case TYPE_TRANSLATION:
-                case TYPE_POPUP:
                 case TYPE_JUKEBOX_POPUP:
                     this.message = this.getString();
                     int count = (int) this.getUnsignedVarInt();
@@ -80,6 +80,7 @@ public class TextPacket extends DataPacket {
         this.putByte(this.type);
         this.putBoolean(this.isLocalized || type == TYPE_TRANSLATION);
         switch (this.type) {
+            case TYPE_POPUP:
             case TYPE_CHAT:
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
@@ -96,7 +97,6 @@ public class TextPacket extends DataPacket {
                 break;
 
             case TYPE_TRANSLATION:
-            case TYPE_POPUP:
             case TYPE_JUKEBOX_POPUP:
                 this.putString(this.message);
                 this.putUnsignedVarInt(this.parameters.length);
