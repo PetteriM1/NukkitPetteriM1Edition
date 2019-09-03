@@ -1,5 +1,6 @@
 package com.nukkitx.network.raknet;
 
+import cn.nukkit.Server;
 import com.nukkitx.network.raknet.util.RoundRobinIterator;
 import com.nukkitx.network.util.Bootstraps;
 import com.nukkitx.network.util.DisconnectReason;
@@ -39,6 +40,7 @@ public class RakNetServer extends RakNet {
     private volatile RakNetServerListener listener = null;
     private final int bindThreads;
     private int maxConnections = 1024;
+    public boolean strongIPBans;
 
     public RakNetServer(InetSocketAddress bindAddress) {
         this(bindAddress, 1);
@@ -160,6 +162,8 @@ public class RakNetServer extends RakNet {
         } else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
+            this.sendConnectionBanned(ctx, packet.sender());
+        } else if (strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
             this.sendConnectionBanned(ctx, packet.sender());
         } else {
             // Passed all checks. Now create the session and send the first reply.

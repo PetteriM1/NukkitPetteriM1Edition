@@ -49,7 +49,7 @@ public class BlockGrass extends BlockDirt {
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0F) {
             item.count--;
-            ObjectTallGrass.growGrass(this.getLevel(), this, new NukkitRandom(), 15, 10);
+            ObjectTallGrass.growGrass(this.getLevel(), this, new NukkitRandom(), Utils.rand(8, 40), 7);
             return true;
         } else if (item.isHoe()) {
             item.useOn(this);
