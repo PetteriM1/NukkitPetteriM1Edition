@@ -3413,15 +3413,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendPopup(String message) {
-        this.sendPopup(message, "");
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_POPUP;
+        pk.message = message;
+        this.dataPacket(pk);
     }
 
     public void sendPopup(String message, String subtitle) {
-        TextPacket pk = new TextPacket();
-        pk.type = TextPacket.TYPE_POPUP;
-        pk.source = message;
-        pk.message = subtitle;
-        this.dataPacket(pk);
+        this.sendPopup(message);
     }
 
     public void sendTip(String message) {

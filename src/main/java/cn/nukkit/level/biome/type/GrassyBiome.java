@@ -9,6 +9,7 @@ import cn.nukkit.level.generator.populator.impl.PopulatorGrass;
  * Nukkit Project
  */
 public abstract class GrassyBiome extends CoveredBiome {
+
     public GrassyBiome() {
         PopulatorGrass grass = new PopulatorGrass();
         grass.setBaseAmount(30);
@@ -20,12 +21,12 @@ public abstract class GrassyBiome extends CoveredBiome {
     }
 
     @Override
-    public int getSurfaceBlock(int y) {
-        return GRASS;
+    public int getSurfaceId(int x, int y, int z) {
+        return GRASS << 4;
     }
 
     @Override
-    public int getGroundBlock(int y) {
-        return DIRT;
+    public int getGroundId(int x, int y, int z) {
+        return DIRT << 4;
     }
 }

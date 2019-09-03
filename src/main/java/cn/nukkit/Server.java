@@ -2090,7 +2090,7 @@ public class Server {
             put("dimensions", false);
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
-            put("strong-ip-bans", false);
+            put("strong-ip-bans", true);
         }
     }
 
