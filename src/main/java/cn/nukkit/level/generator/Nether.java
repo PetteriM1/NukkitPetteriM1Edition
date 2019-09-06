@@ -23,7 +23,6 @@ public class Nether extends Generator {
 
     private ChunkManager level;
     private NukkitRandom nukkitRandom;
-    private Random random;
     private double lavaHeight = 32;
     private SimplexF[] noiseGen = new SimplexF[3];
     private final List<Populator> populators = new ArrayList<>();
@@ -68,7 +67,7 @@ public class Nether extends Generator {
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
         this.nukkitRandom = random;
-        this.random = new Random();
+        Random random1 = new Random();
         this.nukkitRandom.setSeed(this.level.getSeed());
 
         for (int i = 0; i < noiseGen.length; i++)   {
@@ -76,8 +75,8 @@ public class Nether extends Generator {
         }
 
         this.nukkitRandom.setSeed(this.level.getSeed());
-        this.localSeed1 = this.random.nextLong();
-        this.localSeed2 = this.random.nextLong();
+        this.localSeed1 = random1.nextLong();
+        this.localSeed2 = random1.nextLong();
 
         PopulatorOre ores = new PopulatorOre(Block.NETHERRACK, new OreType[]{
                 new OreType(new BlockOreQuartz(), 20, 16, 0, 128),

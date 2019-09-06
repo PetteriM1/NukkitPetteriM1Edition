@@ -8,7 +8,6 @@ import cn.nukkit.level.generator.populator.impl.PopulatorDeadBush;
 import cn.nukkit.math.NukkitRandom;
 
 import java.util.Arrays;
-import java.util.Random;
 import java.util.SplittableRandom;
 
 /**

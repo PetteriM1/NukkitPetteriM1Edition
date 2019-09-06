@@ -903,13 +903,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         this.send(buffer, RakNetPriority.IMMEDIATE, RakNetReliability.RELIABLE_ORDERED);
     }
 
-    private void sendDetectLostConnection() {
-        ByteBuf buffer = this.allocateBuffer(1);
-        buffer.writeByte(ID_DETECT_LOST_CONNECTION);
-
-        this.send(buffer, RakNetPriority.IMMEDIATE);
-    }
-
     private void touch() {
         this.checkForClosed();
         this.lastTouched = System.currentTimeMillis();

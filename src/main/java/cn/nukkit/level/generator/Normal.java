@@ -47,7 +47,6 @@ public class Normal extends Generator {
     public NoiseGeneratorOctavesF scaleNoise;
     public NoiseGeneratorOctavesF depthNoise;
     private ChunkManager level;
-    private Random random;
     private NukkitRandom nukkitRandom;
     private long localSeed1;
     private long localSeed2;
@@ -96,10 +95,10 @@ public class Normal extends Generator {
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
         this.nukkitRandom = random;
-        this.random = new Random();
+        Random random1 = new Random();
         this.nukkitRandom.setSeed(this.level.getSeed());
-        this.localSeed1 = this.random.nextLong();
-        this.localSeed2 = this.random.nextLong();
+        this.localSeed1 = random1.nextLong();
+        this.localSeed2 = random1.nextLong();
         this.nukkitRandom.setSeed(this.level.getSeed());
         this.selector = new BiomeSelector(this.nukkitRandom);
 

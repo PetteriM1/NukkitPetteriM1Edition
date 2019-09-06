@@ -13,7 +13,6 @@ import cn.nukkit.math.NukkitRandom;
  */
 public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
     private static final SimplexF gravelNoise = new SimplexF(new NukkitRandom(0), 1f, 1 / 4f, 1 / 64f);
-    private boolean isGravel = false;
 
     public ExtremeHillsMBiome() {
         this(true);

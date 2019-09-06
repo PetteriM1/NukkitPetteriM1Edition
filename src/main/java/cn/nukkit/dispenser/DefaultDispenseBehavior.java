@@ -44,8 +44,4 @@ public class DefaultDispenseBehavior implements DispenseBehavior {
         block.level.dropItem(dispensePos, i, motion);
         return null;
     }
-
-    private int getParticleMetadataForFace(BlockFace face) {
-        return face.getXOffset() + 1 + (face.getZOffset() + 1) * 3;
-    }
 }

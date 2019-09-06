@@ -180,6 +180,8 @@ public class Server {
 
     private final Map<UUID, Player> playerList = new HashMap<>();
 
+    public static final List<String> disabledSpawnWorlds = new ArrayList<>();
+
     @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
@@ -422,6 +424,14 @@ public class Server {
         if (this.getPropertyBoolean("thread-watchdog", true)) {
             this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 50000));
             this.watchdog.start();
+        }
+
+        String disabledWorlds = Server.getInstance().getPropertyString("worlds-entity-spawning-disabled");
+        if (!disabledWorlds.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(disabledWorlds, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                disabledSpawnWorlds.add(tokenizer.nextToken());
+            }
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
@@ -1107,8 +1117,8 @@ public class Server {
         String title = (char) 0x1b + "]0;Nukkit Server " +
                 " | Online " + this.players.size() + '/' + this.maxPlayers +
                 " | Memory " + Math.round(used / max * 100) + '%' +
-                " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
-                " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +
+                /*" | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
+                " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +*/
                 " | TPS " + this.getTicksPerSecond() +
                 " | Load " + this.getTickUsage() + '%' + (char) 0x07;
 
