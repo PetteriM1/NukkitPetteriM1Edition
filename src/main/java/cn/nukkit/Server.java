@@ -181,6 +181,7 @@ public class Server {
     private final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
+    private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
 
     @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
@@ -426,11 +427,19 @@ public class Server {
             this.watchdog.start();
         }
 
-        String disabledWorlds = Server.getInstance().getPropertyString("worlds-entity-spawning-disabled");
-        if (!disabledWorlds.trim().isEmpty()) {
-            StringTokenizer tokenizer = new StringTokenizer(disabledWorlds, ", ");
+        String worlds1 = Server.getInstance().getPropertyString("worlds-entity-spawning-disabled");
+        if (!worlds1.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(worlds1, ", ");
             while (tokenizer.hasMoreTokens()) {
                 disabledSpawnWorlds.add(tokenizer.nextToken());
+            }
+        }
+
+        String worlds2 = Server.getInstance().getPropertyString("worlds-level-auto-save-disabled");
+        if (!worlds2.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(worlds2, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                nonAutoSaveWorlds.add(tokenizer.nextToken());
             }
         }
 
@@ -1000,7 +1009,9 @@ public class Server {
             }
 
             for (Level level : this.levelArray) {
-                this.scheduler.scheduleTask(null, level::save, true);
+                if (!nonAutoSaveWorlds.contains(level.getName())) {
+                    this.scheduler.scheduleTask(null, level::save, true);
+                }
             }
             Timings.levelSaveTimer.stopTiming();
         }
@@ -1066,7 +1077,7 @@ public class Server {
             this.network.updateName();
         }
 
-        if (this.autoSave && ++this.autoSaveTicker >= this.autoSaveTicks) {
+        if (++this.autoSaveTicker >= this.autoSaveTicks) {
             this.autoSaveTicker = 0;
             this.doAutoSave();
         }
@@ -2101,6 +2112,7 @@ public class Server {
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
             put("strong-ip-bans", true);
+            put("worlds-level-auto-save-disabled", "");
         }
     }
 
