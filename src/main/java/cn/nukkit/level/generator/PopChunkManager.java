@@ -4,6 +4,7 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import java.util.Arrays;
 
 public class PopChunkManager extends SimpleChunkManager {
+
     private boolean clean = true;
     private final BaseFullChunk[] chunks = new BaseFullChunk[9];
     private int CX = Integer.MAX_VALUE;

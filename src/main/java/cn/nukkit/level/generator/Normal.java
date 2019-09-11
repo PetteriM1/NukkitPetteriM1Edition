@@ -13,8 +13,12 @@ import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
+import com.google.common.collect.ImmutableList;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Nukkit's terrain generator
@@ -37,13 +41,12 @@ public class Normal extends Generator {
         }
     }
 
-    private final List<Populator> populators = new ArrayList<>();
-    private final List<Populator> generationPopulators = new ArrayList<>();
+    private List<Populator> populators = Collections.emptyList();
+    private List<Populator> generationPopulators = Collections.emptyList();
     public static final int seaHeight = 64;
     public NoiseGeneratorOctavesF scaleNoise;
     public NoiseGeneratorOctavesF depthNoise;
     private ChunkManager level;
-    private Random random;
     private NukkitRandom nukkitRandom;
     private long localSeed1;
     private long localSeed2;
@@ -58,7 +61,7 @@ public class Normal extends Generator {
     private NoiseGeneratorOctavesF mainPerlinNoise;
 
     public Normal() {
-        this(new HashMap<>());
+        this(Collections.emptyMap());
     }
 
     public Normal(Map<String, Object> options) {
@@ -81,7 +84,7 @@ public class Normal extends Generator {
 
     @Override
     public Map<String, Object> getSettings() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     public Biome pickBiome(int x, int z) {
@@ -92,10 +95,10 @@ public class Normal extends Generator {
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
         this.nukkitRandom = random;
-        this.random = new Random();
+        Random random1 = new Random();
         this.nukkitRandom.setSeed(this.level.getSeed());
-        this.localSeed1 = this.random.nextLong();
-        this.localSeed2 = this.random.nextLong();
+        this.localSeed1 = random1.nextLong();
+        this.localSeed2 = random1.nextLong();
         this.nukkitRandom.setSeed(this.level.getSeed());
         this.selector = new BiomeSelector(this.nukkitRandom);
 
@@ -106,30 +109,28 @@ public class Normal extends Generator {
         this.depthNoise = new NoiseGeneratorOctavesF(random, 16);
 
         //this should run before all other populators so that we don't do things like generate ground cover on bedrock or something
-        PopulatorGroundCover cover = new PopulatorGroundCover();
-        this.generationPopulators.add(cover);
+        this.generationPopulators = ImmutableList.of(
+                new PopulatorBedrock(),
+                new PopulatorGroundCover()
+        );
 
-        PopulatorBedrock bedrock = new PopulatorBedrock();
-        this.generationPopulators.add(bedrock);
-
-        PopulatorOre ores = new PopulatorOre();
-        ores.setOreTypes(new OreType[]{
-                new OreType(new BlockOreCoal(), 20, 17, 0, 128),
-                new OreType(new BlockOreIron(), 20, 9, 0, 64),
-                new OreType(new BlockOreRedstone(), 8, 8, 0, 16),
-                new OreType(new BlockOreLapis(), 1, 7, 0, 16),
-                new OreType(new BlockOreGold(), 2, 9, 0, 32),
-                new OreType(new BlockOreDiamond(), 1, 8, 0, 16),
-                new OreType(new BlockDirt(), 10, 33, 0, 128),
-                new OreType(new BlockGravel(), 8, 33, 0, 128),
-                new OreType(new BlockStone(BlockStone.GRANITE), 10, 33, 0, 80),
-                new OreType(new BlockStone(BlockStone.DIORITE), 10, 33, 0, 80),
-                new OreType(new BlockStone(BlockStone.ANDESITE), 10, 33, 0, 80)
-        });
-        this.populators.add(ores);
-
-        PopulatorCaves caves = new PopulatorCaves();
-        this.populators.add(caves);
+        this.populators = ImmutableList.of(
+                new PopulatorOre(STONE, new OreType[]{
+                        new OreType(new BlockOreCoal(), 20, 17, 0, 128),
+                        new OreType(new BlockOreIron(), 20, 9, 0, 64),
+                        new OreType(new BlockOreRedstone(), 8, 8, 0, 16),
+                        new OreType(new BlockOreLapis(), 1, 7, 0, 16),
+                        new OreType(new BlockOreGold(), 2, 9, 0, 32),
+                        new OreType(new BlockOreDiamond(), 1, 8, 0, 16),
+                        new OreType(new BlockDirt(), 10, 33, 0, 128),
+                        new OreType(new BlockGravel(), 8, 33, 0, 128),
+                        new OreType(new BlockStone(BlockStone.GRANITE), 10, 33, 0, 80),
+                        new OreType(new BlockStone(BlockStone.DIORITE), 10, 33, 0, 80),
+                        new OreType(new BlockStone(BlockStone.ANDESITE), 10, 33, 0, 80)
+                }),
+                new PopulatorCaves(),
+                new PopulatorRavines()
+        );
     }
 
     @Override

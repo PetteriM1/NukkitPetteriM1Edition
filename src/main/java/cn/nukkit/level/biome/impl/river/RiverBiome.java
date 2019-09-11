@@ -23,11 +23,12 @@ public class RiverBiome extends WateryBiome {
         tallSugarcane.setRandomAmount(1);
         this.addPopulator(tallSugarcane);
 
-        PopulatorOre ores = new PopulatorOre(DIRT);
-        ores.setOreTypes(new OreType[]{
+        PopulatorOre ores = new PopulatorOre(DIRT, new OreType[]{
                 new OreType(new BlockGravel(), 13, 33, 50, 60),
                 new OreType(new BlockClay(), 8, 22, 50, 60)
         });
+
+        this.addPopulator(ores);
 
         this.setBaseHeight(-0.5f);
         this.setHeightVariation(0f);

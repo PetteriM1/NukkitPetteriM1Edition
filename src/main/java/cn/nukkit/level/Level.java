@@ -1055,7 +1055,7 @@ public class Level implements ChunkManager, Metadatable {
 
         int chunksPerLoader = Math.min(200, Math.max(1, (int) (((double) (this.chunksPerTicks - this.loaders.size()) / this.loaders.size() + 0.5))));
         int randRange = 3 + chunksPerLoader / 30;
-        randRange = randRange > this.chunkTickRadius ? this.chunkTickRadius : randRange;
+        randRange = Math.min(randRange, this.chunkTickRadius);
 
         if (!this.loaders.isEmpty()) {
             for (ChunkLoader loader : this.loaders.values()) {
@@ -2484,6 +2484,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void generateChunkCallback(int x, int z, BaseFullChunk chunk) {
+        generateChunkCallback(x, z, chunk, true);
+    }
+
+    public void generateChunkCallback(int x, int z, BaseFullChunk chunk, boolean isPopulated) {
         Timings.generationCallbackTimer.startTiming();
         long index = Level.chunkHash(x, z);
         if (this.chunkPopulationQueue.containsKey(index)) {
@@ -2497,7 +2501,7 @@ public class Level implements ChunkManager, Metadatable {
             chunk.setProvider(this.provider);
             this.setChunk(x, z, chunk, false);
             chunk = this.getChunk(x, z, false);
-            if (chunk != null && (oldChunk == null || !oldChunk.isPopulated()) && chunk.isPopulated()
+            if (chunk != null && (oldChunk == null || !isPopulated) && chunk.isPopulated()
                     && chunk.getProvider() != null) {
                 this.server.getPluginManager().callEvent(new ChunkPopulateEvent(chunk));
 
@@ -3556,6 +3560,10 @@ public class Level implements ChunkManager, Metadatable {
     public boolean shouldMobBurn(BaseEntity entity) {
         int time = this.getTime() % TIME_FULL;
         return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
+    }
+
+    public boolean isSpawningAllowed() {
+        return !Server.disabledSpawnWorlds.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

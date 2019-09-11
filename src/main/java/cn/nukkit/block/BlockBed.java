@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBed;
 import cn.nukkit.entity.Entity;
@@ -148,8 +149,11 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
                 this.getLevel().setBlock(block, Block.get(BED_BLOCK, meta), true, true);
                 this.getLevel().setBlock(next, Block.get(BED_BLOCK, meta | 0x08), true, true);
 
-                createBlockEntity(this, item.getDamage());
-                createBlockEntity(next, item.getDamage());
+                // HACK: Make bed color to update for the player
+                Server.getInstance().getScheduler().scheduleDelayedTask(() -> {
+                    createBlockEntity(this, item.getDamage());
+                    createBlockEntity(next, item.getDamage());
+                }, 2);
                 return true;
             }
         }

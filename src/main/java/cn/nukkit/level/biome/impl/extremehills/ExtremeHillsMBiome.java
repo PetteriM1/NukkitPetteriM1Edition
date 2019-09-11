@@ -13,7 +13,6 @@ import cn.nukkit.math.NukkitRandom;
  */
 public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
     private static final SimplexF gravelNoise = new SimplexF(new NukkitRandom(0), 1f, 1 / 4f, 1 / 64f);
-    private boolean isGravel = false;
 
     public ExtremeHillsMBiome() {
         this(true);
@@ -32,24 +31,18 @@ public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
     }
 
     @Override
-    public int getSurfaceBlock(int y) {
-        return isGravel ? GRAVEL : super.getSurfaceBlock(y);
+    public int getSurfaceId(int x, int y, int z) {
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? GRAVEL << 4 : super.getSurfaceId(x, y, z);
     }
 
     @Override
-    public int getSurfaceDepth(int y) {
-        return isGravel ? 4 : super.getSurfaceDepth(y);
+    public int getSurfaceDepth(int x, int y, int z) {
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? 4 : super.getSurfaceDepth(x, y, z);
     }
 
     @Override
-    public int getGroundDepth(int y) {
-        return isGravel ? 0 : super.getGroundDepth(y);
-    }
-
-    @Override
-    public void preCover(int x, int z) {
-        //-0.75 is farily rare, so there'll be much more gravel than grass
-        isGravel = gravelNoise.noise2D(x, z, true) < -0.75f;
+    public int getGroundDepth(int x, int y, int z) {
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? 0 : super.getGroundDepth(x, y, z);
     }
 
     @Override
