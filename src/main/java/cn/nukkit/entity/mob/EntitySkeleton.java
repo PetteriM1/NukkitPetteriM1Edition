@@ -3,6 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,7 +24,7 @@ import cn.nukkit.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntitySkeleton extends EntityWalkingMob {
+public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
 
     public static final int NETWORK_ID = 34;
 

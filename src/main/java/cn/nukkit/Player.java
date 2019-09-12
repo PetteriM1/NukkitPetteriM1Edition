@@ -131,7 +131,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean spawned = false;
     public boolean loggedIn = false;
     public int gamemode;
-    public long lastBreak;
+    public long lastBreak = -1;
     private BlockVector3 lastBreakPosition = new BlockVector3();
 
     protected int windowCnt = 4;
@@ -581,20 +581,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.interfaz = interfaz;
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
-        this.lastBreak = -1;
         this.socketAddress = socketAddress;
         this.clientID = clientID;
         this.loaderId = Level.generateChunkLoaderId(this);
         this.chunksPerTick = this.server.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.server.getPropertyInt("spawn-threshold", 50);
-        this.spawnPosition = null;
         this.gamemode = this.server.getGamemode();
         this.setLevel(this.server.getDefaultLevel());
         this.viewDistance = this.server.getViewDistance();
         this.chunkRadius = viewDistance;
         this.boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-        this.uuid = null;
-        this.rawUUID = null;
     }
 
     @Override
@@ -1445,7 +1441,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
-                if (this.checkMovement && !server.getAllowFlight() && (this.isSurvival() || this.isAdventure())) {
+                if (this.checkMovement && !isOp() && !server.getAllowFlight() && (this.isSurvival() || this.isAdventure())) {
                     if (!this.isSleeping() && this.riding == null && !this.hasEffect(Effect.LEVITATION)) {
                         if ((diffX * diffX + diffZ * diffZ) / ((double) (tickDiff * tickDiff)) > 0.5 ) {
                             PlayerInvalidMoveEvent ev;
@@ -1993,7 +1989,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.z = (float) this.z;
         startGamePacket.yaw = (float) this.yaw;
         startGamePacket.pitch = (float) this.pitch;
-        startGamePacket.seed = -1;
         startGamePacket.dimension = getServer().getPropertyBoolean("dimensions") ? (byte) (this.level.getDimension() & 0xff) : 0;
         startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();

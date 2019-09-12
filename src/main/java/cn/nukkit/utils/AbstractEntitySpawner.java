@@ -7,7 +7,6 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -29,10 +28,10 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     }
 
     @Override
-    public void spawn(Collection<Player> onlinePlayers) {
+    public void spawn() {
         if (isSpawnAllowedByDifficulty()) {
             SpawnResult lastSpawnResult;
-            for (Player player : onlinePlayers) {
+            for (Player player : Server.getInstance().getOnlinePlayers().values()) {
                 if (isWorldSpawnAllowed (player.getLevel())) {
                     lastSpawnResult = spawn(player);
                     if (lastSpawnResult.equals(SpawnResult.MAX_SPAWN_REACHED)) {

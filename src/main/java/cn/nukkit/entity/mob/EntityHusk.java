@@ -2,7 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.utils.Utils;
+import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -10,11 +10,12 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityHusk extends EntityWalkingMob {
+public class EntityHusk extends EntityWalkingMob implements EntitySmite {
 
     public static final int NETWORK_ID = 47;
 

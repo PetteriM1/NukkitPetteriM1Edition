@@ -2,6 +2,7 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityArthropod;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -10,7 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.HashMap;
 
-public class EntitySilverfish extends EntityWalkingMob {
+public class EntitySilverfish extends EntityWalkingMob implements EntityArthropod {
 
     public static final int NETWORK_ID = 39;
 

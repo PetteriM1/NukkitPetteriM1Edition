@@ -56,7 +56,7 @@ public class Spawner extends Thread {
     public void run() {
         if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
             for (EntitySpawner spawner : entitySpawners) {
-                spawner.spawn(Server.getInstance().getOnlinePlayers().values());
+                spawner.spawn();
             }
         }
     }
