@@ -6,9 +6,9 @@ public class ElementToggle extends Element {
 
     @SuppressWarnings("unused")
     private final String type = "toggle";
-    private String text = "";
-    @SerializedName("value")
-    private boolean defaultValue = false;
+    private String text;
+    @SerializedName("default")
+    private boolean defaultValue;
 
     public ElementToggle(String text) {
         this(text, false);

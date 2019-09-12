@@ -5,7 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class NBTEntityData extends EntityData<CompoundTag> {

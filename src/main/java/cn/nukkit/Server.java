@@ -180,6 +180,9 @@ public class Server {
 
     private final Map<UUID, Player> playerList = new HashMap<>();
 
+    public static final List<String> disabledSpawnWorlds = new ArrayList<>();
+    private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
+
     @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
@@ -422,6 +425,22 @@ public class Server {
         if (this.getPropertyBoolean("thread-watchdog", true)) {
             this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 50000));
             this.watchdog.start();
+        }
+
+        String worlds1 = Server.getInstance().getPropertyString("worlds-entity-spawning-disabled");
+        if (!worlds1.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(worlds1, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                disabledSpawnWorlds.add(tokenizer.nextToken());
+            }
+        }
+
+        String worlds2 = Server.getInstance().getPropertyString("worlds-level-auto-save-disabled");
+        if (!worlds2.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(worlds2, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                nonAutoSaveWorlds.add(tokenizer.nextToken());
+            }
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
@@ -990,7 +1009,9 @@ public class Server {
             }
 
             for (Level level : this.levelArray) {
-                this.scheduler.scheduleTask(null, level::save, true);
+                if (!nonAutoSaveWorlds.contains(level.getName())) {
+                    this.scheduler.scheduleTask(null, level::save, true);
+                }
             }
             Timings.levelSaveTimer.stopTiming();
         }
@@ -1056,7 +1077,7 @@ public class Server {
             this.network.updateName();
         }
 
-        if (this.autoSave && ++this.autoSaveTicker >= this.autoSaveTicks) {
+        if (++this.autoSaveTicker >= this.autoSaveTicks) {
             this.autoSaveTicker = 0;
             this.doAutoSave();
         }
@@ -1107,8 +1128,8 @@ public class Server {
         String title = (char) 0x1b + "]0;Nukkit Server " +
                 " | Online " + this.players.size() + '/' + this.maxPlayers +
                 " | Memory " + Math.round(used / max * 100) + '%' +
-                " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
-                " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +
+                /*" | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
+                " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +*/
                 " | TPS " + this.getTicksPerSecond() +
                 " | Load " + this.getTickUsage() + '%' + (char) 0x07;
 
@@ -2090,7 +2111,8 @@ public class Server {
             put("dimensions", false);
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
-            put("strong-ip-bans", false);
+            put("strong-ip-bans", true);
+            put("worlds-level-auto-save-disabled", "");
         }
     }
 

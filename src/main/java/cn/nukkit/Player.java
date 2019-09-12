@@ -140,8 +140,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected final BiMap<Integer, Inventory> windowIndex = windows.inverse();
     protected final Set<Integer> permanentWindows = new IntOpenHashSet();
 
-    protected int messageCounter = 2;
-
     public Vector3 speed = null;
 
     public final HashSet<String> achievements = new HashSet<>();
@@ -1649,8 +1647,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (tickDiff <= 0) {
             return true;
         }
-
-        this.messageCounter = 2;
 
         this.lastUpdate = currentTick;
 
@@ -3281,7 +3277,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         for (String msg : message.split("\n")) {
-            if (!msg.trim().isEmpty() && msg.length() <= 255 && this.messageCounter-- > 0) {
+            if (!msg.trim().isEmpty() && msg.length() <= 255) {
                 PlayerChatEvent chatEvent = new PlayerChatEvent(this, msg);
                 this.server.getPluginManager().callEvent(chatEvent);
                 if (!chatEvent.isCancelled()) {
@@ -3408,15 +3404,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendPopup(String message) {
-        this.sendPopup(message, "");
+        TextPacket pk = new TextPacket();
+        pk.type = TextPacket.TYPE_POPUP;
+        pk.message = message;
+        this.dataPacket(pk);
     }
 
     public void sendPopup(String message, String subtitle) {
-        TextPacket pk = new TextPacket();
-        pk.type = TextPacket.TYPE_POPUP;
-        pk.source = message;
-        pk.message = subtitle;
-        this.dataPacket(pk);
+        this.sendPopup(message);
     }
 
     public void sendTip(String message) {

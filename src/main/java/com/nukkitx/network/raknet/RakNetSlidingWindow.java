@@ -100,7 +100,7 @@ public class RakNetSlidingWindow {
 
         long threshold = (long) ((2.0D * this.estimatedRTT + 4.0D * this.deviationRTT) + RakNetConstants.CC_ADDITIONAL_VARIANCE);
 
-        return threshold > RakNetConstants.CC_MAXIMUM_THRESHOLD ? RakNetConstants.CC_MAXIMUM_THRESHOLD : threshold;
+        return Math.min(threshold, RakNetConstants.CC_MAXIMUM_THRESHOLD);
     }
 
     public double getRTT() {
