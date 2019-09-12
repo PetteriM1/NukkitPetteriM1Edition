@@ -19,7 +19,7 @@ public class EndermanSpawner extends AbstractEntitySpawner {
     public SpawnResult spawn(Player player, Position pos, Level level) {
         SpawnResult result = SpawnResult.OK;
 
-        if (Utils.rand(1, level.isNether ? 10 : 6) != 1 && !level.isEnd) {
+        if (Utils.rand(1, level.isNether ? 10 : 7) != 1 && !level.isEnd) {
             return SpawnResult.SPAWN_DENIED;
         }
 
