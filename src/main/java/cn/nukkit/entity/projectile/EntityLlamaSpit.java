@@ -2,15 +2,11 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.Utils;
 
 public class EntityLlamaSpit extends EntityProjectile {
 
     public static final int NETWORK_ID = 102;
-
-    protected boolean critical;
 
     @Override
     public int getNetworkId() {
@@ -52,8 +48,6 @@ public class EntityLlamaSpit extends EntityProjectile {
 
     public EntityLlamaSpit(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
         super(chunk, nbt, shootingEntity);
-
-        this.critical = critical;
     }
 
     @Override
@@ -63,12 +57,6 @@ public class EntityLlamaSpit extends EntityProjectile {
         }
 
         this.timing.startTiming();
-
-        if (!this.hadCollision && this.critical) {
-            this.level.addParticle(new CriticalParticle(this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
-        } else if (this.onGround) {
-            this.critical = false;
-        }
 
         if (this.age > 100 || this.isCollided) {
             this.close();

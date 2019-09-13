@@ -15,6 +15,8 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
 
     public static final int NETWORK_ID = 91;
 
+    private boolean canExplode;
+
     public EntityBlueWitherSkull(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -30,8 +32,10 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
 
     public EntityBlueWitherSkull(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
         super(chunk, nbt, shootingEntity);
+    }
 
-        this.critical = critical;
+    public void setExplode(boolean bool) {
+        this.canExplode = bool;
     }
 
     @Override

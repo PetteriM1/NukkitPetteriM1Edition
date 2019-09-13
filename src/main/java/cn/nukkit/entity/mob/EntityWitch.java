@@ -66,7 +66,7 @@ public class EntityWitch extends EntityWalkingMob {
                 if (player.isAlive() && !player.closed) {
 
                     double f = 1;
-                    double yaw = this.yaw + Utils.rand(-50.0, 50.0) / 10;
+                    double yaw = this.yaw + Utils.rand(-5.0, 5.0);
                     Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                             this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 

@@ -11,10 +11,6 @@ public class EntityWitherSkull extends EntityProjectile {
 
     public static final int NETWORK_ID = 89;
 
-    protected boolean critical = false;
-
-    protected boolean canExplode = false;
-
     public EntityWitherSkull(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -60,12 +56,6 @@ public class EntityWitherSkull extends EntityProjectile {
 
     public EntityWitherSkull(FullChunk chunk, CompoundTag nbt, Entity shootingEntity, boolean critical) {
         super(chunk, nbt, shootingEntity);
-
-        this.critical = critical;
-    }
-
-    public void setExplode(boolean bool) {
-        this.canExplode = bool;
     }
 
     @Override
