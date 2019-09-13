@@ -49,7 +49,7 @@ public class EntityBlazeFireBall extends EntityProjectile {
 
     @Override
     public double getDamage() {
-        return 4;
+        return 5;
     }
 
     public void setExplode(boolean bool) {
@@ -82,6 +82,8 @@ public class EntityBlazeFireBall extends EntityProjectile {
     
     @Override
     public void onCollideWithEntity(Entity entity) {
+        super.onCollideWithEntity(entity);
         this.isCollided = true;
+        entity.setOnFire(5);
     }
 }

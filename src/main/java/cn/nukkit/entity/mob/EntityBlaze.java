@@ -57,7 +57,7 @@ public class EntityBlaze extends EntityFlyingMob {
             this.attackDelay = 0;
 
             double f = 1.1;
-            double yaw = this.yaw + Utils.rand(-120.0, 120.0) / 10;
+            double yaw = this.yaw + Utils.rand(-100.0, 100.0) / 10;
             double pitch = this.pitch + Utils.rand(-70.0, 70.0) / 10;
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);

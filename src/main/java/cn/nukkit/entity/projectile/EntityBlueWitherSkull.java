@@ -65,7 +65,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
 
     @Override
     public void explode() {
-        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1.1);
+        ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1.2);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
