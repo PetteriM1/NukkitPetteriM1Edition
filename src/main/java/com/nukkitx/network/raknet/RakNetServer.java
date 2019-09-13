@@ -165,6 +165,7 @@ public class RakNetServer extends RakNet {
             this.sendConnectionBanned(ctx, packet.sender());
         } else if (strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
             this.sendConnectionBanned(ctx, packet.sender());
+            Server.getInstance().getLogger().info("\u00A7c" + packet.sender().getHostName() + " disconnected due to IP banned");
         } else {
             // Passed all checks. Now create the session and send the first reply.
             session = new RakNetServerSession(this, packet.sender(), ctx.channel(), mtu,
