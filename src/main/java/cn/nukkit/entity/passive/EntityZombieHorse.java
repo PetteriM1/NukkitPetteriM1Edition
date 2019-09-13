@@ -1,5 +1,6 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
@@ -9,7 +10,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityZombieHorse extends EntityHorseBase {
+public class EntityZombieHorse extends EntityHorseBase implements EntitySmite {
 
     public static final int NETWORK_ID = 27;
 

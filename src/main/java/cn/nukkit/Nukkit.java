@@ -27,7 +27,6 @@ import java.util.Properties;
  */
 
 /**
- * Nukkit启动类，包含{@code main}函数。<br>
  * The launcher class of Nukkit, including the {@code main} function.
  *
  * @author MagicDroidX(code) @ Nukkit Project

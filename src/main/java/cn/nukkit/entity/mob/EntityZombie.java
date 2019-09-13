@@ -173,7 +173,6 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
 
         MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
         pk.eid = this.getId();
-
         pk.slots = this.armor;
 
         if (java.time.LocalDate.now().toString().contains("-10-31")) {
