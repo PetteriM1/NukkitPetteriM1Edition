@@ -4609,7 +4609,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk1.x = (float) this.x;
         pk1.y = (float) this.y;
         pk1.z = (float) this.z;
-        pk1.respawn = false;
+        pk1.respawn = !this.isAlive();
         this.directDataPacket(pk1);
 
         this.forceSendEmptyChunks();
