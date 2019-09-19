@@ -79,7 +79,7 @@ public class Spawner extends Thread {
         BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
         if (entity != null) {
             if (!entity.isInsideOfSolid() && !tooNearOfPlayer(pos)) {
-                CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), CreatureSpawnEvent.SpawnReason.NATURAL);
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(entity.getNetworkId(), pos, entity.namedTag, CreatureSpawnEvent.SpawnReason.NATURAL);
                 Server.getInstance().getPluginManager().callEvent(ev);
                 if (!ev.isCancelled()) {
                     entity.spawnToAll();

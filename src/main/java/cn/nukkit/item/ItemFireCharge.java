@@ -253,9 +253,7 @@ public class ItemFireCharge extends Item {
                     }
 
                     if (!player.isCreative()) {
-                        Item item = player.getInventory().getItemInHand();
-                        item.setCount(item.getCount() - 1);
-                        player.getInventory().setItemInHand(item);
+                        player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                     }
 
                     level.addSound(block, Sound.MOB_GHAST_FIREBALL);
@@ -279,9 +277,7 @@ public class ItemFireCharge extends Item {
                 }
 
                 if (!player.isCreative()) {
-                    Item item = player.getInventory().getItemInHand();
-                    item.setCount(item.getCount() - 1);
-                    player.getInventory().setItemInHand(item);
+                    player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                 }
 
                 level.addSound(block, Sound.MOB_GHAST_FIREBALL);

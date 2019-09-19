@@ -60,9 +60,7 @@ public class ItemEndCrystal extends Item {
 
         if (entity != null) {
             if (!player.isCreative()) {
-                Item item = player.getInventory().getItemInHand();
-                item.setCount(item.getCount() - 1);
-                player.getInventory().setItemInHand(item);
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             }
 
             entity.spawnToAll();

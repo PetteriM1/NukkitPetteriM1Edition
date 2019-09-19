@@ -2113,6 +2113,7 @@ public class Server {
             put("chemistry-resources-enabled", false);
             put("strong-ip-bans", true);
             put("worlds-level-auto-save-disabled", "");
+            put("temp-ip-ban-failed-xbox-auth", false);
         }
     }
 
