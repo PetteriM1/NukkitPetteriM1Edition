@@ -3,6 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntitySmite;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class EntityZombiePigman extends EntityWalkingMob {
+public class EntityZombiePigman extends EntityWalkingMob implements EntitySmite {
 
     public static final int NETWORK_ID = 36;
 

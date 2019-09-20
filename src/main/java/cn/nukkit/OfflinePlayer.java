@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 描述一个不在线的玩家的类。<br>
  * Describes an offline player.
  *
  * @author MagicDroidX(code) @ Nukkit Project

@@ -2,17 +2,11 @@ package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.CriticalParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.utils.Utils;
 
 public class EntityBlazeFireBall extends EntityProjectile {
 
     public static final int NETWORK_ID = 94;
-
-    protected boolean critical = false;
-
-    protected boolean canExplode = false;
 
     public EntityBlazeFireBall(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
@@ -49,11 +43,7 @@ public class EntityBlazeFireBall extends EntityProjectile {
 
     @Override
     public double getDamage() {
-        return 4;
-    }
-
-    public void setExplode(boolean bool) {
-        this.canExplode = bool;
+        return 5;
     }
 
     @Override
@@ -63,13 +53,6 @@ public class EntityBlazeFireBall extends EntityProjectile {
         }
 
         this.timing.startTiming();
-
-        if (!this.hadCollision && this.critical) {
-            this.level.addParticle(new CriticalParticle(
-                    this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
-        } else if (this.onGround) {
-            this.critical = false;
-        }
 
         if (this.age > 1200 || this.isCollided) {
             this.close();
@@ -82,6 +65,8 @@ public class EntityBlazeFireBall extends EntityProjectile {
     
     @Override
     public void onCollideWithEntity(Entity entity) {
+        super.onCollideWithEntity(entity);
         this.isCollided = true;
+        entity.setOnFire(5);
     }
 }

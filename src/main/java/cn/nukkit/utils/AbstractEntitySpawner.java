@@ -5,7 +5,6 @@ import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
-import java.util.Collection;
 
 public abstract class AbstractEntitySpawner implements EntitySpawner {
 
@@ -16,10 +15,10 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     }
 
     @Override
-    public void spawn(Collection<Player> onlinePlayers) {
+    public void spawn() {
         if (isSpawnAllowedByDifficulty()) {
             SpawnResult lastSpawnResult;
-            for (Player player : onlinePlayers) {
+            for (Player player : Server.getInstance().getOnlinePlayers().values()) {
                 if (player.getLevel().isSpawningAllowed()) {
                     lastSpawnResult = spawn(player);
                     if (lastSpawnResult.equals(SpawnResult.MAX_SPAWN_REACHED)) {

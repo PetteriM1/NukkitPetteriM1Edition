@@ -92,13 +92,6 @@ public class ItemSpawnEgg extends Item {
             return false;
         }
 
-        CreatureSpawnEvent ev = new CreatureSpawnEvent(this.meta, CreatureSpawnEvent.SpawnReason.SPAWN_EGG);
-        level.getServer().getPluginManager().callEvent(ev);
-
-        if (ev.isCancelled()) {
-            return false;
-        }
-
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos")
                         .add(new DoubleTag("", block.getX() + 0.5))
@@ -114,6 +107,13 @@ public class ItemSpawnEgg extends Item {
 
         if (this.hasCustomName()) {
             nbt.putString("CustomName", this.getCustomName());
+        }
+
+        CreatureSpawnEvent ev = new CreatureSpawnEvent(this.meta, block, nbt, CreatureSpawnEvent.SpawnReason.SPAWN_EGG);
+        level.getServer().getPluginManager().callEvent(ev);
+
+        if (ev.isCancelled()) {
+            return false;
         }
 
         Entity entity = Entity.createEntity(this.meta, chunk, nbt);

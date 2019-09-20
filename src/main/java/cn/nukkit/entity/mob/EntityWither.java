@@ -1,10 +1,8 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Attribute;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntityBoss;
-import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.*;
+import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.entity.projectile.EntityWitherSkull;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -17,7 +15,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
 
-public class EntityWither extends EntityFlyingMob implements EntityBoss {
+public class EntityWither extends EntityFlyingMob implements EntityBoss, EntitySmite {
 
     public static final int NETWORK_ID = 52;
 
@@ -74,8 +72,8 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
             this.attackDelay = 0;
 
             double f = 1;
-            double yaw = this.yaw + Utils.rand(-120.0, 120.0) / 10;
-            double pitch = this.pitch + Utils.rand(-70.0, 70.0) / 10;
+            double yaw = this.yaw + Utils.rand(-12.0, 12.0);
+            double pitch = this.pitch + Utils.rand(-7.0, 7.0);
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 
@@ -85,12 +83,12 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss {
             if (Utils.rand(0, 200) > 180 || Utils.rand(0, 200) < 20) {
                 f = 0.8;
                 k = Entity.createEntity("BlueWitherSkull", pos, this);
-                if (!(k instanceof EntityWitherSkull)) {
+                if (!(k instanceof EntityBlueWitherSkull)) {
                     return;
                 }
 
-                skull = (EntityWitherSkull) k;
-                skull.setExplode(true);
+                skull = (EntityBlueWitherSkull) k;
+                ((EntityBlueWitherSkull) skull).setExplode(true);
                 skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                         Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 

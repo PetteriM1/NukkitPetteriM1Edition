@@ -6,10 +6,8 @@ import cn.nukkit.permission.ServerOperator;
 import java.util.UUID;
 
 /**
- * 用来描述一个玩家和获得这个玩家相应信息的接口。<br>
  * An interface to describe a player and get its information.
  * 
- * 这个玩家可以在线，也可以是不在线。<br>
  * This player can be online or offline.
  *
  * @author MagicDroidX(code) @ Nukkit Project

@@ -22,7 +22,7 @@ public class WitchSpawner extends AbstractEntitySpawner {
 
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (Utils.rand(1, 4) != 1 && biomeId != 6 && biomeId != 134) {
+        if (Utils.rand(1, 5) != 1 && biomeId != 6 && biomeId != 134) {
             return SpawnResult.SPAWN_DENIED;
         }
 
