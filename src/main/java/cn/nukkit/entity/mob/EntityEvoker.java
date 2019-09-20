@@ -9,9 +9,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class EntityEvoker extends EntityWalkingMob {
 
@@ -73,19 +71,12 @@ public class EntityEvoker extends EntityWalkingMob {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.EMERALD, 0, Utils.rand(0, 1)));
-            drops.add(Item.get(Item.TOTEM, 0, 1));
-        }
-
-        return drops.toArray(new Item[0]);
+        return new Item[]{Item.get(Item.EMERALD, 0, Utils.rand(0, 1)), Item.get(Item.TOTEM, 0, 1)};
     }
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 10;
+        return 10;
     }
 
     @Override

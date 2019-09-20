@@ -23,6 +23,10 @@ public class CreatureSpawnEvent extends Event implements Cancellable {
         this(networkId, new Position(), new CompoundTag(), reason);
     }
 
+    public CreatureSpawnEvent(int networkId, Position position, SpawnReason reason) {
+        this(networkId, position, new CompoundTag(), reason);
+    }
+
     public CreatureSpawnEvent(int networkId, Position position, CompoundTag nbt, SpawnReason reason) {
         this.reason = reason;
         this.entityNetworkId = networkId;

@@ -12,9 +12,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class EntityGuardian extends EntitySwimmingMob {
 
@@ -106,19 +104,11 @@ public class EntityGuardian extends EntitySwimmingMob {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.PRISMARINE_SHARD, 0, 1));
-            }
-        }
-
-        return drops.toArray(new Item[0]);
+        return new Item[]{Item.get(Item.PRISMARINE_SHARD, 0, Utils.rand(0, 2))};
     }
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 10;
+        return 10;
     }
 }

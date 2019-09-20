@@ -183,11 +183,11 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.GUNPOWDER, 0, 1));
-            }
+        for (int i = 0; i < Utils.rand(0, 2); i++) {
+            drops.add(Item.get(Item.GUNPOWDER, 0, 1));
+        }
 
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
             Entity killer = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
 
             if (killer instanceof EntitySkeleton || killer instanceof EntityStray) {
@@ -206,7 +206,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override

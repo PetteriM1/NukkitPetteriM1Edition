@@ -1,12 +1,14 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
+import cn.nukkit.block.BlockSponge;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.Utils;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +58,13 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.PRISMARINE_SHARD, 0, 1));
+        for (int i = 0; i < Utils.rand(0, 2); i++) {
+            drops.add(Item.get(Item.PRISMARINE_SHARD, 0, 1));
+        }
+
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) this.lastDamageCause).getDamager() instanceof Player) {
+                drops.add(Item.get(Item.SPONGE, BlockSponge.WET, 1));
             }
         }
 
@@ -67,7 +73,7 @@ public class EntityElderGuardian extends EntitySwimmingMob {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 10;
+        return 10;
     }
 
     @Override

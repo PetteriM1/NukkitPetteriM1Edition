@@ -71,7 +71,7 @@ public class EntityEndermite extends EntityWalkingMob implements EntityArthropod
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 3;
+        return 3;
     }
 
     @Override

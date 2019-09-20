@@ -12,9 +12,6 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EntityHusk extends EntityWalkingMob implements EntitySmite {
 
     public static final int NETWORK_ID = 47;
@@ -82,15 +79,7 @@ public class EntityHusk extends EntityWalkingMob implements EntitySmite {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.ROTTEN_FLESH, 0, 1));
-            }
-        }
-
-        return drops.toArray(new Item[0]);
+        return this.isBaby() ? new Item[0] : new Item[]{Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 2))};
     }
 
     @Override

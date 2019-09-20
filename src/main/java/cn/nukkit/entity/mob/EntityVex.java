@@ -45,7 +45,7 @@ public class EntityVex extends EntityFlyingMob {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 3;
+        return 3;
     }
 
     @Override

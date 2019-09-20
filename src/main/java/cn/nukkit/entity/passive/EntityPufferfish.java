@@ -44,11 +44,7 @@ public class EntityPufferfish extends EntityFish {
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            return new Item[]{Item.get(Item.PUFFERFISH, 0, 1)};
-        } else {
-            return new Item[0];
-        }
+        return new Item[]{Item.get(Item.PUFFERFISH, 0, 1)};
     }
 
     @Override

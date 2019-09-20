@@ -10,9 +10,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class EntityMagmaCube extends EntityJumpingMob {
 
@@ -117,7 +115,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
     @Override
     public Item[] getDrops() {
         if (this.size == SIZE_BIG) {
-            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, this, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
             level.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
@@ -134,7 +132,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
 
             return new Item[0];
         } else if (this.size == SIZE_MEDIUM) {
-            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, this, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
             level.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
@@ -151,13 +149,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
 
             return new Item[0];
         } else {
-            List<Item> drops = new ArrayList<>();
-
-            if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-                drops.add(Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1)));
-            }
-
-            return drops.toArray(new Item[0]);
+            return new Item[]{Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1))};
         }
     }
 
