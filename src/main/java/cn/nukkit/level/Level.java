@@ -3539,12 +3539,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean randomTickingEnabled() {
-        for (String name : this.noTickingWorlds) {
-            if (this.getName().equalsIgnoreCase(name)) {
-                return false;
-            }
-        }
-        return true;
+        return !noTickingWorlds.contains(this.getName());
     }
 
     public boolean isAnimalSpawningAllowedByTime() {
