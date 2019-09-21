@@ -132,7 +132,7 @@ public class EntityZombiePigman extends EntityWalkingMob implements EntitySmite 
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+        if (!this.isBaby()) {
             drops.add(Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 1)));
             drops.add(Item.get(Item.GOLD_NUGGET, 0, Utils.rand(0, 1)));
 

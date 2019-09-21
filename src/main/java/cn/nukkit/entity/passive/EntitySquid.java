@@ -1,7 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.utils.Utils;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
@@ -9,6 +7,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.Utils;
 
 public class EntitySquid extends EntityWaterAnimal {
 
@@ -42,16 +41,12 @@ public class EntitySquid extends EntityWaterAnimal {
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            return new Item[]{new ItemDye(DyeColor.BLACK.getDyeData())};
-        } else {
-            return new Item[0];
-        }
+        return new Item[]{new ItemDye(DyeColor.BLACK.getDyeData(), Utils.rand(1, 3))};
     }
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
+        return Utils.rand(1, 3);
     }
 
     @Override

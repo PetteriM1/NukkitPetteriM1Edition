@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
@@ -9,9 +8,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EntityDolphin extends EntityWaterAnimal {
 
@@ -45,13 +41,7 @@ public class EntityDolphin extends EntityWaterAnimal {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.RAW_FISH, 0, Utils.rand(0, 1)));
-        }
-
-        return drops.toArray(new Item[0]);
+        return new Item[]{Item.get(Item.RAW_FISH, 0, Utils.rand(0, 1))};
     }
 
     @Override

@@ -1,7 +1,6 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.entity.EntitySmite;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -50,7 +49,7 @@ public class EntitySkeletonHorse extends EntityHorseBase implements EntitySmite 
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+        if (!this.isBaby()) {
             for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }

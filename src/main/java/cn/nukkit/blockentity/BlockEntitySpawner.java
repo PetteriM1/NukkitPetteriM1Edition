@@ -104,13 +104,6 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
             }
 
             if (isValid && list.size() <= (Server.getInstance().suomiCraftPEMode() ? 10 : this.maxNearbyEntities)) {
-                CreatureSpawnEvent ev = new CreatureSpawnEvent(this.entityId, CreatureSpawnEvent.SpawnReason.SPAWNER);
-                level.getServer().getPluginManager().callEvent(ev);
-
-                if (ev.isCancelled()) {
-                    return true;
-                }
-
                 Position pos = new Position
                         (
                                 this.x + Utils.rand(-(Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange), Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange),
@@ -118,6 +111,13 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                                 this.z + Utils.rand(-(Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange), Server.getInstance().suomiCraftPEMode() ? 3 : this.spawnRange),
                                 this.level
                         );
+
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(this.entityId, pos, CreatureSpawnEvent.SpawnReason.SPAWNER);
+                level.getServer().getPluginManager().callEvent(ev);
+
+                if (ev.isCancelled()) {
+                    return true;
+                }
 
                 Entity entity = Entity.createEntity(this.entityId, pos);
 

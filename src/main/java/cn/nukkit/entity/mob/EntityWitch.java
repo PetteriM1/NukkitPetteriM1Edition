@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.item.EntityPotion;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -101,32 +100,30 @@ public class EntityWitch extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            if (Utils.rand(1, 4) == 1) {
-                drops.add(Item.get(Item.STICK, 0, Utils.rand(0, 2)));
-            }
+        if (Utils.rand(1, 4) == 1) {
+            drops.add(Item.get(Item.STICK, 0, Utils.rand(0, 2)));
+        }
 
-            if (Utils.rand(1, 3) == 1) {
-                switch (Utils.rand(1, 6)) {
-                    case 1:
-                        drops.add(Item.get(Item.BOTTLE, 0, Utils.rand(0, 2)));
-                        break;
-                    case 2:
-                        drops.add(Item.get(Item.GLOWSTONE_DUST, 0, Utils.rand(0, 2)));
-                        break;
-                    case 3:
-                        drops.add(Item.get(Item.GUNPOWDER, 0, Utils.rand(0, 2)));
-                        break;
-                    case 4:
-                        drops.add(Item.get(Item.REDSTONE, 0, Utils.rand(0, 2)));
-                        break;
-                    case 5:
-                        drops.add(Item.get(Item.SPIDER_EYE, 0, Utils.rand(0, 2)));
-                        break;
-                    case 6:
-                        drops.add(Item.get(Item.SUGAR, 0, Utils.rand(0, 2)));
-                        break;
-                }
+        if (Utils.rand(1, 3) == 1) {
+            switch (Utils.rand(1, 6)) {
+                case 1:
+                    drops.add(Item.get(Item.BOTTLE, 0, Utils.rand(0, 2)));
+                    break;
+                case 2:
+                    drops.add(Item.get(Item.GLOWSTONE_DUST, 0, Utils.rand(0, 2)));
+                    break;
+                case 3:
+                    drops.add(Item.get(Item.GUNPOWDER, 0, Utils.rand(0, 2)));
+                    break;
+                case 4:
+                    drops.add(Item.get(Item.REDSTONE, 0, Utils.rand(0, 2)));
+                    break;
+                case 5:
+                    drops.add(Item.get(Item.SPIDER_EYE, 0, Utils.rand(0, 2)));
+                    break;
+                case 6:
+                    drops.add(Item.get(Item.SUGAR, 0, Utils.rand(0, 2)));
+                    break;
             }
         }
 
@@ -135,7 +132,7 @@ public class EntityWitch extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override

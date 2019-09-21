@@ -106,7 +106,7 @@ public class EntityLlama extends EntityHorseBase {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+        if (!this.isBaby()) {
             for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }

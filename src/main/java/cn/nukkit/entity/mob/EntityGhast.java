@@ -3,9 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
-import cn.nukkit.utils.Utils;
 import cn.nukkit.entity.projectile.EntityGhastFireBall;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Location;
@@ -13,6 +11,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,20 +96,18 @@ public class EntityGhast extends EntityFlyingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.GUNPOWDER, 0, 1));
-            }
-
-            drops.add(Item.get(Item.GHAST_TEAR, 0, Utils.rand(0, 1)));
+        for (int i = 0; i < Utils.rand(0, 2); i++) {
+            drops.add(Item.get(Item.GUNPOWDER, 0, 1));
         }
+
+        drops.add(Item.get(Item.GHAST_TEAR, 0, Utils.rand(0, 1)));
 
         return drops.toArray(new Item[0]);
     }
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override

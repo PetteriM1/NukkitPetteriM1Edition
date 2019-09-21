@@ -71,7 +71,7 @@ public class EntitySilverfish extends EntityWalkingMob implements EntityArthropo
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override

@@ -11,9 +11,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class EntityPhantom extends EntityFlyingMob implements EntitySmite {
 
@@ -83,18 +81,12 @@ public class EntityPhantom extends EntityFlyingMob implements EntitySmite {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            drops.add(Item.get(Item.PHANTOM_MEMBRANE, 0, Utils.rand(0, 1)));
-        }
-
-        return drops.toArray(new Item[0]);
+        return new Item[]{Item.get(Item.PHANTOM_MEMBRANE, 0, Utils.rand(0, 1))};
     }
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override

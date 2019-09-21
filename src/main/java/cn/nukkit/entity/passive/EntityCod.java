@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -37,11 +36,7 @@ public class EntityCod extends EntityFish {
 
     @Override
     public Item[] getDrops() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            return new Item[]{Item.get(Item.RAW_FISH, 0, 1)};
-        } else {
-            return new Item[0];
-        }
+        return new Item[]{Item.get(Item.RAW_FISH, 0, 1)};
     }
 
     @Override

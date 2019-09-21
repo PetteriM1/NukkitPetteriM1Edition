@@ -100,7 +100,6 @@ public class EntityFallingBlock extends Entity {
 
     @Override
     public boolean onUpdate(int currentTick) {
-
         if (closed) {
             return false;
         }

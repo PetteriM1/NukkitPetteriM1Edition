@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.ByteEntityData;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.level.format.FullChunk;
@@ -91,7 +90,7 @@ public class EntitySheep extends EntityWalkingAnimal {
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
             this.setInLove();
             return true;
-        } else if (item.equals(Item.get(Item.SHEARS, 0, 1), false) && !isBaby() && !this.sheared) {
+        } else if (item.equals(Item.get(Item.SHEARS, 0, 1), false) && !this.isBaby() && !this.sheared) {
             this.shear(true);
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SHEAR);
             player.getInventory().getItemInHand().setDamage(item.getDamage() + 1);
@@ -124,7 +123,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+        if (!this.isBaby()) {
             drops.add(Item.get(Item.WOOL, this.getColor(), 1));
 
             for (int i = 0; i < Utils.rand(1, 2); i++) {

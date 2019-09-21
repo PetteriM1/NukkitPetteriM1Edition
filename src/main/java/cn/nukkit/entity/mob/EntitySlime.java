@@ -115,7 +115,7 @@ public class EntitySlime extends EntityJumpingMob {
     @Override
     public Item[] getDrops() {
         if (this.size == SIZE_BIG) {
-            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, this, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
             level.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
@@ -132,7 +132,7 @@ public class EntitySlime extends EntityJumpingMob {
 
             return new Item[0];
         } else if (this.size == SIZE_MEDIUM) {
-            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
+            CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, this, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
             level.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
@@ -151,10 +151,8 @@ public class EntitySlime extends EntityJumpingMob {
         } else {
             List<Item> drops = new ArrayList<>();
 
-            if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-                for (int i = 0; i < Utils.rand(0, 2); i++) {
-                    drops.add(Item.get(Item.SLIMEBALL, 0, 1));
-                }
+            for (int i = 0; i < Utils.rand(0, 2); i++) {
+                drops.add(Item.get(Item.SLIMEBALL, 0, 1));
             }
 
             return drops.toArray(new Item[0]);

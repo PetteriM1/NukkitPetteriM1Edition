@@ -5,7 +5,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityProjectile;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
@@ -97,14 +96,12 @@ public class EntityPillager extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.ARROW, 0, 1));
-            }
+        for (int i = 0; i < Utils.rand(0, 2); i++) {
+            drops.add(Item.get(Item.ARROW, 0, 1));
+        }
 
-            if (Utils.rand(1, 12) == 1) {
-                drops.add(Item.get(Item.CROSSBOW, Utils.rand(300, 380), Utils.rand(0, 1)));
-            }
+        if (Utils.rand(1, 12) == 1) {
+            drops.add(Item.get(Item.CROSSBOW, Utils.rand(300, 380), Utils.rand(0, 1)));
         }
 
         return drops.toArray(new Item[0]);
@@ -112,7 +109,7 @@ public class EntityPillager extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override

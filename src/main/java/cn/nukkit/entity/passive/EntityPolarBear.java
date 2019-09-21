@@ -124,7 +124,7 @@ public class EntityPolarBear extends EntityWalkingMob {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
+        if (!this.isBaby()) {
             drops.add(Item.get(Item.RAW_FISH, 0, Utils.rand(0, 2)));
             drops.add(Item.get(Item.RAW_SALMON, 0, Utils.rand(0, 2)));
         }

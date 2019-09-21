@@ -19,9 +19,9 @@ public abstract class BlockFallableMeta extends BlockSolidMeta {
 
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!this.getLevel().randomTickingEnabled()) return type;
             Block down = this.down();
             if (down.getId() == AIR || down instanceof BlockLiquid) {
-                if (!this.getLevel().randomTickingEnabled()) return type;
                 this.level.setBlock(this, Block.get(Block.AIR), true, true);
                 CompoundTag nbt = new CompoundTag()
                         .putList(new ListTag<DoubleTag>("Pos")

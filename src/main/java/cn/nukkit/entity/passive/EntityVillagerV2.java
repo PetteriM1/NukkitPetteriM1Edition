@@ -15,4 +15,9 @@ public class EntityVillagerV2 extends EntityVillager {
     public int getNetworkId() {
         return NETWORK_ID;
     }
+
+    @Override
+    public String getName() {
+        return "Villager";
+    }
 }

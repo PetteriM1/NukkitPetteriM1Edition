@@ -123,14 +123,12 @@ public class EntitySpider extends EntityWalkingMob implements EntityArthropod {
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent && !this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.STRING, 0, 1));
-            }
+        for (int i = 0; i < Utils.rand(0, 2); i++) {
+            drops.add(Item.get(Item.STRING, 0, 1));
+        }
 
-            for (int i = 0; i < (Utils.rand(0, 2) == 0 ? 1 : 0); i++) {
-                drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
-            }
+        for (int i = 0; i < (Utils.rand(0, 2) == 0 ? 1 : 0); i++) {
+            drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
         }
 
         return drops.toArray(new Item[0]);
@@ -138,7 +136,7 @@ public class EntitySpider extends EntityWalkingMob implements EntityArthropod {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : 5;
+        return 5;
     }
 
     @Override
