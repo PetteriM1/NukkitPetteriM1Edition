@@ -129,7 +129,8 @@ public class BlockSapling extends BlockFlowable {
                     break;
                 //TODO: big spruce
                 default:
-                    ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);                    return true;
+                    ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
+                    return true;
             }
             BlockAir air = new BlockAir();
 
@@ -167,7 +168,12 @@ public class BlockSapling extends BlockFlowable {
         } else if (type == Level.BLOCK_UPDATE_RANDOM) { //Growth
             if (Utils.rand(1, 7) == 1) {
                 if ((this.getDamage() & 0x08) == 0x08) {
-                    ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
+                    if ((this.getDamage() & 0x07) == ACACIA) {
+                        this.level.setBlock(this, new BlockAir(), true, false);
+                        new ObjectSavannaTree().generate(level, new NukkitRandom(), this);
+                    } else {
+                        ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
+                    }
                 } else {
                     this.setDamage(this.getDamage() | 0x08);
                     this.getLevel().setBlock(this, this, true);
