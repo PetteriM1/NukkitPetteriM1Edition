@@ -279,15 +279,19 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public boolean onInteract(Player p, Item item, Vector3 clickedPos) {
-        if (!passengers.isEmpty() && isRideable()) {
-            return false;
-        }
-
         if (!isRideable()) {
             return false;
         }
 
-        return blockInside == null && mountEntity(p);
+        if (!passengers.isEmpty() && isRideable()) {
+            return false;
+        }
+
+        if (blockInside == null) {
+            mountEntity(p);
+        }
+
+        return super.onInteract(p, item, clickedPos);
     }
 
     @Override
