@@ -1861,22 +1861,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        Player oldPlayer = null;
         for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
             if (p != this && p.username != null && (p.username.equalsIgnoreCase(this.username) || this.getUniqueId().equals(p.getUniqueId()))) {
-                oldPlayer = p;
+                p.close("", "disconnectionScreen.loggedinOtherLocation");
                 break;
             }
         }
 
-        CompoundTag nbt;
-        if (oldPlayer != null) {
-            oldPlayer.saveNBT();
-            nbt = oldPlayer.namedTag;
-            oldPlayer.close("", "disconnectionScreen.loggedinOtherLocation");
-        } else {
-            nbt = this.server.getOfflinePlayerData(this.username);
-        }
+        CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
 
         if (nbt == null) {
             this.close(this.getLeaveMessage(), "Invalid data");
@@ -1885,17 +1877,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
 
-        boolean alive = true;
+        boolean alive = 0 <= nbt.getShort("Health");
 
         nbt.putString("NameTag", this.username);
 
-        if (0 >= nbt.getShort("Health")) {
-            alive = false;
-        }
-
-        int exp = nbt.getInt("EXP");
-        int expLevel = nbt.getInt("expLevel");
-        this.setExperience(exp, expLevel);
+        this.setExperience(nbt.getInt("EXP"), nbt.getInt("expLevel"));
 
         this.gamemode = nbt.getInt("playerGameType") & 0x03;
         if (this.server.getForceGamemode()) {
@@ -1951,12 +1937,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.namedTag.contains("foodLevel")) {
             this.namedTag.putInt("foodLevel", 20);
         }
-        int foodLevel = this.namedTag.getInt("foodLevel");
+
         if (!this.namedTag.contains("FoodSaturationLevel")) {
             this.namedTag.putFloat("FoodSaturationLevel", 20);
         }
-        float foodSaturationLevel = this.namedTag.getFloat("foodSaturationLevel");
-        this.foodData = new PlayerFood(this, foodLevel, foodSaturationLevel);
+
+        this.foodData = new PlayerFood(this, this.namedTag.getInt("foodLevel"), this.namedTag.getFloat("foodSaturationLevel"));
 
         if (this.isSpectator()) this.keepMovement = true;
 
@@ -2829,18 +2815,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(this, mapItem));
 
                         if (!event.isCancelled()) {
-                            BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
 				            try {
+                                BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
 					            Graphics2D graphics = image.createGraphics();
+
 					            for (int x = 0; x != 128; x++) {
 						            for (int y = 0; y != 128; y++) {
 							            graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
 							            graphics.fillRect(x, y, x, y);
 						            }
                                 }
+
+                                ((ItemMap) mapItem).setImage(image);
+                                ((ItemMap) mapItem).sendImage(this);
 				            } catch (Exception ignored) {}
-                            ((ItemMap) mapItem).setImage(image);
-                            ((ItemMap) mapItem).sendImage(this);
                         }
                     }
 

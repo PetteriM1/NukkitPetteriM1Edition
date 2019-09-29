@@ -2,18 +2,26 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityDispenser;
 import cn.nukkit.blockentity.BlockEntityDropper;
+import cn.nukkit.inventory.ContainerInventory;
+import cn.nukkit.inventory.Inventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
-import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.Utils;
 
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockDropper extends BlockSolidMeta implements Faceable {
+
+    protected boolean triggered = false;
 
     public BlockDropper() {
         this(0);
@@ -68,54 +76,44 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     public boolean canBeActivated() {
         return true;
     }
-    
+
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = {2, 5, 3, 4};
-        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        if (player != null) {
+            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
+                double y = player.y + player.getEyeHeight();
 
-        this.getLevel().setBlock(block, this, true, true);
-        CompoundTag nbt = new CompoundTag("")
-                .putString("id", BlockEntity.DROPPER)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-
-        if (item.hasCustomName()) {
-            nbt.putString("CustomName", item.getCustomName());
-        }
-
-        if (item.hasCustomBlockData()) {
-            Map<String, Tag> customData = item.getCustomBlockData().getTags();
-            for (Map.Entry<String, Tag> tag : customData.entrySet()) {
-                nbt.put(tag.getKey(), tag.getValue());
+                if (y - this.y > 2) {
+                    this.setDamage(BlockFace.UP.getIndex());
+                } else if (this.y - y > 0) {
+                    this.setDamage(BlockFace.DOWN.getIndex());
+                } else {
+                    this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
+                }
+            } else {
+                this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
             }
         }
 
-        new BlockEntityDropper(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+        this.getLevel().setBlock(block, this, true);
+
+        new BlockEntityDropper(this.level.getChunk(getChunkX(), getChunkZ()), BlockEntity.getDefaultCompound(this, BlockEntity.DROPPER));
         return true;
     }
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            BlockEntityDropper inv;
-            if (t instanceof BlockEntityDropper) {
-                inv = (BlockEntityDropper) t;
-            } else {
-                CompoundTag nbt = new CompoundTag("")
-                        .putString("id", BlockEntity.DROPPER)
-                        .putInt("x", (int) this.x)
-                        .putInt("y", (int) this.y)
-                        .putInt("z", (int) this.z);
-                inv = new BlockEntityDropper(this.getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
-            }
-
-            player.addWindow(inv.getInventory());
+        if (player == null) {
+            return false;
         }
 
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (!(blockEntity instanceof BlockEntityDropper)) {
+            return false;
+        }
+
+        player.addWindow(((BlockEntityDropper) blockEntity).getInventory());
         return true;
     }
 
@@ -127,5 +125,102 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     @Override
     public Item toItem() {
         return new ItemBlock(this, 0);
+    }
+
+    public Vector3 getDispensePosition() {
+        BlockFace facing = getBlockFace();
+        return this.add(
+                0.5 + 0.7 * facing.getXOffset(),
+                0.5 + 0.7 * facing.getYOffset(),
+                0.5 + 0.7 * facing.getZOffset()
+        );
+    }
+
+    public void dispense() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (!(blockEntity instanceof BlockEntityDropper)) {
+            return;
+        }
+
+        int r = 1;
+        int slot = -1;
+        Item target = null;
+
+        Inventory inv = ((BlockEntityDropper) blockEntity).getInventory();
+        for (Map.Entry<Integer, Item> entry : inv.getContents().entrySet()) {
+            Item item = entry.getValue();
+
+            if (!item.isNull() && Utils.random.nextInt(r++) == 0) {
+                target = item;
+                slot = entry.getKey();
+            }
+        }
+
+        if (target != null) {
+            target = target.clone();
+            drop(target);
+
+            target.count--;
+            inv.setItem(slot, target);
+        }
+    }
+
+    public void drop(Item item) {
+        BlockFace face = this.getBlockFace();
+        Vector3 dispensePos = this.getDispensePosition();
+
+        if (face.getAxis() == BlockFace.Axis.Y) {
+            dispensePos.y -= 0.125;
+        } else {
+            dispensePos.y -= 0.15625;
+        }
+
+        Random rand = ThreadLocalRandom.current();
+        Vector3 motion = new Vector3();
+
+        double offset = rand.nextDouble() * 0.1 + 0.2;
+
+        motion.x = face.getXOffset() * offset;
+        motion.y = 0.1;
+        motion.z = face.getZOffset() * offset;
+
+        motion.x += rand.nextGaussian() * 0.007499999832361937 * 6;
+        motion.y += rand.nextGaussian() * 0.007499999832361937 * 6;
+        motion.z += rand.nextGaussian() * 0.007499999832361937 * 6;
+
+        Item i = item.clone();
+        i.setCount(1);
+        this.level.dropItem(dispensePos, i, motion);
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityDispenser) {
+            return ContainerInventory.calculateRedstone(((BlockEntityDispenser) blockEntity).getInventory());
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            triggered = false;
+            dispense();
+
+            return type;
+        } else if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            if ((level.isBlockPowered(this) || level.isBlockPowered(this.up())) && !triggered) {
+                triggered = true;
+                level.scheduleUpdate(this, this, 4);
+            }
+
+            return type;
+        }
+
+        return 0;
     }
 }

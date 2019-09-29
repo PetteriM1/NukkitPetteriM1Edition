@@ -13,10 +13,9 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.Utils;
 
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by CreeperFace on 15.4.2017.
@@ -132,12 +131,7 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
             dispense();
             return type;
         } else if (type == Level.BLOCK_UPDATE_REDSTONE) {
-            Vector3 pos = this.add(0);
-
-            boolean powered = level.isBlockPowered(pos) || level.isBlockPowered(pos.up());
-            boolean triggered = isTriggered();
-
-            if (powered && !triggered) {
+            if ((level.isBlockPowered(this) || level.isBlockPowered(this.up())) && !isTriggered()) {
                 this.setTriggered(true);
                 this.level.setBlock(this, this, false, false);
                 level.scheduleUpdate(this, this, 4);
@@ -156,7 +150,6 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
             return;
         }
 
-        Random rand = ThreadLocalRandom.current();
         int r = 1;
         int slot = -1;
         Item target = null;
@@ -165,7 +158,7 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         for (Entry<Integer, Item> entry : inv.getContents().entrySet()) {
             Item item = entry.getValue();
 
-            if (!item.isNull() && rand.nextInt(r++) == 0) {
+            if (!item.isNull() && Utils.random.nextInt(r++) == 0) {
                 target = item;
                 slot = entry.getKey();
             }
