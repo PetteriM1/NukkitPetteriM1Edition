@@ -48,13 +48,13 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
         this.explode();
 
         return true;
-	}
+    }
 
     @Override
-	public boolean canCollideWith(Entity entity) {
-		return true;
-	}
-    
+    public boolean canCollideWith(Entity entity) {
+        return true;
+    }
+
     public boolean showBase() {
         return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE);
     }
@@ -66,7 +66,7 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     @Override
     public void explode() {
         this.close();
-        if (this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) {
+        if ((level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) || (!level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING))) {
             ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) return;

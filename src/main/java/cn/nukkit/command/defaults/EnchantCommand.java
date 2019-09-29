@@ -108,6 +108,7 @@ public class EnchantCommand extends VanillaCommand {
             case "silk_touch":
                 return 16;
             case "durability":
+            case "unbreaking":
                 return 17;
             case "fortune":
                 return 18;
