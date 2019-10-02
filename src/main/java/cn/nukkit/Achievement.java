@@ -30,7 +30,7 @@ public class Achievement {
         if (!achievements.containsKey(achievementId)) {
             return false;
         }
-        String translation = Server.getInstance().getLanguage().translateString("chat.type.achievement", player.getDisplayName(), TextFormat.GREEN + achievements.get(achievementId).message);
+        String translation = Server.getInstance().getLanguage().translateString("chat.type.achievement", player.getDisplayName(), TextFormat.GREEN + achievements.get(achievementId).message) + TextFormat.RESET;
 
         if (Server.getInstance().getPropertyBoolean("announce-player-achievements", false)) {
             Server.getInstance().broadcastMessage(translation);
