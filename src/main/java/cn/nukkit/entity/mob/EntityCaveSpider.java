@@ -8,6 +8,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -67,8 +68,14 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
 
                 damage.put(EntityDamageEvent.DamageModifier.ARMOR,
                         (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+
+                EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage);
+                player.attack(ev);
+
+                if (!ev.isCancelled() && this.server.getDifficulty() > 0) {
+                    player.addEffect(Effect.getEffect(Effect.POISON).setAmplifier(1).setDuration(this.server.getDifficulty() > 1 ? 300 : 140));
+                }
             }
-            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
         }
     }
 

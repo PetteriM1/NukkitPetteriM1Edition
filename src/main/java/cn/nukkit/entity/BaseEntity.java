@@ -2,6 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.entity.mob.EntityCaveSpider;
 import cn.nukkit.entity.mob.EntityEnderDragon;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -135,7 +136,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
                 Player player = (Player) creature;
                 return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 80;
             }
-            return creature.isAlive() && !creature.closed && distance <= 80;
+            // The cave spider check is to prevent cave spiders targeting to holograms and NPCs in SuomiCraft's halloween lobby. This whole check should probably be changed.
+            return creature.isAlive() && !creature.closed && distance <= 80 && !(this instanceof EntityCaveSpider);
         }
         return false;
     }
