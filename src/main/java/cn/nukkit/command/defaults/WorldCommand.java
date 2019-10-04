@@ -8,6 +8,7 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.Level;
 
 public class WorldCommand extends Command {
 
@@ -26,8 +27,12 @@ public class WorldCommand extends Command {
             return true;
         }
         
-        if (args.length == 0) {
-            return false;
+        if (args.length == 0 && !Server.getInstance().suomiCraftPEMode()) {
+            sender.sendMessage("Available worlds:");
+            for (Level level : Server.getInstance().getLevels().values()) {
+                sender.sendMessage(level.getName());
+            }
+            return true;
         }
         
         if (args.length == 2) {
