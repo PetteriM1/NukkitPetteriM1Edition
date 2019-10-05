@@ -36,6 +36,7 @@ import java.util.Properties;
 @Log4j2
 public class Nukkit {
 
+    public static final String NUKKIT = "Nukkit PetteriM1 Edition";
     public final static Properties GIT_INFO = getGitInfo();
     public final static String VERSION = getVersion();
     public final static String API_VERSION = "CUSTOM";

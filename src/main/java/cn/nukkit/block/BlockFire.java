@@ -19,9 +19,6 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 /**
  * @author MagicDroidX
  * Nukkit Project
@@ -199,14 +196,10 @@ public class BlockFire extends BlockFlowable {
     }
 
     private void tryToCatchBlockOnFire(Block block, int bound, int damage) {
-        int burnAbility = block.getBurnAbility();
+        if (Utils.random.nextInt(bound) < block.getBurnAbility()) {
 
-        Random random = ThreadLocalRandom.current();
-
-        if (random.nextInt(bound) < burnAbility) {
-
-            if (random.nextInt(damage + 10) < 5) {
-                int meta = damage + random.nextInt(5) / 4;
+            if (Utils.random.nextInt(damage + 10) < 5) {
+                int meta = damage + Utils.random.nextInt(5) / 4;
 
                 if (meta > 15) {
                     meta = 15;

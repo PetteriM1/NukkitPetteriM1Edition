@@ -46,10 +46,8 @@ public class ItemBookWritten extends Item {
         tag.putString(TAG_AUTHOR, author);
         tag.putString(TAG_TITLE, title);
         tag.putList(pages);
-
         tag.putInt(TAG_GENERATION, GENERATION_ORIGINAL);
-        long randomId = 1095216660480L + Utils.random.nextLong(0L, 2147483647L);
-        tag.putLong("id", randomId);
+        tag.putLong("id", 1095216660480L + Utils.random.nextLong(0L, 2147483647L));
 
         this.isWritten = true;
         return this.setNamedTag(tag);

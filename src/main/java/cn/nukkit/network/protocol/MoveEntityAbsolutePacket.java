@@ -37,9 +37,9 @@ public class MoveEntityAbsolutePacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.pitch = this.getByte() * (360d / 256d);
-        this.headYaw = this.getByte() * (360d / 256d);
-        this.yaw = this.getByte() * (360d / 256d);
+        this.pitch = this.getByte() * 1.40625;
+        this.headYaw = this.getByte() * 1.40625;
+        this.yaw = this.getByte() * 1.40625;
     }
 
     @Override
@@ -57,9 +57,9 @@ public class MoveEntityAbsolutePacket extends DataPacket {
             this.putByte(flags);
         }
         this.putVector3f((float) this.x, (float) this.y, (float) this.z);
-        this.putByte((byte) (this.pitch / (360d / 256d)));
-        this.putByte((byte) (this.headYaw / (360d / 256d)));
-        this.putByte((byte) (this.yaw / (360d / 256d)));
+        this.putByte((byte) (this.pitch / 1.40625));
+        this.putByte((byte) (this.headYaw / 1.40625));
+        this.putByte((byte) (this.yaw / 1.40625));
         if (protocol <= 261) {
             this.putBoolean(this.onGround);
             this.putBoolean(this.teleport);

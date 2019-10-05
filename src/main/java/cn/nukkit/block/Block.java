@@ -657,8 +657,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             (this.getToolType() == ItemTool.TYPE_AXE && item.isAxe()) ||
                             (this.getToolType() == ItemTool.TYPE_SHOVEL && item.isShovel())
                     ) {
-                int tier = item.getTier();
-                switch (tier) {
+                switch (item.getTier()) {
                     case ItemTool.TIER_WOODEN:
                         base /= 2;
                         break;

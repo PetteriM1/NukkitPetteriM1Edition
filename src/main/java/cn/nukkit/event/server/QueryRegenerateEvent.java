@@ -1,5 +1,6 @@
 package cn.nukkit.event.server;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.HandlerList;
@@ -30,7 +31,6 @@ public class QueryRegenerateEvent extends ServerEvent {
     private Player[] players;
     private final String gameType;
     private final String version;
-    private final String server_engine;
     private String map;
     private int numPlayers;
     private int maxPlayers;
@@ -47,12 +47,11 @@ public class QueryRegenerateEvent extends ServerEvent {
     public QueryRegenerateEvent(Server server, int timeout) {
         this.timeout = timeout;
         this.serverName = server.getMotd();
-        this.listPlugins = server.getPropertyBoolean("query-plugins", false);
+        this.listPlugins = server.getPropertyBoolean("query-plugins");
         this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
         this.players = server.getOnlinePlayers().values().toArray(new Player[0]);
         this.gameType = (server.getGamemode() & 0x01) == 0 ? "SMP" : "CMP";
         this.version = server.getVersion();
-        this.server_engine = "Nukkit PetteriM1 Edition";
         this.map = server.getDefaultLevel() == null ? "unknown" : server.getDefaultLevel().getName();
         this.numPlayers = this.players.length;
         this.maxPlayers = server.getMaxPlayers();
@@ -135,7 +134,7 @@ public class QueryRegenerateEvent extends ServerEvent {
 
     public byte[] getLongQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
-        StringBuilder plist = new StringBuilder(this.server_engine);
+        StringBuilder plist = new StringBuilder(Nukkit.NUKKIT);
         if (this.plugins.length > 0 && this.listPlugins) {
             plist.append(':');
             for (Plugin p : this.plugins) {
@@ -155,7 +154,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         KVdata.put("gametype", this.gameType);
         KVdata.put("game_id", "MINECRAFTPE");
         KVdata.put("version", this.version);
-        KVdata.put("server_engine", this.server_engine);
+        KVdata.put("server_engine", Nukkit.NUKKIT);
         KVdata.put("plugins", plist.toString());
         KVdata.put("map", this.map);
         KVdata.put("numplayers", String.valueOf(this.numPlayers));

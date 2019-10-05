@@ -815,6 +815,10 @@ public class Item implements Cloneable, BlockID, ItemID {
             this.clearCustomName();
         }
 
+        if (name.length() > 100) {
+            name = name.substring(0, 100);
+        }
+
         CompoundTag tag;
         if (!this.hasCompoundTag()) {
             tag = new CompoundTag();

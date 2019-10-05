@@ -13,7 +13,6 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -204,7 +203,7 @@ public abstract class EntityProjectile extends Entity {
     }
 
     public void inaccurate(float modifier) {
-        Random rand = ThreadLocalRandom.current();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
 
         this.motionX += rand.nextGaussian() * 0.007499999832361937 * modifier;
         this.motionY += rand.nextGaussian() * 0.007499999832361937 * modifier;

@@ -1125,7 +1125,7 @@ public class Server {
         Runtime runtime = Runtime.getRuntime();
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
         double max = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
-        String title = (char) 0x1b + "]0;Nukkit Server " +
+        String title = (char) 0x1b + "]0;" + Nukkit.NUKKIT +
                 " | Online " + this.players.size() + '/' + this.maxPlayers +
                 " | Memory " + Math.round(used / max * 100) + '%' +
                 /*" | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
@@ -1141,7 +1141,7 @@ public class Server {
     }
 
     public String getName() {
-        return "Nukkit PetteriM1 Edition";
+        return Nukkit.NUKKIT;
     }
 
     public boolean isRunning() {

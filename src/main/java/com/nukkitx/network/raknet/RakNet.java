@@ -1,5 +1,6 @@
 package com.nukkitx.network.raknet;
 
+import cn.nukkit.utils.Utils;
 import com.nukkitx.network.util.Bootstraps;
 import com.nukkitx.network.util.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -15,14 +16,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @ParametersAreNonnullByDefault
 public abstract class RakNet implements AutoCloseable {
 
-    final long guid = ThreadLocalRandom.current().nextLong();
+    final long guid = Utils.random.nextLong();
     final Bootstrap bootstrap;
     final EventLoopGroup eventLoopGroup;
     final InetSocketAddress bindAddress;

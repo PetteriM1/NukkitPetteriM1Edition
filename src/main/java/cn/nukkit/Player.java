@@ -244,6 +244,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public boolean initialized;
 
+    private boolean foodEnabled = true;
+
     public int getStartActionTick() {
         return startAction;
     }
@@ -554,16 +556,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void sendCommandData() {
         AvailableCommandsPacket pk = new AvailableCommandsPacket();
         Map<String, CommandDataVersions> data = new HashMap<>();
-        int count = 0;
+
         for (Command command : this.server.getCommandMap().getCommands().values()) {
             if (!command.testPermissionSilent(this)) {
                 continue;
             }
-            ++count;
-            CommandDataVersions data0 = command.generateCustomCommandData(this);
-            data.put(command.getName(), data0);
+
+            data.put(command.getName(), command.generateCustomCommandData(this));
         }
-        if (count > 0) {
+
+        if (data.size() != 0) {
             pk.commands = data;
             this.dataPacket(pk);
         }
@@ -1851,7 +1853,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void processLogin() {
         if (!this.server.isWhitelisted((this.username).toLowerCase())) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason", "Server is white-listed").replace("§n", "\n"));
-
             return;
         } else if (this.isBanned()) {
             this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned");
@@ -3257,10 +3258,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return successful
      */
     public boolean chat(String message) {
-        if (!this.spawned || !this.isAlive()) {
-            return false;
-        }
-
         this.resetCraftingGridType();
         this.craftingType = CRAFTING_SMALL;
 
@@ -4487,10 +4484,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    /**
+     * Remove all windows
+     */
     public void removeAllWindows() {
         removeAllWindows(false);
     }
 
+    /**
+     * Remove all windows
+     * @param permanent remove permanent windows
+     */
     public void removeAllWindows(boolean permanent) {
         for (Entry<Integer, Inventory> entry : new ArrayList<>(this.windowIndex.entrySet())) {
             if (!permanent && this.permanentWindows.contains(entry.getKey())) {
@@ -4552,6 +4556,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.connected;
     }
 
+    /**
+     * Get chunk cache from data
+     * @param chunkX chunk x
+     * @param chunkZ chunk z
+     * @param subChunkCount sub chunk count
+     * @param payload data
+     * @return BatchPacket
+     */
     public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, int subChunkCount, byte[] payload) {
         LevelChunkPacket pk = new LevelChunkPacket();
         pk.chunkX = chunkX;
@@ -4574,20 +4586,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return batch;
     }
 
-    private boolean foodEnabled = true;
-
+    /**
+     * Check whether food is enabled or not
+     * @return food enabled
+     */
     public boolean isFoodEnabled() {
         return !(this.isCreative() || this.isSpectator()) && this.foodEnabled;
     }
 
+    /**
+     * Enable or disable food
+     * @param foodEnabled food enabled
+     */
     public void setFoodEnabled(boolean foodEnabled) {
         this.foodEnabled = foodEnabled;
     }
 
+    /**
+     * Get player's food data
+     * @return food data
+     */
     public PlayerFood getFoodData() {
         return this.foodData;
     }
 
+    /**
+     * Send dimension change
+     * @param dimension dimension id
+     */
     public void setDimension(int dimension) {
         if (this.protocol >= 313) {
             NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
@@ -4656,15 +4682,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return false;
     }
 
-
+    /**
+     * Enable or disable movement check
+     * @param checkMovement movement check enabled
+     */
     public void setCheckMovement(boolean checkMovement) {
         this.checkMovement = checkMovement;
     }
 
+
+    /**
+     * Set locale
+     * @param locale locale
+     */
     public synchronized void setLocale(Locale locale) {
         this.locale.set(locale);
     }
 
+    /**
+     * Get locale
+     * @return locale
+     */
     public synchronized Locale getLocale() {
         return this.locale.get();
     }
@@ -4677,10 +4715,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    /**
+     * Transfer player to other server
+     * @param address target server address
+     */
     public void transfer(InetSocketAddress address) {
         transfer(address.getAddress().getHostAddress(), address.getPort());
     }
 
+    /**
+     * Transfer player to other server
+     * @param hostName target server address
+     * @param port target server port
+     */
     public void transfer(String hostName, int port) {
         TransferPacket pk = new TransferPacket();
         pk.address = hostName;
@@ -4690,10 +4737,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.close(message, message, false);
     }
 
+    /**
+     * Get player's LoginChainData
+     * @return login chain data
+     */
     public LoginChainData getLoginChainData() {
         return this.loginChainData;
     }
 
+    /**
+     * Try to pick up an entity
+     * @param entity target
+     * @param near near
+     * @return success
+     */
     public boolean pickupEntity(Entity entity, boolean near) {
         if (!this.spawned || !this.isAlive() || !this.isOnline() || this.isSpectator() || entity.isClosed()) {
             return false;
@@ -4785,14 +4842,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        int tick = this.getServer().getTick();
-        if (pickedXPOrb < tick && entity instanceof EntityXPOrb && this.boundingBox.isVectorInside(entity)) {
+        if (pickedXPOrb < server.getTick() && entity instanceof EntityXPOrb && this.boundingBox.isVectorInside(entity)) {
             EntityXPOrb xpOrb = (EntityXPOrb) entity;
             if (xpOrb.getPickupDelay() <= 0) {
                 int exp = xpOrb.getExp();
                 entity.kill();
                 this.getLevel().addSound(new ExperienceOrbSound(this));
-                pickedXPOrb = tick;
+                pickedXPOrb = server.getTick();
 
                 ArrayList<Integer> itemsWithMending = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
@@ -4858,6 +4914,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
+    /**
+     * Start fishing
+     * @param fishingRod fishing rod item
+     */
     public void startFishing(Item fishingRod) {
         CompoundTag nbt = new CompoundTag()
 				.putList(new ListTag<DoubleTag>("Pos")
@@ -4886,6 +4946,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 		}
     }
 
+    /**
+     * Stop fishing
+     * @param click clicked or forced
+     */
     public void stopFishing(boolean click) {
         if (this.fishing != null && click) {
             fishing.reelLine();

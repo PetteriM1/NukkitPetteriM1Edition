@@ -16,7 +16,6 @@ import cn.nukkit.utils.Faceable;
 import cn.nukkit.utils.Utils;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockDropper extends BlockSolidMeta implements Faceable {
@@ -176,7 +175,7 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
             dispensePos.y -= 0.15625;
         }
 
-        Random rand = ThreadLocalRandom.current();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
         Vector3 motion = new Vector3();
 
         double offset = rand.nextDouble() * 0.1 + 0.2;

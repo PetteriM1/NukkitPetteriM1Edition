@@ -255,6 +255,6 @@ public final class Stopwatch {
         double value = (double) nanos / NANOSECONDS.convert(1, unit);
 
         // Too bad this functionality is not exposed as a regular method call
-        return formatCompact4Digits(value) + " " + abbreviate(unit);
+        return formatCompact4Digits(value) + ' ' + abbreviate(unit);
     }
 }

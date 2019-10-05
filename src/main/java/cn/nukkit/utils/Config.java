@@ -108,7 +108,6 @@ public class Config {
         this.correct = false;
         if (this.file == null) throw new IllegalStateException("Failed to reload Config. File object is undefined.");
         this.load(this.file.toString(), this.type);
-
     }
 
     public boolean load(String file) {

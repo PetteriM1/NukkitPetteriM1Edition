@@ -6,6 +6,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.utils.Utils;
 
 import java.util.Random;
 
@@ -47,7 +48,6 @@ public class PopulatorRavines extends Populator {
         if (this.random.nextInt(300) >= this.ravineRarity)
             return;
         double d1 = (chunkX * 16) + this.random.nextInt(16);
-        double d2 = numberInRange(random, this.ravineMinAltitude, this.ravineMaxAltitude);
         double d3 = (chunkZ * 16) + this.random.nextInt(16);
 
         int i = 1;
@@ -57,9 +57,7 @@ public class PopulatorRavines extends Populator {
             float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
             float f3 = (this.random.nextFloat() * 2.0F + this.random.nextFloat()) * 2.0F;
 
-            int size = numberInRange(random, this.ravineMinLength, this.ravineMaxLength);
-
-            createRavine(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.ravineDepth);
+            createRavine(this.random.nextLong(), generatingChunkBuffer, d1, Utils.rand(this.ravineMinAltitude, this.ravineMaxAltitude), d3, f3, f1, f2, Utils.rand(this.ravineMinLength, this.ravineMaxLength), this.ravineDepth);
         }
     }
 
@@ -190,12 +188,10 @@ public class PopulatorRavines extends Populator {
                     }
                 }
             }
-            if (i != 0)
-                break;
-        }
-    }
 
-    public static int numberInRange(Random random, int min, int max) {
-        return min + random.nextInt(max - min + 1);
+            if (i != 0) {
+                break;
+            }
+        }
     }
 }

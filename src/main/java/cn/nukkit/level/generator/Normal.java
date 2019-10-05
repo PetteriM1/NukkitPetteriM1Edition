@@ -15,10 +15,7 @@ import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Nukkit's terrain generator
@@ -43,7 +40,7 @@ public class Normal extends Generator {
 
     private List<Populator> populators = Collections.emptyList();
     private List<Populator> generationPopulators = Collections.emptyList();
-    public static final int seaHeight = 64;
+    public static final int seaHeight = 64; // should be 62
     public NoiseGeneratorOctavesF scaleNoise;
     public NoiseGeneratorOctavesF depthNoise;
     private ChunkManager level;
@@ -95,7 +92,7 @@ public class Normal extends Generator {
     public void init(ChunkManager level, NukkitRandom random) {
         this.level = level;
         this.nukkitRandom = random;
-        Random random1 = new Random();
+        SplittableRandom random1 = new SplittableRandom();
         this.nukkitRandom.setSeed(this.level.getSeed());
         this.localSeed1 = random1.nextLong();
         this.localSeed2 = random1.nextLong();

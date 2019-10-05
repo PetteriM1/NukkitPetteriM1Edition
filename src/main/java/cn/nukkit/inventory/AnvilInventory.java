@@ -60,7 +60,6 @@ public class AnvilInventory extends ContainerInventory {
 
             if (local.getId() != 0 && second.getId() != 0) {
                 Item result = local.clone();
-                int enchants = 0;
 
                 ArrayList<Enchantment> enchantments = new ArrayList<>(Arrays.asList(second.getEnchantments()));
 
@@ -108,7 +107,6 @@ public class AnvilInventory extends ContainerInventory {
                     }
 
                     result.addEnchantment(enchantment);
-                    enchants++;
                 }
 
                 result.setCustomName(resultItem.getCustomName());

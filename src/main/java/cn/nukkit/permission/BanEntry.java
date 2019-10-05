@@ -23,7 +23,7 @@ public class BanEntry {
     private Date creationDate;
     private String source = "(Unknown)";
     private Date expirationDate = null;
-    private String reason = "Banned by an operator.";
+    private String reason = "Banned";
 
     public BanEntry(String name) {
         this.name = name.toLowerCase();

@@ -60,7 +60,7 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     private double getRotation(int flag) {
         if ((flags & flag) != 0) {
-            return this.getByte() * (360d / 256d);
+            return this.getByte() * 1.40625;
         }
         return 0d;
     }
@@ -73,7 +73,7 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     private void putRotation(int flag, double value) {
         if ((flags & flag) != 0) {
-            this.putByte((byte) (value / (360d / 256d)));
+            this.putByte((byte) (value / 1.40625));
         }
     }
 }

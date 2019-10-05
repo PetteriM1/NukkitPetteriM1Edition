@@ -6,7 +6,6 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Axis;
 import cn.nukkit.math.Vector3;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -26,7 +25,7 @@ public class DefaultDispenseBehavior implements DispenseBehavior {
             dispensePos.y -= 0.15625;
         }
 
-        Random rand = ThreadLocalRandom.current();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
         Vector3 motion = new Vector3();
 
         double offset = rand.nextDouble() * 0.1 + 0.2;

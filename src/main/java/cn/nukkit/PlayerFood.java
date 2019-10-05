@@ -138,7 +138,7 @@ public class PlayerFood {
         if (!this.player.isFoodEnabled()) return;
         if (this.player.isAlive()) {
             int diff = Server.getInstance().getDifficulty();
-            if (this.foodLevel > 17) {
+            if (this.foodLevel > 17 || diff == 0) {
                 this.foodTickTimer += tickDiff;
                 if (this.foodTickTimer >= 80) {
                     if (this.player.getHealth() < this.player.getMaxHealth()) {
@@ -147,13 +147,13 @@ public class PlayerFood {
                     }
                     this.foodTickTimer = 0;
                 }
-            } else if (this.foodLevel == 0) {
+            } else if (this.foodLevel == 0 && diff != 0) {
                 this.foodTickTimer += tickDiff;
                 if (this.foodTickTimer >= 80) {
                     EntityDamageEvent ev = new EntityDamageEvent(this.player, DamageCause.HUNGER, 1);
                     float now = this.player.getHealth();
                     if (diff == 1) {
-                        /*if (now > 10)*/ this.player.attack(ev);
+                        if (now > 10) this.player.attack(ev);
                     } else if (diff == 2) {
                         if (now > 1) this.player.attack(ev);
                     } else {
