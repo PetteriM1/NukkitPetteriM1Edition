@@ -1566,8 +1566,6 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
-    public void onCollideWithPlayer(EntityHuman entityPlayer) {}
-
     public void applyEntityCollision(Entity entity) {
         if (entity.riding != this && !entity.passengers.contains(this)) {
             double dx = entity.x - this.x;

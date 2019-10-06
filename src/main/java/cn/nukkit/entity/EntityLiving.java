@@ -24,7 +24,10 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
 import co.aikar.timings.Timings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author MagicDroidX
@@ -184,12 +187,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
         this.server.getPluginManager().callEvent(ev);
 
-        if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT)) {
+        if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT) && DamageCause.VOID != this.lastDamageCause.getCause()) {
             if (ev.getEntity() instanceof BaseEntity) {
                 BaseEntity baseEntity = (BaseEntity) ev.getEntity();
                 if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                    Entity damager = ((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager();
-                    if (damager instanceof Player) {
+                    if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
                         int killExperience = baseEntity.getKillExperience();
                         if (killExperience > 0) {
                             this.getLevel().dropExpOrb(this, killExperience);
@@ -243,7 +245,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-
             if (this.isInsideOfSolid() && !this.isSubmerged()) {
                 hasUpdate = true;
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
@@ -289,6 +290,23 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     }
                 }
             }
+
+            // Check collisions with blocks
+            if (this instanceof Player) {
+                Block block = this.level.getBlock(getFloorX(), getFloorY() - 1, getFloorZ());
+                int id = block.getId();
+                if (id == Block.MAGMA || id == Block.CACTUS) {
+                    block.onEntityCollide(this);
+                }
+                if (id == Block.MAGMA && this.isInsideOfWater()) {
+                    this.level.addParticle(new BubbleParticle(this));
+                    this.setMotion(new Vector3(0, -0.3, 0));
+                }
+                if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
+                    this.level.addParticle(new BubbleParticle(this));
+                    this.setMotion(new Vector3(0, 0.3, 0));
+                }
+            }
         }
 
         if (this.attackTime > 0) {
@@ -300,21 +318,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     this.collidingWith(entity);
                 }
             }
-        }
-
-        // Check collisions with blocks
-        Block block = this.level.getBlock((int) x, (int) y - 1, (int) z);
-        int id = block.getId();
-        if (id == Block.MAGMA || id == Block.CACTUS) {
-            block.onEntityCollide(this);
-        }
-        if (id == Block.MAGMA && this.isInsideOfWater()) {
-            this.level.addParticle(new BubbleParticle(this));
-            this.setMotion(new Vector3(0, -0.3, 0));
-        }
-        if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
-            this.level.addParticle(new BubbleParticle(this));
-            this.setMotion(new Vector3(0, 0.3, 0));
         }
 
         Timings.livingEntityBaseTickTimer.stopTiming();

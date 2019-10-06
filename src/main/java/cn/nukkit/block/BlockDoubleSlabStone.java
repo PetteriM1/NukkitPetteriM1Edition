@@ -70,7 +70,7 @@ public class BlockDoubleSlabStone extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
+        if (item.isPickaxe()) {
             return new Item[]{
                     Item.get(Item.SLAB, this.getDamage() & 0x07, 2)
             };

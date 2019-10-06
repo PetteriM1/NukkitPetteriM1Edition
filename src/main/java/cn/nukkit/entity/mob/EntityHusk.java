@@ -73,7 +73,7 @@ public class EntityHusk extends EntityWalkingMob implements EntitySmite {
             pk.eid = this.getId();
             pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
-            player.addEffect(Effect.getEffectByName("HUNGER").setAmplifier(1).setDuration(140));
+            player.addEffect(Effect.getEffect(Effect.HUNGER).setAmplifier(1).setDuration(140));
         }
     }
 

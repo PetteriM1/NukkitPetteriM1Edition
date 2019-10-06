@@ -27,7 +27,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     public static final int NETWORK_ID = 33;
 
-    private int bombTime = 0;
+    private short bombTime = 0;
 
     public EntityCreeper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -58,10 +58,6 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         super.initEntity();
 
         this.setMaxHealth(20);
-    }
-
-    public int getBombTime() {
-        return this.bombTime;
     }
 
     public void explode() {

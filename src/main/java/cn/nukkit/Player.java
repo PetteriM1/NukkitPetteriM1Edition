@@ -285,10 +285,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.left", this.displayName);
     }
 
-    public String getClientSecret() {
-        return "null";
-    }
-
     /**
      * This might disappear in the future.
      * Please use getUniqueId() instead (IP + clientId + name combo, in the future it'll change to real UUID for online auth)

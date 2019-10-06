@@ -50,7 +50,7 @@ public class BlockTerracottaStained extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
+        if (item.isPickaxe()) {
             return new Item[]{toItem()};
         } else {
             return new Item[0];

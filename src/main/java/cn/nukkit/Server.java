@@ -1157,7 +1157,7 @@ public class Server {
     }
 
     public String getVersion() {
-        return ProtocolInfo.MINECRAFT_VERSION;
+        return Nukkit.MINECRAFT_VERSION;
     }
 
     public String getApiVersion() {

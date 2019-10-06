@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.mob.EntityCaveSpider;
 import cn.nukkit.entity.mob.EntityEnderDragon;
 import cn.nukkit.entity.mob.EntityMob;
+import cn.nukkit.entity.mob.EntityRavager;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -26,8 +27,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
-    protected int attackDelay = 0;
-    protected int inLoveTicks = 0;
+    protected byte attackDelay = 0;
+    protected short inLoveTicks = 0;
 
     protected boolean baby = false;
     private boolean movement = true;
@@ -151,7 +152,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return true;
         }
 
-        if (this instanceof EntityMob && this.attackDelay < 400) {
+        if (this instanceof EntityMob && this.attackDelay < Byte.MAX_VALUE) {
             this.attackDelay++;
         }
 
@@ -186,7 +187,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         }
 
         if (source instanceof EntityDamageByEntityEvent) {
-            ((EntityDamageByEntityEvent) source).setKnockBack(0.25f);
+            if (this instanceof EntityRavager && Utils.rand()) {
+                ((EntityDamageByEntityEvent) source).setKnockBack(0f);
+            } else {
+                ((EntityDamageByEntityEvent) source).setKnockBack(0.25f);
+            }
         }
 
         super.attack(source);
