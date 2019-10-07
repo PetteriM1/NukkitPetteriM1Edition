@@ -6,8 +6,10 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * Nukkit Project
+ * Adventure settings
+ *
  * @author MagicDroidX
+ * Nukkit Project
  */
 public class AdventureSettings implements Cloneable {
 
@@ -62,6 +64,9 @@ public class AdventureSettings implements Cloneable {
         player.resetInAirTicks();
     }
 
+    /**
+     * List of adventure settings
+     */
     public enum Type {
         WORLD_IMMUTABLE(AdventureSettingsPacket.WORLD_IMMUTABLE, false),
         AUTO_JUMP(AdventureSettingsPacket.AUTO_JUMP, true),

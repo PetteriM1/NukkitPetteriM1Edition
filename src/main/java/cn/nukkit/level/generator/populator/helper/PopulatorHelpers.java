@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  * @author DaPorkchop_
  */
 public final class PopulatorHelpers implements BlockID {
+
     private static final IntSet nonSolidBlocks = new IntOpenHashSet();
 
     static {

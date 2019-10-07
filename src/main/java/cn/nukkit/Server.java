@@ -82,6 +82,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * The main server class
+ *
  * @author MagicDroidX
  * @author Box
  */
@@ -1891,6 +1893,9 @@ public class Server {
         return currentThread;
     }
 
+    /**
+     * Internal method to register all default entities
+     */
     private void registerEntities() {
         //Items
         Entity.registerEntity("Item", EntityItem.class);
@@ -1993,6 +1998,9 @@ public class Server {
         Entity.registerEntity("Human", EntityHuman.class, true);
     }
 
+    /**
+     * Internal method to register all default block entities
+     */
     private void registerBlockEntities() {
         BlockEntity.registerBlockEntity(BlockEntity.FURNACE, BlockEntityFurnace.class);
         BlockEntity.registerBlockEntity(BlockEntity.CHEST, BlockEntityChest.class);
@@ -2022,10 +2030,18 @@ public class Server {
         return instance;
     }
 
+    /**
+     * SuomiCraft PE mode tweaks some stuff to work better on SuomiCraft PE server.
+     *
+     * @return SuomiCraft PE mode enabled
+     */
     public boolean suomiCraftPEMode() {
         return suomicraftMode;
     }
 
+    /**
+     * This class contains all default server.properties values.
+     */
     private static class ServerProperties extends ConfigSection {
         {
             put("motd", "Minecraft Server");

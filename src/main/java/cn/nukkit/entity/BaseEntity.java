@@ -17,6 +17,9 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
 
+/**
+ * The base class of all entities that have an AI
+ */
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
     protected int stayTime = 0;

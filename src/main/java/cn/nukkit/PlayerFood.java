@@ -9,6 +9,8 @@ import cn.nukkit.item.food.Food;
 import cn.nukkit.potion.Effect;
 
 /**
+ * This class handles player's food.
+ *
  * Created by funcraft on 2015/11/11.
  */
 public class PlayerFood {
@@ -147,7 +149,7 @@ public class PlayerFood {
                     }
                     this.foodTickTimer = 0;
                 }
-            } else if (this.foodLevel == 0 && diff != 0) {
+            } else if (this.foodLevel == 0) {
                 this.foodTickTimer += tickDiff;
                 if (this.foodTickTimer >= 80) {
                     EntityDamageEvent ev = new EntityDamageEvent(this.player, DamageCause.HUNGER, 1);

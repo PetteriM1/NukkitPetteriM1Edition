@@ -8,9 +8,9 @@ import java.util.zip.InflaterInputStream;
 
 public class ZlibSingleThreadLowMem implements ZlibProvider {
 
-    static final int BUFFER_SIZE = 8192;
-    Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-    byte[] buffer = new byte[BUFFER_SIZE];
+    private static final int BUFFER_SIZE = 8192;
+    private Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
+    private byte[] buffer = new byte[BUFFER_SIZE];
 
     @Override
     public synchronized byte[] deflate(byte[][] datas, int level) throws Exception {

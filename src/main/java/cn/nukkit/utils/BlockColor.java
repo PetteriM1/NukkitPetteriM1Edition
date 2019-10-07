@@ -110,7 +110,6 @@ public class BlockColor  {
         return (this.red << 16 | this.green << 8 | this.blue) & 0xffffff;
     }
 
-    @Deprecated
     public static BlockColor getDyeColor(int dyeColorMeta) {
         return DyeColor.getByDyeData(dyeColorMeta).getColor();
     }

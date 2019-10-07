@@ -27,7 +27,7 @@ import java.util.Properties;
  */
 
 /**
- * The launcher class of Nukkit, including the {@code main} function.
+ * The launcher class of Nukkit, including the {@code main} function
  *
  * @author MagicDroidX(code) @ Nukkit Project
  * @author 粉鞋大妈(javadoc) @ Nukkit Project

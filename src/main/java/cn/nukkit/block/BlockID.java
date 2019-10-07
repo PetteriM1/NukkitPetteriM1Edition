@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+/**
+ * List of block IDs
+ */
 public interface BlockID {
 
     int AIR = 0;

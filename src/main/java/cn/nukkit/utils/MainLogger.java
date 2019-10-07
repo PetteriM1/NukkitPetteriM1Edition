@@ -10,7 +10,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MainLogger extends ThreadedLogger {
+public class MainLogger extends Thread implements Logger {
 
     private static final MainLogger logger = new MainLogger();
 

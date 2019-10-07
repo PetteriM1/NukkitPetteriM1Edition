@@ -1,5 +1,8 @@
 package cn.nukkit.item;
 
+/**
+ * List of item IDs
+ */
 public interface ItemID {
 
     int IRON_SHOVEL = 256;

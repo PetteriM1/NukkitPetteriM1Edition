@@ -93,6 +93,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
+ * The Player class
+ *
  * @author MagicDroidX &amp; Box
  * Nukkit Project
  */

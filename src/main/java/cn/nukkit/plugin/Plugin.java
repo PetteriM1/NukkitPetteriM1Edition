@@ -120,7 +120,7 @@ public interface Plugin extends CommandExecutor {
      * 来从{@code InputStream}读取所有内容为字符串。例如：<br>
      * When you need to read the whole file content as a String, you can use
      * to read from a {@code InputStream} and get whole content as a String. For example:
-     * <code>String string = Utils.readFile(this.getResource("string.txt"));</code>
+     * {@code String string = Utils.readFile(this.getResource("string.txt"));}
      *
      * @param filename 要读取的资源文件名字。<br>The name of the resource file to read.
      * @return 读取的资源文件的 {@code InputStream}对象。若错误会返回{@code null}<br>
