@@ -169,13 +169,13 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
         Block blockWest = this.west();
 
         if ((this.getDamage() & 0x08) == 0x08) { //This is the Top part of bed
-            if (blockNorth.getId() == BED_BLOCK && blockNorth.getDamage() != 0x08) { //Checks if the block ID&&meta are right
+            if (blockNorth.getId() == BED_BLOCK && (blockNorth.getDamage() & 0x08) != 0x08) { //Checks if the block ID&&meta are right
                 this.getLevel().setBlock(blockNorth, new BlockAir(), true, true);
-            } else if (blockSouth.getId() == BED_BLOCK && blockSouth.getDamage() != 0x08) {
+            } else if (blockSouth.getId() == BED_BLOCK && (blockSouth.getDamage() & 0x08) != 0x08) {
                 this.getLevel().setBlock(blockSouth, new BlockAir(), true, true);
-            } else if (blockEast.getId() == BED_BLOCK && blockEast.getDamage() != 0x08) {
+            } else if (blockEast.getId() == BED_BLOCK && (blockEast.getDamage() & 0x08) != 0x08) {
                 this.getLevel().setBlock(blockEast, new BlockAir(), true, true);
-            } else if (blockWest.getId() == BED_BLOCK && blockWest.getDamage() != 0x08) {
+            } else if (blockWest.getId() == BED_BLOCK && (blockWest.getDamage() & 0x08) != 0x08) {
                 this.getLevel().setBlock(blockWest, new BlockAir(), true, true);
             }
         } else { //Bottom Part of Bed
