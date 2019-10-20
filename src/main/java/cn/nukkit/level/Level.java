@@ -1930,14 +1930,16 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
-            int dropExp = target.getDropExp();
             if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
                 if (player.isSurvival() || player.isAdventure()) {
-                    if (this.server.suomiCraftPEMode()) {
-                        this.dropExpOrb(target, dropExp);
-                    } else {
-                        for (int ii = 1; ii <= dropExp; ii++) {
-                            this.dropExpOrb(target, 1);
+                    int dropExp = target.getDropExp();
+                    if (dropExp != 0) {
+                        if (this.server.suomiCraftPEMode()) {
+                            this.dropExpOrb(target, dropExp);
+                        } else {
+                            for (int ii = 1; ii <= dropExp; ii++) {
+                                this.dropExpOrb(target, 1);
+                            }
                         }
                     }
                 }
