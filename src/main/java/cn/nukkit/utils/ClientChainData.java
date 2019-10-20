@@ -6,9 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
-import net.minidev.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -209,11 +207,10 @@ public final class ClientChainData implements LoginChainData {
         if (skinToken.has("CapeData")) this.capeData = skinToken.get("CapeData").getAsString();
     }
 
-    private JsonObject decodeToken(String token) {
+    private static JsonObject decodeToken(String token) {
         String[] base = token.split("\\.");
         if (base.length < 2) return null;
-        String json = new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8);
-        return new Gson().fromJson(json, JsonObject.class);
+        return new Gson().fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
     }
 
     private void decodeChainData() {
@@ -248,7 +245,7 @@ public final class ClientChainData implements LoginChainData {
         }
     }
 
-    private boolean verifyChain(List<String> chains) throws Exception {
+    private static boolean verifyChain(List<String> chains) throws Exception {
 
         PublicKey lastKey = null;
         boolean mojangKeyVerified = false;
@@ -266,8 +263,7 @@ public final class ClientChainData implements LoginChainData {
                 }
             }
 
-            JSONObject payload = jws.getPayload().toJSONObject();
-            String base64key = payload.getAsString("identityPublicKey");
+            String base64key = jws.getPayload().toJSONObject().getAsString("identityPublicKey");
             if (base64key == null) {
                 throw new RuntimeException("No key found");
             }
@@ -276,9 +272,8 @@ public final class ClientChainData implements LoginChainData {
         return mojangKeyVerified;
     }
 
-    private boolean verify(PublicKey key, JWSObject object) throws JOSEException {
-        JWSVerifier verifier = new DefaultJWSVerifierFactory().createJWSVerifier(object.getHeader(), key);
-        return object.verify(verifier);
+    private static boolean verify(PublicKey key, JWSObject object) throws JOSEException {
+        return object.verify(new DefaultJWSVerifierFactory().createJWSVerifier(object.getHeader(), key));
     }
 
     private static class MapTypeToken extends TypeToken<Map<String, List<String>>> {

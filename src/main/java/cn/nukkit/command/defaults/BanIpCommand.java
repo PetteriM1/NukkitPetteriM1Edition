@@ -58,13 +58,13 @@ public class BanIpCommand extends VanillaCommand {
         }
 
         if (Pattern.matches("^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$", value)) {
-            this.processIPBan(value, sender, reason.toString());
+            processIPBan(value, sender, reason.toString());
 
             Command.broadcastCommandMessage(sender, new TranslationContainer("commands.banip.success", value));
         } else {
             Player player = sender.getServer().getPlayer(value);
             if (player != null) {
-                this.processIPBan(player.getAddress(), sender, reason.toString());
+                processIPBan(player.getAddress(), sender, reason.toString());
 
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.banip.success.players", player.getAddress(), player.getName()));
             } else {
@@ -81,7 +81,7 @@ public class BanIpCommand extends VanillaCommand {
                 }
 
                 if (nbt != null && nbt.contains("lastIP") && Pattern.matches("^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$", (value = nbt.getString("lastIP")))) {
-                    this.processIPBan(value, sender, reason.toString());
+                    processIPBan(value, sender, reason.toString());
 
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.banip.success", value));
                 } else {
@@ -94,7 +94,7 @@ public class BanIpCommand extends VanillaCommand {
         return true;
     }
 
-    private void processIPBan(String ip, CommandSender sender, String reason) {
+    private static void processIPBan(String ip, CommandSender sender, String reason) {
         sender.getServer().getIPBans().addBan(ip, reason, null, sender.getName());
 
         for (Player player : new ArrayList<>(sender.getServer().getOnlinePlayers().values())) {

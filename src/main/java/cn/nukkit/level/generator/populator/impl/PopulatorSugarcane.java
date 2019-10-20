@@ -17,7 +17,7 @@ import cn.nukkit.math.NukkitRandom;
  */
 public class PopulatorSugarcane extends PopulatorSurfaceBlock {
 
-    private boolean findWater(int x, int y, int z, Level level) {
+    private static boolean findWater(int x, int y, int z, Level level) {
         int count = 0;
         for (int i = x - 4; i < (x + 4); i++) {
             for (int j = z - 4; j < (z + 4); j++) {
@@ -30,7 +30,7 @@ public class PopulatorSugarcane extends PopulatorSurfaceBlock {
                 }
             }
         }
-        return (count > 10);
+        return false;
     }
 
     @Override

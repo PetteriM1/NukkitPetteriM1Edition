@@ -116,7 +116,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 			if (flag && item instanceof ItemArmor) {
 				ItemArmor itemArmor = (ItemArmor) item;
-				i = this.getArmorSlot(itemArmor);
+				i = getArmorSlot(itemArmor);
 				isArmorSlot = true;
 			}
 
@@ -285,7 +285,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 		return "Armor Stand";
 	}
 
-	private int getArmorSlot(ItemArmor armorItem) {
+	private static int getArmorSlot(ItemArmor armorItem) {
 		if (armorItem.isHelmet()) {
 			return 0;
 		} else if (armorItem.isChestplate()) {

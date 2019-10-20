@@ -37,11 +37,6 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     @Override
-    public float getMaxJumpHeight() {
-        return 2f;
-    }
-
-    @Override
     public boolean mountEntity(Entity entity) {
         Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
 

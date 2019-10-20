@@ -132,8 +132,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isSection(String key) {
-        Object value = this.get(key);
-        return value instanceof ConfigSection;
+        return this.get(key) instanceof ConfigSection;
     }
 
     /**
@@ -217,8 +216,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isInt(String key) {
-        Object val = get(key);
-        return val instanceof Integer;
+        return get(key) instanceof Integer;
     }
 
     /**
@@ -249,8 +247,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isLong(String key) {
-        Object val = get(key);
-        return val instanceof Long;
+        return get(key) instanceof Long;
     }
 
     /**
@@ -281,8 +278,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isDouble(String key) {
-        Object val = get(key);
-        return val instanceof Double;
+        return get(key) instanceof Double;
     }
 
     /**
@@ -303,8 +299,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public String getString(String key, String defaultValue) {
-        Object result = this.get(key, defaultValue);
-        return String.valueOf(result);
+        return String.valueOf(this.get(key, defaultValue));
     }
 
     /**
@@ -314,8 +309,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isString(String key) {
-        Object val = get(key);
-        return val instanceof String;
+        return get(key) instanceof String;
     }
 
     /**
@@ -346,8 +340,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isBoolean(String key) {
-        Object val = get(key);
-        return val instanceof Boolean;
+        return get(key) instanceof Boolean;
     }
 
     /**
@@ -378,8 +371,7 @@ public class ConfigSection extends LinkedHashMap<String, Object> {
      * @return
      */
     public boolean isList(String key) {
-        Object val = get(key);
-        return val instanceof List;
+        return get(key) instanceof List;
     }
 
     /**

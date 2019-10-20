@@ -18,7 +18,7 @@ public class EntityChicken extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 10;
 
-    private int EggLayTime = this.getRandomEggLayTime();
+    private int EggLayTime = getRandomEggLayTime();
     private boolean IsChickenJockey = false;
 
     public EntityChicken(FullChunk chunk, CompoundTag nbt) {
@@ -63,7 +63,7 @@ public class EntityChicken extends EntityWalkingAnimal {
         if (this.namedTag.contains("EggLayTime")) {
             this.EggLayTime = this.namedTag.getInt("EggLayTime");
         } else {
-            this.EggLayTime = this.getRandomEggLayTime();
+            this.EggLayTime = getRandomEggLayTime();
         }
         if (this.namedTag.contains("IsChickenJockey")) {
             this.IsChickenJockey = this.namedTag.getBoolean("IsChickenJockey");
@@ -84,7 +84,7 @@ public class EntityChicken extends EntityWalkingAnimal {
             } else {
                 this.level.dropItem(this, Item.get(Item.EGG, 0, 1));
                 this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_PLOP);
-                this.EggLayTime = this.getRandomEggLayTime();
+                this.EggLayTime = getRandomEggLayTime();
             }
         }
 
@@ -166,7 +166,7 @@ public class EntityChicken extends EntityWalkingAnimal {
         return false;
     }
 
-    public int getRandomEggLayTime() {
+    private static  int getRandomEggLayTime() {
         return Utils.rand(6000, 12000);
     }
 

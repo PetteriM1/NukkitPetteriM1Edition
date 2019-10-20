@@ -475,7 +475,7 @@ public class BinaryStream {
         this.putVarInt(ingredient.getCount());
     }
 
-    private List<String> extractStringList(Item item, String tagName) {
+    private static List<String> extractStringList(Item item, String tagName) {
         CompoundTag namedTag = item.getNamedTag();
         if (namedTag == null) {
             return Collections.emptyList();

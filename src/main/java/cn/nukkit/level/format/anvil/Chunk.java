@@ -58,7 +58,7 @@ public class Chunk extends BaseChunk {
         if (nbt == null) {
             this.biomes = new byte[16 * 16];
             this.sections = new cn.nukkit.level.format.ChunkSection[16];
-            if (16 >= 0) System.arraycopy(EmptyChunkSection.EMPTY, 0, this.sections, 0, 16);
+            System.arraycopy(EmptyChunkSection.EMPTY, 0, this.sections, 0, 16);
             return;
         }
 
@@ -272,7 +272,7 @@ public class Chunk extends BaseChunk {
             if (section instanceof EmptyChunkSection) {
                 continue;
             }
-            CompoundTag s = new CompoundTag(null);
+            CompoundTag s = new CompoundTag();
             s.putByte("Y", section.getY());
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());
@@ -354,7 +354,7 @@ public class Chunk extends BaseChunk {
             if (section instanceof EmptyChunkSection) {
                 continue;
             }
-            CompoundTag s = new CompoundTag(null);
+            CompoundTag s = new CompoundTag();
             s.putByte("Y", (section.getY()));
             s.putByteArray("Blocks", section.getIdArray());
             s.putByteArray("Data", section.getDataArray());

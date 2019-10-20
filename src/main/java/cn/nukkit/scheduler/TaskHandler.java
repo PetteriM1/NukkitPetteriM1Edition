@@ -102,10 +102,6 @@ public class TaskHandler {
         }
     }
 
-    public String getTaskName() {
-        return "Unknown";
-    }
-
     public boolean isAsynchronous() {
         return asynchronous;
     }

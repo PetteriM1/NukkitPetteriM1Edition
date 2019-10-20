@@ -210,7 +210,7 @@ public class SimpleCommandMap implements CommandMap {
         return true;
     }
 
-    private ArrayList<String> parseArguments(String cmdLine) {
+    private static ArrayList<String> parseArguments(String cmdLine) {
         StringBuilder sb = new StringBuilder(cmdLine);
         ArrayList<String> args = new ArrayList<>();
         boolean notQuoted = true;

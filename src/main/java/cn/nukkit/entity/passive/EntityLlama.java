@@ -14,8 +14,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityLlama extends EntityHorseBase {
@@ -104,19 +102,6 @@ public class EntityLlama extends EntityHorseBase {
 
     @Override
     public Item[] getDrops() {
-        List<Item> drops = new ArrayList<>();
-
-        if (!this.isBaby()) {
-            for (int i = 0; i < Utils.rand(0, 2); i++) {
-                drops.add(Item.get(Item.LEATHER, 0, 1));
-            }
-        }
-
-        return drops.toArray(new Item[0]);
-    }
-
-    @Override
-    public float getMaxJumpHeight() {
-        return 1.2f;
+        return new Item[]{Item.get(Item.LEATHER, 0, Utils.rand(0, 2))};
     }
 }

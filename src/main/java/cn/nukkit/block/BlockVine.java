@@ -178,7 +178,7 @@ public class BlockVine extends BlockTransparentMeta {
         return BlockFace.SOUTH;
     }
 
-    private int getMetaFromFace(BlockFace face) {
+    private static int getMetaFromFace(BlockFace face) {
         switch (face) {
             case SOUTH:
             default:

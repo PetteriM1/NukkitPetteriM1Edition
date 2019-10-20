@@ -47,11 +47,6 @@ public class EntityMagmaCube extends EntityJumpingMob {
     }
 
     @Override
-    public float getMaxJumpHeight() {
-        return 2f;
-    }
-
-    @Override
     protected void initEntity() {
         super.initEntity();
 

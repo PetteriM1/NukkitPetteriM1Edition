@@ -162,7 +162,7 @@ public class BlockFire extends BlockFlowable {
                                 }
 
                                 Block block = this.getLevel().getBlock(new Vector3(x, y, z));
-                                int chance = this.getChanceOfNeighborsEncouragingFire(block);
+                                int chance = getChanceOfNeighborsEncouragingFire(block);
 
                                 if (chance > 0) {
                                     int t = (chance + 40 + this.getLevel().getServer().getDifficulty() * 7) / (meta + 30);
@@ -227,7 +227,7 @@ public class BlockFire extends BlockFlowable {
         }
     }
 
-    private int getChanceOfNeighborsEncouragingFire(Block block) {
+    private static int getChanceOfNeighborsEncouragingFire(Block block) {
         if (block.getId() != AIR) {
             return 0;
         } else {

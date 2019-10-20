@@ -120,7 +120,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
         List<Item> needInputs = this.getIngredientList();
 
-        if (!this.matchItemList(haveInputs, needInputs)) {
+        if (!matchItemList(haveInputs, needInputs)) {
             return false;
         }
 
@@ -131,11 +131,11 @@ public class ShapelessRecipe implements CraftingRecipe {
         haveOutputs.sort(CraftingManager.recipeComparator);
         List<Item> needOutputs = this.getExtraResults();
 
-        return this.matchItemList(haveOutputs, needOutputs);
+        return matchItemList(haveOutputs, needOutputs);
     }
 
 
-    private boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
+    private static boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
         haveItems.removeIf(Item::isNull);
 
         if (haveItems.size() != needItems.size()) {

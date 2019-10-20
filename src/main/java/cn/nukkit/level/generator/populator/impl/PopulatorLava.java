@@ -32,7 +32,7 @@ public class PopulatorLava extends Populator {
             for (int i = 0; i < amount; ++i) {
                 int x = random.nextRange(0, 15);
                 int z = random.nextRange(0, 15);
-                int y = this.getHighestWorkableBlock(chunk, x, z);
+                int y = getHighestWorkableBlock(chunk, x, z);
                 if (y != -1 && chunk.getBlockId(x, y, z) == Block.AIR) {
                     chunk.setBlock(x, y, z, Block.LAVA);
                     chunk.setBlockLight(x, y, z, Block.light[Block.LAVA]);
@@ -214,7 +214,7 @@ public class PopulatorLava extends Populator {
     }
 
 
-    private int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
+    private static int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
         int y;
         for (y = 127; y >= 0; y--) {
             int b = chunk.getBlockId(x, y, z);

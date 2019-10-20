@@ -78,10 +78,6 @@ public class ServerScheduler {
         return asyncPool.getCorePoolSize();
     }
 
-    public void increaseAsyncTaskPoolSize(int newSize) {
-        throw new UnsupportedOperationException("Cannot increase a working pool size.");
-    }
-
     public TaskHandler scheduleDelayedTask(Task task, int delay) {
         return this.addTask(task, delay, 0, false);
     }

@@ -106,7 +106,7 @@ public abstract class SimpleConfig {
         return true;
     }
 
-    private String getPath(Field field) {
+    private static String getPath(Field field) {
         String path = null;
         if (field.isAnnotationPresent(Path.class)) {
             Path pathDefine = field.getAnnotation(Path.class);
@@ -118,7 +118,7 @@ public abstract class SimpleConfig {
         return path;
     }
 
-    private boolean skipSave(Field field) {
+    private static boolean skipSave(Field field) {
         if (!field.isAnnotationPresent(Skip.class)) return false;
         return field.getAnnotation(Skip.class).skipSave();
     }

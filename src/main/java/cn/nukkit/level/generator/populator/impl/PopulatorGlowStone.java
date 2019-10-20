@@ -13,7 +13,7 @@ public class PopulatorGlowStone extends Populator {
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
         int x = NukkitMath.randomRange(random, chunkX << 4, (chunkX << 4) + 15);
         int z = NukkitMath.randomRange(random, chunkZ << 4, (chunkZ << 4) + 15);
-        int y = this.getHighestWorkableBlock(chunk, x & 0xF, z & 0xF);
+        int y = getHighestWorkableBlock(chunk, x & 0xF, z & 0xF);
         if (y != -1 && level.getBlockIdAt(x, y, z) != NETHERRACK) {
             int count = NukkitMath.randomRange(random, 40, 60);
             for (int i = 0; i < count; i++) {
@@ -22,7 +22,7 @@ public class PopulatorGlowStone extends Populator {
         }
     }
 
-    private int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
+    private static int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
         int y;
         // Start scanning a bit lower down to allow space for placing on top
         for (y = 120; y >= 0; y--) {

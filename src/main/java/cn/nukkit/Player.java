@@ -960,7 +960,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         packet.protocol = this.protocol;
 
-        try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
+        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
@@ -994,7 +994,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             ((StartGamePacket) packet).version = this.version;
         }
 
-        try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
+        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -1025,7 +1025,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         packet.protocol = this.protocol;
 
-        try (Timing timing = Timings.getSendDataPacketTiming(packet)) {
+        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
             DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -1797,7 +1797,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return entity;
     }
 
-    private EntityInteractable getEntityAtPosition(Entity[] nearbyEntities, int x, int y, int z) {
+    private static EntityInteractable getEntityAtPosition(Entity[] nearbyEntities, int x, int y, int z) {
         for (Entity nearestEntity : nearbyEntities) {
             if (nearestEntity.getFloorX() == x && nearestEntity.getFloorY() == y && nearestEntity.getFloorZ() == z
                     && nearestEntity instanceof EntityInteractable
@@ -2044,7 +2044,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         packet.protocol = this.protocol;
 
-        try (Timing timing = Timings.getReceiveDataPacketTiming(packet)) {
+        try (Timing ignore = Timings.getReceiveDataPacketTiming(packet)) {
             DataPacketReceiveEvent ev = new DataPacketReceiveEvent(this, packet);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -2620,7 +2620,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.server.getPluginManager().callEvent(pickEvent);
 
                     if (!pickEvent.isCancelled()) {
-                        this.inventory.setItemInHand(pickEvent.getItem());
+                        boolean itemExists = false;
+
+                        for (int slot = 0; slot < this.inventory.getHotbarSize(); slot++) {
+                            if (this.inventory.getItem(slot).equals(pickEvent.getItem())) {
+                                this.inventory.setHeldItemSlot(slot);
+                                itemExists = true;
+                                break;
+                            }
+                        }
+
+                        if (!itemExists) {
+                            this.inventory.setItemInHand(pickEvent.getItem());
+                        }
                     }
                     break;
                 case ProtocolInfo.ANIMATE_PACKET:
@@ -2911,7 +2923,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 blockVector = useItemData.blockPos;
                                 face = useItemData.face;
                                 type = useItemData.actionType;
-                            } catch (Exception ignore) {
+                            } catch (Exception ignored) {
                                 break packetswitch;
                             }
 
@@ -4295,8 +4307,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return bossBarId  The BossBar ID, you should store it if you want to remove or update the BossBar later
      */
     public long createBossBar(String text, int length) {
-        DummyBossBar bossBar = new DummyBossBar.Builder(this).text(text).length(length).build();
-        return this.createBossBar(bossBar);
+        return this.createBossBar(new DummyBossBar.Builder(this).text(text).length(length).build());
     }
 
     /**

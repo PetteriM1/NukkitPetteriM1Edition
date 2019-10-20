@@ -33,12 +33,12 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         Position pos = player.getPosition();
         Level level = player.getLevel();
 
-        if (this.spawnTask.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
+        if (Spawner.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
             if (pos != null) {
-                pos.x += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
-                pos.z += this.spawnTask.getRandomSafeXZCoord(50, 26, 6);
+                pos.x += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
+                pos.z += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
                 if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return SpawnResult.ERROR;
-                pos.y = this.spawnTask.getSafeYCoord(level, pos, 3);
+                pos.y = Spawner.getSafeYCoord(level, pos, 3);
             } else {
                 return SpawnResult.POSITION_MISMATCH;
             }
@@ -53,7 +53,7 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 		}
     }
 
-    protected static boolean isSpawnAllowedByDifficulty() {
+    private static boolean isSpawnAllowedByDifficulty() {
         int randomNumber = Utils.rand(0, 3);
 
         switch (Server.getInstance().getDifficulty()) {

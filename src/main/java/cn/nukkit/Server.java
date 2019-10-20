@@ -324,8 +324,8 @@ public class Server {
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
 
-        this.registerEntities();
-        this.registerBlockEntities();
+        registerEntities();
+        registerBlockEntities();
 
         Block.init();
         Enchantment.init();
@@ -374,7 +374,7 @@ public class Server {
                 long seed;
                 String seedString = String.valueOf(this.getProperty("level-seed", System.currentTimeMillis()));
                 try {
-                    seed = Long.valueOf(seedString);
+                    seed = Long.parseLong(seedString);
                 } catch (NumberFormatException e) {
                     seed = seedString.hashCode();
                 }
@@ -399,26 +399,22 @@ public class Server {
 
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
-            String dir2 = null;
-            File directory = new File("");
             try {
-                String f = directory.getCanonicalPath();
-                dir2 = f + "/worlds/";
-            } catch (Exception ignored) {}
-            File var11 = new File(dir2);
-            File[] fa = var11.listFiles();
-            for (File fs : fa) {
-                if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
-                    this.loadLevel(fs.getName());
+                for (File fs : new File(new File("").getCanonicalPath() + "/worlds/").listFiles()) {
+                    if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
+                        this.loadLevel(fs.getName());
+                    }
                 }
-            }
-            if (this.getLevelByName("nether") == null && this.getPropertyBoolean("nether", false)) {
-                this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
-                this.loadLevel("nether");
-            }
-            if (this.getLevelByName("end") == null && this.getPropertyBoolean("end", false)) {
-                this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
-                this.loadLevel("end");
+                if (this.getLevelByName("nether") == null && this.getPropertyBoolean("nether", false)) {
+                    this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
+                    this.loadLevel("nether");
+                }
+                if (this.getLevelByName("end") == null && this.getPropertyBoolean("end", false)) {
+                    this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
+                    this.loadLevel("end");
+                }
+            } catch (Exception e) {
+                this.getLogger().debug("Unable to load levels", e);
             }
         }
 
@@ -1408,11 +1404,10 @@ public class Server {
 
     public float getTickUsageAverage() {
         float sum = 0;
-        int count = this.useAverage.length;
         for (float aUseAverage : this.useAverage) {
             sum += aUseAverage;
         }
-        return ((float) Math.round(sum / count * 100)) / 100;
+        return ((float) Math.round(sum / this.useAverage.length * 100)) / 100;
     }
 
     public SimpleCommandMap getCommandMap() {
@@ -1553,8 +1548,7 @@ public class Server {
         }
 
         for (InetSocketAddress socketAddress : new ArrayList<>(this.players.keySet())) {
-            Player p = this.players.get(socketAddress);
-            if (player == p) {
+            if (player == this.players.get(socketAddress)) {
                 this.players.remove(socketAddress);
                 break;
             }
@@ -1896,7 +1890,7 @@ public class Server {
     /**
      * Internal method to register all default entities
      */
-    private void registerEntities() {
+    private static void registerEntities() {
         //Items
         Entity.registerEntity("Item", EntityItem.class);
         Entity.registerEntity("Painting", EntityPainting.class);
@@ -2001,7 +1995,7 @@ public class Server {
     /**
      * Internal method to register all default block entities
      */
-    private void registerBlockEntities() {
+    private static void registerBlockEntities() {
         BlockEntity.registerBlockEntity(BlockEntity.FURNACE, BlockEntityFurnace.class);
         BlockEntity.registerBlockEntity(BlockEntity.CHEST, BlockEntityChest.class);
         BlockEntity.registerBlockEntity(BlockEntity.SIGN, BlockEntitySign.class);

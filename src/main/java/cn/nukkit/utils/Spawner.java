@@ -61,7 +61,7 @@ public class Spawner extends Thread {
         }
     }
 
-    public boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
+    static boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
         try {
             int count = 0;
             for (Entity entity : level.getEntities()) {
@@ -93,7 +93,7 @@ public class Spawner extends Thread {
         return entity;
     }
 
-    private boolean tooNearOfPlayer(Position pos) {
+    private static boolean tooNearOfPlayer(Position pos) {
         for (Player p : pos.getLevel().getPlayers().values()) {
             if (p.distanceSquared(pos) < 144) { // 12 blocks
                 return true;
@@ -102,7 +102,7 @@ public class Spawner extends Thread {
         return false;
     }
 
-    public int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
+    static int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
         int addX = Utils.rand(degree / 2 * -1, degree / 2);
         if (addX >= 0) {
             if (degree < safeDegree) {
@@ -118,7 +118,7 @@ public class Spawner extends Thread {
         return addX;
     }
 
-    public int getSafeYCoord(Level level, Position pos, int needDegree) {
+    static int getSafeYCoord(Level level, Position pos, int needDegree) {
         int x = (int) pos.x;
         int y = (int) pos.y;
         int z = (int) pos.z;

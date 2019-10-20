@@ -54,7 +54,7 @@ class TimingIdentifier {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof TimingIdentifier)) {
+        if (!(o instanceof TimingIdentifier)) {
             return false;
         }
 

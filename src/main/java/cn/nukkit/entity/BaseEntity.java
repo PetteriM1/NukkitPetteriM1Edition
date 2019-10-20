@@ -25,15 +25,14 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     protected int stayTime = 0;
     protected int moveTime = 0;
 
-    public float maxJumpHeight = 1.2f;
-    public float moveMultifier = 1.0f;
+    protected float moveMultifier = 1.0f;
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
     protected byte attackDelay = 0;
-    protected short inLoveTicks = 0;
+    private short inLoveTicks = 0;
 
-    protected boolean baby = false;
+    private boolean baby = false;
     private boolean movement = true;
     private boolean friendly = false;
 
@@ -76,10 +75,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return 1.2;
         }
         return 1;
-    }
-
-    public float getMaxJumpHeight() {
-        return this.maxJumpHeight;
     }
 
     public int getAge() {

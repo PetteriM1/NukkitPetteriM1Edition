@@ -315,6 +315,7 @@ public interface BlockID {
     int INFO_UPDATE = 248;
     int INFO_UPDATE2 = 249;
     int PISTON_EXTENSION = 250;
+    int MOVING_BLOCK = 250;
     int OBSERVER = 251;
     int STRUCTURE_BLOCK = 252;
     int HARD_GLASS = 253;

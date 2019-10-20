@@ -366,7 +366,7 @@ public abstract class Entity extends Location implements Metadatable {
                 this.setNameTagVisible(this.namedTag.getBoolean("CustomNameVisible"));
             }
 
-            if(this.namedTag.contains("CustomNameAlwaysVisible")){
+            if (this.namedTag.contains("CustomNameAlwaysVisible")){
                 this.setNameTagAlwaysVisible(this.namedTag.getBoolean("CustomNameAlwaysVisible"));
             }
         }

@@ -37,11 +37,11 @@ public class BaseLang {
 
         if (path == null) {
             path = "lang/";
-            this.lang = this.loadLang(this.getClass().getClassLoader().getResourceAsStream(path + this.langName + "/lang.ini"));
-            if (useFallback) this.fallbackLang = this.loadLang(this.getClass().getClassLoader().getResourceAsStream(path + fallback + "/lang.ini"));
+            this.lang = loadLang(this.getClass().getClassLoader().getResourceAsStream(path + this.langName + "/lang.ini"));
+            if (useFallback) this.fallbackLang = loadLang(this.getClass().getClassLoader().getResourceAsStream(path + fallback + "/lang.ini"));
         } else {
-            this.lang = this.loadLang(path + this.langName + "/lang.ini");
-            if (useFallback) this.fallbackLang = this.loadLang(path + fallback + "/lang.ini");
+            this.lang = loadLang(path + this.langName + "/lang.ini");
+            if (useFallback) this.fallbackLang = loadLang(path + fallback + "/lang.ini");
         }
         if (this.fallbackLang == null) this.fallbackLang = this.lang;
 
@@ -64,7 +64,7 @@ public class BaseLang {
         return langName;
     }
 
-    protected Map<String, String> loadLang(String path) {
+    protected static Map<String, String> loadLang(String path) {
         try {
             String content = Utils.readFile(path);
             Map<String, String> d = new HashMap<>();
@@ -95,7 +95,7 @@ public class BaseLang {
         }
     }
 
-    protected Map<String, String> loadLang(InputStream stream) {
+    protected static Map<String, String> loadLang(InputStream stream) {
         try {
             String content = Utils.readFile(stream);
             Map<String, String> d = new HashMap<>();

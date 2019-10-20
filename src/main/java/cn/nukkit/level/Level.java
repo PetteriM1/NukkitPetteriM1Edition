@@ -2430,7 +2430,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public synchronized void setBlockLightAt(int x, int y, int z, int level) {
-        this.getChunk(x >> 4, z >> 4, true).setBlockLight(x & 0x0f, y & 0xff, z & 0x0f, level & 0x0f);
+        BaseFullChunk c = this.getChunkIfLoaded(x >> 4, z >> 4);
+        if (null != c) {
+            c.setBlockLight(x & 0x0f, y & 0xff, z & 0x0f, level & 0x0f);
+        }
     }
 
     public int getBiomeId(int x, int z) {

@@ -60,7 +60,7 @@ public abstract class Command {
 
     public Command(String name, String description, String usageMessage, String[] aliases) {
         this.commandData = new CommandData();
-        this.name = name;
+        this.name = name.toLowerCase(); // Prevent client crash
         this.nextLabel = name;
         this.label = name;
         this.description = description;

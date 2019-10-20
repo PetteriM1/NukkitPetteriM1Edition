@@ -298,7 +298,7 @@ public class Utils {
         if (min == max) {
             return max;
         }
-        return min + Math.random() * (max-min);
+        return min + random.nextDouble() * (max-min);
     }
 
     public static boolean rand() {

@@ -218,6 +218,11 @@ public class CompoundTag extends Tag implements Cloneable {
         return getByte(name) != 0;
     }
 
+    public boolean getBoolean(String name, boolean def) {
+        if (!tags.containsKey(name)) return def;
+        return (((NumberTag) tags.get(name)).getData().intValue()) != 0;
+    }
+
     public String toString() {
         StringJoiner joiner = new StringJoiner(",\n\t");
         tags.forEach((key, tag) -> joiner.add('\'' + key + "' : " + tag.toString().replace("\n", "\n\t")));

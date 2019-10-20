@@ -730,7 +730,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      * @return {@code true} if the block is normal block
      */
     public boolean setDisplayBlock(Block block, boolean update) {
-        if(!update){
+        if (!update){
             if (block.isNormalBlock()) {
                 blockInside = block;
             } else {
