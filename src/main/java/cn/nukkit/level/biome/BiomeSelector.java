@@ -29,22 +29,22 @@ public class BiomeSelector {
         float temperature = this.temperature.noise2D(x, z, true);
         float rainfall = this.rainfall.noise2D(x, z, true);
         EnumBiome biome;
-        if (noiseOcean < -0.15f)    {
-            if (noiseOcean < -0.91f)    {
-                if (noiseOcean < -0.92f) {
+        if (noiseOcean < -0.3f) {
+            if (noiseOcean < -0.46f) {
+                if (noiseOcean < -0.5f) {
                     biome = EnumBiome.MUSHROOM_ISLAND;
                 } else {
                     biome = EnumBiome.MUSHROOM_ISLAND_SHORE;
                 }
             } else {
-                if (rainfall < 0f)  {
+                if (rainfall < 0f) {
                     biome = EnumBiome.OCEAN;
                 } else {
                     biome = EnumBiome.DEEP_OCEAN;
                 }
             }
-        } else if (Math.abs(noiseRiver) < 0.04f) {
-            if (temperature < -0.3f)    {
+        } else if (Math.abs(noiseRiver) < -0.1f) {
+            if (temperature < -0.3f) {
                 biome = EnumBiome.FROZEN_RIVER;
             } else {
                 biome = EnumBiome.RIVER;

@@ -5,8 +5,7 @@ import cn.nukkit.level.generator.populator.impl.WaterIcePopulator;
 
 public class ColdBeachBiome extends SandyBiome {
     public ColdBeachBiome() {
-        WaterIcePopulator ice = new WaterIcePopulator();
-        this.addPopulator(ice);
+        this.addPopulator(new WaterIcePopulator());
 
         this.setBaseHeight(0f);
         this.setHeightVariation(0.025f);
