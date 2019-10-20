@@ -18,7 +18,6 @@ public class RakNetUtils {
     public static final InetSocketAddress[] LOCAL_IP_ADDRESSES_V4 = new InetSocketAddress[20];
     public static final InetSocketAddress[] LOCAL_IP_ADDRESSES_V6 = new InetSocketAddress[20];
 
-
     static {
         LOCAL_IP_ADDRESSES_V4[0] = LOOPBACK_V4;
         LOCAL_IP_ADDRESSES_V6[0] = LOOPBACK_V6;

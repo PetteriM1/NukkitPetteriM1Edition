@@ -66,8 +66,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
     private volatile int reliabilityWriteIndex;
     private int[] orderReadIndex;
     private AtomicIntegerArray orderWriteIndex;
-    private AtomicIntegerArray sequenceReadIndex;
-    private AtomicIntegerArray sequenceWriteIndex;
     private Lock outgoingLock;
 
     private RoundRobinArray<SplitPacketHelper> splitPackets;
@@ -109,8 +107,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         this.reliabilityReadLock = new ReentrantLock(true);
         this.orderReadIndex = new int[MAXIMUM_ORDERING_CHANNELS];
         this.orderWriteIndex = new AtomicIntegerArray(MAXIMUM_ORDERING_CHANNELS);
-        this.sequenceReadIndex = new AtomicIntegerArray(MAXIMUM_ORDERING_CHANNELS);
-        this.sequenceWriteIndex = new AtomicIntegerArray(MAXIMUM_ORDERING_CHANNELS);
 
         //noinspection unchecked
         this.orderingHeaps = new FastBinaryMinHeap[MAXIMUM_ORDERING_CHANNELS];
@@ -139,8 +135,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         this.reliableDatagramQueue = null;
         this.orderReadIndex = null;
         this.orderWriteIndex = null;
-        this.sequenceReadIndex = null;
-        this.sequenceWriteIndex = null;
 
         RoundRobinArray<SplitPacketHelper> splitPackets = this.splitPackets;
         this.splitPackets = null;
@@ -906,10 +900,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
     private void touch() {
         this.checkForClosed();
         this.lastTouched = System.currentTimeMillis();
-    }
-
-    public boolean isStale() {
-        return System.currentTimeMillis() - this.lastTouched >= SESSION_STALE_MS;
     }
 
     public boolean isTimedOut() {

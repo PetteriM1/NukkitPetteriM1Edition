@@ -22,15 +22,11 @@ public class RakNetConstants {
 
     public static final int RAKNET_DATAGRAM_HEADER_SIZE = 4;
 
-    public static final int MAXIMUM_CONNECTION_ATTEMPTS = 10;
+    public static final int MAXIMUM_CONNECTION_ATTEMPTS = 12;
     /**
      * Time after {@link RakNetSession} is closed due to no activity.
      */
     public static final int SESSION_TIMEOUT_MS = Server.getInstance().getPropertyInt("timeout-milliseconds", 30000);
-    /**
-     * Time after {@link RakNetSession} is refreshed due to no activity.
-     */
-    public static final int SESSION_STALE_MS = 5000;
 
     /*
         Flags

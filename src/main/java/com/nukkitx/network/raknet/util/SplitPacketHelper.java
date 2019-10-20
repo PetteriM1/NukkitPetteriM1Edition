@@ -54,13 +54,6 @@ public class SplitPacketHelper extends AbstractReferenceCounted {
         return packet.fromSplit(reassembled);
     }
 
-    public boolean expired() {
-        // If we're waiting on a split packet for more than 30 seconds, the client on the other end is either severely
-        // lagging, or has died.
-        Preconditions.checkState(this.refCnt() > 0, "packet has been released");
-        return System.currentTimeMillis() - created >= 30000;
-    }
-
     @Override
     protected void deallocate() {
         for (EncapsulatedPacket packet : this.packets) {

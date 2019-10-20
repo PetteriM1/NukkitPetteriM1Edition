@@ -1123,15 +1123,13 @@ public class Server {
         Runtime runtime = Runtime.getRuntime();
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
         double max = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
-        String title = (char) 0x1b + "]0;" + Nukkit.NUKKIT +
+        System.out.print((char) 0x1b + "]0;" + Nukkit.NUKKIT +
                 " | Online " + this.players.size() + '/' + this.maxPlayers +
                 " | Memory " + Math.round(used / max * 100) + '%' +
                 /*" | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
                 " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +*/
                 " | TPS " + this.getTicksPerSecond() +
-                " | Load " + this.getTickUsage() + '%' + (char) 0x07;
-
-        System.out.print(title);
+                " | Load " + this.getTickUsage() + '%' + (char) 0x07);
     }
 
     public QueryRegenerateEvent getQueryInformation() {

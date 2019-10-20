@@ -161,6 +161,11 @@
             <scope>compile</scope>
             <classifier>osx-x86_64</classifier>
         </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.3</version>
+        </dependency>
     </dependencies>
 
     <build>

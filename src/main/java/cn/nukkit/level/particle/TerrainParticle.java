@@ -12,6 +12,6 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 public class TerrainParticle extends GenericParticle {
 
     public TerrainParticle(Vector3 pos, Block block) {
-        super(pos, Particle.TYPE_TERRAIN, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, block.getDamage(), block.getId()));
+        super(pos, Particle.TYPE_TERRAIN, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, block.getId(), block.getDamage()));
     }
 }

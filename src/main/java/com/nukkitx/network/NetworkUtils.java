@@ -8,8 +8,6 @@ import java.net.*;
 @UtilityClass
 public class NetworkUtils {
 
-    private static final int AF_INET6 = 23;
-
     public static InetSocketAddress readAddress(ByteBuf buffer) {
         short type = buffer.readByte();
         InetAddress address;
@@ -47,7 +45,7 @@ public class NetworkUtils {
             buffer.writeShort(address.getPort());
         } else if (address.getAddress() instanceof Inet6Address) {
             buffer.writeByte(6);
-            buffer.writeShortLE(AF_INET6);
+            buffer.writeShortLE(23); // AF_INET6
             buffer.writeShort(address.getPort());
             buffer.writeInt(0);
             buffer.writeBytes(addressBytes);

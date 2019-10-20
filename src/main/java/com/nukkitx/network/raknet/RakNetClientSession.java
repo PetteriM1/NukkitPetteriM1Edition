@@ -2,7 +2,6 @@ package com.nukkitx.network.raknet;
 
 import com.nukkitx.network.NetworkUtils;
 import com.nukkitx.network.util.DisconnectReason;
-import com.nukkitx.network.util.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoop;
@@ -72,8 +71,7 @@ public class RakNetClientSession extends RakNetSession {
     }
 
     private void attemptConnection(long curTime) {
-        int mtuDiff = (RakNetConstants.MAXIMUM_MTU_SIZE - RakNetConstants.MINIMUM_MTU_SIZE) / 9;
-        int mtuSize = RakNetConstants.MAXIMUM_MTU_SIZE - (this.connectionAttempts * mtuDiff);
+        int mtuSize = RakNetConstants.MAXIMUM_MTU_SIZE - (this.connectionAttempts * ((RakNetConstants.MAXIMUM_MTU_SIZE - RakNetConstants.MINIMUM_MTU_SIZE) / 9));
         if (mtuSize < RakNetConstants.MINIMUM_MTU_SIZE) {
             mtuSize = RakNetConstants.MINIMUM_MTU_SIZE;
         }
@@ -91,15 +89,6 @@ public class RakNetClientSession extends RakNetSession {
         }
     }
 
-    public void connect() {
-        Preconditions.checkState(this.closed, "Session is already started");
-        this.closed = false;
-
-        this.attemptConnection(System.currentTimeMillis());
-
-        this.setState(RakNetState.UNCONNECTED);
-    }
-
     @Override
     public RakNet getRakNet() {
         return this.rakNet;
@@ -114,8 +103,7 @@ public class RakNetClientSession extends RakNetSession {
         }
         this.guid = buffer.readLong();
         boolean security = buffer.readBoolean();
-        int mtu = buffer.readUnsignedShort();
-        this.setMtu(mtu);
+        this.setMtu(buffer.readUnsignedShort());
 
         if (security) {
             this.close(DisconnectReason.CONNECTION_REQUEST_FAILED);
@@ -136,15 +124,13 @@ public class RakNetClientSession extends RakNetSession {
             return;
         }
 
-        long guid = buffer.readLong();
-        if (this.guid != guid) {
+        if (this.guid != buffer.readLong()) {
             this.close(DisconnectReason.CONNECTION_REQUEST_FAILED);
             return;
         }
-        InetSocketAddress address = NetworkUtils.readAddress(buffer);
-        int mtu = buffer.readUnsignedShort();
-        this.setMtu(mtu);
-        boolean security = buffer.readBoolean();
+        NetworkUtils.readAddress(buffer);
+        this.setMtu(buffer.readUnsignedShort());
+        buffer.readBoolean();
 
         this.initialize();
         this.setState(RakNetState.INITIALIZED);
@@ -153,14 +139,13 @@ public class RakNetClientSession extends RakNetSession {
     }
 
     private void onConnectionRequestAccepted(ByteBuf buffer) {
-        InetSocketAddress address = NetworkUtils.readAddress(buffer);
-        int systemIndex = buffer.readUnsignedShort();
+        NetworkUtils.readAddress(buffer);
+        buffer.readUnsignedShort();
         while (buffer.readableBytes() > 16) {
             NetworkUtils.readAddress(buffer);
         }
-        long pongTime = buffer.readLong();
 
-        this.sendNewIncomingConnection(pongTime);
+        this.sendNewIncomingConnection(buffer.readLong());
 
         this.setState(RakNetState.CONNECTED);
     }
