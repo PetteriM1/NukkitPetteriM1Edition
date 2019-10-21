@@ -274,6 +274,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[GOLDEN_APPLE_ENCHANTED] = ItemAppleGoldEnchanted.class; //466
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
             list[CROSSBOW] = ItemCrossbow.class; //471
+            list[SWEET_BERRIES] = ItemSweetBerries.class; //477
             list[RECORD_11] = ItemRecord11.class;
             list[RECORD_CAT] = ItemRecordCat.class;
             list[RECORD_13] = ItemRecord13.class;
@@ -286,6 +287,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[RECORD_STAL] = ItemRecordStal.class;
             list[RECORD_STRAD] = ItemRecordStrad.class;
             list[RECORD_WAIT] = ItemRecordWait.class;
+            list[SHIELD] = ItemShield.class; //513
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
