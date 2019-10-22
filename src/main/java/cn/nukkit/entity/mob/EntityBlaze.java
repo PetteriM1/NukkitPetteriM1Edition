@@ -96,4 +96,9 @@ public class EntityBlaze extends EntityFlyingMob {
 
         return super.entityBaseTick(tickDiff);
     }
+
+    @Override
+    public int nearbyDistanceMultiplier() {
+        return 30;
+    }
 }

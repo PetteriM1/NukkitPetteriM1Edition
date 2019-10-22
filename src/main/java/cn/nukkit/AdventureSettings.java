@@ -44,7 +44,6 @@ public class AdventureSettings implements Cloneable {
 
     public boolean get(Type type) {
         Boolean value = this.values.get(type);
-
         return value == null ? type.getDefaultValue() : value;
     }
 

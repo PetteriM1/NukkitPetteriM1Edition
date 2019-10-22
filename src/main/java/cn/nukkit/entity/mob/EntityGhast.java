@@ -119,4 +119,9 @@ public class EntityGhast extends EntityFlyingMob {
 
         return super.entityBaseTick(tickDiff);
     }
+
+    @Override
+    public int nearbyDistanceMultiplier() {
+        return 30;
+    }
 }

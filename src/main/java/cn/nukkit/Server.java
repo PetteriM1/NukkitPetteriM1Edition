@@ -833,8 +833,7 @@ public class Server {
                             int offset = 0;
                             for (int i = 0; i < levelArray.length; i++) {
                                 offset = (i + lastLevelGC) % levelArray.length;
-                                Level level = levelArray[offset];
-                                level.doGarbageCollection(allocated - 1);
+                                levelArray[offset].doGarbageCollection(allocated - 1);
                                 allocated = next - System.currentTimeMillis();
                                 if (allocated <= 0) break;
                             }
@@ -1516,9 +1515,8 @@ public class Server {
     }
 
     public Player getPlayerExact(String name) {
-        name = name.toLowerCase();
         for (Player player : this.getOnlinePlayers().values()) {
-            if (player.getName().toLowerCase().equals(name)) {
+            if (player.getName().equalsIgnoreCase(name)) {
                 return player;
             }
         }

@@ -150,4 +150,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
         return super.entityBaseTick(tickDiff);
     }
+
+    @Override
+    public int nearbyDistanceMultiplier() {
+        return 30;
+    }
 }

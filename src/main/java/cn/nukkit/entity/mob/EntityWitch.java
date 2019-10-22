@@ -144,4 +144,9 @@ public class EntityWitch extends EntityWalkingMob {
 
         return super.entityBaseTick(tickDiff);
     }
+
+    @Override
+    public int nearbyDistanceMultiplier() {
+        return 8;
+    }
 }

@@ -8,23 +8,23 @@ import lombok.ToString;
 @ToString
 public class BossEventPacket extends DataPacket {
 
-    /* S2C: Shows the bossbar to the player. */
+    /** Shows the bossbar to the player. */
     public static final int TYPE_SHOW = 0;
-    /* C2S: Registers a player to a boss fight. */
+    /** Registers a player to a boss fight. */
     public static final int TYPE_REGISTER_PLAYER = 1;
-    /* S2C: Not sure on this. */
+    /** Not sure on this. */
     public static final int TYPE_UPDATE = 1;
-    /* S2C: Removes the bossbar from the client. */
+    /** Removes the bossbar from the client. */
     public static final int TYPE_HIDE = 2;
-    /* C2S: Unregisters a player from a boss fight. */
+    /** Unregisters a player from a boss fight. */
     public static final int TYPE_UNREGISTER_PLAYER = 3;
-    /* S2C: Appears not to be implemented. Currently bar percentage only appears to change in response to the target entity's health. */
+    /** Sets the bar percentage. */
     public static final int TYPE_HEALTH_PERCENT = 4;
-    /* S2C: Also appears to not be implemented. Title clientside sticks as the target entity's nametag, or their entity type name if not set. */
+    /** Sets title of the bar. */
     public static final int TYPE_TITLE = 5;
-    /* S2C: Not sure on this. Includes color and overlay fields, plus an unknown short. */
+    /** Not sure on this. Includes color and overlay fields, plus an unknown short. */
     public static final int TYPE_UNKNOWN_6 = 6;
-    /* S2C: Not implemented :( Intended to alter bar appearance, but these currently produce no effect on clientside whatsoever. */
+    /** Not implemented :( Intended to alter bar appearance, but these currently produce no effect on clientside whatsoever. */
     public static final int TYPE_TEXTURE = 7;
 
     public long bossEid;

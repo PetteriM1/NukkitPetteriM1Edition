@@ -158,8 +158,6 @@ public abstract class EntitySwimmingMob extends EntitySwimming implements Entity
             if (target != this.followTarget || this.canAttack) {
                 this.attackEntity((Entity) target);
             }
-        } else if (target != null && (Math.pow(this.x - target.x, 2) + Math.pow(this.z - target.z, 2)) <= 1) {
-            this.moveTime = 0;
         }
         return true;
     }

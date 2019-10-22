@@ -470,4 +470,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public boolean canDespawn() {
         return despawn;
     }
+
+    public int nearbyDistanceMultiplier() {
+        return 1;
+    }
 }

@@ -88,4 +88,9 @@ public class EntityEvoker extends EntityWalkingMob {
 
         return super.entityBaseTick(tickDiff);
     }
+
+    @Override
+    public int nearbyDistanceMultiplier() {
+        return 20;
+    }
 }

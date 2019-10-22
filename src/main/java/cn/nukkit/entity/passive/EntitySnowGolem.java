@@ -55,7 +55,6 @@ public class EntitySnowGolem extends EntityWalkingMob {
     @Override
     public void attackEntity(Entity player) {
         if (this.attackDelay > 23 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
-            this.stayTime = 30;
             this.attackDelay = 0;
 
             double f = 1.2;
@@ -111,5 +110,10 @@ public class EntitySnowGolem extends EntityWalkingMob {
         }
 
         return super.entityBaseTick(tickDiff);
+    }
+
+    @Override
+    public int nearbyDistanceMultiplier() {
+        return 10;
     }
 }
