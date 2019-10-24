@@ -518,7 +518,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
 
         while (!this.outgoingNaks.isEmpty()) {
             ByteBuf buffer = this.allocateBuffer(mtu);
-            buffer.writeByte(FLAG_VALID | FLAG_NACK);
+            buffer.writeByte(-96);
             RakNetUtils.writeIntRanges(buffer, this.outgoingNaks, mtu - 1);
 
             this.sendDirect(buffer);
@@ -527,7 +527,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         if (this.slidingWindow.shouldSendAcks(curTime)) {
             while (!this.outgoingAcks.isEmpty()) {
                 ByteBuf buffer = this.allocateBuffer(mtu);
-                buffer.writeByte(FLAG_VALID | FLAG_ACK);
+                buffer.writeByte(-64);
                 RakNetUtils.writeIntRanges(buffer, this.outgoingAcks, mtu - 1);
 
                 this.sendDirect(buffer);
@@ -772,7 +772,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
             packet.orderingIndex = orderingIndex;
             //packet.setSequenceIndex(sequencingIndex);
             packet.reliability = reliability;
-            packet.priority = priority;
             if (reliability.isReliable()) {
                 packet.reliabilityIndex = reliabilityWriteIndexUpdater.getAndIncrement(this);
             }

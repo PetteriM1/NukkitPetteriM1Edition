@@ -72,7 +72,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
                 this.putEntityUniqueId(eid);
             }
         }
-        if ((update & (TEXTURE_UPDATE | DECORATIONS_UPDATE)) != 0) {
+        if ((update & (6)) != 0) {
             this.putByte(this.scale);
         }
 

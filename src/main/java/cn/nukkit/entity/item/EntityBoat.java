@@ -148,11 +148,11 @@ public class EntityBoat extends EntityVehicle {
 
                 if (waterDiff > SINKING_DEPTH && !sinking) {
                     sinking = true;
-                } else if (waterDiff < -SINKING_DEPTH && sinking) {
+                } else if (waterDiff < -0.07 && sinking) {
                     sinking = false;
                 }
 
-                if (waterDiff < -SINKING_DEPTH) {
+                if (waterDiff < -0.07) {
                     this.motionY = Math.min(0.05, this.motionY + 0.005);
                 } else if (waterDiff < 0 || !sinking) {
                     this.motionY = this.motionY > SINKING_MAX_SPEED ? Math.max(this.motionY - 0.02, SINKING_MAX_SPEED) : this.motionY + SINKING_SPEED;
@@ -175,7 +175,7 @@ public class EntityBoat extends EntityVehicle {
 
             if (!hasControllingPassenger()) {
                 if (waterDiff > SINKING_DEPTH || sinking) {
-                    this.motionY = waterDiff > 0.5 ? this.motionY - this.getGravity() : (this.motionY - SINKING_SPEED < -SINKING_MAX_SPEED ? this.motionY : this.motionY - SINKING_SPEED);
+                    this.motionY = waterDiff > 0.5 ? this.motionY - this.getGravity() : (this.motionY - SINKING_SPEED < -0.005 ? this.motionY : this.motionY - SINKING_SPEED);
                 }
             }
 

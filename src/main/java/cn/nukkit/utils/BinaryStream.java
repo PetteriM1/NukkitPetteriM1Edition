@@ -32,7 +32,7 @@ public class BinaryStream {
     private byte[] buffer;
     private int count;
 
-    private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
+    private static final int MAX_ARRAY_SIZE = 2147483639;
 
     public BinaryStream() {
         this.buffer = new byte[32];

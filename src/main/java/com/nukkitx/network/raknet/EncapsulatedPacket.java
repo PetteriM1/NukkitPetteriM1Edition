@@ -11,7 +11,6 @@ import lombok.Setter;
 public class EncapsulatedPacket implements ReferenceCounted {
 
     RakNetReliability reliability;
-    RakNetPriority priority;
     int reliabilityIndex;
     int sequenceIndex;
     int orderingIndex;

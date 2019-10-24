@@ -20,14 +20,14 @@ public abstract class Food {
 
     public static final Food apple = registerDefaultFood(new FoodNormal(4, 2.4F).addRelative(Item.APPLE));
     public static final Food apple_golden = registerDefaultFood(new FoodEffective(4, 9.6F)
-            .addEffect(Effect.getEffect(Effect.REGENERATION).setAmplifier(1).setDuration(5 * 20))
-            .addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(2 * 60 * 20))
+            .addEffect(Effect.getEffect(Effect.REGENERATION).setAmplifier(1).setDuration(100))
+            .addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(2400))
             .addRelative(Item.GOLDEN_APPLE));
     public static final Food apple_golden_enchanted = registerDefaultFood(new FoodEffective(4, 9.6F)
-            .addEffect(Effect.getEffect(Effect.REGENERATION).setAmplifier(4).setDuration(30 * 20))
-            .addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(2 * 60 * 20).setAmplifier(3))
-            .addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setDuration(5 * 60 * 20))
-            .addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(5 * 60 * 20))
+            .addEffect(Effect.getEffect(Effect.REGENERATION).setAmplifier(4).setDuration(600))
+            .addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(2400).setAmplifier(3))
+            .addEffect(Effect.getEffect(Effect.DAMAGE_RESISTANCE).setDuration(6000))
+            .addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(6000))
             .addRelative(Item.GOLDEN_APPLE_ENCHANTED));
     public static final Food beef_raw = registerDefaultFood(new FoodNormal(3, 1.8F).addRelative(Item.RAW_BEEF));
     public static final Food beetroot = registerDefaultFood(new FoodNormal(1, 1.2F).addRelative(Item.BEETROOT));
@@ -40,7 +40,7 @@ public abstract class Food {
     public static final Food carrot = registerDefaultFood(new FoodNormal(3, 4.8F).addRelative(Item.CARROT));
     public static final Food carrot_golden = registerDefaultFood(new FoodNormal(6, 14.4F).addRelative(Item.GOLDEN_CARROT));
     public static final Food chicken_raw = registerDefaultFood(new FoodEffective(2, 1.2F)
-            .addChanceEffect(0.3F, Effect.getEffect(Effect.HUNGER).setDuration(30 * 20))
+            .addChanceEffect(0.3F, Effect.getEffect(Effect.HUNGER).setDuration(600))
             .addRelative(Item.RAW_CHICKEN));
     public static final Food chicken_cooked = registerDefaultFood(new FoodNormal(6, 7.2F).addRelative(Item.COOKED_CHICKEN));
     public static final Food chorus_fruit = registerDefaultFood(new FoodChorusFruit());
@@ -55,17 +55,17 @@ public abstract class Food {
     public static final Food potato_raw = registerDefaultFood(new FoodNormal(1, 0.6F).addRelative(Item.POTATO));
     public static final Food potato_baked = registerDefaultFood(new FoodNormal(5, 7.2F).addRelative(Item.BAKED_POTATO));
     public static final Food potato_poisonous = registerDefaultFood(new FoodEffective(2, 1.2F)
-            .addChanceEffect(0.6F, Effect.getEffect(Effect.POISON).setDuration(4 * 20))
+            .addChanceEffect(0.6F, Effect.getEffect(Effect.POISON).setDuration(80))
             .addRelative(Item.POISONOUS_POTATO));
     public static final Food pumpkin_pie = registerDefaultFood(new FoodNormal(8, 4.8F).addRelative(Item.PUMPKIN_PIE));
     public static final Food rabbit_cooked = registerDefaultFood(new FoodNormal(5, 6F).addRelative(Item.COOKED_RABBIT));
     public static final Food rabbit_raw = registerDefaultFood(new FoodNormal(3, 1.8F).addRelative(Item.RAW_RABBIT));
     public static final Food rabbit_stew = registerDefaultFood(new FoodInBowl(10, 12F).addRelative(Item.RABBIT_STEW));
     public static final Food rotten_flesh = registerDefaultFood(new FoodEffective(4, 0.8F)
-            .addChanceEffect(0.8F, Effect.getEffect(Effect.HUNGER).setDuration(30 * 20))
+            .addChanceEffect(0.8F, Effect.getEffect(Effect.HUNGER).setDuration(600))
             .addRelative(Item.ROTTEN_FLESH));
     public static final Food spider_eye = registerDefaultFood(new FoodEffective(2, 3.2F)
-            .addEffect(Effect.getEffect(Effect.POISON).setDuration(4 * 20))
+            .addEffect(Effect.getEffect(Effect.POISON).setDuration(80))
             .addRelative(Item.SPIDER_EYE));
     public static final Food steak = registerDefaultFood(new FoodNormal(8, 12.8F).addRelative(Item.COOKED_BEEF));
     public static final Food clownfish = registerDefaultFood(new FoodNormal(1, 0.2F).addRelative(Item.CLOWNFISH));
@@ -74,9 +74,9 @@ public abstract class Food {
     public static final Food salmon_cooked = registerDefaultFood(new FoodNormal(6, 9.6F).addRelative(Item.COOKED_SALMON));
     public static final Food salmon_raw = registerDefaultFood(new FoodNormal(2, 0.4F).addRelative(Item.RAW_SALMON));
     public static final Food pufferfish = registerDefaultFood(new FoodEffective(1, 0.2F)
-            .addEffect(Effect.getEffect(Effect.HUNGER).setAmplifier(2).setDuration(15 * 20))
-            .addEffect(Effect.getEffect(Effect.NAUSEA).setAmplifier(1).setDuration(15 * 20))
-            .addEffect(Effect.getEffect(Effect.POISON).setAmplifier(4).setDuration(60 * 20))
+            .addEffect(Effect.getEffect(Effect.HUNGER).setAmplifier(2).setDuration(300))
+            .addEffect(Effect.getEffect(Effect.NAUSEA).setAmplifier(1).setDuration(300))
+            .addEffect(Effect.getEffect(Effect.POISON).setAmplifier(4).setDuration(1200))
             .addRelative(Item.PUFFERFISH));
     public static final Food dried_kelp = registerDefaultFood(new FoodNormal(1, 0.6F).addRelative(Item.DRIED_KELP));
     public static final Food sweet_berries = registerDefaultFood(new FoodNormal(2, 0.4F).addRelative(Item.SWEET_BERRIES));

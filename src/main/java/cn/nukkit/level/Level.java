@@ -1443,11 +1443,11 @@ public class Level implements ChunkManager, Metadatable {
 
     public int calculateSkylightSubtracted(float tickDiff) {
         float angle = this.calculateCelestialAngle(getTime(), tickDiff);
-        float light = 1 - (MathHelper.cos(angle * ((float) Math.PI * 2F)) * 2 + 0.5f);
+        float light = 1 - (MathHelper.cos(angle * (6.2831855f)) * 2 + 0.5f);
         light = light < 0 ? 0 : light > 1 ? 1 : light;
         light = 1 - light;
-        light = (float) ((double) light * ((raining ? 1 : 0) - (double) 5f / 16d));
-        light = (float) ((double) light * ((isThundering() ? 1 : 0) - (double) 5f / 16d));
+        light = (float) ((double) light * ((raining ? 1 : 0) - 0.3125));
+        light = (float) ((double) light * ((isThundering() ? 1 : 0) - 0.3125));
         light = 1 - light;
         return (int) (light * 11f);
     }
@@ -1756,7 +1756,7 @@ public class Level implements ChunkManager, Metadatable {
             if (motion == null) {
                 if (dropAround) {
                     float f = ThreadLocalRandom.current().nextFloat() * 0.5f;
-                    float f1 = ThreadLocalRandom.current().nextFloat() * ((float) Math.PI * 2);
+                    float f1 = ThreadLocalRandom.current().nextFloat() * (6.2831855f);
 
                     motion = new Vector3(-MathHelper.sin(f1) * f, 0.20000000298023224, MathHelper.cos(f1) * f);
                 } else {
@@ -2621,8 +2621,8 @@ public class Level implements ChunkManager, Metadatable {
     private boolean areNeighboringChunksLoaded(long hash) {
         return this.provider.isChunkLoaded(hash + 1) &&
                this.provider.isChunkLoaded(hash - 1) &&
-               this.provider.isChunkLoaded(hash + (1L << 32)) &&
-               this.provider.isChunkLoaded(hash - (1L << 32));
+               this.provider.isChunkLoaded(hash + (4294967296L)) &&
+               this.provider.isChunkLoaded(hash - (4294967296L));
     }
 
     public boolean isChunkGenerated(int x, int z) {

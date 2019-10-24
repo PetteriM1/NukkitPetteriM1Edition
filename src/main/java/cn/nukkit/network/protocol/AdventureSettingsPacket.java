@@ -20,7 +20,7 @@ public class AdventureSettingsPacket extends DataPacket {
      * flags would all be set on the same packet field, but as of MCPE 1.2, the new abilities flags have for some
      * reason been assigned a separate field.
      */
-    public static final int BITFLAG_SECOND_SET = 1 << 16;
+    public static final int BITFLAG_SECOND_SET = 65536;
 
     public static final int WORLD_IMMUTABLE = 0x01;
     public static final int NO_PVP = 0x02;
@@ -30,13 +30,13 @@ public class AdventureSettingsPacket extends DataPacket {
     public static final int WORLD_BUILDER = 0x100;
     public static final int FLYING = 0x200;
     public static final int MUTED = 0x400;
-    public static final int BUILD_AND_MINE = 0x01 | BITFLAG_SECOND_SET;
-    public static final int DOORS_AND_SWITCHES = 0x02 | BITFLAG_SECOND_SET;
-    public static final int OPEN_CONTAINERS = 0x04 | BITFLAG_SECOND_SET;
-    public static final int ATTACK_PLAYERS = 0x08 | BITFLAG_SECOND_SET;
-    public static final int ATTACK_MOBS = 0x10 | BITFLAG_SECOND_SET;
-    public static final int OPERATOR = 0x20 | BITFLAG_SECOND_SET;
-    public static final int TELEPORT = 0x80 | BITFLAG_SECOND_SET;
+    public static final int BUILD_AND_MINE = 65537;
+    public static final int DOORS_AND_SWITCHES = 65538;
+    public static final int OPEN_CONTAINERS = 65540;
+    public static final int ATTACK_PLAYERS = 65544;
+    public static final int ATTACK_MOBS = 65552;
+    public static final int OPERATOR = 65568;
+    public static final int TELEPORT = 65664;
 
     public long flags = 0;
 

@@ -9,7 +9,7 @@ import cn.nukkit.level.biome.type.WateryBiome;
 public class OceanBiome extends WateryBiome {
 
     public OceanBiome() {
-        this.setBaseHeight(-1f);
+        this.setBaseHeight(-1.0f);
         this.setHeightVariation(0.1f);
     }
 
@@ -20,6 +20,6 @@ public class OceanBiome extends WateryBiome {
 
     @Override
     public int getGroundId(int x, int y, int z) {
-        return GRAVEL << 4;
+        return 208;
     }
 }

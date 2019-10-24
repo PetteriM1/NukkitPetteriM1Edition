@@ -50,7 +50,7 @@ public class BlockCake extends BlockTransparentMeta {
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
-                x + (1 + getDamage() * 2) / 16,
+                x + ((1 + getDamage() * 2) >> 4),
                 y,
                 z + 0.0625,
                 x - 0.0625 + 1,

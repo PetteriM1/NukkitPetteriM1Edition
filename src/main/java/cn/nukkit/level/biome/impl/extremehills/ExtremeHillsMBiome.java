@@ -12,7 +12,7 @@ import cn.nukkit.math.NukkitRandom;
  * very smooth hills with flat areas between
  */
 public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
-    private static final SimplexF gravelNoise = new SimplexF(new NukkitRandom(0), 1f, 1 / 4f, 1 / 64f);
+    private static final SimplexF gravelNoise = new SimplexF(new NukkitRandom(0), 1f, 0.25f, 0.015625f);
 
     public ExtremeHillsMBiome() {
         this(true);
@@ -32,7 +32,7 @@ public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
 
     @Override
     public int getSurfaceId(int x, int y, int z) {
-        return gravelNoise.noise2D(x, z, true) < -0.75f ? GRAVEL << 4 : super.getSurfaceId(x, y, z);
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? 208 : super.getSurfaceId(x, y, z);
     }
 
     @Override

@@ -30,8 +30,8 @@ public class FullServerTickTiming extends Timing {
 
     private static final TimingIdentifier IDENTIFIER = new TimingIdentifier(DEFAULT_GROUP.name, "Full Server Tick", null);
     final TimingData minuteData;
-    double avgFreeMemory = -1D;
-    double avgUsedMemory = -1D;
+    double avgFreeMemory = -1.0;
+    double avgUsedMemory = -1.0;
 
     FullServerTickTiming() {
         super(IDENTIFIER);
@@ -65,13 +65,13 @@ public class FullServerTickTiming extends Timing {
             if (this.avgFreeMemory == -1) {
                 this.avgFreeMemory = freeMemory;
             } else {
-                this.avgFreeMemory = (this.avgFreeMemory * (59 / 60D)) + (freeMemory * (1 / 60D));
+                this.avgFreeMemory = (this.avgFreeMemory * (0.9833333333333333)) + (freeMemory * (0.016666666666666666));
             }
 
             if (this.avgUsedMemory == -1) {
                 this.avgUsedMemory = usedMemory;
             } else {
-                this.avgUsedMemory = (this.avgUsedMemory * (59 / 60D)) + (usedMemory * (1 / 60D));
+                this.avgUsedMemory = (this.avgUsedMemory * (0.9833333333333333)) + (usedMemory * (0.016666666666666666));
             }
         }
 

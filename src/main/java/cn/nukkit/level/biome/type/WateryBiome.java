@@ -24,6 +24,6 @@ public abstract class WateryBiome extends CoveredBiome {
 
     @Override
     public int getGroundId(int x, int y, int z) {
-        return DIRT << 4;
+        return 48;
     }
 }

@@ -36,9 +36,7 @@ public class EntityFishingHook extends EntityProjectile {
 
 	public static final int NETWORK_ID = 77;
 
-	public static final int WAIT_CHANCE = 120;
-
-	public int waitChance = WAIT_CHANCE * 2;
+	public int waitChance = 240;
 	public boolean attracted = false;
 	public int attractTimer = 0;
 	public boolean caught = false;
@@ -121,7 +119,7 @@ public class EntityFishingHook extends EntityProjectile {
 						this.caught = false;
 						this.attracted = true;
 					} else {
-						this.waitChance = WAIT_CHANCE;
+						this.waitChance = 120;
 					}
 				}
 			} else if (!this.caught) {
@@ -137,7 +135,7 @@ public class EntityFishingHook extends EntityProjectile {
 				if (this.coughtTimer == 0) {
 					this.attracted = false;
 					this.caught = false;
-					this.waitChance = WAIT_CHANCE * 3;
+					this.waitChance = 360;
 				}
 			}
 		}
@@ -207,7 +205,7 @@ public class EntityFishingHook extends EntityProjectile {
 	public void reelLine() {
 		if (this.shootingEntity instanceof Player && this.caught) {
 			Item item = Fishing.getFishingResult(this.rod);
-			int experience = Utils.random.nextInt((3 - 1) + 1) + 1;
+			int experience = Utils.random.nextInt(3) + 1;
 			Vector3 motion;
 
 			if (this.shootingEntity != null) {

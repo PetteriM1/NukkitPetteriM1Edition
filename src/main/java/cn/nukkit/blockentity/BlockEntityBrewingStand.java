@@ -261,9 +261,6 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
             this.brewTime = MAX_BREW_TIME;
         }
 
-        //this.sendBrewTime();
-        lastUpdate = System.currentTimeMillis();
-
         return ret;
     }
 

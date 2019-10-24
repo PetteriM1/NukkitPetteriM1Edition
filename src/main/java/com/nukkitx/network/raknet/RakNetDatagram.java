@@ -22,7 +22,7 @@ public class RakNetDatagram extends AbstractReferenceCounted {
     private static final InternalLogger log = InternalLoggerFactory.getInstance(RakNetDatagram.class);
 
     final List<EncapsulatedPacket> packets = new ArrayList<>();
-    byte flags = RakNetConstants.FLAG_VALID;
+    private byte flags = RakNetConstants.FLAG_VALID;
     final long sendTime;
     long nextSend;
     int sequenceIndex = -1;

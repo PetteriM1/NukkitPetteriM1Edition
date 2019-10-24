@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author MagicDroidX
@@ -52,9 +51,5 @@ public class PluginClassLoader extends URLClassLoader {
         }
 
         return result;
-    }
-
-    Set<String> getClasses() {
-        return classes.keySet();
     }
 }

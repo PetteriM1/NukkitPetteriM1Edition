@@ -67,7 +67,7 @@ public class Explosion {
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
 
-        int mRays = rays - 1;
+        int mRays = 15;
         for (int i = 0; i < rays; ++i) {
             for (int j = 0; j < rays; ++j) {
                 for (int k = 0; k < rays; ++k) {
@@ -79,7 +79,7 @@ public class Explosion {
                         double pointerY = this.source.y;
                         double pointerZ = this.source.z;
 
-                        for (double blastForce = this.size * (Utils.random.nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= stepLen * 0.75d) {
+                        for (double blastForce = this.size * (Utils.random.nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= 0.22499999999999998) {
                             int x = (int) pointerX;
                             int y = (int) pointerY;
                             int z = (int) pointerZ;

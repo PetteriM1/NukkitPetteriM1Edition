@@ -14,7 +14,7 @@ import cn.nukkit.level.generator.Normal;
 public abstract class CoveredBiome extends Biome {
 
     public int getCoverId(int x, int z) {
-        return AIR << 4;
+        return 0;
     }
 
     public int getSurfaceDepth(int x, int y, int z) {
@@ -39,7 +39,7 @@ public abstract class CoveredBiome extends Biome {
         int realY;
         //start one below build limit in case of cover blocks
         for (int y = 254; y > 32; y--) {
-            if (chunk.getFullBlock(x, y, z) == STONE << 4) {
+            if (chunk.getFullBlock(x, y, z) == 16) {
                 COVER:
                 if (!hasCovered) {
                     if (y >= Normal.seaHeight) {
@@ -47,7 +47,7 @@ public abstract class CoveredBiome extends Biome {
                         int surfaceDepth = this.getSurfaceDepth(fullX, y, fullZ);
                         for (int i = 0; i < surfaceDepth; i++) {
                             realY = y - i;
-                            if (chunk.getFullBlock(x, realY, z) == STONE << 4) {
+                            if (chunk.getFullBlock(x, realY, z) == 16) {
                                 chunk.setFullBlockId(x, realY, z, this.getSurfaceId(fullX, realY, fullZ));
                             } else break COVER;
                         }
@@ -56,7 +56,7 @@ public abstract class CoveredBiome extends Biome {
                     int groundDepth = this.getGroundDepth(fullX, y, fullZ);
                     for (int i = 0; i < groundDepth; i++) {
                         realY = y - i;
-                        if (chunk.getFullBlock(x, realY, z) == STONE << 4) {
+                        if (chunk.getFullBlock(x, realY, z) == 16) {
                             chunk.setFullBlockId(x, realY, z, this.getGroundId(fullX, realY, fullZ));
                         } else break COVER;
                     }

@@ -64,7 +64,6 @@ public class EntityThrownTrident extends EntityProjectile {
     protected void initEntity() {
         super.initEntity();
 
-        this.damage = namedTag.contains("damage") ? namedTag.getDouble("damage") : 8;
         this.trident = namedTag.contains("Trident") ? NBTIO.getItemHelper(namedTag.getCompound("Trident")) : Item.get(0);
     }
 

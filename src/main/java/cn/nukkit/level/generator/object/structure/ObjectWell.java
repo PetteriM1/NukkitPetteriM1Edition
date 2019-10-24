@@ -16,7 +16,7 @@ public class ObjectWell {
 
     public boolean canPlaceObject(ChunkManager level, int x, int y, int z) {
         int radiusToCheck = 0;
-        for (int yy = 0; yy < 5 + 3; ++yy) {
+        for (int yy = 0; yy < 8; ++yy) {
             if (yy == 1 || yy == 5) {
                 ++radiusToCheck;
             }

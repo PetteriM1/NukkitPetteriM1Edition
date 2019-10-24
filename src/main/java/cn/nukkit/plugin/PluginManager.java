@@ -188,8 +188,7 @@ public class PluginManager {
                             }
                         }
                     } catch (Exception e) {
-                        this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin" +
-                                ".fileError", file.getName(), dictionary.toString(), Utils
+                        this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.fileError", file.getName(), dictionary.toString(), Utils
                                 .getExceptionMessage(e)));
                         MainLogger logger = this.server.getLogger();
                         if (logger != null) {

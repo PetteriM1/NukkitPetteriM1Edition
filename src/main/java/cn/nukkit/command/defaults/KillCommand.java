@@ -26,8 +26,7 @@ public class KillCommand extends VanillaCommand {
 
     public KillCommand(String name) {
         super(name, "%nukkit.command.kill.description", "%nukkit.command.kill.usage", new String[]{"suicide"});
-        this.setPermission("nukkit.command.kill.self;"
-                + "nukkit.command.kill.other");
+        this.setPermission("nukkit.command.kill.self;nukkit.command.kill.other");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 new CommandParameter("player", CommandParamType.TARGET, true)

@@ -17,7 +17,7 @@ abstract public class BaseRegionLoader {
 
     public static final byte COMPRESSION_GZIP = 1;
     public static final byte COMPRESSION_ZLIB = 2;
-    public static final int MAX_SECTOR_LENGTH = 256 << 12;
+    public static final int MAX_SECTOR_LENGTH = 1048576;
     public static final int COMPRESSION_LEVEL = 7;
 
     protected int x;

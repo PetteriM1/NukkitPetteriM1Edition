@@ -1,6 +1,5 @@
 package cn.nukkit.entity;
 
-import cn.nukkit.Player;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -85,7 +84,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
                 );
             }
 
-            int slotCount = Player.SURVIVAL_SLOTS + 9;
+            int slotCount = 45;
             for (int slot = 9; slot < slotCount; ++slot) {
                 Item item = this.inventory.getItem(slot - 9);
                 inventoryTag.add(NBTIO.putItemHelper(item, slot));

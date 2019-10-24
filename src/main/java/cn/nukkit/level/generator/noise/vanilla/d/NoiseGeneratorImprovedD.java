@@ -3,11 +3,11 @@ package cn.nukkit.level.generator.noise.vanilla.d;
 import cn.nukkit.math.NukkitRandom;
 
 public class NoiseGeneratorImprovedD {
-    private static final double[] GRAD_X = new double[]{1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, -1.0D, 0.0D};
-    private static final double[] GRAD_Y = new double[]{1.0D, 1.0D, -1.0D, -1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D};
-    private static final double[] GRAD_Z = new double[]{0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 1.0D, -1.0D, -1.0D, 1.0D, 1.0D, -1.0D, -1.0D, 0.0D, 1.0D, 0.0D, -1.0D};
-    private static final double[] GRAD_2X = new double[]{1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D, 1.0D, -1.0D, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, -1.0D, 0.0D};
-    private static final double[] GRAD_2Z = new double[]{0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 1.0D, -1.0D, -1.0D, 1.0D, 1.0D, -1.0D, -1.0D, 0.0D, 1.0D, 0.0D, -1.0D};
+    private static final double[] GRAD_X = new double[]{1.0D, -1.0, 1.0D, -1.0, 1.0D, -1.0, 1.0D, -1.0, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, -1.0, 0.0D};
+    private static final double[] GRAD_Y = new double[]{1.0D, 1.0D, -1.0, -1.0, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, -1.0, 1.0D, -1.0, 1.0D, -1.0, 1.0D, -1.0};
+    private static final double[] GRAD_Z = new double[]{0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 1.0D, -1.0, -1.0, 1.0D, 1.0D, -1.0, -1.0, 0.0D, 1.0D, 0.0D, -1.0};
+    private static final double[] GRAD_2X = new double[]{1.0D, -1.0, 1.0D, -1.0, 1.0D, -1.0, 1.0D, -1.0, 0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 0.0D, -1.0, 0.0D};
+    private static final double[] GRAD_2Z = new double[]{0.0D, 0.0D, 0.0D, 0.0D, 1.0D, 1.0D, -1.0, -1.0, 1.0D, 1.0D, -1.0, -1.0, 0.0D, 1.0D, 0.0D, -1.0};
     private final int[] permutations;
     public double xCoord;
     public double yCoord;

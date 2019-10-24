@@ -107,7 +107,7 @@ public class ItemFireCharge extends Item {
                     }
 
                     int innerWidth = 0;
-                    LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
+                    LOOP: for (int i = 0; i < 21; i++) {
                         int id = level.getBlockIdAt(scanX - i, scanY, targZ);
                         switch (id) {
                             case AIR:
@@ -120,7 +120,7 @@ public class ItemFireCharge extends Item {
                         }
                     }
                     int innerHeight = 0;
-                    LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
+                    LOOP: for (int i = 0; i < 21; i++) {
                         int id = level.getBlockIdAt(scanX, scanY + i, targZ);
                         switch (id) {
                             case AIR:
@@ -132,9 +132,9 @@ public class ItemFireCharge extends Item {
                                 break PORTAL;
                         }
                     }
-                    if (!(innerWidth <= MAX_PORTAL_SIZE - 2
+                    if (!(innerWidth <= 21
                             && innerWidth >= 2
-                            && innerHeight <= MAX_PORTAL_SIZE - 2
+                            && innerHeight <= 21
                             && innerHeight >= 3))   {
                         break PORTAL;
                     }
@@ -193,7 +193,7 @@ public class ItemFireCharge extends Item {
                     }
 
                     int innerWidth = 0;
-                    LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
+                    LOOP: for (int i = 0; i < 21; i++) {
                         int id = level.getBlockIdAt(targX, scanY, scanZ - i);
                         switch (id) {
                             case AIR:
@@ -206,7 +206,7 @@ public class ItemFireCharge extends Item {
                         }
                     }
                     int innerHeight = 0;
-                    LOOP: for (int i = 0; i < MAX_PORTAL_SIZE - 2; i++) {
+                    LOOP: for (int i = 0; i < 21; i++) {
                         int id = level.getBlockIdAt(targX, scanY + i, scanZ);
                         switch (id) {
                             case AIR:
@@ -218,9 +218,9 @@ public class ItemFireCharge extends Item {
                                 break PORTAL;
                         }
                     }
-                    if (!(innerWidth <= MAX_PORTAL_SIZE - 2
+                    if (!(innerWidth <= 21
                             && innerWidth >= 2
-                            && innerHeight <= MAX_PORTAL_SIZE - 2
+                            && innerHeight <= 21
                             && innerHeight >= 3))   {
                         break PORTAL;
                     }

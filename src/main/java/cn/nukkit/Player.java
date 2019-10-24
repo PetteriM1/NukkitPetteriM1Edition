@@ -172,7 +172,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected int startAction = -1;
 
     protected Vector3 sleeping = null;
-    protected Long clientID;
 
     private int loaderId;
 
@@ -580,7 +579,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
         this.socketAddress = socketAddress;
-        this.clientID = clientID;
         this.loaderId = Level.generateChunkLoaderId(this);
         this.chunksPerTick = this.server.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.server.getPropertyInt("spawn-threshold", 50);

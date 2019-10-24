@@ -24,7 +24,7 @@ public class PopulatorRavines extends Populator {
 
     private double ravineDepth = 3;
 
-    private int worldHeightCap = 1 << 8;
+    private int worldHeightCap = 256;
 
     private float[] a = new float[1024];
 

@@ -49,7 +49,7 @@ public class FloatingTextParticle extends Particle {
         this.level = level;
 
         long flags = (
-                1L << Entity.DATA_FLAG_NO_AI
+                65536L
         );
         metadata.putLong(Entity.DATA_FLAGS, flags)
                 .putLong(Entity.DATA_LEAD_HOLDER_EID,-1)

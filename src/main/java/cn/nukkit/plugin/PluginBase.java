@@ -283,7 +283,7 @@ abstract public class PluginBase implements Plugin {
      * @return 这个插件的文件 {@code File}对象。<br>The {@code File} object of this plugin itself.
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
-    protected File getFile() {
+    public File getFile() {
         return file;
     }
 

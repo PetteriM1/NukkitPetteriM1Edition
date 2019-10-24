@@ -37,8 +37,6 @@ public abstract class EntityProjectile extends Entity {
 
     public boolean hadCollision = false;
 
-    protected double damage = 0;
-
     public EntityProjectile(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);
     }

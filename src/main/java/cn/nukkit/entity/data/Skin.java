@@ -15,12 +15,10 @@ import java.util.Arrays;
 @ToString(exclude = {"skinData", "capeData", "geometryData"})
 public class Skin {
 
-    private static final int PIXEL_SIZE = 4;
-
-    public static final int SINGLE_SKIN_SIZE = 64 * 32 * PIXEL_SIZE;
-    public static final int DOUBLE_SKIN_SIZE = 64 * 64 * PIXEL_SIZE;
-    public static final int SKIN_128_64_SIZE = 128 * 64 * PIXEL_SIZE;
-    public static final int SKIN_128_128_SIZE = 128 * 128 * PIXEL_SIZE;
+    public static final int SINGLE_SKIN_SIZE = 8192;
+    public static final int DOUBLE_SKIN_SIZE = 16384;
+    public static final int SKIN_128_64_SIZE = 32768;
+    public static final int SKIN_128_128_SIZE = 65536;
 
     public static final String GEOMETRY_CUSTOM = "geometry.humanoid.custom";
     public static final String GEOMETRY_CUSTOM_SLIM = "geometry.humanoid.customSlim";

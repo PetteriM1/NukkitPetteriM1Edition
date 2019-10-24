@@ -63,7 +63,7 @@ public class Nukkit {
 
         try {
             if (TITLE) {
-                System.out.print((char) 0x1b + "]0;Nukkit PetteriM1 Edition" + (char) 0x07);
+                System.out.print("\u001B]0;Nukkit PetteriM1 Edition\u0007");
             }
             new Server(PATH, DATA_PATH, PLUGIN_PATH);
         } catch (Throwable t) {
@@ -71,7 +71,7 @@ public class Nukkit {
         }
 
         if (TITLE) {
-            System.out.print((char) 0x1b + "]0;Server shutting down..." + (char) 0x07);
+            System.out.print("\u001B]0;Server shutting down...\u0007");
         }
 
         log.debug("Stopping other threads...");
@@ -90,7 +90,7 @@ public class Nukkit {
         killer.start();
 
         if (TITLE) {
-            System.out.print((char) 0x1b + "]0;Server Stopped" + (char) 0x07);
+            System.out.print("\u001B]0;Server Stopped\u0007");
         }
 
         System.exit(0);

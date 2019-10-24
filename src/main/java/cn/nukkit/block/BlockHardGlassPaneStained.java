@@ -20,7 +20,7 @@ public class BlockHardGlassPaneStained extends BlockHardGlassPane {
 
     @Override
     public int getFullId() {
-        return (HARD_STAINED_GLASS_PANE << 4) + meta;
+        return (3056) + meta;
     }
 
     @Override

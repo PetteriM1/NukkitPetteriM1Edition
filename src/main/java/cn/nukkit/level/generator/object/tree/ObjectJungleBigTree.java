@@ -15,13 +15,13 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
     public boolean generate(ChunkManager level, NukkitRandom rand, Vector3 position) {
         int height = this.getHeight(rand);
 
-        if (!this.ensureGrowable(level, rand, position, height)) {
+        if (!this.ensureGrowable(level, position, height)) {
             return false;
         } else {
             this.createCrown(level, position.up(height), 2);
 
             for (int j = (int) position.getY() + height - 2 - rand.nextBoundedInt(4); j > position.getY() + height / 2; j -= 2 + rand.nextBoundedInt(4)) {
-                float f = rand.nextFloat() * ((float) Math.PI * 2F);
+                float f = rand.nextFloat() * (6.2831855f);
                 int k = (int) (position.getX() + (0.5F + MathHelper.cos(f) * 4.0F));
                 int l = (int) (position.getZ() + (0.5F + MathHelper.sin(f) * 4.0F));
 

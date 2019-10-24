@@ -18,6 +18,6 @@ public class PopulatorGrass extends PopulatorSurfaceBlock {
 
     @Override
     protected int getBlockId(int x, int z, NukkitRandom random, FullChunk chunk) {
-        return TALL_GRASS << 4;
+        return 496;
     }
 }

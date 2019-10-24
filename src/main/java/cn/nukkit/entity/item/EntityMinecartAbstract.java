@@ -585,13 +585,13 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 if (level.getBlock(new Vector3(dx - 1, dy, dz)).isNormalBlock()) {
                     motionX = 0.02D;
                 } else if (level.getBlock(new Vector3(dx + 1, dy, dz)).isNormalBlock()) {
-                    motionX = -0.02D;
+                    motionX = -0.02;
                 }
             } else if (block.getOrientation() == Orientation.STRAIGHT_EAST_WEST) {
                 if (level.getBlock(new Vector3(dx, dy, dz - 1)).isNormalBlock()) {
                     motionZ = 0.02D;
                 } else if (level.getBlock(new Vector3(dx, dy, dz + 1)).isNormalBlock()) {
-                    motionZ = -0.02D;
+                    motionZ = -0.02;
                 }
             }
         }

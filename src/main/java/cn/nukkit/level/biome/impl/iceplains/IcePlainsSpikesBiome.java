@@ -20,7 +20,7 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
 
     @Override
     public int getSurfaceId(int x, int y, int z) {
-        return SNOW_BLOCK << 4;
+        return 1280;
     }
 
     public String getName() {

@@ -71,7 +71,7 @@ public class Nether extends Generator {
         this.nukkitRandom.setSeed(this.level.getSeed());
 
         for (int i = 0; i < noiseGen.length; i++)   {
-            noiseGen[i] = new SimplexF(nukkitRandom, 4, 1 / 4f, 1 / 64f);
+            noiseGen[i] = new SimplexF(nukkitRandom, 4, 0.25f, 0.015625f);
         }
 
         this.nukkitRandom.setSeed(this.level.getSeed());

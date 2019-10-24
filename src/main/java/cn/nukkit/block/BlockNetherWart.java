@@ -81,7 +81,7 @@ public class BlockNetherWart extends BlockFlowable {
     public Item[] getDrops(Item item) {
         if (this.getDamage() == 0x03) {
             return new Item[]{
-                    new ItemNetherWart(0, 2 + (int) (Math.random() * ((4 - 2) + 1)))
+                    new ItemNetherWart(0, 2 + (int) (Math.random() * (3)))
             };
         } else {
             return new Item[]{

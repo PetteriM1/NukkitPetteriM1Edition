@@ -71,7 +71,7 @@ public class RakNetClientSession extends RakNetSession {
     }
 
     private void attemptConnection(long curTime) {
-        int mtuSize = RakNetConstants.MAXIMUM_MTU_SIZE - (this.connectionAttempts * ((RakNetConstants.MAXIMUM_MTU_SIZE - RakNetConstants.MINIMUM_MTU_SIZE) / 9));
+        int mtuSize = RakNetConstants.MAXIMUM_MTU_SIZE - (this.connectionAttempts * (622));
         if (mtuSize < RakNetConstants.MINIMUM_MTU_SIZE) {
             mtuSize = RakNetConstants.MINIMUM_MTU_SIZE;
         }

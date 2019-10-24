@@ -32,13 +32,6 @@ public final class DataPalette implements Cloneable {
         }
     };
 
-    protected static final ThreadLocal<char[]> charCache = new ThreadLocal<char[]>() {
-        @Override
-        protected char[] initialValue() {
-            return new char[4096];
-        }
-    };
-
     private char[] rawData;
 
     private BitArray encodedData;

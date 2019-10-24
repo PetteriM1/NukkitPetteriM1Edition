@@ -184,7 +184,7 @@ public class PopulatorCaves extends Populator {
                     if (modX * modX + modZ * modZ < 1.0D) {
                         for (int yy = yTo; yy > yFrom; yy--) {
                             double modY = ((yy - 1) + 0.5D - y) / offsetY;
-                            if ((modY > -0.7D) && (modX * modX + modY * modY + modZ * modZ < 1.0D)) {
+                            if ((modY > -0.7) && (modX * modX + modY * modY + modZ * modZ < 1.0D)) {
                                 Biome biome = EnumBiome.getBiome(chunk.getBiomeId(xx, zz));
                                 if (!(biome instanceof CoveredBiome)) {
                                     continue;

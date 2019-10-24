@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 public class SplitPacketHelper extends AbstractReferenceCounted {
 
     private final EncapsulatedPacket[] packets;
-    private final long created = System.currentTimeMillis();
 
     public SplitPacketHelper(long expectedLength) {
         Preconditions.checkArgument(expectedLength >= 1, "expectedLength is less than 1 (%s)", expectedLength);

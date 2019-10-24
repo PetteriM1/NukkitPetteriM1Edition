@@ -53,10 +53,6 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
         return 6;
     }
 
-    protected String getEntityType() {
-        return this.entityType;
-    }
-
     /**
      * you can add extra data of projectile here
      *

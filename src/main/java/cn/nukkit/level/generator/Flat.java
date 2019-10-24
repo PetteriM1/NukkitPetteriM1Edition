@@ -83,7 +83,7 @@ public class Flat extends Generator {
         }
     }
 
-    protected void parsePreset(String preset, int chunkX, int chunkZ) {
+    protected void parsePreset(String preset) {
         try {
             this.preset = preset;
             String[] presetArray = preset.split(";");
@@ -154,9 +154,9 @@ public class Flat extends Generator {
         if (!this.init) {
             init = true;
             if (this.options.containsKey("preset") && !"".equals(this.options.get("preset"))) {
-                this.parsePreset((String) this.options.get("preset"), chunkX, chunkZ);
+                this.parsePreset((String) this.options.get("preset"));
             } else {
-                this.parsePreset(this.preset, chunkX, chunkZ);
+                this.parsePreset(this.preset);
             }
         }
         this.generateChunk(level.getChunk(chunkX, chunkZ));

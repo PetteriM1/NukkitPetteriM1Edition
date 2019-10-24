@@ -9,8 +9,6 @@ import cn.nukkit.utils.BlockColor;
  */
 public class InstantSpellParticle extends SpellParticle {
 
-    protected int data;
-
     public InstantSpellParticle(Vector3 pos) {
         this(pos, 0);
     }

@@ -12,7 +12,7 @@ public abstract class SandyBiome extends CoveredBiome {
 
     @Override
     public int getSurfaceId(int x, int y, int z) {
-        return SAND << 4;
+        return 192;
     }
 
     @Override
@@ -22,6 +22,6 @@ public abstract class SandyBiome extends CoveredBiome {
 
     @Override
     public int getGroundId(int x, int y, int z) {
-        return SANDSTONE << 4;
+        return 384;
     }
 }

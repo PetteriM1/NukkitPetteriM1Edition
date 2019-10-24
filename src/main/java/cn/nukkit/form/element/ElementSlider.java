@@ -25,8 +25,8 @@ public class ElementSlider extends Element {
         this.text = text;
         this.min = Math.max(min, 0f);
         this.max = Math.max(max, this.min);
-        if (step != -1f && step > 0) this.step = step;
-        if (defaultValue != -1f) this.defaultValue = defaultValue;
+        if (step != -1.0f && step > 0) this.step = step;
+        if (defaultValue != -1.0f) this.defaultValue = defaultValue;
     }
 
     public String getText() {

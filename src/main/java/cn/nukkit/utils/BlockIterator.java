@@ -15,7 +15,7 @@ public class BlockIterator implements Iterator<Block> {
 
     private final int maxDistance;
 
-    private static final int gridSize = 1 << 24;
+    private static final int gridSize = 16777216;
 
     private boolean end = false;
 

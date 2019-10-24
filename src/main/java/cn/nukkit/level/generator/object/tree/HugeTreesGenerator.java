@@ -97,7 +97,7 @@ public abstract class HugeTreesGenerator extends TreeGenerator {
      * returns whether or not a tree can grow at a specific position.
      * If it can, it generates surrounding dirt underneath.
      */
-    protected boolean ensureGrowable(ChunkManager worldIn, NukkitRandom rand, Vector3 treePos, int p_175929_4_) {
+    protected boolean ensureGrowable(ChunkManager worldIn, Vector3 treePos, int p_175929_4_) {
         return this.isSpaceAt(worldIn, treePos, p_175929_4_) && this.ensureDirtsUnderneath(treePos, worldIn);
     }
 

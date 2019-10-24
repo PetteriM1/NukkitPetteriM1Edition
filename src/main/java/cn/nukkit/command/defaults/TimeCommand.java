@@ -17,10 +17,7 @@ public class TimeCommand extends VanillaCommand {
 
     public TimeCommand(String name) {
         super(name, "%nukkit.command.time.description", "%nukkit.command.time.usage");
-        this.setPermission("nukkit.command.time.add;" +
-                "nukkit.command.time.set;" +
-                "nukkit.command.time.start;" +
-                "nukkit.command.time.stop");
+        this.setPermission("nukkit.command.time.add;nukkit.command.time.set;nukkit.command.time.start;nukkit.command.time.stop");
         this.commandParameters.clear();
         this.commandParameters.put("1arg", new CommandParameter[]{
                 new CommandParameter("start|stop", CommandParamType.STRING, false)

@@ -1,6 +1,5 @@
 package cn.nukkit.level.biome.impl.mesa;
 
-import cn.nukkit.block.BlockSand;
 import cn.nukkit.level.biome.type.CoveredBiome;
 import cn.nukkit.level.generator.noise.nukkit.f.SimplexF;
 import cn.nukkit.level.generator.populator.impl.PopulatorCactus;
@@ -18,8 +17,8 @@ import java.util.SplittableRandom;
 public class MesaBiome extends CoveredBiome {
 
     static final int[] colorLayer = new int[64];
-    static final SimplexF redSandNoise = new SimplexF(new NukkitRandom(937478913), 2f, 1 / 4f, 1 / 4f);
-    static final SimplexF colorNoise = new SimplexF(new NukkitRandom(193759875), 2f, 1 / 4f, 1 / 32f);
+    static final SimplexF redSandNoise = new SimplexF(new NukkitRandom(937478913), 2f, 0.25f, 0.25f);
+    static final SimplexF colorNoise = new SimplexF(new NukkitRandom(193759875), 2f, 0.25f, 0.03125f);
 
     static {
         SplittableRandom random = new SplittableRandom(29864);
@@ -43,7 +42,7 @@ public class MesaBiome extends CoveredBiome {
     }
 
     protected int moundHeight;
-    private SimplexF moundNoise = new SimplexF(new NukkitRandom(347228794), 2f, 1 / 4f, getMoundFrequency());
+    private SimplexF moundNoise = new SimplexF(new NukkitRandom(347228794), 2f, 0.25f, getMoundFrequency());
     public MesaBiome() {
         PopulatorCactus cactus = new PopulatorCactus();
         cactus.setBaseAmount(1);
@@ -81,10 +80,10 @@ public class MesaBiome extends CoveredBiome {
     @Override
     public int getSurfaceId(int x, int y, int z) {
         if (y < (71 + Math.round((redSandNoise.noise2D(x, z, true) + 1) * 1.5f))) {
-            return (SAND << 4) | BlockSand.RED;
+            return 193;
         } else {
             int meta = colorLayer[(y + Math.round((colorNoise.noise2D(x, z, true) + 1) * 1.5f)) & 0x3F];
-            return (meta == -1 ? TERRACOTTA << 4 : STAINED_TERRACOTTA << 4) | Math.max(0, meta);
+            return (meta == -1 ? 2752 : 2544) | Math.max(0, meta);
         }
     }
 
@@ -95,7 +94,7 @@ public class MesaBiome extends CoveredBiome {
 
     @Override
     public int getGroundId(int x, int y, int z) {
-        return RED_SANDSTONE << 4;
+        return 2864;
     }
 
     @Override

@@ -16,11 +16,11 @@ public class BiomeSelector {
     private final SimplexF hills;
 
     public BiomeSelector(NukkitRandom random) {
-        this.temperature = new SimplexF(random, 2F, 1F / 8F, 1F / 2048f);
-        this.rainfall = new SimplexF(random, 2F, 1F / 8F, 1F / 2048f);
-        this.river = new SimplexF(random, 6f, 2 / 4f, 1 / 1024f);
-        this.ocean = new SimplexF(random, 6f, 2 / 4f, 1 / 2048f);
-        this.hills = new SimplexF(random, 2f, 2 / 4f, 1 / 2048f);
+        this.temperature = new SimplexF(random, 2F, 0.125f, 4.8828125E-4f);
+        this.rainfall = new SimplexF(random, 2F, 0.125f, 4.8828125E-4f);
+        this.river = new SimplexF(random, 6f, 0.5f, 9.765625E-4f);
+        this.ocean = new SimplexF(random, 6f, 0.5f, 4.8828125E-4f);
+        this.hills = new SimplexF(random, 2f, 0.5f, 4.8828125E-4f);
     }
 
     public Biome pickBiome(int x, int z) {

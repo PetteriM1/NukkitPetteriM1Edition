@@ -56,7 +56,6 @@ public abstract class BlockEntity extends Position {
 
     public boolean closed = false;
     public CompoundTag namedTag;
-    protected long lastUpdate;
     protected Server server;
     protected Timing timing;
 
@@ -71,7 +70,6 @@ public abstract class BlockEntity extends Position {
         this.setLevel(chunk.getProvider().getLevel());
         this.namedTag = nbt;
         this.name = "";
-        this.lastUpdate = System.currentTimeMillis();
         this.id = BlockEntity.count++;
         this.x = this.namedTag.getInt("x");
         this.y = this.namedTag.getInt("y");
