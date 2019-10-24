@@ -15,6 +15,8 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockAnvil extends BlockFallableMeta implements Faceable {
 
+    private static final int[] faces = {1, 2, 3, 0};
+
     private static final String[] NAMES = new String[]{
             "Anvil",
             "Anvil",
@@ -82,7 +84,6 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (!target.isTransparent() || target.getId() == Block.SNOW_LAYER) {
             int damage = this.getDamage();
-            int[] faces = {1, 2, 3, 0};
             this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
             if (damage >= 4 && damage <= 7) {
                 this.setDamage(this.getDamage() | 0x04);

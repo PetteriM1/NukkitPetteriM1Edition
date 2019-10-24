@@ -20,6 +20,8 @@ import java.util.Set;
 
 public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
+    private static final int[] faces = {2, 5, 3, 4};
+
     private Set<Player> viewers = new HashSet<>();
 
     public BlockEnderChest() {
@@ -79,7 +81,6 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = {2, 5, 3, 4};
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
 
         this.getLevel().setBlock(block, this, true, true);

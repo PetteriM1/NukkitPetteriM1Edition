@@ -961,10 +961,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
-            this.server.getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                return false;
+            if (server.callDataPkEv) {
+                DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
+                this.server.getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    return false;
+                }
             }
 
             if (!this.batchedPackets.containsKey(packet.getChannel())) {
@@ -995,10 +997,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-            this.server.getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
+            if (server.callDataPkEv) {
+                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
+                this.server.getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    return false;
+                }
             }
 
             this.interfaz.putPacket(this, packet, false, false);
@@ -1026,10 +1030,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-            this.server.getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
+            if (server.callDataPkEv) {
+                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
+                this.server.getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    return false;
+                }
             }
 
             this.interfaz.putPacket(this, packet, false, true);

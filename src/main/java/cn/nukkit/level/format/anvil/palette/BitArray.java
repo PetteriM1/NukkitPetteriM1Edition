@@ -16,8 +16,7 @@ public final class BitArray {
         this.bitsPerEntry = bitsPerEntry;
         this.maxSeqLocIndex = 64 - bitsPerEntry;
         maxEntryValue = (1 << bitsPerEntry) - 1;
-        int longLen = (this.bitsPerEntry * 4096) >> 6;
-        this.data = new long[longLen];
+        this.data = new long[(this.bitsPerEntry * 4096) >> 6];
     }
 
     public final void setAt(int index, int value) {
@@ -43,8 +42,7 @@ public final class BitArray {
         if (localBitIndexStart <= maxSeqLocIndex) {
             return (int)(this.data[longIndexStart] >>> localBitIndexStart & maxEntryValue);
         } else {
-            int localShift = 64 - localBitIndexStart;
-            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << localShift) & maxEntryValue);
+            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << (64 - localBitIndexStart)) & maxEntryValue);
         }
     }
 
@@ -93,8 +91,7 @@ public final class BitArray {
     }
 
     public BitArray grow(int newBitsPerEntry) {
-        int amtGrow = newBitsPerEntry - this.bitsPerEntry;
-        if (amtGrow <= 0) return this;
+        if (newBitsPerEntry - this.bitsPerEntry <= 0) return this;
         BitArray newBitArray = new BitArray(newBitsPerEntry);
 
         char[] buffer = ThreadCache.charCache4096.get();
@@ -146,8 +143,7 @@ public final class BitArray {
                     lastVal = (char) (l >>> localStart);
                     localStart -= maxSeqLocIndex;
                     l = data[i + 1];
-                    int localShift = bitsPerEntry - localStart;
-                    lastVal |= l << localShift;
+                    lastVal |= l << (bitsPerEntry - localStart);
                     lastVal &= maxEntryValue;
                     buffer[arrI++] = lastVal;
                 }

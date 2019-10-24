@@ -16,8 +16,7 @@ public final class BitArray4096 {
         this.bitsPerEntry = bitsPerEntry;
         this.maxSeqLocIndex = 64 - bitsPerEntry;
         maxEntryValue = (1 << bitsPerEntry) - 1;
-        int longLen = (this.bitsPerEntry * 4096) >> 6;
-        this.data = new long[longLen];
+        this.data = new long[(this.bitsPerEntry * 4096) >> 6];
     }
 
     public final void setAt(int index, int value) {
@@ -95,8 +94,7 @@ public final class BitArray4096 {
     }
 
     public BitArray4096 grow(int newBitsPerEntry) {
-        int amtGrow = newBitsPerEntry - this.bitsPerEntry;
-        if (amtGrow <= 0) return this;
+        if (newBitsPerEntry - this.bitsPerEntry <= 0) return this;
         BitArray4096 newBitArray = new BitArray4096(newBitsPerEntry);
 
         char[] buffer = ThreadCache.charCache4096.get();

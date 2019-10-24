@@ -24,6 +24,8 @@ import java.util.Map;
  */
 public class BlockChest extends BlockTransparentMeta implements Faceable {
 
+    private static final int[] faces = {2, 5, 3, 4};
+
     public BlockChest() {
         this(0);
     }
@@ -77,7 +79,6 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         BlockEntityChest chest = null;
-        int[] faces = {2, 5, 3, 4};
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
 
         for (int side = 2; side <= 5; ++side) {

@@ -19,7 +19,7 @@ public class MesaPlateauMBiome extends MesaBiome {
 
     @Override
     protected float getMoundFrequency() {
-        return 1 / 50f;
+        return 0.02f;
     }
 
     @Override

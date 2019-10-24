@@ -12,6 +12,15 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
+    private static final int[] faces = new int[]{
+            0,
+            0,
+            0b1000,
+            0b1000,
+            0b0100,
+            0b0100,
+    };
+
     public BlockHayBale() {
         this(0);
     }
@@ -52,14 +61,6 @@ public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = new int[]{
-                0,
-                0,
-                0b1000,
-                0b1000,
-                0b0100,
-                0b0100,
-        };
         this.setDamage((this.getDamage() & 0x03) | faces[face.getIndex()]);
         this.getLevel().setBlock(block, this, true, true);
 

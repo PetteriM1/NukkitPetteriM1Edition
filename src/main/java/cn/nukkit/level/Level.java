@@ -901,8 +901,8 @@ public class Level implements ChunkManager, Metadatable {
         if (Utils.random.nextInt(10000) == 0) {
             int LCG = this.getUpdateLCG() >> 2;
 
-            int chunkX = chunk.getX() * 16;
-            int chunkZ = chunk.getZ() * 16;
+            int chunkX = chunk.getX() << 4;
+            int chunkZ = chunk.getZ() << 4;
             Vector3 vector = this.adjustPosToNearbyEntity(new Vector3(chunkX + (LCG & 0xf), 0, chunkZ + (LCG >> 8 & 0xf)));
 
             int bId = this.getBlockIdAt(vector.getFloorX(), vector.getFloorY(), vector.getFloorZ());
@@ -1119,7 +1119,7 @@ public class Level implements ChunkManager, Metadatable {
                                     int fullId = section.getFullBlock(x, y, z);
                                     int blockId = fullId >> 4;
                                     if (randomTickBlocks[blockId]) {
-                                        Block block = Block.get(fullId, this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
+                                        Block block = Block.get(fullId, this, (chunkX << 4) + x, (Y << 4) + y, (chunkZ << 4) + z);
                                         block.onUpdate(BLOCK_UPDATE_RANDOM);
                                     }
                                 }
@@ -2604,8 +2604,7 @@ public class Level implements ChunkManager, Metadatable {
     public BlockColor getMapColorAt(int x, int z) {
         int y = getHighestBlockAt(x, z);
         while (y > 1) {
-            Block block = getBlock(new Vector3(x, y, z));
-            BlockColor blockColor = block.getColor();
+            BlockColor blockColor = getBlock(new Vector3(x, y, z)).getColor();
             if (blockColor.getAlpha() == 0x00) {
                 y--;
             } else {
@@ -3134,8 +3133,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.cancelUnloadChunkRequest(x, z);
 
-        BaseFullChunk chunk = provider.getEmptyChunk(x, z);
-        provider.setChunk(x, z, chunk);
+        provider.setChunk(x, z, provider.getEmptyChunk(x, z));
 
         this.generateChunk(x, z);
     }

@@ -14,6 +14,8 @@ import java.util.Map;
 
 public class BlockTrappedChest extends BlockChest {
 
+    private static final int[] faces = {2, 5, 3, 4};
+
     public BlockTrappedChest() {
         this(0);
     }
@@ -34,8 +36,6 @@ public class BlockTrappedChest extends BlockChest {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = {2, 5, 3, 4};
-
         BlockEntityChest chest = null;
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
 

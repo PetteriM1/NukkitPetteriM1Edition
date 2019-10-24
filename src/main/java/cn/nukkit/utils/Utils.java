@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Utils {
 
     public static final SplittableRandom random = new SplittableRandom();
+    public static final int[] emptyDamageArray = new int[] { 0, 0, 0, 0 };
 
     public static void writeFile(String fileName, String content) throws IOException {
         writeFile(fileName, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
@@ -274,7 +275,7 @@ public class Utils {
             if (h == -1 || l == -1)
                 throw new IllegalArgumentException("contains illegal character for hexBinary: " + s);
 
-            out[i / 2] = (byte)(h * 16 + l);
+            out[i / 2] = (byte)((h << 4) + l);
         }
 
         return out;

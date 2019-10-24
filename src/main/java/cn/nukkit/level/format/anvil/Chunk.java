@@ -56,7 +56,7 @@ public class Chunk extends BaseChunk {
         }
 
         if (nbt == null) {
-            this.biomes = new byte[16 * 16];
+            this.biomes = new byte[256];
             this.sections = new cn.nukkit.level.format.ChunkSection[16];
             System.arraycopy(EmptyChunkSection.EMPTY, 0, this.sections, 0, 16);
             return;
@@ -95,7 +95,7 @@ public class Chunk extends BaseChunk {
         }
 
         if (nbt.contains("BiomeColors")) {
-            this.biomes = new byte[16 * 16];
+            this.biomes = new byte[256];
             int[] biomeColors = nbt.getIntArray("BiomeColors");
             if (biomeColors != null && biomeColors.length == 256) {
                 BiomePalette palette = new BiomePalette(biomeColors);

@@ -104,7 +104,7 @@ public class MesaBiome extends CoveredBiome {
     }
 
     protected float getMoundFrequency() {
-        return 1 / 128f;
+        return 0.0078125f;
     }
 
     @Override

@@ -70,7 +70,7 @@ public class End extends Generator {
 
         BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
 
-        double[][][] noise = getFastNoise3D(this.noiseBase, 16, 128, 16, 4, 8, 4, chunkX * 16, 0, chunkZ * 16);
+        double[][][] noise = getFastNoise3D(this.noiseBase, 16, 128, 16, 4, 8, 4, chunkX << 4, 0, chunkZ << 4);
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -80,7 +80,7 @@ public class End extends Generator {
                     double noiseValue = (Math.abs(64 - y) / 64) - noise[x][z][y];
                     noiseValue -= 1 - 0.5;
 
-                    double distance = new Vector3(0, 64, 0).distance(new Vector3(chunkX * 16 + x, y / 1.3, chunkZ * 16 + z));
+                    double distance = new Vector3(0, 64, 0).distance(new Vector3((chunkX << 4) + x, y / 1.3, (chunkZ << 4) + z));
 
                     if ((noiseValue < 0 && distance < 100) || (noiseValue < -0.2 && distance > 400)) {
                         chunk.setBlockId(x, y, z, Block.END_STONE);

@@ -44,8 +44,7 @@ public final class BitArray256 {
         if (localBitIndexStart <= 64 - bitsPerEntry) {
             return (int)(this.data[longIndexStart] >>> localBitIndexStart & ((1 << bitsPerEntry) - 1));
         } else {
-            int localShift = 64 - localBitIndexStart;
-            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << localShift) & ((1 << bitsPerEntry) - 1));
+            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << (64 - localBitIndexStart)) & ((1 << bitsPerEntry) - 1));
         }
     }
 
@@ -56,8 +55,7 @@ public final class BitArray256 {
     }
 
     public BitArray256 grow(int newBitsPerEntry) {
-        int amtGrow = newBitsPerEntry - this.bitsPerEntry;
-        if (amtGrow <= 0) return this;
+        if (newBitsPerEntry - this.bitsPerEntry <= 0) return this;
         BitArray256 newBitArray = new BitArray256(newBitsPerEntry);
 
         int[] buffer = ThreadCache.intCache256.get();

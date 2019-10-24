@@ -79,11 +79,11 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
         }
 
         if (minDamage == null || minDamage.length < 4) {
-            minDamage = new int[] { 0, 0, 0, 0 };
+            minDamage = Utils.emptyDamageArray;
         }
 
         if (maxDamage == null || maxDamage.length < 4) {
-            maxDamage = new int[] { 0, 0, 0, 0 };
+            maxDamage = Utils.emptyDamageArray;
         }
 
         for (int i = 0; i < 4; i++) {

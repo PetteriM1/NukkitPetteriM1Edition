@@ -61,8 +61,8 @@ public class PopulatorCaves extends Populator {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
 
-        double realX = chunkX * 16 + 8;
-        double realZ = chunkZ * 16 + 8;
+        double realX = (chunkX << 4) + 8;
+        double realZ = (chunkZ << 4) + 8;
 
         float f1 = 0.0F;
         float f2 = 0.0F;
@@ -70,7 +70,7 @@ public class PopulatorCaves extends Populator {
         Random localRandom = new Random(seed);
 
         if (maxAngle <= 0) {
-            int checkAreaSize = this.checkAreaSize * 16 - 16;
+            int checkAreaSize = (this.checkAreaSize << 4) - 16;
             maxAngle = checkAreaSize - localRandom.nextInt(checkAreaSize / 4);
         }
         boolean isLargeCave = false;
@@ -129,14 +129,14 @@ public class PopulatorCaves extends Populator {
                 continue;
 
 
-            int xFrom = MathHelper.floor(x - offsetXZ) - chunkX * 16 - 1;
-            int xTo = MathHelper.floor(x + offsetXZ) - chunkX * 16 + 1;
+            int xFrom = MathHelper.floor(x - offsetXZ) - (chunkX << 4) - 1;
+            int xTo = MathHelper.floor(x + offsetXZ) - (chunkX << 4) + 1;
 
             int yFrom = MathHelper.floor(y - offsetY) - 1;
             int yTo = MathHelper.floor(y + offsetY) + 1;
 
-            int zFrom = MathHelper.floor(z - offsetXZ) - chunkZ * 16 - 1;
-            int zTo = MathHelper.floor(z + offsetXZ) - chunkZ * 16 + 1;
+            int zFrom = MathHelper.floor(z - offsetXZ) - (chunkZ << 4) - 1;
+            int zTo = MathHelper.floor(z + offsetXZ) - (chunkZ << 4) + 1;
 
             if (xFrom < 0)
                 xFrom = 0;
@@ -176,9 +176,9 @@ public class PopulatorCaves extends Populator {
 
             // Generate cave
             for (int xx = xFrom; xx < xTo; xx++) {
-                double modX = (xx + chunkX * 16 + 0.5D - x) / offsetXZ;
+                double modX = (xx + (chunkX << 4) + 0.5D - x) / offsetXZ;
                 for (int zz = zFrom; zz < zTo; zz++) {
-                    double modZ = (zz + chunkZ * 16 + 0.5D - z) / offsetXZ;
+                    double modZ = (zz + (chunkZ << 4) + 0.5D - z) / offsetXZ;
 
                     boolean grassFound = false;
                     if (modX * modX + modZ * modZ < 1.0D) {
@@ -229,7 +229,7 @@ public class PopulatorCaves extends Populator {
             i = 0;
 
         for (int j = 0; j < i; j++) {
-            double x = chunkX * 16 + this.random.nextInt(16);
+            double x = (chunkX << 4) + this.random.nextInt(16);
 
             double y;
 
@@ -238,7 +238,7 @@ public class PopulatorCaves extends Populator {
             else
                 y = this.random.nextInt(this.random.nextInt(caveMaxAltitude - caveMinAltitude + 1) + 1) + caveMinAltitude;
 
-            double z = chunkZ * 16 + this.random.nextInt(16);
+            double z = (chunkZ << 4) + this.random.nextInt(16);
 
             int count = caveSystemFrequency;
             boolean largeCaveSpawned = false;

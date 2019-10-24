@@ -13,6 +13,8 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceable {
 
+    private static final int[] faces = {2, 3, 0, 1};
+
     public BlockEndPortalFrame() {
         this(0);
     }
@@ -123,7 +125,6 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = {2, 3, 0, 1};
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
         this.getLevel().setBlock(block, this, true, true);
         return true;

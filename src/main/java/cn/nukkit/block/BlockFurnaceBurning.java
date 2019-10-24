@@ -21,6 +21,8 @@ import java.util.Map;
  */
 public class BlockFurnaceBurning extends BlockSolidMeta {
 
+    private static final int[] faces = {2, 5, 3, 4};
+
     public BlockFurnaceBurning() {
         this(0);
     }
@@ -66,7 +68,6 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = {2, 5, 3, 4};
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = new CompoundTag()

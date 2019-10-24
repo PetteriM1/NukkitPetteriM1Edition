@@ -96,56 +96,38 @@ public class Server {
     private static Server instance;
 
     private BanList banByName;
-
     private BanList banByIP;
-
     private Config operators;
-
     private Config whitelist;
 
     private AtomicBoolean isRunning = new AtomicBoolean(true);
-
     private boolean hasStopped;
 
     private PluginManager pluginManager;
-
     private ServerScheduler scheduler;
 
     private int tickCounter;
-
     private long nextTick;
-
     private final float[] tickAverage = {20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
-
     private final float[] useAverage = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
     private float maxTick = 20;
-
     private float maxUse = 0;
 
     private final NukkitConsole console;
     private final ConsoleThread consoleThread;
 
     private SimpleCommandMap commandMap;
-
     private CraftingManager craftingManager;
-
     private ResourcePackManager resourcePackManager;
-
     private ConsoleCommandSender consoleSender;
 
     private int maxPlayers;
-
     private boolean autoSave = true;
-
     private RCON rcon;
 
     private EntityMetadataStore entityMetadata;
-
     private PlayerMetadataStore playerMetadata;
-
     private LevelMetadataStore levelMetadata;
-
     private Network network;
 
     private boolean networkCompressionAsync;
@@ -163,7 +145,6 @@ public class Server {
     private int autoSaveTicks = 6000;
 
     private BaseLang baseLang;
-
     private boolean forceLanguage;
 
     private UUID serverID;
@@ -173,13 +154,10 @@ public class Server {
     private final String pluginPath;
 
     private QueryHandler queryHandler;
-
     private QueryRegenerateEvent queryRegenerateEvent;
-
     private Config properties;
 
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
-
     private final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
@@ -205,16 +183,14 @@ public class Server {
     };
 
     private Level[] levelArray = new Level[0];
-
     private final ServiceManager serviceManager = new NKServiceManager();
-
-    private Level defaultLevel = null;
-
+    private Level defaultLevel;
     private final Thread currentThread;
-
     private Watchdog watchdog;
-    
     private boolean suomicraftMode;
+    boolean callDataPkEv;
+    private boolean doLevelGC;
+    private boolean mobAI;
 
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -320,6 +296,9 @@ public class Server {
         log.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
 
         this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
+        this.callDataPkEv = this.getPropertyBoolean("call-data-pk-send-event", true);
+        this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
+        this.mobAI = this.getPropertyBoolean("mob-ai", true);
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -823,28 +802,30 @@ public class Server {
                 try {
                     this.tick();
 
-                    long next = this.nextTick;
-                    long current = System.currentTimeMillis();
+                    if (doLevelGC) {
+                        long next = this.nextTick;
+                        long current = System.currentTimeMillis();
 
-                    if (next - 0.1 > current) {
-                      long allocated = next - current - 1;
+                        if (next - 0.1 > current) {
+                            long allocated = next - current - 1;
 
-                        { // Instead of wasting time, do something potentially useful
-                            int offset = 0;
-                            for (int i = 0; i < levelArray.length; i++) {
-                                offset = (i + lastLevelGC) % levelArray.length;
-                                levelArray[offset].doGarbageCollection(allocated - 1);
-                                allocated = next - System.currentTimeMillis();
-                                if (allocated <= 0) break;
+                            { // Instead of wasting time, do something potentially useful
+                                int offset = 0;
+                                for (int i = 0; i < levelArray.length; i++) {
+                                    offset = (i + lastLevelGC) % levelArray.length;
+                                    levelArray[offset].doGarbageCollection(allocated - 1);
+                                    allocated = next - System.currentTimeMillis();
+                                    if (allocated <= 0) break;
+                                }
+                                lastLevelGC = offset + 1;
                             }
-                            lastLevelGC = offset + 1;
-                        }
 
-                        if (allocated > 0) {
-                            try {
-                                Thread.sleep(allocated, 900000);
-                            } catch (Exception e) {
-                                this.getLogger().logException(e);
+                            if (allocated > 0) {
+                                try {
+                                    Thread.sleep(allocated, 900000);
+                                } catch (Exception e) {
+                                    this.getLogger().logException(e);
+                                }
                             }
                         }
                     }
@@ -1343,7 +1324,7 @@ public class Server {
     }
 
     public boolean getMobAiEnabled() {
-        return this.getPropertyBoolean("mob-ai", true);
+        return this.mobAI;
     }
 
     public MainLogger getLogger() {
@@ -2120,6 +2101,8 @@ public class Server {
             put("strong-ip-bans", true);
             put("worlds-level-auto-save-disabled", "");
             put("temp-ip-ban-failed-xbox-auth", false);
+            put("call-data-pk-send-event", true);
+            put("do-level-gc", true);
         }
     }
 

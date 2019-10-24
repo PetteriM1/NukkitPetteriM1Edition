@@ -142,7 +142,7 @@ public class Network {
     public void processBatch(BatchPacket packet, Player player) {
         byte[] data;
         try {
-            data = Zlib.inflate(packet.payload, 2 * 1024 * 1024);
+            data = Zlib.inflate(packet.payload, 2097152); // 2 * 1024 * 1024
         } catch (Exception e) {
             return;
         }

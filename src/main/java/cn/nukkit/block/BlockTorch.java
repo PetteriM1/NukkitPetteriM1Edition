@@ -14,6 +14,25 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockTorch extends BlockFlowable implements Faceable {
 
+    private static final int[] faces = new int[]{
+            0, //0, nerver used
+            5, //1
+            4, //2
+            3, //3
+            2, //4
+            1, //5
+    };
+
+    private static final int[] faces2 = new int[]{
+            0, //0
+            4, //1
+            5, //2
+            2, //3
+            3, //4
+            0, //5
+            0  //6
+    };
+
     public BlockTorch() {
         this(0);
     }
@@ -42,17 +61,8 @@ public class BlockTorch extends BlockFlowable implements Faceable {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             Block below = this.down();
             int side = this.getDamage();
-            int[] faces = new int[]{
-                    0, //0
-                    4, //1
-                    5, //2
-                    2, //3
-                    3, //4
-                    0, //5
-                    0  //6
-            };
 
-            if (this.getSide(BlockFace.fromIndex(faces[side])).isTransparent() && !(side == 0 && (below instanceof BlockFence || below.getId() == COBBLE_WALL))) {
+            if (this.getSide(BlockFace.fromIndex(faces2[side])).isTransparent() && !(side == 0 && (below instanceof BlockFence || below.getId() == COBBLE_WALL))) {
                 this.getLevel().useBreakOn(this);
 
                 return Level.BLOCK_UPDATE_NORMAL;
@@ -67,14 +77,6 @@ public class BlockTorch extends BlockFlowable implements Faceable {
         Block below = this.down();
 
         if (!target.isTransparent() && face != BlockFace.DOWN) {
-            int[] faces = new int[]{
-                    0, //0, nerver used
-                    5, //1
-                    4, //2
-                    3, //3
-                    2, //4
-                    1, //5
-            };
             this.setDamage(faces[face.getIndex()]);
             this.getLevel().setBlock(block, this, true, true);
 

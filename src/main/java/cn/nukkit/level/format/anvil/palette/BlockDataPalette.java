@@ -215,7 +215,6 @@ public final class BlockDataPalette implements Cloneable {
     }
 
     public synchronized BlockDataPalette clone() {
-        char[] raw = getRaw();
-        return new BlockDataPalette(raw.clone());
+        return new BlockDataPalette(getRaw().clone());
     }
 }

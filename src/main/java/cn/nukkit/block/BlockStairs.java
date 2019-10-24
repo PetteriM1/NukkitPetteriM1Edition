@@ -12,6 +12,8 @@ import cn.nukkit.utils.Faceable;
  */
 public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
+    private static final int[] faces = new int[]{2, 1, 3, 0};
+
     protected BlockStairs(int meta) {
         super(meta);
     }
@@ -41,7 +43,6 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        int[] faces = new int[]{2, 1, 3, 0};
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
         if ((fy > 0.5 && face != BlockFace.UP) || face == BlockFace.DOWN) {
             this.setDamage(this.getDamage() | 0x04); //Upside-down stairs

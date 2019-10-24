@@ -211,7 +211,6 @@ public final class DataPalette implements Cloneable {
     }
 
     public synchronized DataPalette clone() {
-        char[] raw = getRaw();
-        return new DataPalette(raw.clone());
+        return new DataPalette(getRaw().clone());
     }
 }

@@ -18,6 +18,8 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
 
+    private static final int[] faces = {2, 1, 3, 0};
+
     public BlockTrapdoor() {
         this(0);
     }
@@ -152,10 +154,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
             top = face != BlockFace.UP;
         }
 
-        int[] faces = {2, 1, 3, 0};
-        int faceBit = faces[facing.getHorizontalIndex()];
-
-        this.setDamage(this.getDamage() | faceBit);
+        this.setDamage(this.getDamage() | faces[facing.getHorizontalIndex()]);
 
         if (top) {
             this.setDamage(this.getDamage() | 0x04);

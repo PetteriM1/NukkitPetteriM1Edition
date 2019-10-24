@@ -47,8 +47,8 @@ public class PopulatorRavines extends Populator {
     protected void generateChunk(int chunkX, int chunkZ, FullChunk generatingChunkBuffer) {
         if (this.random.nextInt(300) >= this.ravineRarity)
             return;
-        double d1 = (chunkX * 16) + this.random.nextInt(16);
-        double d3 = (chunkZ * 16) + this.random.nextInt(16);
+        double d1 = (chunkX << 4) + this.random.nextInt(16);
+        double d3 = (chunkZ << 4) + this.random.nextInt(16);
 
         int i = 1;
 
@@ -68,8 +68,8 @@ public class PopulatorRavines extends Populator {
         int chunkX = generatingChunkBuffer.getX();
         int chunkZ = generatingChunkBuffer.getZ();
 
-        double d1 = chunkX * 16 + 8;
-        double d2 = chunkZ * 16 + 8;
+        double d1 = (chunkX << 4) + 8;
+        double d2 = (chunkZ << 4) + 8;
 
         float f1 = 0.0F;
         float f2 = 0.0F;
@@ -122,14 +122,14 @@ public class PopulatorRavines extends Populator {
 
             if ((paramDouble1 < d1 - 16.0D - d3 * 2.0D) || (paramDouble3 < d2 - 16.0D - d3 * 2.0D) || (paramDouble1 > d1 + 16.0D + d3 * 2.0D) || (paramDouble3 > d2 + 16.0D + d3 * 2.0D))
                 continue;
-            int k = MathHelper.floor(paramDouble1 - d3) - (chunkX * 16) - 1;
-            int m = MathHelper.floor(paramDouble1 + d3) - (chunkZ * 16) + 1;
+            int k = MathHelper.floor(paramDouble1 - d3) - (chunkX << 4) - 1;
+            int m = MathHelper.floor(paramDouble1 + d3) - (chunkZ << 4) + 1;
 
             int maxY = MathHelper.floor(paramDouble2 - d4) - 1;
             int minY = MathHelper.floor(paramDouble2 + d4) + 1;
 
-            int i2 = MathHelper.floor(paramDouble3 - d3) - (chunkX * 16) - 1;
-            int i3 = MathHelper.floor(paramDouble3 + d3) - (chunkZ * 16) + 1;
+            int i2 = MathHelper.floor(paramDouble3 - d3) - (chunkX << 4) - 1;
+            int i3 = MathHelper.floor(paramDouble3 + d3) - (chunkZ << 4) + 1;
 
             if (k < 0)
                 k = 0;
@@ -168,9 +168,9 @@ public class PopulatorRavines extends Populator {
                 continue;
             }
             for (int localX = k; localX < m; localX++) {
-                double d9 = (localX + (chunkX * 16) + 0.5D - paramDouble1) / d3;
+                double d9 = (localX + (chunkX << 4) + 0.5D - paramDouble1) / d3;
                 for (int localZ = i2; localZ < i3; localZ++) {
-                    double d10 = (localZ + (chunkZ * 16) + 0.5D - paramDouble3) / d3;
+                    double d10 = (localZ + (chunkZ << 4) + 0.5D - paramDouble3) / d3;
                     if (d9 * d9 + d10 * d10 < 1.0D) {
                         for (int localY = minY; localY >= maxY; localY--) {
                             double d11 = ((localY - 1) + 0.5D - paramDouble2) / d4;
