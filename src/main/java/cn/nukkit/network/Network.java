@@ -165,11 +165,14 @@ public class Network {
                 if ((pk = this.getPacket(buf[0])) != null) {
                     pk.setBuffer(buf, player.protocol <= 274 ? 3 : 1);
 
+                    pk.protocol = player.protocol;
+
                     try {
                         pk.decode();
-                    } catch (Exception e) { // LoginPacket < 1.6
+                    } catch (Exception e) { // LoginPacket < 1.6 // TODO: This exception is not always caused by different game version
+                        getServer().getLogger().logException(e);
                         try {
-                            pk.setBuffer(buf, 3);
+                            pk.setBuffer(buf, 3); // TODO: Isn't this already set above?
                             pk.decode();
                         } catch (Exception ignore) {}
                     }
@@ -262,7 +265,6 @@ public class Network {
         this.registerPacket(ProtocolInfo.DISCONNECT_PACKET, DisconnectPacket.class);
         this.registerPacket(ProtocolInfo.ENTITY_EVENT_PACKET, EntityEventPacket.class);
         this.registerPacket(ProtocolInfo.ENTITY_FALL_PACKET, EntityFallPacket.class);
-        this.registerPacket(ProtocolInfo.EXPLODE_PACKET, ExplodePacket.class);
         this.registerPacket(ProtocolInfo.FULL_CHUNK_DATA_PACKET, LevelChunkPacket.class);
         this.registerPacket(ProtocolInfo.GAME_RULES_CHANGED_PACKET, GameRulesChangedPacket.class);
         this.registerPacket(ProtocolInfo.HURT_ARMOR_PACKET, HurtArmorPacket.class);

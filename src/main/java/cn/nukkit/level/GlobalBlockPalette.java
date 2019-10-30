@@ -1,14 +1,19 @@
 package cn.nukkit.level;
 
 import cn.nukkit.Server;
+import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BinaryStream;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +30,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator340 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator361 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator388 = new AtomicInteger(0);
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -35,6 +41,7 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId340 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId354 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId361 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId388 = new Int2IntOpenHashMap();
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -43,6 +50,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable340;
     private static byte[] compiledTable354;
     private static byte[] compiledTable361;
+    private static byte[] compiledTable388;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -55,6 +63,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId340.defaultReturnValue(-1);
         legacyToRuntimeId354.defaultReturnValue(-1);
         legacyToRuntimeId361.defaultReturnValue(-1);
+        legacyToRuntimeId388.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
             // 223
@@ -178,6 +187,24 @@ public class GlobalBlockPalette {
                 table361.putLShort(entry361.id);
             }
             compiledTable361 = table361.getBuffer();
+            // 388
+            InputStream stream388 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_388.dat");
+            if (stream388 == null) throw new AssertionError("Unable to locate block state nbt 388");
+            CompoundTag tag;
+            try {
+                tag = NBTIO.read(stream388);
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            for (CompoundTag state : tag.getList("Palette", CompoundTag.class).getAll()) {
+                registerMapping(388, state.getShort("id") << 4 | state.getShort("meta"));
+                state.remove("meta"); // No point in sending this since the client doesn't use it
+            }
+            try {
+                compiledTable388 = NBTIO.write(tag.getList("Palette"), ByteOrder.LITTLE_ENDIAN, true);
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
         }, true);
     }
 
@@ -208,8 +235,10 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId340.get(legacyId);
             case 354:
                 return legacyToRuntimeId354.get(legacyId);
-            default: // Current protocol
+            case 361:
                 return legacyToRuntimeId361.get(legacyId);
+            default: // Current protocol
+                return legacyToRuntimeId388.get(legacyId);
         }
     }
 
@@ -242,6 +271,9 @@ public class GlobalBlockPalette {
             case 361:
                 legacyToRuntimeId361.put(legacyId, runtimeIdAllocator361.getAndIncrement());
                 break;
+            case 388:
+                legacyToRuntimeId388.put(legacyId, runtimeIdAllocator388.getAndIncrement());
+                break;
             default:
                 Server.getInstance().getLogger().alert("Tried to register mapping for unsupported protocol version: " + protocol);
                 break;
@@ -268,6 +300,8 @@ public class GlobalBlockPalette {
                 return compiledTable354;
             case 361:
                 return compiledTable361;
+            case 388:
+                return compiledTable388;
             default:
                 Server.getInstance().getLogger().alert("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
                 return null;

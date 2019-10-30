@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.ToString;
@@ -95,6 +96,7 @@ public class StartGamePacket extends DataPacket {
     public String worldName;
     public String premiumWorldTemplateId = "";
     public boolean isTrial = false;
+    public boolean isMovementServerAuthoritative;
     public long currentTick;
     public int enchantmentSeed;
     public String multiplayerCorrelationId = "";
@@ -172,6 +174,9 @@ public class StartGamePacket extends DataPacket {
                 this.putBoolean(this.isWorldTemplateOptionLocked);
                 if (protocol >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
+                    if (protocol >= 388) {
+                        this.putString(Utils.getVersionByProtocol(protocol));
+                    }
                 }
             }
         }
@@ -179,6 +184,9 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
+        if (protocol >= 388) {
+            this.putBoolean(this.isMovementServerAuthoritative);
+        }
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
         if (protocol > 274) {

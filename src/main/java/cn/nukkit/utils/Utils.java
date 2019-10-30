@@ -305,4 +305,21 @@ public class Utils {
     public static boolean rand() {
         return random.nextBoolean();
     }
+
+    /**
+     * Get game version string by protocol version
+     * For internal usage!
+     * Starting from 388 / 1.13.0
+     *
+     * @param protocol protocol version
+     * @return game version string
+     */
+    public static String getVersionByProtocol(int protocol) {
+        switch (protocol) {
+            case 388:
+                return "1.13.0";
+            default:
+                throw new IllegalStateException("Invalid protocol: " + protocol);
+        }
+    }
 }

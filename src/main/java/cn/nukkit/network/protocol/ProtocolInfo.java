@@ -10,12 +10,12 @@ import java.util.List;
  */
 public interface ProtocolInfo {
 
-    int CURRENT_PROTOCOL = 361;
+    int CURRENT_PROTOCOL = 388;
 
-    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(137, 140, 141, 150, 160, 201, 223, 224, 261, 274, 281, 282, 291, 313, 332, 340, 354, CURRENT_PROTOCOL);
+    List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(137, 140, 141, 150, 160, 201, 223, 224, 261, 274, 281, 282, 291, 313, 332, 340, 354, 361, CURRENT_PROTOCOL);
 
-    String MINECRAFT_VERSION = "v1.12.0";
-    String MINECRAFT_VERSION_NETWORK = "1.12.0";
+    String MINECRAFT_VERSION = "v1.13.0";
+    String MINECRAFT_VERSION_NETWORK = "1.13.0";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
@@ -38,7 +38,7 @@ public interface ProtocolInfo {
     byte RIDER_JUMP_PACKET = 0x14;
     byte UPDATE_BLOCK_PACKET = 0x15;
     byte ADD_PAINTING_PACKET = 0x16;
-    byte EXPLODE_PACKET = 0x17;
+    byte TICK_SYNC_PACKET = 0x17;
     byte LEVEL_SOUND_EVENT_PACKET_V1 = 0x18;
     byte LEVEL_EVENT_PACKET = 0x19;
     byte BLOCK_EVENT_PACKET = 0x1a;
@@ -149,5 +149,13 @@ public interface ProtocolInfo {
     byte UPDATE_BLOCK_PROPERTIES = (byte) 0x86;
     byte CLIENT_CACHE_BLOB_STATUS_PACKET = (byte) 0x87;
     byte CLIENT_CACHE_MISS_RESPONSE_PACKET = (byte) 0x88;
+    byte EDUCATION_SETTINGS_PACKET = (byte) 0x89;
+    byte EMOTE_PACKET = (byte) 0x8a;
+    byte MULTIPLAYER_SETTINGS_PACKET = (byte) 0x8b;
+    byte SETTINGS_COMMAND_PACKET = (byte) 0x8c;
+    byte ANVIL_DAMAGE_PACKET = (byte) 0x8d;
+    byte COMPLETED_USING_ITEM_PACKET = (byte) 0x8e;
+    byte NETWORK_SETTINGS_PACKET = (byte) 0x8f;
+    byte PLAYER_AUTH_INPUT_PACKET = (byte) 0x90;
     byte BATCH_PACKET = (byte) 0xff;
 }

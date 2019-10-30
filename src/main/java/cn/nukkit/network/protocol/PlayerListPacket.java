@@ -40,13 +40,21 @@ public class PlayerListPacket extends DataPacket {
                     this.putString("");
                     this.putVarInt(0);
                 }
-                this.putSkin(entry.skin);
-                if (protocol < 223) {
-                    this.putByteArray(new byte[0]);
+                if (protocol < 388) {
+                    this.putSkin(protocol, entry.skin);
+                    if (protocol < 223) {
+                        this.putByteArray(new byte[0]);
+                    }
                 }
                 this.putString(entry.xboxUserId);
                 if (protocol >= 223) {
                     this.putString(entry.platformChatId);
+                    if (protocol >= 388) {
+                        this.putLInt(entry.buildPlatform);
+                        this.putSkin(protocol, entry.skin);
+                        this.putBoolean(entry.isTeacher);
+                        this.putBoolean(entry.isHost);
+                    }
                 }
             } else if (protocol < 223) {
                 this.putUUID(entry.uuid);
@@ -68,6 +76,9 @@ public class PlayerListPacket extends DataPacket {
         public Skin skin;
         public String xboxUserId = "";
         public String platformChatId = "";
+        public int buildPlatform = -1;
+        public boolean isTeacher;
+        public boolean isHost;
 
         public Entry(UUID uuid) {
             this.uuid = uuid;

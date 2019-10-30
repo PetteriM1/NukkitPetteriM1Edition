@@ -6,11 +6,15 @@ import cn.nukkit.entity.data.IntPositionEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
+import cn.nukkit.utils.SerializedImage;
+import cn.nukkit.utils.SkinAnimation;
 import cn.nukkit.utils.Utils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -111,22 +115,57 @@ public class EntityHuman extends EntityHumanType {
                     newSkin.setSkinId(skinTag.getString("ModelId"));
                 }
                 if (skinTag.contains("Data")) {
-                    newSkin.setSkinData(skinTag.getByteArray("Data"));
+                    byte[] data = skinTag.getByteArray("Data");
+                    if (skinTag.contains("SkinImageWidth") && skinTag.contains("SkinImageHeight")) {
+                        newSkin.setSkinData(new SerializedImage(skinTag.getInt("SkinImageWidth"), skinTag.getInt("SkinImageHeight"), data));
+                    } else {
+                        newSkin.setSkinData(data);
+                    }
+                }
+                if (skinTag.contains("CapeId")) {
+                    newSkin.setCapeId(skinTag.getString("CapeId"));
                 }
                 if (skinTag.contains("CapeData")) {
                     newSkin.setCapeData(skinTag.getByteArray("CapeData"));
+                    byte[] data = skinTag.getByteArray("CapeData");
+                    if (skinTag.contains("CapeImageWidth") && skinTag.contains("CapeImageHeight")) {
+                        newSkin.setSkinData(new SerializedImage(skinTag.getInt("CapeImageWidth"), skinTag.getInt("CapeImageHeight"), data));
+                    } else {
+                        newSkin.setSkinData(data);
+                    }
                 }
                 if (skinTag.contains("GeometryName")) {
                     newSkin.setGeometryName(skinTag.getString("GeometryName"));
                 }
+                if (skinTag.contains("SkinResourcePatch")) {
+                    newSkin.setSkinResourcePatch(new String(skinTag.getByteArray("SkinResourcePatch"), StandardCharsets.UTF_8));
+                }
                 if (skinTag.contains("GeometryData")) {
                     newSkin.setGeometryData(new String(skinTag.getByteArray("GeometryData"), StandardCharsets.UTF_8));
                 }
+                if (skinTag.contains("AnimationData")) {
+                    newSkin.setAnimationData(new String(skinTag.getByteArray("Animation"), StandardCharsets.UTF_8));
+                }
+                if (skinTag.contains("PremiumSkin")) {
+                    newSkin.setPremium(skinTag.getBoolean("PremiumSkin"));
+                }
+                if (skinTag.contains("PersonaSkin")) {
+                    newSkin.setPersona(skinTag.getBoolean("PersonaSkin"));
+                }
+                if (skinTag.contains("CapeOnClassicSkin")) {
+                    newSkin.setCapeOnClassic(skinTag.getBoolean("CapeOnClassicSkin"));
+                }
+                if (skinTag.contains("AnimatedImageData")) {
+                    for (CompoundTag animationTag : skinTag.getList("AnimatedImageData", CompoundTag.class).getAll()) {
+                        skin.getAnimations().add(new SkinAnimation(new SerializedImage(animationTag.getInt("ImageWidth"), animationTag.getInt("ImageHeight"), animationTag.getByteArray("Image")), animationTag.getInt("Type"), animationTag.getFloat("Frames")));
+                    }
+                }
+
                 this.setSkin(newSkin);
             }
 
             this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.skin
-                    .getSkinData(), this.getNameTag().getBytes(StandardCharsets.UTF_8));
+                    .getSkinData().data, this.getNameTag().getBytes(StandardCharsets.UTF_8));
         }
 
         super.initEntity();
@@ -142,13 +181,40 @@ public class EntityHuman extends EntityHumanType {
         super.saveNBT();
 
         if (skin != null) {
-            this.namedTag.putCompound("Skin", new CompoundTag()
-                    .putByteArray("Data", this.skin.getSkinData())
+            CompoundTag skinTag = new CompoundTag()
+                    .putByteArray("Data", this.getSkin().getSkinData().data)
+                    .putInt("SkinImageWidth", this.getSkin().getSkinData().width)
+                    .putInt("SkinImageHeight", this.getSkin().getSkinData().height)
                     .putString("ModelId", this.skin.getSkinId())
-                    .putByteArray("CapeData", this.skin.getCapeData())
-                    .putString("GeometryName", this.skin.getGeometryName())
+                    .putString("CapeId", this.getSkin().getCapeId())
+                    .putByteArray("CapeData", this.getSkin().getCapeData().data)
+                    .putInt("CapeImageWidth", this.getSkin().getCapeData().width)
+                    .putInt("CapeImageHeight", this.getSkin().getCapeData().height)
+                    .putByteArray("SkinResourcePatch", this.getSkin().getSkinResourcePatch().getBytes(StandardCharsets.UTF_8))
                     .putByteArray("GeometryData", this.skin.getGeometryData().getBytes(StandardCharsets.UTF_8))
-            );
+                    .putByteArray("AnimationData", this.getSkin().getAnimationData().getBytes(StandardCharsets.UTF_8))
+                    .putBoolean("PremiumSkin", this.getSkin().isPremium())
+                    .putBoolean("PersonaSkin", this.getSkin().isPersona())
+                    .putBoolean("CapeOnClassicSkin", this.getSkin().isCapeOnClassic());
+
+            List<SkinAnimation> animations = this.getSkin().getAnimations();
+
+            if (!animations.isEmpty()) {
+                ListTag<CompoundTag> animationsTag = new ListTag<>("AnimationImageData");
+
+                for (SkinAnimation animation : animations) {
+                    animationsTag.add(new CompoundTag()
+                            .putFloat("Frames", animation.frames)
+                            .putInt("Type", animation.type)
+                            .putInt("ImageWidth", animation.image.width)
+                            .putInt("ImageHeight", animation.image.height)
+                            .putByteArray("Image", animation.image.data));
+                }
+
+                skinTag.putList(animationsTag);
+            }
+
+            this.namedTag.putCompound("Skin", skinTag);
         }
     }
 
