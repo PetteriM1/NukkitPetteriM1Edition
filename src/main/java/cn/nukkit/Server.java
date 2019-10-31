@@ -1052,7 +1052,7 @@ public class Server {
                 }
             }
 
-            this.network.updateName();
+            //this.network.updateName();
         }
 
         if (++this.autoSaveTicker >= this.autoSaveTicks) {

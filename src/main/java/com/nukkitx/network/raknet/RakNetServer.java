@@ -150,7 +150,7 @@ public class RakNetServer extends RakNet {
             return;
         }
         int protocolVersion = buffer.readUnsignedByte();
-        int mtu = buffer.readableBytes() + 1 + 16 + 1 + (packet.sender().getAddress() instanceof Inet6Address ? 40 : 20)
+        int mtu = buffer.readableBytes() + 18 /*1 + 16 + 1*/ + (packet.sender().getAddress() instanceof Inet6Address ? 40 : 20)
                 + UDP_HEADER_SIZE; // 1 (Packet ID), 16 (Magic), 1 (Protocol Version), 20/40 (IP Header)
 
         RakNetServerSession session = this.sessionsByAddress.get(packet.sender());

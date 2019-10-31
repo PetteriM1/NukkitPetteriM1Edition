@@ -9,19 +9,20 @@ import cn.nukkit.item.ItemBlock;
  */
 public class BlockLeaves2 extends BlockLeaves {
 
+    private static final String[] names = new String[]{
+            "Acacia Leaves",
+            "Dark Oak Leaves"
+    };
+
     public BlockLeaves2() {
         this(0);
     }
 
     public BlockLeaves2(int meta) {
-        super(meta);
+        super(meta & 0x7); // Anything above this range is invalid
     }
 
     public String getName() {
-        String[] names = new String[]{
-                "Acacia Leaves",
-                "Dark Oak Leaves"
-        };
         return names[this.getDamage() & 0x01];
     }
 

@@ -22,7 +22,7 @@ public class RakNetConstants {
 
     public static final int RAKNET_DATAGRAM_HEADER_SIZE = 4;
 
-    public static final int MAXIMUM_CONNECTION_ATTEMPTS = 12;
+    public static final int MAXIMUM_CONNECTION_ATTEMPTS = 10;
     /**
      * Time after {@link RakNetSession} is closed due to no activity.
      */

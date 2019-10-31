@@ -129,14 +129,13 @@ public class RakNetServerSession extends RakNetSession {
     }
 
     private void sendConnectionRequestAccepted(long time) {
-        boolean ipv6 = this.isIpv6Session();
-        ByteBuf buffer = this.allocateBuffer(ipv6 ? 628 : 166);
+        ByteBuf buffer = this.allocateBuffer(this.isIpv6Session() ? 628 : 166);
 
         buffer.writeByte(RakNetConstants.ID_CONNECTION_REQUEST_ACCEPTED);
         NetworkUtils.writeAddress(buffer, this.address);
         buffer.writeShort(0); // System index
 
-        for (InetSocketAddress socketAddress : ipv6 ? RakNetUtils.LOCAL_IP_ADDRESSES_V6 : RakNetUtils.LOCAL_IP_ADDRESSES_V4) {
+        for (InetSocketAddress socketAddress : this.isIpv6Session() ? RakNetUtils.LOCAL_IP_ADDRESSES_V6 : RakNetUtils.LOCAL_IP_ADDRESSES_V4) {
             NetworkUtils.writeAddress(buffer, socketAddress);
         }
 
