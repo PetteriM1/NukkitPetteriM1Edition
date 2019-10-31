@@ -36,6 +36,9 @@ public class LoginPacket extends DataPacket {
             setOffset(getOffset() + 2);
             this.protocol_ = getInt();
         }
+        if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(protocol_)) {
+            return;
+        }
         this.setBuffer(this.getByteArray(), 0);
         decodeChainData();
         decodeSkinData();
@@ -81,9 +84,9 @@ public class LoginPacket extends DataPacket {
                 skin.setSkinData(Base64.getDecoder().decode(skinToken.get("SkinData").getAsString()));
             }
 
-            if (skinToken.has("CapeData")) {
+            /*if (skinToken.has("CapeData")) { //TODO: Fix
                 this.skin.setCapeData(Base64.getDecoder().decode(skinToken.get("CapeData").getAsString()));
-            }
+            }*/
 
             if (skinToken.has("SkinGeometryName")) {
                 skin.setGeometryName(skinToken.get("SkinGeometryName").getAsString());
@@ -148,13 +151,17 @@ public class LoginPacket extends DataPacket {
     }
 
     private static SerializedImage getImage(JsonObject token, String name) {
-        if (token.has(name + "Data") && token.has(name + "ImageHeight") && token.has(name + "ImageWidth")) {
+        if (token.has(name + "Data")) {
             byte[] skinImage = Base64.getDecoder().decode(token.get(name + "Data").getAsString());
-            int width = token.get(name + "ImageWidth").getAsInt();
-            int height = token.get(name + "ImageHeight").getAsInt();
-            return new SerializedImage(width, height, skinImage);
+            if (token.has(name + "ImageHeight") && token.has(name + "ImageWidth")) {
+                int width = token.get(name + "ImageWidth").getAsInt();
+                int height = token.get(name + "ImageHeight").getAsInt();
+                return new SerializedImage(width, height, skinImage);
+            } else {
+                return SerializedImage.fromLegacy(skinImage);
+            }
         }
-        return null;
+        return SerializedImage.EMPTY;
     }
 
     private static class MapTypeToken extends TypeToken<Map<String, List<String>>> {

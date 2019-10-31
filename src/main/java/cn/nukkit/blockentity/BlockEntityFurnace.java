@@ -200,7 +200,6 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         burnDuration = 0;
         if (this.getBlock().getId() == Item.FURNACE) {
             this.getLevel().setBlock(this, new BlockFurnaceBurning(this.getBlock().getDamage()), true);
-            this.getLevel().addSound(this, Sound.FURNACE_LIT);
         }
 
         if (burnTime > 0 && ev.isBurning()) {

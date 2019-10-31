@@ -3259,6 +3259,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.initialized = true;
                     doFirstSpawn();
                     break;
+                case ProtocolInfo.RESPAWN_PACKET:
+                    if (this.isAlive() || this.protocol < 388) {
+                        break;
+                    }
+
+                    RespawnPacket respawnPacket = (RespawnPacket) packet;
+                    if (respawnPacket.respawnState == RespawnPacket.STATE_CLIENT_READY_TO_SPAWN) {
+                        RespawnPacket respawn1 = new RespawnPacket();
+                        respawn1.x = (float) this.getX();
+                        respawn1.y = (float) this.getY();
+                        respawn1.z = (float) this.getZ();
+                        respawn1.respawnState = RespawnPacket.STATE_READY_TO_SPAWN;
+                        this.dataPacket(respawn1);
+                    }
                 default:
                     break;
             }
@@ -3851,6 +3865,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.x = (float) pos.x;
         pk.y = (float) pos.y;
         pk.z = (float) pos.z;
+        pk.respawnState = RespawnPacket.STATE_SEARCHING_FOR_SPAWN;
 
         // HACK: fix chunk loading when respawning
         if (this.level != pos.level) {
