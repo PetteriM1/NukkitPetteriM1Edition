@@ -6,11 +6,14 @@ import cn.nukkit.Server;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
+import cn.nukkit.utils.VarInt;
 import cn.nukkit.utils.Zlib;
 import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -161,11 +164,9 @@ public class Network {
                 }
                 byte[] buf = stream.getByteArray();
 
-                DataPacket pk;
+                DataPacket pk = this.getPacketFromBuffer(player.protocol, buf);
 
-                if ((pk = this.getPacket(buf[0])) != null) {
-                    pk.setBuffer(buf, player.protocol <= 274 ? 3 : 1);
-
+                if (pk != null) {
                     pk.protocol = player.protocol;
 
                     try {
@@ -199,6 +200,18 @@ public class Network {
         packets.forEach(player::handleDataPacket);
     }
 
+    private DataPacket getPacketFromBuffer(int protocol, byte[] buffer) throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
+        DataPacket pk = this.getPacket((byte) VarInt.readUnsignedVarInt(stream));
+        if (pk != null) {
+            if (protocol >= 388) {
+                pk.setBuffer(buffer, buffer.length - stream.available());
+            } else {
+                pk.setBuffer(buffer, protocol <= 274 ? 3 : 1);
+            }
+        }
+        return pk;
+    }
 
     public DataPacket getPacket(byte id) {
         Class<? extends DataPacket> clazz = this.packetPool[id & 0xff];
