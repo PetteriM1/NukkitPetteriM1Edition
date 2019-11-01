@@ -50,7 +50,7 @@ public class ItemSpawnEgg extends Item {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        if (!Server.getInstance().getPropertyBoolean("spawn-eggs", true)) {
+        if (!Server.getInstance().spawnEggsEnabled) {
             player.sendMessage("\u00A7cSpawn eggs are disabled on this server");
             return false;
         }

@@ -1075,7 +1075,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, (int) pos.x, (int) pos.y, (int) pos.z));
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, true);
 
-        if (this.getServer().getPropertyBoolean("bed-spawnpoints", true)) {
+        if (this.getServer().bedSpawnpoints) {
             this.setSpawn(pos);
         }
 
@@ -1119,7 +1119,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        if (!Server.getInstance().getPropertyBoolean("achievements", true)) {
+        if (!Server.getInstance().achievements) {
             return false;
         }
 
@@ -1352,7 +1352,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inEndPortalTicks = 0;
         }
         
-        if (inEndPortalTicks == 1 && Server.getInstance().getPropertyBoolean("end", false)) {
+        if (inEndPortalTicks == 1 && Server.getInstance().endEnabled) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.END);
             this.getServer().getPluginManager().callEvent(ev);
 
@@ -1367,7 +1367,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (inPortalTicks == 80 && Server.getInstance().getPropertyBoolean("nether", true)) {
+        if (inPortalTicks == 80 && Server.getInstance().netherEnabled) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.getServer().getPluginManager().callEvent(ev);
 
@@ -1974,7 +1974,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.z = (float) this.z;
         startGamePacket.yaw = (float) this.yaw;
         startGamePacket.pitch = (float) this.pitch;
-        startGamePacket.dimension = getServer().getPropertyBoolean("dimensions") ? (byte) (this.level.getDimension() & 0xff) : 0;
+        startGamePacket.dimension = this.getServer().dimensionsEndbled ? (byte) (this.level.getDimension() & 0xff) : 0;
         startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) this.x;
@@ -2090,9 +2090,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     this.loginChainData = ClientChainData.read(loginPacket);
 
-                    if (!loginChainData.isXboxAuthed() && server.getPropertyBoolean("xbox-auth")) {
+                    if (!loginChainData.isXboxAuthed() && server.xboxAuth) {
                         this.close("", "disconnectionScreen.notAuthenticated");
-                        if (server.getPropertyBoolean("temp-ip-ban-failed-xbox-auth")) {
+                        if (server.banAuthFailed) {
                             this.server.getNetwork().blockAddress(this.socketAddress.getAddress(), 5);
                             this.server.getLogger().notice("Blocked " + getAddress() + " for 5 seconds");
                         }
@@ -3111,7 +3111,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     } else if (target instanceof Player) {
                                         if ((((Player) target).gamemode & 0x01) > 0) {
                                             break;
-                                        } else if (!this.server.getPropertyBoolean("pvp")) {
+                                        } else if (!this.server.pvp) {
                                             break;
                                         }
                                     }
@@ -4701,7 +4701,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             level.sendTime(this);
             level.sendWeather(this);
 
-            if (getServer().getPropertyBoolean("dimensions") && oldLevel.getDimension() != level.getDimension()) {
+            if (this.getServer().dimensionsEndbled && oldLevel.getDimension() != level.getDimension()) {
                 this.setDimension(level.getDimension());
             }
 

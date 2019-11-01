@@ -60,7 +60,7 @@ public abstract class ProjectileItem extends Item {
 
                 if (ev.isCancelled()) {
                     projectile.kill();
-                } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle && !player.getServer().getPropertyBoolean("xp-bottles-on-creative", false)) {
+                } else if (player.getGamemode() == 1 && projectile instanceof EntityExpBottle && !player.getServer().xpBottlesOnCreative) {
                     ev.setCancelled(true);
                     projectile.kill();
                     player.sendMessage("\u00A7cXP bottles are disabled on creative");

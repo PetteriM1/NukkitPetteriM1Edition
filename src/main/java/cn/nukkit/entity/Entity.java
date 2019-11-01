@@ -885,7 +885,7 @@ public abstract class Entity extends Location implements Metadatable {
             player.dataPacket(pkk);
         }
 
-        if (this instanceof EntityBoss && this.server.getPropertyBoolean("vanilla-bossbars")) {
+        if (this instanceof EntityBoss && this.server.vanillaBB) {
             BossEventPacket pkBoss = new BossEventPacket();
             pkBoss.bossEid = this.id;
             pkBoss.type = BossEventPacket.TYPE_SHOW;
@@ -1242,7 +1242,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        if (this.inPortalTicks == 80 && Server.getInstance().getPropertyBoolean("nether", true) && this instanceof BaseEntity) {
+        if (this.inPortalTicks == 80 && Server.getInstance().netherEnabled && this instanceof BaseEntity) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.server.getPluginManager().callEvent(ev);
 

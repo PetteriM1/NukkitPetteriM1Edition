@@ -34,7 +34,7 @@ public class Achievement {
         }
         String translation = Server.getInstance().getLanguage().translateString("chat.type.achievement", player.getDisplayName(), TextFormat.GREEN + achievements.get(achievementId).message) + TextFormat.RESET;
 
-        if (Server.getInstance().getPropertyBoolean("announce-player-achievements", false)) {
+        if (Server.getInstance().announceAchievements) {
             Server.getInstance().broadcastMessage(translation);
         } else {
             player.sendMessage(translation);
@@ -66,7 +66,7 @@ public class Achievement {
     public void broadcast(Player player) {
         String translation = Server.getInstance().getLanguage().translateString("chat.type.achievement", player.getDisplayName(), TextFormat.GREEN + this.message, null);
 
-        if (Server.getInstance().getPropertyBoolean("announce-player-achievements", true)) {
+        if (Server.getInstance().announceAchievements) {
             Server.getInstance().broadcastMessage(translation);
         } else {
             player.sendMessage(translation);

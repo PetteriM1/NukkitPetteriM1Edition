@@ -76,7 +76,7 @@ public class RakNetServerSession extends RakNetSession {
         boolean security = buffer.readBoolean();
 
         if (this.guid != guid || security) {
-            this.sendConnectionFailure(RakNetConstants.ID_CONNECTION_REQUEST_FAILED);
+            this.sendConnectionFailure();
             this.close(DisconnectReason.DISCONNECTED);
             return;
         }
@@ -119,9 +119,9 @@ public class RakNetServerSession extends RakNetSession {
         this.sendDirect(buffer);
     }
 
-    private void sendConnectionFailure(short id) {
+    private void sendConnectionFailure() {
         ByteBuf buffer = this.allocateBuffer(21);
-        buffer.writeByte(id);
+        buffer.writeByte(RakNetConstants.ID_CONNECTION_REQUEST_FAILED);
         RakNetUtils.writeUnconnectedMagic(buffer);
         buffer.writeLong(this.rakNet.guid);
 

@@ -65,7 +65,7 @@ public class EntityEgg extends EntityProjectile {
         } else if (this.isCollided) {
             this.close();
 
-            if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
+            if (Server.getInstance().blockListener) {
                 if (Utils.rand(1, 20) == 5) {
                     CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.EGG);
                     level.getServer().getPluginManager().callEvent(ev);

@@ -60,7 +60,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        if (Server.getInstance().getPropertyBoolean("block-listener", true)) {
+        if (Server.getInstance().blockListener) {
             if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && Utils.rand(1, 5) == 1) {
 
                 EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", this.add(0.5, 0, 0.5));
