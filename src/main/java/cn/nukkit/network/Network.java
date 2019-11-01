@@ -7,6 +7,7 @@ import cn.nukkit.network.protocol.*;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
+import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
@@ -169,12 +170,9 @@ public class Network {
 
                     try {
                         pk.decode();
-                    } catch (Exception e) { // LoginPacket < 1.6 // TODO: This exception is not always caused by different game version
-                        getServer().getLogger().logException(e);
-                        try {
-                            pk.setBuffer(buf, 3); // TODO: Isn't this already set above?
-                            pk.decode();
-                        } catch (Exception ignore) {}
+                    } catch (JsonSyntaxException e) { // LoginPacket < 1.6
+                        pk.setBuffer(buf, 3);
+                        pk.decode();
                     }
 
                     packets.add(pk);

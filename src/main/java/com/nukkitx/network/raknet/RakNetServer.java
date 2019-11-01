@@ -157,8 +157,6 @@ public class RakNetServer extends RakNet {
 
         if (session != null) {
             this.sendAlreadyConnected(ctx, packet.sender());
-        } else if (this.protocolVersion >= 0 && this.protocolVersion != protocolVersion) {
-            this.sendIncompatibleProtocolVersion(ctx, packet.sender());
         } else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
@@ -228,16 +226,6 @@ public class RakNetServer extends RakNet {
     private void sendConnectionBanned(ChannelHandlerContext ctx, InetSocketAddress recipient) {
         ByteBuf buffer = ctx.alloc().ioBuffer(25, 25);
         buffer.writeByte(RakNetConstants.ID_CONNECTION_BANNED);
-        RakNetUtils.writeUnconnectedMagic(buffer);
-        buffer.writeLong(this.guid);
-
-        RakNet.send(ctx, recipient, buffer);
-    }
-
-    private void sendIncompatibleProtocolVersion(ChannelHandlerContext ctx, InetSocketAddress recipient) {
-        ByteBuf buffer = ctx.alloc().ioBuffer(26, 26);
-        buffer.writeByte(RakNetConstants.ID_INCOMPATIBLE_PROTOCOL_VERSION);
-        buffer.writeByte(this.protocolVersion);
         RakNetUtils.writeUnconnectedMagic(buffer);
         buffer.writeLong(this.guid);
 

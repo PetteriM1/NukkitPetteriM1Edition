@@ -154,7 +154,7 @@ public class RakNetClientSession extends RakNetSession {
         ByteBuf buffer = this.allocateBuffer(mtuSize);
         buffer.writeByte(RakNetConstants.ID_OPEN_CONNECTION_REQUEST_1);
         RakNetUtils.writeUnconnectedMagic(buffer);
-        buffer.writeByte(this.rakNet.protocolVersion);
+        buffer.writeByte(RakNetConstants.RAKNET_PROTOCOL_VERSION);
         buffer.writeZero(mtuSize - 46);
 
         this.sendDirect(buffer);

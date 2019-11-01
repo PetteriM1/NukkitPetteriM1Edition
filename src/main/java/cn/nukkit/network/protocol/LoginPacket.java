@@ -36,9 +36,6 @@ public class LoginPacket extends DataPacket {
             setOffset(getOffset() + 2);
             this.protocol_ = getInt();
         }
-        if (!ProtocolInfo.SUPPORTED_PROTOCOLS.contains(protocol_)) {
-            return;
-        }
         this.setBuffer(this.getByteArray(), 0);
         decodeChainData();
         decodeSkinData();
