@@ -170,7 +170,7 @@ public class Network {
 
                     try {
                         pk.decode();
-                    } catch (JsonSyntaxException e) { // LoginPacket < 1.6
+                    } catch (JsonSyntaxException | ArrayIndexOutOfBoundsException e) { // LoginPacket < 1.6
                         pk.setBuffer(buf, 3);
                         pk.decode();
                     }
