@@ -46,7 +46,7 @@ public class BlockSugarcane extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0F) { //Bonemeal
+        if (item.getId() == Item.DYE && item.getDamage() == 0x0F) { // Bone meal
             int count = 1;
 
             for (int i = 1; i <= 2; i++) {
@@ -58,6 +58,7 @@ public class BlockSugarcane extends BlockFlowable {
             }
 
             if (count < 3) {
+                boolean success = false;
                 int toGrow = 3 - count;
 
                 for (int i = 1; i <= toGrow; i++) {
@@ -68,17 +69,21 @@ public class BlockSugarcane extends BlockFlowable {
 
                         if (!ev.isCancelled()) {
                             this.getLevel().setBlock(block, ev.getNewState(), true);
+                            success = true;
                         }
                     } else if (block.getId() != SUGARCANE_BLOCK) {
                         break;
                     }
                 }
-            }
 
-            if (player != null && (player.gamemode & 0x01) == 0) {
-                item.count--;
+                if (success) {
+                    if (player != null && !player.isCreative()) {
+                        item.count--;
+                    }
+
+                    this.level.addParticle(new BoneMealParticle(this));
+                }
             }
-            this.level.addParticle(new BoneMealParticle(this.add(0.5, 0.5, 0.5)));
             return true;
         }
         return false;
