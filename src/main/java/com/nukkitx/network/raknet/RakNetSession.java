@@ -1,5 +1,6 @@
 package com.nukkitx.network.raknet;
 
+import cn.nukkit.Nukkit;
 import com.nukkitx.network.SessionConnection;
 import com.nukkitx.network.raknet.util.*;
 import com.nukkitx.network.util.DisconnectReason;
@@ -130,22 +131,12 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
     }
 
     private void deinitialize() {
-        this.slidingWindow = null;
-
-        this.reliableDatagramQueue = null;
-        this.orderReadIndex = null;
-        this.orderWriteIndex = null;
-
-        RoundRobinArray<SplitPacketHelper> splitPackets = this.splitPackets;
-        this.splitPackets = null;
         // Perform resource clean up.
-        if (splitPackets != null) {
-            splitPackets.forEach(ReferenceCountUtil::release);
+        if (this.splitPackets != null) {
+            this.splitPackets.forEach(ReferenceCountUtil::release);
         }
-        ConcurrentMap<Integer, RakNetDatagram> sentDatagrams = this.sentDatagrams;
-        this.sentDatagrams = null;
-        if (sentDatagrams != null) {
-            sentDatagrams.values().forEach(ReferenceCountUtil::release);
+        if (this.sentDatagrams != null) {
+            this.sentDatagrams.values().forEach(ReferenceCountUtil::release);
         }
         if (this.orderingLock != null) {
             this.orderingLock.lock();
@@ -181,11 +172,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
                 this.outgoingLock.unlock();
             }
         }
-
-        this.incomingAcks = null;
-        this.incomingNaks = null;
-        this.outgoingAcks = null;
-        this.outgoingNaks = null;
     }
 
     public InetSocketAddress getAddress() {
@@ -482,7 +468,6 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         // Incoming queues
 
         if (!this.incomingAcks.isEmpty()) {
-
             IntRange range;
             while ((range = this.incomingAcks.poll()) != null) {
                 for (int i = range.start; i <= range.end; i++) {
@@ -503,8 +488,8 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
                 for (int i = range.start; i <= range.end; i++) {
                     RakNetDatagram datagram = this.sentDatagrams.get(i);
                     if (datagram != null) {
-                        if (log.isTraceEnabled()) {
-                            log.trace("NAK'ed datagram {} from {}", datagram.sequenceIndex, this.address);
+                        if (Nukkit.DEBUG > 2) {
+                            log.debug("NAK'ed datagram {} from {}", datagram.sequenceIndex, this.address);
                         }
                         this.sendDatagram(datagram.retain(), curTime, false);
                     }
@@ -554,9 +539,8 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
                     if (!hasResent) {
                         hasResent = true;
                     }
-                    if (log.isTraceEnabled()) {
-                        log.trace("Stale datagram {} from {}", datagram.sequenceIndex,
-                                this.address);
+                    if (Nukkit.DEBUG > 2) {
+                        log.debug("Stale datagram {} from {}", datagram.sequenceIndex, this.address);
                     }
                     this.sendDatagram(datagram.retain(), curTime, false);
                 }
@@ -833,9 +817,8 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
             // We don't need the upper limit if it's a singleton
             int end = singleton ? start : buffer.readMediumLE();
             if (start > end) {
-                if (log.isTraceEnabled()) {
-                    log.trace("{} sent an IntRange with a start value {} greater than an end value of {}", this.address,
-                            start, end);
+                if (Nukkit.DEBUG > 2) {
+                    log.debug("{} sent an IntRange with a start value {} greater than an end value of {}", this.address, start, end);
                 }
                 this.disconnect(DisconnectReason.BAD_PACKET);
                 return;

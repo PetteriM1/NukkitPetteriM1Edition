@@ -28,7 +28,6 @@ public abstract class RakNet implements AutoCloseable {
     final InetSocketAddress bindAddress;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private ScheduledFuture<?> tickFuture;
-    int protocolVersion = RakNetConstants.RAKNET_PROTOCOL_VERSION;
     private volatile boolean closed;
 
     RakNet(InetSocketAddress bindAddress, EventLoopGroup eventLoopGroup) {
@@ -88,11 +87,7 @@ public abstract class RakNet implements AutoCloseable {
 
     @Nonnegative
     public int getProtocolVersion() {
-        return protocolVersion;
-    }
-
-    public void setProtocolVersion(@Nonnegative int protocolVersion) {
-        this.protocolVersion = protocolVersion;
+        return RakNetConstants.RAKNET_PROTOCOL_VERSION;
     }
 
     public InetSocketAddress getBindAddress() {

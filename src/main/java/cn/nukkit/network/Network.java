@@ -6,10 +6,14 @@ import cn.nukkit.Server;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
+import cn.nukkit.utils.VarInt;
 import cn.nukkit.utils.Zlib;
+import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -160,18 +164,16 @@ public class Network {
                 }
                 byte[] buf = stream.getByteArray();
 
-                DataPacket pk;
+                DataPacket pk = this.getPacketFromBuffer(player.protocol, buf);
 
-                if ((pk = this.getPacket(buf[0])) != null) {
-                    pk.setBuffer(buf, player.protocol <= 274 ? 3 : 1);
+                if (pk != null) {
+                    pk.protocol = player.protocol;
 
                     try {
                         pk.decode();
-                    } catch (Exception e) { // LoginPacket < 1.6
-                        try {
-                            pk.setBuffer(buf, 3);
-                            pk.decode();
-                        } catch (Exception ignore) {}
+                    } catch (JsonSyntaxException | ArrayIndexOutOfBoundsException e) { // LoginPacket < 1.6
+                        pk.setBuffer(buf, 3);
+                        pk.decode();
                     }
 
                     packets.add(pk);
@@ -198,6 +200,18 @@ public class Network {
         packets.forEach(player::handleDataPacket);
     }
 
+    private DataPacket getPacketFromBuffer(int protocol, byte[] buffer) throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
+        DataPacket pk = this.getPacket((byte) VarInt.readUnsignedVarInt(stream));
+        if (pk != null) {
+            if (protocol >= 388) {
+                pk.setBuffer(buffer, buffer.length - stream.available());
+            } else {
+                pk.setBuffer(buffer, protocol <= 274 ? 3 : 1);
+            }
+        }
+        return pk;
+    }
 
     public DataPacket getPacket(byte id) {
         Class<? extends DataPacket> clazz = this.packetPool[id & 0xff];
@@ -262,7 +276,6 @@ public class Network {
         this.registerPacket(ProtocolInfo.DISCONNECT_PACKET, DisconnectPacket.class);
         this.registerPacket(ProtocolInfo.ENTITY_EVENT_PACKET, EntityEventPacket.class);
         this.registerPacket(ProtocolInfo.ENTITY_FALL_PACKET, EntityFallPacket.class);
-        this.registerPacket(ProtocolInfo.EXPLODE_PACKET, ExplodePacket.class);
         this.registerPacket(ProtocolInfo.FULL_CHUNK_DATA_PACKET, LevelChunkPacket.class);
         this.registerPacket(ProtocolInfo.GAME_RULES_CHANGED_PACKET, GameRulesChangedPacket.class);
         this.registerPacket(ProtocolInfo.HURT_ARMOR_PACKET, HurtArmorPacket.class);

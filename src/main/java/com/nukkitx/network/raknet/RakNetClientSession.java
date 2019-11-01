@@ -154,7 +154,7 @@ public class RakNetClientSession extends RakNetSession {
         ByteBuf buffer = this.allocateBuffer(mtuSize);
         buffer.writeByte(RakNetConstants.ID_OPEN_CONNECTION_REQUEST_1);
         RakNetUtils.writeUnconnectedMagic(buffer);
-        buffer.writeByte(this.rakNet.protocolVersion);
+        buffer.writeByte(RakNetConstants.RAKNET_PROTOCOL_VERSION);
         buffer.writeZero(mtuSize - 46);
 
         this.sendDirect(buffer);
@@ -183,12 +183,11 @@ public class RakNetClientSession extends RakNetSession {
     }
 
     private void sendNewIncomingConnection(long pingTime) {
-        boolean ipv6 = this.isIpv6Session();
-        ByteBuf buffer = this.allocateBuffer(ipv6 ? 626 : 164);
+        ByteBuf buffer = this.allocateBuffer(this.isIpv6Session() ? 626 : 164);
 
         buffer.writeByte(RakNetConstants.ID_NEW_INCOMING_CONNECTION);
         NetworkUtils.writeAddress(buffer, address);
-        for (InetSocketAddress address : ipv6 ? RakNetUtils.LOCAL_IP_ADDRESSES_V6 : RakNetUtils.LOCAL_IP_ADDRESSES_V4) {
+        for (InetSocketAddress address : this.isIpv6Session() ? RakNetUtils.LOCAL_IP_ADDRESSES_V6 : RakNetUtils.LOCAL_IP_ADDRESSES_V4) {
             NetworkUtils.writeAddress(buffer, address);
         }
         buffer.writeLong(pingTime);

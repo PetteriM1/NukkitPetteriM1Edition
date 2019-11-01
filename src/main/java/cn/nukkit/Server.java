@@ -137,7 +137,6 @@ public class Server {
     private int autoTickRateLimit;
     private boolean alwaysTickPlayers;
     private int baseTickRate;
-    private Boolean getAllowFlight;
     private int difficulty;
     private int defaultGamemode = Integer.MAX_VALUE;
 
@@ -187,10 +186,40 @@ public class Server {
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
+
+    /* Some settings */
+    private String motd;
+    private int viewDistance;
     private boolean suomicraftMode;
-    boolean callDataPkEv;
     private boolean doLevelGC;
     private boolean mobAI;
+    private boolean shouldSavePlayerData;
+    private boolean getAllowFlight;
+    private boolean isHardcore;
+    public int despawnTicks;
+    public boolean netherEnabled;
+    public boolean xboxAuth;
+    public boolean spawnEggsEnabled;
+    public boolean xpBottlesOnCreative;
+    boolean callDataPkEv;
+    boolean bedSpawnpoints;
+    boolean achievements;
+    boolean dimensionsEndbled;
+    boolean banAuthFailed;
+    boolean endEnabled;
+    boolean pvp;
+    boolean announceAchievements;
+    public boolean blockListener;
+    public boolean explosionBreakBlocks;
+    public boolean vanillaBB;
+    public boolean stopInGame;
+    public boolean opInGame;
+    public boolean lightUpdates;
+    public boolean queryPlugins;
+    public boolean despawnEntities;
+    public boolean forceResources;
+    public boolean whitelistEnabled;
+    public boolean forceGamemode;
 
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -219,7 +248,7 @@ public class Server {
 
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
 
-        if (!new File(dataPath + "players/").exists() && this.getPropertyBoolean("save-player-data", true)) {
+        if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
             new File(dataPath + "players/").mkdirs();
         }
 
@@ -271,7 +300,7 @@ public class Server {
         this.maxPlayers = this.getPropertyInt("max-players", 50);
         this.setAutoSave(this.getPropertyBoolean("auto-save", true));
 
-        if (this.getPropertyBoolean("hardcore", false) && this.difficulty < 3) {
+        if (this.isHardcore && this.difficulty < 3) {
             this.setDifficulty(3);
         } else {
             this.setDifficulty(this.getPropertyInt("difficulty", 2));
@@ -286,6 +315,8 @@ public class Server {
             }
         }
 
+        this.loadSettings();
+
         log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
 
@@ -294,11 +325,6 @@ public class Server {
         this.network.setSubName(this.getSubMotd());
 
         log.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
-
-        this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
-        this.callDataPkEv = this.getPropertyBoolean("call-data-pk-send-event", true);
-        this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
-        this.mobAI = this.getPropertyBoolean("mob-ai", true);
 
         this.consoleSender = new ConsoleCommandSender();
         this.commandMap = new SimpleCommandMap(this);
@@ -372,9 +398,7 @@ public class Server {
             return;
         }
 
-        if (this.getPropertyInt("ticks-per-autosave", 6000) > 0) {
-            this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
-        }
+        this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
 
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
@@ -384,11 +408,11 @@ public class Server {
                         this.loadLevel(fs.getName());
                     }
                 }
-                if (this.getLevelByName("nether") == null && this.getPropertyBoolean("nether", false)) {
+                if (this.getLevelByName("nether") == null && netherEnabled) {
                     this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
                     this.loadLevel("nether");
                 }
-                if (this.getLevelByName("end") == null && this.getPropertyBoolean("end", false)) {
+                if (this.getLevelByName("end") == null && endEnabled) {
                     this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
                     this.loadLevel("end");
                 }
@@ -666,9 +690,11 @@ public class Server {
         this.properties.reload();
         this.maxPlayers = this.getPropertyInt("max-players", 50);
 
-        if (this.getPropertyBoolean("hardcore", false) && this.difficulty < 3) {
+        if (this.isHardcore && this.difficulty < 3) {
             this.setDifficulty(3);
         }
+
+        this.loadSettings();
 
         this.banByIP.load();
         this.banByName.load();
@@ -1052,7 +1078,7 @@ public class Server {
                 }
             }
 
-            this.network.updateName();
+            //this.network.updateName();
         }
 
         if (++this.autoSaveTicker >= this.autoSaveTicks) {
@@ -1165,7 +1191,7 @@ public class Server {
     }
 
     public int getViewDistance() {
-        return this.getPropertyInt("view-distance", 10);
+        return viewDistance;
     }
 
     public String getIp() {
@@ -1200,7 +1226,7 @@ public class Server {
     }
 
     public boolean getForceGamemode() {
-        return this.getPropertyBoolean("force-gamemode", true);
+        return this.forceGamemode;
     }
 
     public static String getGamemodeString(int mode) {
@@ -1286,7 +1312,7 @@ public class Server {
     }
 
     public boolean hasWhitelist() {
-        return this.getPropertyBoolean("white-list", false);
+        return this.whitelistEnabled;
     }
 
     public int getSpawnRadius() {
@@ -1294,14 +1320,11 @@ public class Server {
     }
 
     public boolean getAllowFlight() {
-        if (getAllowFlight == null) {
-            getAllowFlight = this.getPropertyBoolean("allow-flight", false);
-        }
         return getAllowFlight;
     }
 
     public boolean isHardcore() {
-        return this.getPropertyBoolean("hardcore", false);
+        return this.isHardcore;
     }
 
     public int getDefaultGamemode() {
@@ -1312,7 +1335,7 @@ public class Server {
     }
 
     public String getMotd() {
-        return this.getPropertyString("motd", "Minecraft Server");
+        return motd;
     }
 
     public String getSubMotd() {
@@ -1320,7 +1343,7 @@ public class Server {
     }
 
     public boolean getForceResources() {
-        return this.getPropertyBoolean("force-resources", false);
+        return this.forceResources;
     }
 
     public boolean getMobAiEnabled() {
@@ -1846,7 +1869,7 @@ public class Server {
     }
 
     public boolean shouldSavePlayerData() {
-        return this.getPropertyBoolean("save-player-data", false);
+        return shouldSavePlayerData;
     }
 
     /**
@@ -2011,6 +2034,44 @@ public class Server {
     }
 
     /**
+     * Load some settings from server.properties
+     */
+    private void loadSettings() {
+        this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
+        this.callDataPkEv = this.getPropertyBoolean("call-data-pk-send-event", true);
+        this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
+        this.mobAI = this.getPropertyBoolean("mob-ai", true);
+        this.netherEnabled = this.getPropertyBoolean("nether", true);
+        this.endEnabled = this.getPropertyBoolean("end", true);
+        this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
+        this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
+        this.achievements = this.getPropertyBoolean("achievements", true);
+        this.dimensionsEndbled = this.getPropertyBoolean("dimensions", false);
+        this.banAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
+        this.pvp = this.getPropertyBoolean("pvp", true);
+        this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
+        this.spawnEggsEnabled = this.getPropertyBoolean("spawn-eggs", true);
+        this.xpBottlesOnCreative = this.getPropertyBoolean("xp-bottles-on-creative", false);
+        this.shouldSavePlayerData = this.getPropertyBoolean("save-player-data", true);
+        this.blockListener = this.getPropertyBoolean("block-listener", true);
+        this.explosionBreakBlocks = this.getPropertyBoolean("explosion-break-blocks", true);
+        this.vanillaBB = this.getPropertyBoolean("vanilla-bossbars", false);
+        this.stopInGame = this.getPropertyBoolean("stop-in-game", false);
+        this.opInGame = this.getPropertyBoolean("op-in-game", false);
+        this.lightUpdates = this.getPropertyBoolean("light-updates", false);
+        this.queryPlugins = this.getPropertyBoolean("query-plugins", false);
+        this.getAllowFlight = this.getPropertyBoolean("allow-flight", false);
+        this.isHardcore = this.getPropertyBoolean("hardcore", false);
+        this.despawnEntities = this.getPropertyBoolean("entity-despawn-task", true);
+        this.forceResources = this.getPropertyBoolean("force-resources", false);
+        this.whitelistEnabled = this.getPropertyBoolean("white-list", false);
+        this.forceGamemode = this.getPropertyBoolean("force-gamemode", true);
+        this.motd = this.getPropertyString("motd", "Minecraft Server");
+        this.viewDistance = this.getPropertyInt("view-distance", 8);
+        this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 6000);
+    }
+
+    /**
      * This class contains all default server.properties values.
      */
     private static class ServerProperties extends ConfigSection {
@@ -2069,7 +2130,7 @@ public class Server {
             put("timings-history-interval", 6000);
             put("timings-history-length", 72000);
             put("timings-bypass-max", false);
-            put("light-updates", true);
+            put("light-updates", false);
             put("clear-chunk-tick-list", true);
             put("cache-chunks", false);
             put("spawn-threshold", 50);

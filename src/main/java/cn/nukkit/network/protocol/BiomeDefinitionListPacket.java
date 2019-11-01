@@ -4,8 +4,6 @@ import cn.nukkit.Nukkit;
 import com.google.common.io.ByteStreams;
 import lombok.ToString;
 
-import java.io.InputStream;
-
 @ToString(exclude = "tag")
 public class BiomeDefinitionListPacket extends DataPacket {
 
@@ -13,9 +11,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
 
     static {
         try {
-            InputStream inputStream = Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat");
-            //noinspection UnstableApiUsage
-            TAG = ByteStreams.toByteArray(inputStream);
+            TAG = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat"));
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading biome_definitions_361.dat", e);
         }

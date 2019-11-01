@@ -38,9 +38,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public Item[] armor;
 
-    private static final boolean despawn = Server.getInstance().getPropertyBoolean("entity-despawn-task", true);
-    private static final int despawnTicks = Server.getInstance().getPropertyInt("ticks-per-entity-despawns", 8000);
-
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         this.setHealth(this.getMaxHealth());
@@ -145,7 +142,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public boolean entityBaseTick(int tickDiff) {
         Timings.entityBaseTickTimer.startTiming();
 
-        if (this.canDespawn() && this.age > despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
+        if (this.canDespawn() && this.age > Server.getInstance().despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
             return true;
         }
@@ -468,7 +465,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean canDespawn() {
-        return despawn;
+        return Server.getInstance().despawnEntities;
     }
 
     public int nearbyDistanceMultiplier() {

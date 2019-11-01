@@ -9,9 +9,15 @@ import lombok.ToString;
 @ToString
 public class RespawnPacket extends DataPacket {
 
+    public static final int STATE_SEARCHING_FOR_SPAWN = 0;
+    public static final int STATE_READY_TO_SPAWN = 1;
+    public static final int STATE_CLIENT_READY_TO_SPAWN = 2;
+
     public float x;
     public float y;
     public float z;
+    public int respawnState = STATE_SEARCHING_FOR_SPAWN;
+    public long runtimeEntityId;
 
     @Override
     public void decode() {
@@ -19,12 +25,20 @@ public class RespawnPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
+        if (protocol >= 388) {
+            this.respawnState = this.getByte();
+            this.runtimeEntityId  = this.getEntityRuntimeId();
+        }
     }
 
     @Override
     public void encode() {
         this.reset();
         this.putVector3f(this.x, this.y, this.z);
+        if (protocol >= 388) {
+            this.putByte((byte) respawnState);
+            this.putEntityRuntimeId(runtimeEntityId );
+        }
     }
 
     @Override

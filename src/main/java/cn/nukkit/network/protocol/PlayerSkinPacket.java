@@ -21,31 +21,39 @@ public class PlayerSkinPacket extends DataPacket {
 
     @Override
     public void decode() {
-        uuid = getUUID();
-        skin = new Skin();
-        skin.setSkinId(getString());
-        newSkinName = getString();
-        oldSkinName = getString();
-        skin.setSkinData(getByteArray());
-        skin.setCapeData(getByteArray());
-        skin.setGeometryName(getString());
-        skin.setGeometryData(getString());
-        premium = getBoolean();
+        if (protocol < 388) {
+            uuid = getUUID();
+            skin = new Skin();
+            skin.setSkinId(getString());
+            newSkinName = getString();
+            oldSkinName = getString();
+            skin.setSkinData(getByteArray());
+            skin.setCapeData(getByteArray());
+            skin.setGeometryName(getString());
+            skin.setGeometryData(getString());
+            premium = getBoolean();
+        } else {
+            skin = getSkin();
+        }
     }
 
     @Override
     public void encode() {
         reset();
         putUUID(uuid);
-        putString(skin.getGeometryName());
-        putString(newSkinName);
-        putString(oldSkinName);
-        putByteArray(skin.getSkinData());
-        putByteArray(skin.getCapeData());
-        putString(skin.getGeometryName());
-        putString(skin.getGeometryData());
-        if (protocol > 274) {
-            putBoolean(premium);
+        if (protocol < 388) {
+            putString("geometry.humanoid.custom");
+            putString(newSkinName);
+            putString(oldSkinName);
+            putByteArray(skin.getSkinData().data);
+            putByteArray(skin.getCapeData().data);
+            putString("geometry.humanoid.custom");
+            putString(skin.getGeometryData());
+            if (protocol > 274) {
+                putBoolean(premium);
+            }
+        } else {
+            putSkin(protocol, skin);
         }
     }
 }

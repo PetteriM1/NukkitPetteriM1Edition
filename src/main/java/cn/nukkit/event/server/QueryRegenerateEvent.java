@@ -47,7 +47,7 @@ public class QueryRegenerateEvent extends ServerEvent {
     public QueryRegenerateEvent(Server server, int timeout) {
         this.timeout = timeout;
         this.serverName = server.getMotd();
-        this.listPlugins = server.getPropertyBoolean("query-plugins");
+        this.listPlugins = server.queryPlugins;
         this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
         this.players = server.getOnlinePlayers().values().toArray(new Player[0]);
         this.gameType = (server.getGamemode() & 0x01) == 0 ? "SMP" : "CMP";

@@ -1,6 +1,7 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.resourcepacks.ResourcePack;
+import cn.nukkit.utils.Utils;
 import lombok.ToString;
 
 @ToString
@@ -36,7 +37,11 @@ public class ResourcePackStackPacket extends DataPacket {
             }
         }
         if (this.protocol >= 313) {
-            this.putBoolean(isExperimental);
+            if (protocol < 388) {
+                this.putBoolean(isExperimental);
+            } else {
+                this.putString(Utils.getVersionByProtocol(protocol));
+            }
         }
     }
 

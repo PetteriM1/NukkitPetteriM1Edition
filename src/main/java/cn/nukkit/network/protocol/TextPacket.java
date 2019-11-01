@@ -33,42 +33,35 @@ public class TextPacket extends DataPacket {
     public void decode() {
         this.type = (byte) getByte();
         this.isLocalized = this.getBoolean() || type == TYPE_TRANSLATION;
-        if (type == TYPE_CHAT) {
-            this.source = this.getString();
-            String value2 = this.getString();
-            try {
-                this.getVarInt();
-            } catch (Exception e) {
-                this.platformChatId = this.getString();
-            }
-            String value4 = this.getString();
-            try {
-                this.platformChatId = this.getString();
-                this.message = value4;
-            } catch (Exception e) {
-                this.message = value2;
-            }
-        } else {
-            switch (type) {
-                case TYPE_WHISPER:
-                case TYPE_ANNOUNCEMENT:
-                    this.source = this.getString();
-                case TYPE_RAW:
-                case TYPE_TIP:
-                case TYPE_SYSTEM:
-                case TYPE_JSON:
-                    this.message = this.getString();
-                    break;
+        switch (type) {
+            case TYPE_CHAT:
+            case TYPE_WHISPER:
+            case TYPE_ANNOUNCEMENT:
+                this.source = this.getString();
+                if (protocol > 201 && protocol <= 282) {
+                    this.getString();
+                    this.getVarInt();
+                }
+            case TYPE_RAW:
+            case TYPE_TIP:
+            case TYPE_SYSTEM:
+            case TYPE_JSON:
+                this.message = this.getString();
+                break;
 
-                case TYPE_TRANSLATION:
-                case TYPE_POPUP:
-                case TYPE_JUKEBOX_POPUP:
-                    this.message = this.getString();
-                    int count = (int) this.getUnsignedVarInt();
-                    this.parameters = new String[count];
-                    for (int i = 0; i < count; i++) {
-                        this.parameters[i] = this.getString();
-                    }
+            case TYPE_TRANSLATION:
+            case TYPE_POPUP:
+            case TYPE_JUKEBOX_POPUP:
+                this.message = this.getString();
+                int count = (int) this.getUnsignedVarInt();
+                this.parameters = new String[count];
+                for (int i = 0; i < count; i++) {
+                    this.parameters[i] = this.getString();
+                }
+        }
+        if (protocol >= 223) {
+            if (protocol >= 361) {
+                this.xboxUserId = this.getString();
             }
             this.platformChatId = this.getString();
         }

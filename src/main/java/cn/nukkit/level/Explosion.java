@@ -14,7 +14,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.HugeExplodeSeedParticle;
 import cn.nukkit.math.*;
-import cn.nukkit.network.protocol.ExplodePacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Hash;
 import cn.nukkit.utils.Utils;
@@ -94,7 +93,7 @@ public class Explosion {
                             if (block.getId() != 0 && block.getId() != 7) {
                                 blastForce -= (block.getResistance() / 5 + 0.3d) * stepLen;
                                 if (blastForce > 0) {
-                                    if (level.getServer().getPropertyBoolean("explosion-break-blocks", true)) {
+                                    if (level.getServer().explosionBreakBlocks) {
                                         if (!this.affectedBlocks.contains(block)) {
                                             this.affectedBlocks.add(block);
                                         }
@@ -194,14 +193,6 @@ public class Explosion {
             send.add(new Vector3(block.x - source.x, block.y - source.y, block.z - source.z));
         }
 
-        ExplodePacket pk = new ExplodePacket();
-        pk.x = (float) this.source.x;
-        pk.y = (float) this.source.y;
-        pk.z = (float) this.source.z;
-        pk.radius = (float) this.size;
-        pk.records = send.toArray(new Vector3[0]);
-
-        this.level.addChunkPacket((int) source.x >> 4, (int) source.z >> 4, pk);
         this.level.addParticle(new HugeExplodeSeedParticle(this.source));
         this.level.addLevelSoundEvent(source, LevelSoundEventPacket.SOUND_EXPLODE);
 

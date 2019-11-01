@@ -2145,7 +2145,7 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
-                if (server.getPropertyBoolean("block-listener", true)) {
+                if (server.blockListener) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN);
                         server.getPluginManager().callEvent(ev);
@@ -2835,7 +2835,7 @@ public class Level implements ChunkManager, Metadatable {
                 throw new IllegalStateException("Could not create new chunk");
             }
             this.timings.syncChunkLoadTimer.stopTiming();
-            return chunk;
+            return null;
         }
 
         if (chunk.getProvider() != null) {
@@ -2848,8 +2848,7 @@ public class Level implements ChunkManager, Metadatable {
 
         chunk.initChunk();
 
-        if (!chunk.isLightPopulated() && chunk.isPopulated()
-                && this.server.getPropertyBoolean("light-updates", true)) {
+        if (!chunk.isLightPopulated() && chunk.isPopulated() && this.server.lightUpdates) {
             this.server.getScheduler().scheduleAsyncTask(new LightPopulationTask(this, chunk));
         }
 

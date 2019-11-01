@@ -162,11 +162,15 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
                 if (ev.isCancelled()) {
                     return false;
                 }
+
                 this.getLevel().setBlock(this, ev.getNewState(), true, true);
+                this.level.addParticle(new BoneMealParticle(this));
+
+                if (player != null && !player.isCreative()) {
+                    item.count--;
+                }
             }
 
-            this.level.addParticle(new BoneMealParticle(this.add(0.5, 0.5, 0.5)));
-            item.count--;
             return true;
         }
 

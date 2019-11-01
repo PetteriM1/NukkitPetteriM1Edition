@@ -1,5 +1,7 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
+import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
 
 /**
@@ -35,4 +37,19 @@ public class BlockGrassPath extends BlockGrass {
         return 3.25;
     }
 
+    @Override
+    public int onUpdate(int type) {
+        return 0;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.isHoe()) {
+            item.useOn(this);
+            this.getLevel().setBlock(this, get(FARMLAND), true);
+            return true;
+        }
+
+        return false;
+    }
 }

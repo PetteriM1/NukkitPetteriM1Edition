@@ -311,15 +311,10 @@ public class Item implements Cloneable, BlockID, ItemID {
     private static void initCreativeItems() {
         clearCreativeItems();
 
-        // Creative inventory for 137
+        // Creative inventory for oldest versions
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems137.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(137, Item.get(id, damage, 1, nbt));
+                addCreativeItem(137, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -328,12 +323,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         // Creative inventory for 274
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems274.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(274, Item.get(id, damage, 1, nbt));
+                addCreativeItem(274, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -342,12 +332,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         // Creative inventory for 291
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems291.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(291, Item.get(id, damage, 1, nbt));
+                addCreativeItem(291, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -356,12 +341,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         // Creative inventory for 313
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems313.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(313, Item.get(id, damage, 1, nbt));
+                addCreativeItem(313, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -370,12 +350,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         // Creative inventory for 332
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems332.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(332, Item.get(id, damage, 1, nbt));
+                addCreativeItem(332, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -384,32 +359,20 @@ public class Item implements Cloneable, BlockID, ItemID {
         // Creative inventory for 340
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems340.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(340, Item.get(id, damage, 1, nbt));
+                addCreativeItem(340, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
         }
 
-        // Creative inventory for 354
+        // Creative inventory for 354, 361, 388
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems354.json")).getMapList("items")) {
             try {
-                int id = (int) map.get("id");
-                int damage = (int) map.getOrDefault("damage", 0);
-                String hex = (String) map.get("nbt_hex");
-                byte[] nbt = hex != null ? Utils.parseHexBinary(hex) : new byte[0];
-
-                addCreativeItem(354, Item.get(id, damage, 1, nbt));
+                addCreativeItem(354, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
         }
-
-        // TODO: Update creative items for 361
     }
 
     public static void clearCreativeItems() {
@@ -450,13 +413,18 @@ public class Item implements Cloneable, BlockID, ItemID {
                 return new ArrayList<>(Item.creative332);
             case 340:
                 return new ArrayList<>(Item.creative340);
-            default: // Current protocol
+            case 354:
+            case 361:
+            case 388:
                 return new ArrayList<>(Item.creative354);
+            default:
+                Server.getInstance().getLogger().alert("Tried to get creative items for unsupported protocol version: " + protocol);
+                return null;
         }
     }
 
     public static void addCreativeItem(Item item) {
-        addCreativeItem(ProtocolInfo.CURRENT_PROTOCOL, item);
+        addCreativeItem(354, item);
     }
 
     public static void addCreativeItem(int protocol, Item item) {
@@ -477,8 +445,11 @@ public class Item implements Cloneable, BlockID, ItemID {
             case 340:
                 Item.creative340.add(item.clone());
                 break;
-            default: // Current protocol
+            case 354:
                 Item.creative354.add(item.clone());
+                break;
+            default:
+                Server.getInstance().getLogger().alert("Tried to register creative items for unsupported protocol version: " + protocol);
                 break;
         }
     }

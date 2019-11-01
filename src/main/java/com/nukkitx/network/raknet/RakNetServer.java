@@ -150,15 +150,13 @@ public class RakNetServer extends RakNet {
             return;
         }
         int protocolVersion = buffer.readUnsignedByte();
-        int mtu = buffer.readableBytes() + 1 + 16 + 1 + (packet.sender().getAddress() instanceof Inet6Address ? 40 : 20)
+        int mtu = buffer.readableBytes() + 18 /*1 + 16 + 1*/ + (packet.sender().getAddress() instanceof Inet6Address ? 40 : 20)
                 + UDP_HEADER_SIZE; // 1 (Packet ID), 16 (Magic), 1 (Protocol Version), 20/40 (IP Header)
 
         RakNetServerSession session = this.sessionsByAddress.get(packet.sender());
 
         if (session != null) {
             this.sendAlreadyConnected(ctx, packet.sender());
-        } else if (this.protocolVersion >= 0 && this.protocolVersion != protocolVersion) {
-            this.sendIncompatibleProtocolVersion(ctx, packet.sender());
         } else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
@@ -228,16 +226,6 @@ public class RakNetServer extends RakNet {
     private void sendConnectionBanned(ChannelHandlerContext ctx, InetSocketAddress recipient) {
         ByteBuf buffer = ctx.alloc().ioBuffer(25, 25);
         buffer.writeByte(RakNetConstants.ID_CONNECTION_BANNED);
-        RakNetUtils.writeUnconnectedMagic(buffer);
-        buffer.writeLong(this.guid);
-
-        RakNet.send(ctx, recipient, buffer);
-    }
-
-    private void sendIncompatibleProtocolVersion(ChannelHandlerContext ctx, InetSocketAddress recipient) {
-        ByteBuf buffer = ctx.alloc().ioBuffer(26, 26);
-        buffer.writeByte(RakNetConstants.ID_INCOMPATIBLE_PROTOCOL_VERSION);
-        buffer.writeByte(this.protocolVersion);
         RakNetUtils.writeUnconnectedMagic(buffer);
         buffer.writeLong(this.guid);
 

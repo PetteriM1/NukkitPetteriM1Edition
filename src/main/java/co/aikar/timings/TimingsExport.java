@@ -77,7 +77,7 @@ public class TimingsExport extends Thread {
         if (!Timings.isPrivacy()) {
             out.addProperty("server", Server.getInstance().getName());
             out.addProperty("motd", Server.getInstance().getMotd());
-            out.addProperty("online-mode", Server.getInstance().getPropertyBoolean("xbox-auth"));
+            out.addProperty("online-mode", Server.getInstance().xboxAuth);
             out.addProperty("icon", "");
         }
 
