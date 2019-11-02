@@ -37,7 +37,7 @@ public class ItemCrossbow extends ItemBow {
     }
 
     @Override
-    public boolean onReleaseUsing(Player player) {
+    public boolean onRelease(Player player, int ticksUsed) {
         if (player.getServer().getTick() - player.getStartActionTick() < 20 && player.getStartActionTick() != -1) {
             return false;
         }
@@ -58,6 +58,7 @@ public class ItemCrossbow extends ItemBow {
                         if (this.getDamage() >= DURABILITY_CROSSBOW) {
                             this.count--;
                         }
+                        player.getInventory().setItemInHand(this);
                     }
                 }
             }

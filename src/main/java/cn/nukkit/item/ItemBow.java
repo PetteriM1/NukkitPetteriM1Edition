@@ -7,10 +7,12 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.CompletedUsingItemPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
@@ -46,7 +48,18 @@ public class ItemBow extends ItemTool {
         return 1;
     }
 
-    public boolean onReleaseUsing(Player player) {
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        return player.getInventory().contains(Item.get(ItemID.ARROW)) || player.isCreative();
+    }
+
+    @Override
+    public int getCompletionAction() {
+        return CompletedUsingItemPacket.ACTION_SHOOT;
+    }
+
+    @Override
+    public boolean onRelease(Player player, int ticksUsed) {
         Item itemArrow = Item.get(Item.ARROW, 0, 1);
 
         if (player.isSurvival() && !player.getInventory().contains(itemArrow)) {
@@ -78,13 +91,12 @@ public class ItemBow extends ItemTool {
                 .putShort("Fire", flame ? 2700 : 0)
                 .putDouble("damage", damage);
 
-        int diff = (Server.getInstance().getTick() - player.getStartActionTick());
-        double p = (double) diff / 20;
+        double p = (double) ticksUsed / 20;
 
         double f = Math.min((p * p + p * 2) / 3, 1) * 2.8;
         EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, new EntityArrow(player.chunk, nbt, player, f == 2), f);
 
-        if (f < 0.1 || diff < 5) {
+        if (f < 0.1 || ticksUsed < 3) {
             entityShootBowEvent.setCancelled();
         }
 
@@ -112,6 +124,7 @@ public class ItemBow extends ItemTool {
                         if (this.getDamage() >= getMaxDurability()) {
                             this.count--;
                         }
+                        player.getInventory().setItemInHand(this);
                     }
                 }
             }
@@ -130,8 +143,6 @@ public class ItemBow extends ItemTool {
                         proj.namedTag.putBoolean("canNotPickup", true);
                     }
                 }
-            } else {
-                entityShootBowEvent.getProjectile().spawnToAll();
             }
         }
 

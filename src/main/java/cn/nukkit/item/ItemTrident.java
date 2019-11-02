@@ -5,10 +5,12 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.CompletedUsingItemPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 
 /**
@@ -42,8 +44,14 @@ public class ItemTrident extends ItemTool {
     public int getAttackDamage() {
         return 9;
     }
-    
-    public boolean onReleaseUsing(Player player) {
+
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        return true;
+    }
+
+    @Override
+    public boolean onRelease(Player player, int ticksUsed) {
         this.useOn(player);
 
         CompoundTag nbt = new CompoundTag()
@@ -63,13 +71,12 @@ public class ItemTrident extends ItemTool {
         if (trident != null) {
             trident.setItem(this);
 
-            int diff = (Server.getInstance().getTick() - player.getStartActionTick());
-            double p = (double) diff / 20;
+            double p = (double) ticksUsed / 20;
             double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
 
             EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, trident, f);
 
-            if (f < 0.1 || diff < 5) {
+            if (f < 0.1 || ticksUsed < 5) {
                 entityShootBowEvent.setCancelled();
             }
 
@@ -87,6 +94,7 @@ public class ItemTrident extends ItemTool {
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THROW);
                     if (!player.isCreative()) {
                         this.count--;
+                        player.getInventory().setItemInHand(this);
                     }
                 }
             }

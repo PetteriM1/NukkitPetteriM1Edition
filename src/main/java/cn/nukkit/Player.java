@@ -3039,15 +3039,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         break packetswitch;
                                     }
 
-                                    if (item.onClickAir(this, directionVector) && (this.isSurvival() || this.isAdventure()) && !(item instanceof ItemCrossbow)) {
-                                        this.inventory.setItemInHand(item);
-                                    }
+                                    if (item.onClickAir(this, directionVector)) {
+                                        if (this.isSurvival() || this.isAdventure()) {
+                                            this.inventory.setItemInHand(item);
+                                        }
 
-                                    if (item instanceof ItemCrossbow && this.startAction == -1) {
-                                        this.inventory.setItemInHand(item);
-                                    }
+                                        if (this.startAction == -1) {
+                                            this.startAction();
+                                            break packetswitch;
+                                        }
 
-                                    this.startAction();
+                                        // Used item
+                                        int ticksUsed = this.server.getTick() - this.startAction;
+                                        this.stopAction();
+                                        if (item.onUse(this, ticksUsed) && this.protocol >= 388) {
+                                            CompletedUsingItemPacket completedUsingItem = new CompletedUsingItemPacket();
+                                            completedUsingItem.itemId = item.getId();
+                                            completedUsingItem.action = item.getCompletionAction();
+                                            this.dataPacket(completedUsingItem);
+                                        }
+                                    }
 
                                     break packetswitch;
                                 default:
@@ -3157,11 +3168,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 type = releaseItemData.actionType;
                                 switch (type) {
                                     case InventoryTransactionPacket.RELEASE_ITEM_ACTION_RELEASE:
-                                        if (this.isUsingItem()) {
+                                        if (this.startAction != -1) {
                                             item = this.inventory.getItemInHand();
-                                            if (item.onReleaseUsing(this)) {
-                                                this.inventory.setItemInHand(item);
+                                            int ticksUsed = this.server.getTick() - this.startAction;
+                                            if (item.onRelease(this, ticksUsed) && this.protocol >= 388) {
+                                                CompletedUsingItemPacket completedUsingItem = new CompletedUsingItemPacket();
+                                                completedUsingItem.itemId = item.getId();
+                                                completedUsingItem.action = item.getCompletionAction();
+                                                this.dataPacket(completedUsingItem);
                                             }
+                                            this.stopAction();
                                         } else {
                                             this.inventory.sendContents(this);
                                         }
@@ -3187,26 +3203,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             if (potion != null) {
                                                 potion.applyPotion(this);
                                             }
-                                        } else if (itemInHand.getId() == Item.BUCKET && itemInHand.getDamage() == 1) {
-                                            this.server.getPluginManager().callEvent(consumeEvent);
-                                            if (consumeEvent.isCancelled()) {
-                                                this.inventory.sendContents(this);
-                                                break;
-                                            }
-
-                                            EntityEventPacket eventPacket = new EntityEventPacket();
-                                            eventPacket.eid = this.getId();
-                                            eventPacket.event = EntityEventPacket.USE_ITEM;
-                                            this.dataPacket(eventPacket);
-                                            Server.broadcastPacket(this.getViewers().values(), eventPacket);
-
-                                            if (!this.isCreative()) {
-                                                itemInHand.count--;
-                                                this.inventory.setItemInHand(itemInHand);
-                                                this.inventory.addItem(new ItemBucket());
-                                            }
-
-                                            this.removeAllEffects();
                                         } else {
                                             this.server.getPluginManager().callEvent(consumeEvent);
                                             if (consumeEvent.isCancelled()) {
@@ -4988,5 +4984,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.fishing = null;
+    }
+
+    @Override
+    public String toString() {
+        return "Player(name='" + getName() + "', location=" + super.toString() + ')';
     }
 }

@@ -16,6 +16,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.protocol.CompletedUsingItemPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.Config;
@@ -1069,13 +1070,21 @@ public class Item implements Cloneable, BlockID, ItemID {
         return false;
     }
 
+    public int getCompletionAction() {
+        return CompletedUsingItemPacket.ACTION_UNKNOWN;
+    }
+
+    public boolean onUse(Player player, int ticksUsed) {
+        return false;
+    }
+
+    public boolean onRelease(Player player, int ticksUsed) {
+        return false;
+    }
+
     @Override
     final public String toString() {
         return "Item " + this.name + " (" + this.id + ':' + (!this.hasMeta ? "?" : this.meta) + ")x" + this.count + (this.hasCompoundTag() ? " tags:0x" + Binary.bytesToHexString(this.getCompoundTag()) : "");
-    }
-
-    public int getDestroySpeed(Block block, Player player) {
-        return 1;
     }
 
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
@@ -1091,17 +1100,6 @@ public class Item implements Cloneable, BlockID, ItemID {
      * @return item changed
      */
     public boolean onClickAir(Player player, Vector3 directionVector) {
-        return false;
-    }
-
-    /**
-     * Called when a player is using this item and releases it. Used to handle bow shoot actions.
-     * Returns whether the item was changed, for example count decrease or durability change.
-     *
-     * @param player player
-     * @return item changed
-     */
-    public boolean onReleaseUsing(Player player) {
         return false;
     }
 
