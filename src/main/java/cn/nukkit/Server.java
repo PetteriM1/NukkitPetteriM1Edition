@@ -1078,7 +1078,9 @@ public class Server {
                 }
             }
 
-            //this.network.updateName();
+            if (!suomicraftMode) {
+                this.network.updateName();
+            }
         }
 
         if (++this.autoSaveTicker >= this.autoSaveTicks) {
