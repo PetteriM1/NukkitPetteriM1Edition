@@ -65,6 +65,7 @@ public class StartGamePacket extends DataPacket {
     public boolean hasAchievementsDisabled = true;
     public int dayCycleStopTime = -1;
     public boolean eduMode = false;
+    public int eduEditionOffer = 0;
     public boolean hasEduFeaturesEnabled = false;
     public float rainLevel;
     public float lightningLevel;
@@ -123,7 +124,11 @@ public class StartGamePacket extends DataPacket {
         this.putBlockVector3(this.spawnX, this.spawnY, this.spawnZ);
         this.putBoolean(this.hasAchievementsDisabled);
         this.putVarInt(this.dayCycleStopTime);
-        this.putBoolean(this.eduMode);
+        if (protocol >= 388) {
+            this.putVarInt(this.eduEditionOffer);
+        } else {
+            this.putBoolean(this.eduMode);
+        }
         if (protocol > 224) {
             this.putBoolean(this.hasEduFeaturesEnabled);
         }
