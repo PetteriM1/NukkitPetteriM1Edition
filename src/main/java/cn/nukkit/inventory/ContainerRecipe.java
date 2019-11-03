@@ -1,17 +1,16 @@
 package cn.nukkit.inventory;
 
-
 import cn.nukkit.item.Item;
 
-public class BrewingRecipe extends MixRecipe {
+public class ContainerRecipe extends MixRecipe {
 
-    public BrewingRecipe(Item input, Item ingredient, Item output) {
+    public ContainerRecipe(Item input, Item ingredient, Item output) {
         super(input, ingredient, output);
     }
 
     @Override
     public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerBrewingRecipe(this);
+        manager.registerContainerRecipe(this);
     }
 
     @Override
