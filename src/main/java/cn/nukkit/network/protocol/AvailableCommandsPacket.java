@@ -36,12 +36,18 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_WILDCARD_TARGET = 7;
     public static final int ARG_TYPE_FILE_PATH = 14;
     public static final int ARG_TYPE_INT_RANGE = 18;
-    public static final int ARG_TYPE_STRING = 27;
-    public static final int ARG_TYPE_POSITION = 29;
-    public static final int ARG_TYPE_MESSAGE = 32;
-    public static final int ARG_TYPE_RAWTEXT = 34;
-    public static final int ARG_TYPE_JSON = 37;
-    public static final int ARG_TYPE_COMMAND = 44;
+    public static final int ARG_TYPE_STRING = 29;
+    public static final int ARG_TYPE_POSITION = 37;
+    public static final int ARG_TYPE_STRING_PRE388 = 27;
+    public static final int ARG_TYPE_POSITION_PRE388 = 29;
+    public static final int ARG_TYPE_MESSAGE = 41;
+    public static final int ARG_TYPE_RAWTEXT = 43;
+    public static final int ARG_TYPE_JSON = 47;
+    public static final int ARG_TYPE_COMMAND = 54;
+    public static final int ARG_TYPE_MESSAGE_PRE388 = 32;
+    public static final int ARG_TYPE_RAWTEXT_PRE388 = 34;
+    public static final int ARG_TYPE_JSON_PRE388 = 37;
+    public static final int ARG_TYPE_COMMAND_PRE388 = 44;
 
     public Map<String, CommandDataVersions> commands;
     public final Map<String, List<String>> softEnums = new HashMap<>();
@@ -266,7 +272,30 @@ public class AvailableCommandsPacket extends DataPacket {
                         if (parameter.enumData != null) {
                             type |= ARG_FLAG_ENUM | enums.indexOf(parameter.enumData);
                         } else {
-                            type |= parameter.type.getId();
+                            int id = parameter.type.getId();
+                            if (protocol < 388) {
+                                switch (parameter.type) {
+                                    case STRING:
+                                        id = ARG_TYPE_STRING_PRE388;
+                                        break;
+                                    case POSITION:
+                                        id = ARG_TYPE_POSITION_PRE388;
+                                        break;
+                                    case MESSAGE:
+                                        id = ARG_TYPE_MESSAGE_PRE388;
+                                        break;
+                                    case RAWTEXT:
+                                        id = ARG_TYPE_RAWTEXT_PRE388;
+                                        break;
+                                    case JSON:
+                                        id = ARG_TYPE_JSON_PRE388;
+                                        break;
+                                    case COMMAND:
+                                        id = ARG_TYPE_COMMAND_PRE388;
+                                        break;
+                                }
+                            }
+                            type |= id;
                         }
                     }
 
