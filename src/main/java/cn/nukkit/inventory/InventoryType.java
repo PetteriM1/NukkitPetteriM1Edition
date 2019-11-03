@@ -26,7 +26,8 @@ public enum InventoryType {
     ENTITY_ARMOR(4, "Entity Armor", -1), //4 ARMOR
     ENTITY_EQUIPMENT(36, "Entity Equipment", -1), //36 CONTAINER
     MINECART_CHEST(27, "Minecart with Chest", 0), //27 CONTAINER
-    MINECART_HOPPER(5, "Minecart with Hopper", 8); //5 CONTAINER
+    MINECART_HOPPER(5, "Minecart with Hopper", 8), //5 CONTAINER
+    OFFHAND(1, "Offhand", -1); //1 CONTAINER
 
     private final int size;
     private final String title;
