@@ -37,8 +37,7 @@ public class EnchantmentDamageArthropods extends EnchantmentDamage {
     @Override
     public void doPostAttack(Entity attacker, Entity entity) {
         if (entity instanceof EntityArthropod) {
-            int duration = 20 + Utils.random.nextInt(10 * this.level);
-            entity.addEffect(Effect.getEffect(Effect.SLOWNESS).setDuration(duration).setAmplifier(3));
+            entity.addEffect(Effect.getEffect(Effect.SLOWNESS).setDuration(20 + Utils.random.nextInt(10 * this.level)).setAmplifier(3));
         }
     }
 }

@@ -1803,7 +1803,7 @@ public class Level implements ChunkManager, Metadatable {
 
     @SuppressWarnings("unchecked")
     public Item useBreakOn(Vector3 vector, BlockFace face, Item item, Player player, boolean createParticles) {
-        if (player != null && player.getGamemode() > 2) {
+        if (player != null && player.getGamemode() > Player.ADVENTURE) {
             return null;
         }
         Block target = this.getBlock(vector);
@@ -1815,7 +1815,7 @@ public class Level implements ChunkManager, Metadatable {
         boolean isSilkTouch = item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null;
 
         if (player != null) {
-            if (player.getGamemode() == 2) {
+            if (player.getGamemode() == Player.ADVENTURE) {
                 Tag tag = item.getNamedTagEntry("CanDestroy");
                 boolean canBreak = false;
                 if (tag instanceof ListTag) {
@@ -2022,7 +2022,7 @@ public class Level implements ChunkManager, Metadatable {
 
             player.lastInteraction = this.server.getTick();
 
-            if (player.getGamemode() > 2) {
+            if (player.getGamemode() > Player.ADVENTURE) {
                 ev.setCancelled();
             }
 
@@ -2111,7 +2111,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (player != null) {
             BlockPlaceEvent event = new BlockPlaceEvent(player, hand, block, target, item);
-            if (player.getGamemode() == 2) {
+            if (player.getGamemode() == Player.ADVENTURE) {
                 Tag tag = item.getNamedTagEntry("CanPlaceOn");
                 boolean canPlace = false;
                 if (tag instanceof ListTag) {

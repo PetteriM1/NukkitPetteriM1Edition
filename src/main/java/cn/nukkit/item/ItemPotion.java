@@ -1,5 +1,11 @@
 package cn.nukkit.item;
 
+import cn.nukkit.Player;
+import cn.nukkit.event.player.PlayerItemConsumeEvent;
+import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.CompletedUsingItemPacket;
+import cn.nukkit.potion.Potion;
+
 public class ItemPotion extends Item {
 
     public static final int NO_EFFECTS = 0;
@@ -55,5 +61,36 @@ public class ItemPotion extends Item {
     @Override
     public int getMaxStackSize() {
         return 1;
+    }
+
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        return true;
+    }
+
+    @Override
+    public int getCompletionAction() {
+        return CompletedUsingItemPacket.ACTION_CONSUME;
+    }
+
+    @Override
+    public boolean onUse(Player player, int ticksUsed) {
+        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(player, this);
+        player.getServer().getPluginManager().callEvent(consumeEvent);
+        if (consumeEvent.isCancelled()) {
+            return false;
+        }
+        Potion potion = Potion.getPotion(this.getDamage()).setSplash(false);
+
+        if (!player.isCreative()) {
+            --this.count;
+            player.getInventory().setItemInHand(this);
+            player.getInventory().addItem(new ItemGlassBottle());
+        }
+
+        if (potion != null) {
+            potion.applyPotion(player);
+        }
+        return true;
     }
 }

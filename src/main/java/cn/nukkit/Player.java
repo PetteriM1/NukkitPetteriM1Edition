@@ -3064,11 +3064,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         // Used item
                                         int ticksUsed = this.server.getTick() - this.startAction;
                                         this.stopAction();
-                                        if (item.onUse(this, ticksUsed) && this.protocol >= 388) {
-                                            CompletedUsingItemPacket completedUsingItem = new CompletedUsingItemPacket();
-                                            completedUsingItem.itemId = item.getId();
-                                            completedUsingItem.action = item.getCompletionAction();
-                                            this.dataPacket(completedUsingItem);
+                                        if (item.onUse(this, ticksUsed)) {
+                                            if (this.protocol >= 388) {
+                                                CompletedUsingItemPacket completedUsingItem = new CompletedUsingItemPacket();
+                                                completedUsingItem.itemId = item.getId();
+                                                completedUsingItem.action = item.getCompletionAction();
+                                                this.dataPacket(completedUsingItem);
+                                            }
+                                        } else {
+                                            this.inventory.sendContents(this);
                                         }
                                     }
 
@@ -3192,39 +3196,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             this.stopAction();
                                         } else {
                                             this.inventory.sendContents(this);
-                                        }
-                                        return;
-                                    case InventoryTransactionPacket.RELEASE_ITEM_ACTION_CONSUME:
-                                        Item itemInHand = this.inventory.getItemInHand();
-                                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
-
-                                        if (itemInHand.getId() == Item.POTION) {
-                                            this.server.getPluginManager().callEvent(consumeEvent);
-                                            if (consumeEvent.isCancelled()) {
-                                                this.inventory.sendContents(this);
-                                                break;
-                                            }
-                                            Potion potion = Potion.getPotion(itemInHand.getDamage()).setSplash(false);
-
-                                            if (this.gamemode == SURVIVAL) {
-                                                --itemInHand.count;
-                                                this.inventory.setItemInHand(itemInHand);
-                                                this.inventory.addItem(new ItemGlassBottle());
-                                            }
-
-                                            if (potion != null) {
-                                                potion.applyPotion(this);
-                                            }
-                                        } else {
-                                            this.server.getPluginManager().callEvent(consumeEvent);
-                                            if (consumeEvent.isCancelled()) {
-                                                this.inventory.sendContents(this);
-                                                break;
-                                            }
-
-                                            Food food = Food.getByRelative(itemInHand);
-                                            if (food != null && food.eatenBy(this)) --itemInHand.count;
-                                            this.inventory.setItemInHand(itemInHand);
                                         }
                                         return;
                                     default:
