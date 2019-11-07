@@ -1982,6 +1982,7 @@ public class Server {
         Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
         Entity.registerEntity("WanderingTrader", EntityWanderingTrader.class);
         Entity.registerEntity("VillagerV2", EntityVillagerV2.class);
+        Entity.registerEntity("Fox", EntityFox.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("MinecartChest", EntityMinecartChest.class);

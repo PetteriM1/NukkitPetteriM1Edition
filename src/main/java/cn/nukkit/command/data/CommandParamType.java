@@ -21,7 +21,6 @@ public enum CommandParamType {
     TEXT(ARG_TYPE_RAWTEXT),
     COMMAND(ARG_TYPE_COMMAND),
     FILE_PATH(ARG_TYPE_FILE_PATH),
-    INT_RANGE(ARG_TYPE_INT_RANGE),
     OPERATOR(ARG_TYPE_OPERATOR);
 
     private final int id;

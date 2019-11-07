@@ -35,6 +35,7 @@ public class AddPlayerPacket extends DataPacket {
     public Item item;
     public EntityMetadata metadata = new EntityMetadata();
     public String deviceId = "";
+    public int buildPlatform = -1;
 
     @Override
     public void decode() {
@@ -70,6 +71,9 @@ public class AddPlayerPacket extends DataPacket {
             this.putLLong(entityUniqueId);
             this.putUnsignedVarInt(0);
             this.putString(deviceId);
+            if (protocol >= 388) {
+                this.putLInt(buildPlatform);
+            }
         }
     }
 }

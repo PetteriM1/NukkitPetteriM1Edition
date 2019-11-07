@@ -123,6 +123,7 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityRavager.NETWORK_ID, "minecraft:ravager")
             .put(EntityVillagerV2.NETWORK_ID, "minecraft:villager_v2")
             .put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2")
+            .put(EntityFox.NETWORK_ID, "minecraft:fox")
             .build();
 
     @Override

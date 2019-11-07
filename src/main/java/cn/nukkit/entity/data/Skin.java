@@ -40,7 +40,7 @@ public class Skin {
     private String capeId;
 
     public boolean isValid() {
-        return true; //TODO: some sort of validation
+        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32;
     }
 
     public SerializedImage getSkinData() {
@@ -121,8 +121,9 @@ public class Skin {
 
     public void setCapeData(byte[] capeData) {
         Objects.requireNonNull(capeData, "capeData");
-        Preconditions.checkArgument(capeData.length == SINGLE_SKIN_SIZE, "Invalid legacy cape");
-        setCapeData(new SerializedImage(64, 32, capeData));
+        if (capeData.length == SINGLE_SKIN_SIZE) {
+            setCapeData(new SerializedImage(64, 32, capeData));
+        }
     }
 
     public void setCapeData(BufferedImage image) {
@@ -191,7 +192,7 @@ public class Skin {
     }
 
     public String getFullSkinId() {
-        return getSkinId() + '_' + getCapeId();
+        return skinId; //TODO: Client sends full skin ID as normal skin ID. Find out what this is actually for.
     }
 
     private static SerializedImage parseBufferedImage(BufferedImage image) {
