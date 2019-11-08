@@ -958,8 +958,8 @@ public class Server {
     }
 
     private void checkTickUpdates(int currentTick) {
-        for (Player p : new ArrayList<>(this.players.values())) {
-            if (this.alwaysTickPlayers) {
+        if (this.alwaysTickPlayers) {
+            for (Player p : new ArrayList<>(this.players.values())) {
                 p.onUpdate(currentTick);
             }
         }
