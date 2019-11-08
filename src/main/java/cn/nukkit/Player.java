@@ -4455,7 +4455,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.addWindow(this.craftingGrid, ContainerIds.NONE);
     }
 
-    public PlayerUIInventory getPlayerUIInventory() {
+    public PlayerUIInventory getUIInventory() {
         return playerUIInventory;
     }
 
