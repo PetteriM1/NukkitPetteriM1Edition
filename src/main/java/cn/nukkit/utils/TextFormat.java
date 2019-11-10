@@ -136,7 +136,7 @@ public enum TextFormat {
      * Gets the TextFormat represented by the specified format code.
      *
      * @param code Code to check
-     * @return Associative {@link TextFormat} with the given code,
+     * @return Associative  with the given code,
      * or null if it doesn't exist
      */
     public static TextFormat getByChar(char code) {
@@ -147,7 +147,7 @@ public enum TextFormat {
      * Gets the TextFormat represented by the specified format code.
      *
      * @param code Code to check
-     * @return Associative {@link TextFormat} with the given code,
+     * @return Associative  with the given code,
      * or null if it doesn't exist
      */
     public static TextFormat getByChar(String code) {

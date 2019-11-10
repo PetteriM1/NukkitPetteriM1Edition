@@ -1,16 +1,25 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.data.FloatEntityData;
+import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+
+import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
 
 public class EntityPig extends EntityWalkingAnimal {
 
@@ -46,6 +55,10 @@ public class EntityPig extends EntityWalkingAnimal {
         super.initEntity();
 
         this.setMaxHealth(10);
+
+        if (this.namedTag.contains("Saddle")) {
+            this.setSaddled(this.namedTag.getBoolean("Saddle"));
+        }
     }
 
     @Override
@@ -79,6 +92,14 @@ public class EntityPig extends EntityWalkingAnimal {
             this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(),0),Item.get(Item.BEETROOT)));
             this.setInLove();
             return true;
+        } else if (item.equals(Item.get(Item.SADDLE)) && !this.isSaddled() && !this.isBaby()) {
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SADDLE);
+            this.setSaddled(true);
+        } else if (this.isSaddled() && this.passengers.isEmpty() && !this.isBaby() && !player.isSneaking()) {
+            if (player.riding == null) {
+                this.mountEntity(player);
+            }
         }
         return super.onInteract(player, item, clickedPos);
     }
@@ -91,6 +112,10 @@ public class EntityPig extends EntityWalkingAnimal {
             for (int i = 0; i < Utils.rand(1, 3); i++) {
                 drops.add(Item.get(this.isOnFire() ? Item.COOKED_PORKCHOP : Item.RAW_PORKCHOP, 0, 1));
             }
+
+            if (this.isSaddled()) {
+                drops.add(Item.get(Item.SADDLE));
+            }
         }
 
         return drops.toArray(new Item[0]);
@@ -98,5 +123,110 @@ public class EntityPig extends EntityWalkingAnimal {
 
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    public boolean mountEntity(Entity entity, byte mode) {
+        Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
+
+        if (entity.riding != null) {
+            dismountEntity(entity);
+            entity.resetFallDistance();
+        } else {
+            if (isPassenger(entity)) {
+                return false;
+            }
+
+            broadcastLinkPacket(entity, TYPE_RIDE);
+
+            entity.riding = this;
+            entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
+            entity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, 1.85001f, 0)));
+            entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 181));
+            passengers.add(entity);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onUpdate(int currentTick) {
+        Iterator<Entity> linkedIterator = this.passengers.iterator();
+
+        while (linkedIterator.hasNext()) {
+            Entity linked = linkedIterator.next();
+
+            if (!linked.isAlive()) {
+                if (linked.riding == this) {
+                    linked.riding = null;
+                }
+
+                linkedIterator.remove();
+            }
+        }
+
+        return super.onUpdate(currentTick);
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putBoolean("Saddle", this.isSaddled());
+    }
+
+    public boolean isSaddled() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED);
+    }
+
+    public void setSaddled(boolean saddled) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED, saddled);
+    }
+
+    public void onPlayerInput(Player player, double strafe, double forward) {
+        if (player.getInventory().getItemInHand().getId() == Item.CARROT_ON_A_STICK) {
+            this.stayTime = 0;
+            this.moveTime = 10;
+            this.yaw = player.yaw;
+
+            strafe *= 0.4;
+
+            double f = strafe * strafe + forward * forward;
+            double friction = 0.3;
+
+            if (f >= 1.0E-4) {
+                f = Math.sqrt(f);
+
+                if (f < 1) {
+                    f = 1;
+                }
+
+                f = friction / f;
+                strafe = strafe * f;
+                forward = forward * f;
+                double f1 = Math.sin(this.yaw * 0.017453292);
+                double f2 = Math.cos(this.yaw * 0.017453292);
+                this.motionX = (strafe * f2 - forward * f1);
+                this.motionZ = (forward * f2 + strafe * f1);
+            } else {
+                this.motionX = 0;
+                this.motionZ = 0;
+            }
+        }
+    }
+
+    @Override
+    protected void checkTarget() {
+        if (this.passengers.isEmpty() || !(this.getPassengers().get(0) instanceof Player) || ((Player) this.getPassengers().get(0)).getInventory().getItemInHand().getId() != Item.CARROT_ON_A_STICK) {
+            super.checkTarget();
+        }
+    }
+
+    @Override
+    public boolean canDespawn() {
+        if (this.isSaddled() || !this.passengers.isEmpty()) {
+            return false;
+        }
+
+        return super.canDespawn();
     }
 }

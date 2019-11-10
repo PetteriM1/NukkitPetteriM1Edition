@@ -15,7 +15,7 @@ public class EntityHorse extends EntityHorseBase {
 
     public static final int NETWORK_ID = 23;
 
-    public int variant = this.getRandomVariant();
+    public int variant = getRandomVariant();
 
     public EntityHorse(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

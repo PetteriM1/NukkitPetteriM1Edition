@@ -205,7 +205,6 @@ public class PluginDescription {
      * {@code HelloWorld v1.0.0}
      *
      * @return 这个插件完整的名字。<br>The full name of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getFullName() {
@@ -217,7 +216,6 @@ public class PluginDescription {
      * Returns all Nukkit API versions this plugin supports.
      *
      * @return 这个插件支持的Nukkit API版本列表。<br>A list of all Nukkit API versions String this plugin supports.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public List<String> getCompatibleAPIs() {
@@ -229,7 +227,6 @@ public class PluginDescription {
      * Returns all the authors of this plugin.
      *
      * @return 这个插件的作者列表。<br>A list of all authors of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public List<String> getAuthors() {
@@ -247,7 +244,6 @@ public class PluginDescription {
      * @return 这个插件的作信息前缀。如果没定义，返回{@code null}。<br>
      * The message title of this plugin, or{@code null} if undefined.
      * @see PluginLogger
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getPrefix() {
@@ -259,7 +255,6 @@ public class PluginDescription {
      * Returns all the defined commands of this plugin.
      *
      * @return 这个插件定义的命令列表。<br>A map of all defined commands of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public Map<String, Object> getCommands() {
@@ -288,7 +283,6 @@ public class PluginDescription {
      * by Nukkit.
      *
      * @return 插件名字列表的 {@code List}对象。<br>A {@code List} object carries the plugin names.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public List<String> getDepend() {
@@ -300,7 +294,6 @@ public class PluginDescription {
      * Returns the description text of this plugin.
      *
      * @return 这个插件的描述文字。<br>The description text of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getDescription() {
@@ -324,7 +317,6 @@ public class PluginDescription {
      * {@code "com.example.ExamplePlugin"}
      *
      * @return 这个插件的主类名。<br>The main class name of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getMain() {
@@ -336,7 +328,6 @@ public class PluginDescription {
      * Returns the name of this plugin.
      *
      * @return 这个插件的名字。<br>The name of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getName() {
@@ -348,7 +339,6 @@ public class PluginDescription {
      * Returns the order the plugin loads, or when the plugin is loaded.
      *
      * @return 这个插件加载的顺序。<br>The order the plugin loads.
-     * @see PluginDescription
      * @see PluginLoadOrder
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
@@ -361,7 +351,6 @@ public class PluginDescription {
      * Returns all the defined permissions of this plugin.
      *
      * @return 这个插件定义的权限列表。<br>A map of all defined permissions of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public List<Permission> getPermissions() {
@@ -380,7 +369,6 @@ public class PluginDescription {
      * Returns the version string of this plugin.
      *
      * @return 这个插件的版本号。<br>The version string od this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getVersion() {
@@ -392,7 +380,6 @@ public class PluginDescription {
      * Returns the website of this plugin.
      *
      * @return 这个插件的网站。<br>The website of this plugin.
-     * @see PluginDescription
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
     public String getWebsite() {

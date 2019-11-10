@@ -32,7 +32,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             this.putByte(this.pid());
             this.putShort(0);
         } else {
-            this.putUnsignedVarInt(this.pid());
+            this.putUnsignedVarInt(this.pid() & 0xff);
         }
         return this;
     }

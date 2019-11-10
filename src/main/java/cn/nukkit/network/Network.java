@@ -193,7 +193,7 @@ public class Network {
      * Process packets obtained from batch packets
      * Required to perform additional analyses and filter unnecessary packets
      *
-     * @param packets
+     * @param packets packets
      */
     public void processPackets(Player player, List<DataPacket> packets) {
         if (packets.isEmpty()) return;

@@ -203,9 +203,9 @@ public class Config {
     /**
      * Save configuration into provided file. Internal file object will be set to new file.
      *
-     * @param file
-     * @param async
-     * @return
+     * @param file file
+     * @param async async
+     * @return save success
      */
     public boolean save(File file, boolean async) {
         this.file = file;
@@ -428,7 +428,7 @@ public class Config {
     /**
      * Get root (main) config section of the Config
      *
-     * @return
+     * @return root config section of the Config
      */
     public ConfigSection getRootSection() {
         return config;

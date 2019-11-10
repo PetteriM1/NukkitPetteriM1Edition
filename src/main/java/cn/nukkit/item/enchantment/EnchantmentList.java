@@ -11,11 +11,6 @@ public class EnchantmentList {
         this.enchantments = new EnchantmentEntry[size];
     }
 
-    /**
-     * @param slot  The index of enchantment.
-     * @param entry The given enchantment entry.
-     * @return {@link EnchantmentList}
-     */
     public EnchantmentList setSlot(int slot, EnchantmentEntry entry) {
         enchantments[slot] = entry;
         return this;

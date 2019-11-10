@@ -45,7 +45,6 @@ public @interface EventHandler {
      * </ol>
      *
      * @return 这个处理器的优先级。<br>The priority of this handler.
-     * @see cn.nukkit.event.EventHandler
      */
     EventPriority priority() default EventPriority.NORMAL;
 
@@ -58,7 +57,6 @@ public @interface EventHandler {
      * not called. Otherwise, the method is always called.
      *
      * @return 这个处理器是否忽略被取消的事件。<br>Whether cancelled events should be ignored.
-     * @see cn.nukkit.event.EventHandler
      */
     boolean ignoreCancelled() default false;
 }
