@@ -33,7 +33,10 @@ public class PlayerSkinPacket extends DataPacket {
             skin.setGeometryData(getString());
             premium = getBoolean();
         } else {
+            uuid = getUUID();
             skin = getSkin();
+            newSkinName = getString();
+            oldSkinName = getString();
         }
     }
 
@@ -54,6 +57,8 @@ public class PlayerSkinPacket extends DataPacket {
             }
         } else {
             putSkin(protocol, skin);
+            putString(newSkinName);
+            putString(oldSkinName);
         }
     }
 }

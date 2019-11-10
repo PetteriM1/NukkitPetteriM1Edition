@@ -262,8 +262,8 @@ public class BinaryStream {
     }
 
     public void putSkin(int protocol, Skin skin) {
+        this.putString(skin.getSkinId());
         if (protocol < 388) {
-            this.putString(skin.getSkinId());
             this.putByteArray(skin.getSkinData().data);
             if (protocol >= 223) {
                 this.putByteArray(skin.getCapeData().data);
@@ -271,7 +271,6 @@ public class BinaryStream {
             this.putString("geometry.humanoid.custom");
             this.putString(skin.getGeometryData());
         } else {
-            this.putString(skin.getSkinId());
             this.putString(skin.getSkinResourcePatch());
             this.putImage(skin.getSkinData());
 
@@ -307,7 +306,7 @@ public class BinaryStream {
         return new SerializedImage(width, height, data);
     }
 
-    public Skin getSkin() {
+    public Skin getSkin() { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
         skin.setSkinResourcePatch(this.getString());

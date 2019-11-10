@@ -13,7 +13,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.CompletedUsingItemPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
@@ -52,11 +51,6 @@ public class ItemBow extends ItemTool {
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         return player.getInventory().contains(Item.get(ItemID.ARROW)) || player.isCreative();
-    }
-
-    @Override
-    public int getCompletionAction() {
-        return CompletedUsingItemPacket.ACTION_SHOOT;
     }
 
     @Override

@@ -2545,7 +2545,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                     }
 
-                    this.stopAction();
+                    this.setUsingItem(false);
                     break;
                 case ProtocolInfo.MODAL_FORM_RESPONSE_PACKET:
                     this.formOpen = false;
@@ -2690,7 +2690,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
                     if (entityEventPacket.event == EntityEventPacket.EATING_ITEM) {
-                        if (entityEventPacket.data == 0) {
+                        if (entityEventPacket.data == 0 || entityEventPacket.eid != this.id) {
                             break;
                         }
 
@@ -3057,22 +3057,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             this.inventory.setItemInHand(item);
                                         }
 
-                                        if (this.startAction == -1) {
-                                            this.startAction();
+                                        if (!this.isUsingItem()) {
+                                            this.setUsingItem(true);
                                             break packetswitch;
                                         }
 
                                         // Used item
                                         int ticksUsed = this.server.getTick() - this.startAction;
-                                        this.stopAction();
-                                        if (item.onUse(this, ticksUsed)) {
-                                            if (this.protocol >= 388) {
-                                                CompletedUsingItemPacket completedUsingItem = new CompletedUsingItemPacket();
-                                                completedUsingItem.itemId = item.getId();
-                                                completedUsingItem.action = item.getCompletionAction();
-                                                this.dataPacket(completedUsingItem);
-                                            }
-                                        } else {
+                                        this.setUsingItem(false);
+                                        if (!item.onUse(this, ticksUsed)) {
                                             this.inventory.sendContents(this);
                                         }
                                     }
@@ -3185,16 +3178,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 type = releaseItemData.actionType;
                                 switch (type) {
                                     case InventoryTransactionPacket.RELEASE_ITEM_ACTION_RELEASE:
-                                        if (this.startAction != -1) {
+                                        if (this.isUsingItem()) {
                                             item = this.inventory.getItemInHand();
                                             int ticksUsed = this.server.getTick() - this.startAction;
-                                            if (item.onRelease(this, ticksUsed) && this.protocol >= 388) {
-                                                CompletedUsingItemPacket completedUsingItem = new CompletedUsingItemPacket();
-                                                completedUsingItem.itemId = item.getId();
-                                                completedUsingItem.action = item.getCompletionAction();
-                                                this.dataPacket(completedUsingItem);
+                                            if (!item.onRelease(this, ticksUsed)) {
+                                                this.inventory.sendContents(this);
                                             }
-                                            this.stopAction();
+                                            this.setUsingItem(false);
                                         } else {
                                             this.inventory.sendContents(this);
                                         }

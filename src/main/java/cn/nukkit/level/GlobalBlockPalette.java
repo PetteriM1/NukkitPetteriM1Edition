@@ -3,6 +3,7 @@ package cn.nukkit.level;
 import cn.nukkit.Server;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BinaryStream;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -189,18 +190,18 @@ public class GlobalBlockPalette {
             // 388
             InputStream stream388 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_388.dat");
             if (stream388 == null) throw new AssertionError("Unable to locate block state nbt 388");
-            CompoundTag tag;
+            ListTag<CompoundTag> tag388;
             try {
-                tag = NBTIO.read(stream388);
+                tag388 = (ListTag<CompoundTag>) NBTIO.readNetwork(stream388);
             } catch (IOException e) {
                 throw new AssertionError(e);
             }
-            for (CompoundTag state : tag.getList("Palette", CompoundTag.class).getAll()) {
-                registerMapping(388, state.getShort("id") << 4 | state.getShort("meta"));
-                state.remove("meta"); // No point in sending this since the client doesn't use it
+            for (CompoundTag state388 : tag388.getAll()) {
+                registerMapping(388, state388.getShort("id") << 4 | state388.getShort("meta"));
+                state388.remove("meta"); // No point in sending this since the client doesn't use it
             }
             try {
-                compiledTable388 = NBTIO.write(tag.getList("Palette"), ByteOrder.LITTLE_ENDIAN, true);
+                compiledTable388 = NBTIO.write(tag388, ByteOrder.LITTLE_ENDIAN, true);
             } catch (IOException e) {
                 throw new AssertionError(e);
             }
