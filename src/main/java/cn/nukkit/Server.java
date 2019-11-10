@@ -189,13 +189,17 @@ public class Server {
 
     /* Some settings */
     private String motd;
+    private String ip;
+    private int port;
     private int viewDistance;
+    private int gamemode;
     private boolean suomicraftMode;
     private boolean doLevelGC;
     private boolean mobAI;
     private boolean shouldSavePlayerData;
     private boolean getAllowFlight;
     private boolean isHardcore;
+    private boolean callBatchPkEv;
     public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
@@ -580,10 +584,12 @@ public class Server {
             return;
         }
 
-        BatchPacketsEvent ev = new BatchPacketsEvent(players, packets, forceSync);
-        pluginManager.callEvent(ev);
-        if (ev.isCancelled()) {
-            return;
+        if (callBatchPkEv) {
+            BatchPacketsEvent ev = new BatchPacketsEvent(players, packets, forceSync);
+            pluginManager.callEvent(ev);
+            if (ev.isCancelled()) {
+                return;
+            }
         }
 
         Timings.playerNetworkSendTimer.startTiming();
@@ -1187,7 +1193,7 @@ public class Server {
     }
 
     public int getPort() {
-        return this.getPropertyInt("server-port", 19132);
+        return port;
     }
 
     public int getViewDistance() {
@@ -1195,7 +1201,7 @@ public class Server {
     }
 
     public String getIp() {
-        return this.getPropertyString("server-ip", "0.0.0.0");
+        return ip;
     }
 
     public UUID getServerUniqueId() {
@@ -1218,11 +1224,7 @@ public class Server {
     }
 
     public int getGamemode() {
-        try {
-            return this.getPropertyInt("gamemode", 0) & 0b11;
-        } catch (NumberFormatException exception) {
-            return getGamemodeFromString(this.getPropertyString("gamemode")) & 0b11;
-        }
+        return gamemode;
     }
 
     public boolean getForceGamemode() {
@@ -2040,6 +2042,7 @@ public class Server {
     private void loadSettings() {
         this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
         this.callDataPkEv = this.getPropertyBoolean("call-data-pk-send-event", true);
+        this.callBatchPkEv = this.getPropertyBoolean("call-batch-pk-send-event", true);
         this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
         this.mobAI = this.getPropertyBoolean("mob-ai", true);
         this.netherEnabled = this.getPropertyBoolean("nether", true);
@@ -2070,6 +2073,13 @@ public class Server {
         this.motd = this.getPropertyString("motd", "Minecraft Server");
         this.viewDistance = this.getPropertyInt("view-distance", 8);
         this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 6000);
+        this.port = this.getPropertyInt("server-port", 19132);
+        this.ip = this.getPropertyString("server-ip", "0.0.0.0");
+        try {
+            this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
+        } catch (NumberFormatException exception) {
+            this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode")) & 0b11;
+        }
     }
 
     /**
@@ -2164,6 +2174,7 @@ public class Server {
             put("worlds-level-auto-save-disabled", "");
             put("temp-ip-ban-failed-xbox-auth", false);
             put("call-data-pk-send-event", true);
+            put("call-batch-pk-send-event", true);
             put("do-level-gc", true);
         }
     }

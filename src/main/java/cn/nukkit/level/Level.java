@@ -793,7 +793,9 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
+        if (Server.getInstance().lightUpdates) {
+            this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
+        }
 
         this.levelCurrentTick++;
 
