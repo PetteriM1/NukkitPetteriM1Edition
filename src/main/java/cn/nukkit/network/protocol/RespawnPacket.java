@@ -37,7 +37,7 @@ public class RespawnPacket extends DataPacket {
         this.putVector3f(this.x, this.y, this.z);
         if (protocol >= 388) {
             this.putByte((byte) respawnState);
-            this.putEntityRuntimeId(runtimeEntityId );
+            this.putEntityRuntimeId(runtimeEntityId);
         }
     }
 

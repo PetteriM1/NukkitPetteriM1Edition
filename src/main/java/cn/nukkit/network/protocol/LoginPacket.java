@@ -94,7 +94,7 @@ public class LoginPacket extends DataPacket {
             }
         } else {
             if (skinToken.has("CapeId")) {
-                skin.setSkinId(skinToken.get("CapeId").getAsString());
+                skin.setCapeId(skinToken.get("CapeId").getAsString());
             }
 
             skin.setSkinData(getImage(skinToken, "Skin"));
