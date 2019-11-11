@@ -242,10 +242,6 @@ public class Server {
         this.dataPath = new File(dataPath).getAbsolutePath() + '/';
         this.pluginPath = new File(pluginPath).getAbsolutePath() + '/';
 
-        if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
-            new File(dataPath + "players/").mkdirs();
-        }
-
         this.console = new NukkitConsole();
         this.consoleThread = new ConsoleThread();
         this.consoleThread.start();
@@ -258,6 +254,10 @@ public class Server {
 
         this.loadSettings();
 
+        if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
+            new File(dataPath + "players/").mkdirs();
+        }
+        
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang(this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 
