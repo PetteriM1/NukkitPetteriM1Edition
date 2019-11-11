@@ -6,6 +6,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSkull;
@@ -58,6 +59,10 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         super.initEntity();
 
         this.setMaxHealth(20);
+
+        if (this.namedTag.contains("powered")) {
+            this.setPowered(this.namedTag.getBoolean("powered"));
+        }
     }
 
     public void explode() {
@@ -223,5 +228,22 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     public void setPowered(boolean charged) {
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_POWERED, charged);
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putBoolean("powered", this.isPowered());
+    }
+
+    @Override
+    public void onStruckByLightning(Entity entity) {
+        if (this.attack(new EntityDamageByEntityEvent(entity, this, EntityDamageEvent.DamageCause.LIGHTNING, 5))) {
+            if (this.fireTicks < 160) {
+                this.setOnFire(8);
+            }
+            this.setPowered(true);
+        }
     }
 }

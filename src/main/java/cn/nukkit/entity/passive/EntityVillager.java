@@ -1,5 +1,8 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityWitch;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -66,5 +69,33 @@ public class EntityVillager extends EntityWalkingAnimal {
     @Override
     public int getKillExperience() {
         return 0;
+    }
+
+    @Override
+    public void onStruckByLightning(Entity entity) {
+        Entity ent = Entity.createEntity("Witch", this);
+        if (ent != null) {
+            CreatureSpawnEvent cse = new CreatureSpawnEvent(EntityWitch.NETWORK_ID, this, ent.namedTag, CreatureSpawnEvent.SpawnReason.LIGHTNING);
+            this.getServer().getPluginManager().callEvent(cse);
+
+            if (cse.isCancelled()) {
+                ent.close();
+                return;
+            }
+
+            ent.yaw = this.yaw;
+            ent.pitch = this.pitch;
+            ent.setImmobile(this.isImmobile());
+            if (this.hasCustomName()) {
+                ent.setNameTag(this.getNameTag());
+                ent.setNameTagVisible(this.isNameTagVisible());
+                ent.setNameTagAlwaysVisible(this.isNameTagAlwaysVisible());
+            }
+
+            this.close();
+            ent.spawnToAll();
+        } else {
+            super.onStruckByLightning(entity);
+        }
     }
 }

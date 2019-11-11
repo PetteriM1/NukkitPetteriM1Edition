@@ -5,6 +5,8 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.Vector3fEntityData;
+import cn.nukkit.entity.mob.EntityZombiePigman;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
@@ -228,5 +230,33 @@ public class EntityPig extends EntityWalkingAnimal {
         }
 
         return super.canDespawn();
+    }
+
+    @Override
+    public void onStruckByLightning(Entity entity) {
+        Entity ent = Entity.createEntity("ZombiePigman", this);
+        if (ent != null) {
+            CreatureSpawnEvent cse = new CreatureSpawnEvent(EntityZombiePigman.NETWORK_ID, this, ent.namedTag, CreatureSpawnEvent.SpawnReason.LIGHTNING);
+            this.getServer().getPluginManager().callEvent(cse);
+
+            if (cse.isCancelled()) {
+                ent.close();
+                return;
+            }
+
+            ent.yaw = this.yaw;
+            ent.pitch = this.pitch;
+            ent.setImmobile(this.isImmobile());
+            if (this.hasCustomName()) {
+                ent.setNameTag(this.getNameTag());
+                ent.setNameTagVisible(this.isNameTagVisible());
+                ent.setNameTagAlwaysVisible(this.isNameTagAlwaysVisible());
+            }
+
+            this.close();
+            ent.spawnToAll();
+        } else {
+            super.onStruckByLightning(entity);
+        }
     }
 }

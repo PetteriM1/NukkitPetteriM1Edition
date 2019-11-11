@@ -45,12 +45,12 @@ public class PlayerSkinPacket extends DataPacket {
         reset();
         putUUID(uuid);
         if (protocol < 388) {
-            putString("geometry.humanoid.custom");
+            putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
             putString(newSkinName);
             putString(oldSkinName);
             putByteArray(skin.getSkinData().data);
             putByteArray(skin.getCapeData().data);
-            putString("geometry.humanoid.custom");
+            putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
             putString(skin.getGeometryData());
             if (protocol > 274) {
                 putBoolean(premium);

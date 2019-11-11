@@ -268,7 +268,7 @@ public class BinaryStream {
             if (protocol >= 223) {
                 this.putByteArray(skin.getCapeData().data);
             }
-            this.putString("geometry.humanoid.custom");
+            this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
             this.putString(skin.getGeometryData());
         } else {
             this.putString(skin.getSkinResourcePatch());

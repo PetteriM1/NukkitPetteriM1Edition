@@ -257,7 +257,7 @@ public class Server {
         if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
             new File(dataPath + "players/").mkdirs();
         }
-        
+
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang(this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
 

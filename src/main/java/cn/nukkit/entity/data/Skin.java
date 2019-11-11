@@ -40,6 +40,7 @@ public class Skin {
     private boolean persona;
     private boolean capeOnClassic;
     private String capeId;
+    public boolean isLegacySlim;
 
     public boolean isValid() {
         return isValidSkin() && isValidResourcePatch();
@@ -102,6 +103,11 @@ public class Skin {
     }
 
     public void setGeometryName(String geometryName) {
+        // Hack for slim skins on older versions
+        if (geometryName.equals("geometry.humanoid.customSlim")) {
+            isLegacySlim = true;
+        }
+
         if (geometryName == null || geometryName.trim().isEmpty()) {
             skinResourcePatch = GEOMETRY_CUSTOM;
             return;
