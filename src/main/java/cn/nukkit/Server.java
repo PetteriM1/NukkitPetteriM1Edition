@@ -242,6 +242,10 @@ public class Server {
         this.dataPath = new File(dataPath).getAbsolutePath() + '/';
         this.pluginPath = new File(pluginPath).getAbsolutePath() + '/';
 
+        if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
+            new File(dataPath + "players/").mkdirs();
+        }
+
         this.console = new NukkitConsole();
         this.consoleThread = new ConsoleThread();
         this.consoleThread.start();
@@ -252,9 +256,7 @@ public class Server {
 
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
 
-        if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
-            new File(dataPath + "players/").mkdirs();
-        }
+        this.loadSettings();
 
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
         this.baseLang = new BaseLang(this.getPropertyString("language", BaseLang.FALLBACK_LANGUAGE));
@@ -318,8 +320,6 @@ public class Server {
                 break;
             }
         }
-
-        this.loadSettings();
 
         log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
