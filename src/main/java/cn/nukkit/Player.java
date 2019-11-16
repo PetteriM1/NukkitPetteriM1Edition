@@ -1715,9 +1715,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         int block = level.getBlock(this).getId();
                         boolean ignore = block == Block.LADDER || block == Block.VINES || block == Block.COBWEB;
-                         if (!this.hasEffect(Effect.JUMP) && diff > 0.6 && expectedVelocity < this.speed.y && !ignore) {
+                        if (!this.hasEffect(Effect.JUMP) && diff > 0.6 && expectedVelocity < this.speed.y && !ignore) {
                             if (this.inAirTicks < 200) {
-                                this.setMotion(new Vector3(0, expectedVelocity, 0));
+                                PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
+                                this.getServer().getPluginManager().callEvent(ev);
+                                if (!ev.isCancelled()) {
+                                    this.setMotion(new Vector3(0, expectedVelocity, 0));
+                                }
                             } else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server")) {
                                 return false;
                             }
