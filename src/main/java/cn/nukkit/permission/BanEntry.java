@@ -17,7 +17,7 @@ import java.util.TreeMap;
  */
 public class BanEntry {
 
-    public static final String format = "yyyy-MM-dd hh:mm:ss Z";
+    public static final String format = "yyyy-MM-dd HH:mm:ss Z";
 
     private final String name;
     private Date creationDate;
