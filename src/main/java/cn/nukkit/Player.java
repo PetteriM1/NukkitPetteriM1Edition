@@ -88,6 +88,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -219,8 +220,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private BlockEnderChest viewingEnderChest = null;
 
-    protected int lastEnderPearl = 20;
-
     private LoginChainData loginChainData;
 
     public Block breakingBlock = null;
@@ -236,7 +235,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private AsyncTask preLoginEventTask = null;
     protected boolean shouldLogin = false;
 
+    private int lastEnderPearl = 20;
     public int lastInteraction = 5;
+    public long lastSkinChange = -1;
     
     public EntityFishingHook fishing = null;
 
@@ -2234,6 +2235,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     dataPacket.data = resourcePack.getPackChunk(1048576 * requestPacket.chunkIndex, 1048576);
                     dataPacket.progress = 1048576 * requestPacket.chunkIndex;
                     this.dataPacket(dataPacket);
+                    break;
+                case ProtocolInfo.PLAYER_SKIN_PACKET:
+                    PlayerSkinPacket skinPacket = (PlayerSkinPacket) packet;
+                    Skin skin = skinPacket.skin;
+
+                    if (!skin.isValid()) {
+                        break;
+                    }
+
+                    PlayerChangeSkinEvent playerChangeSkinEvent = new PlayerChangeSkinEvent(this, skin);
+                    playerChangeSkinEvent.setCancelled(TimeUnit.SECONDS.toMillis(this.server.getPlayerSkinChangeCooldown()) > System.currentTimeMillis() - this.lastSkinChange);
+                    this.server.getPluginManager().callEvent(playerChangeSkinEvent);
+                    if (!playerChangeSkinEvent.isCancelled()) {
+                        this.lastSkinChange = System.currentTimeMillis();
+                        this.setSkin(skin);
+                    }
                     break;
                 case ProtocolInfo.PLAYER_INPUT_PACKET:
                     if (!this.isAlive() || !this.spawned) {

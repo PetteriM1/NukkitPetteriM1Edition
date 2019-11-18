@@ -27,10 +27,10 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
 
     protected FurnaceInventory inventory;
 
-    protected int burnTime = 0;
-    protected int burnDuration = 0;
-    protected int cookTime = 0;
-    protected int maxTime = 0;
+    private int burnTime = 0;
+    private int burnDuration = 0;
+    private int cookTime = 0;
+    private int maxTime = 0;
 
     public BlockEntityFurnace(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -311,5 +311,37 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         }
 
         return c;
+    }
+
+    public int getBurnTime() {
+        return burnTime;
+    }
+
+    public void setBurnTime(int burnTime) {
+        this.burnTime = burnTime;
+    }
+
+    public int getBurnDuration() {
+        return burnDuration;
+    }
+
+    public void setBurnDuration(int burnDuration) {
+        this.burnDuration = burnDuration;
+    }
+
+    public int getCookTime() {
+        return cookTime;
+    }
+
+    public void setCookTime(int cookTime) {
+        this.cookTime = cookTime;
+    }
+
+    public int getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(int maxTime) {
+        this.maxTime = maxTime;
     }
 }
