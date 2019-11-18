@@ -81,9 +81,9 @@ public class LoginPacket extends DataPacket {
                 skin.setSkinData(Base64.getDecoder().decode(skinToken.get("SkinData").getAsString()));
             }
 
-            /*if (skinToken.has("CapeData")) { //TODO: Fix
-                this.skin.setCapeData(Base64.getDecoder().decode(skinToken.get("CapeData").getAsString()));
-            }*/
+            if (skinToken.has("CapeData")) {
+                skin.setCapeData(Base64.getDecoder().decode(skinToken.get("CapeData").getAsString()));
+            }
 
             if (skinToken.has("SkinGeometryName")) {
                 skin.setGeometryName(skinToken.get("SkinGeometryName").getAsString());
@@ -121,7 +121,7 @@ public class LoginPacket extends DataPacket {
             }
 
             if (skinToken.has("AnimationData")) {
-                skin.setGeometryData(new String(Base64.getDecoder().decode(skinToken.get("AnimationData").getAsString()), StandardCharsets.UTF_8));
+                skin.setAnimationData(new String(Base64.getDecoder().decode(skinToken.get("AnimationData").getAsString()), StandardCharsets.UTF_8));
             }
 
             if (skinToken.has("AnimatedImageData")) {

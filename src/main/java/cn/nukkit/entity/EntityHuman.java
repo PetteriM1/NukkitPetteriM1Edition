@@ -126,12 +126,11 @@ public class EntityHuman extends EntityHumanType {
                     newSkin.setCapeId(skinTag.getString("CapeId"));
                 }
                 if (skinTag.contains("CapeData")) {
-                    newSkin.setCapeData(skinTag.getByteArray("CapeData"));
                     byte[] data = skinTag.getByteArray("CapeData");
                     if (skinTag.contains("CapeImageWidth") && skinTag.contains("CapeImageHeight")) {
-                        newSkin.setSkinData(new SerializedImage(skinTag.getInt("CapeImageWidth"), skinTag.getInt("CapeImageHeight"), data));
+                        newSkin.setCapeData(new SerializedImage(skinTag.getInt("CapeImageWidth"), skinTag.getInt("CapeImageHeight"), data));
                     } else {
-                        newSkin.setSkinData(data);
+                        newSkin.setCapeData(data);
                     }
                 }
                 if (skinTag.contains("GeometryName")) {
@@ -144,7 +143,7 @@ public class EntityHuman extends EntityHumanType {
                     newSkin.setGeometryData(new String(skinTag.getByteArray("GeometryData"), StandardCharsets.UTF_8));
                 }
                 if (skinTag.contains("AnimationData")) {
-                    newSkin.setAnimationData(new String(skinTag.getByteArray("Animation"), StandardCharsets.UTF_8));
+                    newSkin.setAnimationData(new String(skinTag.getByteArray("AnimationData"), StandardCharsets.UTF_8));
                 }
                 if (skinTag.contains("PremiumSkin")) {
                     newSkin.setPremium(skinTag.getBoolean("PremiumSkin"));

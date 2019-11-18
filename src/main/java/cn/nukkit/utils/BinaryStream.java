@@ -263,13 +263,23 @@ public class BinaryStream {
 
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
+
         if (protocol < 388) {
-            this.putByteArray(skin.getSkinData().data);
-            if (protocol >= 223) {
-                this.putByteArray(skin.getCapeData().data);
+            if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
+                this.putByteArray(Base64.getDecoder().decode(Skin.STEVE_SKIN));
+                if (protocol >= 223) {
+                    this.putByteArray(skin.getCapeData().data);
+                }
+                this.putString("geometry.humanoid.custom");
+                this.putString(Skin.STEVE_GEOMETRY);
+            } else {
+                this.putByteArray(skin.getSkinData().data);
+                if (protocol >= 223) {
+                    this.putByteArray(skin.getCapeData().data);
+                }
+                this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
+                this.putString(skin.getGeometryData());
             }
-            this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
-            this.putString(skin.getGeometryData());
         } else {
             this.putString(skin.getSkinResourcePatch());
             this.putImage(skin.getSkinData());
