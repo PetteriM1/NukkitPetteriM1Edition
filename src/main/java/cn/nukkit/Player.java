@@ -3865,11 +3865,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.z = (float) pos.z;
         pk.respawnState = RespawnPacket.STATE_SEARCHING_FOR_SPAWN;
 
-        // HACK: fix chunk loading when respawning
-        if (this.level != pos.level) {
-            this.teleport(new Location(pos.x, -100, pos.z, pos.level), null);
-            this.teleport(new Location(pos.x, pos.y, pos.z, pos.level), null);
-        }
+        this.teleport(pos, null);
 
         this.dataPacket(pk);
     }
