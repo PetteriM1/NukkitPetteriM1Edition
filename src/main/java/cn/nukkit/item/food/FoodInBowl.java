@@ -17,8 +17,7 @@ public class FoodInBowl extends Food {
     @Override
     protected boolean onEatenBy(Player player) {
         super.onEatenBy(player);
-        int slot = player.getInventory().getHeldItemSlot();
-        player.getInventory().setItem(slot, new ItemBowl());
+        player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemBowl());
         return true;
     }
 }

@@ -187,7 +187,7 @@ public class ItemBucket extends Item {
             return false;
         }
 
-        if (player.isSurvival()) {
+        if (!player.isCreative()) {
             this.count--;
             player.getInventory().setItemInHand(this);
             player.getInventory().addItem(new ItemBucket());
