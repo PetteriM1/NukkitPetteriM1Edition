@@ -236,8 +236,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean shouldLogin = false;
 
     private int lastEnderPearl = 20;
-    public int lastInteraction = 5;
     public long lastSkinChange = -1;
+    private double lastRightClickTime = 0.0;
+    private Vector3 lastRightClickPos = null;
     
     public EntityFishingHook fishing = null;
 
@@ -304,7 +305,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setBanned(boolean value) {
         if (value) {
             this.server.getNameBans().addBan(this.username, null, null, null);
-            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "Banned!");
+            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "\u00A7cYou are banned!");
         } else {
             this.server.getNameBans().remove(this.username);
         }
@@ -1859,10 +1860,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason", "Server is white-listed").replace("§n", "\n"));
             return;
         } else if (this.isBanned()) {
-            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned");
+            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "\u00A7cYou are banned! Reason: " + this.server.getNameBans().getEntires().get(this.getName().toLowerCase()).getReason());
             return;
         } else if (this.server.getIPBans().isBanned(this.getAddress())) {
-            this.kick(PlayerKickEvent.Reason.IP_BANNED, "You are banned");
+            this.kick(PlayerKickEvent.Reason.IP_BANNED, "\u00A7cYou are banned! Reason: " + this.server.getNameBans().getEntires().get(this.getName().toLowerCase()).getReason());
             return;
         }
 
@@ -2969,6 +2970,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
+                                    // Hack: Fix client spamming right clicks
+                                    if ((lastRightClickPos != null && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
+                                        return;
+                                    }
+
+                                    lastRightClickPos = blockVector.asVector3();
+                                    lastRightClickTime = System.currentTimeMillis();
+
                                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
 
                                     if (this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7)) {
