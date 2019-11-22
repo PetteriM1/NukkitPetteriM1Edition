@@ -792,10 +792,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
+
         if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= this.spawnThreshold) {
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
             this.spawnChunkLoadCount = -1;
         }
+
         Timings.playerChunkSendTimer.stopTiming();
     }
 
@@ -806,9 +808,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.noDamageTicks = 60;
         this.setAirTicks(400);
-
-        this.spawned = true;
-        this.setImmobile(false);
 
         if (this.hasPermission(Server.BROADCAST_CHANNEL_USERS)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_USERS, this);
@@ -823,8 +822,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.server.getPluginManager().callEvent(respawnEvent);
 
-        pos = respawnEvent.getRespawnPosition();
-
         if (this.getHealth() <= 0) {
             pos = this.getSpawn();
             RespawnPacket respawnPacket = new RespawnPacket();
@@ -834,10 +831,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(respawnPacket);
         }
 
+        this.getLevel().sendTime(this);
+        this.getLevel().sendWeather(this);
+
+        this.setImmobile(false);
+        this.spawned = true;
+
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
-                new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{
-                        this.displayName
-                })
+                new TranslationContainer(TextFormat.YELLOW + "%multiplayer.player.joined", new String[]{this.displayName})
         );
 
         this.server.getPluginManager().callEvent(playerJoinEvent);
@@ -857,7 +858,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         // Prevent PlayerTeleportEvent during player spawn
-        this.teleport(pos, null);
+        //this.teleport(pos, null);
 
         if (!this.isSpectator()) {
             this.spawnToAll();
@@ -1513,8 +1514,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.getZ() + 0.6f
                         );
                         for (int i = 0; i < 8; i++) {
-                            aab.offset(-Math.sin(this.getYaw() * Math.PI / 180) * i, i * (Math.tan(this.getPitch() * -1 * Math.PI / 180)), Math.cos(this.getYaw() * Math.PI / 180) * i);
-                            Entity[] entities = this.level.getCollidingEntities(aab);
+                            Entity[] entities = this.level.getCollidingEntities(aab.offset(-Math.sin(this.getYaw() * Math.PI / 180) * i, i * (Math.tan(this.getPitch() * -1 * Math.PI / 180)), Math.cos(this.getYaw() * Math.PI / 180) * i));
                             if (entities.length > 0) {
                                 for (Entity e : entities) {
                                     if (e instanceof EntityEnderman) {
@@ -1851,9 +1851,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         Vector2 dV = this.getDirectionPlane();
-        double dot = dV.dot(new Vector2(this.x, this.z));
-        double dot1 = dV.dot(new Vector2(pos.x, pos.z));
-        return (dot1 - dot) >= -maxDiff;
+        return (dV.dot(new Vector2(pos.x, pos.z)) - dV.dot(new Vector2(this.x, this.z))) >= -maxDiff;
     }
 
     protected void processLogin() {
@@ -1884,16 +1882,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
 
-        boolean alive = 0 <= nbt.getShort("Health");
-
         nbt.putString("NameTag", this.username);
 
         this.setExperience(nbt.getInt("EXP"), nbt.getInt("expLevel"));
 
-        this.gamemode = nbt.getInt("playerGameType") & 0x03;
         if (this.server.getForceGamemode()) {
             this.gamemode = this.server.getGamemode();
             nbt.putInt("playerGameType", this.gamemode);
+        } else {
+            this.gamemode = nbt.getInt("playerGameType") & 0x03;
         }
 
         this.adventureSettings = new AdventureSettings(this)
@@ -1904,7 +1901,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 .set(Type.NO_CLIP, isSpectator());
 
         Level level;
-        if ((level = this.server.getLevelByName(nbt.getString("Level"))) == null || !alive) {
+        if ((level = this.server.getLevelByName(nbt.getString("Level"))) == null || !(0 <= nbt.getShort("Health"))) {
             this.setLevel(this.server.getDefaultLevel());
             nbt.putString("Level", this.level.getName());
             nbt.getList("Pos", DoubleTag.class)
@@ -1985,7 +1982,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.spawnY = (int) this.y;
         startGamePacket.spawnZ = (int) this.z;
         startGamePacket.commandsEnabled = this.enableClientCommand;
-        startGamePacket.gameRules = getLevel().getGameRules();
+        startGamePacket.gameRules = this.getLevel().getGameRules();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         this.dataPacket(startGamePacket);
 
@@ -1996,9 +1993,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.getAddress(),
                 String.valueOf(this.getPort())));
 
-        this.getLevel().sendTime(this);
-        this.getLevel().sendWeather(this);
-
         this.getServer().getScheduler().scheduleTask(null, () -> {
             try {
                 if (this.protocol >= 313) {
@@ -2006,10 +2000,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.dataPacket(new BiomeDefinitionListPacket());
                     }
                     this.dataPacket(new AvailableEntityIdentifiersPacket());
-                }
-
-                if (this.isOp() || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
-                    this.setRemoveFormat(false);
                 }
 
                 this.setImmobile(true);
@@ -2036,6 +2026,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 if (this.isOp() && !server.checkOpMovement) {
                     this.setCheckMovement(false);
+                }
+
+                if (this.isOp() || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
+                    this.setRemoveFormat(false);
                 }
             } catch (Exception e) {
                 this.close("", "Internal Server Error");
@@ -2125,18 +2119,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         valid = false;
                     }
 
-                    for (int i = 0; i < len && valid; i++) {
-                        char c = loginPacket.username.charAt(i);
-                        if ((c >= 'a' && c <= 'z') ||
-                                (c >= 'A' && c <= 'Z') ||
-                                (c >= '0' && c <= '9') ||
-                                c == '_' || c == ' '
-                                ) {
-                            continue;
-                        }
+                    if (valid) {
+                        for (int i = 0; i < len && valid; i++) {
+                            char c = loginPacket.username.charAt(i);
+                            if ((c >= 'a' && c <= 'z') ||
+                                    (c >= 'A' && c <= 'Z') ||
+                                    (c >= '0' && c <= '9') ||
+                                    c == '_' || c == ' '
+                            ) {
+                                continue;
+                            }
 
-                        valid = false;
-                        break;
+                            valid = false;
+                            break;
+                        }
                     }
 
                     if (!valid || Objects.equals(this.iusername, "rcon") || Objects.equals(this.iusername, "console")) {
@@ -3911,11 +3907,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         super.setHealth(health);
+
         // HACK: solve the client-side absorption bug
-        Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getAbsorption() % 2 != 0 ? this.getMaxHealth() + 1 : this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0);
         if (this.spawned) {
             UpdateAttributesPacket pk = new UpdateAttributesPacket();
-            pk.entries = new Attribute[]{attr};
+            pk.entries = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getAbsorption() % 2 != 0 ? this.getMaxHealth() + 1 : this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0)};
             pk.entityId = this.id;
             this.dataPacket(pk);
         }
@@ -3925,10 +3921,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setMaxHealth(int maxHealth) {
         super.setMaxHealth(maxHealth);
 
-        Attribute attr = Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getAbsorption() % 2 != 0 ? this.getMaxHealth() + 1 : this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0);
         if (this.spawned) {
             UpdateAttributesPacket pk = new UpdateAttributesPacket();
-            pk.entries = new Attribute[]{attr};
+            pk.entries = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getAbsorption() % 2 != 0 ? this.getMaxHealth() + 1 : this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0)};
             pk.entityId = this.id;
             this.dataPacket(pk);
         }
@@ -3944,8 +3939,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void addExperience(int add) {
         if (add == 0) return;
-        int now = this.exp;
-        int added = now + add;
+        int added = this.exp + add;
         int level = this.expLevel;
         int most = calculateRequireExperience(level);
         while (added >= most) {
@@ -3984,9 +3978,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void sendExperience(int exp) {
         if (this.spawned) {
-            float percent = ((float) exp) / calculateRequireExperience(this.expLevel);
-            percent = Math.max(0f, Math.min(1f, percent));
-            this.setAttribute(Attribute.getAttribute(Attribute.EXPERIENCE).setValue(percent));
+            this.setAttribute(Attribute.getAttribute(Attribute.EXPERIENCE).setValue(Math.max(0f, Math.min(1f, ((float) exp) / calculateRequireExperience(this.expLevel)))));
         }
     }
 
@@ -4015,8 +4007,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setMovementSpeed(float speed, boolean send) {
         super.setMovementSpeed(speed);
         if (this.spawned && send) {
-            Attribute attribute = Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed);
-            this.setAttribute(attribute);
+            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed));
         }
     }
 
@@ -4637,9 +4628,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         byte[] buf = pk.getBuffer();
         batchPayload[0] = Binary.writeUnsignedVarInt(buf.length);
         batchPayload[1] = buf;
-        byte[] data = Binary.appendBytes(batchPayload);
         try {
-            batch.payload = Zlib.deflate(data, Server.getInstance().networkCompressionLevel);
+            batch.payload = Zlib.deflate(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
