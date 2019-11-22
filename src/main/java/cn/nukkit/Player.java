@@ -64,6 +64,7 @@ import cn.nukkit.permission.PermissionAttachment;
 import cn.nukkit.permission.PermissionAttachmentInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.*;
@@ -760,12 +761,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             int count = 0;
             ObjectIterator<Long2ObjectMap.Entry<Boolean>> iter = loadQueue.long2ObjectEntrySet().fastIterator();
             while (iter.hasNext()) {
-                Long2ObjectMap.Entry<Boolean> entry = iter.next();
-                long index = entry.getLongKey();
-
                 if (count >= this.chunksPerTick) {
                     break;
                 }
+
+                Long2ObjectMap.Entry<Boolean> entry = iter.next();
+                long index = entry.getLongKey();
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
 
@@ -3217,6 +3218,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             this.setUsingItem(false);
                                         } else {
                                             this.inventory.sendContents(this);
+                                        }
+                                        return;
+                                    case InventoryTransactionPacket.RELEASE_ITEM_ACTION_CONSUME:
+                                        if (this.protocol >= 388) break; // Usage of potions on 1.13 and later is handled at ItemPotion#onUse
+                                        Item itemInHand = this.inventory.getItemInHand();
+                                        PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(this, itemInHand);
+
+                                        if (itemInHand.getId() == Item.POTION) {
+                                            this.server.getPluginManager().callEvent(consumeEvent);
+                                            if (consumeEvent.isCancelled()) {
+                                                this.inventory.sendContents(this);
+                                                break;
+                                            }
+                                            Potion potion = Potion.getPotion(itemInHand.getDamage());
+
+                                            if (this.gamemode == SURVIVAL) {
+                                                --itemInHand.count;
+                                                this.inventory.setItemInHand(itemInHand);
+                                                this.inventory.addItem(new ItemGlassBottle());
+                                            }
+
+                                            if (potion != null) {
+                                                potion.applyPotion(this);
+                                            }
                                         }
                                         return;
                                     default:

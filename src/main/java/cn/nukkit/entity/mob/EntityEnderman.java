@@ -157,17 +157,13 @@ public class EntityEnderman extends EntityWalkingMob {
         return super.canDespawn();
     }
 
-    /*public void makeVibrating(boolean bool) {
-        this.setDataFlag(DATA_FLAGS, TODO_ID, bool);
-    }*/
-
     public boolean isAngry() {
         return angry;
     }
 
     public void setAngry(boolean bool) {
         this.angry = bool;
-        //makeVibrating(bool);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_VIBRATING, bool);
     }
 
     @Override

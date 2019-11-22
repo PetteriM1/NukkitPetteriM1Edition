@@ -1444,8 +1444,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int calculateSkylightSubtracted(float tickDiff) {
-        float angle = this.calculateCelestialAngle(getTime(), tickDiff);
-        float light = 1 - (MathHelper.cos(angle * (6.2831855f)) * 2 + 0.5f);
+        float light = 1 - (MathHelper.cos(this.calculateCelestialAngle(getTime(), tickDiff) * (6.2831855f)) * 2 + 0.5f);
         light = light < 0 ? 0 : light > 1 ? 1 : light;
         light = 1 - light;
         light = (float) ((double) light * ((raining ? 1 : 0) - 0.3125));
@@ -3088,8 +3087,7 @@ public class Level implements ChunkManager, Metadatable {
                         }
                     }
 
-                    PopulationTask task = new PopulationTask(this, chunk);
-                    this.server.getScheduler().scheduleAsyncTask(task);
+                    this.server.getScheduler().scheduleAsyncTask(new PopulationTask(this, chunk));
                 }
             }
             Timings.populationTimer.stopTiming();

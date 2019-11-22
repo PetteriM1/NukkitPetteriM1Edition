@@ -69,6 +69,7 @@ public class ItemPotion extends Item {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
+        if (player.protocol < 388) return true;
         PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(player, this);
         player.getServer().getPluginManager().callEvent(consumeEvent);
         if (consumeEvent.isCancelled()) {
