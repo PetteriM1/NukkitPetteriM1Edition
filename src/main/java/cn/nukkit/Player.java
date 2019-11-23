@@ -237,6 +237,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected boolean shouldLogin = false;
 
     private int lastEnderPearl = 20;
+    private int lastChorusFruitTeleport = 20;
     public long lastSkinChange = -1;
     private double lastRightClickTime = 0.0;
     private Vector3 lastRightClickPos = null;
@@ -269,6 +270,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void onThrowEnderPearl() {
         this.lastEnderPearl = this.server.getTick();
+    }
+
+    public int getLastChorusFruitTeleport() {
+        return lastChorusFruitTeleport;
+    }
+
+    public void onChorusFruitTeleport() {
+        this.lastChorusFruitTeleport = this.server.getTick();
     }
 
     public BlockEnderChest getViewingEnderChest() {
@@ -2968,7 +2977,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
                                     // Hack: Fix client spamming right clicks
-                                    if ((lastRightClickPos != null && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
+                                    if (!server.doNotLimitInteractions && (lastRightClickPos != null && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
                                         return;
                                     }
 

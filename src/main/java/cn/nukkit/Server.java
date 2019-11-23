@@ -218,6 +218,7 @@ public class Server {
     boolean pvp;
     boolean announceAchievements;
     boolean checkOpMovement;
+    boolean doNotLimitInteractions;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
     public boolean vanillaBB;
@@ -2074,6 +2075,7 @@ public class Server {
         this.whitelistEnabled = this.getPropertyBoolean("white-list", false);
         this.checkOpMovement = this.getPropertyBoolean("check-op-movement", false);
         this.forceGamemode = this.getPropertyBoolean("force-gamemode", true);
+        this.doNotLimitInteractions = this.getPropertyBoolean("do-not-limit-interactions", false);
         this.motd = this.getPropertyString("motd", "Minecraft Server");
         this.viewDistance = this.getPropertyInt("view-distance", 8);
         this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 6000);
@@ -2183,6 +2185,7 @@ public class Server {
             put("do-level-gc", true);
             put("skin-change-cooldown", 30);
             put("check-op-movement", false);
+            put("do-not-limit-interactions", false);
         }
     }
 

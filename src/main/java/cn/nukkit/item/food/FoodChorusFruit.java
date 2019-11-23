@@ -34,11 +34,13 @@ public class FoodChorusFruit extends FoodNormal {
             int y = Utils.rand(minY, maxY);
             int z = Utils.rand(minZ, maxZ);
 
+            if (y < 0) continue;
+
             while (y >= 0 && !level.getBlock(new Vector3(x, y + 1, z)).isSolid()) {
                 y--;
             }
 
-            if (y < 0) continue;
+            y++;
 
             Block blockUp = level.getBlock(new Vector3(x, y + 1, z));
             Block blockUp2 = level.getBlock(new Vector3(x, y + 2, z));
