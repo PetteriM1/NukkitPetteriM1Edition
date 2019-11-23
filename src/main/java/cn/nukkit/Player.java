@@ -2986,10 +2986,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_ACTION, false);
 
-                                    if (this.canInteract(blockVector.add(0.5, 0.5, 0.5), this.isCreative() ? 13 : 7)) {
+                                    if (!(this.distance(blockVector.asVector3()) > (this.isCreative() ? 13 : 7))) {
                                         if (this.isCreative()) {
-                                            Item i = inventory.getItemInHand();
-                                            if (this.level.useItemOn(blockVector.asVector3(), i, face, useItemData.clickPos.x, useItemData.clickPos.y, useItemData.clickPos.z, this) != null) {
+                                            if (this.level.useItemOn(blockVector.asVector3(), inventory.getItemInHand(), face, useItemData.clickPos.x, useItemData.clickPos.y, useItemData.clickPos.z, this) != null) {
                                                 break packetswitch;
                                             }
                                         } else if (inventory.getItemInHand().equals(useItemData.itemInHand)) {

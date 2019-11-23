@@ -2017,11 +2017,8 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             int distance = this.server.getSpawnRadius();
-
             if (!player.isOp() && distance > -1) {
-                Vector2 t = new Vector2(target.x, target.z);
-                Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
-                if (!this.server.getOps().getAll().isEmpty() && t.distance(s) <= distance) {
+                if (!this.server.getOps().getAll().isEmpty() && new Vector2(target.x, target.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= distance) {
                     ev.setCancelled();
                 }
             }
@@ -2084,15 +2081,14 @@ public class Level implements ChunkManager, Metadatable {
                 ++realCount;
             }
 
-            if (player != null) {
+            /*if (player != null) {
                 Vector3 diff = player.getNextPosition().subtract(player.getPosition());
                 if (diff.lengthSquared() > 0.00001) {
-                    AxisAlignedBB bb = player.getBoundingBox().getOffsetBoundingBox(diff.x, diff.y, diff.z);
-                    if (hand.getBoundingBox().intersectsWith(bb)) {
+                    if (hand.getBoundingBox().intersectsWith(player.getBoundingBox().getOffsetBoundingBox(diff.x, diff.y, diff.z))) {
                         ++realCount;
                     }
                 }
-            }
+            }*/
 
             if (realCount > 0) {
                 return null;
@@ -2122,9 +2118,7 @@ public class Level implements ChunkManager, Metadatable {
 
             int distance = this.server.getSpawnRadius();
             if (!player.isOp() && distance > -1) {
-                Vector2 t = new Vector2(target.x, target.z);
-                Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
-                if (!this.server.getOps().getAll().isEmpty() && t.distance(s) <= distance) {
+                if (!this.server.getOps().getAll().isEmpty() && new Vector2(target.x, target.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= distance) {
                     if (!this.server.suomiCraftPEMode()) event.setCancelled();
                 }
             }
