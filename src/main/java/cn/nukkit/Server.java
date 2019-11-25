@@ -604,11 +604,12 @@ public class Server {
                 p.encode();
             }
             byte[] buf = p.getBuffer();
-            payload[i * 2] = Binary.writeUnsignedVarInt(buf.length);
-            payload[i * 2 + 1] = buf;
+            int i2 = i * 2;
+            payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+            payload[i2 + 1] = buf;
             packets[i] = null;
-            size += payload[i * 2].length;
-            size += payload[i * 2 + 1].length;
+            size += payload[i2].length;
+            size += payload[i2 + 1].length;
         }
 
         List<InetSocketAddress> targets = new ArrayList<>();

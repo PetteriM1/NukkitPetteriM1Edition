@@ -88,7 +88,6 @@ public class SmallExplosion extends Explosion {
     @Override
     public boolean explodeB() {
         LongArraySet updateBlocks = new LongArraySet();
-        List<Vector3> send = new ArrayList<>();
         Vector3 source = (new Vector3(this.source.x, this.source.y, this.source.z)).floor();
         double yield = (1d / this.size) * 100d;
         if (this.what instanceof Entity) {
@@ -150,7 +149,6 @@ public class SmallExplosion extends Explosion {
                     updateBlocks.add(index);
                 }
             }
-            send.add(new Vector3(block.x - source.x, block.y - source.y, block.z - source.z));
         }
         this.level.addParticle(new HugeExplodeSeedParticle(this.source));
         this.level.addLevelSoundEvent(source, LevelSoundEventPacket.SOUND_EXPLODE);

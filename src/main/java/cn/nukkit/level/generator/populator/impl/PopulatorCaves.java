@@ -252,7 +252,7 @@ public class PopulatorCaves extends Populator {
             }
             while (count > 0) {
                 count--;
-                float f1 = this.random.nextFloat() * 3.141593F * 2.0F;
+                float f1 = this.random.nextFloat() * 6.283186f;
                 float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
                 float f3 = this.random.nextFloat() * 2.0F + this.random.nextFloat();
 

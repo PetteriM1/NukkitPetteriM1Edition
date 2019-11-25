@@ -12,7 +12,7 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
-    private static final int[] faces = new int[]{
+    private static final short[] faces = new short[]{
             0,
             0,
             0b1000,

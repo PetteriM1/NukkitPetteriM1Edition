@@ -14,7 +14,7 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockTorch extends BlockFlowable implements Faceable {
 
-    private static final int[] faces = new int[]{
+    private static final short[] faces = new short[]{
             0, //0, nerver used
             5, //1
             4, //2
@@ -23,7 +23,7 @@ public class BlockTorch extends BlockFlowable implements Faceable {
             1, //5
     };
 
-    private static final int[] faces2 = new int[]{
+    private static final short[] faces2 = new short[]{
             0, //0
             4, //1
             5, //2

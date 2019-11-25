@@ -24,7 +24,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     protected static final AxisAlignedBB[] NORTH = new AxisAlignedBB[]{new AxisAlignedBB(0.375D, 0.4375D, 0.0625D, 0.625D, 0.75D, 0.3125D), new AxisAlignedBB(0.3125D, 0.3125D, 0.0625D, 0.6875D, 0.75D, 0.4375D), new AxisAlignedBB(0.3125D, 0.3125D, 0.0625D, 0.6875D, 0.75D, 0.4375D)};
     protected static final AxisAlignedBB[] SOUTH = new AxisAlignedBB[]{new AxisAlignedBB(0.375D, 0.4375D, 0.6875D, 0.625D, 0.75D, 0.9375D), new AxisAlignedBB(0.3125D, 0.3125D, 0.5625D, 0.6875D, 0.75D, 0.9375D), new AxisAlignedBB(0.3125D, 0.3125D, 0.5625D, 0.6875D, 0.75D, 0.9375D)};
 
-    private static final int[] faces = new int[]{
+    private static final short[] faces = new short[]{
             0,
             0,
             0,
@@ -33,7 +33,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
             1,
     };
 
-    private static final int[] faces2 = new int[]{
+    private static final short[] faces2 = new short[]{
             3, 4, 2, 5, 3, 4, 2, 5, 3, 4, 2, 5
     };
 

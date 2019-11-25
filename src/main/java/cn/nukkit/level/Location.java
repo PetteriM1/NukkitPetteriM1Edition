@@ -172,10 +172,7 @@ public class Location extends Position {
     public Vector3 getDirectionVector() {
         double pitch = ((this.pitch + 90) * Math.PI) / 180;
         double yaw = ((this.yaw + 90) * Math.PI) / 180;
-        double x = Math.sin(pitch) * Math.cos(yaw);
-        double z = Math.sin(pitch) * Math.sin(yaw);
-        double y = Math.cos(pitch);
-        return new Vector3(x, y, z).normalize();
+        return new Vector3(Math.sin(pitch) * Math.cos(yaw), Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch)).normalize();
     }
 
     @Override

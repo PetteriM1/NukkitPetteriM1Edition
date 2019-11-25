@@ -3065,7 +3065,6 @@ public class Level implements ChunkManager, Metadatable {
             for (int xx = -1; xx <= 1; ++xx) {
                 for (int zz = -1; zz <= 1; ++zz) {
                     if (this.chunkPopulationLock.containsKey(Level.chunkHash(x + xx, z + zz))) {
-
                         populate = false;
                         break;
                     }
@@ -3112,11 +3111,8 @@ public class Level implements ChunkManager, Metadatable {
 
     public void regenerateChunk(int x, int z) {
         this.unloadChunk(x, z, false);
-
         this.cancelUnloadChunkRequest(x, z);
-
         provider.setChunk(x, z, provider.getEmptyChunk(x, z));
-
         this.generateChunk(x, z);
     }
 
