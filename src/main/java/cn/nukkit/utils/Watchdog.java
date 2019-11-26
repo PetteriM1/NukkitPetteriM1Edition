@@ -60,7 +60,7 @@ public class Watchdog extends Thread {
             }
             try {
                 synchronized (this) {
-                    this.wait(Math.max(time / 4, 1000));
+                    this.wait(Math.max(time >> 2, 1000));
                 }
             } catch (InterruptedException ignore) {}
         }

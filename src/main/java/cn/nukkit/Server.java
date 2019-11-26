@@ -596,7 +596,7 @@ public class Server {
         }
 
         Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload = new byte[packets.length * 2][];
+        byte[][] payload = new byte[(packets.length << 1)][];
         int size = 0;
         for (int i = 0; i < packets.length; i++) {
             DataPacket p = packets[i];
@@ -604,7 +604,7 @@ public class Server {
                 p.encode();
             }
             byte[] buf = p.getBuffer();
-            int i2 = i * 2;
+            int i2 = i << 1;
             payload[i2] = Binary.writeUnsignedVarInt(buf.length);
             payload[i2 + 1] = buf;
             packets[i] = null;

@@ -214,7 +214,7 @@ public class Anvil extends BaseLevelProvider {
         this.level.timings.syncChunkLoadDataTimer.startTiming();
         BaseFullChunk chunk;
         try {
-            chunk = region.readChunk(chunkX - regionX * 32, chunkZ - regionZ * 32);
+            chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

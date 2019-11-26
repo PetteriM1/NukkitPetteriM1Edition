@@ -170,7 +170,7 @@ public class BlockFire extends BlockFlowable {
                                     //TODO: decrease the t if the rainfall values are high
 
                                     if (t > 0 && Utils.random.nextInt(k) <= t) {
-                                        int damage = meta + Utils.random.nextInt(5) / 4;
+                                        int damage = meta + (Utils.random.nextInt(5) >> 2);
 
                                         if (damage > 15) {
                                             damage = 15;
@@ -199,7 +199,7 @@ public class BlockFire extends BlockFlowable {
         if (Utils.random.nextInt(bound) < block.getBurnAbility()) {
 
             if (Utils.random.nextInt(damage + 10) < 5) {
-                int meta = damage + Utils.random.nextInt(5) / 4;
+                int meta = damage + (Utils.random.nextInt(5) >> 2);
 
                 if (meta > 15) {
                     meta = 15;

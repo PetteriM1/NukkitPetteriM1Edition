@@ -21,7 +21,7 @@ public class ObjectTallGrass {
             int z = pos.getFloorZ();
 
             while (true) {
-                if (num >= i / 16) {
+                if (num >= i >> 4) {
                     if (level.getBlockIdAt(x, y, z) == Block.AIR) {
                         if (random.nextBoundedInt(8) == 0) {
                             if (random.nextBoolean()) {

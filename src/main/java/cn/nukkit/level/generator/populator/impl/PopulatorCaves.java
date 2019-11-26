@@ -71,7 +71,7 @@ public class PopulatorCaves extends Populator {
 
         if (maxAngle <= 0) {
             int checkAreaSize = (this.checkAreaSize << 4) - 16;
-            maxAngle = checkAreaSize - localRandom.nextInt(checkAreaSize / 4);
+            maxAngle = checkAreaSize - localRandom.nextInt(checkAreaSize >> 2);
         }
         boolean isLargeCave = false;
 
@@ -80,7 +80,7 @@ public class PopulatorCaves extends Populator {
             isLargeCave = true;
         }
 
-        int randomAngel = localRandom.nextInt(maxAngle / 2) + maxAngle / 4;
+        int randomAngel = localRandom.nextInt(maxAngle >> 1) + (maxAngle >> 2);
         boolean bigAngel = localRandom.nextInt(6) == 0;
 
         for (; angle < maxAngle; angle++) {

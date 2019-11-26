@@ -155,11 +155,11 @@ public class Normal extends Generator {
                 float heightVariationSum = 0.0F;
                 float baseHeightSum = 0.0F;
                 float biomeWeightSum = 0.0F;
-                Biome biome = pickBiome(baseX + (xSeg * 4), baseZ + (zSeg * 4));
+                Biome biome = pickBiome(baseX + (xSeg << 2), baseZ + (zSeg << 2));
 
                 for (int xSmooth = -2; xSmooth <= 2; ++xSmooth) {
                     for (int zSmooth = -2; zSmooth <= 2; ++zSmooth) {
-                        Biome biome1 = pickBiome(baseX + (xSeg * 4) + xSmooth, baseZ + (zSeg * 4) + zSmooth);
+                        Biome biome1 = pickBiome(baseX + (xSeg << 2) + xSmooth, baseZ + (zSeg << 2) + zSmooth);
                         float baseHeight = biome1.getBaseHeight();
                         float heightVariation = biome1.getHeightVariation();
 
@@ -267,9 +267,9 @@ public class Normal extends Generator {
 
                             for (int xIn = 0; xIn < 4; ++xIn) {
                                 if ((scaleZ2 += scaleZ) > 0.0f) {
-                                    chunk.setBlockId(xSeg * 4 + zIn, ySeg * 8 + yIn, zSeg * 4 + xIn, STONE);
-                                } else if (ySeg * 8 + yIn <= seaHeight) {
-                                    chunk.setBlockId(xSeg * 4 + zIn, ySeg * 8 + yIn, zSeg * 4 + xIn, STILL_WATER);
+                                    chunk.setBlockId((xSeg << 2) + zIn, (ySeg << 3) + yIn, (zSeg << 2) + xIn, STONE);
+                                } else if ((ySeg << 3) + yIn <= seaHeight) {
+                                    chunk.setBlockId((xSeg << 2) + zIn, (ySeg << 3) + yIn, (zSeg << 2) + xIn, STILL_WATER);
                                 }
                             }
 

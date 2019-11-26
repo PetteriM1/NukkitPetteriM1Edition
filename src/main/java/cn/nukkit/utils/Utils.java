@@ -269,7 +269,7 @@ public class Utils {
 
         byte[] out = new byte[len / 2];
 
-        for(int i = 0; i < len; i += 2) {
+        for (int i = 0; i < len; i += 2) {
             int h = hexToBin(s.charAt(i));
             int l = hexToBin(s.charAt(i + 1));
             if (h == -1 || l == -1)

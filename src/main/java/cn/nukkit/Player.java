@@ -3964,7 +3964,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else if (level >= 15) {
             return 37 + (level - 15) * 5;
         } else {
-            return 7 + level * 2;
+            return 7 + (level << 1);
         }
     }
 

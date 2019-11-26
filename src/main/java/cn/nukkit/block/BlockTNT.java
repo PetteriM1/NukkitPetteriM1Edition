@@ -66,7 +66,7 @@ public class BlockTNT extends BlockSolid {
 
     public void prime(int fuse, Entity source) {
         this.getLevel().setBlock(this, new BlockAir(), true);
-        double mot = (new NukkitRandom()).nextSignedFloat() * Math.PI * 2;
+        double mot = (new NukkitRandom()).nextSignedFloat() * 6.283185307179586;
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos")
                         .add(new DoubleTag("", this.x + 0.5))

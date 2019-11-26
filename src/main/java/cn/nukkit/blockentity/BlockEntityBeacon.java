@@ -87,9 +87,9 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
             this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BEACON_AMBIENT);
         }
 
-        int duration = 9 + getPowerLevel() * 2;
+        int duration = 9 + (getPowerLevel() << 1);
 
-        for(Map.Entry<Long, Player> entry : this.level.getPlayers().entrySet()) {
+        for (Map.Entry<Long, Player> entry : this.level.getPlayers().entrySet()) {
             Player p = entry.getValue();
 
             //If the player is in range

@@ -113,7 +113,7 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     public int getComparatorInputOverride() {
-        return (7 - this.getDamage()) * 2;
+        return (7 - this.getDamage()) << 1;
     }
 
     public boolean hasComparatorInputOverride() {
