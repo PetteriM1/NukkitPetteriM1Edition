@@ -98,7 +98,8 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        for (Entity e : this.getLevel().getEntities()) {
+        Entity[] entities = this.getLevel().getEntities();
+        for (Entity e : entities) {
             if (e instanceof EntityEndCrystal) {
                 if (e.distanceSquared(this) <= 32) {
                     float health = this.getHealth();

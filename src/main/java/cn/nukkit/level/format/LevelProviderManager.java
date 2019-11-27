@@ -35,7 +35,6 @@ public abstract class LevelProviderManager {
     }
 
     public static Class<? extends LevelProvider> getProviderByName(String name) {
-        name = name.trim().toLowerCase();
-        return providers.getOrDefault(name, null);
+        return providers.getOrDefault(name.trim().toLowerCase(), null);
     }
 }

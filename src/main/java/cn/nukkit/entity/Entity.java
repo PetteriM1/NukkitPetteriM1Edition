@@ -647,9 +647,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void removeEffect(int effectId) {
         if (this.effects.containsKey(effectId)) {
-            Effect effect = this.effects.get(effectId);
             this.effects.remove(effectId);
-            effect.remove(this);
+            this.effects.get(effectId).remove(this);
             this.recalculateEffectColor();
         }
     }
@@ -1207,8 +1206,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.y <= -16 && this.isAlive()) {
             if (this instanceof Player) {
-                Player player = (Player) this;
-                if (player.getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
+                if (((Player) this).getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
             } else {
                 this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
                 hasUpdate = true;
@@ -1654,8 +1652,7 @@ public abstract class Entity extends Location implements Metadatable {
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
-            double f = (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.1111111);
-            return y < f;
+            return y < (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.1111111);
         }
 
         return false;
@@ -1665,8 +1662,7 @@ public abstract class Entity extends Location implements Metadatable {
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
-            double f = (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.1111111);
-            return this.y < f;
+            return this.y < (block.y + 1) - (((BlockWater) block).getFluidHeightPercent() - 0.1111111);
         }
 
         return false;
@@ -2290,9 +2286,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = (int) (29 * hash + this.id);
-        return hash;
+        return (int) (29 * 7 + this.id);
     }
 
     public static Entity create(Object type, Position source, Object... args) {

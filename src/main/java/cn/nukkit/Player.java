@@ -1067,7 +1067,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        for (Entity p : this.level.getNearbyEntities(this.boundingBox.grow(2, 1, 2), this)) {
+        Entity[] e = this.level.getNearbyEntities(this.boundingBox.grow(2, 1, 2), this);
+        for (Entity p : e) {
             if (p instanceof Player) {
                 if (((Player) p).sleeping != null && pos.distance(((Player) p).sleeping) <= 0.1) {
                     return false;
@@ -1398,7 +1399,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void checkNearEntities() {
-        for (Entity entity : this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this)) {
+        Entity[] e = this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this);
+        for (Entity entity : e) {
             entity.scheduleUpdate();
 
             if (!entity.isAlive() || !this.isAlive()) {

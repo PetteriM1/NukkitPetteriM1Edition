@@ -66,9 +66,8 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         Iterator<NukkitSessionListener> iterator = this.sessionListeners.iterator();
         while (iterator.hasNext()) {
             NukkitSessionListener listener = iterator.next();
-            Player player = listener.player;
             if (listener.disconnectReason != null) {
-                player.close(player.getLeaveMessage(), listener.disconnectReason, false);
+                listener.player.close(listener.player.getLeaveMessage(), listener.disconnectReason, false);
                 iterator.remove();
                 continue;
             }
@@ -244,8 +243,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
         public void onEncapsulated(EncapsulatedPacket packet) {
             ByteBuf buffer = packet.getBuffer();
-            short packetId = buffer.readUnsignedByte();
-            if (packetId == 0xfe) {
+            if (buffer.readUnsignedByte() == 0xfe) {
                 DataPacket batchPacket = RakNetInterface.this.network.getPacket(ProtocolInfo.BATCH_PACKET);
                 if (batchPacket == null) {
                     return;

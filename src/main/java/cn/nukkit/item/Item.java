@@ -786,6 +786,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     public Item setCustomName(String name) {
         if (name == null || name.isEmpty()) {
             this.clearCustomName();
+            return this;
         }
 
         if (name.length() > 100) {
@@ -887,9 +888,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             this.cachedNBT = parseCompoundTag(this.tags);
         }
 
-        if (this.cachedNBT != null) {
-            this.cachedNBT.setName("");
-        }
+        this.cachedNBT.setName("");
 
         return this.cachedNBT;
     }

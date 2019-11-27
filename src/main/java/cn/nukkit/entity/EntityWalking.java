@@ -30,7 +30,8 @@ public abstract class EntityWalking extends BaseEntity {
         if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))) {
             double near = Integer.MAX_VALUE;
 
-            for (Entity entity : this.getLevel().getEntities()) {
+            Entity[] e = this.getLevel().getEntities();
+            for (Entity entity : e) {
                 if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
                     continue;
                 }

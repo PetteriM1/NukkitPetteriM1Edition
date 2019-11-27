@@ -84,12 +84,13 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
     }
 
     public float getFluidHeightPercent() {
-        float d = (float) this.getDamage();
+        /*float d = (float) this.getDamage();
         if (d >= 8) {
             d = 0;
         }
 
-        return (d + 1) / 9f;
+        return (d + 1) / 9f;*/
+        return 0.11111111f;
     }
 
     protected int getFlowDecay(Block block) {

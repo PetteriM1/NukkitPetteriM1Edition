@@ -64,7 +64,8 @@ public class Spawner extends Thread {
     static boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
         try {
             int count = 0;
-            for (Entity entity : level.getEntities()) {
+            Entity[] e = level.getEntities();
+            for (Entity entity : e) {
                 if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
                     count++;
                 }
