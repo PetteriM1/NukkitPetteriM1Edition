@@ -32,7 +32,7 @@ public class Watchdog extends Thread {
             long current = server.getNextTick();
             if (current != 0) {
                 long diff = System.currentTimeMillis() - current;
-                if (!responding && diff > time * 2) {
+                if (!responding && diff > time << 1) {
                     System.exit(1); // Kill the server if it gets stuck on shutdown
                 }
                 if (server.isRunning() && diff > time) {

@@ -30,7 +30,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
     }
 
     @Override
-    public boolean isRideable(){
+    public boolean isRideable() {
         return false;
     }
 

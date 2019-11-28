@@ -46,7 +46,7 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
 
     @Override
     protected int getDelay() {
-        return (1 + (getDamage() >> 2)) * 2;
+        return (1 + (getDamage() >> 2)) << 1;
     }
 
     @Override

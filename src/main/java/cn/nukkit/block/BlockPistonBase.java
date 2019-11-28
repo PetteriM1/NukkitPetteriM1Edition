@@ -208,7 +208,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 this.level.setBlock(newPos, newBlocks.get(i), true, false);
             }
 
-            if (extending){
+            if (extending) {
                 this.setDamage(this.getDamage() | 0x8);
             } else {
                 this.setDamage(this.getDamage() & 0x7);

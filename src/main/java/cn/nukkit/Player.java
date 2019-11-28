@@ -3313,8 +3313,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     /**
-     * Sends a chat message as this player. If the message begins with a / (forward-slash) it will be treated
-     * as a command.
+     * Sends a chat message as this player
      * @param message message to send
      * @return successful
      */
@@ -3817,15 +3816,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         message = "death.attack.explosion";
                     }
                     break;
-
                 case MAGIC:
                     message = "death.attack.magic";
                     break;
-
+                case LIGHTNING:
+                    message = "death.attack.lightningBolt";
+                    break;
                 case HUNGER:
                     message = "death.attack.starve";
                     break;
-
                 default:
                     message = "death.attack.generic";
                     break;
@@ -3882,13 +3881,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (!ev.getKeepExperience() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-            if (!this.isCreative()) {
+            if (this.isSurvival() || this.isAdventure()) {
                 int exp = ev.getExperience() * 7;
-                if (exp > 100) exp = 100;
-                int add = 1;
-                for (int ii = 1; ii < exp; ii += add) {
-                    this.getLevel().dropExpOrb(this, add);
-                    add = Utils.rand(1, 3);
+                if (exp > 0) {
+                    if (exp > 100) exp = 100;
+                    this.getLevel().dropExpOrb(this, exp);
                 }
             }
             this.setExperience(0, 0);

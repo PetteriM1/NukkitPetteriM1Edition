@@ -15,7 +15,7 @@ public class NibbleArray implements Cloneable {
     }
 
     public byte get(int index) {
-        Preconditions.checkElementIndex(index, data.length * 2);
+        Preconditions.checkElementIndex(index, data.length << 1);
         byte val = data[index / 2];
         if ((index & 1) == 0) {
             return (byte) (val & 0x0f);
@@ -26,7 +26,7 @@ public class NibbleArray implements Cloneable {
 
     public void set(int index, byte value) {
         Preconditions.checkArgument(value >= 0 && value < 16, "Nibbles must have a value between 0 and 15.");
-        Preconditions.checkElementIndex(index, data.length * 2);
+        Preconditions.checkElementIndex(index, data.length << 1);
         value &= 0xf;
         int half = index / 2;
         byte previous = data[half];

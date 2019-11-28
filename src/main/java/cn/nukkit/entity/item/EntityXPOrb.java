@@ -6,6 +6,9 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+
+import java.util.List;
 
 /**
  * Created on 2015/12/26 by xtypr.
@@ -14,6 +17,11 @@ import cn.nukkit.nbt.tag.CompoundTag;
 public class EntityXPOrb extends Entity {
 
     public static final int NETWORK_ID = 69;
+
+    /**
+     * Split sizes used for dropping experience orbs
+     */
+    public static final int[] ORB_SPLIT_SIZES = {2477, 1237, 617, 307, 149, 73, 37, 17, 7, 3, 1}; // This is indexed biggest to smallest so that we can return as soon as we found the biggest value
 
     @Override
     public int getNetworkId() {
@@ -65,14 +73,30 @@ public class EntityXPOrb extends Entity {
         super.initEntity();
 
         setMaxHealth(5);
-        setHealth(5);
+
+        if (namedTag.contains("Health")) {
+            this.setHealth(namedTag.getShort("Health"));
+        } else {
+            this.setHealth(5);
+        }
 
         if (namedTag.contains("Age")) {
-            this.age = namedTag.getInt("Age");
+            this.age = namedTag.getShort("Age");
         }
+
         if (namedTag.contains("PickupDelay")) {
-            this.pickupDelay = namedTag.getInt("PickupDelay");
+            this.pickupDelay = namedTag.getShort("PickupDelay");
         }
+
+        if (namedTag.contains("Value")) {
+            this.exp = namedTag.getShort("Value");
+        }
+
+        if (this.exp <= 0) {
+            this.exp = 1;
+        }
+
+        this.dataProperties.putInt(DATA_EXPERIENCE_VALUE, this.exp);
     }
 
     @Override
@@ -98,14 +122,14 @@ public class EntityXPOrb extends Entity {
 
         boolean hasUpdate = entityBaseTick(tickDiff);
         if (this.isAlive()) {
-
-            if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
+            if (this.pickupDelay > 0) {
                 this.pickupDelay -= tickDiff;
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
             } else {
-                for (Entity entity : this.level.getCollidingEntities(this.boundingBox, this)) {
+                Entity[] e = this.level.getCollidingEntities(this.boundingBox, this);
+                for (Entity entity : e) {
                     if (entity instanceof Player) {
                         if (((Player) entity).pickupEntity(this, false)) {
                             return true;
@@ -183,6 +207,7 @@ public class EntityXPOrb extends Entity {
         this.namedTag.putShort("Health", (int) getHealth());
         this.namedTag.putShort("Age", age);
         this.namedTag.putShort("PickupDelay", pickupDelay);
+        this.namedTag.putShort("Value", exp);
     }
 
     public int getExp() {
@@ -190,6 +215,9 @@ public class EntityXPOrb extends Entity {
     }
 
     public void setExp(int exp) {
+        if (exp <= 0) {
+            throw new IllegalArgumentException("XP amount must be greater than 0, got " + exp);
+        }
         this.exp = exp;
     }
 
@@ -204,5 +232,34 @@ public class EntityXPOrb extends Entity {
 
     public void setPickupDelay(int pickupDelay) {
         this.pickupDelay = pickupDelay;
+    }
+
+    /**
+     * Returns the largest size of normal XP orb that will be spawned for the specified amount of XP. Used to split XP
+     * up into multiple orbs when an amount of XP is dropped.
+     */
+    public static int getMaxOrbSize(int amount) {
+        for (int split : ORB_SPLIT_SIZES) {
+            if (amount >= split) {
+                return split;
+            }
+        }
+
+        return 1;
+    }
+
+    /**
+     * Splits the specified amount of XP into an array of acceptable XP orb sizes.
+     */
+    public static List<Integer> splitIntoOrbSizes(int amount) {
+        List<Integer> result = new IntArrayList();
+
+        while (amount > 0) {
+            int size = getMaxOrbSize(amount);
+            result.add(size);
+            amount -= size;
+        }
+
+        return result;
     }
 }

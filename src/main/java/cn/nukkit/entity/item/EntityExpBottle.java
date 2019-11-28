@@ -86,11 +86,6 @@ public class EntityExpBottle extends EntityProjectile {
     public void dropXp() {
         this.getLevel().addParticle(new EnchantParticle(this));
         this.getLevel().addParticle(new SpellParticle(this, 0x00385dc6));
-
-        int add = 1;
-        for (int ii = 1; ii <= Utils.rand(3, 11); ii += add) {
-            getLevel().dropExpOrb(this, add);
-            add = Utils.rand(1, 3);
-        }
+        this.getLevel().dropExpOrb(this, Utils.rand(3, 12));
     }
 }

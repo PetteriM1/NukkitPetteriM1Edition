@@ -196,6 +196,11 @@ public class BlockSapling extends BlockFlowable {
     }
 
     @Override
+    public Item toItem() {
+        return Item.get(BlockID.SAPLING, this.getDamage() & 0x7);
+    }
+
+    @Override
     public BlockColor getColor() {
         return BlockColor.FOLIAGE_BLOCK_COLOR;
     }

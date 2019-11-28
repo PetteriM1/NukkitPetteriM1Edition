@@ -45,7 +45,7 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
             Thread[] threads = new Thread[ rootGroup.activeCount() ];
             if (threads.length != 0) {
                 while (rootGroup.enumerate(threads, true) == threads.length) {
-                    threads = new Thread[threads.length * 2];
+                    threads = new Thread[(threads.length << 1)];
                 }
             }
             Field tl = Thread.class.getDeclaredField("threadLocals");
