@@ -241,14 +241,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public long lastSkinChange = -1;
     private double lastRightClickTime = 0.0;
     private Vector3 lastRightClickPos = null;
-    
     public EntityFishingHook fishing = null;
-
     public boolean formOpen;
-
     public boolean initialized;
-
     private boolean foodEnabled = true;
+    private byte failedTransactions;
 
     public int getStartActionTick() {
         return startAction;
@@ -1669,6 +1666,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.lastUpdate = currentTick;
 
+        this.failedTransactions = 0;
+
         if (this.fishing != null) {
             if (this.distance(fishing) > 80) {
                 this.stopFishing(false);
@@ -2951,6 +2950,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             if (!transaction.execute()) {
                                 this.server.getLogger().debug("Failed to execute inventory transaction from " + this.username + " with actions: " + Arrays.toString(transactionPacket.actions));
+                                failedTransactions++;
+                                if (failedTransactions > 10) {
+                                    this.close("", "Too many failed inventory transactions");
+                                }
                                 break packetswitch;
                             }
 
