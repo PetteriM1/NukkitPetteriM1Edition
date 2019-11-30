@@ -40,7 +40,6 @@ public class RakNetServer extends RakNet {
     private volatile RakNetServerListener listener = null;
     private final int bindThreads;
     private int maxConnections = 1024;
-    public boolean strongIPBans;
 
     public RakNetServer(InetSocketAddress bindAddress) {
         this(bindAddress, 1);
@@ -161,7 +160,7 @@ public class RakNetServer extends RakNet {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
             this.sendConnectionBanned(ctx, packet.sender());
-        } else if (strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
+        } else if (Server.getInstance().strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
             this.sendConnectionBanned(ctx, packet.sender());
             Server.getInstance().getLogger().info("\u00A7c" + packet.sender().getHostName() + " disconnected due to IP banned");
         } else {

@@ -47,11 +47,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     public RakNetInterface(Server server) {
         this.server = server;
-
-        InetSocketAddress bindAddress = new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort());
-
-        this.raknet = new RakNetServer(bindAddress, Runtime.getRuntime().availableProcessors());
-        this.raknet.strongIPBans = server.getPropertyBoolean("strong-ip-bans");
+        this.raknet = new RakNetServer(new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort()), Runtime.getRuntime().availableProcessors());
         this.raknet.bind().join();
         this.raknet.setListener(this);
     }

@@ -312,7 +312,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setBanned(boolean value) {
         if (value) {
             this.server.getNameBans().addBan(this.username, null, null, null);
-            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "\u00A7cYou are banned!");
+            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned!");
         } else {
             this.server.getNameBans().remove(this.username);
         }
@@ -1866,13 +1866,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected void processLogin() {
         if (!this.server.isWhitelisted((this.username).toLowerCase())) {
-            this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason", "Server is white-listed").replace("§n", "\n"));
+            this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason").replace("§n", "\n"));
             return;
         } else if (this.isBanned()) {
-            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "\u00A7cYou are banned! Reason: " + this.server.getNameBans().getEntires().get(this.getName().toLowerCase()).getReason());
+            String reason = this.server.getNameBans().getEntires().get(this.getName().toLowerCase()).getReason();
+            this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned!" + (reason.isEmpty() ? "" : (" Reason: " + reason)));
             return;
-        } else if (this.server.getIPBans().isBanned(this.getAddress())) {
-            this.kick(PlayerKickEvent.Reason.IP_BANNED, "\u00A7cYou are banned! Reason: " + this.server.getNameBans().getEntires().get(this.getName().toLowerCase()).getReason());
+        } else if (!server.strongIPBans && this.server.getIPBans().isBanned(this.getAddress())) {
+            this.kick(PlayerKickEvent.Reason.IP_BANNED, "Your IP is banned!");
             return;
         }
 

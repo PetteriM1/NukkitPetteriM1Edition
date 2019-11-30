@@ -852,8 +852,7 @@ public class Level implements ChunkManager, Metadatable {
                                 p.onChunkChanged(chunk);
                             }
                         } else {
-                            Collection<Player> toSend = this.getChunkPlayers(chunkX, chunkZ).values();
-                            Player[] playerArray = toSend.toArray(new Player[0]);
+                            Player[] playerArray = this.getChunkPlayers(chunkX, chunkZ).values().toArray(new Player[0]);
                             Vector3[] blocksArray = new Vector3[blocks.size()];
                             int i = 0;
                             for (char blockHash : blocks.keySet()) {
@@ -1297,9 +1296,9 @@ public class Level implements ChunkManager, Metadatable {
 
     public Set<BlockUpdateEntry> getPendingBlockUpdates(FullChunk chunk) {
         int minX = (chunk.getX() << 4) - 2;
-        int maxX = minX + 16 + 2;
+        int maxX = minX + 18;
         int minZ = (chunk.getZ() << 4) - 2;
-        int maxZ = minZ + 16 + 2;
+        int maxZ = minZ + 18;
 
         return this.getPendingBlockUpdates(new AxisAlignedBB(minX, 0, minZ, maxX, 256, maxZ));
     }

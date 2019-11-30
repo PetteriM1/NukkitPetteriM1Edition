@@ -227,6 +227,7 @@ public class Server {
     public boolean lightUpdates;
     public boolean queryPlugins;
     public boolean despawnEntities;
+    public boolean strongIPBans;
 
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2083,6 +2084,7 @@ public class Server {
         this.port = this.getPropertyInt("server-port", 19132);
         this.ip = this.getPropertyString("server-ip", "0.0.0.0");
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
+        this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2178,7 +2180,7 @@ public class Server {
             put("dimensions", false);
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
-            put("strong-ip-bans", true);
+            put("strong-ip-bans", false);
             put("worlds-level-auto-save-disabled", "");
             put("temp-ip-ban-failed-xbox-auth", false);
             put("call-data-pk-send-event", true);
