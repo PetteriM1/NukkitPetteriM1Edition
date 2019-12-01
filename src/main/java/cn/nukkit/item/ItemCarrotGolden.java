@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-public class ItemCarrotGolden extends Item {
+public class ItemCarrotGolden extends ItemEdible {
 
     public ItemCarrotGolden() {
         this(0, 1);

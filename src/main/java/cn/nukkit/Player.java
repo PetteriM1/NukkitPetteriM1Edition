@@ -1620,7 +1620,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean setMotion(Vector3 motion) {
         if (super.setMotion(motion)) {
             if (this.chunk != null) {
-                this.addMotion(this.motionX, this.motionY, this.motionZ);  // Send to others
+                this.addMotion(this.motionX, this.motionY, this.motionZ); // Send to others
                 SetEntityMotionPacket pk = new SetEntityMotionPacket();
                 pk.eid = this.id;
                 pk.motionX = (float) motion.x;
@@ -2896,9 +2896,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET:
                 case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V1:
                 case ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V2:
-                    if (!this.isSpectator() || (((LevelSoundEventPacket) packet).sound != LevelSoundEventPacket.SOUND_HIT && ((LevelSoundEventPacket) packet).sound != LevelSoundEventPacket.SOUND_ATTACK_NODAMAGE)) {
-                        this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), packet);
+                    if (this.isSpectator()) {
+                        if (((LevelSoundEventPacket) packet).sound == LevelSoundEventPacket.SOUND_HIT || ((LevelSoundEventPacket) packet).sound == LevelSoundEventPacket.SOUND_ATTACK_NODAMAGE || ((LevelSoundEventPacket) packet).sound == LevelSoundEventPacket.SOUND_ATTACK || ((LevelSoundEventPacket) packet).sound == LevelSoundEventPacket.SOUND_ATTACK_STRONG) {
+                            break;
+                        }
                     }
+                    this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), packet);
                     break;
                 case ProtocolInfo.INVENTORY_TRANSACTION_PACKET:
                     if (this.isSpectator()) {
