@@ -106,7 +106,7 @@ public class Chunk extends BaseChunk {
                 }
             }
         } else {
-            this.biomes = nbt.getByteArray("Biomes");
+            this.biomes = Arrays.copyOf(nbt.getByteArray("Biomes"), 256);
         }
 
         int[] heightMap = nbt.getIntArray("HeightMap");
@@ -262,11 +262,11 @@ public class Chunk extends BaseChunk {
         nbt.putInt("zPos", this.getZ());
 
         nbt.putByteArray("Biomes", this.getBiomeIdArray());
-        int[] heightInts = new int[256];
+        /*int[] heightInts = new int[256]; // Unused?
         byte[] heightBytes = this.getHeightMapArray();
         for (int i = 0; i < heightInts.length; i++) {
             heightInts[i] = heightBytes[i] & 0xFF;
-        }
+        }*/
 
         for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
             if (section instanceof EmptyChunkSection) {
