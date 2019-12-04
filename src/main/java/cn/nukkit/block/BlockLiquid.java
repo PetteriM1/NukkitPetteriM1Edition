@@ -80,17 +80,16 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
 
     @Override
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 1 - getFluidHeightPercent(), this.z + 1);
+        return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.9, this.z + 1);
     }
 
     public float getFluidHeightPercent() {
-        /*float d = (float) this.getDamage();
+        float d = (float) this.getDamage();
         if (d >= 8) {
             d = 0;
         }
 
-        return (d + 1) / 9f;*/
-        return 0.11111111f;
+        return (d + 1) / 9f;
     }
 
     protected int getFlowDecay(Block block) {
@@ -347,7 +346,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                 1000,
                 1000
         };
-        int maxCost = 4 / this.getFlowDecayPerBlock();
+        int maxCost = 4/* / this.getFlowDecayPerBlock()*/;
         for (int j = 0; j < 4; ++j) {
             int x = (int) this.x;
             int y = (int) this.y;

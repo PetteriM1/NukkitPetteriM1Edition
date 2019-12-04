@@ -1666,7 +1666,7 @@ public abstract class Entity extends Location implements Metadatable {
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
-            return y < (block.y + 1) - 0.1111111;
+            return y < (block.y + 0.9);
         }
 
         return false;
@@ -1676,7 +1676,7 @@ public abstract class Entity extends Location implements Metadatable {
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
-            return this.y < (block.y + 1) - 0.1111111;
+            return this.y < (block.y + 0.9);
         }
 
         return false;

@@ -1869,12 +1869,8 @@ public class Level implements ChunkManager, Metadatable {
 
             if ((player.isSurvival() || player.isAdventure()) && !target.isBreakable(item)) {
                 ev.setCancelled();
-            } else if (!player.isOp() && this.server.getSpawnRadius() > -1) {
-                Vector2 t = new Vector2(target.x, target.z);
-                Vector2 s = new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z);
-                if (t.distance(s) <= this.server.getSpawnRadius()) {
-                    ev.setCancelled();
-                }
+            } else if (!player.isOp() && isInSpawnRadius(target)) {
+                ev.setCancelled();
             }
 
             this.server.getPluginManager().callEvent(ev);
@@ -2008,11 +2004,8 @@ public class Level implements ChunkManager, Metadatable {
                 ev.setCancelled();
             }
 
-            int distance = this.server.getSpawnRadius();
-            if (!player.isOp() && distance > -1) {
-                if (!this.server.getOps().getAll().isEmpty() && new Vector2(target.x, target.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= distance) {
-                    ev.setCancelled();
-                }
+            if (!player.isOp() && isInSpawnRadius(target)) {
+                ev.setCancelled();
             }
 
             this.server.getPluginManager().callEvent(ev);
@@ -2108,11 +2101,8 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
 
-            int distance = this.server.getSpawnRadius();
-            if (!player.isOp() && distance > -1) {
-                if (!this.server.getOps().getAll().isEmpty() && new Vector2(target.x, target.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= distance) {
-                    if (!this.server.suomiCraftPEMode()) event.setCancelled();
-                }
+            if (!player.isOp() && isInSpawnRadius(target)) {
+                event.setCancelled();
             }
 
             this.server.getPluginManager().callEvent(event);
@@ -2204,6 +2194,10 @@ public class Level implements ChunkManager, Metadatable {
             item = new ItemBlock(new BlockAir(), 0, 0);
         }
         return item;
+    }
+
+    public boolean isInSpawnRadius(Vector3 vector3) {
+        return server.getSpawnRadius() > -1 && new Vector2(vector3.x, vector3.z).distance(new Vector2(this.getSpawnLocation().x, this.getSpawnLocation().z)) <= server.getSpawnRadius();
     }
 
     public Entity getEntity(long entityId) {

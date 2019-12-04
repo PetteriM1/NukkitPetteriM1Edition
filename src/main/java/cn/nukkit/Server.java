@@ -194,6 +194,7 @@ public class Server {
     private int viewDistance;
     private int gamemode;
     private int skinChangeCooldown;
+    private int spawnRadius;
     private boolean suomicraftMode;
     private boolean doLevelGC;
     private boolean mobAI;
@@ -1320,7 +1321,7 @@ public class Server {
     }
 
     public int getSpawnRadius() {
-        return this.getPropertyInt("spawn-protection", 10);
+        return spawnRadius;
     }
 
     public boolean getAllowFlight() {
@@ -2085,6 +2086,7 @@ public class Server {
         this.ip = this.getPropertyString("server-ip", "0.0.0.0");
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
+        this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
