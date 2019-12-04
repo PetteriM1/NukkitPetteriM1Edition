@@ -416,6 +416,7 @@ public class Item implements Cloneable, BlockID, ItemID {
             case 354:
             case 361:
             case 388:
+            case 389:
             case 390:
                 return new ArrayList<>(Item.creative354);
             default:
