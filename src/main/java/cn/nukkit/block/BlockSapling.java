@@ -127,11 +127,36 @@ public class BlockSapling extends BlockFlowable {
                         return false;
                     }
                     break;
-                //TODO: big spruce
+                case SPRUCE:
+                    bigTree = false;
+
+                    loop:
+                    for (x = 0; x >= -1; --x) {
+                        for (z = 0; z >= -1; --z) {
+                            if (this.findSaplings(x, z, SPRUCE)) {
+                                new ObjectBigSpruceTree(0.5f, 5, true).placeObject(this.level, (int) this.x, (int) this.y, (int) this.z, new NukkitRandom());
+                                bigTree = true;
+                                break loop;
+                            }
+                        }
+                    }
+
+                    if (!bigTree) {
+                        ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
+                    } else {
+                        BlockAir air = new BlockAir();
+                        this.level.setBlock(this.add(this.x, 0, this.z), air, true, false);
+                        this.level.setBlock(this.add(this.x + 1, 0, this.z), air, true, false);
+                        this.level.setBlock(this.add(this.x, 0, this.z + 1), air, true, false);
+                        this.level.setBlock(this.add(this.x + 1, 0, this.z + 1), air, true, false);
+                    }
+
+                    return true;
                 default:
                     ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
                     return true;
             }
+
             BlockAir air = new BlockAir();
 
             if (bigTree) {

@@ -194,7 +194,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected Position spawnPosition;
 
     protected int inAirTicks = 0;
-    protected int startAirTicks = 5;
+    protected int startAirTicks = 10;
 
     protected AdventureSettings adventureSettings;
 
@@ -451,7 +451,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void resetFallDistance() {
         super.resetFallDistance();
         if (this.inAirTicks != 0) {
-            this.startAirTicks = 5;
+            this.startAirTicks = 10;
         }
         this.inAirTicks = 0;
         this.highestPosition = this.y;
@@ -1713,7 +1713,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (!this.isSpectator() && this.speed != null) {
                 if (this.onGround) {
                     if (this.inAirTicks != 0) {
-                        this.startAirTicks = 5;
+                        this.startAirTicks = 10;
                     }
                     this.inAirTicks = 0;
                     this.highestPosition = this.y;
@@ -1726,7 +1726,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (block == Block.LADDER || block == Block.VINES || block == Block.COBWEB) {
                             this.resetFallDistance();
                         } else {
-                            if (!this.hasEffect(Effect.JUMP) && diff > 0.6 && expectedVelocity < this.speed.y) {
+                            if (!this.hasEffect(Effect.JUMP) && diff > 1 && expectedVelocity < this.speed.y) {
                                 if (this.inAirTicks < 200) {
                                     PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(ev);
@@ -1746,9 +1746,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (this.isGliding() || this.isSwimming()) {
                         this.resetFallDistance();
+                    } else {
+                        ++this.inAirTicks;
                     }
-
-                    ++this.inAirTicks;
                 }
 
                 if (this.isSurvival() || this.isAdventure()) {

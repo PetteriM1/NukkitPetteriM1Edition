@@ -56,13 +56,19 @@ public class BlockGrass extends BlockDirt {
             }
             return true;
         } else if (item.isHoe()) {
-            item.useOn(this);
-            this.getLevel().setBlock(this, new BlockFarmland());
-            return true;
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, new BlockFarmland());
+                return true;
+            }
         } else if (item.isShovel()) {
-            item.useOn(this);
-            this.getLevel().setBlock(this, new BlockGrassPath());
-            return true;
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, new BlockGrassPath());
+                return true;
+            }
         }
 
         return false;
