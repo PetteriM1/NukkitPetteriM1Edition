@@ -82,4 +82,7 @@ public class RakNetConstants {
     public static final long CC_MAXIMUM_THRESHOLD = 2000;
     public static final long CC_ADDITIONAL_VARIANCE = 30;
     public static final long CC_SYN = 10;
+
+    public static final int IPV4_MESSAGE_SIZE = 7;
+    public static final int IPV6_MESSAGE_SIZE = 29;
 }

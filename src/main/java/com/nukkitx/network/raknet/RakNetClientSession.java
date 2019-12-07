@@ -140,13 +140,17 @@ public class RakNetClientSession extends RakNetSession {
     }
 
     private void onConnectionRequestAccepted(ByteBuf buffer) {
-        NetworkUtils.readAddress(buffer);
-        buffer.readUnsignedShort();
-        while (buffer.isReadable(16)) {
+        NetworkUtils.readAddress(buffer); // our address
+        buffer.readUnsignedShort(); // system index
+        final int required = (this.address.getAddress() instanceof Inet6Address ? RakNetConstants.IPV6_MESSAGE_SIZE : RakNetConstants.IPV4_MESSAGE_SIZE) + 16;
+        while (buffer.isReadable(required)) {
             NetworkUtils.readAddress(buffer);
         }
 
-        this.sendNewIncomingConnection(buffer.readLong());
+        long pongTime = buffer.readLong();
+        buffer.readLong();
+
+        this.sendNewIncomingConnection(pongTime);
 
         this.setState(RakNetState.CONNECTED);
     }
