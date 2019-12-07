@@ -5,17 +5,19 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BinaryStream;
+import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlobalBlockPalette {
@@ -192,27 +194,25 @@ public class GlobalBlockPalette {
             if (stream388 == null) throw new AssertionError("Unable to locate block state nbt 388");
             ListTag<CompoundTag> tag388;
             try {
-                tag388 = (ListTag<CompoundTag>) NBTIO.readNetwork(stream388);
+                compiledTable388 = ByteStreams.toByteArray(stream388);
+                //noinspection unchecked
+                tag388 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable388));
             } catch (IOException e) {
                 throw new AssertionError(e);
             }
             for (CompoundTag state388 : tag388.getAll()) {
-                registerMapping(388, state388.getShort("id") << 4 | state388.getShort("meta"));
+                int runtimeId = runtimeIdAllocator388.getAndIncrement();
+                if (!state388.contains("meta")) continue;
+                for (int val : state388.getIntArray("meta")) {
+                    legacyToRuntimeId388.put(state388.getShort("id") << 6 | val, runtimeId);
+                }
                 state388.remove("meta"); // No point in sending this since the client doesn't use it
-            }
-            try {
-                compiledTable388 = NBTIO.write(tag388, ByteOrder.LITTLE_ENDIAN, true);
-            } catch (IOException e) {
-                throw new AssertionError(e);
             }
         }, true);
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
-        return getOrCreateRuntimeId(protocol, (id << 4) | meta);
-    }
-
-    public static int getOrCreateRuntimeId(int protocol, int legacyId) {
+        int legacyId = (protocol >= 388) ? ((id << 6) | meta) : ((id << 4) | meta);
         switch (protocol) {
             // Versions before this doesn't use runtime IDs
             case 223:
@@ -271,10 +271,7 @@ public class GlobalBlockPalette {
             case 361:
                 legacyToRuntimeId361.put(legacyId, runtimeIdAllocator361.getAndIncrement());
                 break;
-            case 388:
-                legacyToRuntimeId388.put(legacyId, runtimeIdAllocator388.getAndIncrement());
-                break;
-            default:
+            default: // Not used for 388+
                 Server.getInstance().getLogger().alert("Tried to register mapping for unsupported protocol version: " + protocol);
                 break;
         }
@@ -307,6 +304,36 @@ public class GlobalBlockPalette {
             default:
                 Server.getInstance().getLogger().alert("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
                 return null;
+        }
+    }
+
+    public static int getOrCreateRuntimeId(int protocol, int legacyId) throws NoSuchElementException {
+        switch (protocol) {
+            // Versions before this doesn't use runtime IDs
+            case 223:
+            case 224:
+                return legacyToRuntimeId223.get(legacyId);
+            case 261:
+                return legacyToRuntimeId261.get(legacyId);
+            case 274:
+                return legacyToRuntimeId274.get(legacyId);
+            case 281:
+            case 282:
+                return legacyToRuntimeId282.get(legacyId);
+            case 291:
+                return legacyToRuntimeId291.get(legacyId);
+            case 313:
+                return legacyToRuntimeId313.get(legacyId);
+            case 332:
+                return legacyToRuntimeId332.get(legacyId);
+            case 340:
+                return legacyToRuntimeId340.get(legacyId);
+            case 354:
+                return legacyToRuntimeId354.get(legacyId);
+            case 361:
+                return legacyToRuntimeId361.get(legacyId);
+            default: // Current protocol
+                return getOrCreateRuntimeId(protocol, legacyId >> 4, legacyId & 0xf);
         }
     }
 

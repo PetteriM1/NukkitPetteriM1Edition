@@ -31,10 +31,6 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
             namedTag.putFloat("ItemDropChance", 1.0f);
         }
 
-        if (!namedTag.contains("isMoveable")) {
-            namedTag.putBoolean("isMoveable", true);
-        }
-
         this.level.updateComparatorOutputLevel(this);
 
         super.initBlockEntity();
@@ -78,14 +74,6 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
         this.level.updateComparatorOutputLevel(this);
     }
 
-    public boolean isMoveable() {
-        return this.namedTag.getBoolean("isMoveable");
-    }
-
-    public void setMoveable(boolean moveable) {
-        this.namedTag.putBoolean("isMoveable", moveable);
-    }
-
     public float getItemDropChance() {
         return this.namedTag.getFloat("ItemDropChance");
     }
@@ -111,8 +99,7 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
                 .putString("id", BlockEntity.ITEM_FRAME)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putBoolean("isMoveable", true);
+                .putInt("z", (int) this.z);
 
         if (item.getShort("id") != Item.AIR) {
             tag.putCompound("Item", item)
