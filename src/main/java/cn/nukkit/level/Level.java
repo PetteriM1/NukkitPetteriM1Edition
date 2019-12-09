@@ -926,8 +926,8 @@ public class Level implements ChunkManager, Metadatable {
                 bolt.setEffect(false);
             }
 
-            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_THUNDER, 93);
-            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_EXPLODE, 93);
+            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_THUNDER, -1, EntityLightning.NETWORK_ID);
+            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_EXPLODE, -1, EntityLightning.NETWORK_ID);
         }
     }
 
@@ -1957,17 +1957,31 @@ public class Level implements ChunkManager, Metadatable {
 
     public void dropExpOrb(Vector3 source, int exp, Vector3 motion, int delay) {
         Random rand = ThreadLocalRandom.current();
-        for (int split : EntityXPOrb.splitIntoOrbSizes(exp)) {
+        if (server.suomiCraftPEMode()) {
             CompoundTag nbt = Entity.getDefaultNBT(source, motion == null ? new Vector3(
                             (rand.nextDouble() * 0.2 - 0.1) * 2,
                             rand.nextDouble() * 0.4,
                             (rand.nextDouble() * 0.2 - 0.1) * 2) : motion,
                     rand.nextFloat() * 360f, 0);
-            nbt.putShort("Value", split);
+            nbt.putShort("Value", exp);
             nbt.putShort("PickupDelay", delay);
             Entity entity = Entity.createEntity("XpOrb", this.getChunk(source.getChunkX(), source.getChunkZ()), nbt);
             if (entity != null) {
                 entity.spawnToAll();
+            }
+        } else {
+            for (int split : EntityXPOrb.splitIntoOrbSizes(exp)) {
+                CompoundTag nbt = Entity.getDefaultNBT(source, motion == null ? new Vector3(
+                                (rand.nextDouble() * 0.2 - 0.1) * 2,
+                                rand.nextDouble() * 0.4,
+                                (rand.nextDouble() * 0.2 - 0.1) * 2) : motion,
+                        rand.nextFloat() * 360f, 0);
+                nbt.putShort("Value", split);
+                nbt.putShort("PickupDelay", delay);
+                Entity entity = Entity.createEntity("XpOrb", this.getChunk(source.getChunkX(), source.getChunkZ()), nbt);
+                if (entity != null) {
+                    entity.spawnToAll();
+                }
             }
         }
     }
