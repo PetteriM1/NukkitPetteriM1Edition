@@ -299,7 +299,7 @@ public class BinaryStream {
             this.putBoolean(skin.isPersona());
             this.putBoolean(skin.isCapeOnClassic());
             this.putString(skin.getCapeId());
-            this.putString(UUID.randomUUID().toString()/*skin.getFullSkinId()*/);
+            this.putString(skin.getFullSkinId());
         }
     }
 

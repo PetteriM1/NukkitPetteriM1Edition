@@ -1048,6 +1048,34 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
+    public void sendBlocks(Player target, Vector3[] blocks, int flags) {
+        for (Vector3 b : blocks) {
+            if (b == null) {
+                continue;
+            }
+
+            UpdateBlockPacket updateBlockPacket = new UpdateBlockPacket();
+            updateBlockPacket.x = (int) b.x;
+            updateBlockPacket.y = (int) b.y;
+            updateBlockPacket.z = (int) b.z;
+            updateBlockPacket.flags = flags;
+
+            try {
+                if (b instanceof Block) {
+                    updateBlockPacket.blockId = ((Block) b).getId();
+                    updateBlockPacket.blockData = ((Block) b).getDamage();
+                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getFullId());
+                } else {
+                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                }
+            } catch (NoSuchElementException e) {
+                throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for player " + target.getName() + " with protocol " + target.protocol);
+            }
+
+            target.batchDataPacket(updateBlockPacket);
+        }
+    }
+
     private void tickChunks() {
         if (this.chunksPerTicks <= 0 || this.loaders.isEmpty()) {
             this.chunkTickList.clear();

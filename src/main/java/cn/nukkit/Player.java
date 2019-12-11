@@ -3022,7 +3022,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     Block target = this.level.getBlock(blockVector.asVector3());
                                     block = target.getSide(face);
 
-                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(this, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
 
                                     if (target instanceof BlockDoor) {
                                         BlockDoor door = (BlockDoor) target;
@@ -3035,7 +3035,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             if (part.getId() == target.getId()) {
                                                 target = part;
 
-                                                this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                                this.level.sendBlocks(this, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
                                             }
                                         }
                                     }
@@ -3066,7 +3066,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     target = this.level.getBlock(blockVector.asVector3());
                                     BlockEntity blockEntity = this.level.getBlockEntity(blockVector.asVector3());
 
-                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(this, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
 
                                     inventory.sendHeldItem(this);
 
