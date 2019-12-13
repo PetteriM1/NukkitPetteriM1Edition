@@ -5,7 +5,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRail;
 import cn.nukkit.block.BlockRailActivator;
 import cn.nukkit.block.BlockRailPowered;
-import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
@@ -297,14 +296,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     @Override
     public void applyEntityCollision(cn.nukkit.entity.Entity entity) {
         if (entity != riding) {
-            if (entity instanceof EntityLiving
-                    && !(entity instanceof EntityHuman)
-                    && motionX * motionX + motionZ * motionZ > 0.01D
-                    && passengers.isEmpty()
-                    && entity.riding == null
-                    && blockInside == null) {
-            }
-
             double motiveX = entity.x - x;
             double motiveZ = entity.z - z;
             double square = motiveX * motiveX + motiveZ * motiveZ;
@@ -531,7 +522,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
         x = playerYawNeg + facing1 * expectedSpeed;
         z = playerYawPos + facing2 * expectedSpeed;
-        setPosition(new Vector3(x, y, z)); // Hehe, my minstake :3
+        setPosition(new Vector3(x, y, z));
 
         motX = motionX;
         motZ = motionZ;

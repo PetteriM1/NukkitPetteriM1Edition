@@ -33,6 +33,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator354 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator361 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator388 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator389 = new AtomicInteger(0);
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -44,6 +45,7 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId354 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId361 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId388 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId389 = new Int2IntOpenHashMap();
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -53,6 +55,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable354;
     private static byte[] compiledTable361;
     private static byte[] compiledTable388;
+    private static byte[] compiledTable389;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -66,6 +69,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId354.defaultReturnValue(-1);
         legacyToRuntimeId361.defaultReturnValue(-1);
         legacyToRuntimeId388.defaultReturnValue(-1);
+        legacyToRuntimeId389.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
             // 223
@@ -208,6 +212,25 @@ public class GlobalBlockPalette {
                 }
                 state388.remove("meta"); // No point in sending this since the client doesn't use it
             }
+            // 389
+            InputStream stream389 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_389.dat");
+            if (stream389 == null) throw new AssertionError("Unable to locate block state nbt 389");
+            ListTag<CompoundTag> tag389;
+            try {
+                compiledTable389 = ByteStreams.toByteArray(stream389);
+                //noinspection unchecked
+                tag389 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable389));
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            for (CompoundTag state389 : tag389.getAll()) {
+                int runtimeId = runtimeIdAllocator389.getAndIncrement();
+                if (!state389.contains("meta")) continue;
+                for (int val : state389.getIntArray("meta")) {
+                    legacyToRuntimeId389.put(state389.getShort("id") << 6 | val, runtimeId);
+                }
+                state389.remove("meta"); // No point in sending this since the client doesn't use it
+            }
         }, true);
     }
 
@@ -237,8 +260,11 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId354.get(legacyId);
             case 361:
                 return legacyToRuntimeId361.get(legacyId);
-            default: // Current protocol
+            case 388:
+            case 390:
                 return legacyToRuntimeId388.get(legacyId);
+            default: // Current protocol
+                return legacyToRuntimeId389.get(legacyId);
         }
     }
 
@@ -298,9 +324,10 @@ public class GlobalBlockPalette {
             case 361:
                 return compiledTable361;
             case 388:
-            case 389:
             case 390:
                 return compiledTable388;
+            case 389:
+                return compiledTable389;
             default:
                 Server.getInstance().getLogger().alert("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
                 return null;
@@ -332,7 +359,7 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId354.get(legacyId);
             case 361:
                 return legacyToRuntimeId361.get(legacyId);
-            default: // Current protocol
+            default: // 388+
                 return getOrCreateRuntimeId(protocol, legacyId >> 4, legacyId & 0xf);
         }
     }

@@ -249,7 +249,8 @@ public interface ItemID {
     int ACACIA_SIGN = 475;
     int DARKOAK_SIGN = 476;
     int SWEET_BERRIES = 477;
-    // 478 - 498 not yet in Minecraft
+    // 478 - 497 not yet in Minecraft
+    int CAMERA = 498;
     int COMPOUND = 499;
     int RECORD_13 = 500;
     int RECORD_CAT = 501;
@@ -265,4 +266,7 @@ public interface ItemID {
     int RECORD_WAIT = 511;
     // 512 not yet in Minecraft
     int SHIELD = 513;
+    // 514 - 735 not yet in Minecraft
+    int HONEYCOMB = 736;
+    int HONEY_BOTTLE = 737;
 }

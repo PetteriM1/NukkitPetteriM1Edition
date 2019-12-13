@@ -306,6 +306,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     private static final ArrayList<Item> creative332 = new ArrayList<>();
     private static final ArrayList<Item> creative340 = new ArrayList<>();
     private static final ArrayList<Item> creative354 = new ArrayList<>();
+    private static final ArrayList<Item> creative389 = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -373,6 +374,15 @@ public class Item implements Cloneable, BlockID, ItemID {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // Creative inventory for 389
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems389.json")).getMapList("items")) {
+            try {
+                addCreativeItem(389, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
     }
 
     public static void clearCreativeItems() {
@@ -383,6 +393,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         Item.creative332.clear();
         Item.creative340.clear();
         Item.creative354.clear();
+        Item.creative389.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -416,9 +427,10 @@ public class Item implements Cloneable, BlockID, ItemID {
             case 354:
             case 361:
             case 388:
-            case 389:
             case 390:
                 return new ArrayList<>(Item.creative354);
+            case 389:
+                return new ArrayList<>(Item.creative389);
             default:
                 Server.getInstance().getLogger().alert("Tried to get creative items for unsupported protocol version: " + protocol);
                 return null;
@@ -426,7 +438,7 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static void addCreativeItem(Item item) {
-        addCreativeItem(354, item);
+        addCreativeItem(389, item);
     }
 
     public static void addCreativeItem(int protocol, Item item) {
@@ -450,6 +462,9 @@ public class Item implements Cloneable, BlockID, ItemID {
             case 354:
                 Item.creative354.add(item.clone());
                 break;
+            case 389:
+                Item.creative389.add(item.clone());
+                break;
             default:
                 Server.getInstance().getLogger().alert("Tried to register creative items for unsupported protocol version: " + protocol);
                 break;
@@ -459,12 +474,12 @@ public class Item implements Cloneable, BlockID, ItemID {
     public static void removeCreativeItem(Item item) {
         int index = getCreativeItemIndex(item);
         if (index != -1) {
-            Item.creative354.remove(index);
+            Item.creative389.remove(index);
         }
     }
 
     public static boolean isCreativeItem(Item item) {
-        for (Item aCreative : Item.creative354) {
+        for (Item aCreative : Item.creative389) {
             if (item.equals(aCreative, !item.isTool())) {
                 return true;
             }
@@ -473,12 +488,12 @@ public class Item implements Cloneable, BlockID, ItemID {
     }
 
     public static Item getCreativeItem(int index) {
-        return (index >= 0 && index < Item.creative354.size()) ? Item.creative354.get(index) : null;
+        return (index >= 0 && index < Item.creative389.size()) ? Item.creative389.get(index) : null;
     }
 
     public static int getCreativeItemIndex(Item item) {
-        for (int i = 0; i < Item.creative354.size(); i++) {
-            if (item.equals(Item.creative354.get(i), !item.isTool())) {
+        for (int i = 0; i < Item.creative389.size(); i++) {
+            if (item.equals(Item.creative389.get(i), !item.isTool())) {
                 return i;
             }
         }
