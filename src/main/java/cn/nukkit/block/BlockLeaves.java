@@ -197,7 +197,7 @@ public class BlockLeaves extends BlockTransparentMeta {
         if (checkDecay) {
             this.setDamage(this.getDamage() | 0x08);
         } else {
-            this.setDamage(this.getDamage() & ~0x08);
+            this.setDamage(this.getDamage() & -9);
         }
     }
 
@@ -209,7 +209,7 @@ public class BlockLeaves extends BlockTransparentMeta {
         if (persistent) {
             this.setDamage(this.getDamage() | 0x04);
         } else {
-            this.setDamage(this.getDamage() & ~0x04);
+            this.setDamage(this.getDamage() & -5);
         }
     }
 
