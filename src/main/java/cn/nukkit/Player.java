@@ -1726,8 +1726,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (block == Block.LADDER || block == Block.VINES || block == Block.COBWEB) {
                             this.resetFallDistance();
                         } else {
-                            if (!this.hasEffect(Effect.JUMP) && diff > 1 && expectedVelocity < this.speed.y) {
-                                if (this.inAirTicks < 200) {
+                            if (diff > 1 && expectedVelocity < this.speed.y && (speed.y < -0.2 || speed.y > 4)) {
+                                if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(ev);
                                     if (!ev.isCancelled()) {

@@ -9,6 +9,7 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.noise.vanilla.f.NoiseGeneratorOctavesF;
 import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.impl.*;
+import cn.nukkit.level.generator.populator.impl.tree.PopulatorDungeon;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
@@ -124,7 +125,8 @@ public class Normal extends Generator {
                         new OreType(new BlockStone(BlockStone.DIORITE), 10, 33, 0, 80),
                         new OreType(new BlockStone(BlockStone.ANDESITE), 10, 33, 0, 80)
                 }),
-                new PopulatorCaves()
+                new PopulatorCaves(),
+                new PopulatorDungeon()
         );
     }
 

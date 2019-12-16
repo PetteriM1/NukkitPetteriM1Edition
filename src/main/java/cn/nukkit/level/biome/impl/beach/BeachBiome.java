@@ -4,6 +4,7 @@ import cn.nukkit.level.biome.type.SandyBiome;
 import cn.nukkit.level.generator.populator.impl.PopulatorCactus;
 import cn.nukkit.level.generator.populator.impl.PopulatorSugarcane;
 import cn.nukkit.level.generator.populator.impl.PopulatorTallSugarcane;
+import cn.nukkit.level.generator.populator.impl.PopulatorWell;
 
 /**
  * @author PeratX
@@ -22,6 +23,7 @@ public class BeachBiome extends SandyBiome {
         PopulatorCactus cactus = new PopulatorCactus();
         cactus.setRandomAmount(1);
         this.addPopulator(cactus);
+        this.addPopulator(new PopulatorWell());
 
         this.setBaseHeight(0f);
         this.setHeightVariation(0.025f);
