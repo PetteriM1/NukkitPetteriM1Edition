@@ -76,7 +76,7 @@ public class PopulatorCaves extends Populator {
         boolean isLargeCave = false;
 
         if (angle == -1) {
-            angle = maxAngle / 2;
+            angle = maxAngle >> 1;
             isLargeCave = true;
         }
 

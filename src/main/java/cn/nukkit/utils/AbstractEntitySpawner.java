@@ -16,20 +16,16 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 
     @Override
     public void spawn() {
-        if (isSpawnAllowedByDifficulty()) {
-            SpawnResult lastSpawnResult;
-            for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-                if (player.getLevel().isSpawningAllowed()) {
-                    lastSpawnResult = spawn(player);
-                    if (lastSpawnResult.equals(SpawnResult.MAX_SPAWN_REACHED)) {
-                        break;
-                    }
+        for (Player player : Server.getInstance().getOnlinePlayers().values()) {
+            if (player.getLevel().isSpawningAllowed()) {
+                if (isSpawnAllowedByDifficulty()) {
+                    spawnTo(player);
                 }
             }
         }
     }
 
-    protected SpawnResult spawn(Player player) {
+    private void spawnTo(Player player) {
         Position pos = player.getPosition();
         Level level = player.getLevel();
 
@@ -37,20 +33,18 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
             if (pos != null) {
                 pos.x += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
                 pos.z += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
-                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return SpawnResult.ERROR;
+                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return;
                 pos.y = Spawner.getSafeYCoord(level, pos, 3);
             } else {
-                return SpawnResult.POSITION_MISMATCH;
+                return;
             }
         } else {
-            return SpawnResult.MAX_SPAWN_REACHED;
+            return;
         }
 
 		try {
-        	return spawn(player, pos, level);
-		} catch (Exception e) {
-			return SpawnResult.ERROR;
-		}
+        	spawn(player, pos, level);
+		} catch (Exception ignored) {}
     }
 
     private static boolean isSpawnAllowedByDifficulty() {

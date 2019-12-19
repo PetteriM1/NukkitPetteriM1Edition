@@ -89,7 +89,7 @@ public class EntityArrow extends EntityProjectile {
         int base = super.getResultDamage();
 
         if (this.isCritical()) {
-            base += Utils.random.nextInt(base / 2 + 2);
+            base += Utils.random.nextInt((base >> 1) + 2);
         }
 
         return base;

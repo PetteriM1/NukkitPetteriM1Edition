@@ -87,7 +87,7 @@ public class NewJungleTree extends TreeGenerator {
 
                     for (int i3 = position.getY() - 3 + i; i3 <= position.getY() + i; ++i3) {
                         int i4 = i3 - (position.getY() + i);
-                        int j1 = 1 - i4 / 2;
+                        int j1 = 1 - (i4 >> 1);
 
                         for (int k1 = position.getX() - j1; k1 <= position.getX() + j1; ++k1) {
                             int l1 = k1 - position.getX();
@@ -136,7 +136,7 @@ public class NewJungleTree extends TreeGenerator {
 
                     for (int k3 = position.getY() - 3 + i; k3 <= position.getY() + i; ++k3) {
                         int j4 = k3 - (position.getY() + i);
-                        int k4 = 2 - j4 / 2;
+                        int k4 = 2 - (j4 >> 1);
                         BlockVector3 pos2 = new BlockVector3();
 
                         for (int l4 = position.getX() - k4; l4 <= position.getX() + k4; ++l4) {

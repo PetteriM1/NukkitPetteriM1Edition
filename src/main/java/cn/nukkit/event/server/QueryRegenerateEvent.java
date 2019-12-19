@@ -38,8 +38,6 @@ public class QueryRegenerateEvent extends ServerEvent {
     private final int port;
     private final String ip;
 
-    private Map<String, String> extraData = new HashMap<>();
-
     public QueryRegenerateEvent(Server server) {
         this(server, 5);
     }
@@ -122,14 +120,6 @@ public class QueryRegenerateEvent extends ServerEvent {
 
     public void setWorld(String world) {
         this.map = world;
-    }
-
-    public Map<String, String> getExtraData() {
-        return extraData;
-    }
-
-    public void setExtraData(Map<String, String> extraData) {
-        this.extraData = extraData;
     }
 
     public byte[] getLongQuery() {

@@ -67,7 +67,7 @@ public class ObjectSwampTree extends TreeGenerator {
 
                     for (int k1 = position.getY() - 3 + i; k1 <= position.getY() + i; ++k1) {
                         int j2 = k1 - (position.getY() + i);
-                        int l2 = 2 - j2 / 2;
+                        int l2 = 2 - (j2 >> 1);
 
                         for (int j3 = position.getX() - l2; j3 <= position.getX() + l2; ++j3) {
                             int k3 = j3 - position.getX();
@@ -98,7 +98,7 @@ public class ObjectSwampTree extends TreeGenerator {
 
                     for (int i2 = position.getY() - 3 + i; i2 <= position.getY() + i; ++i2) {
                         int k2 = i2 - (position.getY() + i);
-                        int i3 = 2 - k2 / 2;
+                        int i3 = 2 - (k2 >> 1);
                         BlockVector3 pos2 = new BlockVector3();
 
                         for (int l3 = position.getX() - i3; l3 <= position.getX() + i3; ++l3) {

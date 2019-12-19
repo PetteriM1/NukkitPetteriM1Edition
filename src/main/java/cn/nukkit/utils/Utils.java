@@ -267,7 +267,7 @@ public class Utils {
         if (len % 2 != 0)
             throw new IllegalArgumentException("hexBinary needs to be even-length: " + s);
 
-        byte[] out = new byte[len / 2];
+        byte[] out = new byte[(len >> 1)];
 
         for (int i = 0; i < len; i += 2) {
             int h = hexToBin(s.charAt(i));
@@ -275,7 +275,7 @@ public class Utils {
             if (h == -1 || l == -1)
                 throw new IllegalArgumentException("contains illegal character for hexBinary: " + s);
 
-            out[i / 2] = (byte)((h << 4) + l);
+            out[(i >> 1)] = (byte)((h << 4) + l);
         }
 
         return out;

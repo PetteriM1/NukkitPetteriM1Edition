@@ -674,7 +674,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.recalculateEffectColor();
 
         if (effect.getId() == Effect.HEALTH_BOOST) {
-            this.setHealth(this.health + 4 * (effect.getAmplifier() + 1));
+            this.setHealth(this.health + ((effect.getAmplifier() + 1) << 2));
         }
     }
 
@@ -1066,7 +1066,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public int getMaxHealth() {
-        return maxHealth + (this.hasEffect(Effect.HEALTH_BOOST) ? 4 * (this.getEffect(Effect.HEALTH_BOOST).getAmplifier() + 1) : 0);
+        return maxHealth + (this.hasEffect(Effect.HEALTH_BOOST) ? (this.getEffect(Effect.HEALTH_BOOST).getAmplifier() + 1) << 2 : 0);
     }
 
     public void setMaxHealth(int maxHealth) {
@@ -1229,7 +1229,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.fireTicks > 0) {
             if (this.fireProof) {
-                this.fireTicks -= 4 * tickDiff;
+                this.fireTicks -= tickDiff << 2;
                 if (this.fireTicks < 0) {
                     this.fireTicks = 0;
                 }

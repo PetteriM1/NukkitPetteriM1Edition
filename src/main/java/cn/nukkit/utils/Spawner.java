@@ -104,16 +104,16 @@ public class Spawner extends Thread {
     }
 
     static int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
-        int addX = Utils.rand(degree / 2 * -1, degree / 2);
+        int addX = Utils.rand((degree >> 1) * -1, degree >> 1);
         if (addX >= 0) {
             if (degree < safeDegree) {
                 addX = safeDegree;
-                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand((correctionDegree >> 1) * -1, correctionDegree >> 1);
             }
         } else {
             if (degree > safeDegree) {
                 addX = -safeDegree;
-                addX += Utils.rand(correctionDegree / 2 * -1, correctionDegree / 2);
+                addX += Utils.rand((correctionDegree >> 1) * -1, correctionDegree >> 1);
             }
         }
         return addX;

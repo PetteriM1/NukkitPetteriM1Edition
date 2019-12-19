@@ -22,12 +22,12 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public abstract class BlockLiquid extends BlockTransparentMeta {
 
-    private static final byte CAN_FLOW_DOWN = 1;
-    private static final byte CAN_FLOW = 0;
-    private static final byte BLOCKED = -1;
+    protected static final byte CAN_FLOW_DOWN = 1;
+    protected static final byte CAN_FLOW = 0;
+    protected static final byte BLOCKED = -1;
     public int adjacentSources = 0;
     protected Vector3 flowVector = null;
-    private Long2ByteMap flowCostVisited = new Long2ByteOpenHashMap();
+    protected Long2ByteMap flowCostVisited = new Long2ByteOpenHashMap();
 
     protected BlockLiquid(int meta) {
         super(meta);
@@ -284,7 +284,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
         }
     }
 
-    private int calculateFlowCost(int blockX, int blockY, int blockZ, int accumulatedCost, int maxCost, int originOpposite, int lastOpposite) {
+    protected int calculateFlowCost(int blockX, int blockY, int blockZ, int accumulatedCost, int maxCost, int originOpposite, int lastOpposite) {
         int cost = 1000;
         for (int j = 0; j < 4; ++j) {
             if (j == originOpposite || j == lastOpposite) {
@@ -298,7 +298,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                 ++x;
             } else if (j == 2) {
                 --z;
-            } else if (j == 3) {
+            } else {
                 ++z;
             }
             long hash = Level.blockHash(x, blockY, z);
@@ -339,14 +339,14 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
         return 500;
     }
 
-    private boolean[] getOptimalFlowDirections() {
+    protected boolean[] getOptimalFlowDirections() {
         int[] flowCost = new int[]{
                 1000,
                 1000,
                 1000,
                 1000
         };
-        int maxCost = 4/* / this.getFlowDecayPerBlock()*/;
+        int maxCost = 4;
         for (int j = 0; j < 4; ++j) {
             int x = (int) this.x;
             int y = (int) this.y;
