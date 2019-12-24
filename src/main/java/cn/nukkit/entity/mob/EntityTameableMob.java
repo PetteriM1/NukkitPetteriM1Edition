@@ -28,7 +28,9 @@ public abstract class EntityTameableMob extends EntityWalkingMob implements Enti
             String ownerName = namedTag.getString(NAMED_TAG_OWNER);
             if (ownerName != null && !ownerName.isEmpty()) {
                 Player player = Server.getInstance().getPlayer(ownerName);
-                this.setOwner(player);
+                if (player != null) {
+                    this.setOwner(player);
+                }
                 this.setSitting(namedTag.getBoolean(NAMED_TAG_SITTING));
             }
         }

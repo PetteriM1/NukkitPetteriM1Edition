@@ -266,7 +266,9 @@ public interface ItemID {
     int RECORD_WAIT = 511;
     // 512 not yet in Minecraft
     int SHIELD = 513;
-    // 514 - 735 not yet in Minecraft
+    // 514 - 733 not yet in Minecraft
+    int SUSPICIOUS_STEW = 734;
+    // 735 not yet in Minecraft
     int HONEYCOMB = 736;
     int HONEY_BOTTLE = 737;
 }
