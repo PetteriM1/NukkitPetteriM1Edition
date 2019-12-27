@@ -1,5 +1,6 @@
 package cn.nukkit.blockentity;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
@@ -10,7 +11,7 @@ import cn.nukkit.nbt.tag.ListTag;
 /**
  * @author CreeperFace
  */
-public class BlockEntityPistonArm extends BlockEntity {
+public class BlockEntityPistonArm extends BlockEntitySpawnable {
 
     public float progress;
     public float lastProgress;
@@ -29,6 +30,8 @@ public class BlockEntityPistonArm extends BlockEntity {
 
     @Override
     protected void initBlockEntity() {
+        this.isMovable = true;
+
         if (namedTag.contains("Progress")) {
             this.progress = namedTag.getFloat("Progress");
         }
@@ -62,7 +65,8 @@ public class BlockEntityPistonArm extends BlockEntity {
     }
 
     public boolean isBlockEntityValid() {
-        return true;
+        int blockId = getBlock().getId();
+        return blockId == Block.PISTON || blockId == Block.STICKY_PISTON;
     }
 
     public void saveNBT() {
@@ -77,11 +81,14 @@ public class BlockEntityPistonArm extends BlockEntity {
 
     public CompoundTag getSpawnCompound() {
         return new CompoundTag()
-                .putString("id", "PistonArm")
+                .putString("id", BlockEntity.PISTON_ARM)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z)
                 .putFloat("Progress", this.progress)
-                .putByte("State", this.state);
+                .putFloat("LastProgress", this.lastProgress)
+                .putBoolean("Sticky", this.sticky)
+                .putByte("State", this.state)
+                .putByte("NewState", this.newState);
     }
 }

@@ -72,7 +72,7 @@ public abstract class EntityFlying extends BaseEntity {
             }
             this.stayTime = Utils.rand(100, 200);
             this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
-        } else if (this.moveTime <= 0 || !(this.target instanceof Vector3)) {
+        } else if (this.moveTime <= 0 || this.target == null) {
             x = Utils.rand(20, 100);
             z = Utils.rand(20, 100);
             if (this.y > maxY) {

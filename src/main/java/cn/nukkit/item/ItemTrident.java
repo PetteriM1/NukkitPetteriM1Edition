@@ -67,34 +67,32 @@ public class ItemTrident extends ItemTool {
                         .add(new FloatTag("", (float) -player.pitch)));
 
         EntityThrownTrident trident = new EntityThrownTrident(player.chunk, nbt, player);
-        if (trident != null) {
-            trident.setItem(this);
+        trident.setItem(this);
 
-            double p = (double) ticksUsed / 20;
-            double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
+        double p = (double) ticksUsed / 20;
+        double f = Math.min((p * p + p * 2) / 3, 1) * 2.5;
 
-            EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, trident, f);
+        EntityShootBowEvent entityShootBowEvent = new EntityShootBowEvent(player, this, trident, f);
 
-            if (f < 0.1 || ticksUsed < 5) {
-                entityShootBowEvent.setCancelled();
-            }
+        if (f < 0.1 || ticksUsed < 5) {
+            entityShootBowEvent.setCancelled();
+        }
 
-            Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
-            if (entityShootBowEvent.isCancelled()) {
+        Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
+        if (entityShootBowEvent.isCancelled()) {
+            entityShootBowEvent.getProjectile().kill();
+        } else {
+            entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
+            ProjectileLaunchEvent ev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
+            Server.getInstance().getPluginManager().callEvent(ev);
+            if (ev.isCancelled()) {
                 entityShootBowEvent.getProjectile().kill();
             } else {
-                entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
-                ProjectileLaunchEvent ev = new ProjectileLaunchEvent(entityShootBowEvent.getProjectile());
-                Server.getInstance().getPluginManager().callEvent(ev);
-                if (ev.isCancelled()) {
-                    entityShootBowEvent.getProjectile().kill();
-                } else {
-                    entityShootBowEvent.getProjectile().spawnToAll();
-                    player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THROW);
-                    if (!player.isCreative()) {
-                        this.count--;
-                        player.getInventory().setItemInHand(this);
-                    }
+                entityShootBowEvent.getProjectile().spawnToAll();
+                player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THROW);
+                if (!player.isCreative()) {
+                    this.count--;
+                    player.getInventory().setItemInHand(this);
                 }
             }
         }

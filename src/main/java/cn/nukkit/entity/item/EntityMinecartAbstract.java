@@ -282,7 +282,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             return false;
         }
 
-        if (!passengers.isEmpty() && isRideable()) {
+        if (!passengers.isEmpty()) {
             return false;
         }
 

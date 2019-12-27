@@ -1086,21 +1086,19 @@ public class Level implements ChunkManager, Metadatable {
         int randRange = 3 + chunksPerLoader / 30;
         randRange = Math.min(randRange, this.chunkTickRadius);
 
-        if (!this.loaders.isEmpty()) {
-            for (ChunkLoader loader : this.loaders.values()) {
-                int chunkX = (int) loader.getX() >> 4;
-                int chunkZ = (int) loader.getZ() >> 4;
+        for (ChunkLoader loader : this.loaders.values()) {
+            int chunkX = (int) loader.getX() >> 4;
+            int chunkZ = (int) loader.getZ() >> 4;
 
-                long index = Level.chunkHash(chunkX, chunkZ);
-                int existingLoaders = Math.max(0, this.chunkTickList.getOrDefault(index, 0));
-                this.chunkTickList.put(index, existingLoaders + 1);
-                for (int chunk = 0; chunk < chunksPerLoader; ++chunk) {
-                    int dx = Utils.random.nextInt(2 * randRange) - randRange;
-                    int dz = Utils.random.nextInt(2 * randRange) - randRange;
-                    long hash = Level.chunkHash(dx + chunkX, dz + chunkZ);
-                    if (!this.chunkTickList.containsKey(hash) && provider.isChunkLoaded(hash)) {
-                        this.chunkTickList.put(hash, -1);
-                    }
+            long index = Level.chunkHash(chunkX, chunkZ);
+            int existingLoaders = Math.max(0, this.chunkTickList.getOrDefault(index, 0));
+            this.chunkTickList.put(index, existingLoaders + 1);
+            for (int chunk = 0; chunk < chunksPerLoader; ++chunk) {
+                int dx = Utils.random.nextInt(2 * randRange) - randRange;
+                int dz = Utils.random.nextInt(2 * randRange) - randRange;
+                long hash = Level.chunkHash(dx + chunkX, dz + chunkZ);
+                if (!this.chunkTickList.containsKey(hash) && provider.isChunkLoaded(hash)) {
+                    this.chunkTickList.put(hash, -1);
                 }
             }
         }
@@ -2072,7 +2070,7 @@ public class Level implements ChunkManager, Metadatable {
             } else {
                 return null;
             }
-        } else if (target.canBeActivated() && target.onActivate(item, player)) {
+        } else if (target.canBeActivated() && target.onActivate(item, null)) {
             if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
                 item = new ItemBlock(new BlockAir(), 0, 0);
             }
@@ -2170,11 +2168,9 @@ public class Level implements ChunkManager, Metadatable {
                         block.getLevel().setBlock(target, new BlockAir());
                         block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
 
-                        if (player != null) {
-                            if (!player.isCreative()) {
-                                item.setCount(item.getCount() - 1);
-                                player.getInventory().setItemInHand(item);
-                            }
+                        if (!player.isCreative()) {
+                            item.setCount(item.getCount() - 1);
+                            player.getInventory().setItemInHand(item);
                         }
                         return null;
                     } else if (block.getSide(BlockFace.DOWN).getId() == Item.IRON_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.IRON_BLOCK) {
@@ -2204,11 +2200,9 @@ public class Level implements ChunkManager, Metadatable {
                             block.getLevel().setBlock(block, new BlockAir());
                             block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
 
-                            if (player != null) {
-                                if (!player.isCreative()) {
-                                    item.setCount(item.getCount() - 1);
-                                    player.getInventory().setItemInHand(item);
-                                }
+                            if (!player.isCreative()) {
+                                item.setCount(item.getCount() - 1);
+                                player.getInventory().setItemInHand(item);
                             }
                             return null;
                         }

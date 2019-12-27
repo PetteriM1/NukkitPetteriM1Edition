@@ -112,7 +112,7 @@ public class Skin {
             this.isLegacySlim = true;
         }
 
-        if (geometryName == null || geometryName.trim().isEmpty()) {
+        if (geometryName.trim().isEmpty()) {
             this.skinResourcePatch = GEOMETRY_CUSTOM;
             return;
         }

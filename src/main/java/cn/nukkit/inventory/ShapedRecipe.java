@@ -51,7 +51,7 @@ public class ShapedRecipe implements CraftingRecipe {
         }
 
         int columnCount = shape[0].length();
-        if (columnCount > 3 || rowCount <= 0) {
+        if (columnCount > 3) {
             throw new RuntimeException("Shaped recipes may only have 1, 2 or 3 columns, not " + columnCount);
         }
 

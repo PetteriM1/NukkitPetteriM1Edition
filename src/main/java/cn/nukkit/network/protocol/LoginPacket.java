@@ -66,6 +66,8 @@ public class LoginPacket extends DataPacket {
     private void decodeSkinData() {
         JsonObject skinToken = decodeToken(new String(this.get(this.getLInt())));
 
+        if (skinToken == null) return;
+
         if (skinToken.has("ClientRandomId")) {
             this.clientId = skinToken.get("ClientRandomId").getAsLong();
         }

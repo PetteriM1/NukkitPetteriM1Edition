@@ -215,8 +215,6 @@ public class NewJungleTree extends TreeGenerator {
     private static int getCocoaMeta(int age, int side) {
         int meta = 0;
 
-        meta *= age;
-
         //3 4 2 5
         switch (side) {
             case 4:

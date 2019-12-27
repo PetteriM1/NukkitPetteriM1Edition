@@ -64,7 +64,9 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 .putInt("z", (int) this.z)
                 .putBoolean("Sticky", this.sticky);
 
-        new BlockEntityPistonArm(this.level.getChunk(getChunkX(), getChunkZ()), nbt);
+        BlockEntityPistonArm be = new BlockEntityPistonArm(this.level.getChunk(getChunkX(), getChunkZ()), nbt);
+        be.sticky = this.sticky;
+        be.spawnToAll();
 
         this.checkState();
         return true;
@@ -282,13 +284,13 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             } else if (!this.addBlockLine(this.blockToMove)) {
                 return false;
             } else {
-                if (false) {
+                /*if (false) { //todo?
                     for (Block b : this.toMove) {
                         if (b.getId() == SLIME_BLOCK && !this.addBranchingBlocks(b)) {
                             return false;
                         }
                     }
-                }
+                }*/
 
                 return true;
             }

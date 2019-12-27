@@ -124,7 +124,7 @@ public class ItemCrossbow extends ItemBow {
                 player.getInventory().sendContents(player);
             } else {
                 entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
-                if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
+                if (entityShootBowEvent.getProjectile() != null) {
                     EntityProjectile proj = entityShootBowEvent.getProjectile();
                     ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(proj);
                     Server.getInstance().getPluginManager().callEvent(projectev);

@@ -45,8 +45,6 @@ public enum EnchantmentType {
                     return item.isBoots();
                 case WEARABLE:
                     return item instanceof ItemArmor || item instanceof ItemSkull || item.getBlock() instanceof BlockPumpkin;
-                case TRIDENT:
-                    return item instanceof ItemTrident;
                 default:
                     return false;
             }
@@ -60,6 +58,8 @@ public enum EnchantmentType {
                     return item instanceof ItemBow;
                 case FISHING_ROD:
                     return item instanceof ItemFishingRod;
+                case TRIDENT:
+                    return item instanceof ItemTrident;
                 default:
                     return false;
             }
