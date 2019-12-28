@@ -9,10 +9,12 @@ public class RakNetConstants {
     public static final byte RAKNET_PROTOCOL_VERSION = 9; // Mojang's version.
     public static final short MINIMUM_MTU_SIZE = 576;
     public static final short MAXIMUM_MTU_SIZE = 1492;
+
     /**
      * Maximum amount of ordering channels as defined in vanilla RakNet.
      */
     public static final int MAXIMUM_ORDERING_CHANNELS = 16;
+
     /**
      * Maximum size of an {@link EncapsulatedPacket} header.
      */
@@ -22,7 +24,6 @@ public class RakNetConstants {
 
     public static final int RAKNET_DATAGRAM_HEADER_SIZE = 4;
 
-    public static final int MAXIMUM_CONNECTION_ATTEMPTS = 10;
     /**
      * Time after {@link RakNetSession} is closed due to no activity.
      */
@@ -38,9 +39,7 @@ public class RakNetConstants {
     public static final byte FLAG_PACKET_PAIR = (byte) 0b00010000;
     public static final byte FLAG_CONTINUOUS_SEND = (byte) 0b00001000;
     public static final byte FLAG_NEEDS_B_AND_AS = (byte) 0b00000100;
-    /**
-     *
-     */
+
     public static final byte ID_CONNECTED_PING = (byte) 0x00;
 
     /*
@@ -69,6 +68,7 @@ public class RakNetConstants {
     public static final short ID_UNCONNECTED_PONG = 0x1c;
     public static final short ID_ADVERTISE_SYSTEM = 0x1d;
     public static final short ID_USER_PACKET_ENUM = 0x80;
+
     /**
      * Magic used to identify RakNet packets
      */
@@ -82,7 +82,4 @@ public class RakNetConstants {
     public static final long CC_MAXIMUM_THRESHOLD = 2000;
     public static final long CC_ADDITIONAL_VARIANCE = 30;
     public static final long CC_SYN = 10;
-
-    public static final int IPV4_MESSAGE_SIZE = 7;
-    public static final int IPV6_MESSAGE_SIZE = 29;
 }
