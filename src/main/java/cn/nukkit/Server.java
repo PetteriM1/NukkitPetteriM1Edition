@@ -13,6 +13,7 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.*;
+import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
@@ -2001,6 +2002,7 @@ public class Server {
         Entity.registerEntity("Boat", EntityBoat.class);
         //Others
         Entity.registerEntity("Human", EntityHuman.class, true);
+        Entity.registerEntity("Lightning", EntityLightning.class);
     }
 
     /**
