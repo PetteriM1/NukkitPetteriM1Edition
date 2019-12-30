@@ -213,6 +213,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected final EntityMetadata dataProperties = new EntityMetadata()
             .putLong(DATA_FLAGS, 0)
+            .putByte(DATA_COLOR, 0)
             .putShort(DATA_AIR, 400)
             .putShort(DATA_MAX_AIR, 400)
             .putString(DATA_NAMETAG, "")
@@ -812,7 +813,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void saveNBT() {
-        if (!(this instanceof Player)) {
+        if (!this.isPlayer) {
             this.namedTag.putString("id", this.getSaveId());
             if (!this.getNameTag().isEmpty()) {
                 this.namedTag.putString("CustomName", this.getNameTag());
@@ -977,7 +978,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
             player.dataPacket(pk.clone());
         }
-        if (this instanceof Player) {
+        if (this.isPlayer) {
             ((Player) this).dataPacket(pk);
         }
     }
@@ -1219,7 +1220,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.checkBlockCollision();
 
         if (this.y <= -16 && this.isAlive()) {
-            if (this instanceof Player) {
+            if (this.isPlayer) {
                 if (((Player) this).getGamemode() != Player.CREATIVE) this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
             } else {
                 this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
@@ -1241,7 +1242,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
             if (this.fireTicks <= 0) {
                 this.extinguish();
-            } else if (!this.fireProof && (!(this instanceof Player) || !((Player) this).isSpectator())) {
+            } else if (!this.fireProof && (!this.isPlayer || !((Player) this).isSpectator())) {
                 this.setDataFlag(DATA_FLAGS, DATA_FLAG_ONFIRE, true);
                 hasUpdate = true;
             }
@@ -1478,7 +1479,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void setAbsorption(float absorption) {
         if (absorption != this.absorption) {
             this.absorption = absorption;
-            if (this instanceof Player) ((Player) this).setAttribute(Attribute.getAttribute(Attribute.ABSORPTION).setValue(absorption));
+            if (this.isPlayer) ((Player) this).setAttribute(Attribute.getAttribute(Attribute.ABSORPTION).setValue(absorption));
         }
     }
 
@@ -1534,7 +1535,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void fall(float fallDistance) {
         float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
         if (damage > 0) {
-            if (!(this instanceof Player) || level.getGameRules().getBoolean(GameRule.FALL_DAMAGE)) {
+            if (!this.isPlayer || level.getGameRules().getBoolean(GameRule.FALL_DAMAGE)) {
                 this.attack(new EntityDamageEvent(this, DamageCause.FALL, damage));
             }
         }
@@ -1545,7 +1546,7 @@ public abstract class Entity extends Location implements Metadatable {
             if (down.getId() == Item.FARMLAND) {
                 Event ev;
 
-                if (this instanceof Player) {
+                if (this.isPlayer) {
                     ev = new PlayerInteractEvent((Player) this, null, down, null, Action.PHYSICAL);
                 } else {
                     ev = new EntityInteractEvent(this, down);
@@ -1708,7 +1709,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean fastMove(double dx, double dy, double dz) {
-        if (!(this instanceof Player)) {
+        if (!this.isPlayer) {
             this.blocksAround = null;
         }
 
@@ -1743,7 +1744,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean move(double dx, double dy, double dz) {
-        if (!(this instanceof Player)) {
+        if (!this.isPlayer) {
             this.blocksAround = null;
         }
 
@@ -2022,7 +2023,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.boundingBox.setBounds(pos.x - radius, pos.y, pos.z - radius, pos.x + radius, pos.y + (this.getHeight() * this.scale), pos.z
                 + radius);
 
-        if (!(this instanceof Player)) {
+        if (!this.isPlayer) {
             this.blocksAround = null;
         }
 

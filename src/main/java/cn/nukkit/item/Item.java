@@ -288,6 +288,8 @@ public class Item implements Cloneable, BlockID, ItemID {
             list[RECORD_STRAD] = ItemRecordStrad.class;
             list[RECORD_WAIT] = ItemRecordWait.class;
             list[SHIELD] = ItemShield.class; //513
+            list[SUSPICIOUS_STEW] = ItemSuspiciousStew.class; //734
+            list[HONEY_BOTTLE] = ItemHoneyBottle.class; //737
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
