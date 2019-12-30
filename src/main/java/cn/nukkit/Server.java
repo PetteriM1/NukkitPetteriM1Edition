@@ -230,6 +230,7 @@ public class Server {
     public boolean queryPlugins;
     public boolean despawnEntities;
     public boolean strongIPBans;
+    public boolean forceMtu;
 
     Server(final String filePath, String dataPath, String pluginPath) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2090,6 +2091,7 @@ public class Server {
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
+        this.forceMtu = this.getPropertyBoolean("force-mtu", true);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2194,6 +2196,7 @@ public class Server {
             put("skin-change-cooldown", 30);
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
+            put("force-mtu", true);
         }
     }
 
