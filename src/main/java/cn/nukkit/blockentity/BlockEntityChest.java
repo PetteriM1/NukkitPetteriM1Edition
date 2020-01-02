@@ -69,6 +69,7 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         for (Item content : inventory.getContents().values()) {
             level.dropItem(this, content);
         }
+        inventory.clearAll(); // Stop items from being moved around by another player in the inventory
     }
 
     @Override

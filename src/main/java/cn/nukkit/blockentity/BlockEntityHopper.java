@@ -313,6 +313,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
         for (Item content : inventory.getContents().values()) {
             level.dropItem(this, content);
         }
+        inventory.clearAll();
     }
 
     public boolean pushItems() {

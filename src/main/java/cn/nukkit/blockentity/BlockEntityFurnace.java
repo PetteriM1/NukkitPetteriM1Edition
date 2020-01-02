@@ -115,6 +115,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         for (Item content : inventory.getContents().values()) {
             level.dropItem(this, content);
         }
+        inventory.clearAll();
     }
 
     @Override

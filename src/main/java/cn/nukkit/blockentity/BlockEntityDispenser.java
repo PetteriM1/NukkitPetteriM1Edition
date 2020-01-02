@@ -141,5 +141,6 @@ public class BlockEntityDispenser extends BlockEntitySpawnable implements Invent
         for (Item content : inventory.getContents().values()) {
             level.dropItem(this, content);
         }
+        inventory.clearAll();
     }
 }
