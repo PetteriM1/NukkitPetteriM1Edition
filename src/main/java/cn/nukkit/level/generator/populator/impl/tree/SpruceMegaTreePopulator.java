@@ -19,10 +19,7 @@ public class SpruceMegaTreePopulator extends Populator {
     private int baseAmount;
 
     public SpruceMegaTreePopulator() {
-        this(BlockSapling.SPRUCE);
     }
-
-    private SpruceMegaTreePopulator(int type) {}
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;
