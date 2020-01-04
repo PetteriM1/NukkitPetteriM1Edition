@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -217,11 +218,10 @@ public class GlobalBlockPalette {
             if (stream389 == null) throw new AssertionError("Unable to locate block state nbt 389");
             ListTag<CompoundTag> tag389;
             try {
-                compiledTable389 = ByteStreams.toByteArray(stream389);
                 //noinspection unchecked
-                tag389 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable389));
+                tag389 = (ListTag<CompoundTag>) NBTIO.readNetwork(stream389);
             } catch (IOException e) {
-                throw new AssertionError(e);
+                throw new AssertionError("Unable to load block palette 389", e);
             }
             for (CompoundTag state389 : tag389.getAll()) {
                 int runtimeId = runtimeIdAllocator389.getAndIncrement();
@@ -230,6 +230,11 @@ public class GlobalBlockPalette {
                     legacyToRuntimeId389.put(state389.getShort("id") << 6 | val, runtimeId);
                 }
                 state389.remove("meta"); // No point in sending this since the client doesn't use it
+            }
+            try {
+                compiledTable389 = NBTIO.write(tag389, ByteOrder.LITTLE_ENDIAN, true);
+            } catch (IOException e) {
+                throw new AssertionError("Unable to write block palette 389", e);
             }
         }, true);
     }
