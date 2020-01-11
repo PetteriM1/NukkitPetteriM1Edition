@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.utils.BlockColor;
 
 /**
  * Created on 2015/11/25 by xtypr.
@@ -44,5 +45,10 @@ public class BlockStairsBrick extends BlockStairs {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 }

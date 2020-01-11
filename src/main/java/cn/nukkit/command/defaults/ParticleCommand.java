@@ -13,7 +13,6 @@ import cn.nukkit.level.particle.*;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.network.protocol.SpawnParticleEffectPacket;
-import cn.nukkit.utils.TextFormat;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -95,7 +94,7 @@ public class ParticleCommand extends VanillaCommand {
             Particle particle = getParticle(name, position, data);
 
             if (particle == null) {
-                sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.particle.notFound", name));
+                position.level.addParticleEffect(position.asVector3f(), args[0], -1, position.level.getDimension());
                 return true;
             }
 
@@ -239,7 +238,7 @@ public class ParticleCommand extends VanillaCommand {
         return true;
     }
 
-    private static double getDouble(String arg, double defaultValue) throws Exception {
+    private static double getDouble(String arg, double defaultValue) {
         if (arg.startsWith("~")) {
             String relativePos = arg.substring(1);
             if (relativePos.isEmpty()) {

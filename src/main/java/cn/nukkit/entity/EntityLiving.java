@@ -194,10 +194,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 BaseEntity baseEntity = (BaseEntity) ev.getEntity();
                 if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                     if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
-                        int killExperience = baseEntity.getKillExperience();
-                        if (killExperience > 0) {
-                            this.getLevel().dropExpOrb(this, killExperience);
-                        }
+                        this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
                     }
                 }
             }
@@ -295,18 +292,20 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
             // Check collisions with blocks
             if (this instanceof Player) {
-                Block block = this.level.getBlock(getFloorX(), getFloorY() - 1, getFloorZ());
-                int id = block.getId();
-                if (id == Block.MAGMA || id == Block.CACTUS) {
-                    block.onEntityCollide(this);
-                }
-                if (id == Block.MAGMA && this.isInsideOfWater()) {
-                    this.level.addParticle(new BubbleParticle(this));
-                    this.setMotion(new Vector3(0, -0.3, 0));
-                }
-                if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
-                    this.level.addParticle(new BubbleParticle(this));
-                    this.setMotion(new Vector3(0, 0.3, 0));
+                if (this.age % 5 == 0) {
+                    Block block = this.level.getBlock(getFloorX(), getFloorY() - 1, getFloorZ());
+                    int id = block.getId();
+                    if (id == Block.MAGMA || id == Block.CACTUS) {
+                        block.onEntityCollide(this);
+                    }
+                    if (id == Block.MAGMA && this.isInsideOfWater()) {
+                        this.level.addParticle(new BubbleParticle(this));
+                        this.setMotion(this.getMotion().add(0, -0.3, 0));
+                    }
+                    if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
+                        this.level.addParticle(new BubbleParticle(this));
+                        this.setMotion(this.getMotion().add(0, 0.3, 0));
+                    }
                 }
             }
         }

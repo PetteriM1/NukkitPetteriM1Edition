@@ -19,5 +19,4 @@ public class EnchantmentWaterWorker extends Enchantment {
     public int getMaxEnchantAbility(int level) {
         return this.getMinEnchantAbility(level) + 40;
     }
-
 }

@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.utils.BlockColor;
 
 /**
  * Created by CreeperFace on 26. 11. 2016.
@@ -49,4 +50,8 @@ public class BlockRedSandstone extends BlockSandstone {
         return new ItemBlock(this, this.getDamage() & 0x03);
     }
 
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
+    }
 }

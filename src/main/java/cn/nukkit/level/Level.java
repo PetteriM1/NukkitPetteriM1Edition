@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockGrass;
 import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
@@ -585,6 +586,40 @@ public class Level implements ChunkManager, Metadatable {
 
     public void addParticle(Particle particle, Collection<Player> players) {
         this.addParticle(particle, players.toArray(new Player[0]));
+    }
+
+    public void addParticleEffect(Vector3 pos, ParticleEffect particleEffect) {
+        this.addParticleEffect(pos, particleEffect, -1, this.dimension, (Player[]) null);
+    }
+
+    public void addParticleEffect(Vector3 pos, ParticleEffect particleEffect, long uniqueEntityId) {
+        this.addParticleEffect(pos, particleEffect, uniqueEntityId, this.dimension, (Player[]) null);
+    }
+
+    public void addParticleEffect(Vector3 pos, ParticleEffect particleEffect, long uniqueEntityId, int dimensionId) {
+        this.addParticleEffect(pos, particleEffect, uniqueEntityId, dimensionId, (Player[]) null);
+    }
+
+    public void addParticleEffect(Vector3 pos, ParticleEffect particleEffect, long uniqueEntityId, int dimensionId, Collection<Player> players) {
+        this.addParticleEffect(pos, particleEffect, uniqueEntityId, dimensionId, players.toArray(new Player[0]));
+    }
+
+    public void addParticleEffect(Vector3 pos, ParticleEffect particleEffect, long uniqueEntityId, int dimensionId, Player... players) {
+        this.addParticleEffect(pos.asVector3f(), particleEffect.getIdentifier(), uniqueEntityId, dimensionId, players);
+    }
+
+    public void addParticleEffect(Vector3f pos, String identifier, long uniqueEntityId, int dimensionId, Player... players) {
+        SpawnParticleEffectPacket pk = new SpawnParticleEffectPacket();
+        pk.identifier = identifier;
+        pk.uniqueEntityId = uniqueEntityId;
+        pk.dimensionId = dimensionId;
+        pk.position = pos;
+
+        if (players == null || players.length == 0) {
+            addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
+        } else {
+            Server.broadcastPacket(players, pk);
+        }
     }
 
     public boolean getAutoSave() {
@@ -1834,6 +1869,8 @@ public class Level implements ChunkManager, Metadatable {
         }
         Block target = this.getBlock(vector);
         Item[] drops;
+        int dropExp = target.getDropExp();
+
         if (item == null) {
             item = new ItemBlock(new BlockAir(), 0, 0);
         }
@@ -1911,6 +1948,7 @@ public class Level implements ChunkManager, Metadatable {
             player.lastBreak = System.currentTimeMillis();
 
             drops = ev.getDrops();
+            dropExp = ev.getDropExp();
         } else if (!target.isBreakable(item)) {
             return null;
         } else if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
@@ -1954,10 +1992,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.gameRules.getBoolean(GameRule.DO_TILE_DROPS)) {
             if (!isSilkTouch && player != null && drops.length != 0) { // For example no xp from redstone if it's mined with stone pickaxe
                 if (player.isSurvival() || player.isAdventure()) {
-                    int dropExp = target.getDropExp();
-                    if (dropExp != 0) {
-                        this.dropExpOrb(vector.add(0.5, 0.5, 0.5), dropExp);
-                    }
+                    this.dropExpOrb(vector.add(0.5, 0.5, 0.5), dropExp);
                 }
             }
 
@@ -1974,7 +2009,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void dropExpOrb(Vector3 source, int exp) {
-        dropExpOrb(source, exp, null);
+        if (exp > 0) {
+            dropExpOrb(source, exp, null);
+        }
     }
 
     public void dropExpOrb(Vector3 source, int exp, Vector3 motion) {
@@ -2609,15 +2646,105 @@ public class Level implements ChunkManager, Metadatable {
 
     public BlockColor getMapColorAt(int x, int z) {
         int y = getHighestBlockAt(x, z);
+
         while (y > 1) {
-            BlockColor blockColor = getBlock(new Vector3(x, y, z)).getColor();
-            if (blockColor.getAlpha() == 0x00) {
-                y--;
+            Block block = getBlock(new Vector3(x, y, z));
+            if (block instanceof BlockGrass) {
+                return getGrassColorAt(x, z);
             } else {
-                return blockColor;
+                BlockColor blockColor = block.getColor();
+                if (blockColor.getAlpha() == 0x00) {
+                    y--;
+                } else {
+                    return blockColor;
+                }
             }
         }
+
         return BlockColor.VOID_BLOCK_COLOR;
+    }
+
+    public BlockColor getGrassColorAt(int x, int z) {
+        int biome = this.getBiomeId(x, z);
+
+        switch (biome) {
+            case 0: //ocean
+            case 7: //river
+            case 9: //end
+            case 24: //deep ocean
+                return new BlockColor("#8eb971");
+            case 1: //plains
+            case 16: //beach
+            case 129: //sunflower plains
+                return new BlockColor("#91bd59");
+            case 2: //desert
+            case 8: //hell
+            case 17: //desert hills
+            case 35: //savanna
+            case 36: //savanna plateau
+            case 130: //desert m
+            case 163: //savanna m
+            case 164: //savanna plateau m
+                return new BlockColor("#bfb755");
+            case 3: //extreme hills
+            case 20: //extreme hills edge
+            case 25: //stone beach
+            case 34: //extreme hills
+            case 131: //extreme hills m
+            case 162: //extreme hills plus m
+                return new BlockColor("#8ab689");
+            case 4: //forest
+            case 132: //flower forest
+                return new BlockColor("#79c05a");
+            case 5: //taiga
+            case 19: //taiga hills
+            case 32: //mega taiga
+            case 33: //mega taiga hills
+            case 133: //taiga m
+            case 160: //mega spruce taiga
+                return new BlockColor("#86b783");
+            case 6: //swamp
+            case 134: //swampland m
+                return new BlockColor("#6A7039");
+            case 10: //frozen ocean
+            case 11: //frozen river
+            case 12: //ice plains
+            case 30: //cold taiga
+            case 31: //cold taiga hills
+            case 140: //ice plains spikes
+            case 158: //cold taiga m
+                return new BlockColor("#80b497");
+            case 14: //mushroom island
+            case 15: //mushroom island shore
+                return new BlockColor("#55c93f");
+            case 18: //forest hills
+            case 27: //birch forest
+            case 28: //birch forest hills
+            case 155: //birch forest m
+            case 156: //birch forest hills m
+                return new BlockColor("#88bb67");
+            case 21: //jungle
+            case 22: //jungle hills
+            case 149: //jungle m
+                return new BlockColor("#59c93c");
+            case 23: //jungle edge
+            case 151: //jungle edge m
+                return new BlockColor("#64c73f");
+            case 26: //cold beach
+                return new BlockColor("#83b593");
+            case 29: //roofed forest
+            case 157: //roofed forest m
+                return new BlockColor("#507a32");
+            case 37: //mesa
+            case 38: //mesa plateau f
+            case 39: //mesa plateau
+            case 165: //mesa bryce
+            case 166: //mesa plateau f m
+            case 167: //mesa plateau m
+                return new BlockColor("#90814d");
+            default:
+                return BlockColor.GRASS_BLOCK_COLOR;
+        }
     }
 
     public boolean isChunkLoaded(int x, int z) {

@@ -13,6 +13,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -134,5 +136,22 @@ public class BlockBanner extends BlockTransparentMeta implements Faceable {
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return this.getDyeColor().getColor();
+    }
+
+    public DyeColor getDyeColor() {
+        if (this.level != null) {
+            BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+            if (blockEntity instanceof BlockEntityBanner) {
+                return ((BlockEntityBanner) blockEntity).getDyeColor();
+            }
+        }
+
+        return DyeColor.WHITE;
     }
 }

@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.BlockColor;
 
 public class BlockChorusPlant extends BlockTransparent {
 
@@ -58,5 +59,10 @@ public class BlockChorusPlant extends BlockTransparent {
         }
 
         return 0;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 }

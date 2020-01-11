@@ -132,7 +132,7 @@ public class EntityItem extends Entity {
 
         this.timing.startTiming();
 
-        if (this.age % 100 == 0 && this.onGround && this.item != null && this.isAlive()) {
+        if (this.age % 200 == 0 && this.onGround && this.item != null && this.isAlive()) {
             if (this.item.getCount() < this.item.getMaxStackSize()) {
                 Entity[] e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
                 for (Entity entity : e) {

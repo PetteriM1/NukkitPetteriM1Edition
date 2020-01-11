@@ -194,9 +194,10 @@ public enum TextFormat {
     public static String colorize(char altFormatChar, String textToTranslate) {
         char[] b = textToTranslate.toCharArray();
         for (int i = 0; i < b.length - 1; i++) {
-            if (b[i] == altFormatChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
+            int x = i + 1;
+            if (b[i] == altFormatChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[x]) > -1) {
                 b[i] = TextFormat.ESCAPE;
-                b[i + 1] = Character.toLowerCase(b[i + 1]);
+                b[x] = Character.toLowerCase(b[x]);
             }
         }
         return new String(b);

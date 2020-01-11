@@ -261,7 +261,6 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 					}
 				}
 			}
-
 		}
 
 		if (source.getCause() == EntityDamageEvent.DamageCause.CONTACT) {

@@ -95,17 +95,6 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         this.getLevel().setBlock(block, this, true, true);
         CompoundTag nbt = BlockEntity.getDefaultCompound(this, BlockEntity.SHULKER_BOX)

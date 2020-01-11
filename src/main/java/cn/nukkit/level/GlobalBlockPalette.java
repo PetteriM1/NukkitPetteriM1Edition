@@ -73,6 +73,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId389.defaultReturnValue(-1);
 
         Server.getInstance().getScheduler().scheduleTask(null, () -> {
+            Server.getInstance().getLogger().debug("Loading block palette...");
             // 223
             InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
             if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
@@ -219,7 +220,7 @@ public class GlobalBlockPalette {
             ListTag<CompoundTag> tag389;
             try {
                 //noinspection unchecked
-                tag389 = (ListTag<CompoundTag>) NBTIO.readNetwork(stream389);
+                tag389 = (ListTag<CompoundTag>) NBTIO.readTag(stream389, ByteOrder.LITTLE_ENDIAN, false);
             } catch (IOException e) {
                 throw new AssertionError("Unable to load block palette 389", e);
             }

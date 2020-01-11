@@ -7,6 +7,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.LeverSound;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -225,5 +226,10 @@ public class BlockLever extends BlockFlowable implements Faceable {
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 }

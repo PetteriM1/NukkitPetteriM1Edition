@@ -89,6 +89,6 @@ public class BlockPurpur extends BlockSolidMeta {
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
+        return BlockColor.MAGENTA_BLOCK_COLOR;
     }
 }

@@ -278,6 +278,7 @@ public interface BlockID {
     // 211 Deny in Education Edition
     // 212 Border in Education Edition
     int MAGMA = 213;
+    int MAGMA_BLOCK = 213;
     int BLOCK_NETHER_WART_BLOCK = 214;
     int RED_NETHER_BRICK = 215;
     int BONE_BLOCK = 216;

@@ -2109,6 +2109,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.server.getNetwork().blockAddress(this.socketAddress.getAddress(), 5);
                             this.server.getLogger().notice("Blocked " + getAddress() + " for 5 seconds");
                         }
+                        break;
                     }
 
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
@@ -2906,8 +2907,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
 					            Graphics2D graphics = image.createGraphics();
 
-					            for (int x = 0; x != 128; x++) {
-						            for (int y = 0; y != 128; y++) {
+					            for (int x = 0; x < 128; x++) {
+						            for (int y = 0; y < 128; y++) {
 							            graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
 							            graphics.fillRect(x, y, x, y);
 						            }
@@ -2915,7 +2916,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                 ((ItemMap) mapItem).setImage(image);
                                 ((ItemMap) mapItem).sendImage(this);
-				            } catch (Exception ignored) {}
+				            } catch (Exception ex) {
+				                this.getServer().getLogger().debug("There was an error while generating map image", ex);
+                            }
                         }
                     }
 
@@ -3915,10 +3918,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!ev.getKeepExperience() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
             if (this.isSurvival() || this.isAdventure()) {
                 int exp = ev.getExperience() * 7;
-                if (exp > 0) {
-                    if (exp > 100) exp = 100;
-                    this.getLevel().dropExpOrb(this, exp);
-                }
+                if (exp > 100) exp = 100;
+                this.getLevel().dropExpOrb(this, exp);
             }
             this.setExperience(0, 0);
         }

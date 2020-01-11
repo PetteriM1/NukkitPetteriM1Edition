@@ -601,11 +601,7 @@ public abstract class Entity extends Location implements Metadatable {
     public void setScale(float scale) {
         this.scale = scale;
         this.setDataProperty(new FloatEntityData(DATA_SCALE, this.scale));
-
-        float height = this.getHeight() * this.scale;
-        double radius = (this.getWidth() * this.scale) / 2d;
-
-        this.boundingBox.setBounds(x - radius, y, z - radius, x + radius, y + height, z + radius);
+        this.recalculateBoundingBox();
     }
 
     public float getScale() {
@@ -676,6 +672,25 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (effect.getId() == Effect.HEALTH_BOOST) {
             this.setHealth(this.health + ((effect.getAmplifier() + 1) << 2));
+        }
+    }
+
+    public void recalculateBoundingBox() {
+        this.recalculateBoundingBox(false);
+    }
+
+    public void recalculateBoundingBox(boolean send) {
+        float height = this.getHeight() * this.scale;
+        double radius = (this.getWidth() * this.scale) / 2d;
+        this.boundingBox.setBounds(x - radius, y, z - radius, x + radius, y + height, z + radius);
+
+        FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
+        FloatEntityData bbW = new FloatEntityData(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
+        this.dataProperties.put(bbH);
+        this.dataProperties.put(bbW);
+
+        if (send) {
+            sendData(this.hasSpawned.values().toArray(new Player[0]), new EntityMetadata().put(bbH).put(bbW));
         }
     }
 
@@ -2018,10 +2033,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.y = pos.y;
         this.z = pos.z;
 
-        double radius = this.getWidth() / 2d;
-
-        this.boundingBox.setBounds(pos.x - radius, pos.y, pos.z - radius, pos.x + radius, pos.y + (this.getHeight() * this.scale), pos.z
-                + radius);
+        this.recalculateBoundingBox();
 
         if (!this.isPlayer) {
             this.blocksAround = null;

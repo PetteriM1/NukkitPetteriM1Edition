@@ -7,6 +7,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.BlockColor;
 
 /**
  * @author Nukkit Project Team
@@ -71,5 +72,10 @@ public class BlockRedstoneLamp extends BlockSolid {
         return new Item[]{
                 new ItemBlock(new BlockRedstoneLamp())
         };
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 }

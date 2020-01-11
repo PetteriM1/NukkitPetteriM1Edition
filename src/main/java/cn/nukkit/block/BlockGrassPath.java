@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.utils.BlockColor;
 
 /**
  * Created on 2015/11/22 by xtypr.
@@ -54,5 +55,10 @@ public class BlockGrassPath extends BlockGrass {
         }
 
         return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
     }
 }

@@ -312,6 +312,7 @@ public class Item implements Cloneable, BlockID, ItemID {
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
+        Server.getInstance().getLogger().debug("Loading creative items...");
         clearCreativeItems();
 
         // Creative inventory for oldest versions
@@ -568,7 +569,7 @@ public class Item implements Cloneable, BlockID, ItemID {
         byte[] nbtBytes;
         if (nbt != null) {
             nbtBytes = Base64.getDecoder().decode(nbt);
-        } else { // Support old format for backwards compat
+        } else { // Support old format for backwards compatibility
             nbt = (String) data.getOrDefault("nbt_hex", null);
             if (nbt == null) {
                 nbtBytes = new byte[0];
