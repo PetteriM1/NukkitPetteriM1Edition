@@ -787,7 +787,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         // Tick Weather
-        if (this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName()) && !this.isNether && !this.isEnd) {
+        if (!this.isNether && !this.isEnd && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName())) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -2041,10 +2041,7 @@ public class Level implements ChunkManager, Metadatable {
                         rand.nextFloat() * 360f, 0);
                 nbt.putShort("Value", split);
                 nbt.putShort("PickupDelay", delay);
-                Entity entity = Entity.createEntity("XpOrb", this.getChunk(source.getChunkX(), source.getChunkZ()), nbt);
-                if (entity != null) {
-                    entity.spawnToAll();
-                }
+                Entity.createEntity("XpOrb", this.getChunk(source.getChunkX(), source.getChunkZ()), nbt).spawnToAll();
             }
         }
     }
@@ -2197,10 +2194,7 @@ public class Level implements ChunkManager, Metadatable {
                             return null;
                         }
 
-                        Entity entity = Entity.createEntity("SnowGolem", target.add(0.5, -1, 0.5));
-                        if (entity != null) {
-                            entity.spawnToAll();
-                        }
+                        Entity.createEntity("SnowGolem", target.add(0.5, -1, 0.5)).spawnToAll();
 
                         block.getLevel().setBlock(target, new BlockAir());
                         block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
@@ -2229,10 +2223,7 @@ public class Level implements ChunkManager, Metadatable {
                                 return null;
                             }
 
-                            Entity entity = Entity.createEntity("IronGolem", block.add(0.5, -1, 0.5));
-                            if (entity != null) {
-                                entity.spawnToAll();
-                            }
+                            Entity.createEntity("IronGolem", block.add(0.5, -1, 0.5)).spawnToAll();
 
                             block.getLevel().setBlock(block, new BlockAir());
                             block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
@@ -3090,10 +3081,10 @@ public class Level implements ChunkManager, Metadatable {
         Vector3 spawn = this.getSpawnLocation();
 
         if (this.server.suomiCraftPEMode() && noTickingWorlds.contains(this.getName())) {
-            if (this.getName().equals("lobby")) {
-                return Math.abs(X - (spawn.getFloorX() >> 4)) <= 8 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 8;
+            if (this.equals(this.getServer().getDefaultLevel())) {
+                return Math.abs(X - (spawn.getFloorX() >> 4)) <= 9 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 9;
             }
-            return Math.abs(X - (spawn.getFloorX() >> 4)) <= 4 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 4;
+            return Math.abs(X - (spawn.getFloorX() >> 4)) <= 5 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 5;
         } else {
             return Math.abs(X - (spawn.getFloorX() >> 4)) <= 1 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 1;
         }

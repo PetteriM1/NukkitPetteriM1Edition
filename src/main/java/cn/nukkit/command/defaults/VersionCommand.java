@@ -42,8 +42,7 @@ public class VersionCommand extends VanillaCommand {
             if (sender.isOp()) {
                 sender.getServer().getScheduler().scheduleTask(() -> {
                     try {
-                        URL url = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master");
-                        URLConnection request = url.openConnection();
+                        URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                         request.connect();
                         String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
 

@@ -16,7 +16,7 @@ public class ShapedRecipe implements CraftingRecipe {
     private Item primaryResult;
     private List<Item> extraResults = new ArrayList<>();
 
-    private long least,most;
+    private long least, most;
 
     private final String[] shape;
     private final int priority;

@@ -118,12 +118,9 @@ public class EntityMagmaCube extends EntityJumpingMob {
             }
 
             EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
-
-            if (entity != null) {
-                entity.size = SIZE_MEDIUM;
-                entity.setScale(0.51f + entity.size * 0.51f);
-                entity.spawnToAll();
-            }
+            entity.size = SIZE_MEDIUM;
+            entity.setScale(0.51f + entity.size * 0.51f);
+            entity.spawnToAll();
 
             return new Item[0];
         } else if (this.size == SIZE_MEDIUM) {
@@ -135,12 +132,9 @@ public class EntityMagmaCube extends EntityJumpingMob {
             }
 
             EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
-
-            if (entity != null) {
-                entity.size = SIZE_SMALL;
-                entity.setScale(0.51f + entity.size * 0.51f);
-                entity.spawnToAll();
-            }
+            entity.size = SIZE_SMALL;
+            entity.setScale(0.51f + entity.size * 0.51f);
+            entity.spawnToAll();
 
             return new Item[0];
         } else {

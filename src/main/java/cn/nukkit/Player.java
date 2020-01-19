@@ -3656,7 +3656,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.loggedIn = false;
 
             if (ev != null && !Objects.equals(this.username, "") && this.spawned && !Objects.equals(ev.getQuitMessage().toString(), "")) {
-                if (!ev.getQuitMessage().toString().contains("Transferred to")) this.server.broadcastMessage(ev.getQuitMessage());
+                this.server.broadcastMessage(ev.getQuitMessage());
             }
 
             this.server.getPluginManager().unsubscribeFromPermission(Server.BROADCAST_CHANNEL_USERS, this);
@@ -4824,7 +4824,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.port = port;
         this.dataPacket(pk);
         String message = "Transferred to " + hostName + ':' + port;
-        this.close(message, message, false);
+        this.close("", message, false);
     }
 
     /**
@@ -4936,7 +4936,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             EntityXPOrb xpOrb = (EntityXPOrb) entity;
             if (xpOrb.getPickupDelay() <= 0) {
                 int exp = xpOrb.getExp();
-                entity.kill();
+                entity.close();
                 this.getLevel().addSound(new ExperienceOrbSound(this));
                 pickedXPOrb = server.getTick();
 
@@ -5028,7 +5028,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 		ProjectileLaunchEvent ev = new ProjectileLaunchEvent(fishingHook);
 		this.getServer().getPluginManager().callEvent(ev);
 		if (ev.isCancelled()) {
-			fishingHook.kill();
+			fishingHook.close();
 		} else {
 			fishingHook.spawnToAll();
             this.fishing = fishingHook;

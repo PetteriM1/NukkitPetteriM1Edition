@@ -10,12 +10,12 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Scanner;
 
 /*
  * `_   _       _    _    _ _
@@ -55,17 +55,21 @@ public class Nukkit {
         System.setProperty("java.net.preferIPv4Stack" , "true");
         System.setProperty("log4j.skipJansi", "false");
 
+        boolean loadPlugins = true;
+
         if (args.length > 0 && args[0].equalsIgnoreCase("-DEBUG")) {
             InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
             System.out.print("Debug stuff enabled!\n");
+            System.out.print("Do you want to skip loading plugins? (yes/no) ");
+            loadPlugins = !"yes".equals(new Scanner(System.in).nextLine());
         }
 
         try {
             if (TITLE) {
                 System.out.print("\u001B]0;Nukkit PetteriM1 Edition\u0007");
             }
-            new Server(PATH, DATA_PATH, PLUGIN_PATH);
+            new Server(PATH, DATA_PATH, PLUGIN_PATH, loadPlugins);
         } catch (Throwable t) {
             log.throwing(t);
         }
@@ -123,9 +127,12 @@ public class Nukkit {
     public static void setLogLevel(Level level) {
         Preconditions.checkNotNull(level, "level");
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration log4jConfig = ctx.getConfiguration();
-        LoggerConfig loggerConfig = log4jConfig.getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME);
+        LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME);
         loggerConfig.setLevel(level);
         ctx.updateLoggers();
+    }
+
+    public static Level getLogLevel() {
+        return ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME).getLevel();
     }
 }

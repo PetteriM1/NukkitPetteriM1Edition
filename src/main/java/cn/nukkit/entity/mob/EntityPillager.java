@@ -61,12 +61,7 @@ public class EntityPillager extends EntityWalkingMob {
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
             if (this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
-                Entity k = Entity.createEntity("Arrow", pos, this);
-                if (!(k instanceof EntityArrow)) {
-                    return;
-                }
-
-                EntityArrow arrow = (EntityArrow) k;
+                EntityArrow arrow = (EntityArrow) Entity.createEntity("Arrow", pos, this);
                 arrow.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                         Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
@@ -75,12 +70,12 @@ public class EntityPillager extends EntityWalkingMob {
 
                 EntityProjectile projectile = ev.getProjectile();
                 if (ev.isCancelled()) {
-                    projectile.kill();
+                    projectile.close();
                 } else {
                     ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
                     this.server.getPluginManager().callEvent(launch);
                     if (launch.isCancelled()) {
-                        projectile.kill();
+                        projectile.close();
                     } else {
                         projectile.namedTag.putDouble("damage", 4);
                         projectile.spawnToAll();

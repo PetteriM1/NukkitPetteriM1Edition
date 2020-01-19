@@ -14,7 +14,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     private final Item output;
 
-    private long least,most;
+    private long least, most;
 
     private final List<Item> ingredients;
 

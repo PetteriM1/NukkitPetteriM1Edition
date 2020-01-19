@@ -46,7 +46,7 @@ public abstract class ProjectileItem extends Item {
         if (projectile != null) {
             if (projectile instanceof EntityEnderPearl) {
                 if (player.getServer().getTick() - player.getLastEnderPearlThrowingTick() < 20) {
-                    projectile.kill();
+                    projectile.close();
                     return false;
                 }
             }
@@ -59,10 +59,10 @@ public abstract class ProjectileItem extends Item {
                 player.getServer().getPluginManager().callEvent(ev);
 
                 if (ev.isCancelled()) {
-                    projectile.kill();
+                    projectile.close();
                 } else if (player.getGamemode() == Player.CREATIVE && projectile instanceof EntityExpBottle && !player.getServer().xpBottlesOnCreative) {
                     ev.setCancelled(true);
-                    projectile.kill();
+                    projectile.close();
                     player.sendMessage("\u00A7cXP bottles are disabled on creative");
                 } else {
                     if (!player.isCreative()) {

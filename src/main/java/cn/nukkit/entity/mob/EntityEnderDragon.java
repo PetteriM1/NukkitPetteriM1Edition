@@ -77,19 +77,15 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
             double f = 1.1;
             double yaw = this.yaw + Utils.rand(-12.0, 12.0);
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Entity k = Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
-            if (!(k instanceof EntityEnderCharge)) {
-                return;
-            }
 
-            EntityEnderCharge charge = (EntityEnderCharge) k;
+            EntityEnderCharge charge = (EntityEnderCharge) Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
             charge.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                     Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(charge);
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                charge.kill();
+                charge.close();
             } else {
                 charge.spawnToAll();
             }
