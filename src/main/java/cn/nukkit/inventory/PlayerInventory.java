@@ -425,7 +425,6 @@ public class PlayerInventory extends BaseInventory {
             }
             pk.inventoryId = id;
             player.dataPacket(pk.clone());
-
         }
     }
 

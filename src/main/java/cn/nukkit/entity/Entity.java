@@ -923,7 +923,7 @@ public abstract class Entity extends Location implements Metadatable {
             player.dataPacket(pkBoss);
         }
     }
-    
+
     protected DataPacket createAddEntityPacket() {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
@@ -973,9 +973,25 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player player, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.id;
-        pk.metadata = data == null ? this.dataProperties : data;
+        if (player.protocol < 274) {
+            pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
+        } else {
+            pk.metadata = data == null ? this.dataProperties : data;
+        }
 
         player.dataPacket(pk);
+    }
+
+    private EntityMetadata mvReplace(EntityMetadata data) {
+        EntityMetadata updated = new EntityMetadata()
+                .putLong(DATA_FLAGS, data.getLong(DATA_FLAGS))
+                .putShort(DATA_AIR, data.getShort(DATA_AIR))
+                .putShort(43, data.getShort(DATA_MAX_AIR))
+                .putString(DATA_NAMETAG, data.getString(DATA_NAMETAG))
+                .putLong(DATA_LEAD_HOLDER_EID, data.getLong(DATA_LEAD_HOLDER_EID))
+                .putFloat(DATA_SCALE, data.getFloat(DATA_SCALE));
+        // TODO: All other data properties
+        return updated;
     }
 
     public void sendData(Player[] players) {
@@ -985,15 +1001,25 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player[] players, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.id;
-        pk.metadata = data == null ? this.dataProperties : data;
+        //pk.metadata = data == null ? this.dataProperties : data;
 
         for (Player player : players) {
             if (player == this) {
                 continue;
             }
-            player.dataPacket(pk.clone());
+            if (player.protocol < 274) {
+                pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
+            } else {
+                pk.metadata = data == null ? this.dataProperties : data;
+            }
+            player.dataPacket(pk/*.clone()*/);
         }
         if (this.isPlayer) {
+            if (((Player) this).protocol < 274) {
+                pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
+            } else {
+                pk.metadata = data == null ? this.dataProperties : data;
+            }
             ((Player) this).dataPacket(pk);
         }
     }
