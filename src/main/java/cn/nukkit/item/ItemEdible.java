@@ -32,7 +32,9 @@ public abstract class ItemEdible extends Item {
         if (player.getFoodData().getLevel() < player.getFoodData().getMaxLevel() || player.isCreative()) {
             return true;
         }
-        player.getFoodData().sendFoodLevel();
+        if (player.protocol > 361) {
+            player.getFoodData().sendFoodLevel();
+        }
         return false;
     }
 
