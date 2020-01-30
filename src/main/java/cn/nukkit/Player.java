@@ -800,6 +800,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= this.spawnThreshold) {
+            if (this.protocol < 274) {
+                this.initialized = true;
+                this.doFirstSpawn();
+            }
+
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
             this.spawnChunkLoadCount = -1;
         }
@@ -814,6 +819,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.noDamageTicks = 60;
         this.setAirTicks(400);
+        this.sendAttributes();
 
         if (this.hasPermission(Server.BROADCAST_CHANNEL_USERS)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_USERS, this);
@@ -828,7 +834,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.server.getPluginManager().callEvent(respawnEvent);
 
-        if (this.getHealth() <= 0) {
+        if (this.getHealth() <= 0 || this.protocol < 274) {
             pos = this.getSpawn();
             RespawnPacket respawnPacket = new RespawnPacket();
             respawnPacket.x = (float) pos.x;
@@ -2014,11 +2020,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 this.setImmobile(true);
-                this.setMovementSpeed(DEFAULT_SPEED);
-                this.sendAttributes();
+                this.setCanClimb(true);
                 this.setNameTagVisible(true);
                 this.setNameTagAlwaysVisible(true);
-                this.setCanClimb(true);
+                this.sendAttributes();
                 this.adventureSettings.update();
                 this.sendPotionEffects(this);
                 this.sendData(this);
@@ -2035,11 +2040,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.inventory.sendHeldItem(this);
                 this.server.sendRecipeList(this);
 
-                if (this.isOp() && !server.checkOpMovement) {
+                boolean op = this.isOp();
+
+                if (!server.checkOpMovement && op) {
                     this.setCheckMovement(false);
                 }
 
-                if (this.isOp() || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
+                if (op || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
                     this.setRemoveFormat(false);
                 }
             } catch (Exception e) {
@@ -3322,12 +3329,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET:
-                    if (this.initialized) {
+                    if (this.initialized || this.protocol < 274) {
                         return;
                     }
 
                     this.initialized = true;
-                    doFirstSpawn();
+                    this.doFirstSpawn();
                     break;
                 case ProtocolInfo.RESPAWN_PACKET:
                     if (this.isAlive() || this.protocol < 388) {
