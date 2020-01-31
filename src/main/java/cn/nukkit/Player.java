@@ -3879,11 +3879,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
-            if (cause.getCause() != DamageCause.VOID) {
+            if (cause != null && cause.getCause() != DamageCause.VOID) {
                 Inventory inventory = this.getOffhandInventory();
                 Item totem = Item.get(Item.TOTEM, 0, 1);
                 if (inventory.contains(totem) || ((PlayerInventory) (inventory = this.getInventory())).getItemInHand() instanceof ItemTotem) {
-                    inventory.remove(totem);
+                    inventory.removeItem(totem);
                     this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
                     this.extinguish();
                     this.setHealth(1);
