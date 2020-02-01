@@ -166,9 +166,9 @@ public class CraftingDataPacket extends DataPacket {
                     this.putVarInt(recipe.getResult().getId());
                 }
             }
-
-            this.putBoolean(cleanRecipes);
         }
+
+        this.putBoolean(cleanRecipes);
     }
 
     @Override
