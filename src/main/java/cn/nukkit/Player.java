@@ -3889,6 +3889,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.setHealth(1);
 
                     this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(2));
+                    this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800).setAmplifier(2));
                     this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(2));
 
                     EntityEventPacket pk = new EntityEventPacket();
