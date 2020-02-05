@@ -1093,6 +1093,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.getServer().bedSpawnpoints) {
             this.setSpawn(pos);
+            this.sendTranslation("tile.bed.respawnSet");
         }
 
         this.level.sleepTicks = 60;
@@ -1123,7 +1124,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.sleeping = null;
             this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0));
             this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
-
 
             this.level.sleepTicks = 0;
 
@@ -1474,7 +1474,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                 }
 
-
                 this.x = newPos.x;
                 this.y = newPos.y;
                 this.z = newPos.z;
@@ -1601,7 +1600,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (revert) {
-
             this.lastX = from.x;
             this.lastY = from.y;
             this.lastZ = from.z;
@@ -2536,7 +2534,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             break packetswitch;
                         case PlayerActionPacket.ACTION_DIMENSION_CHANGE_ACK:
-                            this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_NORMAL);
+                            this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
                             break;
                         case PlayerActionPacket.ACTION_START_GLIDE:
                             PlayerToggleGlideEvent playerToggleGlideEvent = new PlayerToggleGlideEvent(this, true);
@@ -3886,6 +3884,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     inventory.removeItem(totem);
                     this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
                     this.extinguish();
+                    this.removeAllEffects();
                     this.setHealth(1);
 
                     this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(1));
@@ -4714,13 +4713,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param dimension dimension id
      */
     public void setDimension(int dimension) {
-        if (this.protocol >= 313) {
-            NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
-            pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
-            pk0.radius = viewDistance << 4;
-            this.directDataPacket(pk0);
-        }
-
         ChangeDimensionPacket pk1 = new ChangeDimensionPacket();
         pk1.dimension = dimension;
         pk1.x = (float) this.x;
@@ -4729,16 +4721,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk1.respawn = !this.isAlive();
         this.directDataPacket(pk1);
 
-        this.forceSendEmptyChunks();
-
-        PlayerActionPacket pk2 = new PlayerActionPacket();
-        pk2.entityId = this.id;
-        pk2.action = PlayerActionPacket.ACTION_DIMENSION_CHANGE_ACK;
-        pk2.x = (int) this.x;
-        pk2.y = (int) this.y;
-        pk2.z = (int) this.z;
-        pk2.face = 0;
-        this.dataPacket(pk2);
+        if (this.protocol >= 313) {
+            NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
+            pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
+            pk0.radius = viewDistance << 4;
+            this.directDataPacket(pk0);
+        }
     }
 
     @Override
@@ -4769,6 +4757,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             level.sendTime(this);
             level.sendWeather(this);
+
+            // Update game rules
+            GameRulesChangedPacket packet = new GameRulesChangedPacket();
+            packet.gameRules = level.getGameRules();
+            this.dataPacket(packet);
 
             if (this.getServer().dimensionsEndbled && oldLevel.getDimension() != level.getDimension()) {
                 this.setDimension(level.getDimension());

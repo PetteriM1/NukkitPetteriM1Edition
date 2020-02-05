@@ -163,7 +163,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
     public void setAngry(boolean bool) {
         this.angry = bool;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_VIBRATING, bool);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, bool);
     }
 
     @Override
