@@ -896,31 +896,30 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void spawnTo(Player player) {
-        player.dataPacket(createAddEntityPacket());
-
         if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
+            player.dataPacket(createAddEntityPacket());
             this.hasSpawned.put(player.getLoaderId(), player);
-        }
 
-        if (this.riding != null) {
-            this.riding.spawnTo(player);
+            if (this.riding != null) {
+                this.riding.spawnTo(player);
 
-            SetEntityLinkPacket pkk = new SetEntityLinkPacket();
-            pkk.vehicleUniqueId = this.riding.id;
-            pkk.riderUniqueId = this.id;
-            pkk.type = 1;
-            pkk.immediate = 1;
+                SetEntityLinkPacket pkk = new SetEntityLinkPacket();
+                pkk.vehicleUniqueId = this.riding.id;
+                pkk.riderUniqueId = this.id;
+                pkk.type = 1;
+                pkk.immediate = 1;
 
-            player.dataPacket(pkk);
-        }
+                player.dataPacket(pkk);
+            }
 
-        if (this instanceof EntityBoss && this.server.vanillaBB) {
-            BossEventPacket pkBoss = new BossEventPacket();
-            pkBoss.bossEid = this.id;
-            pkBoss.type = BossEventPacket.TYPE_SHOW;
-            pkBoss.title = this.getName();
-            pkBoss.healthPercent = this.health;
-            player.dataPacket(pkBoss);
+            if (this instanceof EntityBoss && this.server.vanillaBB) {
+                BossEventPacket pkBoss = new BossEventPacket();
+                pkBoss.bossEid = this.id;
+                pkBoss.type = BossEventPacket.TYPE_SHOW;
+                pkBoss.title = this.getName();
+                pkBoss.healthPercent = this.health;
+                player.dataPacket(pkBoss);
+            }
         }
     }
 

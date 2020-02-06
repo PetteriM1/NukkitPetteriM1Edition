@@ -834,7 +834,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.server.getPluginManager().callEvent(respawnEvent);
 
-        if (this.getHealth() <= 0 || this.protocol < 274) {
+        if (this.getHealth() < 1 || this.protocol < 274) {
             pos = this.getSpawn();
             RespawnPacket respawnPacket = new RespawnPacket();
             respawnPacket.x = (float) pos.x;
