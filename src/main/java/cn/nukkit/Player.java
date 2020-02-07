@@ -1916,7 +1916,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 .set(Type.NO_CLIP, isSpectator());
 
         Level level;
-        if ((level = this.server.getLevelByName(nbt.getString("Level"))) == null || !(0 <= nbt.getShort("Health"))) {
+        if ((level = this.server.getLevelByName(nbt.getString("Level"))) == null || nbt.getShort("Health") < 1) {
             this.setLevel(this.server.getDefaultLevel());
             nbt.putString("Level", this.level.getName());
             nbt.getList("Pos", DoubleTag.class)

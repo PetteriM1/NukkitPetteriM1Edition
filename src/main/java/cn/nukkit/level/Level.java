@@ -779,7 +779,7 @@ public class Level implements ChunkManager, Metadatable {
         updateBlockLight(lightQueue);
         this.checkTime();
         
-        if (stopTime || !this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE) || currentTick % 1200 == 0) {
+        if (/*stopTime || !this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE) ||*/ currentTick % 2400 == 0) {
             this.sendTime();
         }
 

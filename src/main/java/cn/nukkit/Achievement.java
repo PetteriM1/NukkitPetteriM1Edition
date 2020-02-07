@@ -5,7 +5,7 @@ import cn.nukkit.utils.TextFormat;
 import java.util.HashMap;
 
 /**
- * Achievement list & functions
+ * Achievement list and functions
  *
  * @author CreeperFace
  */

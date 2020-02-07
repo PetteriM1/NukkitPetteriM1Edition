@@ -16,19 +16,13 @@ import java.util.List;
 
 public class Spawner extends Thread {
 
-    private final List<EntitySpawner> entitySpawners = Arrays.asList(
-            new BlazeSpawner(this),
+    private final List<EntitySpawner> animalSpawners = Arrays.asList(
             new ChickenSpawner(this),
             new CodSpawner(this),
             new CowSpawner(this),
-            new CreeperSpawner(this),
             new DolphinSpawner(this),
             new DonkeySpawner(this),
-            new EndermanSpawner(this),
-            new GhastSpawner(this),
             new HorseSpawner(this),
-            new HuskSpawner(this),
-            new MagmaCubeSpawner(this),
             new MooshroomSpawner(this),
             new OcelotSpawner(this),
             new ParrotSpawner(this),
@@ -38,25 +32,41 @@ public class Spawner extends Thread {
             new RabbitSpawner(this),
             new SalmonSpawner(this),
             new SheepSpawner(this),
+            new SquidSpawner(this),
+            new TropicalFishSpawner(this),
+            new TurtleSpawner(this),
+            new WolfSpawner(this)
+    );
+
+    private final List<EntitySpawner> mobSpawners = Arrays.asList(
+            new BlazeSpawner(this),
+            new CreeperSpawner(this),
+            new EndermanSpawner(this),
+            new GhastSpawner(this),
+            new HuskSpawner(this),
+            new MagmaCubeSpawner(this),
             new SkeletonSpawner(this),
             new SlimeSpawner(this),
             new SpiderSpawner(this),
-            new SquidSpawner(this),
             new StraySpawner(this),
-            new TropicalFishSpawner(this),
-            new TurtleSpawner(this),
             new ZombieSpawner(this),
             new ZombiePigmanSpawner(this),
             new WitchSpawner(this),
-            new WitherSkeletonSpawner(this),
-            new WolfSpawner(this)
+            new WitherSkeletonSpawner(this)
     );
 
     @Override
     public void run() {
         if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
-            for (EntitySpawner spawner : entitySpawners) {
-                spawner.spawn();
+            if (Server.getInstance().spawnAnimals) {
+                for (EntitySpawner spawner : animalSpawners) {
+                    spawner.spawn();
+                }
+            }
+            if (Server.getInstance().spawnMobs) {
+                for (EntitySpawner spawner : mobSpawners) {
+                    spawner.spawn();
+                }
             }
         }
     }

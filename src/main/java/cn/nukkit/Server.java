@@ -231,6 +231,8 @@ public class Server {
     public boolean despawnEntities;
     public boolean strongIPBans;
     public boolean forceMtu;
+    public boolean spawnAnimals;
+    public boolean spawnMobs;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2097,6 +2099,8 @@ public class Server {
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
         this.forceMtu = this.getPropertyBoolean("force-mtu", false);
+        this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
+        this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2119,6 +2123,8 @@ public class Server {
             put("announce-player-achievements", false);
             put("spawn-protection", 10);
             put("max-players", 50);
+            put("spawn-animals", true);
+            put("spawn-mobs", true);
             put("gamemode", 0);
             put("force-gamemode", true);
             put("hardcore", false);
