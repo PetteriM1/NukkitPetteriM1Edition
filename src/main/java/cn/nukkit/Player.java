@@ -42,6 +42,7 @@ import cn.nukkit.inventory.transaction.data.UseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
 import cn.nukkit.item.*;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.item.food.Food;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.*;
@@ -3281,14 +3282,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             }
                                             Potion potion = Potion.getPotion(itemInHand.getDamage());
 
-                                            if (this.gamemode == SURVIVAL) {
-                                                --itemInHand.count;
-                                                this.inventory.setItemInHand(itemInHand);
+                                            if (this.gamemode == SURVIVAL || this.gamemode == ADVENTURE) {
+                                                this.getInventory().decreaseCount(this.getInventory().getHeldItemIndex());
                                                 this.inventory.addItem(new ItemGlassBottle());
                                             }
 
                                             if (potion != null) {
                                                 potion.applyPotion(this);
+                                            }
+                                        } else { // Food
+                                            this.server.getPluginManager().callEvent(consumeEvent);
+                                            if (consumeEvent.isCancelled()) {
+                                                this.inventory.sendContents(this);
+                                                break;
+                                            }
+
+                                            Food food = Food.getByRelative(itemInHand);
+                                            if (food != null && food.eatenBy(this)) {
+                                                this.getInventory().decreaseCount(this.getInventory().getHeldItemIndex());
                                             }
                                         }
                                         return;

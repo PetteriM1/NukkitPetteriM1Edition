@@ -114,14 +114,13 @@ public class Binary {
 
             // HACK: Multiversion entity data
             if (protocol < 361) {
-                if (protocol <= 201) {
-                    if (id2 > 35 && id2 < 400) {
+                if (protocol == 354) {
+                    if (id2 >= 40) {
                         id2 = id2 + 1;
                     }
-                }
-                if (protocol == 354) {
-                    if (id2 > 40 && id2 < 400) {
-                        id2 = id2 + 1;
+                } else if (protocol <= 201) {
+                    if (id2 > 35) {
+                        id2 = id2 - 1;
                     }
                 }
             }
