@@ -21,7 +21,7 @@ import java.util.UUID;
  * @author MagicDroidX
  * Nukkit Project
  */
-public class Binary {
+public class Binary implements ProtocolInfo {
 
     public static int signByte(int value) {
         return value << 56 >> 56;
@@ -101,7 +101,7 @@ public class Binary {
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {
-        return writeMetadata(ProtocolInfo.CURRENT_PROTOCOL, metadata);
+        return writeMetadata(CURRENT_PROTOCOL, metadata);
     }
 
     public static byte[] writeMetadata(int protocol, EntityMetadata metadata) {
@@ -113,12 +113,12 @@ public class Binary {
             int id2 = entry.getKey();
 
             // HACK: Multiversion entity data
-            if (protocol < 361) {
-                if (protocol == 354) {
+            if (protocol < v1_12_0) {
+                if (protocol == v1_11_0) {
                     if (id2 >= 40) {
                         id2 = id2 + 1;
                     }
-                } else if (protocol <= 201) {
+                } else if (protocol <= v1_2_10) {
                     if (id2 > 35) {
                         id2 = id2 - 1;
                     }
@@ -148,7 +148,7 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_NBT:
                     NBTEntityData slot = (NBTEntityData) d;
-                    if (protocol < 361) {
+                    if (protocol < v1_12_0) {
                         stream.putSlot(protocol, slot.item);
                     } else {
                         try {
