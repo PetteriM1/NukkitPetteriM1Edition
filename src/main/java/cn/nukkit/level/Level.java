@@ -2577,8 +2577,6 @@ public class Level implements ChunkManager, Metadatable {
         if (oldChunk != chunk) {
             if (unload && oldChunk != null) {
                 this.unloadChunk(chunkX, chunkZ, false, false);
-
-                this.provider.setChunk(chunkX, chunkZ, chunk);
             } else {
                 Map<Long, Entity> oldEntities = oldChunk != null ? oldChunk.getEntities() : Collections.emptyMap();
 
@@ -2612,8 +2610,8 @@ public class Level implements ChunkManager, Metadatable {
                     }
                 }
 
-                this.provider.setChunk(chunkX, chunkZ, chunk);
             }
+            this.provider.setChunk(chunkX, chunkZ, chunk);
         }
 
         chunk.setChanged();
@@ -3254,7 +3252,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void doChunkGarbageCollection() {
         this.timings.doChunkGC.startTiming();
-        // Remove all invaild block entities
+        // Remove all invalid block entities
         if (!blockEntities.isEmpty()) {
             ObjectIterator<BlockEntity> iter = blockEntities.values().iterator();
             while (iter.hasNext()) {

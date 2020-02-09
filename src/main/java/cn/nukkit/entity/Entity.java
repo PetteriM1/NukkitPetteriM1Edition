@@ -256,7 +256,7 @@ public abstract class Entity extends Location implements Metadatable {
     public int age = 0;
 
     protected float health = 20;
-    private int maxHealth = 20;
+    protected int maxHealth = 20;
 
     protected float absorption = 0;
 

@@ -125,7 +125,7 @@ public class QueryRegenerateEvent extends ServerEvent {
     public byte[] getLongQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
         StringBuilder plist = new StringBuilder(Nukkit.NUKKIT);
-        if (this.plugins.length > 0 && this.listPlugins) {
+        if (this.listPlugins && this.plugins.length > 0) {
             plist.append(':');
             for (Plugin p : this.plugins) {
                 PluginDescription d = p.getDescription();
