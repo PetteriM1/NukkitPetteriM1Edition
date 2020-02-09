@@ -566,7 +566,7 @@ public class Server {
         //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
                 //player.dataPacket(packet); // HACK: Force multiversion
-                if (player.protocol <= 274) { // 1.5 or lower
+                if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
                     mvplayers = true;
                     break;
                 }
@@ -964,11 +964,11 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol < 354) {
+        if (player.protocol < ProtocolInfo.v1_11_0) {
             player.dataPacket(CraftingManager.packetPre354);
-        } else if (player.protocol == 354) {
+        } else if (player.protocol == ProtocolInfo.v1_11_0) {
             player.dataPacket(CraftingManager.packet354);
-        } else if (player.protocol == 361) {
+        } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
         } else {
             player.dataPacket(CraftingManager.packet);
