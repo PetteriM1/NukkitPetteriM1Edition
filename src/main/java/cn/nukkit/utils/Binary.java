@@ -101,7 +101,7 @@ public class Binary {
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {
-        return writeMetadata(CURRENT_PROTOCOL, metadata);
+        return writeMetadata(ProtocolInfo.CURRENT_PROTOCOL, metadata);
     }
 
     public static byte[] writeMetadata(int protocol, EntityMetadata metadata) {
