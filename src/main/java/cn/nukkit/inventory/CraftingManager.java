@@ -256,22 +256,22 @@ public class CraftingManager {
         }
         pk354.encode();
         packet354 = pk354.compress(Deflater.BEST_COMPRESSION);
-        // Pre 354
-        CraftingDataPacket pkPre354 = new CraftingDataPacket();
-        pkPre354.cleanRecipes = true;
-        pkPre354.protocol = 340;
+        // 340
+        CraftingDataPacket pk340 = new CraftingDataPacket();
+        pk340.cleanRecipes = true;
+        pk340.protocol = 340;
         for (Recipe recipe : this.recipesVeryOld) {
             if (recipe instanceof ShapedRecipe) {
-                pkPre354.addShapedRecipe((ShapedRecipe) recipe);
+                pk340.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
-                pkPre354.addShapelessRecipe((ShapelessRecipe) recipe);
+                pk340.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pkPre354.addFurnaceRecipe(recipe);
+            pk340.addFurnaceRecipe(recipe);
         }
-        pkPre354.encode();
-        packet340 = pkPre354.compress(Deflater.BEST_COMPRESSION);
+        pk340.encode();
+        packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
     }
 
     public Collection<Recipe> getRecipes() {
