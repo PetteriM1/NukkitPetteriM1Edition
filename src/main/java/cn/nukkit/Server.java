@@ -959,12 +959,18 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol < 354) {
-            player.dataPacket(CraftingManager.packetPre354);
-        } else if (player.protocol < 361) {
-            player.dataPacket(CraftingManager.packet354);
-        } else {
-            player.dataPacket(CraftingManager.packet);
+        // Don't send recipes if they wouldn't work anyways
+        // TODO: Support for older versions
+        if (player.protocol >= 340) {
+            if (player.protocol == 354) {
+                player.dataPacket(CraftingManager.packet354);
+            } else if (player.protocol == 361) {
+                player.dataPacket(CraftingManager.packet361);
+            } else if (player.protocol == 340) {
+                player.dataPacket(CraftingManager.packet340);
+            } else { // Current version(s)
+                player.dataPacket(CraftingManager.packet);
+            }
         }
     }
 

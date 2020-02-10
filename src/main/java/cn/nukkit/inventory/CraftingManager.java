@@ -27,7 +27,7 @@ public class CraftingManager {
     public static BatchPacket packet = null;
     public static BatchPacket packet361 = null;
     public static BatchPacket packet354 = null;
-    public static BatchPacket packetPre354 = null;
+    public static BatchPacket packet340 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -259,7 +259,7 @@ public class CraftingManager {
         // Pre 354
         CraftingDataPacket pkPre354 = new CraftingDataPacket();
         pkPre354.cleanRecipes = true;
-        pkPre354.protocol = 0;
+        pkPre354.protocol = 340;
         for (Recipe recipe : this.recipesVeryOld) {
             if (recipe instanceof ShapedRecipe) {
                 pkPre354.addShapedRecipe((ShapedRecipe) recipe);
@@ -271,7 +271,7 @@ public class CraftingManager {
             pkPre354.addFurnaceRecipe(recipe);
         }
         pkPre354.encode();
-        packetPre354 = pkPre354.compress(Deflater.BEST_COMPRESSION);
+        packet340 = pkPre354.compress(Deflater.BEST_COMPRESSION);
     }
 
     public Collection<Recipe> getRecipes() {
