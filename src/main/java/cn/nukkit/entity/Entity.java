@@ -1574,7 +1574,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public void fall(float fallDistance) {
         float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
-        if (damage > 0) {
+        if (damage > 0 && !this.hasEffect(Effect.SLOW_FALLING)) {
             if (!this.isPlayer || level.getGameRules().getBoolean(GameRule.FALL_DAMAGE)) {
                 this.attack(new EntityDamageEvent(this, DamageCause.FALL, damage));
             }

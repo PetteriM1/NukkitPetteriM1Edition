@@ -55,6 +55,7 @@ import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.ContainerIds;
@@ -3460,6 +3461,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
+        pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3490,6 +3492,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message, parameters);
         }
+        pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3502,6 +3505,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.type = TextPacket.TYPE_CHAT;
         pk.source = source;
         pk.message = this.server.getLanguage().translateString(message);
+        pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3509,6 +3513,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_POPUP;
         pk.message = message;
+        pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3520,6 +3525,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
+        pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
