@@ -64,7 +64,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
     @Override
     public void onCollideWithEntity(Entity entity) {
         super.onCollideWithEntity(entity);
-        entity.addEffect(Effect.getEffect(Effect.WITHER).setAmplifier(1).setDuration(200));
+        entity.addEffect(Effect.getEffect(Effect.WITHER).setDuration(200));
     }
 
     @Override

@@ -391,13 +391,11 @@ public abstract class BaseLevelProvider implements LevelProvider {
         synchronized (chunks) {
             lastChunk.set(tmp = chunks.get(index));
         }
-        if (tmp != null) {
-            return tmp;
-        } else {
+        if (tmp == null) {
             tmp = this.loadChunk(index, chunkX, chunkZ, create);
             lastChunk.set(tmp);
-            return tmp;
         }
+        return tmp;
     }
 
     @Override

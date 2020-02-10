@@ -82,12 +82,12 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
             EntityProjectile projectile = ev.getProjectile();
             if (ev.isCancelled()) {
-                projectile.kill();
+                projectile.close();
             } else if (projectile != null) {
                 ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
                 this.server.getPluginManager().callEvent(launch);
                 if (launch.isCancelled()) {
-                    projectile.kill();
+                    projectile.close();
                 } else {
                     projectile.spawnToAll();
                 }

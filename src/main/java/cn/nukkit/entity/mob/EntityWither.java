@@ -83,32 +83,22 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             if (Utils.rand(0, 200) > 180 || Utils.rand(0, 200) < 20) {
                 f = 0.8;
                 k = Entity.createEntity("BlueWitherSkull", pos, this);
-                if (!(k instanceof EntityBlueWitherSkull)) {
-                    return;
-                }
-
                 skull = (EntityBlueWitherSkull) k;
                 ((EntityBlueWitherSkull) skull).setExplode(true);
                 skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                         Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
                 launch = new ProjectileLaunchEvent(skull);
             } else {
                 k = Entity.createEntity("WitherSkull", pos, this);
-                if (!(k instanceof EntityWitherSkull)) {
-                    return;
-                }
-
                 skull = (EntityWitherSkull) k;
                 skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                         Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
                 launch = new ProjectileLaunchEvent(skull);
             }
 
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                skull.kill();
+                skull.close();
             } else {
                 skull.spawnToAll();
                 this.level.addSound(this, Sound.MOB_WITHER_SHOOT);

@@ -1,6 +1,7 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockFurnace;
@@ -274,20 +275,22 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
             burnDuration = 0;
         }
 
-        for (Player player : this.inventory.getViewers()) {
-            int windowId = player.getWindowId(this.inventory);
-            if (windowId > 0) {
-                ContainerSetDataPacket pk = new ContainerSetDataPacket();
-                pk.windowId = windowId;
-                pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_TICK_COUNT;
-                pk.value = cookTime;
-                player.dataPacket(pk);
+        if (Server.getInstance().getTick() % 4 == 0) {
+            for (Player player : this.inventory.getViewers()) {
+                int windowId = player.getWindowId(this.inventory);
+                if (windowId > 0) {
+                    ContainerSetDataPacket pk = new ContainerSetDataPacket();
+                    pk.windowId = windowId;
+                    pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_TICK_COUNT;
+                    pk.value = cookTime;
+                    player.dataPacket(pk);
 
-                pk = new ContainerSetDataPacket();
-                pk.windowId = windowId;
-                pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_LIT_TIME;
-                pk.value = burnDuration;
-                player.dataPacket(pk);
+                    pk = new ContainerSetDataPacket();
+                    pk.windowId = windowId;
+                    pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_LIT_TIME;
+                    pk.value = burnDuration;
+                    player.dataPacket(pk);
+                }
             }
         }
 

@@ -460,7 +460,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     private void addHealth(int health) {
-        this.setMaxHealth(this.getMaxHealth() + health);
+        this.maxHealth = this.maxHealth + health;
         this.setHealth(this.getHealth() + health);
     }
 

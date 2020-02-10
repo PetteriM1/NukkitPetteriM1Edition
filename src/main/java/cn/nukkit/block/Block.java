@@ -621,8 +621,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         if (correctTool) speed *= toolBreakTimeBonus0(toolType, toolTier, isWoolBlock, isCobweb);
         speed += speedBonusByEfficiencyLore0(efficiencyLoreLevel);
         speed *= speedRateByHasteLore0(hasteEffectLevel);
-        if (insideOfWaterWithoutAquaAffinity) speed *= 0.2;
-        if (outOfWaterButNotOnGround) speed *= 0.2;
+        if (insideOfWaterWithoutAquaAffinity || outOfWaterButNotOnGround) speed *= 0.25;
         return 1.0 / speed;
     }
 

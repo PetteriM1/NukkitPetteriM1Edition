@@ -14,7 +14,7 @@
         <log4j2.version>2.12.1</log4j2.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jline.version>3.12.1</jline.version>
-        <netty.version>4.1.44.Final</netty.version>
+        <netty.version>4.1.45.Final</netty.version>
     </properties>
     
     <distributionManagement>
@@ -309,6 +309,14 @@
                         <tags>false</tags>
                         <forceLongFormat>false</forceLongFormat>
                     </gitDescribe>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
         </plugins>

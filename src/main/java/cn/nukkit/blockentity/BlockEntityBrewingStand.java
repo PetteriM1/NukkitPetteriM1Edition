@@ -258,7 +258,9 @@ public class BlockEntityBrewingStand extends BlockEntitySpawnable implements Inv
                     this.inventory.setIngredient(ingredient);
 
                     this.fuelAmount--;
-                    this.sendFuel();
+                    if (Server.getInstance().getTick() % 4 == 0) {
+                        this.sendFuel();
+                    }
                 }
 
                 this.brewTime = MAX_BREW_TIME;

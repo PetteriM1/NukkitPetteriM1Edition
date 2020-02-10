@@ -256,7 +256,7 @@ public abstract class Entity extends Location implements Metadatable {
     public int age = 0;
 
     protected float health = 20;
-    private int maxHealth = 20;
+    protected int maxHealth = 20;
 
     protected float absorption = 0;
 
@@ -896,34 +896,33 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void spawnTo(Player player) {
-        player.dataPacket(createAddEntityPacket());
-
         if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
+            player.dataPacket(createAddEntityPacket());
             this.hasSpawned.put(player.getLoaderId(), player);
-        }
 
-        if (this.riding != null) {
-            this.riding.spawnTo(player);
+            if (this.riding != null) {
+                this.riding.spawnTo(player);
 
-            SetEntityLinkPacket pkk = new SetEntityLinkPacket();
-            pkk.vehicleUniqueId = this.riding.id;
-            pkk.riderUniqueId = this.id;
-            pkk.type = 1;
-            pkk.immediate = 1;
+                SetEntityLinkPacket pkk = new SetEntityLinkPacket();
+                pkk.vehicleUniqueId = this.riding.id;
+                pkk.riderUniqueId = this.id;
+                pkk.type = 1;
+                pkk.immediate = 1;
 
-            player.dataPacket(pkk);
-        }
+                player.dataPacket(pkk);
+            }
 
-        if (this instanceof EntityBoss && this.server.vanillaBB) {
-            BossEventPacket pkBoss = new BossEventPacket();
-            pkBoss.bossEid = this.id;
-            pkBoss.type = BossEventPacket.TYPE_SHOW;
-            pkBoss.title = this.getName();
-            pkBoss.healthPercent = this.health;
-            player.dataPacket(pkBoss);
+            if (this instanceof EntityBoss && this.server.vanillaBB) {
+                BossEventPacket pkBoss = new BossEventPacket();
+                pkBoss.bossEid = this.id;
+                pkBoss.type = BossEventPacket.TYPE_SHOW;
+                pkBoss.title = this.getName();
+                pkBoss.healthPercent = this.health;
+                player.dataPacket(pkBoss);
+            }
         }
     }
-    
+
     protected DataPacket createAddEntityPacket() {
         AddEntityPacket addEntity = new AddEntityPacket();
         addEntity.type = this.getNetworkId();
@@ -973,9 +972,25 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player player, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.id;
-        pk.metadata = data == null ? this.dataProperties : data;
+        if (player.protocol < 274) {
+            pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
+        } else {
+            pk.metadata = data == null ? this.dataProperties : data;
+        }
 
         player.dataPacket(pk);
+    }
+
+    private EntityMetadata mvReplace(EntityMetadata data) {
+        EntityMetadata updated = new EntityMetadata()
+                .putLong(DATA_FLAGS, data.getLong(DATA_FLAGS))
+                .putShort(DATA_AIR, data.getShort(DATA_AIR))
+                .putShort(43, data.getShort(DATA_MAX_AIR))
+                .putString(DATA_NAMETAG, data.getString(DATA_NAMETAG))
+                .putLong(DATA_LEAD_HOLDER_EID, data.getLong(DATA_LEAD_HOLDER_EID))
+                .putFloat(DATA_SCALE, data.getFloat(DATA_SCALE));
+        // TODO: All other data properties
+        return updated;
     }
 
     public void sendData(Player[] players) {
@@ -985,15 +1000,25 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player[] players, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.id;
-        pk.metadata = data == null ? this.dataProperties : data;
+        //pk.metadata = data == null ? this.dataProperties : data;
 
         for (Player player : players) {
             if (player == this) {
                 continue;
             }
-            player.dataPacket(pk.clone());
+            if (player.protocol < 274) {
+                pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
+            } else {
+                pk.metadata = data == null ? this.dataProperties : data;
+            }
+            player.dataPacket(pk/*.clone()*/);
         }
         if (this.isPlayer) {
+            if (((Player) this).protocol < 274) {
+                pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
+            } else {
+                pk.metadata = data == null ? this.dataProperties : data;
+            }
             ((Player) this).dataPacket(pk);
         }
     }

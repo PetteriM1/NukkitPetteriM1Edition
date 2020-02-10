@@ -4,6 +4,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDurable;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.math.BlockFace;
@@ -264,17 +265,17 @@ public class BinaryStream {
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
-        if (protocol < 388) {
+        if (protocol < ProtocolInfo.v1_13_0) {
             if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
                 this.putByteArray(Base64.getDecoder().decode(Skin.STEVE_SKIN));
-                if (protocol >= 223) {
+                if (protocol >= ProtocolInfo.v1_2_13) {
                     this.putByteArray(skin.getCapeData().data);
                 }
                 this.putString("geometry.humanoid.custom");
                 this.putString(Skin.STEVE_GEOMETRY);
             } else {
                 this.putByteArray(skin.getSkinData().data);
-                if (protocol >= 223) {
+                if (protocol >= ProtocolInfo.v1_2_13) {
                     this.putByteArray(skin.getCapeData().data);
                 }
                 this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
@@ -423,7 +424,7 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
-        if (item.getId() == 513) {
+        if (item.getId() == ItemID.SHIELD) {
             this.getVarLong();
         }
 
@@ -446,7 +447,7 @@ public class BinaryStream {
 
         int auxValue;
 
-        if (protocol < 361) {
+        if (protocol < ProtocolInfo.v1_12_0) {
             auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
         } else {
             auxValue = item.getCount();
@@ -457,8 +458,8 @@ public class BinaryStream {
 
         this.putVarInt(auxValue);
 
-        if (item.hasCompoundTag() || (isDurable && protocol >= 361)) {
-            if (protocol < 361) {
+        if (item.hasCompoundTag() || (isDurable && protocol >= ProtocolInfo.v1_12_0)) {
+            if (protocol < ProtocolInfo.v1_12_0) {
                 byte[] nbt = item.getCompoundTag();
                 this.putLShort(nbt.length);
                 this.put(nbt);
@@ -500,7 +501,7 @@ public class BinaryStream {
             this.putString(block);
         }
 
-        if (item.getId() == 513) {
+        if (item.getId() == ItemID.SHIELD) {
             this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
     }

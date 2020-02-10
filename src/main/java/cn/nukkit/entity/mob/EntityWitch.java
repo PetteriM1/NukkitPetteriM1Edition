@@ -86,7 +86,7 @@ public class EntityWitch extends EntityWalkingMob {
                     ProjectileLaunchEvent launch = new ProjectileLaunchEvent(thrownPotion);
                     this.server.getPluginManager().callEvent(launch);
                     if (launch.isCancelled()) {
-                        thrownPotion.kill();
+                        thrownPotion.close();
                     } else {
                         thrownPotion.spawnToAll();
                         this.level.addSound(this, Sound.MOB_WITCH_THROW);

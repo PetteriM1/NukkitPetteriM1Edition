@@ -161,7 +161,7 @@ public class CraftingTransaction extends InventoryTransaction {
             public void onRun(int currentTick) {
                 source.dataPacket(pk);
             }
-        }, 20);
+        }, 10);
 
         this.source.resetCraftingGridType();
     }

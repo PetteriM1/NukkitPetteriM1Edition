@@ -71,12 +71,8 @@ public class EntityGhast extends EntityFlyingMob {
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            Entity k = Entity.createEntity("GhastFireBall", pos, this);
-            if (!(k instanceof EntityGhastFireBall)) {
-                return;
-            }
 
-            EntityGhastFireBall fireball = (EntityGhastFireBall) k;
+            EntityGhastFireBall fireball = (EntityGhastFireBall) Entity.createEntity("GhastFireBall", pos, this);
             fireball.setExplode(true);
             fireball.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                     Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
@@ -84,7 +80,7 @@ public class EntityGhast extends EntityFlyingMob {
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(fireball);
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                fireball.kill();
+                fireball.close();
             } else {
                 fireball.spawnToAll();
                 this.level.addLevelEvent(this, LevelEventPacket.EVENT_SOUND_GHAST_SHOOT);

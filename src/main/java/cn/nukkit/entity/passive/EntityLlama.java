@@ -76,19 +76,19 @@ public class EntityLlama extends EntityHorseBase {
                             double pitch = this.pitch;
                             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-                            Entity k = Entity.createEntity("LlamaSplit", pos, this);
+                            Entity k = Entity.createEntity("LlamaSpit", pos, this);
                             if (!(k instanceof EntityLlamaSpit)) return;
                             
-                            EntityLlamaSpit split = (EntityLlamaSpit) k;
-                            split.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
+                            EntityLlamaSpit spit = (EntityLlamaSpit) k;
+                            spit.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
                                     Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
 
-                            ProjectileLaunchEvent launch = new ProjectileLaunchEvent(split);
+                            ProjectileLaunchEvent launch = new ProjectileLaunchEvent(spit);
                             this.server.getPluginManager().callEvent(launch);
                             if (launch.isCancelled()) {
-                                split.kill();
+                                spit.close();
                             } else {
-                                split.spawnToAll();
+                                spit.spawnToAll();
                                 this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SHOOT, -1, "minecraft:llama", false, false);
                             }
                         }

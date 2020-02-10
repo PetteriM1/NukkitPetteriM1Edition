@@ -211,10 +211,10 @@ public class Server {
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
     public boolean xpBottlesOnCreative;
+    public boolean dimensionsEnabled;
     boolean callDataPkEv;
     boolean bedSpawnpoints;
     boolean achievements;
-    boolean dimensionsEndbled;
     boolean banAuthFailed;
     boolean endEnabled;
     boolean pvp;
@@ -231,8 +231,10 @@ public class Server {
     public boolean despawnEntities;
     public boolean strongIPBans;
     public boolean forceMtu;
+    public boolean spawnAnimals;
+    public boolean spawnMobs;
 
-    Server(final String filePath, String dataPath, String pluginPath) {
+    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
@@ -319,21 +321,15 @@ public class Server {
             this.setDifficulty(this.getPropertyInt("difficulty", 2));
         }
 
-        Nukkit.DEBUG = Math.max(this.getPropertyInt("debug-level", 1), 1);
+        Nukkit.DEBUG = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
 
+        org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
-            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100) {
+            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100  && level.intLevel() > currentLevel.intLevel()) {
                 Nukkit.setLogLevel(level);
                 break;
             }
         }
-
-        log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
-        this.serverID = UUID.randomUUID();
-
-        this.network = new Network(this);
-        this.network.setName(this.getMotd());
-        this.network.setSubName(this.getSubMotd());
 
         log.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
 
@@ -353,6 +349,13 @@ public class Server {
         DispenseBehaviorRegister.init();
         GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
 
+        log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        this.serverID = UUID.randomUUID();
+
+        this.network = new Network(this);
+        this.network.setName(this.getMotd());
+        this.network.setSubName(this.getSubMotd());
+
         this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(new File(Nukkit.DATA_PATH, "resource_packs"));
 
@@ -365,9 +368,10 @@ public class Server {
 
         this.network.registerInterface(new RakNetInterface(this));
 
-        this.pluginManager.loadPlugins(this.pluginPath);
-
-        this.enablePlugins(PluginLoadOrder.STARTUP);
+        if (loadPlugins) {
+            this.pluginManager.loadPlugins(this.pluginPath);
+            this.enablePlugins(PluginLoadOrder.STARTUP);
+        }
 
         LevelProviderManager.addProvider(this, Anvil.class);
 
@@ -432,7 +436,9 @@ public class Server {
             }
         }
 
-        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        if (loadPlugins) {
+            this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        }
 
         if (this.getPropertyBoolean("thread-watchdog", true)) {
             this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 50000));
@@ -462,8 +468,7 @@ public class Server {
         // Check for updates
         this.scheduler.scheduleTask(null, () -> {
             try {
-                URL url = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master");
-                URLConnection request = url.openConnection();
+                URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
                 String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
 
@@ -561,7 +566,7 @@ public class Server {
         //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
                 //player.dataPacket(packet); // HACK: Force multiversion
-                if (player.protocol <= 274) { // 1.5 or lower
+                if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
                     mvplayers = true;
                     break;
                 }
@@ -959,19 +964,17 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
+        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
+            player.dataPacket(CraftingManager.packet);
+        } else if (player.protocol == ProtocolInfo.v1_12_0) {
+            player.dataPacket(CraftingManager.packet361);
+        } else if (player.protocol == ProtocolInfo.v1_11_0) {
+             player.dataPacket(CraftingManager.packet354);
+        } else if (player.protocol == ProtocolInfo.v1_10_0) {
+            player.dataPacket(CraftingManager.packet340);
+        }
         // Don't send recipes if they wouldn't work anyways
         // TODO: Support for older versions
-        if (player.protocol >= 340) {
-            if (player.protocol == 354) {
-                player.dataPacket(CraftingManager.packet354);
-            } else if (player.protocol == 361) {
-                player.dataPacket(CraftingManager.packet361);
-            } else if (player.protocol == 340) {
-                player.dataPacket(CraftingManager.packet340);
-            } else { // Current version(s)
-                player.dataPacket(CraftingManager.packet);
-            }
-        }
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -1004,10 +1007,10 @@ public class Server {
                     } else if (tickMs >= 50) {
                         if (level.getTickRate() == this.baseTickRate) {
                             level.setTickRate(Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, tickMs / 50)));
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
                         } else if ((tickMs / level.getTickRate()) >= 50 && level.getTickRate() < this.autoTickRateLimit) {
                             level.setTickRate(level.getTickRate() + 1);
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
                         }
                         level.tickRateCounter = level.getTickRate();
                     }
@@ -1931,7 +1934,7 @@ public class Server {
         Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
         Entity.registerEntity("WitherSkull", EntityWitherSkull.class);
         Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);
-        Entity.registerEntity("LlamaSplit", EntityLlamaSpit.class);
+        Entity.registerEntity("LlamaSpit", EntityLlamaSpit.class);
         Entity.registerEntity("EvocationFangs", EntityEvocationFangs.class);
         Entity.registerEntity("EnderCharge", EntityEnderCharge.class);
         Entity.registerEntity("FishingHook", EntityFishingHook.class);
@@ -2067,7 +2070,7 @@ public class Server {
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
         this.achievements = this.getPropertyBoolean("achievements", true);
-        this.dimensionsEndbled = this.getPropertyBoolean("dimensions", false);
+        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", false);
         this.banAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
         this.pvp = this.getPropertyBoolean("pvp", true);
         this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
@@ -2098,6 +2101,8 @@ public class Server {
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
         this.forceMtu = this.getPropertyBoolean("force-mtu", false);
+        this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
+        this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2120,6 +2125,8 @@ public class Server {
             put("announce-player-achievements", false);
             put("spawn-protection", 10);
             put("max-players", 50);
+            put("spawn-animals", true);
+            put("spawn-mobs", true);
             put("gamemode", 0);
             put("force-gamemode", true);
             put("hardcore", false);
