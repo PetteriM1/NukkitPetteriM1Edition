@@ -1991,7 +1991,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.z = (float) this.z;
         startGamePacket.yaw = (float) this.yaw;
         startGamePacket.pitch = (float) this.pitch;
-        startGamePacket.dimension = this.getServer().dimensionsEndbled ? (byte) (this.level.getDimension() & 0xff) : 0;
+        startGamePacket.dimension = this.getServer().dimensionsEnabled ? (byte) (this.level.getDimension() & 0xff) : 0;
         startGamePacket.worldGamemode = getClientFriendlyGamemode(this.gamemode);
         startGamePacket.difficulty = this.server.getDifficulty();
         startGamePacket.spawnX = (int) this.x;
@@ -4774,7 +4774,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             packet.gameRules = level.getGameRules();
             this.dataPacket(packet);
 
-            if (this.getServer().dimensionsEndbled && oldLevel.getDimension() != level.getDimension()) {
+            if (this.getServer().dimensionsEnabled && oldLevel.getDimension() != level.getDimension()) {
                 this.setDimension(level.getDimension());
             }
 

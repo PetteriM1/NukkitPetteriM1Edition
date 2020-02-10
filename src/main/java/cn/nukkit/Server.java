@@ -211,10 +211,10 @@ public class Server {
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
     public boolean xpBottlesOnCreative;
+    public boolean dimensionsEnabled;
     boolean callDataPkEv;
     boolean bedSpawnpoints;
     boolean achievements;
-    boolean dimensionsEndbled;
     boolean banAuthFailed;
     boolean endEnabled;
     boolean pvp;
@@ -2068,7 +2068,7 @@ public class Server {
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
         this.achievements = this.getPropertyBoolean("achievements", true);
-        this.dimensionsEndbled = this.getPropertyBoolean("dimensions", false);
+        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", false);
         this.banAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
         this.pvp = this.getPropertyBoolean("pvp", true);
         this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
