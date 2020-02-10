@@ -22,11 +22,12 @@ import java.util.zip.Deflater;
 public class CraftingManager {
 
     public final Collection<Recipe> recipes = new ArrayDeque<>();
+    private final Collection<Recipe> recipesVeryOld = new ArrayDeque<>();
 
     public static BatchPacket packet = null;
     public static BatchPacket packet361 = null;
     public static BatchPacket packet354 = null;
-    public static BatchPacket packetPre354 = null;
+    public static BatchPacket packet340 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -50,8 +51,9 @@ public class CraftingManager {
 
     @SuppressWarnings("unchecked")
     public CraftingManager() {
+        MainLogger.getLogger().debug("Loading recipes...");
         List<Map> recipes = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection().getMapList("recipes");
-        MainLogger.getLogger().info("Loading recipes...");
+        List<Map> recipesOld = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipesOld.json")).getMapList("recipes");
         for (Map<String, Object> recipe : recipes) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
@@ -132,6 +134,44 @@ public class CraftingManager {
                 }
             } catch (Exception e) {
                 MainLogger.getLogger().error("Exception during registering recipe", e);
+            }
+        }
+
+        // Hack: Crafting for old game versions
+        for (Map<String, Object> recipe : recipesOld) {
+            try {
+                switch (Utils.toInt(recipe.get("type"))) {
+                    case 0:
+                        Map<String, Object> first = ((List<Map>) recipe.get("output")).get(0);
+                        List<Item> sorted = new ArrayList<>();
+                        for (Map<String, Object> ingredient : ((List<Map>) recipe.get("input"))) {
+                            sorted.add(Item.fromJsonOld(ingredient));
+                        }
+                        sorted.sort(recipeComparator);
+                        recipesVeryOld.add(new ShapelessRecipe(Item.fromJsonOld(first), sorted));
+                        break;
+                    case 1:
+                        List<Map> output = (List<Map>) recipe.get("output");
+                        first = output.remove(0);
+                        String[] shape = ((List<String>) recipe.get("shape")).toArray(new String[0]);
+                        Map<Character, Item> ingredients = new CharObjectHashMap<>();
+                        List<Item> extraResults = new ArrayList<>();
+                        Map<String, Map<String, Object>> input = (Map) recipe.get("input");
+                        for (Map.Entry<String, Map<String, Object>> ingredientEntry : input.entrySet()) {
+                            char ingredientChar = ingredientEntry.getKey().charAt(0);
+                            Item ingredient = Item.fromJsonOld(ingredientEntry.getValue());
+                            ingredients.put(ingredientChar, ingredient);
+                        }
+                        for (Map<String, Object> data : output) {
+                            extraResults.add(Item.fromJsonOld(data));
+                        }
+                        recipesVeryOld.add(new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults));
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception e) {
+                MainLogger.getLogger().error("Exception during registering (old) recipe", e);
             }
         }
 
@@ -216,22 +256,22 @@ public class CraftingManager {
         }
         pk354.encode();
         packet354 = pk354.compress(Deflater.BEST_COMPRESSION);
-        // Pre 354
-        CraftingDataPacket pkPre354 = new CraftingDataPacket();
-        pkPre354.cleanRecipes = true;
-        pkPre354.protocol = 0;
-        for (Recipe recipe : this.recipes) {
+        // 340
+        CraftingDataPacket pk340 = new CraftingDataPacket();
+        pk340.cleanRecipes = true;
+        pk340.protocol = 340;
+        for (Recipe recipe : this.recipesVeryOld) {
             if (recipe instanceof ShapedRecipe) {
-                pkPre354.addShapedRecipe((ShapedRecipe) recipe);
+                pk340.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
-                pkPre354.addShapelessRecipe((ShapelessRecipe) recipe);
+                pk340.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pkPre354.addFurnaceRecipe(recipe);
+            pk340.addFurnaceRecipe(recipe);
         }
-        pkPre354.encode();
-        packetPre354 = pkPre354.compress(Deflater.BEST_COMPRESSION);
+        pk340.encode();
+        packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
     }
 
     public Collection<Recipe> getRecipes() {
@@ -261,8 +301,7 @@ public class CraftingManager {
     }
 
     public void registerFurnaceRecipe(FurnaceRecipe recipe) {
-        Item input = recipe.getInput();
-        this.furnaceRecipes.put(getItemHash(input), recipe);
+        this.furnaceRecipes.put(getItemHash(recipe.getInput()), recipe);
     }
 
     private static int getItemHash(Item item) {

@@ -964,15 +964,17 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol < ProtocolInfo.v1_11_0) {
-            player.dataPacket(CraftingManager.packetPre354);
-        } else if (player.protocol == ProtocolInfo.v1_11_0) {
-            player.dataPacket(CraftingManager.packet354);
+        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
+            player.dataPacket(CraftingManager.packet);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
-        } else {
-            player.dataPacket(CraftingManager.packet);
+        } else if (player.protocol == ProtocolInfo.v1_11_0) {
+             player.dataPacket(CraftingManager.packet354);
+        } else if (player.protocol == ProtocolInfo.v1_10_0) {
+            player.dataPacket(CraftingManager.packet340);
         }
+        // Don't send recipes if they wouldn't work anyways
+        // TODO: Support for older versions
     }
 
     private void checkTickUpdates(int currentTick) {
