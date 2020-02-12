@@ -1543,7 +1543,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!to.equals(ev.getTo())) {
                         this.teleport(ev.getTo(), null);
                     } else {
-                        this.addMovement(this.x, this.y + this.getEyeHeight(), this.z, this.yaw, this.pitch, this.yaw);
+                        this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
                     }
                 } else {
                     this.blocksAround = blocksAround;
@@ -1620,6 +1620,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.newPosition = null;
+    }
+
+    @Override
+    public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
+        this.sendPosition(x, y, z, yaw, pitch, MovePlayerPacket.MODE_NORMAL, this.getViewers().values().toArray(new Player[0]));
     }
 
     @Override
@@ -4167,6 +4172,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.x = (float) pos.x;
         pk.y = (float) (pos.y + this.getEyeHeight());
         pk.z = (float) pos.z;
+        pk.headYaw = (float) yaw;
+        pk.pitch = (float) pitch;
+        pk.yaw = (float) yaw;
+        pk.mode = mode;
+
+        if (targets != null) {
+            Server.broadcastPacket(targets, pk);
+        } else {
+            pk.eid = this.id;
+            this.directDataPacket(pk);
+        }
+    }
+
+    public void sendPosition(double x, double y, double z, double yaw, double pitch, int mode, Player[] targets) {
+        MovePlayerPacket pk = new MovePlayerPacket();
+        pk.eid = this.getId();
+        pk.x = (float) x;
+        pk.y = (float) y + this.getEyeHeight();
+        pk.z = (float) z;
         pk.headYaw = (float) yaw;
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
