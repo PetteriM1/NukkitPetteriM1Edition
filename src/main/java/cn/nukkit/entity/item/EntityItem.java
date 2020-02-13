@@ -21,6 +21,10 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 public class EntityItem extends Entity {
 
     public static final int NETWORK_ID = 64;
+    protected String owner;
+    protected String thrower;
+    protected Item item;
+    protected int pickupDelay;
 
     public EntityItem(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -30,13 +34,6 @@ public class EntityItem extends Entity {
     public int getNetworkId() {
         return NETWORK_ID;
     }
-
-    protected String owner;
-    protected String thrower;
-
-    protected Item item;
-
-    protected int pickupDelay;
 
     @Override
     public float getWidth() {
@@ -109,10 +106,12 @@ public class EntityItem extends Entity {
     @Override
     public boolean attack(EntityDamageEvent source) {
         return (source.getCause() == DamageCause.VOID ||
+                source.getCause() == DamageCause.CONTACT ||
                 source.getCause() == DamageCause.FIRE_TICK ||
-                source.getCause() == DamageCause.ENTITY_EXPLOSION ||
-                source.getCause() == DamageCause.BLOCK_EXPLOSION)
-                && super.attack(source);
+                (source.getCause() == DamageCause.ENTITY_EXPLOSION ||
+                        source.getCause() == DamageCause.BLOCK_EXPLOSION) &&
+                        !this.isInsideOfWater() && (this.item == null ||
+                        this.item.getId() != Item.NETHER_STAR)) && super.attack(source);
     }
 
     @Override
