@@ -53,7 +53,7 @@ public class CraftingManager {
     public CraftingManager() {
         MainLogger.getLogger().debug("Loading recipes...");
         List<Map> recipes = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection().getMapList("recipes");
-        List<Map> recipesOld = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipesOld.json")).getMapList("recipes");
+        List<Map> recipesOld = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes340.json")).getMapList("recipes");
         for (Map<String, Object> recipe : recipes) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {

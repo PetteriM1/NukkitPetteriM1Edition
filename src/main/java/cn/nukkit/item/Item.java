@@ -517,7 +517,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
-            Class c = list[id];
+            Class<?> c = list[id];
             Item item;
 
             if (c == null) {

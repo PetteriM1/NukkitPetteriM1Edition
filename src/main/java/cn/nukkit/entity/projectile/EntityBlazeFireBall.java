@@ -58,7 +58,7 @@ public class EntityBlazeFireBall extends EntityProjectile {
             this.close();
         }
 
-        this.timing.startTiming();
+        this.timing.stopTiming();
 
         return super.onUpdate(currentTick);
     }
