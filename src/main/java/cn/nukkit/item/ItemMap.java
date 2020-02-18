@@ -20,6 +20,8 @@ public class ItemMap extends Item {
 
     public static int mapCount = 0;
 
+    private BufferedImage image;
+
     public ItemMap() {
         this(0, 1);
     }
@@ -42,19 +44,19 @@ public class ItemMap extends Item {
         setImage(ImageIO.read(file));
     }
 
-    public void setImage(BufferedImage img) {
+    public void setImage(BufferedImage image) {
         try {
-            BufferedImage image = img;
-
-            if (img.getHeight() != 128 || img.getWidth() != 128) {
-                image = new BufferedImage(128, 128, img.getType());
-                Graphics2D g = image.createGraphics();
-                g.drawImage(img, 0, 0, 128, 128, null);
+            if (image.getHeight() != 128 || image.getWidth() != 128) {
+                this.image = new BufferedImage(128, 128, image.getType());
+                Graphics2D g = this.image.createGraphics();
+                g.drawImage(image, 0, 0, 128, 128, null);
                 g.dispose();
+            } else {
+                this.image = image;
             }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
+            ImageIO.write(this.image, "png", baos);
 
             this.getNamedTag().putByteArray("Colors", baos.toByteArray());
         } catch (IOException e) {
@@ -65,7 +67,8 @@ public class ItemMap extends Item {
     protected BufferedImage loadImageFromNBT() {
         try {
             byte[] data = getNamedTag().getByteArray("Colors");
-            return ImageIO.read(new ByteArrayInputStream(data));
+            image = ImageIO.read(new ByteArrayInputStream(data));
+            return image;
         } catch (IOException e) {
             MainLogger.getLogger().logException(e);
         }
@@ -78,7 +81,8 @@ public class ItemMap extends Item {
     }
 
     public void sendImage(Player p) {
-        BufferedImage image = loadImageFromNBT();
+        // Don't load the image from NBT if it has been done before
+        BufferedImage image = this.image != null ? this.image : loadImageFromNBT();
 
         ClientboundMapItemDataPacket pk = new ClientboundMapItemDataPacket();
         pk.mapId = getMapId();

@@ -746,6 +746,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.chunkZ = z;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
+        pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
         this.batchDataPacket(pk);
 
@@ -1639,6 +1640,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.motionX = (float) motion.x;
                 pk.motionY = (float) motion.y;
                 pk.motionZ = (float) motion.z;
+                pk.setChannel(Network.CHANNEL_MOVEMENT);
                 this.dataPacket(pk);
             }
 
@@ -2479,6 +2481,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 respawnPacket.z = (float) respawnPos.z;
                                 this.dataPacket(respawnPacket);
                             }
+
+                            this.sendExperience();
+                            this.sendExperienceLevel();
 
                             this.setSprinting(false);
                             this.setSneaking(false);
@@ -4178,6 +4183,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
+        pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
@@ -4197,6 +4203,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
+        pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
@@ -4339,6 +4346,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 chunk.chunkX = chunkPositionX + x;
                 chunk.chunkZ = chunkPositionZ + z;
                 chunk.data = new byte[0];
+                chunk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
                 this.dataPacket(chunk);
             }
         }
@@ -4712,6 +4720,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.chunkZ = chunkZ;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
+        pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
         pk.encode();
 
         BatchPacket batch = new BatchPacket();

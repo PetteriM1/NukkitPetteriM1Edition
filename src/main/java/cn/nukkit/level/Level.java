@@ -45,6 +45,7 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
@@ -155,7 +156,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private final Long2LongMap unloadQueue = Long2LongMaps.synchronize(new Long2LongOpenHashMap());
 
-    private float time;
+    private int time;
 
     public boolean stopTime;
 
@@ -275,7 +276,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.folderName = name;
-        this.time = this.provider.getTime();
+        this.time = (int) this.provider.getTime();
 
         this.raining = this.provider.isRaining();
         this.rainTime = this.provider.getRainTime();
@@ -759,7 +760,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void sendTime(Player... players) {
         SetTimePacket pk = new SetTimePacket();
-        pk.time = (int) this.time;
+        pk.time = this.time;
 
         Server.broadcastPacket(players, pk);
     }
@@ -1061,6 +1062,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
+            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             for (Player p : target) {
                 try {
@@ -1091,6 +1093,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = flags;
+            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
                 if (b instanceof Block) {
@@ -1223,7 +1226,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.server.getPluginManager().callEvent(new LevelSaveEvent(this));
 
-        this.provider.setTime((int) this.time);
+        this.provider.setTime(this.time);
         this.provider.setRaining(this.raining);
         this.provider.setRainTime(this.rainTime);
         this.provider.setThundering(this.thundering);
@@ -3139,7 +3142,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getTime() {
-        return (int) time;
+        return time;
     }
 
     public boolean isDaytime() {
@@ -3434,6 +3437,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.yaw = (float) yaw;
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
+        pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         Server.broadcastPacket(entity.getViewers().values(), pk);
     }

@@ -12,6 +12,7 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
@@ -131,6 +132,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(200).setValue(200)};
+        addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 }
