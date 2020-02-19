@@ -49,7 +49,7 @@ public class BigMushroom extends BasicGenerator {
         int i = rand.nextBoundedInt(3) + 4;
 
         if (rand.nextBoundedInt(12) == 0) {
-            i *= 2;
+            i <<= 1;
         }
 
         boolean flag = true;
