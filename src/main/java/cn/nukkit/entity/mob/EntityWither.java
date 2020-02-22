@@ -157,4 +157,48 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     public int nearbyDistanceMultiplier() {
         return 30;
     }
+
+    @Override
+    public void kill() {
+        if (this.lastDamageCause != null && EntityDamageEvent.DamageCause.SUICIDE != this.lastDamageCause.getCause()) {
+            this.explode();
+        }
+
+        super.kill();
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (this.age <= 200 && ev.getCause() != EntityDamageEvent.DamageCause.SUICIDE) {
+            return false;
+        }
+
+        return super.attack(ev);
+    }
+
+    private int witherMaxHealth() {
+        switch (this.getServer().getDifficulty()) {
+            case 2:
+                return 450;
+            case 3:
+                return 600;
+            default:
+                return 300;
+        }
+    }
+
+    private void explode() {
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 5);
+        this.server.getPluginManager().callEvent(ev);
+
+        if (!ev.isCancelled()) {
+            Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
+
+            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+                explosion.explodeA();
+            }
+
+            explosion.explodeB();
+        }
+    }
 }
