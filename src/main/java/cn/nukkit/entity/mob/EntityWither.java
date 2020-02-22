@@ -4,8 +4,12 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.entity.projectile.EntityWitherSkull;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Explosion;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
@@ -49,7 +53,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         super.initEntity();
 
         this.fireProof = true;
-        this.setMaxHealth(600);
+        this.setMaxHealth(witherMaxHealth());
         this.setDamage(new int[]{0, 2, 4, 6});
     }
 
@@ -57,7 +61,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && (player.isSurvival() || player.isAdventure()) && distance <= 200;
+            if (!player.isSurvival() && !player.isAdventure()) {
+                return false;
+            }
         }
         return creature.isAlive() && !creature.closed && distance <= 200;
     }
@@ -128,7 +134,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
-        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(600).setValue(600)};
+        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(witherMaxHealth()).setValue(witherMaxHealth())};
         addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
@@ -138,6 +144,10 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         if (getServer().getDifficulty() == 0) {
             this.close();
             return true;
+        }
+
+        if (this.age == 200) {
+            this.explode();
         }
 
         return super.entityBaseTick(tickDiff);

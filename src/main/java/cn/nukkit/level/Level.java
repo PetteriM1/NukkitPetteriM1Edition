@@ -2184,9 +2184,12 @@ public class Level implements ChunkManager, Metadatable {
                 return null;
             }
 
-            if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
-                if (server.blockListener) {
+            if (server.blockListener) {
+                if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
+                        block.getLevel().setBlock(target, new BlockAir());
+                        block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
+
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN);
                         server.getPluginManager().callEvent(ev);
 
@@ -2195,9 +2198,6 @@ public class Level implements ChunkManager, Metadatable {
                         }
 
                         Entity.createEntity("SnowGolem", target.add(0.5, -1, 0.5)).spawnToAll();
-
-                        block.getLevel().setBlock(target, new BlockAir());
-                        block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
 
                         if (!player.isCreative()) {
                             item.setCount(item.getCount() - 1);
@@ -2216,6 +2216,9 @@ public class Level implements ChunkManager, Metadatable {
                         }
 
                         if (second != null) {
+                            block.getLevel().setBlock(block, new BlockAir());
+                            block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+
                             CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
                             server.getPluginManager().callEvent(ev);
 
@@ -2225,15 +2228,51 @@ public class Level implements ChunkManager, Metadatable {
 
                             Entity.createEntity("IronGolem", block.add(0.5, -1, 0.5)).spawnToAll();
 
-                            block.getLevel().setBlock(block, new BlockAir());
-                            block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
-
                             if (!player.isCreative()) {
                                 item.setCount(item.getCount() - 1);
                                 player.getInventory().setItemInHand(item);
                             }
                             return null;
                         }
+                    }
+                } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
+                    if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
+                        Block first, second;
+
+                        if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL_BLOCK && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL_BLOCK && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL_BLOCK && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL_BLOCK && second.toItem().getDamage() == 1))) {
+                            return null;
+                        }
+
+                        block = block.getSide(BlockFace.DOWN);
+
+                        Block first2, second2;
+
+                        if (!((first2 = block.getSide(BlockFace.EAST)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.WEST)).getId() == Item.SOUL_SAND || (first2 = block.getSide(BlockFace.NORTH)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.SOUTH)).getId() == Item.SOUL_SAND)) {
+                            return null;
+                        }
+
+                        block.getLevel().setBlock(first, new BlockAir());
+                        block.getLevel().setBlock(second, new BlockAir());
+                        block.getLevel().setBlock(first2, new BlockAir());
+                        block.getLevel().setBlock(second2, new BlockAir());
+                        block.getLevel().setBlock(block, new BlockAir());
+                        block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+
+                        CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_WITHER);
+                        server.getPluginManager().callEvent(ev);
+
+                        if (ev.isCancelled()) {
+                            return null;
+                        }
+
+                        if (!player.isCreative()) {
+                            item.setCount(item.getCount() - 1);
+                            player.getInventory().setItemInHand(item);
+                        }
+
+                        Entity.createEntity("Wither", block.add(0.5, -1, 0.5)).spawnToAll();
+                        this.addSound(block, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
+                        return null;
                     }
                 }
             }
