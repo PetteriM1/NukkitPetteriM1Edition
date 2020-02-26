@@ -964,7 +964,7 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
+        if (player.protocol > ProtocolInfo.v1_12_0 && player.protocol < ProtocolInfo.v1_15_0_51) { // Current version(s) // TODO: 1.15
             player.dataPacket(CraftingManager.packet);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);

@@ -147,6 +147,9 @@ public class StartGamePacket extends DataPacket {
         }
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
+        if (protocol >= ProtocolInfo.v1_15_0_51) {
+            this.putByte((byte) 0);
+        }
         this.putGameRules(gameRules);
         this.putBoolean(this.bonusChest);
         if (protocol > 201) {
@@ -181,6 +184,10 @@ public class StartGamePacket extends DataPacket {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
                     if (protocol >= 388) {
                         this.putString(Utils.getVersionByProtocol(protocol));
+                        if (protocol >= ProtocolInfo.v1_15_0_51) {
+                            this.putLInt(16);
+                            this.putLInt(16);
+                        }
                     }
                 }
             }
@@ -202,6 +209,8 @@ public class StartGamePacket extends DataPacket {
             this.putString(this.multiplayerCorrelationId);
             if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
                 this.putBoolean(this.isOnlySpawningV1Villagers);
+            } else if (protocol >= ProtocolInfo.v1_15_0_51) {
+                this.putByte((byte) 0);
             }
         }
     }
