@@ -28,6 +28,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.EntityLink;
 import cn.nukkit.plugin.Plugin;
@@ -944,6 +945,8 @@ public abstract class Entity extends Location implements Metadatable {
             addEntity.links[i] = new EntityLink(this.id, this.passengers.get(i).id, i == 0 ? EntityLink.TYPE_RIDER : TYPE_PASSENGER, false);
         }
 
+        addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
+
         return addEntity;
     }
 
@@ -1351,6 +1354,7 @@ public abstract class Entity extends Location implements Metadatable {
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
+        pk.setChannel(Network.CHANNEL_MOVEMENT);
         Server.broadcastPacket(this.hasSpawned.values(), pk);
     }
 

@@ -8,6 +8,7 @@ import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
+import cn.nukkit.entity.mob.EntityWither;
 import cn.nukkit.entity.passive.EntityIronGolem;
 import cn.nukkit.entity.passive.EntitySnowGolem;
 import cn.nukkit.entity.projectile.EntityArrow;
@@ -45,6 +46,7 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
@@ -155,7 +157,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private final Long2LongMap unloadQueue = Long2LongMaps.synchronize(new Long2LongOpenHashMap());
 
-    private float time;
+    private int time;
 
     public boolean stopTime;
 
@@ -275,7 +277,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.folderName = name;
-        this.time = this.provider.getTime();
+        this.time = (int) this.provider.getTime();
 
         this.raining = this.provider.isRaining();
         this.rainTime = this.provider.getRainTime();
@@ -759,7 +761,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void sendTime(Player... players) {
         SetTimePacket pk = new SetTimePacket();
-        pk.time = (int) this.time;
+        pk.time = this.time;
 
         Server.broadcastPacket(players, pk);
     }
@@ -1061,6 +1063,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
+            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             for (Player p : target) {
                 try {
@@ -1091,6 +1094,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = flags;
+            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
                 if (b instanceof Block) {
@@ -1223,7 +1227,7 @@ public class Level implements ChunkManager, Metadatable {
 
         this.server.getPluginManager().callEvent(new LevelSaveEvent(this));
 
-        this.provider.setTime((int) this.time);
+        this.provider.setTime(this.time);
         this.provider.setRaining(this.raining);
         this.provider.setRainTime(this.rainTime);
         this.provider.setThundering(this.thundering);
@@ -2181,9 +2185,12 @@ public class Level implements ChunkManager, Metadatable {
                 return null;
             }
 
-            if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
-                if (server.blockListener) {
+            if (server.blockListener) {
+                if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
+                        block.getLevel().setBlock(target, new BlockAir());
+                        block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
+
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntitySnowGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN);
                         server.getPluginManager().callEvent(ev);
 
@@ -2192,9 +2199,6 @@ public class Level implements ChunkManager, Metadatable {
                         }
 
                         Entity.createEntity("SnowGolem", target.add(0.5, -1, 0.5)).spawnToAll();
-
-                        block.getLevel().setBlock(target, new BlockAir());
-                        block.getLevel().setBlock(target.add(0, -1, 0), new BlockAir());
 
                         if (!player.isCreative()) {
                             item.setCount(item.getCount() - 1);
@@ -2213,6 +2217,9 @@ public class Level implements ChunkManager, Metadatable {
                         }
 
                         if (second != null) {
+                            block.getLevel().setBlock(block, new BlockAir());
+                            block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+
                             CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
                             server.getPluginManager().callEvent(ev);
 
@@ -2222,15 +2229,51 @@ public class Level implements ChunkManager, Metadatable {
 
                             Entity.createEntity("IronGolem", block.add(0.5, -1, 0.5)).spawnToAll();
 
-                            block.getLevel().setBlock(block, new BlockAir());
-                            block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
-
                             if (!player.isCreative()) {
                                 item.setCount(item.getCount() - 1);
                                 player.getInventory().setItemInHand(item);
                             }
                             return null;
                         }
+                    }
+                } else if (item.getId() == Item.SKULL && item.getDamage() == 1) {
+                    if (block.getSide(BlockFace.DOWN).getId() == Item.SOUL_SAND && block.getSide(BlockFace.DOWN, 2).getId() == Item.SOUL_SAND) {
+                        Block first, second;
+
+                        if (!(((first = block.getSide(BlockFace.EAST)).getId() == Item.SKULL_BLOCK && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.WEST)).getId() == Item.SKULL_BLOCK && second.toItem().getDamage() == 1) || ((first = block.getSide(BlockFace.NORTH)).getId() == Item.SKULL_BLOCK && first.toItem().getDamage() == 1) && ((second = block.getSide(BlockFace.SOUTH)).getId() == Item.SKULL_BLOCK && second.toItem().getDamage() == 1))) {
+                            return null;
+                        }
+
+                        block = block.getSide(BlockFace.DOWN);
+
+                        Block first2, second2;
+
+                        if (!((first2 = block.getSide(BlockFace.EAST)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.WEST)).getId() == Item.SOUL_SAND || (first2 = block.getSide(BlockFace.NORTH)).getId() == Item.SOUL_SAND && (second2 = block.getSide(BlockFace.SOUTH)).getId() == Item.SOUL_SAND)) {
+                            return null;
+                        }
+
+                        block.getLevel().setBlock(first, new BlockAir());
+                        block.getLevel().setBlock(second, new BlockAir());
+                        block.getLevel().setBlock(first2, new BlockAir());
+                        block.getLevel().setBlock(second2, new BlockAir());
+                        block.getLevel().setBlock(block, new BlockAir());
+                        block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+
+                        CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_WITHER);
+                        server.getPluginManager().callEvent(ev);
+
+                        if (ev.isCancelled()) {
+                            return null;
+                        }
+
+                        if (!player.isCreative()) {
+                            item.setCount(item.getCount() - 1);
+                            player.getInventory().setItemInHand(item);
+                        }
+
+                        Entity.createEntity("Wither", block.add(0.5, -1, 0.5)).spawnToAll();
+                        this.addSound(block, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
+                        return null;
                     }
                 }
             }
@@ -3139,7 +3182,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getTime() {
-        return (int) time;
+        return time;
     }
 
     public boolean isDaytime() {
@@ -3434,6 +3477,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.yaw = (float) yaw;
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
+        pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         Server.broadcastPacket(entity.getViewers().values(), pk);
     }

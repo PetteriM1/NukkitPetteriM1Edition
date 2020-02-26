@@ -1,4 +1,4 @@
-package cn.nukkit.level.generator.populator.impl.tree;
+package cn.nukkit.level.generator.populator.impl;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
@@ -6,11 +6,17 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.entity.mob.EntitySkeleton;
 import cn.nukkit.entity.mob.EntitySpider;
 import cn.nukkit.entity.mob.EntityZombie;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PopulatorDungeon extends Populator {
 
@@ -89,8 +95,8 @@ public class PopulatorDungeon extends Populator {
 
                 for (int xx = 0; xx < 2; ++xx) {
                     for (int zz = 0; zz < 3; ++zz) {
-                        int tx = x + random.nextBoundedInt(xv * 2 + 1) - xv;
-                        int tz = z + random.nextBoundedInt(zv * 2 + 1) - zv;
+                        int tx = x + random.nextBoundedInt((xv << 1) + 1) - xv;
+                        int tz = z + random.nextBoundedInt((zv << 1) + 1) - zv;
 
                         if (level.getBlockIdAt(tx, y, tz) == AIR) {
                             int n = 0;
@@ -113,6 +119,7 @@ public class PopulatorDungeon extends Populator {
                                 Vector3 vec = new Vector3(tx, y, tz);
                                 FullChunk ck = level.getChunk(vec.getChunkX(), vec.getChunkZ());
                                 BlockEntityChest be = new BlockEntityChest(ck, BlockEntity.getDefaultCompound(vec, BlockEntity.CHEST));
+                                be.getInventory().setContents(getChestLoot(be.getInventory().getSize()));
                                 ck.addBlockEntity(be);
                                 break;
                             }
@@ -127,5 +134,109 @@ public class PopulatorDungeon extends Populator {
                 }
             }
         }
+    }
+
+    private static Map<Integer, Item> getChestLoot(int size) {
+        Map<Integer, Item> items = new HashMap<>();
+        boolean a = false, b = false, c = false, d = false, e = false, f = false, g = false, h = false, i = false, j = false, k = false, l = false, m = false, n = false, o = false, p = false, q = false, r = false, s = false, t = false, u = false, v = false, w = false;
+        for (int x = 0; x < size; x++) {
+            if (Utils.rand(1, 4) == 1) {
+                switch (Utils.rand(1, 23)) {
+                    case 1:
+                        if (!a) items.put(x, Item.get(ItemID.BONE, 0, Utils.rand(1, 8)));
+                        a = true;
+                        break;
+                    case 2:
+                        if (!b) items.put(x, Item.get(ItemID.GUNPOWDER, 0, Utils.rand(1, 8)));
+                        b = true;
+                        break;
+                    case 3:
+                        if (!c) items.put(x, Item.get(ItemID.ROTTEN_FLESH, 0, Utils.rand(1, 8)));
+                        c = true;
+                        break;
+                    case 4:
+                        if (!d) items.put(x, Item.get(ItemID.STRING, 0, Utils.rand(1, 8)));
+                        d = true;
+                        break;
+                    case 5:
+                        if (!e) items.put(x, Item.get(ItemID.WHEAT, 0, Utils.rand(1, 4)));
+                        e = true;
+                        break;
+                    case 6:
+                        if (!f) items.put(x, Item.get(ItemID.BREAD, 0, 1));
+                        f = true;
+                        break;
+                    case 7:
+                        if (!g) items.put(x, Item.get(ItemID.NAME_TAG, 0, 1));
+                        g = true;
+                        break;
+                    case 8:
+                        if (!h) items.put(x, Item.get(ItemID.SADDLE, 0, 1));
+                        h = true;
+                        break;
+                    case 9:
+                        if (!i) items.put(x, Item.get(ItemID.COAL, 0, Utils.rand(1, 4)));
+                        i = true;
+                        break;
+                    case 10:
+                        if (!j) items.put(x, Item.get(ItemID.REDSTONE_DUST, 0, Utils.rand(1, 4)));
+                        j = true;
+                        break;
+                    case 11:
+                        if (!k && !l) items.put(x, Item.get(ItemID.RECORD_13, 0, 1));
+                        k = true;
+                        break;
+                    case 12:
+                        if (!l && !k) items.put(x, Item.get(ItemID.RECORD_CAT, 0, 1));
+                        l = true;
+                        break;
+                    case 13:
+                        if (!m) items.put(x, Item.get(ItemID.IRON_HORSE_ARMOR, 0, 1));
+                        m = true;
+                        break;
+                    case 14:
+                        if (!n) items.put(x, Item.get(ItemID.GOLDEN_APPLE, 0, 1));
+                        n = true;
+                        break;
+                    case 15:
+                        if (!o) items.put(x, Item.get(ItemID.BEETROOT_SEED, 0, Utils.rand(2, 4)));
+                        o = true;
+                        break;
+                    case 16:
+                        if (!p) items.put(x, Item.get(ItemID.MELON_SEEDS, 0, Utils.rand(2, 4)));
+                        p = true;
+                        break;
+                    case 17:
+                        if (!q) items.put(x, Item.get(ItemID.PUMPKIN_SEEDS, 0, Utils.rand(2, 4)));
+                        q = true;
+                        break;
+                    case 18:
+                        if (!r) items.put(x, Item.get(ItemID.IRON_INGOT, 0, Utils.rand(1, 4)));
+                        r = true;
+                        break;
+                    case 19:
+                        if (!s) items.put(x, Item.get(ItemID.BUCKET, 0, 1));
+                        s = true;
+                        break;
+                    case 20:
+                        if (!t && !v) items.put(x, Item.get(ItemID.GOLD_HORSE_ARMOR, 0, 1));
+                        t = true;
+                        break;
+                    case 21:
+                        if (!u) items.put(x, Item.get(ItemID.GOLD_INGOT, 0, Utils.rand(1, 4)));
+                        u = true;
+                        break;
+                    case 22:
+                        if (!v && !t && Utils.rand()) items.put(x, Item.get(ItemID.DIAMOND_HORSE_ARMOR, 0, 1));
+                        v = true;
+                        break;
+                    case 23:
+                        if (!w && Utils.rand()) items.put(x, Item.get(ItemID.GOLDEN_APPLE_ENCHANTED, 0, 1));
+                        w = true;
+                        break;
+                }
+            }
+        }
+        return items;
     }
 }

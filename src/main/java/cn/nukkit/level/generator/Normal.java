@@ -9,7 +9,6 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.generator.noise.vanilla.f.NoiseGeneratorOctavesF;
 import cn.nukkit.level.generator.object.ore.OreType;
 import cn.nukkit.level.generator.populator.impl.*;
-import cn.nukkit.level.generator.populator.impl.tree.PopulatorDungeon;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
@@ -139,13 +138,13 @@ public class Normal extends Generator {
         BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
 
         //generate base noise values
-        float[] depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion.get(), chunkX * 4, chunkZ * 4, 5, 5, 200f, 200f, 0.5f);
+        float[] depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion.get(), chunkX << 2, chunkZ << 2, 5, 5, 200f, 200f, 0.5f);
         this.depthRegion.set(depthRegion);
-        float[] mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion.get(), chunkX * 4, 0, chunkZ * 4, 5, 33, 5, 11.406866f, 4.277575f, 11.406866f);
+        float[] mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion.get(), chunkX << 2, 0, chunkZ << 2, 5, 33, 5, 11.406866f, 4.277575f, 11.406866f);
         this.mainNoiseRegion.set(mainNoiseRegion);
-        float[] minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion.get(), chunkX * 4, 0, chunkZ * 4, 5, 33, 5, 684.412f, 684.412f, 684.412f);
+        float[] minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion.get(), chunkX << 2, 0, chunkZ << 2, 5, 33, 5, 684.412f, 684.412f, 684.412f);
         this.minLimitRegion.set(minLimitRegion);
-        float[] maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion.get(), chunkX * 4, 0, chunkZ * 4, 5, 33, 5, 684.412f, 684.412f, 684.412f);
+        float[] maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion.get(), chunkX << 2, 0, chunkZ << 2, 5, 33, 5, 684.412f, 684.412f, 684.412f);
         this.maxLimitRegion.set(maxLimitRegion);
         float[] heightMap = this.heightMap.get();
 

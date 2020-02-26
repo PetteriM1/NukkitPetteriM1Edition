@@ -312,8 +312,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[RESERVED6] = BlockReserved6.class; //255
 
             for (int id = 0; id < 256; id++) {
-                @SuppressWarnings("rawtypes")
-                Class c = list[id];
+                Class<?> c = list[id];
                 if (c != null) {
                     Block block;
                     try {

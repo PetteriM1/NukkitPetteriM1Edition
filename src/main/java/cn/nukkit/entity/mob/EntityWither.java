@@ -4,13 +4,18 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.entity.projectile.EntityWitherSkull;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Explosion;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
@@ -48,7 +53,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         super.initEntity();
 
         this.fireProof = true;
-        this.setMaxHealth(600);
+        this.setMaxHealth(witherMaxHealth());
         this.setDamage(new int[]{0, 2, 4, 6});
     }
 
@@ -56,7 +61,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && (player.isSurvival() || player.isAdventure()) && distance <= 200;
+            if (!player.isSurvival() && !player.isAdventure()) {
+                return false;
+            }
         }
         return creature.isAlive() && !creature.closed && distance <= 200;
     }
@@ -68,7 +75,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+    if (this.age > 220 && this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
@@ -127,7 +134,8 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
-        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(600).setValue(600)};
+        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(witherMaxHealth()).setValue(witherMaxHealth())};
+        addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 
@@ -138,11 +146,59 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             return true;
         }
 
+        if (this.age == 200) {
+            this.explode();
+        }
+
         return super.entityBaseTick(tickDiff);
     }
 
     @Override
     public int nearbyDistanceMultiplier() {
         return 30;
+    }
+
+    @Override
+    public void kill() {
+        if (this.lastDamageCause != null && EntityDamageEvent.DamageCause.SUICIDE != this.lastDamageCause.getCause()) {
+            this.explode();
+        }
+
+        super.kill();
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (this.age <= 200 && ev.getCause() != EntityDamageEvent.DamageCause.SUICIDE) {
+            return false;
+        }
+
+        return super.attack(ev);
+    }
+
+    private int witherMaxHealth() {
+        switch (this.getServer().getDifficulty()) {
+            case 2:
+                return 450;
+            case 3:
+                return 600;
+            default:
+                return 300;
+        }
+    }
+
+    private void explode() {
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 5);
+        this.server.getPluginManager().callEvent(ev);
+
+        if (!ev.isCancelled()) {
+            Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
+
+            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+                explosion.explodeA();
+            }
+
+            explosion.explodeB();
+        }
     }
 }

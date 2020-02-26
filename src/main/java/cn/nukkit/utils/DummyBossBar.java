@@ -6,6 +6,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.*;
 
 /**
@@ -147,6 +148,7 @@ public class DummyBossBar {
                 .putLong(Entity.DATA_LEAD_HOLDER_EID, -1)
                 .putString(Entity.DATA_NAMETAG, text) // Set the entity name
                 .putFloat(Entity.DATA_SCALE, 0); // And make it invisible
+        pkAdd.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         player.dataPacket(pkAdd);
     }
 
@@ -216,6 +218,7 @@ public class DummyBossBar {
         pk.headYaw = 0;
         pk.yaw = 0;
         pk.pitch = 0;
+        pk.setChannel(Network.CHANNEL_MOVEMENT);
         player.dataPacket(pk);
     }
 
