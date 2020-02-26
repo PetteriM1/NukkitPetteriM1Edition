@@ -32,15 +32,16 @@ public interface ProtocolInfo {
     int v1_14_0 = 389;
     int v1_14_0_2 = 390;
     int v1_15_0_51 = 392;
+    int v1_15_0_53 = 393;
 
     int CURRENT_PROTOCOL = v1_14_0;
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
-            v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0, v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0_2, v1_14_0, v1_15_0_51
+            v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0, v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0_2, v1_14_0, v1_15_0_51, v1_15_0_53
     );
 
-    String MINECRAFT_VERSION = "v1.14.0";
-    String MINECRAFT_VERSION_NETWORK = "1.14.0";
+    String MINECRAFT_VERSION = "v1.15.0";
+    String MINECRAFT_VERSION_NETWORK = "1.15.0";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;

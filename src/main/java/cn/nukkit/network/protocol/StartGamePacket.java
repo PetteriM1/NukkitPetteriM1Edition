@@ -145,11 +145,11 @@ public class StartGamePacket extends DataPacket {
         } else {
             this.putBoolean(this.broadcastToXboxLive);
         }
-        this.putBoolean(this.commandsEnabled);
-        this.putBoolean(this.isTexturePacksRequired);
         if (protocol >= ProtocolInfo.v1_15_0_51) {
             this.putByte((byte) 0);
         }
+        this.putBoolean(this.commandsEnabled);
+        this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(gameRules);
         this.putBoolean(this.bonusChest);
         if (protocol > 201) {
