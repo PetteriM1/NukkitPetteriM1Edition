@@ -330,6 +330,7 @@ public class Utils {
                 return "1.14.0";
             case 392:
             case 393:
+            case 394:
                 return "1.15.0";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
