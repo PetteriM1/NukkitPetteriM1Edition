@@ -52,7 +52,7 @@ public class Skin {
     }
 
     private boolean isValidSkin() {
-        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32 && skinData.data.length >= SINGLE_SKIN_SIZE;
+        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32 && skinData.data.length >= SINGLE_SKIN_SIZE && skinData.data.length <= 131072;
     }
 
     private boolean isValidResourcePatch() {
@@ -174,7 +174,9 @@ public class Skin {
     public void setGeometryData(String geometryData) {
         Preconditions.checkNotNull(geometryData, "geometryData");
         if (!geometryData.equals(this.geometryData)) {
-            this.geometryData = geometryData;
+            if (geometryData.getBytes().length < 131072) {
+                this.geometryData = geometryData;
+            }
         }
     }
 
@@ -188,7 +190,9 @@ public class Skin {
     public void setAnimationData(String animationData) {
         Preconditions.checkNotNull(animationData, "animationData");
         if (!animationData.equals(this.animationData)) {
-            this.animationData = animationData;
+            if (animationData.getBytes().length < 131072) {
+                this.animationData = animationData;
+            }
         }
     }
 
