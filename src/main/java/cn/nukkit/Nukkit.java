@@ -55,6 +55,9 @@ public class Nukkit {
         System.setProperty("java.net.preferIPv4Stack" , "true");
         System.setProperty("log4j.skipJansi", "false");
 
+        // Force Mapped ByteBuffers for LevelDB till fixed
+        System.setProperty("leveldb.mmap", "true");
+
         boolean loadPlugins = true;
 
         if (args.length > 0 && args[0].equalsIgnoreCase("-DEBUG")) {

@@ -50,7 +50,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
-import cn.nukkit.level.sound.ItemFrameItemRemovedSound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
@@ -85,6 +84,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
@@ -1522,7 +1522,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.server.getPluginManager().callEvent(ev);
 
                 if (!(revert = ev.isCancelled())) {
-                    if (this.level.getCurrentTick() % 20 == 0) {
+                    if (this.server.getMobAiEnabled() && this.level.getCurrentTick() % 20 == 0) {
                         AxisAlignedBB aab = new AxisAlignedBB(
                                 this.getX() - 0.6f,
                                 this.getY() + 1.45f,
@@ -1892,19 +1892,40 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        Player oldPlayer = null;
         for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
-            if (p != this && p.username != null && (p.username.equalsIgnoreCase(this.username) || this.getUniqueId().equals(p.getUniqueId()))) {
-                p.close("", "disconnectionScreen.loggedinOtherLocation");
+            if (p != this && p.username != null && p.username.equalsIgnoreCase(this.username) ||
+                    this.getUniqueId().equals(p.getUniqueId())) {
+                oldPlayer = p;
                 break;
             }
         }
 
-        CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
+        CompoundTag nbt;
+        if (oldPlayer != null) {
+            oldPlayer.saveNBT();
+            nbt = oldPlayer.namedTag;
+            oldPlayer.close("", "disconnectionScreen.loggedinOtherLocation");
+        } else {
+            File legacyDataFile = new File(server.getDataPath() + "players/" + this.username.toLowerCase() + ".dat");
+            File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
+            if (legacyDataFile.exists() && !dataFile.exists()) {
+                nbt = this.server.getOfflinePlayerData(this.username, false);
+
+                if (!legacyDataFile.delete()) {
+                    this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
+                }
+            } else {
+                nbt = this.server.getOfflinePlayerData(this.uuid, true);
+            }
+        }
 
         if (nbt == null) {
             this.close(this.getLeaveMessage(), "Invalid data");
             return;
         }
+
+        server.updateName(this.uuid, this.username);
 
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
 
@@ -1955,7 +1976,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         nbt.putLong("UUIDMost", uuid.getMostSignificantBits());
 
         if (this.server.getAutoSave()) {
-            this.server.saveOfflinePlayerData(this.username, nbt, true);
+            this.server.saveOfflinePlayerData(this.uuid, nbt, true);
         }
 
         this.sendPlayStatus(PlayStatusPacket.LOGIN_SUCCESS);
@@ -2306,6 +2327,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (newPos.distanceSquared(this) < 0.01 && movePlayerPacket.yaw % 360 == this.yaw && movePlayerPacket.pitch % 360 == this.pitch) {
                         break;
                     }
+
+                    /*if (newPos.distanceSquared(this) > 100) {
+                        this.sendPosition(this, movePlayerPacket.yaw, movePlayerPacket.pitch, MovePlayerPacket.MODE_RESET);
+                        break;
+                    }*/
 
                     boolean revert = false;
                     if (!this.isAlive() || !this.spawned) {
@@ -2887,7 +2913,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.dropItem(vector3, itemDrop);
                                 itemFrame.setItem(new ItemBlock(new BlockAir()));
                                 itemFrame.setItemRotation(0);
-                                this.getLevel().addSound(new ItemFrameItemRemovedSound(this));
+                                this.getLevel().addSound(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
                             }
                         } else {
                             itemFrame.spawnTo(this);

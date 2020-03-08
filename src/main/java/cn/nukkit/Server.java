@@ -18,6 +18,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.server.BatchPacketsEvent;
+import cn.nukkit.event.server.PlayerDataSerializeEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.event.server.ServerStopEvent;
 import cn.nukkit.inventory.CraftingManager;
@@ -67,20 +68,28 @@ import cn.nukkit.plugin.service.ServiceManager;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePackManager;
-import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
+import org.iq80.leveldb.CompressionType;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.impl.Iq80DBFactory;
 
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 /**
  * The main server class
@@ -187,6 +196,8 @@ public class Server {
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
+    private DB nameLookup;
+    private PlayerDataSerializer playerDataSerializer = new DefaultPlayerDataSerializer(this);
 
     /* Some settings */
     private String motd;
@@ -281,10 +292,16 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
+        Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 5);
         this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
+        this.networkCompressionLevel = this.getPropertyInt("compression-level", 5);
+
+        if (this.networkCompressionLevel < -1) {
+            this.networkCompressionLevel = -1;
+        } else if (this.networkCompressionLevel > 9) {
+            this.networkCompressionLevel = 9;
+        }
 
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
@@ -348,6 +365,17 @@ public class Server {
         Attribute.init();
         DispenseBehaviorRegister.init();
         GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
+
+        // Convert legacy data before plugins get the chance to mess with it
+        try {
+            nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
+                            .createIfMissing(true)
+                            .compressionType(CompressionType.ZLIB_RAW));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        convertLegacyPlayerData();
 
         log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
@@ -632,7 +660,8 @@ public class Server {
             this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
         } else {
             try {
-                this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                byte[] data = Binary.appendBytes(payload);
+                this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -755,9 +784,11 @@ public class Server {
             pluginManager.callEvent(serverStopEvent);
 
             if (this.rcon != null) {
+                this.getLogger().debug("Closing RCON...");
                 this.rcon.close();
             }
 
+            this.getLogger().debug("Disconnecting all players...");
             for (Player player : new ArrayList<>(this.players.values())) {
                 player.close(player.getLeaveMessage(), reason);
             }
@@ -786,10 +817,16 @@ public class Server {
                 this.network.unregisterInterface(interfaz);
             }
 
+            if (nameLookup != null) {
+                this.getLogger().debug("Closing name lookup DB...");
+                nameLookup.close();
+            }
+
             this.getLogger().debug("Disabling timings...");
             Timings.stopServer();
 
             if (this.watchdog != null) {
+                this.getLogger().debug("Stopping Watchdog...");
                 this.watchdog.kill();
             }
         } catch (Exception e) {
@@ -1432,7 +1469,7 @@ public class Server {
     }
 
     public Map<UUID, Player> getOnlinePlayers() {
-        return new HashMap<>(playerList);
+        return ImmutableMap.copyOf(playerList);
     }
 
     public void addRecipe(Recipe recipe) {
@@ -1444,72 +1481,226 @@ public class Server {
         return Optional.ofNullable(playerList.get(uuid));
     }
 
-    public IPlayer getOfflinePlayer(String name) {
-        IPlayer result = this.getPlayerExact(name.toLowerCase());
-        if (result == null) {
-            return new OfflinePlayer(this, name);
+    public Optional<UUID> lookupName(String name) {
+        byte[] nameBytes = name.toLowerCase().getBytes(StandardCharsets.UTF_8);
+        byte[] uuidBytes = nameLookup.get(nameBytes);
+        if (uuidBytes == null) {
+            return Optional.empty();
         }
 
-        return result;
+        if (uuidBytes.length != 16) {
+            log.warn("Invalid uuid in name lookup database detected! Removing...");
+            nameLookup.delete(nameBytes);
+            return Optional.empty();
+        }
+
+        ByteBuffer buffer = ByteBuffer.wrap(uuidBytes);
+        return Optional.of(new UUID(buffer.getLong(), buffer.getLong()));
+    }
+
+    void updateName(UUID uuid, String name) {
+        byte[] nameBytes = name.toLowerCase().getBytes(StandardCharsets.UTF_8);
+
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+
+        nameLookup.put(nameBytes, buffer.array());
+    }
+
+    public IPlayer getOfflinePlayer(final String name) {
+        IPlayer result = this.getPlayerExact(name.toLowerCase());
+        if (result != null) {
+            return result;
+        }
+
+        return lookupName(name).map(uuid -> new OfflinePlayer(this, uuid))
+                .orElse(new OfflinePlayer(this, name));
+    }
+
+    public IPlayer getOfflinePlayer(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid");
+        Optional<Player> onlinePlayer = getPlayer(uuid);
+        if (onlinePlayer.isPresent()) {
+            return onlinePlayer.get();
+        }
+
+        return new OfflinePlayer(this, uuid);
+    }
+
+    public CompoundTag getOfflinePlayerData(UUID uuid) {
+        return getOfflinePlayerData(uuid, false);
+    }
+
+    public CompoundTag getOfflinePlayerData(UUID uuid, boolean create) {
+        return getOfflinePlayerDataInternal(uuid.toString(), true, create);
     }
 
     public CompoundTag getOfflinePlayerData(String name) {
-        name = name.toLowerCase();
-        String path = this.dataPath + "players/";
-        File file = new File(path + name + ".dat");
+        return getOfflinePlayerData(name, false);
+    }
 
-        if (this.shouldSavePlayerData() && file.exists()) {
-            try {
-                return NBTIO.readCompressed(new FileInputStream(file));
-            } catch (Exception e) {
-                file.renameTo(new File(path + name + ".dat.bak"));
-            }
+    public CompoundTag getOfflinePlayerData(String name, boolean create) {
+        Optional<UUID> uuid = lookupName(name);
+        return getOfflinePlayerDataInternal(uuid.map(UUID::toString).orElse(name), true, create);
+    }
+
+    private CompoundTag getOfflinePlayerDataInternal(String name, boolean runEvent, boolean create) {
+        Preconditions.checkNotNull(name, "name");
+
+        PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(name, playerDataSerializer);
+        if (runEvent) {
+            pluginManager.callEvent(event);
         }
 
-        Position spawn = this.defaultLevel.getSafeSpawn();
-        CompoundTag nbt = new CompoundTag()
-                .putLong("firstPlayed", System.currentTimeMillis() / 1000)
-                .putLong("lastPlayed", System.currentTimeMillis() / 1000)
-                .putList(new ListTag<DoubleTag>("Pos")
-                        .add(new DoubleTag("0", spawn.x))
-                        .add(new DoubleTag("1", spawn.y))
-                        .add(new DoubleTag("2", spawn.z)))
-                .putString("Level", this.defaultLevel.getFolderName())
-                .putList(new ListTag<>("Inventory"))
-                .putCompound("Achievements", new CompoundTag())
-                .putInt("playerGameType", this.getGamemode())
-                .putList(new ListTag<DoubleTag>("Motion")
-                        .add(new DoubleTag("0", 0))
-                        .add(new DoubleTag("1", 0))
-                        .add(new DoubleTag("2", 0)))
-                .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("0", 0))
-                        .add(new FloatTag("1", 0)))
-                .putFloat("FallDistance", 0)
-                .putShort("Fire", 0)
-                .putShort("Air", 300)
-                .putBoolean("OnGround", true)
-                .putBoolean("Invulnerable", false)
-                .putString("NameTag", name);
+        Optional<InputStream> dataStream = Optional.empty();
+        try {
+            dataStream = event.getSerializer().read(name, event.getUuid().orElse(null));
+            if (dataStream.isPresent()) {
+                return NBTIO.readCompressed(dataStream.get());
+            }
+        } catch (IOException e) {
+            log.warn(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
+            log.throwing(e);
+        } finally {
+            if (dataStream.isPresent()) {
+                try {
+                    dataStream.get().close();
+                } catch (IOException e) {
+                    log.throwing(e);
+                }
+            }
+        }
+        CompoundTag nbt = null;
+        if (create) {
+            Position spawn = this.getDefaultLevel().getSafeSpawn();
+            nbt = new CompoundTag()
+                    .putLong("firstPlayed", System.currentTimeMillis() / 1000)
+                    .putLong("lastPlayed", System.currentTimeMillis() / 1000)
+                    .putList(new ListTag<DoubleTag>("Pos")
+                            .add(new DoubleTag("0", spawn.x))
+                            .add(new DoubleTag("1", spawn.y))
+                            .add(new DoubleTag("2", spawn.z)))
+                    .putString("Level", this.getDefaultLevel().getName())
+                    .putList(new ListTag<>("Inventory"))
+                    .putCompound("Achievements", new CompoundTag())
+                    .putInt("playerGameType", this.getGamemode())
+                    .putList(new ListTag<DoubleTag>("Motion")
+                            .add(new DoubleTag("0", 0))
+                            .add(new DoubleTag("1", 0))
+                            .add(new DoubleTag("2", 0)))
+                    .putList(new ListTag<FloatTag>("Rotation")
+                            .add(new FloatTag("0", 0))
+                            .add(new FloatTag("1", 0)))
+                    .putFloat("FallDistance", 0)
+                    .putShort("Fire", 0)
+                    .putShort("Air", 300)
+                    .putBoolean("OnGround", true)
+                    .putBoolean("Invulnerable", false);
 
-        this.saveOfflinePlayerData(name, nbt);
+            this.saveOfflinePlayerData(name, nbt, true, runEvent);
+        }
         return nbt;
+    }
+
+    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag) {
+        this.saveOfflinePlayerData(uuid, tag, false);
     }
 
     public void saveOfflinePlayerData(String name, CompoundTag tag) {
         this.saveOfflinePlayerData(name, tag, false);
     }
 
+    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag, boolean async) {
+        this.saveOfflinePlayerData(uuid.toString(), tag, async);
+    }
+
     public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
+        Optional<UUID> uuid = lookupName(name);
+        saveOfflinePlayerData(uuid.map(UUID::toString).orElse(name), tag, async, true);
+    }
+
+    private void saveOfflinePlayerData(String name, CompoundTag tag, boolean async, boolean runEvent) {
+        String nameLower = name.toLowerCase();
         if (this.shouldSavePlayerData()) {
-            try {
-                if (async) {
-                    this.scheduler.scheduleAsyncTask(new FileWriteTask(this.dataPath + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
-                } else {
-                    Utils.writeFile(this.dataPath + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
+            PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(nameLower, playerDataSerializer);
+            if (runEvent) {
+                pluginManager.callEvent(event);
+            }
+
+            this.getScheduler().scheduleTask(new Task() {
+                boolean hasRun = false;
+
+                @Override
+                public void onRun(int currentTick) {
+                    this.onCancel();
                 }
-            } catch (Exception e) {
-                log.error(this.baseLang.translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
+
+                // Doing it like this ensures that the player data will be saved in a server shutdown
+                @Override
+                public void onCancel() {
+                    if (!this.hasRun)    {
+                        this.hasRun = true;
+                        saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                    }
+                }
+            }, async);
+        }
+    }
+
+    private void saveOfflinePlayerDataInternal(PlayerDataSerializer serializer, CompoundTag tag, String name, UUID uuid) {
+        try (OutputStream dataStream = serializer.write(name, uuid)) {
+            NBTIO.writeGZIPCompressed(tag, dataStream, ByteOrder.BIG_ENDIAN);
+        } catch (Exception e) {
+            log.error(this.getLanguage().translateString("nukkit.data.saveError", name, e));
+        }
+    }
+
+    private void convertLegacyPlayerData() {
+        File dataDirectory = new File(getDataPath(), "players/");
+        Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
+
+        File[] files = dataDirectory.listFiles(file -> {
+            String name = file.getName();
+            return !uuidPattern.matcher(name).matches() && name.endsWith(".dat");
+        });
+
+        if (files == null) {
+            return;
+        }
+
+        for (File legacyData : files) {
+            String name = legacyData.getName();
+            // Remove file extension
+            name = name.substring(0, name.length() - 4);
+
+            log.debug("Attempting legacy player data conversion for {}", name);
+
+            CompoundTag tag = getOfflinePlayerDataInternal(name, false, false);
+
+            if (tag == null || !tag.contains("UUIDLeast") || !tag.contains("UUIDMost")) {
+                // No UUID so we cannot convert. Wait until player logs in.
+                continue;
+            }
+
+            UUID uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
+            if (!tag.contains("NameTag")) {
+                tag.putString("NameTag", name);
+            }
+
+            if (new File(getDataPath() + "players/" + uuid.toString() + ".dat").exists()) {
+                // We don't want to overwrite existing data.
+                continue;
+            }
+
+            saveOfflinePlayerData(uuid.toString(), tag, false, false);
+
+            // Add name to lookup table
+            updateName(uuid, name);
+
+            // Delete legacy data
+            if (!legacyData.delete()) {
+                log.warn("Unable to delete legacy data for {}", name);
             }
         }
     }
@@ -2158,7 +2349,7 @@ public class Server {
             put("query-plugins", false);
             put("debug-level", 1);
             put("async-workers", "auto");
-            put("zlib-provider", 0);
+            put("zlib-provider", 2);
             put("async-compression", true);
             put("compression-level", 5);
             put("auto-tick-rate", true);
