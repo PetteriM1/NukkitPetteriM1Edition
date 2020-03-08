@@ -60,7 +60,7 @@ public class TitleCommand extends VanillaCommand {
             return false;
         }
 
-        Player player = Server.getInstance().getPlayerExact(args[0]);
+        Player player = Server.getInstance().getPlayer(args[0]);
         if (player == null) {
             sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.player.notFound"));
             return true;
@@ -87,14 +87,14 @@ public class TitleCommand extends VanillaCommand {
                     sender.sendMessage(new TranslationContainer("nukkit.command.title.title",
                             TextFormat.clean(args[2]), player.getName()));
                     break;
-                /*case "subtitle":
+                case "subtitle":
                     player.setSubtitle(args[2]);
-                    sender.sendMessage(new TranslationContainer("nukkit.command.title.subtitle", new String[]{TextFormat.clean(args[2]), player.getName()}));
+                    sender.sendMessage(new TranslationContainer("nukkit.command.title.subtitle", TextFormat.clean(args[2]), player.getName()));
                     break;
                 case "actionbar":
-                    player.sendActionBarTitle(args[2]);
-                    sender.sendMessage(new TranslationContainer("nukkit.command.title.actionbar", new String[]{TextFormat.clean(args[2]), player.getName()}));
-                    break;*/
+                    player.sendActionBar(args[2]);
+                    sender.sendMessage(new TranslationContainer("nukkit.command.title.actionbar", TextFormat.clean(args[2]), player.getName()));
+                    break;
                 default:
                     sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
                     return false;

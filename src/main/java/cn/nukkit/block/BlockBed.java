@@ -139,11 +139,11 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = this.down();
-        if (!down.isTransparent()) {
-            Block next = this.getSide(player.getDirection());
+        if (!down.isTransparent() || down instanceof BlockSlab) {
+            Block next = this.getSide(player.getHorizontalFacing());
             Block downNext = next.down();
 
-            if (next.canBeReplaced() && !downNext.isTransparent()) {
+            if (next.canBeReplaced() && (!downNext.isTransparent() || downNext instanceof BlockSlab)) {
                 int meta = player.getDirection().getHorizontalIndex();
 
                 this.getLevel().setBlock(block, Block.get(BED_BLOCK, meta), true, true);

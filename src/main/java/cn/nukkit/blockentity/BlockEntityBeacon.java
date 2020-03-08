@@ -126,7 +126,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
                     e.setDuration(duration * 20);
 
                     //Regen I
-                    e.setAmplifier(1);
+                    e.setAmplifier(0);
 
                     //Hide particles
                     e.setVisible(false);
