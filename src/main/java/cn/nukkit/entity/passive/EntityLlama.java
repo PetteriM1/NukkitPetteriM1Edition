@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.projectile.EntityLlamaSpit;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -103,5 +104,15 @@ public class EntityLlama extends EntityHorseBase {
     @Override
     public Item[] getDrops() {
         return new Item[]{Item.get(Item.LEATHER, 0, Utils.rand(0, 2))};
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.WHEAT && distance <= 40;
+        }
+
+        return false;
     }
 }
