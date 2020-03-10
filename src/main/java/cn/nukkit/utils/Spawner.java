@@ -14,7 +14,7 @@ import cn.nukkit.utils.spawners.*;
 import java.util.Arrays;
 import java.util.List;
 
-public class Spawner extends Thread {
+public class Spawner implements Runnable {
 
     private final List<EntitySpawner> animalSpawners = Arrays.asList(
             new ChickenSpawner(this),
@@ -129,7 +129,7 @@ public class Spawner extends Thread {
         return addX;
     }
 
-    static int getSafeYCoord(Level level, Position pos, int needDegree) {
+    static int getSafeYCoord(Level level, Position pos) {
         int x = (int) pos.x;
         int y = (int) pos.y;
         int z = (int) pos.z;
@@ -146,7 +146,7 @@ public class Spawner extends Thread {
                     break;
                 }
                 if (level.getBlockIdAt(x, y, z) != Block.AIR) {
-                    int checkNeedDegree = needDegree;
+                    int checkNeedDegree = 3;
                     int checkY = y;
                     while (true) {
                         checkY++;
@@ -172,7 +172,7 @@ public class Spawner extends Thread {
                     break;
                 }
                 if (level.getBlockIdAt(x, y, z) != Block.AIR) {
-                    int checkNeedDegree = needDegree;
+                    int checkNeedDegree = 3;
                     int checkY = y;
                     while (true) {
                         checkY--;

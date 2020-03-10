@@ -139,10 +139,10 @@ public class Server {
     private boolean alwaysTickPlayers;
     private int baseTickRate;
     private int difficulty;
-    private int defaultGamemode = Integer.MAX_VALUE;
+    private int defaultGameMode = Integer.MAX_VALUE;
 
-    private int autoSaveTicker = 0;
-    private int autoSaveTicks = 6000;
+    private int autoSaveTicker;
+    private int autoSaveTicks;
 
     private BaseLang baseLang;
     private boolean forceLanguage;
@@ -413,8 +413,6 @@ public class Server {
             return;
         }
 
-        this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
-
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             try {
@@ -462,7 +460,7 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            this.scheduler.scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            this.scheduler.scheduleDelayedRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
 
         // Check for updates
@@ -1344,10 +1342,10 @@ public class Server {
     }
 
     public int getDefaultGamemode() {
-        if (this.defaultGamemode == Integer.MAX_VALUE) {
-            this.defaultGamemode = this.getGamemode();
+        if (this.defaultGameMode == Integer.MAX_VALUE) {
+            this.defaultGameMode = this.getGamemode();
         }
-        return this.defaultGamemode;
+        return this.defaultGameMode;
     }
 
     public String getMotd() {
@@ -2103,6 +2101,7 @@ public class Server {
         this.forceMtu = this.getPropertyBoolean("force-mtu", false);
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
+        this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
