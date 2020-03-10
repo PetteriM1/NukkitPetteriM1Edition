@@ -204,7 +204,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         return false;
     }
 
-    @Override
+    /*@Override
     public boolean move(double dx, double dy, double dz) {
         Timings.entityMoveTimer.startTiming();
 
@@ -238,7 +238,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         Timings.entityMoveTimer.stopTiming();
         return true;
-    }
+    }*/
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {

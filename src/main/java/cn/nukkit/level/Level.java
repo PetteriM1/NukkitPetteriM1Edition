@@ -1445,7 +1445,8 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                    Vector3 vec = this.temporalVector.setComponents(x, y, z);
+                    Block block = this.getBlock(vec, false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         collides.add(block.getBoundingBox());
                     }
@@ -2218,7 +2219,7 @@ public class Level implements ChunkManager, Metadatable {
 
                         if (second != null) {
                             block.getLevel().setBlock(block, new BlockAir());
-                            block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+                            block.getLevel().setBlock(block.add(0, 1, 0), new BlockAir()); // block is set to BlockFace.DOWN above
 
                             CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
                             server.getPluginManager().callEvent(ev);
@@ -2257,7 +2258,7 @@ public class Level implements ChunkManager, Metadatable {
                         block.getLevel().setBlock(first2, new BlockAir());
                         block.getLevel().setBlock(second2, new BlockAir());
                         block.getLevel().setBlock(block, new BlockAir());
-                        block.getLevel().setBlock(block.add(0, -1, 0), new BlockAir());
+                        block.getLevel().setBlock(block.add(0, 1, 0), new BlockAir()); // block is set to BlockFace.DOWN above
 
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_WITHER);
                         server.getPluginManager().callEvent(ev);
