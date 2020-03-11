@@ -79,12 +79,14 @@ public class StatusCommand extends VanillaCommand {
         sender.sendMessage(TextFormat.GOLD + "Available processors: " + TextFormat.GREEN + runtime.availableProcessors());
 
 
+        int players = server.getOnlinePlayers().size();
+
         TextFormat playerColor = TextFormat.GREEN;
-        if (((float) server.getOnlinePlayers().size() / (float) server.getMaxPlayers()) > 0.85) {
+        if (((float) players / (float) server.getMaxPlayers()) > 0.85) {
             playerColor = TextFormat.GOLD;
         }
 
-        sender.sendMessage(TextFormat.GOLD + "Players: " + playerColor + server.getOnlinePlayers().size() + TextFormat.GREEN + " online, " +
+        sender.sendMessage(TextFormat.GOLD + "Players: " + playerColor + players + TextFormat.GREEN + " online, " +
                 TextFormat.RED + server.getMaxPlayers() + TextFormat.GREEN + " max. ");
 
         for (Level level : server.getLevels().values()) {
