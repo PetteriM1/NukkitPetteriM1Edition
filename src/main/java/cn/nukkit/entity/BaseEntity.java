@@ -52,7 +52,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean isMovement() {
-        return this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty() && this.movement;
+        return this.getServer().getMobAiEnabled() && this.movement;
     }
 
     public boolean isKnockback() {
@@ -198,14 +198,18 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty()) {
+        if (this.getServer().getMobAiEnabled()) {
             super.setMotion(motion);
         }
         return false;
     }
 
-    /*@Override
+    @Override
     public boolean move(double dx, double dy, double dz) {
+        if (Math.abs(dy) > 30) {
+            return false;
+        }
+
         Timings.entityMoveTimer.startTiming();
 
         this.blocksAround = null;
@@ -214,7 +218,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         double movY = dy;
         double movZ = dz * moveMultifier;
 
-        AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.getOffsetBoundingBox(dx, dy, dz));
+        AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+
         for (AxisAlignedBB bb : list) {
             dx = bb.calculateXOffset(this.boundingBox, dx);
         }
@@ -238,7 +243,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         Timings.entityMoveTimer.stopTiming();
         return true;
-    }*/
+    }
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
