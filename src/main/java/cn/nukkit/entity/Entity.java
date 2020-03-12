@@ -1231,7 +1231,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.justCreated = false;
 
         if (!this.isAlive()) {
-            this.removeAllEffects();
+            //this.removeAllEffects(); // Why to remove them if the entity is dead anyways?
             this.despawnFromAll();
             if (!this.isPlayer) {
                 this.close();
@@ -1923,6 +1923,13 @@ public abstract class Entity extends Location implements Metadatable {
             int maxY = NukkitMath.ceilDouble(this.boundingBox.maxY);
             int maxZ = NukkitMath.ceilDouble(this.boundingBox.maxZ);
 
+            if (!this.isPlayer) {
+                if (minY < -40 || minY > 512 || maxY < -40 || maxY > 512) {
+                    this.kill();
+                    return new ArrayList<>();
+                }
+            }
+
             this.blocksAround = new ArrayList<>();
 
             for (int z = minZ; z <= maxZ; ++z) {
@@ -1942,7 +1949,8 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.collisionBlocks == null) {
             this.collisionBlocks = new ArrayList<>();
 
-            for (Block b : getBlocksAround()) {
+            List<Block> bl = this.getBlocksAround();
+            for (Block b : bl) {
                 if (b.collidesWithBB(this.boundingBox, true)) {
                     this.collisionBlocks.add(b);
                 }
@@ -2020,14 +2028,16 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void checkChunks() {
-        if (this.chunk == null || (this.chunk.getX() != ((int) this.x >> 4)) || this.chunk.getZ() != ((int) this.z >> 4)) {
+        int cx = (int) this.x >> 4;
+        int cz = (int) this.z >> 4;
+        if (this.chunk == null || (this.chunk.getX() != cx) || this.chunk.getZ() != cz) {
             if (this.chunk != null) {
                 this.chunk.removeEntity(this);
             }
-            this.chunk = this.level.getChunk((int) this.x >> 4, (int) this.z >> 4, true);
+            this.chunk = this.level.getChunk(cx, cz, true);
 
             if (!this.justCreated) {
-                Map<Integer, Player> newChunk = this.level.getChunkPlayers((int) this.x >> 4, (int) this.z >> 4);
+                Map<Integer, Player> newChunk = this.level.getChunkPlayers(cx, cz);
                 for (Player player : new ArrayList<>(this.hasSpawned.values())) {
                     if (!newChunk.containsKey(player.getLoaderId())) {
                         this.despawnFrom(player);
