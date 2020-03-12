@@ -337,6 +337,7 @@ public class GlobalBlockPalette {
             case 393:
             case 394:
             case 395:
+            case 396:
                 return compiledTable389;
             default:
                 Server.getInstance().getLogger().alert("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);

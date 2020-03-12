@@ -35,11 +35,12 @@ public interface ProtocolInfo {
     int v1_15_0_53 = 393;
     int v1_15_0_54 = 394;
     int v1_15_0_55 = 395;
+    int v1_15_0_56 = 396;
 
     int CURRENT_PROTOCOL = v1_14_0; //TODO: Bump on release
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
-            v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0, v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0_2, v1_14_0, v1_15_0_51, v1_15_0_53, v1_15_0_54, v1_15_0_55
+            v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0, v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0_2, v1_14_0, v1_15_0_51, v1_15_0_53, v1_15_0_54, v1_15_0_55, v1_15_0_56
     );
 
     String MINECRAFT_VERSION = "v1.15.0";
@@ -185,5 +186,6 @@ public interface ProtocolInfo {
     byte COMPLETED_USING_ITEM_PACKET = (byte) 0x8e;
     byte NETWORK_SETTINGS_PACKET = (byte) 0x8f;
     byte PLAYER_AUTH_INPUT_PACKET = (byte) 0x90;
+    byte CREATIVE_ITEMS_LIST_PACKET = (byte) 0x91;
     byte BATCH_PACKET = (byte) 0xff;
 }
