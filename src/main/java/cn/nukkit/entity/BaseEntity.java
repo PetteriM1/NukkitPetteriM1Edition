@@ -206,7 +206,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean move(double dx, double dy, double dz) {
-        if (Math.abs(dy) > 30) {
+        if (dy < -10 || dy > 10) {
+            this.kill();
             return false;
         }
 

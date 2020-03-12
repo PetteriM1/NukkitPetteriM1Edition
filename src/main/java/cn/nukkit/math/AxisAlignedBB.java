@@ -333,6 +333,53 @@ public class AxisAlignedBB implements Cloneable {
         }
     }
 
+    public double getMaxX() {
+        return maxX;
+    }
+
+    public double getMaxY() {
+        return maxY;
+    }
+
+    public double getMaxZ() {
+        return maxZ;
+    }
+
+    public double getMinX() {
+        return minX;
+    }
+
+    public double getMinY() {
+        return minY;
+    }
+
+    public double getMinZ() {
+        return minZ;
+    }
+
+    public void setMaxX(double maxX) {
+        this.maxX = maxX;
+    }
+
+    public void setMaxY(double maxY) {
+        this.maxY = maxY;
+    }
+
+    public void setMaxZ(double maxZ) {
+        this.maxZ = maxZ;
+    }
+
+    public void setMinX(double minX) {
+        this.minX = minX;
+    }
+
+    public void setMinY(double minY) {
+        this.minY = minY;
+    }
+
+    public void setMinZ(double minZ) {
+        this.minZ = minZ;
+    }
 
     public interface BBConsumer<T> {
 

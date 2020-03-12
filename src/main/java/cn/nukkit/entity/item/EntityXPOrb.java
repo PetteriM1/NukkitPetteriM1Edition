@@ -169,9 +169,9 @@ public class EntityXPOrb extends Entity {
                 this.motionY -= this.getGravity();
             }
 
-            if (this.checkObstruction(this.x, this.y, this.z)) {
+            /*if (this.checkObstruction(this.x, this.y, this.z)) {
                 hasUpdate = true;
-            }
+            }*/
 
             if (this.closestPlayer == null || this.closestPlayer.distanceSquared(this) > 64.0D) {
                 for (Player p : level.getPlayers().values()) {

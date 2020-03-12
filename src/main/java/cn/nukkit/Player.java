@@ -3960,8 +3960,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.stopFishing(false);
             }
 
-            this.health = 0;
             this.extinguish();
+            this.removeAllEffects();
+            this.health = 0;
             this.scheduleUpdate();
 
             if (!ev.getKeepInventory() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {

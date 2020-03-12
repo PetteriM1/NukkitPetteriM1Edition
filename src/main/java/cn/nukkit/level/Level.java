@@ -1433,6 +1433,13 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public AxisAlignedBB[] getCollisionCubes(Entity entity, AxisAlignedBB bb, boolean entities, boolean solidEntities) {
+        if (!(entity instanceof Player)) {
+            if (bb.minY < -40 || bb.minY > 512 || bb.maxY < -40 || bb.maxY > 512) {
+                entity.kill();
+                return new AxisAlignedBB[0];
+            }
+        }
+
         int minX = NukkitMath.floorDouble(bb.minX);
         int minY = NukkitMath.floorDouble(bb.minY);
         int minZ = NukkitMath.floorDouble(bb.minZ);
@@ -1445,8 +1452,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Vector3 vec = this.temporalVector.setComponents(x, y, z);
-                    Block block = this.getBlock(vec, false);
+                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         collides.add(block.getBoundingBox());
                     }
@@ -2069,9 +2075,9 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (target.getId() == Item.AIR) {
+        /*if (target.getId() == Item.AIR) {
             return null;
-        }
+        }*/
 
         if (player != null) {
             PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face, Action.RIGHT_CLICK_BLOCK);
