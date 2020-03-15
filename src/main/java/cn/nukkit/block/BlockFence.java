@@ -99,17 +99,17 @@ public class BlockFence extends BlockTransparentMeta {
     public BlockColor getColor() {
         switch (this.getDamage() & 0x07) {
             default:
-            case 1: //OAK
+            case FENCE_OAK: //OAK
                 return BlockColor.WOOD_BLOCK_COLOR;
-            case 2: //SPRUCE
+            case FENCE_SPRUCE: //SPRUCE
                 return BlockColor.SPRUCE_BLOCK_COLOR;
-            case 3: //BIRCH
+            case FENCE_BIRCH: //BIRCH
                 return BlockColor.SAND_BLOCK_COLOR;
-            case 4: //JUNGLE
+            case FENCE_JUNGLE: //JUNGLE
                 return BlockColor.DIRT_BLOCK_COLOR;
-            case 5: //ACACIA
+            case FENCE_ACACIA: //ACACIA
                 return BlockColor.ORANGE_BLOCK_COLOR;
-            case 6: //DARK OAK
+            case FENCE_DARK_OAK: //DARK OAK
                 return BlockColor.BROWN_BLOCK_COLOR;
         }
     }
