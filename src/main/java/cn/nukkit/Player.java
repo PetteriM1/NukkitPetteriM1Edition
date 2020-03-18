@@ -1683,8 +1683,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.failedTransactions = 0;
 
-        if (this.fishing != null) {
-            if (this.distance(fishing) > 80) {
+        if (this.fishing != null && this.server.getTick() % 20 == 0) {
+            if (this.distance(fishing) > 33) {
                 this.stopFishing(false);
             }
         }
@@ -4205,13 +4205,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.yaw = (float) yaw;
         pk.mode = mode;
         pk.setChannel(Network.CHANNEL_MOVEMENT);
-
-        if (targets != null) {
-            Server.broadcastPacket(targets, pk);
-        } else {
-            pk.eid = this.id;
-            this.directDataPacket(pk);
-        }
+        Server.broadcastPacket(targets, pk);
     }
 
     @Override
