@@ -207,7 +207,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
 
     private void initHeapWeights() {
         for (int priorityLevel = 0; priorityLevel < 4; priorityLevel++) {
-            this.outgoingPacketNextWeights[priorityLevel] = (1 << priorityLevel) * priorityLevel + priorityLevel;
+            this.outgoingPacketNextWeights[priorityLevel] = (long) (1 << priorityLevel) * priorityLevel + priorityLevel;
         }
     }
 
@@ -217,13 +217,13 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
 
         if (!this.outgoingPackets.isEmpty()) {
             if (next >= this.lastMinWeight) {
-                next = this.lastMinWeight + (1 << priorityLevel) * priorityLevel + priorityLevel;
-                this.outgoingPacketNextWeights[priorityLevel] = next + (1 << priorityLevel) * (priorityLevel + 1) + priorityLevel;
+                next = this.lastMinWeight + (1L << priorityLevel) * priorityLevel + priorityLevel;
+                this.outgoingPacketNextWeights[priorityLevel] = next + (1L << priorityLevel) * (priorityLevel + 1) + priorityLevel;
             }
         } else {
             this.initHeapWeights();
         }
-        this.lastMinWeight = next - (1 << priorityLevel) * priorityLevel + priorityLevel;
+        this.lastMinWeight = next - (1L << priorityLevel) * priorityLevel + priorityLevel;
         return next;
     }
 
