@@ -4,6 +4,8 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockTNT;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
@@ -133,6 +135,16 @@ public class SmallExplosion extends Explosion {
         for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(Utils.rand(10, 30), this.what instanceof Entity ? (Entity) this.what : null);
+            } else if (block.getId() == Block.CHEST || block.getId() == Block.TRAPPED_CHEST) {
+                if (block.getLevel().getGameRules().getBoolean(GameRule.DO_TILE_DROPS)) {
+                    BlockEntity chest = block.getLevel().getBlockEntity(block);
+                    if (chest != null) {
+                        for (Item drop : ((BlockEntityChest) chest).getInventory().getContents().values()) {
+                            this.level.dropItem(block.add(0.5, 0.5, 0.5), drop);
+                        }
+                        ((BlockEntityChest) chest).getInventory().clearAll();
+                    }
+                }
             } else if (Math.random() * 100 < yield) {
                 for (Item drop : block.getDrops(air)) {
                     this.level.dropItem(block.add(0.5, 0.5, 0.5), drop);

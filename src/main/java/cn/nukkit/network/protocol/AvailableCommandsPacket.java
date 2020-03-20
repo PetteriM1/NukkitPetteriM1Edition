@@ -36,7 +36,8 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_WILDCARD_TARGET = 7;
     public static final int ARG_TYPE_FILE_PATH = 14;
     public static final int ARG_TYPE_STRING = 29;
-    public static final int ARG_TYPE_POSITION = 37;
+    public static final int ARG_TYPE_BLOCK_POSITION = 37;
+    public static final int ARG_TYPE_POSITION = 38;
     public static final int ARG_TYPE_STRING_PRE388 = 27;
     public static final int ARG_TYPE_POSITION_PRE388 = 29;
     public static final int ARG_TYPE_MESSAGE = 41;
