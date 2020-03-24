@@ -1,5 +1,6 @@
 package cn.nukkit.entity.data;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import cn.nukkit.utils.SerializedImage;
 import cn.nukkit.utils.SkinAnimation;
@@ -52,7 +53,7 @@ public class Skin {
     }
 
     private boolean isValidSkin() {
-        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32 && skinData.data.length >= SINGLE_SKIN_SIZE && skinData.data.length <= 131072;
+        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32 && skinData.data.length >= SINGLE_SKIN_SIZE && (Server.getInstance().doNotLimitSkinGeometry || skinData.data.length <= 131072);
     }
 
     private boolean isValidResourcePatch() {
@@ -174,7 +175,7 @@ public class Skin {
     public void setGeometryData(String geometryData) {
         Preconditions.checkNotNull(geometryData, "geometryData");
         if (!geometryData.equals(this.geometryData)) {
-            if (geometryData.getBytes().length < 131072) {
+            if (Server.getInstance().doNotLimitSkinGeometry || geometryData.getBytes().length < 131072) {
                 this.geometryData = geometryData;
             }
         }
@@ -190,7 +191,7 @@ public class Skin {
     public void setAnimationData(String animationData) {
         Preconditions.checkNotNull(animationData, "animationData");
         if (!animationData.equals(this.animationData)) {
-            if (animationData.getBytes().length < 131072) {
+            if (Server.getInstance().doNotLimitSkinGeometry|| animationData.getBytes().length < 131072) {
                 this.animationData = animationData;
             }
         }
