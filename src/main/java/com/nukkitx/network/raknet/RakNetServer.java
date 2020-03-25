@@ -172,6 +172,8 @@ public class RakNetServer extends RakNet {
                 session.sendOpenConnectionReply1();
                 if (listener != null) {
                     listener.onSessionCreation(session);
+                } else {
+                    Server.getInstance().getLogger().warning("Unable to create session for " + packet.sender().getHostName() + ": listener is null");
                 }
             }
         }
@@ -220,6 +222,7 @@ public class RakNetServer extends RakNet {
         buffer.writeLong(this.guid);
 
         RakNet.send(ctx, recipient, buffer);
+        Server.getInstance().getLogger().debug("Already connected");
     }
 
     private void sendConnectionBanned(ChannelHandlerContext ctx, InetSocketAddress recipient) {
@@ -229,6 +232,7 @@ public class RakNetServer extends RakNet {
         buffer.writeLong(this.guid);
 
         RakNet.send(ctx, recipient, buffer);
+        Server.getInstance().getLogger().debug("Connection banned");
     }
 
     private void sendNoFreeIncomingConnections(ChannelHandlerContext ctx, InetSocketAddress recipient) {
@@ -238,6 +242,7 @@ public class RakNetServer extends RakNet {
         buffer.writeLong(this.guid);
 
         RakNet.send(ctx, recipient, buffer);
+        Server.getInstance().getLogger().debug("No free incoming connections");
     }
 
     @ChannelHandler.Sharable

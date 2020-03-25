@@ -162,7 +162,7 @@ public class BlockEntityHopper extends BlockEntitySpawnable implements Inventory
             boolean changed = pushItems();
 
             if (!changed) {
-                if (blockEntity == null) {
+                if (!(blockEntity instanceof BlockEntityContainer)) {
                     changed = pickupItems();
                 } else {
                     changed = pullItems();

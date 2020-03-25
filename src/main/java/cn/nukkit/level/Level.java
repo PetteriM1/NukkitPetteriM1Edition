@@ -1433,13 +1433,6 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public AxisAlignedBB[] getCollisionCubes(Entity entity, AxisAlignedBB bb, boolean entities, boolean solidEntities) {
-        if (!(entity instanceof Player)) {
-            if (bb.minY < -40 || bb.minY > 512 || bb.maxY < -40 || bb.maxY > 512) {
-                entity.kill();
-                return new AxisAlignedBB[0];
-            }
-        }
-
         int minX = NukkitMath.floorDouble(bb.minX);
         int minY = NukkitMath.floorDouble(bb.minY);
         int minZ = NukkitMath.floorDouble(bb.minZ);
@@ -1942,14 +1935,12 @@ public class Level implements ChunkManager, Metadatable {
                 ev.setCancelled();
             } else if (!player.isOp() && isInSpawnRadius(target)) {
                 ev.setCancelled();
+            } else if (!ev.getInstaBreak() && ev.isFastBreak()) {
+                ev.setCancelled();
             }
 
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
-                return null;
-            }
-
-            if (!ev.getInstaBreak() && ev.isFastBreak()) {
                 return null;
             }
 

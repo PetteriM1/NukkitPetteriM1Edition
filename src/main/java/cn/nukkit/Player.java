@@ -1683,8 +1683,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.failedTransactions = 0;
 
-        if (this.fishing != null) {
-            if (this.distance(fishing) > 80) {
+        if (this.fishing != null && this.server.getTick() % 20 == 0) {
+            if (this.distance(fishing) > 33) {
                 this.stopFishing(false);
             }
         }
@@ -2284,7 +2284,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     dataPacket.packId = resourcePack.getPackId();
                     dataPacket.chunkIndex = requestPacket.chunkIndex;
                     dataPacket.data = resourcePack.getPackChunk(1048576 * requestPacket.chunkIndex, 1048576);
-                    dataPacket.progress = 1048576 * requestPacket.chunkIndex;
+                    dataPacket.progress = 1048576L * requestPacket.chunkIndex;
                     this.dataPacket(dataPacket);
                     break;
                 case ProtocolInfo.PLAYER_SKIN_PACKET:
@@ -3928,34 +3928,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         PlayerDeathEvent ev = new PlayerDeathEvent(this, this.getDrops(), new TranslationContainer(message, params.toArray(new String[0])), this.expLevel);
         ev.setKeepInventory(this.level.gameRules.getBoolean(GameRule.KEEP_INVENTORY));
-        ev.setKeepExperience(ev.getKeepInventory());
+        ev.setKeepExperience(ev.getKeepInventory()); // Same as above
+
+        if (cause != null && cause.getCause() != DamageCause.VOID) {
+            Inventory inventory = this.getOffhandInventory();
+            Item totem = Item.get(Item.TOTEM, 0, 1);
+            if (inventory.contains(totem) || ((PlayerInventory) (inventory = this.getInventory())).getItemInHand() instanceof ItemTotem) {
+                inventory.removeItem(totem);
+                this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
+                this.extinguish();
+                this.removeAllEffects();
+                this.setHealth(1);
+
+                this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(1));
+                this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800).setAmplifier(1));
+                this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(1));
+
+                EntityEventPacket pk = new EntityEventPacket();
+                pk.eid = this.getId();
+                pk.event = EntityEventPacket.CONSUME_TOTEM;
+                this.dataPacket(pk);
+
+                ev.setCancelled(true);
+            }
+        }
+
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
-            if (cause != null && cause.getCause() != DamageCause.VOID) {
-                Inventory inventory = this.getOffhandInventory();
-                Item totem = Item.get(Item.TOTEM, 0, 1);
-                if (inventory.contains(totem) || ((PlayerInventory) (inventory = this.getInventory())).getItemInHand() instanceof ItemTotem) {
-                    inventory.removeItem(totem);
-                    this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
-                    this.extinguish();
-                    this.removeAllEffects();
-                    this.setHealth(1);
-
-                    this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(1));
-                    this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800).setAmplifier(1));
-                    this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(1));
-
-                    EntityEventPacket pk = new EntityEventPacket();
-                    pk.eid = this.getId();
-                    pk.event = EntityEventPacket.CONSUME_TOTEM;
-                    this.dataPacket(pk);
-
-                    ev.setCancelled(true);
-                    return;
-                }
-            }
-
             if (this.fishing != null) {
                 this.stopFishing(false);
             }
@@ -4231,13 +4231,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.yaw = (float) yaw;
         pk.mode = mode;
         pk.setChannel(Network.CHANNEL_MOVEMENT);
-
-        if (targets != null) {
-            Server.broadcastPacket(targets, pk);
-        } else {
-            pk.eid = this.id;
-            this.directDataPacket(pk);
-        }
+        Server.broadcastPacket(targets, pk);
     }
 
     @Override

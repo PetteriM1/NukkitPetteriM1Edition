@@ -127,7 +127,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
     @Override
     public void setName(String name) {
         QueryRegenerateEvent info = this.server.getQueryInformation();
-        String[] names = name.split("!@#");  // Split double names within the program
+        String[] names = name.split("!@#"); // Split double names within the program
         String motd = Utils.rtrim(names[0].replace(";", "\\;"), '\\');
         String subMotd = names.length > 1 ? Utils.rtrim(names[1].replace(";", "\\;"), '\\') : "";
         StringJoiner joiner = new StringJoiner(";")

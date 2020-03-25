@@ -77,7 +77,7 @@ public class EntityFirework extends Entity {
             float f = (float) Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
             this.yaw = (float) (Math.atan2(this.motionX, this.motionZ) * (57.29577951308232));
 
-            this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (57.29577951308232));
+            this.pitch = (float) (Math.atan2(this.motionY, f) * (57.29577951308232));
 
             if (this.age == 0) {
                 this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LAUNCH);

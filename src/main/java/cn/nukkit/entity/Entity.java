@@ -1923,13 +1923,6 @@ public abstract class Entity extends Location implements Metadatable {
             int maxY = NukkitMath.ceilDouble(this.boundingBox.maxY);
             int maxZ = NukkitMath.ceilDouble(this.boundingBox.maxZ);
 
-            if (!this.isPlayer) {
-                if (minY < -40 || minY > 512 || maxY < -40 || maxY > 512) {
-                    this.kill();
-                    return new ArrayList<>();
-                }
-            }
-
             this.blocksAround = new ArrayList<>();
 
             for (int z = minZ; z <= maxZ; ++z) {

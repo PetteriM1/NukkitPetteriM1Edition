@@ -232,6 +232,7 @@ public class Server {
     boolean announceAchievements;
     boolean checkOpMovement;
     boolean doNotLimitInteractions;
+    public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
     public boolean vanillaBB;
@@ -2293,6 +2294,7 @@ public class Server {
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
+        this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2400,6 +2402,7 @@ public class Server {
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
             put("force-mtu", false);
+            put("do-not-limit-skin-geometry", false);
         }
     }
 
