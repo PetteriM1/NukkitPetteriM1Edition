@@ -29,4 +29,9 @@ public class DesertBiome extends SandyBiome {
     public String getName() {
         return "Desert";
     }
+
+    @Override
+    public boolean canRain() {
+        return false;
+    }
 }

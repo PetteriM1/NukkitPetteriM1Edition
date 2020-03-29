@@ -231,7 +231,6 @@ public class Server {
     public boolean queryPlugins;
     public boolean despawnEntities;
     public boolean strongIPBans;
-    public boolean forceMtu;
     public boolean spawnAnimals;
     public boolean spawnMobs;
 
@@ -2099,7 +2098,6 @@ public class Server {
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
-        this.forceMtu = this.getPropertyBoolean("force-mtu", false);
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
@@ -2210,7 +2208,6 @@ public class Server {
             put("skin-change-cooldown", 30);
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
-            put("force-mtu", false);
             put("do-not-limit-skin-geometry", false);
         }
     }
