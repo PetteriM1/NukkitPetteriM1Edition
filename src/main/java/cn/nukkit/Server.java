@@ -187,6 +187,7 @@ public class Server {
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
+    public static List<String> noTickingWorlds = new ArrayList<>();
 
     /* Some settings */
     private String motd;
@@ -553,26 +554,32 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        broadcastPacket(players.toArray(new Player[0]), packet);
+        boolean mvplayers = false;
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
+            }
+        }
+        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+            packet.encode();
+            packet.isEncoded = true;
+            instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
+        } else { // Need to force multiversion
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         boolean mvplayers = false;
-        //packet.encode();
-        //packet.isEncoded = true;
-
-        //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-            for (Player player : players) {
-                //player.dataPacket(packet); // HACK: Force multiversion
-                if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
-                    mvplayers = true;
-                    break;
-                }
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
             }
-        //} else {
-        //    getInstance().batchPackets(players, new DataPacket[]{packet}, true);
-        //}
-
+        }
         if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
@@ -2106,6 +2113,13 @@ public class Server {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
             this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode")) & 0b11;
+        }
+        String list = this.getPropertyString("do-not-tick-worlds");
+        if (!list.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                noTickingWorlds.add(tokenizer.nextToken());
+            }
         }
     }
 

@@ -1627,7 +1627,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
-        this.sendPosition(x, y, z, yaw, pitch, MovePlayerPacket.MODE_NORMAL, this.getViewers().values().toArray(new Player[0]));
+        this.sendPosition(x, y, z, yaw, pitch, MovePlayerPacket.MODE_NORMAL, this.getViewers().values());
     }
 
     @Override
@@ -4239,7 +4239,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
-    public void sendPosition(double x, double y, double z, double yaw, double pitch, int mode, Player[] targets) {
+    public void sendPosition(double x, double y, double z, double yaw, double pitch, int mode, Collection<Player> targets) {
         MovePlayerPacket pk = new MovePlayerPacket();
         pk.eid = this.getId();
         pk.x = (float) x;

@@ -247,8 +247,6 @@ public class Level implements ChunkManager, Metadatable {
 
     public GameRules gameRules;
 
-    private List<String> noTickingWorlds = new ArrayList<>();
-
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
 
         this.levelId = levelIdCounter++;
@@ -309,14 +307,6 @@ public class Level implements ChunkManager, Metadatable {
 
         this.isNether = name.equals("nether");
         this.isEnd = name.equals("end");
-
-        String list = Server.getInstance().getPropertyString("do-not-tick-worlds");
-        if (!list.trim().isEmpty()) {
-            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
-            while (tokenizer.hasMoreTokens()) {
-                noTickingWorlds.add(tokenizer.nextToken());
-            }
-        }
     }
 
     public static long chunkHash(int x, int z) {
@@ -782,12 +772,12 @@ public class Level implements ChunkManager, Metadatable {
         updateBlockLight(lightQueue);
         this.checkTime();
         
-        if (/*stopTime || !this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE) ||*/ currentTick % 2400 == 0) {
+        if (/*stopTime || !this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE) ||*/ currentTick % 6000 == 0) { // Keep the time in sync
             this.sendTime();
         }
 
         // Tick Weather
-        if (!this.isNether && !this.isEnd && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && !noTickingWorlds.contains(this.getName())) {
+        if (!this.isNether && !this.isEnd && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && this.randomTickingEnabled()) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -3122,7 +3112,7 @@ public class Level implements ChunkManager, Metadatable {
     public boolean isSpawnChunk(int X, int Z) {
         Vector3 spawn = this.getSpawnLocation();
 
-        if (this.server.suomiCraftPEMode() && noTickingWorlds.contains(this.getName())) {
+        if (this.server.suomiCraftPEMode() && !this.randomTickingEnabled()) {
             if (this.equals(this.getServer().getDefaultLevel())) {
                 return Math.abs(X - (spawn.getFloorX() >> 4)) <= 9 && Math.abs(Z - (spawn.getFloorZ() >> 4)) <= 9;
             }
@@ -3705,7 +3695,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean randomTickingEnabled() {
-        return !noTickingWorlds.contains(this.getName());
+        return !Server.noTickingWorlds.contains(this.getName());
     }
 
     public boolean isAnimalSpawningAllowedByTime() {

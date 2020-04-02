@@ -1,7 +1,6 @@
 package com.nukkitx.network.raknet;
 
 import cn.nukkit.Nukkit;
-import cn.nukkit.Server;
 import com.nukkitx.network.SessionConnection;
 import com.nukkitx.network.raknet.util.*;
 import com.nukkitx.network.util.DisconnectReason;
