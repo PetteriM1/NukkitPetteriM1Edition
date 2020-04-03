@@ -222,6 +222,7 @@ public class Server {
     boolean announceAchievements;
     boolean checkOpMovement;
     boolean doNotLimitInteractions;
+    boolean experimentalChunkLoading;
     public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
@@ -2109,6 +2110,7 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", false);
+        this.experimentalChunkLoading = this.getPropertyBoolean("experimental-chunk-loading", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2223,6 +2225,7 @@ public class Server {
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", false);
+            put("experimental-chunk-loading", false);
         }
     }
 
