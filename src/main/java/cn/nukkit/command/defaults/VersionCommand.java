@@ -44,7 +44,9 @@ public class VersionCommand extends VanillaCommand {
                     try {
                         URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                         request.connect();
-                        String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                        InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                        String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                        content.close();
 
                         if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null")) {
                             sender.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + sender.getServer().getNukkitVersion() + " Latest: " + latest);

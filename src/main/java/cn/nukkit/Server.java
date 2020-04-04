@@ -470,7 +470,9 @@ public class Server {
             try {
                 URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
-                String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                content.close();
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
                     this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
