@@ -1,7 +1,6 @@
 package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.blockentity.BlockEntity;
@@ -131,7 +130,7 @@ public class SmallExplosion extends Explosion {
                 }
             }
         }
-        ItemBlock air = new ItemBlock(new BlockAir());
+        ItemBlock air = new ItemBlock(Block.get(BlockID.AIR));
         for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(Utils.rand(10, 30), this.what instanceof Entity ? (Entity) this.what : null);

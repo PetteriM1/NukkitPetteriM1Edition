@@ -2415,7 +2415,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             Block block = target.getSide(face);
                             if (block.getId() == Block.FIRE) {
-                                this.level.setBlock(block, new BlockAir(), true);
+                                this.level.setBlock(block, Block.get(BlockID.AIR), true);
                                 this.level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_EXTINGUISH_FIRE);
                                 break;
                             }
@@ -2891,7 +2891,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (itemDrop.getId() != Item.AIR) {
                                 vector3 = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
                                 this.level.dropItem(vector3, itemDrop);
-                                itemFrame.setItem(new ItemBlock(new BlockAir()));
+                                itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
                                 itemFrame.setItemRotation(0);
                                 this.getLevel().addSound(new ItemFrameItemRemovedSound(this));
                             }
@@ -3203,13 +3203,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (target.onInteract(this, item, useItemOnEntityData.clickPos) && (this.isSurvival() || this.isAdventure())) {
                                         if (item.isTool()) {
                                             if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
-                                                item = new ItemBlock(new BlockAir());
+                                                item = new ItemBlock(Block.get(BlockID.AIR));
                                             }
                                         } else {
                                             if (item.count > 1) {
                                                 item.count--;
                                             } else {
-                                                item = new ItemBlock(new BlockAir());
+                                                item = new ItemBlock(Block.get(BlockID.AIR));
                                             }
                                         }
 
@@ -3255,7 +3255,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                     if (item.isTool() && !this.isCreative()) {
                                         if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
-                                            this.inventory.setItemInHand(new ItemBlock(new BlockAir()));
+                                            this.inventory.setItemInHand(new ItemBlock(Block.get(BlockID.AIR)));
                                         } else {
                                             this.inventory.setItemInHand(item);
                                         }

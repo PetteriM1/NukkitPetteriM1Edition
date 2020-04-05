@@ -93,7 +93,7 @@ public class BlockLava extends BlockLiquid {
                             this.level.getServer().getPluginManager().callEvent(e);
 
                             if (!e.isCancelled()) {
-                                BlockFire fire = new BlockFire();
+                                Block fire = Block.get(BlockID.FIRE);
                                 this.getLevel().setBlock(v, fire, true);
                                 this.getLevel().scheduleUpdate(fire, fire.tickRate());
                                 return Level.BLOCK_UPDATE_RANDOM;
@@ -115,7 +115,7 @@ public class BlockLava extends BlockLiquid {
                         this.level.getServer().getPluginManager().callEvent(e);
 
                         if (!e.isCancelled()) {
-                            BlockFire fire = new BlockFire();
+                            Block fire = Block.get(BlockID.FIRE);
                             this.getLevel().setBlock(v, fire, true);
                             this.getLevel().scheduleUpdate(fire, fire.tickRate());
                         }
@@ -144,7 +144,7 @@ public class BlockLava extends BlockLiquid {
 
     @Override
     public BlockLiquid getBlock(int meta) {
-        return new BlockLava(meta);
+        return (BlockLiquid) Block.get(LAVA, meta);
     }
     
     @Override
@@ -172,9 +172,9 @@ public class BlockLava extends BlockLiquid {
         }
         if (colliding != null) {
             if (this.getDamage() == 0) {
-                this.liquidCollide(colliding, new BlockObsidian());
+                this.liquidCollide(colliding, Block.get(OBSIDIAN));
             } else if (this.getDamage() <= 4) {
-                this.liquidCollide(colliding, new BlockCobblestone());
+                this.liquidCollide(colliding, Block.get(COBBLESTONE));
             }
         }
     }
@@ -182,7 +182,7 @@ public class BlockLava extends BlockLiquid {
     @Override
     protected void flowIntoBlock(Block block, int newFlowDecay) {
         if (block instanceof BlockWater) {
-            ((BlockLiquid) block).liquidCollide(this, new BlockStone());
+            ((BlockLiquid) block).liquidCollide(this, Block.get(STONE));
         } else {
             super.flowIntoBlock(block, newFlowDecay);
         }

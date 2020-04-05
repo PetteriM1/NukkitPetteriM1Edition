@@ -104,7 +104,7 @@ public class BlockRedstoneTorch extends BlockTorch implements Faceable {
             BlockFace face = getBlockFace().getOpposite();
             Vector3 pos = getLocation();
 
-            this.level.setBlock(pos, new BlockRedstoneTorchUnlit(getDamage()), false, true);
+            this.level.setBlock(pos, Block.get(UNLIT_REDSTONE_TORCH, getDamage()), false, true);
 
             for (BlockFace side : BlockFace.values()) {
                 if (side == face) {

@@ -70,6 +70,6 @@ public class BlockMonsterEgg extends BlockSolidMeta {
                 entity.getLevel().addChunkPacket(entity.getChunkX() >> 2, entity.getChunkZ() >> 2, pk);
             }
         }
-        return this.getLevel().setBlock(this, new BlockAir(), true);
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
     }
 }

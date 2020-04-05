@@ -27,7 +27,7 @@ public class BlockRedstoneLampLit extends BlockRedstoneLamp {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockRedstoneLamp());
+        return new ItemBlock(Block.get(REDSTONE_LAMP));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class BlockRedstoneLampLit extends BlockRedstoneLamp {
         }
 
         if (type == Level.BLOCK_UPDATE_SCHEDULED && !this.level.isBlockPowered(this.getLocation())) {
-            this.level.setBlock(this, new BlockRedstoneLamp(), false, false);
+            this.level.setBlock(this, Block.get(REDSTONE_LAMP), false, false);
         }
         return 0;
     }
