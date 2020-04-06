@@ -1433,6 +1433,10 @@ public class Server {
         return new HashMap<>(playerList);
     }
 
+    public int getOnlinePlayersCount() {
+        return this.playerList.size();
+    }
+
     public void addRecipe(Recipe recipe) {
         this.craftingManager.registerRecipe(recipe);
     }

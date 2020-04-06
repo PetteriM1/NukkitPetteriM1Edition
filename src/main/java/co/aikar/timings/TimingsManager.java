@@ -64,7 +64,7 @@ public class TimingsManager {
                 }
             }
 
-            TimingsHistory.playerTicks += Server.getInstance().getOnlinePlayers().size();
+            TimingsHistory.playerTicks += Server.getInstance().getOnlinePlayersCount();
             TimingsHistory.timedTicks++;
         }
     }
