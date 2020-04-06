@@ -95,7 +95,7 @@ public class BlockSapling extends BlockFlowable {
                     for (x = 0; x >= -1; --x) {
                         for (z = 0; z >= -1; --z) {
                             if (this.findSaplings(x, z, JUNGLE)) {
-                                generator = new ObjectJungleBigTree(10, 20, new BlockWood(BlockWood.JUNGLE), new BlockLeaves(BlockLeaves.JUNGLE));
+                                generator = new ObjectJungleBigTree(10, 20, Block.get(WOOD, BlockWood.JUNGLE), Block.get(LEAVES, BlockLeaves.JUNGLE));
                                 bigTree = true;
                                 break loop;
                             }
@@ -144,7 +144,7 @@ public class BlockSapling extends BlockFlowable {
                     if (!bigTree) {
                         ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);
                     } else {
-                        BlockAir air = new BlockAir();
+                        Block air = Block.get(BlockID.AIR);
                         this.level.setBlock(this.add(this.x, 0, this.z), air, true, false);
                         this.level.setBlock(this.add(this.x + 1, 0, this.z), air, true, false);
                         this.level.setBlock(this.add(this.x, 0, this.z + 1), air, true, false);
@@ -157,7 +157,7 @@ public class BlockSapling extends BlockFlowable {
                     return true;
             }
 
-            BlockAir air = new BlockAir();
+            Block air = Block.get(BlockID.AIR);
 
             if (bigTree) {
                 this.level.setBlock(this.add(x, 0, z), air, true, false);
@@ -194,7 +194,7 @@ public class BlockSapling extends BlockFlowable {
             if (Utils.rand(1, 7) == 1) {
                 if ((this.getDamage() & 0x08) == 0x08) {
                     if ((this.getDamage() & 0x07) == ACACIA) {
-                        this.level.setBlock(this, new BlockAir(), true, false);
+                        this.level.setBlock(this, Block.get(BlockID.AIR), true, false);
                         new ObjectSavannaTree().generate(level, new NukkitRandom(), this);
                     } else {
                         ObjectTree.growTree(this.getLevel(), (int) this.x, (int) this.y, (int) this.z, new NukkitRandom(), this.getDamage() & 0x07);

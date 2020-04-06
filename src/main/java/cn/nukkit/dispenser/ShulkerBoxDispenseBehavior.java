@@ -3,7 +3,6 @@ package cn.nukkit.dispenser;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDispenser;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.block.BlockShulkerBox;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.item.Item;
@@ -14,7 +13,7 @@ public class ShulkerBoxDispenseBehavior extends DefaultDispenseBehavior {
 
     @Override
     public Item dispense(BlockDispenser block, BlockFace face, Item item) {
-        Block shulkerBox = new BlockShulkerBox();
+        Block shulkerBox = Block.get(BlockID.SHULKER_BOX);
         Block target = block.getSide(face);
 
         this.success = block.level.getCollidingEntities(shulkerBox.getBoundingBox()).length == 0;

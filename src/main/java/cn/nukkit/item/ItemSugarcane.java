@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockSugarcane;
+import cn.nukkit.block.Block;
 
 /**
  * @author MagicDroidX
@@ -18,6 +18,6 @@ public class ItemSugarcane extends Item {
 
     public ItemSugarcane(Integer meta, int count) {
         super(SUGARCANE, 0, count, "Sugar Canes");
-        this.block = new BlockSugarcane();
+        this.block = Block.get(SUGARCANE_BLOCK);
     }
 }

@@ -2,81 +2,118 @@ package cn.nukkit.item;
 
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.utils.Utils;
 
-public class ItemBookWritten extends Item {
+public class ItemBookWritten extends ItemBookWritable {
 
     public static final int GENERATION_ORIGINAL = 0;
-	public static final int GENERATION_COPY = 1;
-	public static final int GENERATION_COPY_OF_COPY = 2;
-	public static final int GENERATION_TATTERED = 3;
-
-	public static final String TAG_GENERATION = "generation"; //TAG_Int
-	public static final String TAG_AUTHOR = "author"; //TAG_String
-	public static final String TAG_TITLE = "title"; //TAG_String
-
-    protected boolean isWritten = false;
+    public static final int GENERATION_COPY = 1;
+    public static final int GENERATION_COPY_OF_COPY = 2;
+    public static final int GENERATION_TATTERED = 3;
 
     public ItemBookWritten() {
         this(0, 1);
     }
 
+    public ItemBookWritten(Integer meta) {
+        this(meta, 1);
+    }
+
     public ItemBookWritten(Integer meta, int count) {
-        super(Item.WRITTEN_BOOK, 0, count, "Book");
+        super(Item.WRITTEN_BOOK, 0, count, "Written Book");
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 16;
     }
 
     public Item writeBook(String author, String title, String[] pages) {
         ListTag<CompoundTag> pageList = new ListTag<>("pages");
         for (String page : pages) {
-            pageList.add(new CompoundTag().putString("photoname", "").putString("text", page));
+            pageList.add(createPageTag(page));
         }
         return writeBook(author, title, pageList);
     }
 
     public Item writeBook(String author, String title, ListTag<CompoundTag> pages) {
-        if (pages.size() > 50 || pages.size() <= 0) return this; //Minecraft does not support more than 50 pages
-        if (this.isWritten) return this; //Book content can only be updated once
-        CompoundTag tag;
-        if (!this.hasCompoundTag()) {
-            tag = new CompoundTag();
-        } else {
-            tag = this.getNamedTag();
-        }
+        if (pages.size() > 50 || pages.size() <= 0) return this; // Minecraft does not support more than 50 pages
+        CompoundTag tag = this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag();
 
-        tag.putString(TAG_AUTHOR, author);
-        tag.putString(TAG_TITLE, title);
+        tag.putString("author", author);
+        tag.putString("title", title);
         tag.putList(pages);
-        tag.putInt(TAG_GENERATION, GENERATION_ORIGINAL);
-        tag.putLong("id", 1095216660480L + Utils.random.nextLong(0L, 2147483647L));
 
-        this.isWritten = true;
+        tag.putInt("generation", GENERATION_ORIGINAL);
+        tag.putString("xuid", "");
+
         return this.setNamedTag(tag);
     }
 
-    public String getAuthor() {
-        if (!this.isWritten) return "";
-        return this.getNamedTag().getString(TAG_AUTHOR);
+    public boolean signBook(String title, String author, String xuid, int generation) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag())
+                .putString("title", title)
+                .putString("author", author)
+                .putInt("generation", generation)
+                .putString("xuid", xuid));
+        return true;
     }
 
-    public String getTitle() {
-        if (!this.isWritten) return "Book";
-        return this.getNamedTag().getString(TAG_TITLE);
-    }
-
+    /**
+     * Returns the generation of the book.
+     * Generations higher than 1 can not be copied.
+     */
     public int getGeneration() {
-        if (!this.isWritten) return 0;
-        return this.getNamedTag().getInt(TAG_GENERATION);
+        return this.hasCompoundTag() ? this.getNamedTag().getInt("generation") : -1;
     }
 
-    public String[] getPages() {
-        if (!this.isWritten) return new String[0];
-        ListTag<CompoundTag> tag = (ListTag<CompoundTag>) this.getNamedTag().getList("pages");
-        String[] pages = new String[tag.size()];
-        int i = 0;
-        for (CompoundTag pageCompound : tag.getAll()) {
-            pages[i] = pageCompound.getString("text");
-            i++;
-        }
-        return pages;
+    /**
+     * Sets the generation of a book.
+     */
+    public void setGeneration(int generation) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putInt("generation", generation));
+    }
+
+    /**
+     * Returns the author of this book.
+     * This is not a reliable way to get the name of the player who signed this book.
+     * The author can be set to anything when signing a book.
+     */
+    public String getAuthor() {
+        return this.hasCompoundTag() ? this.getNamedTag().getString("author") : "";
+    }
+
+    /**
+     * Sets the author of this book.
+     */
+    public void setAuthor(String author) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putString("author", author));
+    }
+
+    /**
+     * Returns the title of this book.
+     */
+    public String getTitle() {
+        return this.hasCompoundTag() ? this.getNamedTag().getString("title") : "Written Book";
+    }
+
+    /**
+     * Sets the title of this book.
+     */
+    public void setTitle(String title) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putString("title", title));
+    }
+
+    /**
+     * Returns the author's XUID of this book.
+     */
+    public String getXUID() {
+        return this.hasCompoundTag() ? this.getNamedTag().getString("xuid") : "";
+    }
+
+    /**
+     * Sets the author's XUID of this book.
+     */
+    public void setXUID(String title) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putString("xuid", title));
     }
 }

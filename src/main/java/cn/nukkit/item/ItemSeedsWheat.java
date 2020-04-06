@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockWheat;
+import cn.nukkit.block.Block;
 
 /**
  * @author MagicDroidX
@@ -18,6 +18,6 @@ public class ItemSeedsWheat extends Item {
 
     public ItemSeedsWheat(Integer meta, int count) {
         super(WHEAT_SEEDS, 0, count, "Seeds");
-        this.block = new BlockWheat();
+        this.block = Block.get(WHEAT_BLOCK);
     }
 }

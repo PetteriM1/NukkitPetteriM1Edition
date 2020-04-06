@@ -224,7 +224,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                     boolean decayed = decay < 0;
                     Block to;
                     if (decayed) {
-                        to = new BlockAir();
+                        to = Block.get(BlockID.AIR);
                     } else {
                         to = getBlock(decay);
                     }
@@ -439,6 +439,6 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockAir());
+        return new ItemBlock(Block.get(BlockID.AIR));
     }
 }

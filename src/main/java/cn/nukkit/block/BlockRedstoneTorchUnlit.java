@@ -37,7 +37,7 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockRedstoneTorch());
+        return new ItemBlock(Block.get(REDSTONE_TORCH));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
         Vector3 pos = getLocation();
 
         if (!this.level.isSidePowered(pos.getSide(face), face)) {
-            this.level.setBlock(pos, new BlockRedstoneTorch(getDamage()), false, true);
+            this.level.setBlock(pos, Block.get(REDSTONE_TORCH, getDamage()), false, true);
 
             for (BlockFace side : BlockFace.values()) {
                 if (side == face) {

@@ -187,6 +187,7 @@ public class Server {
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
+    public static List<String> noTickingWorlds = new ArrayList<>();
 
     /* Some settings */
     private String motd;
@@ -283,8 +284,8 @@ public class Server {
 
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
 
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 5);
-        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
+        this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
+        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", false);
 
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
@@ -468,7 +469,9 @@ public class Server {
             try {
                 URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
-                String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                content.close();
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
                     this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
@@ -553,26 +556,32 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        broadcastPacket(players.toArray(new Player[0]), packet);
+        boolean mvplayers = false;
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
+            }
+        }
+        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+            packet.encode();
+            packet.isEncoded = true;
+            instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
+        } else { // Need to force multiversion
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         boolean mvplayers = false;
-        //packet.encode();
-        //packet.isEncoded = true;
-
-        //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-            for (Player player : players) {
-                //player.dataPacket(packet); // HACK: Force multiversion
-                if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
-                    mvplayers = true;
-                    break;
-                }
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
             }
-        //} else {
-        //    getInstance().batchPackets(players, new DataPacket[]{packet}, true);
-        //}
-
+        }
         if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
@@ -2111,6 +2120,13 @@ public class Server {
         } catch (NumberFormatException exception) {
             this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode")) & 0b11;
         }
+        String list = this.getPropertyString("do-not-tick-worlds");
+        if (!list.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                noTickingWorlds.add(tokenizer.nextToken());
+            }
+        }
     }
 
     /**
@@ -2162,8 +2178,8 @@ public class Server {
             put("debug-level", 1);
             put("async-workers", "auto");
             put("zlib-provider", 0);
-            put("async-compression", true);
-            put("compression-level", 5);
+            put("async-compression", false);
+            put("compression-level", 4);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);
             put("base-tick-rate", 1);

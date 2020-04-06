@@ -28,7 +28,7 @@ public class BlockOreRedstoneGlowing extends BlockOreRedstone {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockOreRedstone());
+        return new ItemBlock(Block.get(REDSTONE_ORE));
     }
 
     @Override

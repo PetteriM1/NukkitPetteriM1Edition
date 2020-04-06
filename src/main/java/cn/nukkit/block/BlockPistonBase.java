@@ -74,7 +74,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
 
     @Override
     public boolean onBreak(Item item) {
-        this.level.setBlock(this, new BlockAir(), true, true);
+        this.level.setBlock(this, Block.get(BlockID.AIR), true, true);
 
         Block block = this.getSide(getFacing());
 
@@ -122,13 +122,13 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 Block block = this.level.getBlock(pos);
 
                 if (block.getId() == AIR) {
-                    this.level.setBlock(this.getLocation().getSide(facing), new BlockAir(), true, true);
+                    this.level.setBlock(this.getLocation().getSide(facing), Block.get(BlockID.AIR), true, true);
                 }
                 if (canPush(block, facing.getOpposite(), false) && (!(block instanceof BlockFlowable) || block.getId() == PISTON || block.getId() == STICKY_PISTON)) {
                     this.doMove(false, null);
                 }
             } else {
-                this.level.setBlock(getLocation().getSide(facing), new BlockAir(), true, false);
+                this.level.setBlock(getLocation().getSide(facing), Block.get(BlockID.AIR), true, false);
             }
 
             this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_PISTON_IN);
@@ -180,7 +180,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
         BlockFace direction = getFacing();
 
         if (!extending) {
-            this.level.setBlock(pos.getSide(direction), new BlockAir(), true, false);
+            this.level.setBlock(pos.getSide(direction), Block.get(BlockID.AIR), true, false);
         }
         if (calculator == null) {
             calculator = new BlocksCalculator(this, direction, extending);
@@ -189,7 +189,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
         if (calculator.canMove()) {
             List<Block> blocks = calculator.getBlocksToMove();
             if (!extending && blocks.isEmpty()) {
-                this.level.setBlock(pos.getSide(direction), new BlockAir(), false, true);
+                this.level.setBlock(pos.getSide(direction), Block.get(BlockID.AIR), false, true);
                 return true;
             }
             List<Block> newBlocks = new ArrayList<>(blocks);
@@ -203,7 +203,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
 
             for (int i = blocks.size() - 1; i >= 0; --i) {
                 Block block = blocks.get(i);
-                this.level.setBlock(block, new BlockAir(), true, false);
+                this.level.setBlock(block, Block.get(BlockID.AIR), true, false);
                 Vector3 newPos = block.getLocation().getSide(side);
 
                 // TODO: Change this to block entity
@@ -220,7 +220,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 // Extension block entity
                 Vector3 pistonHead = pos.getSide(direction);
                 this.level.setBlockFullIdAt(pistonHead.getFloorX(), pistonHead.getFloorY(), pistonHead.getFloorZ(), (544) | (this.getDamage() & 0x7));
-                //this.level.setBlock(pistonHead, new BlockPistonHead(this.getDamage()));
+                //this.level.setBlock(pistonHead, Block.get(PISTON_HEAD, this.getDamage()));
             }
             return true;
         } else {

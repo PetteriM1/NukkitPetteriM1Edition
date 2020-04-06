@@ -40,7 +40,7 @@ public class ItemFlintSteel extends ItemTool {
                 }
             }
 
-            BlockFire fire = new BlockFire();
+            BlockFire fire = (BlockFire) Block.get(BlockID.FIRE);
             fire.x = block.x;
             fire.y = block.y;
             fire.z = block.z;
