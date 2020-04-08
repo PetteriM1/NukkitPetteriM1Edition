@@ -153,16 +153,18 @@ public class Anvil extends BaseLevelProvider {
                 break;
             }
         }
-        if (protocol < 361) {
+        if (protocol < ProtocolInfo.v1_12_0) {
             stream.putByte((byte) count);
         }
         for (int i = 0; i < count; i++) {
-            //if (protocol < ProtocolInfo.v1_13_0) { // incorrect?
+            if (protocol < ProtocolInfo.v1_13_0) {
                 stream.putByte((byte) 0);
-            //}
-            stream.put(sections[i].getBytes(protocol));
+                stream.put(sections[i].getBytes());
+            } else {
+                sections[i].writeTo(protocol, stream); //TODO: multiversion
+            }
         }
-        if (protocol < 361) {
+        if (protocol < ProtocolInfo.v1_12_0) {
             for (byte height : chunk.getHeightMapArray()) {
                 stream.putByte(height);
             }

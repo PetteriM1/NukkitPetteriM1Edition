@@ -94,12 +94,12 @@ public class BlockStorage {
         return blockData.getData();
     }
 
-    public void writeTo(BinaryStream stream) {
+    public void writeTo(int protocol, BinaryStream stream) {
         PalettedBlockStorage storage = new PalettedBlockStorage();
         for (int i = 0; i < SECTION_SIZE; i++) {
-            storage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(blockIds[i] & 0xff, blockData.get(i)));
+            storage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockIds[i] & 0xff, blockData.get(i)));
         }
-        storage.writeTo(stream);
+        storage.writeTo(protocol, stream);
     }
 
     public BlockStorage copy() {

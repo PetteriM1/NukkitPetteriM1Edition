@@ -2873,19 +2873,22 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
 
+            AsyncTask task = null;
+
             if (pk0) {
-                AsyncTask task = this.provider.requestChunkTask(0, x, z);
-                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+                task = this.provider.requestChunkTask(0, x, z);
             }
 
             if (pk361) {
-                AsyncTask task = this.provider.requestChunkTask(ProtocolInfo.v1_12_0, x, z);
-                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+                task = this.provider.requestChunkTask(ProtocolInfo.v1_12_0, x, z);
             }
 
             if (pkNew) {
-                AsyncTask task = this.provider.requestChunkTask(ProtocolInfo.v1_13_0, x, z);
-                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+                task = this.provider.requestChunkTask(ProtocolInfo.v1_13_0, x, z);
+            }
+
+            if (task != null) {
+                this.server.getScheduler().scheduleAsyncTask(task);
             }
 
             this.timings.syncChunkSendPrepareTimer.stopTiming();
@@ -2909,22 +2912,26 @@ public class Level implements ChunkManager, Metadatable {
             return;
         }
 
-        boolean no = false;
+        //boolean no = false;
         if (this.chunkSendTasks.contains(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    if (protocol == 0 && player.protocol >= 361) {
-                        no = true; // what the hell is this? remember to make some kind of documentation when making hacks like this
-                    } else {
+                    //if (protocol == 0 && player.protocol >= 361) {
+                    //    no = true; // what the hell is this? remember to make some kind of documentation when making hacks like this
+                    //} else {
+                    if ((protocol == 0 && player.protocol < ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_12_0 && player.protocol == ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_13_0 && player.protocol >= ProtocolInfo.v1_13_0)) { // send the chunk only for correct version players
                         player.sendChunk(x, z, subChunkCount, payload);
+                    } else {
+                        this.getServer().getLogger().alert("No chunk provider found for p=" + player.protocol + ", c=" + protocol);
                     }
+                    //}
                 }
             }
 
-            if (!no) {
+            //if (!no) {
                 this.chunkSendQueue.remove(index);
                 this.chunkSendTasks.remove(index);
-            }
+            //}
         }
 
         this.timings.syncChunkSendTimer.stopTiming();
