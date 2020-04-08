@@ -270,7 +270,11 @@ public class GlobalBlockPalette {
             case 390:
                 return legacyToRuntimeId388.get(legacyId);
             default: // Current protocol
-                return legacyToRuntimeId389.get(legacyId);
+                int id389 = legacyToRuntimeId389.get(legacyId);
+                if (id389 == -1) {
+                    id389 = legacyToRuntimeId389.get(id << 6);
+                }
+                return id389;
         }
     }
 

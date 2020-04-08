@@ -46,7 +46,7 @@ public interface ChunkSection {
 
     boolean isEmpty();
 
-    byte[] getBytes();
+    byte[] getBytes(int protocol);
 
     ChunkSection copy();
 }

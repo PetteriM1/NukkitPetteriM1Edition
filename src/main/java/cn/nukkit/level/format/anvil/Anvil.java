@@ -10,6 +10,7 @@ import cn.nukkit.level.format.generic.BaseRegionLoader;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
@@ -156,8 +157,10 @@ public class Anvil extends BaseLevelProvider {
             stream.putByte((byte) count);
         }
         for (int i = 0; i < count; i++) {
-            stream.putByte((byte) 0);
-            stream.put(sections[i].getBytes());
+            //if (protocol < ProtocolInfo.v1_13_0) { // incorrect?
+                stream.putByte((byte) 0);
+            //}
+            stream.put(sections[i].getBytes(protocol));
         }
         if (protocol < 361) {
             for (byte height : chunk.getHeightMapArray()) {

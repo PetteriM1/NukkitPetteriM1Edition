@@ -5,7 +5,9 @@ import cn.nukkit.level.format.anvil.util.BlockStorage;
 import cn.nukkit.level.format.anvil.util.NibbleArray;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
 
@@ -304,16 +306,22 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     }
 
     @Override
-    public byte[] getBytes() {
+    public byte[] getBytes(int protocol) {
         synchronized (storage) {
-
-            byte[] ids = storage.getBlockIds();
-            byte[] data = storage.getBlockData();
-            byte[] merged = new byte[ids.length + data.length];
-
-            System.arraycopy(ids, 0, merged, 0, ids.length);
-            System.arraycopy(data, 0, merged, ids.length, data.length);
-            return merged;
+            if (protocol < ProtocolInfo.v1_13_0) {
+                byte[] ids = storage.getBlockIds();
+                byte[] data = storage.getBlockData();
+                byte[] merged = new byte[ids.length + data.length];
+                System.arraycopy(ids, 0, merged, 0, ids.length);
+                System.arraycopy(data, 0, merged, ids.length, data.length);
+                return merged;
+            } else {
+                BinaryStream stream = new BinaryStream();
+                stream.putByte((byte) 8); // Paletted chunk because Mojang messed up the old one
+                stream.putByte((byte) 1);
+                this.storage.writeTo(stream);
+                return stream.getBuffer();
+            }
         }
     }
 

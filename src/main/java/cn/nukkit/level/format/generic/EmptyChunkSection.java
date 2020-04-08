@@ -130,7 +130,7 @@ public class EmptyChunkSection implements ChunkSection {
     }
 
     @Override
-    public byte[] getBytes() {
+    public byte[] getBytes(int protocol) {
         return new byte[6144];
     }
 
