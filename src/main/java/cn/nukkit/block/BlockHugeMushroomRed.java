@@ -43,7 +43,7 @@ public class BlockHugeMushroomRed extends BlockSolidMeta {
     public Item[] getDrops(Item item) {
         if (Utils.rand(1, 10) == 5) {
             return new Item[]{
-                    new ItemBlock(new BlockMushroomRed())
+                    new ItemBlock(Block.get(RED_MUSHROOM))
             };
         } else {
             return new Item[0];

@@ -45,7 +45,7 @@ public class BlockIce extends BlockTransparent {
     @Override
     public boolean onBreak(Item item) {
         if (!this.getLevel().isNether) {
-            this.getLevel().setBlock(this, new BlockWater(), true);
+            this.getLevel().setBlock(this, Block.get(BlockID.WATER), true);
         } else {
             super.onBreak(item);
         }

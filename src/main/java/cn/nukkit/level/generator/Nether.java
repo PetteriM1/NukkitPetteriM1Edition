@@ -79,11 +79,11 @@ public class Nether extends Generator {
         this.localSeed2 = ThreadLocalRandom.current().nextLong();
 
         PopulatorOre ores = new PopulatorOre(Block.NETHERRACK, new OreType[]{
-                new OreType(new BlockOreQuartz(), 20, 16, 0, 128),
-                new OreType(new BlockSoulSand(), 5, 64, 0, 128),
-                new OreType(new BlockGravel(), 5, 64, 0, 128),
-                new OreType(new BlockMagma(), 5, 12, 30, 33),
-                new OreType(new BlockLava(), 1, 16, 0, (int) this.lavaHeight),
+                new OreType(Block.get(BlockID.QUARTZ_ORE), 20, 16, 0, 128),
+                new OreType(Block.get(BlockID.SOUL_SAND), 5, 64, 0, 128),
+                new OreType(Block.get(BlockID.GRAVEL), 5, 64, 0, 128),
+                new OreType(Block.get(BlockID.MAGMA), 5, 12, 30, 33),
+                new OreType(Block.get(BlockID.LAVA), 1, 16, 0, (int) this.lavaHeight),
         });
         this.populators.add(ores);
 

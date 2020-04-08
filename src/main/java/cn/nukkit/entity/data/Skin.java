@@ -27,6 +27,8 @@ public class Skin {
     public static final int DOUBLE_SKIN_SIZE = 16384;
     public static final int SKIN_128_64_SIZE = 32768;
     public static final int SKIN_128_128_SIZE = 65536;
+    
+    private static final int MAX_DATA_SIZE = 262144;
 
     public static final String GEOMETRY_CUSTOM = convertLegacyGeometryName("geometry.humanoid.custom");
     public static final String GEOMETRY_CUSTOM_SLIM = convertLegacyGeometryName("geometry.humanoid.customSlim");
@@ -53,7 +55,7 @@ public class Skin {
     }
 
     private boolean isValidSkin() {
-        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32 && skinData.data.length >= SINGLE_SKIN_SIZE && (Server.getInstance().doNotLimitSkinGeometry || skinData.data.length <= 131072);
+        return skinId != null && !skinId.trim().isEmpty() && skinData != null && skinData.width >= 64 && skinData.height >= 32 && skinData.data.length >= SINGLE_SKIN_SIZE && (Server.getInstance().doNotLimitSkinGeometry || skinData.data.length <= MAX_DATA_SIZE);
     }
 
     private boolean isValidResourcePatch() {
@@ -175,7 +177,7 @@ public class Skin {
     public void setGeometryData(String geometryData) {
         Preconditions.checkNotNull(geometryData, "geometryData");
         if (!geometryData.equals(this.geometryData)) {
-            if (Server.getInstance().doNotLimitSkinGeometry || geometryData.getBytes().length < 131072) {
+            if (Server.getInstance().doNotLimitSkinGeometry || geometryData.getBytes().length < MAX_DATA_SIZE) {
                 this.geometryData = geometryData;
             }
         }
@@ -191,7 +193,7 @@ public class Skin {
     public void setAnimationData(String animationData) {
         Preconditions.checkNotNull(animationData, "animationData");
         if (!animationData.equals(this.animationData)) {
-            if (Server.getInstance().doNotLimitSkinGeometry|| animationData.getBytes().length < 131072) {
+            if (Server.getInstance().doNotLimitSkinGeometry|| animationData.getBytes().length < MAX_DATA_SIZE) {
                 this.animationData = animationData;
             }
         }

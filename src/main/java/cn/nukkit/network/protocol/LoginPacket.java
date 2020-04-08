@@ -50,7 +50,13 @@ public class LoginPacket extends DataPacket {
     }
 
     private void decodeChainData() {
-        Map<String, List<String>> map = new Gson().fromJson(new String(this.get(getLInt()), StandardCharsets.UTF_8), new MapTypeToken().getType());
+        String data = new String(this.get(getLInt()), StandardCharsets.UTF_8);
+        int size = data.getBytes().length;
+        if (size > 5242880) {
+            throw new IllegalArgumentException("The chain data is too big: " + size);
+        }
+
+        Map<String, List<String>> map = new Gson().fromJson(data, new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
         for (String c : map.get("chain")) {
             JsonObject chainMap = decodeToken(c);
@@ -64,7 +70,13 @@ public class LoginPacket extends DataPacket {
     }
 
     private void decodeSkinData() {
-        JsonObject skinToken = decodeToken(new String(this.get(this.getLInt())));
+        String data = new String(this.get(this.getLInt()));
+        int size = data.getBytes().length;
+        if (size > 5242880) {
+            throw new IllegalArgumentException("The skin data is too big: " + size);
+        }
+
+        JsonObject skinToken = decodeToken(data);
 
         if (skinToken == null) return;
 

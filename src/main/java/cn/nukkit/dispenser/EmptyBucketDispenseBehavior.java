@@ -1,8 +1,8 @@
 package cn.nukkit.dispenser;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockDispenser;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBucket;
@@ -18,7 +18,7 @@ public class EmptyBucketDispenseBehavior extends DefaultDispenseBehavior {
         Block target = block.getSide(face);
 
         if (target instanceof BlockLiquid && target.getDamage() == 0) {
-            target.level.setBlock(target, new BlockAir());
+            target.level.setBlock(target, Block.get(BlockID.AIR));
             return new ItemBucket(ItemBucket.getDamageByTarget(target.getId()));
         }
 

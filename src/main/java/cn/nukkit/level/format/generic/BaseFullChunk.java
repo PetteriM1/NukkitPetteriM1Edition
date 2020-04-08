@@ -153,7 +153,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                             changed = true;
                             continue;
                         }
-                        BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id"), this, nbt);
+                        BlockEntity blockEntity = BlockEntity.createBlockEntity(nbt.getString("id").replaceFirst("BlockEntity", ""), this, nbt);
                         if (blockEntity == null) {
                             changed = true;
                         }

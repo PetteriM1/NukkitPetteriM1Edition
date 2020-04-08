@@ -26,11 +26,11 @@ public class BlockObsidianGlowing extends BlockObsidian {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockObsidianGlowing());
+        return new ItemBlock(Block.get(GLOWING_OBSIDIAN));
     }
 
     @Override
     public boolean onBreak(Item item) {
-        return this.getLevel().setBlock(this, new BlockAir(), true, true);
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
     }
 }

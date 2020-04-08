@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockDoorIron;
+import cn.nukkit.block.Block;
 
 /**
  * @author MagicDroidX
@@ -18,6 +18,6 @@ public class ItemDoorIron extends Item {
 
     public ItemDoorIron(Integer meta, int count) {
         super(IRON_DOOR, 0, count, "Iron Door");
-        this.block = new BlockDoorIron();
+        this.block = Block.get(IRON_DOOR_BLOCK);
     }
 }
