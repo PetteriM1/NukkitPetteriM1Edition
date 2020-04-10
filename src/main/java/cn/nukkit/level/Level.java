@@ -2851,23 +2851,34 @@ public class Level implements ChunkManager, Metadatable {
 
             boolean pk0 = false;
             boolean pk361 = false;
+            boolean pkNew = false;
 
             for (Player p : this.getChunkPlayers(x, z).values()) {
-                if (p.protocol < 361) {
+                if (p.protocol < ProtocolInfo.v1_12_0) {
                     pk0 = true;
-                } else {
+                } else if (p.protocol < ProtocolInfo.v1_13_0) {
                     pk361 = true;
+                } else {
+                    pkNew = true;
                 }
             }
 
+            AsyncTask task = null;
+
             if (pk0) {
-                AsyncTask task = this.provider.requestChunkTask(0, x, z);
-                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+                task = this.provider.requestChunkTask(0, x, z);
             }
 
             if (pk361) {
-                AsyncTask task = this.provider.requestChunkTask(361, x, z);
-                if (task != null) this.server.getScheduler().scheduleAsyncTask(task);
+                task = this.provider.requestChunkTask(ProtocolInfo.v1_12_0, x, z);
+            }
+
+            if (pkNew) {
+                task = this.provider.requestChunkTask(ProtocolInfo.v1_13_0, x, z);
+            }
+
+            if (task != null) {
+                this.server.getScheduler().scheduleAsyncTask(task);
             }
 
             this.timings.syncChunkSendPrepareTimer.stopTiming();
@@ -2880,7 +2891,7 @@ public class Level implements ChunkManager, Metadatable {
         this.timings.syncChunkSendTimer.startTiming();
         long index = Level.chunkHash(x, z);
 
-        if (this.cacheChunks) {
+        if (this.cacheChunks) { // no multiversion support for chunk cache :(
             BatchPacket data = Player.getChunkCacheFromData(x, z, subChunkCount, payload);
             BaseFullChunk chunk = getChunk(x, z, false);
             if (chunk != null && chunk.getChanges() <= timestamp) {
@@ -2891,19 +2902,20 @@ public class Level implements ChunkManager, Metadatable {
             return;
         }
 
-        boolean no = false;
+        boolean allChunksSent = true;
         if (this.chunkSendTasks.contains(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    if (protocol == 0 && player.protocol >= 361) {
-                        no = true;
+                    // Hack: Make sure that every player gets chunks for the correct game version
+                    if ((protocol == 0 && player.protocol >= ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_12_0 && player.protocol >= ProtocolInfo.v1_13_0) || (protocol == ProtocolInfo.v1_13_0 && player.protocol < ProtocolInfo.v1_13_0)) {
+                        allChunksSent = false;
                     } else {
                         player.sendChunk(x, z, subChunkCount, payload);
                     }
                 }
             }
 
-            if (!no) {
+            if (allChunksSent) { //TODO: this hack should be rewritten
                 this.chunkSendQueue.remove(index);
                 this.chunkSendTasks.remove(index);
             }
