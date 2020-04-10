@@ -2902,26 +2902,23 @@ public class Level implements ChunkManager, Metadatable {
             return;
         }
 
-        //boolean no = false;
+        boolean allChunksSent = true;
         if (this.chunkSendTasks.contains(index)) {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
-                    //if (protocol == 0 && player.protocol >= 361) {
-                    //    no = true; // what the hell is this? remember to make some kind of documentation when making hacks like this
-                    //} else {
-                    if ((protocol == 0 && player.protocol < ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_12_0 && player.protocol == ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_13_0 && player.protocol >= ProtocolInfo.v1_13_0)) { // send the chunk only for correct version players
-                        player.sendChunk(x, z, subChunkCount, payload);
+                    // Hack: Make sure that every player gets chunks for the correct game version
+                    if ((protocol == 0 && player.protocol >= ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_12_0 && player.protocol >= ProtocolInfo.v1_13_0) || (protocol == ProtocolInfo.v1_13_0 && player.protocol < ProtocolInfo.v1_13_0)) {
+                        allChunksSent = false;
                     } else {
-                        this.getServer().getLogger().alert("No chunk provider found for p=" + player.protocol + ", c=" + protocol);
+                        player.sendChunk(x, z, subChunkCount, payload);
                     }
-                    //}
                 }
             }
 
-            //if (!no) {
+            if (allChunksSent) { //TODO: this hack should be rewritten
                 this.chunkSendQueue.remove(index);
                 this.chunkSendTasks.remove(index);
-            //}
+            }
         }
 
         this.timings.syncChunkSendTimer.stopTiming();
