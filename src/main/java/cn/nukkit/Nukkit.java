@@ -136,4 +136,11 @@ public class Nukkit {
     public static Level getLogLevel() {
         return ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME).getLevel();
     }
+
+    public static boolean isMasterBranchBuild() {
+        if (GIT_INFO == null || (GIT_INFO.getProperty("git.branch")) == null) {
+            return false;
+        }
+        return GIT_INFO.getProperty("git.branch").equals("master");
+    }
 }

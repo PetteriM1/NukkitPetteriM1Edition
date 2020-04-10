@@ -48,9 +48,9 @@ public class VersionCommand extends VanillaCommand {
                         String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
                         content.close();
 
-                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null")) {
+                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
                             sender.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + sender.getServer().getNukkitVersion() + " Latest: " + latest);
-                        } else {
+                        } else if (Nukkit.isMasterBranchBuild()) {
                             sender.sendMessage("\u00A7aYou are running the latest version.");
                         }
                     } catch (Exception ignore) {}
