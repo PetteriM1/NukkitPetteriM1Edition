@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.entity.item.EntityFallingBlock;
+import cn.nukkit.event.block.BlockFallEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -20,7 +21,12 @@ public abstract class BlockFallable extends BlockSolid {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (!this.getLevel().randomTickingEnabled()) return type;
             Block down = this.down();
-            if (down.getId() == AIR || down instanceof BlockLiquid) {
+            if (down.getId() == AIR || down instanceof BlockLiquid || down instanceof BlockFire) {
+                BlockFallEvent event = new BlockFallEvent(this);
+                this.level.getServer().getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    return type;
+                }
                 this.level.setBlock(this, Block.get(Block.AIR), true, true);
                 CompoundTag nbt = new CompoundTag()
                         .putList(new ListTag<DoubleTag>("Pos")

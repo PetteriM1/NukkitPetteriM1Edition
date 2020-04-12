@@ -2907,7 +2907,7 @@ public class Level implements ChunkManager, Metadatable {
             for (Player player : this.chunkSendQueue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
                     // Hack: Make sure that every player gets chunks for the correct game version
-                    if ((protocol == 0 && player.protocol >= ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_12_0 && player.protocol >= ProtocolInfo.v1_13_0) || (protocol == ProtocolInfo.v1_13_0 && player.protocol < ProtocolInfo.v1_13_0)) {
+                    if ((protocol == 0 && player.protocol >= ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_12_0 && player.protocol > ProtocolInfo.v1_12_0) || (protocol == ProtocolInfo.v1_13_0 && player.protocol < ProtocolInfo.v1_13_0)) {
                         allChunksSent = false;
                     } else {
                         player.sendChunk(x, z, subChunkCount, payload);
