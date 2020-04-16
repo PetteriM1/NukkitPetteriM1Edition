@@ -380,6 +380,7 @@ public class BinaryStream {
                 boolean isDefault = this.getBoolean();
                 String productId = this.getString();
                 skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+            }
 
             int tintsLength = this.getLInt();
             for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
