@@ -281,7 +281,7 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
+        Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
         this.networkCompressionAsync = this.getPropertyBoolean("async-compression", false);
@@ -2176,7 +2176,7 @@ public class Server {
             put("query-plugins", false);
             put("debug-level", 1);
             put("async-workers", "auto");
-            put("zlib-provider", 0);
+            put("zlib-provider", 2);
             put("async-compression", false);
             put("compression-level", 4);
             put("auto-tick-rate", true);
