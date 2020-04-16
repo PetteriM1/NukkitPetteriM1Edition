@@ -87,6 +87,8 @@ public class EntityFallingBlock extends Entity {
         }
 
         setDataProperty(new IntEntityData(DATA_VARIANT, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, this.blockId, this.damage)));
+
+        this.fireProof = true;
     }
 
     public boolean canCollideWith(Entity entity) {

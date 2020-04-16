@@ -301,6 +301,12 @@ public class BinaryStream {
             this.putBoolean(skin.isCapeOnClassic());
             this.putString(skin.getCapeId());
             this.putString(skin.getFullSkinId());
+            if (protocol == ProtocolInfo.v1_14_60) {
+                this.putString("");
+                this.putString("");
+                this.putLInt(0);
+                this.putLInt(0);
+            }
         }
     }
 

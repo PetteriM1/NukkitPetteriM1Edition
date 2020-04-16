@@ -101,7 +101,6 @@ import java.util.function.Consumer;
  * @author MagicDroidX &amp; Box
  * Nukkit Project
  */
-@SuppressWarnings("deprecation")
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
 
     public static final int SURVIVAL = 0;
@@ -109,8 +108,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public static final int ADVENTURE = 2;
     public static final int SPECTATOR = 3;
     public static final int VIEW = SPECTATOR;
-
-    public static final int SURVIVAL_SLOTS = 36;
 
     public static final int CRAFTING_SMALL = 0;
     public static final int CRAFTING_BIG = 1;
@@ -248,6 +245,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean initialized;
     private boolean foodEnabled = true;
     private byte failedTransactions;
+
+    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET/*, ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET*/);
 
     public int getStartActionTick() {
         return startAction;
@@ -2075,6 +2074,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        if (!loggedIn && !beforeLoginAvailablePackets.contains(packet.pid())) {
+            server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + "due to player not logged in yet");
+            return;
+        }
+
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getReceiveDataPacketTiming(packet)) {
@@ -2123,7 +2127,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.close("", "disconnectionScreen.notAuthenticated");
                         if (server.banAuthFailed) {
                             this.server.getNetwork().blockAddress(this.socketAddress.getAddress(), 5);
-                            this.server.getLogger().notice("Blocked " + getAddress() + " for 5 seconds");
+                            this.server.getLogger().notice("Blocked " + getAddress() + " for 5 seconds due to failed Xbox auth");
                         }
                         break;
                     }
