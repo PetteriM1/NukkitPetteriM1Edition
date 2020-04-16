@@ -246,7 +246,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private boolean foodEnabled = true;
     private byte failedTransactions;
 
-    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET/*, ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET*/);
+    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET);
 
     public int getStartActionTick() {
         return startAction;
@@ -2075,7 +2075,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (!loggedIn && !beforeLoginAvailablePackets.contains(packet.pid())) {
-            server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + "due to player not logged in yet");
+            server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + " due to player not logged in yet");
             return;
         }
 
@@ -5146,6 +5146,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.fishing = null;
+    }
+
+    @Override
+    public boolean doesTriggerPressurePlate() {
+        return this.gamemode != SPECTATOR;
     }
 
     @Override
