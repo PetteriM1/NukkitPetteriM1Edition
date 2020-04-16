@@ -52,7 +52,7 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockAir());
+        return new ItemBlock(Block.get(BlockID.AIR));
     }
 
     @Override
@@ -258,7 +258,7 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
                 Vector3 blockpos = this.bottomLeft.getSide(this.rightDir, i);
 
                 for (int j = 0; j < this.height; ++j) {
-                    this.level.setBlock(blockpos.up(j), new BlockNetherPortal(this.axis == Axis.X ? 1 : this.axis == Axis.Z ? 2 : 0));
+                    this.level.setBlock(blockpos.up(j), Block.get(NETHER_PORTAL, this.axis == Axis.X ? 1 : this.axis == Axis.Z ? 2 : 0));
                 }
             }
         }

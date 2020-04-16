@@ -2,7 +2,7 @@ package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -229,7 +229,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
 
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BEACON_POWER);
 
-        player.getWindowById(Player.BEACON_WINDOW_ID).setItem(0, new ItemBlock(new BlockAir(), 0, 0));
+        player.getWindowById(Player.BEACON_WINDOW_ID).setItem(0, new ItemBlock(Block.get(BlockID.AIR), 0, 0));
         return true;
     }
 }

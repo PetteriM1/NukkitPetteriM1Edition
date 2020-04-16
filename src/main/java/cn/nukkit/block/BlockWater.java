@@ -45,7 +45,7 @@ public class BlockWater extends BlockLiquid {
 
     @Override
     public BlockLiquid getBlock(int meta) {
-        return new BlockWater(meta);
+        return (BlockLiquid) Block.get(WATER, meta);
     }
 
     @Override

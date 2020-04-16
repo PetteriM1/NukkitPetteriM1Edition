@@ -3,8 +3,8 @@ package cn.nukkit.entity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
@@ -1601,7 +1601,7 @@ public abstract class Entity extends Location implements Metadatable {
                     if (ev.isCancelled()) {
                         return;
                     }
-                    this.level.setBlock(down, new BlockDirt(), true, true);
+                    this.level.setBlock(down, Block.get(BlockID.DIRT), true, true);
                 }
             }
         }

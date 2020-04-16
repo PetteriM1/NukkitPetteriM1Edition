@@ -1,7 +1,6 @@
 package com.nukkitx.network.raknet;
 
 import cn.nukkit.Nukkit;
-import cn.nukkit.Server;
 import com.nukkitx.network.SessionConnection;
 import com.nukkitx.network.raknet.util.*;
 import com.nukkitx.network.util.DisconnectReason;
@@ -184,13 +183,8 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
     }
 
     void setMtu(int mtu) {
-        if (Server.getInstance().forceMtu) {
-            this.mtu = 1492;
-            this.adjustedMtu = 1464;
-        } else {
-            this.mtu = RakNetUtils.clamp(mtu, MINIMUM_MTU_SIZE, MAXIMUM_MTU_SIZE);
-            this.adjustedMtu = (this.mtu - UDP_HEADER_SIZE) - (this.address.getAddress() instanceof Inet6Address ? 40 : 20);
-        }
+        this.mtu = RakNetUtils.clamp(mtu, MINIMUM_MTU_SIZE, MAXIMUM_MTU_SIZE);
+        this.adjustedMtu = (this.mtu - UDP_HEADER_SIZE) - (this.address.getAddress() instanceof Inet6Address ? 40 : 20);
     }
 
     public long getPing() {

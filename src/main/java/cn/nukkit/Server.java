@@ -28,7 +28,6 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
-import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.biome.EnumBiome;
@@ -198,6 +197,7 @@ public class Server {
     private Watchdog watchdog;
     private DB nameLookup;
     private PlayerDataSerializer playerDataSerializer = new DefaultPlayerDataSerializer(this);
+    public static List<String> noTickingWorlds = new ArrayList<>();
 
     /* Some settings */
     private String motd;
@@ -242,7 +242,6 @@ public class Server {
     public boolean queryPlugins;
     public boolean despawnEntities;
     public boolean strongIPBans;
-    public boolean forceMtu;
     public boolean spawnAnimals;
     public boolean spawnMobs;
 
@@ -295,8 +294,8 @@ public class Server {
 
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
-        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 5);
+        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", false);
+        this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
 
         if (this.networkCompressionLevel < -1) {
             this.networkCompressionLevel = -1;
@@ -365,7 +364,6 @@ public class Server {
         Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
-        GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
 
         // Convert legacy data before plugins get the chance to mess with it
         try {
@@ -378,12 +376,7 @@ public class Server {
 
         convertLegacyPlayerData();
 
-        log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
-
-        this.network = new Network(this);
-        this.network.setName(this.getMotd());
-        this.network.setSubName(this.getSubMotd());
 
         this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(new File(Nukkit.DATA_PATH, "resource_packs"));
@@ -395,6 +388,10 @@ public class Server {
 
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
 
+        log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        this.network = new Network(this);
+        this.network.setName(this.getMotd());
+        this.network.setSubName(this.getSubMotd());
         this.network.registerInterface(new RakNetInterface(this));
 
         if (loadPlugins) {
@@ -497,10 +494,14 @@ public class Server {
             try {
                 URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
-                String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                content.close();
 
-                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
+                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
                     this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                } else if (!Nukkit.isMasterBranchBuild()) {
+                    this.getLogger().warning("\u00A7eYou are running a dev build! Do not use in production!");
                 }
 
                 this.getLogger().debug("Update check done");
@@ -582,26 +583,32 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        broadcastPacket(players.toArray(new Player[0]), packet);
+        boolean mvplayers = false;
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
+            }
+        }
+        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+            packet.encode();
+            packet.isEncoded = true;
+            instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
+        } else { // Need to force multiversion
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         boolean mvplayers = false;
-        //packet.encode();
-        //packet.isEncoded = true;
-
-        //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-            for (Player player : players) {
-                //player.dataPacket(packet); // HACK: Force multiversion
-                if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
-                    mvplayers = true;
-                    break;
-                }
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
             }
-        //} else {
-        //    getInstance().batchPackets(players, new DataPacket[]{packet}, true);
-        //}
-
+        }
         if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
@@ -1471,6 +1478,10 @@ public class Server {
         return ImmutableMap.copyOf(playerList);
     }
 
+    public int getOnlinePlayersCount() {
+        return this.playerList.size();
+    }
+
     public void addRecipe(Recipe recipe) {
         this.craftingManager.registerRecipe(recipe);
     }
@@ -2290,7 +2301,6 @@ public class Server {
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
-        this.forceMtu = this.getPropertyBoolean("force-mtu", false);
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
@@ -2299,6 +2309,13 @@ public class Server {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
             this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode")) & 0b11;
+        }
+        String list = this.getPropertyString("do-not-tick-worlds");
+        if (!list.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                noTickingWorlds.add(tokenizer.nextToken());
+            }
         }
     }
 
@@ -2351,8 +2368,8 @@ public class Server {
             put("debug-level", 1);
             put("async-workers", "auto");
             put("zlib-provider", 2);
-            put("async-compression", true);
-            put("compression-level", 5);
+            put("async-compression", false);
+            put("compression-level", 4);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);
             put("base-tick-rate", 1);
@@ -2401,7 +2418,6 @@ public class Server {
             put("skin-change-cooldown", 30);
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
-            put("force-mtu", false);
             put("do-not-limit-skin-geometry", false);
         }
     }

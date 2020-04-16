@@ -72,172 +72,171 @@ public class GlobalBlockPalette {
         legacyToRuntimeId388.defaultReturnValue(-1);
         legacyToRuntimeId389.defaultReturnValue(-1);
 
-        Server.getInstance().getScheduler().scheduleTask(null, () -> {
-            Server.getInstance().getLogger().debug("Loading block palette...");
-            // 223
-            InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
-            if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
-            Collection<TableEntry> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table223 = new BinaryStream();
-            table223.putUnsignedVarInt(entries223.size());
-            for (TableEntry entry223 : entries223) {
-                registerMapping(223, (entry223.id << 4) | entry223.data);
-                table223.putString(entry223.name);
-                table223.putLShort(entry223.data);
+        Server.getInstance().getLogger().debug("Loading block palette...");
+        // 223
+        InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
+        if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
+        Collection<TableEntry> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table223 = new BinaryStream();
+        table223.putUnsignedVarInt(entries223.size());
+        for (TableEntry entry223 : entries223) {
+            registerMapping(223, (entry223.id << 4) | entry223.data);
+            table223.putString(entry223.name);
+            table223.putLShort(entry223.data);
+        }
+        // Compiled table not needed for 223
+        // 261
+        InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
+        if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
+        Collection<TableEntry> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table261 = new BinaryStream();
+        table261.putUnsignedVarInt(entries261.size());
+        for (TableEntry entry261 : entries261) {
+            registerMapping(261, (entry261.id << 4) | entry261.data);
+            table261.putString(entry261.name);
+            table261.putLShort(entry261.data);
+        }
+        // Compiled table not needed 261
+        // 274
+        InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
+        if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
+        Collection<TableEntry> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table274 = new BinaryStream();
+        table274.putUnsignedVarInt(entries274.size());
+        for (TableEntry entry274 : entries274) {
+            registerMapping(274, (entry274.id << 4) | entry274.data);
+            table274.putString(entry274.name);
+            table274.putLShort(entry274.data);
+        }
+        compiledTable274 = table274.getBuffer();
+        // 282
+        InputStream stream282 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
+        if (stream282 == null) throw new AssertionError("Unable to locate RuntimeID table 282");
+        Collection<TableEntry> entries282 = new Gson().fromJson(new InputStreamReader(stream282, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table282 = new BinaryStream();
+        table282.putUnsignedVarInt(entries282.size());
+        for (TableEntry entry282 : entries282) {
+            registerMapping(282, (entry282.id << 4) | entry282.data);
+            table282.putString(entry282.name);
+            table282.putLShort(entry282.data);
+        }
+        compiledTable282 = table282.getBuffer();
+        // 291
+        InputStream stream291 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_291.json");
+        if (stream291 == null) throw new AssertionError("Unable to locate RuntimeID table 291");
+        Collection<TableEntry> entries291 = new Gson().fromJson(new InputStreamReader(stream291, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table291 = new BinaryStream();
+        table291.putUnsignedVarInt(entries291.size());
+        for (TableEntry entry291 : entries291) {
+            registerMapping(291, (entry291.id << 4) | entry291.data);
+            table291.putString(entry291.name);
+            table291.putLShort(entry291.data);
+        }
+        compiledTable291 = table291.getBuffer();
+        // 313
+        InputStream stream313 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_313.json");
+        if (stream313 == null) throw new AssertionError("Unable to locate RuntimeID table 313");
+        Collection<TableEntry> entries313 = new Gson().fromJson(new InputStreamReader(stream313, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table313 = new BinaryStream();
+        table313.putUnsignedVarInt(entries313.size());
+        for (TableEntry entry313 : entries313) {
+            registerMapping(313, (entry313.id << 4) | entry313.data);
+            table313.putString(entry313.name);
+            table313.putLShort(entry313.data);
+        }
+        compiledTable313 = table313.getBuffer();
+        // 332
+        InputStream stream332 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_332.json");
+        if (stream332 == null) throw new AssertionError("Unable to locate RuntimeID table 332");
+        Collection<TableEntry> entries332 = new Gson().fromJson(new InputStreamReader(stream332, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table332 = new BinaryStream();
+        table332.putUnsignedVarInt(entries332.size());
+        for (TableEntry entry332 : entries332) {
+            registerMapping(332, (entry332.id << 4) | entry332.data);
+            table332.putString(entry332.name);
+            table332.putLShort(entry332.data);
+        }
+        compiledTable332 = table332.getBuffer();
+        // 340
+        InputStream stream340 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_340.json");
+        if (stream340 == null) throw new AssertionError("Unable to locate RuntimeID table 340");
+        Collection<TableEntry> entries340 = new Gson().fromJson(new InputStreamReader(stream340, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table340 = new BinaryStream();
+        table340.putUnsignedVarInt(entries340.size());
+        for (TableEntry entry340 : entries340) {
+            registerMapping(340, (entry340.id << 4) | entry340.data);
+            table340.putString(entry340.name);
+            table340.putLShort(entry340.data);
+        }
+        compiledTable340 = table340.getBuffer();
+        // 354
+        InputStream stream354 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_354.json");
+        if (stream354 == null) throw new AssertionError("Unable to locate RuntimeID table 354");
+        Collection<TableEntry> entries354 = new Gson().fromJson(new InputStreamReader(stream354, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table354 = new BinaryStream();
+        table354.putUnsignedVarInt(entries354.size());
+        for (TableEntry entry354 : entries354) {
+            registerMapping(354, (entry354.id << 4) | entry354.data);
+            table354.putString(entry354.name);
+            table354.putLShort(entry354.data);
+        }
+        compiledTable354 = table354.getBuffer();
+        // 361
+        InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_361.json");
+        if (stream361 == null) throw new AssertionError("Unable to locate RuntimeID table 361");
+        Collection<TableEntry> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        BinaryStream table361 = new BinaryStream();
+        table361.putUnsignedVarInt(entries361.size());
+        for (TableEntry entry361 : entries361) {
+            registerMapping(361, (entry361.id << 4) | entry361.data);
+            table361.putString(entry361.name);
+            table361.putLShort(entry361.data);
+            table361.putLShort(entry361.id);
+        }
+        compiledTable361 = table361.getBuffer();
+        // 388
+        InputStream stream388 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_388.dat");
+        if (stream388 == null) throw new AssertionError("Unable to locate block state nbt 388");
+        ListTag<CompoundTag> tag388;
+        try {
+            compiledTable388 = ByteStreams.toByteArray(stream388);
+            //noinspection unchecked
+            tag388 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable388));
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        for (CompoundTag state388 : tag388.getAll()) {
+            int runtimeId = runtimeIdAllocator388.getAndIncrement();
+            if (!state388.contains("meta")) continue;
+            for (int val : state388.getIntArray("meta")) {
+                legacyToRuntimeId388.put(state388.getShort("id") << 6 | val, runtimeId);
             }
-            // Compiled table not needed for 223
-            // 261
-            InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
-            if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
-            Collection<TableEntry> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table261 = new BinaryStream();
-            table261.putUnsignedVarInt(entries261.size());
-            for (TableEntry entry261 : entries261) {
-                registerMapping(261, (entry261.id << 4) | entry261.data);
-                table261.putString(entry261.name);
-                table261.putLShort(entry261.data);
+            state388.remove("meta"); // No point in sending this since the client doesn't use it
+        }
+        // 389
+        InputStream stream389 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_389.dat");
+        if (stream389 == null) throw new AssertionError("Unable to locate block state nbt 389");
+        ListTag<CompoundTag> tag389;
+        try {
+            //noinspection unchecked
+            tag389 = (ListTag<CompoundTag>) NBTIO.readTag(stream389, ByteOrder.LITTLE_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 389", e);
+        }
+        for (CompoundTag state389 : tag389.getAll()) {
+            int runtimeId = runtimeIdAllocator389.getAndIncrement();
+            if (!state389.contains("meta")) continue;
+            for (int val : state389.getIntArray("meta")) {
+                legacyToRuntimeId389.put(state389.getShort("id") << 6 | val, runtimeId);
             }
-            // Compiled table not needed 261
-            // 274
-            InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
-            if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
-            Collection<TableEntry> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table274 = new BinaryStream();
-            table274.putUnsignedVarInt(entries274.size());
-            for (TableEntry entry274 : entries274) {
-                registerMapping(274, (entry274.id << 4) | entry274.data);
-                table274.putString(entry274.name);
-                table274.putLShort(entry274.data);
-            }
-            compiledTable274 = table274.getBuffer();
-            // 282
-            InputStream stream282 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
-            if (stream282 == null) throw new AssertionError("Unable to locate RuntimeID table 282");
-            Collection<TableEntry> entries282 = new Gson().fromJson(new InputStreamReader(stream282, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table282 = new BinaryStream();
-            table282.putUnsignedVarInt(entries282.size());
-            for (TableEntry entry282 : entries282) {
-                registerMapping(282, (entry282.id << 4) | entry282.data);
-                table282.putString(entry282.name);
-                table282.putLShort(entry282.data);
-            }
-            compiledTable282 = table282.getBuffer();
-            // 291
-            InputStream stream291 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_291.json");
-            if (stream291 == null) throw new AssertionError("Unable to locate RuntimeID table 291");
-            Collection<TableEntry> entries291 = new Gson().fromJson(new InputStreamReader(stream291, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table291 = new BinaryStream();
-            table291.putUnsignedVarInt(entries291.size());
-            for (TableEntry entry291 : entries291) {
-                registerMapping(291, (entry291.id << 4) | entry291.data);
-                table291.putString(entry291.name);
-                table291.putLShort(entry291.data);
-            }
-            compiledTable291 = table291.getBuffer();
-            // 313
-            InputStream stream313 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_313.json");
-            if (stream313 == null) throw new AssertionError("Unable to locate RuntimeID table 313");
-            Collection<TableEntry> entries313 = new Gson().fromJson(new InputStreamReader(stream313, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table313 = new BinaryStream();
-            table313.putUnsignedVarInt(entries313.size());
-            for (TableEntry entry313 : entries313) {
-                registerMapping(313, (entry313.id << 4) | entry313.data);
-                table313.putString(entry313.name);
-                table313.putLShort(entry313.data);
-            }
-            compiledTable313 = table313.getBuffer();
-            // 332
-            InputStream stream332 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_332.json");
-            if (stream332 == null) throw new AssertionError("Unable to locate RuntimeID table 332");
-            Collection<TableEntry> entries332 = new Gson().fromJson(new InputStreamReader(stream332, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table332 = new BinaryStream();
-            table332.putUnsignedVarInt(entries332.size());
-            for (TableEntry entry332 : entries332) {
-                registerMapping(332, (entry332.id << 4) | entry332.data);
-                table332.putString(entry332.name);
-                table332.putLShort(entry332.data);
-            }
-            compiledTable332 = table332.getBuffer();
-            // 340
-            InputStream stream340 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_340.json");
-            if (stream340 == null) throw new AssertionError("Unable to locate RuntimeID table 340");
-            Collection<TableEntry> entries340 = new Gson().fromJson(new InputStreamReader(stream340, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table340 = new BinaryStream();
-            table340.putUnsignedVarInt(entries340.size());
-            for (TableEntry entry340 : entries340) {
-                registerMapping(340, (entry340.id << 4) | entry340.data);
-                table340.putString(entry340.name);
-                table340.putLShort(entry340.data);
-            }
-            compiledTable340 = table340.getBuffer();
-            // 354
-            InputStream stream354 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_354.json");
-            if (stream354 == null) throw new AssertionError("Unable to locate RuntimeID table 354");
-            Collection<TableEntry> entries354 = new Gson().fromJson(new InputStreamReader(stream354, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table354 = new BinaryStream();
-            table354.putUnsignedVarInt(entries354.size());
-            for (TableEntry entry354 : entries354) {
-                registerMapping(354, (entry354.id << 4) | entry354.data);
-                table354.putString(entry354.name);
-                table354.putLShort(entry354.data);
-            }
-            compiledTable354 = table354.getBuffer();
-            // 361
-            InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_361.json");
-            if (stream361 == null) throw new AssertionError("Unable to locate RuntimeID table 361");
-            Collection<TableEntry> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-            BinaryStream table361 = new BinaryStream();
-            table361.putUnsignedVarInt(entries361.size());
-            for (TableEntry entry361 : entries361) {
-                registerMapping(361, (entry361.id << 4) | entry361.data);
-                table361.putString(entry361.name);
-                table361.putLShort(entry361.data);
-                table361.putLShort(entry361.id);
-            }
-            compiledTable361 = table361.getBuffer();
-            // 388
-            InputStream stream388 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_388.dat");
-            if (stream388 == null) throw new AssertionError("Unable to locate block state nbt 388");
-            ListTag<CompoundTag> tag388;
-            try {
-                compiledTable388 = ByteStreams.toByteArray(stream388);
-                //noinspection unchecked
-                tag388 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable388));
-            } catch (IOException e) {
-                throw new AssertionError(e);
-            }
-            for (CompoundTag state388 : tag388.getAll()) {
-                int runtimeId = runtimeIdAllocator388.getAndIncrement();
-                if (!state388.contains("meta")) continue;
-                for (int val : state388.getIntArray("meta")) {
-                    legacyToRuntimeId388.put(state388.getShort("id") << 6 | val, runtimeId);
-                }
-                state388.remove("meta"); // No point in sending this since the client doesn't use it
-            }
-            // 389
-            InputStream stream389 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_389.dat");
-            if (stream389 == null) throw new AssertionError("Unable to locate block state nbt 389");
-            ListTag<CompoundTag> tag389;
-            try {
-                //noinspection unchecked
-                tag389 = (ListTag<CompoundTag>) NBTIO.readTag(stream389, ByteOrder.LITTLE_ENDIAN, false);
-            } catch (IOException e) {
-                throw new AssertionError("Unable to load block palette 389", e);
-            }
-            for (CompoundTag state389 : tag389.getAll()) {
-                int runtimeId = runtimeIdAllocator389.getAndIncrement();
-                if (!state389.contains("meta")) continue;
-                for (int val : state389.getIntArray("meta")) {
-                    legacyToRuntimeId389.put(state389.getShort("id") << 6 | val, runtimeId);
-                }
-                state389.remove("meta"); // No point in sending this since the client doesn't use it
-            }
-            try {
-                compiledTable389 = NBTIO.write(tag389, ByteOrder.LITTLE_ENDIAN, true);
-            } catch (IOException e) {
-                throw new AssertionError("Unable to write block palette 389", e);
-            }
-        }, true);
+            state389.remove("meta"); // No point in sending this since the client doesn't use it
+        }
+        try {
+            compiledTable389 = NBTIO.write(tag389, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to write block palette 389", e);
+        }
+        GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
@@ -270,7 +269,14 @@ public class GlobalBlockPalette {
             case 390:
                 return legacyToRuntimeId388.get(legacyId);
             default: // Current protocol
-                return legacyToRuntimeId389.get(legacyId);
+                int id389 = legacyToRuntimeId389.get(legacyId);
+                if (id389 == -1) {
+                    id389 = legacyToRuntimeId389.get(id << 6);
+                    if (id389 == -1) {
+                        throw new NoSuchElementException("Unmapped block registered id:" + id + " meta:" + meta);
+                    }
+                }
+                return id389;
         }
     }
 

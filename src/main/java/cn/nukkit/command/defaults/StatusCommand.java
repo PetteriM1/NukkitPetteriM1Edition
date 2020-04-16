@@ -79,7 +79,7 @@ public class StatusCommand extends VanillaCommand {
         sender.sendMessage(TextFormat.GOLD + "Available processors: " + TextFormat.GREEN + runtime.availableProcessors());
 
 
-        int players = server.getOnlinePlayers().size();
+        int players = server.getOnlinePlayersCount();
 
         TextFormat playerColor = TextFormat.GREEN;
         if (((float) players / (float) server.getMaxPlayers()) > 0.85) {

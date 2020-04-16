@@ -1,7 +1,7 @@
 package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockTNT;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
@@ -17,7 +17,10 @@ import cn.nukkit.event.entity.EntityExplodeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.HugeExplodeSeedParticle;
-import cn.nukkit.math.*;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Hash;
 import cn.nukkit.utils.Utils;
@@ -165,7 +168,7 @@ public class Explosion {
             }
         }
 
-        ItemBlock air = new ItemBlock(new BlockAir());
+        ItemBlock air = new ItemBlock(Block.get(BlockID.AIR));
 
         for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {

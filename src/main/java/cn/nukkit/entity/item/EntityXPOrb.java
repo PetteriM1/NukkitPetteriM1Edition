@@ -147,6 +147,11 @@ public class EntityXPOrb extends Entity {
         }
         this.lastUpdate = currentTick;
 
+        if (this.age > 6000) {
+            this.close();
+            return false;
+        }
+
         boolean hasUpdate = entityBaseTick(tickDiff);
         if (this.isAlive()) {
             if (this.pickupDelay > 0) {
@@ -218,11 +223,6 @@ public class EntityXPOrb extends Entity {
             }
 
             this.updateMovement();
-
-            if (this.age > 6000) {
-                this.close();
-                return false;
-            }
         }
 
         return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;

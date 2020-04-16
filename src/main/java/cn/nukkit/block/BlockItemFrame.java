@@ -20,6 +20,11 @@ import cn.nukkit.utils.Utils;
  */
 public class BlockItemFrame extends BlockTransparentMeta {
 
+    private final static int[] FACING = new int[]{4, 5, 3, 2, 1, 0}; // TODO when 1.13 support arrives, add UP/DOWN facings
+
+    private final static int FACING_BITMASK = 0b0111;
+    private final static int MAP_BIT = 0b1000;
+
     public BlockItemFrame() {
         this(0);
     }
@@ -41,7 +46,7 @@ public class BlockItemFrame extends BlockTransparentMeta {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.getSide(getFacing()).isTransparent()) {
+            if (!this.getSide(getFacing()).isSolid()) {
                 this.level.useBreakOn(this);
                 return type;
             }
@@ -77,23 +82,8 @@ public class BlockItemFrame extends BlockTransparentMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent() && face.getIndex() > 1 && !block.isSolid()) {
-            switch (face) {
-                case NORTH:
-                    this.setDamage(3);
-                    break;
-                case SOUTH:
-                    this.setDamage(2);
-                    break;
-                case WEST:
-                    this.setDamage(1);
-                    break;
-                case EAST:
-                    this.setDamage(0);
-                    break;
-                default:
-                    return false;
-            }
+        if (face.getIndex() > 1 && target.isSolid() && (!block.isSolid() || block.canBeReplaced())) {
+            this.setDamage(FACING[face.getIndex()]);
             this.getLevel().setBlock(block, this, true, true);
             CompoundTag nbt = new CompoundTag()
                     .putString("id", BlockEntity.ITEM_FRAME)
@@ -116,7 +106,7 @@ public class BlockItemFrame extends BlockTransparentMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        this.getLevel().setBlock(this, new BlockAir(), true, true);
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
         this.getLevel().addSound(new ItemFrameRemovedSound(this));
         return true;
     }
@@ -164,7 +154,7 @@ public class BlockItemFrame extends BlockTransparentMeta {
     }
 
     public BlockFace getFacing() {
-        switch (this.getDamage() & 3) {
+        switch (this.getDamage() & FACING_BITMASK) {
             case 0:
                 return BlockFace.WEST;
             case 1:

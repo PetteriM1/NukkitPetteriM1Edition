@@ -59,14 +59,14 @@ public class BlockGrass extends BlockDirt {
             Block up = this.up();
             if (up instanceof BlockAir || up instanceof BlockFlowable) {
                 item.useOn(this);
-                this.getLevel().setBlock(this, new BlockFarmland());
+                this.getLevel().setBlock(this, Block.get(FARMLAND));
                 return true;
             }
         } else if (item.isShovel()) {
             Block up = this.up();
             if (up instanceof BlockAir || up instanceof BlockFlowable) {
                 item.useOn(this);
-                this.getLevel().setBlock(this, new BlockGrassPath());
+                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
                 return true;
             }
         }
@@ -83,7 +83,7 @@ public class BlockGrass extends BlockDirt {
             Block block = this.getLevel().getBlock(new Vector3(x, y, z));
             if (block.getId() == Block.DIRT && block.getDamage() == 0) {
                 if (block.up() instanceof BlockAir) {
-                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, new BlockGrass());
+                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, Block.get(GRASS));
                     Server.getInstance().getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.getLevel().setBlock(block, ev.getNewState());
@@ -91,7 +91,7 @@ public class BlockGrass extends BlockDirt {
                 }
             } else if (block.getId() == Block.GRASS) {
                 if (block.up() instanceof BlockSolid) {
-                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, new BlockDirt());
+                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, Block.get(DIRT));
                     Server.getInstance().getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.getLevel().setBlock(block, ev.getNewState());
