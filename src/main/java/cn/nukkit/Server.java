@@ -2115,7 +2115,7 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
-        this.forceGamemode = this.getPropertyBoolean("async-autosave", false);
+        this.asyncAutosave = this.getPropertyBoolean("async-autosave", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
