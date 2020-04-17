@@ -683,8 +683,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void setButtonText(String text) {
-        this.buttonText = text;
-        this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
+        if (!text.equals(buttonText)) {
+            this.buttonText = text;
+            this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
+        }
     }
 
     public void unloadChunk(int x, int z) {
@@ -1772,7 +1774,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.checkTeleportPosition();
-        this.checkInteractNearby();
+
+        if (currentTick % 10 == 0) {
+            this.checkInteractNearby();
+        }
 
         if (this.spawned && !this.dummyBossBars.isEmpty() && currentTick % 100 == 0) {
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
@@ -1784,9 +1789,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void checkInteractNearby() {
         int interactDistance = isCreative() ? 5 : 3;
         if (canInteract(this, interactDistance)) {
-            if (getEntityPlayerLookingAt(interactDistance) != null) {
-                EntityInteractable onInteract = getEntityPlayerLookingAt(interactDistance);
-                setButtonText(onInteract.getInteractButtonText());
+            EntityInteractable e = getEntityPlayerLookingAt(interactDistance);
+            if (e != null) {
+                setButtonText(e.getInteractButtonText());
             } else {
                 setButtonText("");
             }
@@ -4752,18 +4757,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     /**
      * Get chunk cache from data
+     * @param protocol protocol version
      * @param chunkX chunk x
      * @param chunkZ chunk z
      * @param subChunkCount sub chunk count
      * @param payload data
      * @return BatchPacket
      */
-    public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, int subChunkCount, byte[] payload) {
+    public static BatchPacket getChunkCacheFromData(int protocol, int chunkX, int chunkZ, int subChunkCount, byte[] payload) {
         LevelChunkPacket pk = new LevelChunkPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
+        pk.protocol = protocol;
         pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
         pk.encode();
 
