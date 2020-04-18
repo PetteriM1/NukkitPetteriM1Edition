@@ -302,10 +302,29 @@ public class BinaryStream {
             this.putString(skin.getCapeId());
             this.putString(skin.getFullSkinId());
             if (protocol == ProtocolInfo.v1_14_60) {
-                this.putString("");
-                this.putString("");
-                this.putLInt(0);
-                this.putLInt(0);
+                this.putString(skin.getArmSize());
+                this.putString(skin.getSkinColor());
+
+                List<PersonaPiece> pieces = skin.getPersonaPieces();
+                this.putLInt(pieces.size());
+                for (PersonaPiece piece : pieces) {
+                    this.putString(piece.id);
+                    this.putString(piece.type);
+                    this.putString(piece.packId);
+                    this.putBoolean(piece.isDefault);
+                    this.putString(piece.productId);
+                }
+
+                List<PersonaPieceTint> tints = skin.getTintColors();
+                this.putLInt(tints.size());
+                for (PersonaPieceTint tint : tints) {
+                    this.putString(tint.pieceType);
+                    List<String> colors = tint.colors;
+                    this.putLInt(colors.size());
+                    for (String color : colors) {
+                        this.putString(color);
+                    }
+                }
             }
         }
     }
@@ -323,14 +342,18 @@ public class BinaryStream {
         return new SerializedImage(width, height, data);
     }
 
-    public Skin getSkin() { // Can be used only with protocol >= 388
+    public Skin getSkin() {
+        return getSkin(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public Skin getSkin(int protocol) { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
         skin.setSkinResourcePatch(this.getString());
         skin.setSkinData(this.getImage());
 
         int animationCount = this.getLInt();
-        for (int i = 0; i < animationCount; i++) {
+        for (int i = 0; i < Math.min(animationCount, 1024); i++) {
             SerializedImage image = this.getImage();
             int type = this.getLInt();
             float frames = this.getLFloat();
@@ -345,6 +368,31 @@ public class BinaryStream {
         skin.setCapeOnClassic(this.getBoolean());
         skin.setCapeId(this.getString());
         this.getString(); // TODO: Full skin id
+        if (protocol == ProtocolInfo.v1_14_60) {
+            skin.setArmSize(this.getString());
+            skin.setSkinColor(this.getString());
+
+            int piecesLength = this.getLInt();
+            for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
+                String pieceId = this.getString();
+                String pieceType = this.getString();
+                String packId = this.getString();
+                boolean isDefault = this.getBoolean();
+                String productId = this.getString();
+                skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+            }
+
+            int tintsLength = this.getLInt();
+            for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
+                String pieceType = this.getString();
+                List<String> colors = new ArrayList<>();
+                int colorsLength = this.getLInt();
+                for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
+                    colors.add(this.getString());
+                }
+                skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+            }
+        }
         return skin;
     }
 

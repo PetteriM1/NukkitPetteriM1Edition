@@ -918,7 +918,7 @@ public abstract class Entity extends Location implements Metadatable {
                 pkBoss.bossEid = this.id;
                 pkBoss.type = BossEventPacket.TYPE_SHOW;
                 pkBoss.title = this.getName();
-                pkBoss.healthPercent = this.health;
+                pkBoss.healthPercent = player.protocol >= 361 ? this.health / 100 : this.health;
                 player.dataPacket(pkBoss);
             }
         }
@@ -1398,6 +1398,17 @@ public abstract class Entity extends Location implements Metadatable {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         this.updateMovement();
+
+        /*if (server.vanillaBB && currentTick % 100 == 0) { //TODO: Figure out why doesn't the boss bar length change
+            for (Player p : this.hasSpawned.values()) {
+                BossEventPacket pkBoss = new BossEventPacket();
+                pkBoss.bossEid = this.id;
+                pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;
+                pkBoss.title = this.getName();
+                pkBoss.healthPercent = p.protocol >= 361 ? this.health / 100 : this.health;
+                p.dataPacket(pkBoss);
+            }
+        }*/
 
         return hasUpdate;
     }

@@ -246,7 +246,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private boolean foodEnabled = true;
     private byte failedTransactions;
 
-    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET/*, ProtocolInfo.CLIENT_TO_SERVER_HANDSHAKE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET*/);
+    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET);
 
     public int getStartActionTick() {
         return startAction;
@@ -683,8 +683,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void setButtonText(String text) {
-        this.buttonText = text;
-        this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
+        if (!text.equals(buttonText)) {
+            this.buttonText = text;
+            this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
+        }
     }
 
     public void unloadChunk(int x, int z) {
@@ -1772,7 +1774,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.checkTeleportPosition();
-        this.checkInteractNearby();
+
+        if (currentTick % 10 == 0) {
+            this.checkInteractNearby();
+        }
 
         if (this.spawned && !this.dummyBossBars.isEmpty() && currentTick % 100 == 0) {
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
@@ -1784,9 +1789,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void checkInteractNearby() {
         int interactDistance = isCreative() ? 5 : 3;
         if (canInteract(this, interactDistance)) {
-            if (getEntityPlayerLookingAt(interactDistance) != null) {
-                EntityInteractable onInteract = getEntityPlayerLookingAt(interactDistance);
-                setButtonText(onInteract.getInteractButtonText());
+            EntityInteractable e = getEntityPlayerLookingAt(interactDistance);
+            if (e != null) {
+                setButtonText(e.getInteractButtonText());
             } else {
                 setButtonText("");
             }
@@ -2096,7 +2101,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (!loggedIn && !beforeLoginAvailablePackets.contains(packet.pid())) {
-            server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + "due to player not logged in yet");
+            server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + " due to player not logged in yet");
             return;
         }
 
@@ -4778,18 +4783,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     /**
      * Get chunk cache from data
+     * @param protocol protocol version
      * @param chunkX chunk x
      * @param chunkZ chunk z
      * @param subChunkCount sub chunk count
      * @param payload data
      * @return BatchPacket
      */
-    public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, int subChunkCount, byte[] payload) {
+    public static BatchPacket getChunkCacheFromData(int protocol, int chunkX, int chunkZ, int subChunkCount, byte[] payload) {
         LevelChunkPacket pk = new LevelChunkPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
+        pk.protocol = protocol;
         pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
         pk.encode();
 
@@ -5172,6 +5179,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.fishing = null;
+    }
+
+    @Override
+    public boolean doesTriggerPressurePlate() {
+        return this.gamemode != SPECTATOR;
     }
 
     @Override

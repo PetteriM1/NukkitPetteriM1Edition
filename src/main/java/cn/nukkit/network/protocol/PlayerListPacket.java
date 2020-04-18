@@ -60,6 +60,11 @@ public class PlayerListPacket extends DataPacket {
                 this.putUUID(entry.uuid);
             }
         }
+        if (type == TYPE_ADD && protocol == ProtocolInfo.v1_14_60) {
+            for (Entry entry : this.entries) { // WTF Mojang
+                this.putBoolean(entry.skin.isTrusted());
+            }
+        }
     }
 
     @Override

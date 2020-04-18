@@ -196,7 +196,7 @@ public class DummyBossBar {
     }
 
     private void sendSetBossBarLength() {
-        if (player.protocol >= 361) {
+        if (player.protocol >= 361) { // Again, what the hell is this and where is the documentation?
             BossEventPacket pkBoss = new BossEventPacket();
             pkBoss.bossEid = bossBarId;
             pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;

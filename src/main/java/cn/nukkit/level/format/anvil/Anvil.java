@@ -145,23 +145,23 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = ThreadCache.binaryStream.get().reset();
-        int count = 0;
+        int subChunkCount = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
         for (int i = sections.length - 1; i >= 0; i--) {
             if (!sections[i].isEmpty()) {
-                count = i + 1;
+                subChunkCount = i + 1;
                 break;
             }
         }
         if (protocol < ProtocolInfo.v1_12_0) {
-            stream.putByte((byte) count);
+            stream.putByte((byte) subChunkCount);
         }
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < subChunkCount; i++) {
             if (protocol < ProtocolInfo.v1_13_0) {
                 stream.putByte((byte) 0);
                 stream.put(sections[i].getBytes());
             } else {
-                sections[i].writeTo(protocol, stream); //TODO: multiversion
+                sections[i].writeTo(protocol, stream); //TODO: This may need multiversion support later because it uses the block palette
             }
         }
         if (protocol < ProtocolInfo.v1_12_0) {
@@ -179,7 +179,7 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, count, stream.getBuffer());
+        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, subChunkCount, stream.getBuffer());
 
         return null;
     }
