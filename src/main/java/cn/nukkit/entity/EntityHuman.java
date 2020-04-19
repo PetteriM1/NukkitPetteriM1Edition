@@ -89,12 +89,12 @@ public class EntityHuman extends EntityHumanType {
     @Override
     protected void initEntity() {
         this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true);
 
         // HACK: Fix gravity on 1.2.11 and lower
         if (this instanceof Player) {
             if (((Player) this).protocol <= 201) {
-                this.setDataFlag(DATA_FLAGS, 46);
+                this.setDataFlagSelfOnly(DATA_FLAGS, 46, true);
             }
         }
 

@@ -262,7 +262,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public void setInLove() {
         this.inLoveTicks = 600;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE, true);
     }
 
     public boolean isInLove() {
