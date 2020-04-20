@@ -1896,7 +1896,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
+        for (Player p : new ArrayList<>(this.server.playerList.values())) {
             if (p != this && p.username != null && (p.username.equalsIgnoreCase(this.username) || this.getUniqueId().equals(p.getUniqueId()))) {
                 p.close("", "disconnectionScreen.loggedinOtherLocation");
                 break;
@@ -3710,7 +3710,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            for (Player player : new ArrayList<>(this.server.getOnlinePlayers().values())) {
+            for (Player player : new ArrayList<>(this.server.playerList.values())) {
                 if (!player.canSee(this)) {
                     player.showPlayer(this);
                 }
@@ -3772,10 +3772,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.perm = null;
         }
 
-        if (this.inventory != null) {
-            this.inventory = null;
-        }
-
+        this.inventory = null;
         this.chunk = null;
 
         this.server.removePlayer(this);

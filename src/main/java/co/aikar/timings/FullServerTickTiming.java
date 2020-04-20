@@ -41,6 +41,9 @@ public class FullServerTickTiming extends Timing {
 
     @Override
     public Timing startTiming() {
+        if (!this.enabled) {
+            return this;
+        }
         if (TimingsManager.needsFullReset) {
             TimingsManager.resetTimings();
         } else if (TimingsManager.needsRecheckEnabled) {
@@ -52,10 +55,11 @@ public class FullServerTickTiming extends Timing {
 
     @Override
     public void stopTiming() {
-        super.stopTiming();
         if (!this.enabled) {
             return;
         }
+
+        super.stopTiming();
 
         if (TimingsHistory.timedTicks % 20 == 0) {
             final Runtime runtime = Runtime.getRuntime();

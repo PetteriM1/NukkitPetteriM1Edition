@@ -1452,11 +1452,13 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean dismountEntity(Entity entity) {
-        // Run the events
-        EntityVehicleExitEvent ev = new EntityVehicleExitEvent(entity, (EntityVehicle) this);
-        server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return false;
+        if (this instanceof EntityVehicle) {
+            // Run the events
+            EntityVehicleExitEvent ev = new EntityVehicleExitEvent(entity, (EntityVehicle) this);
+            server.getPluginManager().callEvent(ev);
+            if (ev.isCancelled()) {
+                return false;
+            }
         }
 
         broadcastLinkPacket(entity, TYPE_REMOVE);

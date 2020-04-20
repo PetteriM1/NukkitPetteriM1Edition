@@ -84,6 +84,8 @@ public final class Timings {
     public static final Timing permissibleCalculationTimer;
     public static final Timing permissionDefaultTimer;
 
+    private static final String empty = "?";
+
     static {
         setTimingsEnabled(Server.getInstance().getPropertyBoolean("enable-timings", false));
         setVerboseEnabled(Server.getInstance().getPropertyBoolean("timings-verbose", false));
@@ -196,7 +198,6 @@ public final class Timings {
         TimingsManager.reset();
     }
 
-
     public static Timing getCommandTiming(Command command) {
         return TimingsManager.getTiming(DEFAULT_GROUP.name, "Command: " + command.getLabel(), commandTimer);
     }
@@ -224,23 +225,23 @@ public final class Timings {
 
         return TimingsManager.getTiming(plugin.getName(), "Event: " + listener.getClass().getName() + '.'
                 + (executor instanceof MethodEventExecutor ? ((MethodEventExecutor) executor).getMethod().getName() : "???")
-                + " (" + event.getSimpleName() + ')', group);
+                + " (" + (timingsEnabled ? event.getSimpleName() : empty) + ')', group);
     }
 
     public static Timing getEntityTiming(Entity entity) {
-        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Entity Tick: " + entity.getClass().getSimpleName(), tickEntityTimer);
+        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Entity Tick: " + (timingsEnabled ? entity.getClass().getSimpleName() : empty), tickEntityTimer);
     }
 
     public static Timing getBlockEntityTiming(BlockEntity blockEntity) {
-        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## BlockEntity Tick: " + blockEntity.getClass().getSimpleName(), tickBlockEntityTimer);
+        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## BlockEntity Tick: " + (timingsEnabled ? blockEntity.getClass().getSimpleName() : empty), tickBlockEntityTimer);
     }
 
     public static Timing getReceiveDataPacketTiming(DataPacket pk) {
-        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Receive Packet: " + pk.getClass().getSimpleName(), playerNetworkReceiveTimer);
+        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Receive Packet: " + (timingsEnabled ? pk.getClass().getSimpleName() : empty), playerNetworkReceiveTimer);
     }
 
     public static Timing getSendDataPacketTiming(DataPacket pk) {
-        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Send Packet: " + pk.getClass().getSimpleName(), playerNetworkSendTimer);
+        return TimingsManager.getTiming(DEFAULT_GROUP.name, "## Send Packet: " + (timingsEnabled ? pk.getClass().getSimpleName() : empty), playerNetworkSendTimer);
     }
 
     public static void stopServer() {

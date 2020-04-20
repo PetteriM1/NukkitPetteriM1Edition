@@ -71,6 +71,7 @@ import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
@@ -157,7 +158,7 @@ public class Server {
     private Config properties;
 
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
-    private final Map<UUID, Player> playerList = new HashMap<>();
+    final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
     private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
@@ -1041,7 +1042,11 @@ public class Server {
 
             for (Level level : this.levelArray) {
                 if (!nonAutoSaveWorlds.contains(level.getName())) {
-                    this.scheduler.scheduleTask(null, level::save, asyncAutosave);
+                    if (asyncAutosave) {
+                        this.scheduler.scheduleTask(null, level::save, true);
+                    } else {
+                        level.save();
+                    }
                 }
             }
             Timings.levelSaveTimer.stopTiming();
@@ -1439,7 +1444,7 @@ public class Server {
     }
 
     public Map<UUID, Player> getOnlinePlayers() {
-        return new HashMap<>(playerList);
+        return ImmutableMap.copyOf(playerList);
     }
 
     public int getOnlinePlayersCount() {

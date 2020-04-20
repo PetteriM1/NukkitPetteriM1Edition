@@ -11,7 +11,7 @@ public class BlockPumpkinLit extends BlockPumpkin {
     }
 
     public BlockPumpkinLit(int meta) {
-        super(0);
+        super(meta);
     }
 
     @Override
