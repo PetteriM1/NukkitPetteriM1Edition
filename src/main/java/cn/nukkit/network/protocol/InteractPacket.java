@@ -7,6 +7,7 @@ public class InteractPacket extends DataPacket {
 
     public static final int ACTION_VEHICLE_EXIT = 3;
     public static final int ACTION_MOUSEOVER = 4;
+    public static final int ACTION_OPEN_NPC = 5;
     public static final int ACTION_OPEN_INVENTORY = 6;
 
     public int action;
