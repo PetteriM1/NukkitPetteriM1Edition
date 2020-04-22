@@ -74,6 +74,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
+import io.sentry.SentryClient;
+import io.sentry.SentryClientFactory;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
@@ -156,6 +158,8 @@ public class Server {
     private QueryHandler queryHandler;
     private QueryRegenerateEvent queryRegenerateEvent;
     private Config properties;
+
+    public SentryClient sentry;
 
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
     final Map<UUID, Player> playerList = new HashMap<>();
@@ -264,6 +268,11 @@ public class Server {
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
 
         this.loadSettings();
+
+        if (this.getPropertyBoolean("automatic-bug-report", true)) {
+            ExceptionHandler.registerExceptionHandler();
+            this.sentry = SentryClientFactory.sentryClient("https://0e094ce5464f4663a0b521d61f4bfe54@o381665.ingest.sentry.io/5209314");
+        }
 
         if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
             new File(dataPath + "players/").mkdirs();
@@ -2236,6 +2245,7 @@ public class Server {
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
             put("async-autosave", false);
+            put("automatic-bug-report", true);
         }
     }
 
