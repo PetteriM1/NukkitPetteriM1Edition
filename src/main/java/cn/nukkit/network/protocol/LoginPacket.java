@@ -49,11 +49,12 @@ public class LoginPacket extends DataPacket {
     }
 
     private void decodeChainData() {
-        String data = new String(this.get(getLInt()), StandardCharsets.UTF_8);
-        int size = data.getBytes().length;
-        if (size > 5242880) {
+        int size = this.getLInt();
+        if (size > 3000000) {
             throw new IllegalArgumentException("The chain data is too big: " + size);
         }
+
+        String data = new String(this.get(size), StandardCharsets.UTF_8);
 
         Map<String, List<String>> map = new Gson().fromJson(data, new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
@@ -69,12 +70,12 @@ public class LoginPacket extends DataPacket {
     }
 
     private void decodeSkinData() {
-        String data = new String(this.get(this.getLInt()));
-        int size = data.getBytes().length;
-        if (size > 5242880) {
+        int size = this.getLInt();
+        if (size > 3000000) {
             throw new IllegalArgumentException("The skin data is too big: " + size);
         }
 
+        String data = new String(this.get(size));
         JsonObject skinToken = decodeToken(data);
 
         if (skinToken == null) return;

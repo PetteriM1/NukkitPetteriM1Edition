@@ -177,6 +177,9 @@
                     <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
+            <version>1.7.30</version>
         </dependency>
     </dependencies>
 

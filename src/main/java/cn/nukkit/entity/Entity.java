@@ -1452,11 +1452,13 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean dismountEntity(Entity entity) {
-        // Run the events
-        EntityVehicleExitEvent ev = new EntityVehicleExitEvent(entity, (EntityVehicle) this);
-        server.getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return false;
+        if (this instanceof EntityVehicle) {
+            // Run the events
+            EntityVehicleExitEvent ev = new EntityVehicleExitEvent(entity, (EntityVehicle) this);
+            server.getPluginManager().callEvent(ev);
+            if (ev.isCancelled()) {
+                return false;
+            }
         }
 
         broadcastLinkPacket(entity, TYPE_REMOVE);
@@ -2238,6 +2240,25 @@ public abstract class Entity extends Location implements Metadatable {
         return false;
     }
 
+    public boolean setDataPropertyAndSendOnlyToSelf(EntityData data) {
+        if (!Objects.equals(data, this.dataProperties.get(data.getId()))) {
+            this.dataProperties.put(data);
+            if (this.isPlayer) {
+                EntityMetadata d = new EntityMetadata().put(this.dataProperties.get(data.getId()));
+                SetEntityDataPacket pk = new SetEntityDataPacket();
+                pk.eid = this.id;
+                if (((Player) this).protocol < 274) {
+                    pk.metadata = d == null ? mvReplace(this.dataProperties) : mvReplace(d);
+                } else {
+                    pk.metadata = d == null ? this.dataProperties : d;
+                }
+                ((Player) this).dataPacket(pk);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public EntityMetadata getDataProperties() {
         return this.dataProperties;
     }
@@ -2304,6 +2325,20 @@ public abstract class Entity extends Location implements Metadatable {
                 long flags = this.getDataPropertyLong(propertyId);
                 flags ^= 1L << id;
                 this.setDataProperty(new LongEntityData(propertyId, flags));
+            }
+        }
+    }
+
+    public void setDataFlagSelfOnly(int propertyId, int id, boolean value) {
+        if (this.getDataFlag(propertyId, id) != value) {
+            if (propertyId == EntityHuman.DATA_PLAYER_FLAGS) {
+                byte flags = (byte) this.getDataPropertyByte(propertyId);
+                flags ^= 1 << id;
+                this.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(propertyId, flags));
+            } else {
+                long flags = this.getDataPropertyLong(propertyId);
+                flags ^= 1L << id;
+                this.setDataPropertyAndSendOnlyToSelf(new LongEntityData(propertyId, flags));
             }
         }
     }

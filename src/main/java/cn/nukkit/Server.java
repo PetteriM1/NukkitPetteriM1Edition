@@ -75,6 +75,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
+import io.sentry.SentryClient;
+import io.sentry.SentryClientFactory;
 import lombok.extern.log4j.Log4j2;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
@@ -165,8 +167,10 @@ public class Server {
     private QueryRegenerateEvent queryRegenerateEvent;
     private Config properties;
 
+    public SentryClient sentry;
+
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
-    private final Map<UUID, Player> playerList = new HashMap<>();
+    final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
     private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
@@ -274,6 +278,11 @@ public class Server {
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
 
         this.loadSettings();
+
+        if (this.getPropertyBoolean("automatic-bug-report", true)) {
+            ExceptionHandler.registerExceptionHandler();
+            this.sentry = SentryClientFactory.sentryClient("https://0e094ce5464f4663a0b521d61f4bfe54@o381665.ingest.sentry.io/5209314");
+        }
 
         if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
             new File(dataPath + "players/").mkdirs();
@@ -501,6 +510,7 @@ public class Server {
 
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
                     this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                    this.getLogger().info("\u00A7c[Update] \u00A7eYou can download the latest build from https://github.com/PetteriM1/NukkitPetteriM1Edition/releases");
                 } else if (!Nukkit.isMasterBranchBuild()) {
                     this.getLogger().warning("\u00A7eYou are running a dev build! Do not use in production!");
                 }
@@ -1078,7 +1088,11 @@ public class Server {
 
             for (Level level : this.levelArray) {
                 if (!nonAutoSaveWorlds.contains(level.getName())) {
-                    this.scheduler.scheduleTask(null, level::save, asyncAutosave);
+                    if (asyncAutosave) {
+                        this.scheduler.scheduleTask(null, level::save, true);
+                    } else {
+                        level.save();
+                    }
                 }
             }
             Timings.levelSaveTimer.stopTiming();
@@ -2422,6 +2436,7 @@ public class Server {
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
             put("async-autosave", false);
+            put("automatic-bug-report", true);
         }
     }
 

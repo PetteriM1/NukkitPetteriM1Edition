@@ -233,12 +233,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         // HACK!
         if (this instanceof Player && ((Player) this).protocol <= 282) {
             if (((Player) this).protocol <= 201) {
-                this.setDataFlag(DATA_FLAGS, 33, isBreathing);
+                this.setDataFlagSelfOnly(DATA_FLAGS, 33, isBreathing);
             } else {
-                this.setDataFlag(DATA_FLAGS, 34, isBreathing);
+                this.setDataFlagSelfOnly(DATA_FLAGS, 34, isBreathing);
             }
         } else {
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
+            this.setDataFlagSelfOnly(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
         }
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);
@@ -420,6 +420,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void setAirTicks(int ticks) {
-        this.setDataProperty(new ShortEntityData(DATA_AIR, ticks));
+        this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
     }
 }

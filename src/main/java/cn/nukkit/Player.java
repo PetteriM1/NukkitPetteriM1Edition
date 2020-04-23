@@ -1897,7 +1897,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         Player oldPlayer = null;
-        for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
+        for (Player p : new ArrayList<>(this.server.playerList.values())) {
             if (p != this && p.username != null && p.username.equalsIgnoreCase(this.username) ||
                     this.getUniqueId().equals(p.getUniqueId())) {
                 oldPlayer = p;
@@ -2797,20 +2797,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!this.spawned || !this.isAlive()) {
                         break;
                     }
-                    this.craftingType = CRAFTING_SMALL;
 
                     EntityEventPacket entityEventPacket = (EntityEventPacket) packet;
 
-                    if (entityEventPacket.event == EntityEventPacket.EATING_ITEM) {
-                        if (entityEventPacket.data == 0 || entityEventPacket.eid != this.id) {
+                    if (entityEventPacket.event != EntityEventPacket.ENCHANT) {
+                        this.craftingType = CRAFTING_SMALL;
+                    }
+
+                    switch (entityEventPacket.event) {
+                        case EntityEventPacket.EATING_ITEM:
+                            if (entityEventPacket.data == 0 || entityEventPacket.eid != this.id) {
+                                break;
+                            }
+
+                            entityEventPacket.eid = this.id;
+                            entityEventPacket.isEncoded = false;
+                            this.dataPacket(entityEventPacket);
+                            Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
                             break;
-                        }
+                        case EntityEventPacket.ENCHANT:
+                            if (entityEventPacket.eid != this.id) {
+                                break;
+                            }
 
-                        entityEventPacket.eid = this.id;
-                        entityEventPacket.isEncoded = false;
-
-                        this.dataPacket(entityEventPacket);
-                        Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
+                            int levels = entityEventPacket.data; // Sent as negative number of levels lost
+                            if (levels < 0) {
+                                this.setExperience(this.exp, this.expLevel + levels);
+                            }
+                            break;
                     }
                     break;
                 case ProtocolInfo.COMMAND_REQUEST_PACKET:
@@ -3736,7 +3750,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            for (Player player : new ArrayList<>(this.server.getOnlinePlayers().values())) {
+            for (Player player : new ArrayList<>(this.server.playerList.values())) {
                 if (!player.canSee(this)) {
                     player.showPlayer(this);
                 }
@@ -3798,10 +3812,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.perm = null;
         }
 
-        if (this.inventory != null) {
-            this.inventory = null;
-        }
-
+        this.inventory = null;
         this.chunk = null;
 
         this.server.removePlayer(this);
