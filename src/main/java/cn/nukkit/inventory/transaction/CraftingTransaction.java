@@ -3,9 +3,11 @@ package cn.nukkit.inventory.transaction;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.inventory.CraftItemEvent;
-import cn.nukkit.inventory.BigCraftingGrid;
-import cn.nukkit.inventory.CraftingRecipe;
+import cn.nukkit.inventory.*;
+import cn.nukkit.inventory.transaction.action.DamageAnvilAction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
+import cn.nukkit.inventory.transaction.action.SlotChangeAction;
+import cn.nukkit.inventory.transaction.action.TakeLevelAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.ContainerClosePacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
@@ -13,6 +15,7 @@ import cn.nukkit.scheduler.Task;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author CreeperFace
@@ -27,11 +30,14 @@ public class CraftingTransaction extends InventoryTransaction {
 
     protected Item primaryOutput;
 
-    protected CraftingRecipe recipe;
+    protected Recipe recipe;
+
+    protected int craftingType;
 
     public CraftingTransaction(Player source, List<InventoryAction> actions) {
         super(source, actions, false);
 
+        this.craftingType = source.craftingType;
         this.gridSize = (source.getCraftingGrid() instanceof BigCraftingGrid) ? 3 : 2;
         Item air = Item.get(Item.AIR, 0, 1);
         this.inputs = new Item[gridSize][gridSize];
@@ -87,7 +93,7 @@ public class CraftingTransaction extends InventoryTransaction {
         }
     }
 
-    public CraftingRecipe getRecipe() {
+    public Recipe getRecipe() {
         return recipe;
     }
 
@@ -133,7 +139,36 @@ public class CraftingTransaction extends InventoryTransaction {
     public boolean canExecute() {
         Item[][] inputs = reindexInputs();
 
-        recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);
+        if (craftingType == Player.CRAFTING_ANVIL) {
+            Inventory inventory = source.getWindowById(Player.ANVIL_WINDOW_ID);
+            if (inventory instanceof AnvilInventory) {
+                AnvilInventory anvil = (AnvilInventory) inventory;
+                addInventory(anvil);
+                if (this.primaryOutput.equals(anvil.getResult(), true, true)) {
+                    TakeLevelAction takeLevel = new TakeLevelAction(anvil.getLevelCost());
+                    addAction(takeLevel);
+                    if (takeLevel.isValid(source)) {
+                        recipe = new RepairRecipe(InventoryType.ANVIL, this.primaryOutput, Arrays.asList(inputs[0]));
+                        PlayerUIInventory uiInventory = source.getUIInventory();
+                        actions.add(new DamageAnvilAction(anvil, !source.isCreative() && ThreadLocalRandom.current().nextFloat() < 0.12F, this));
+                        actions.stream()
+                                .filter(a -> a instanceof SlotChangeAction)
+                                .map(a-> (SlotChangeAction) a)
+                                .filter(a -> a.getInventory() == uiInventory)
+                                .filter(a -> a.getSlot() == 50)
+                                .findFirst()
+                                .ifPresent(a -> {
+                                    // Move the set result action to the end, otherwise the result would be cleared too early
+                                    actions.remove(a);
+                                    actions.add(a);
+                                });
+                        anvil.setResult(Item.get(0), false);
+                    }
+                }
+            }
+        } else {
+            recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);
+        }
 
         return this.recipe != null && super.canExecute();
     }

@@ -9,5 +9,6 @@ public enum RecipeType {
     MULTI,
     SHULKER_BOX,
     SHAPELESS_CHEMISTRY,
-    SHAPED_CHEMISTRY
+    SHAPED_CHEMISTRY,
+    REPAIR
 }

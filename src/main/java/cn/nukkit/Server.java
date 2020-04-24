@@ -239,6 +239,7 @@ public class Server {
     public boolean strongIPBans;
     public boolean spawnAnimals;
     public boolean spawnMobs;
+    public boolean anvilsEnabled;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2131,6 +2132,7 @@ public class Server {
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
         this.asyncAutosave = this.getPropertyBoolean("async-autosave", false);
+        this.anvilsEnabled = this.getPropertyBoolean("anvils-enabled", true);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2247,6 +2249,7 @@ public class Server {
             put("do-not-limit-skin-geometry", true);
             put("async-autosave", false);
             put("automatic-bug-report", true);
+            put("anvils-enabled", true);
         }
     }
 
