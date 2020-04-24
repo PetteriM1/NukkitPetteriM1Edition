@@ -64,7 +64,12 @@ public class BlockEndPortal extends BlockFlowable {
     public boolean canHarvestWithHand() {
         return false;
     }
-    
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
