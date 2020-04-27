@@ -217,7 +217,7 @@ public class BlockRedstoneWire extends BlockFlowable {
     public boolean canBePlacedOn(Vector3 v) {
         Block b = this.level.getBlock(v);
 
-        return b.isSolid() && !b.isTransparent() && b.getId() != Block.GLOWSTONE;
+        return (b.isSolid() && !b.isTransparent() && b.getId() != GLOWSTONE) || b.getId() == HOPPER_BLOCK;
     }
 
     public int getStrongPower(BlockFace side) {
