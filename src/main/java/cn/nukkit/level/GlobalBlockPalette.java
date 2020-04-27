@@ -310,8 +310,7 @@ public class GlobalBlockPalette {
                 legacyToRuntimeId361.put(legacyId, runtimeIdAllocator361.getAndIncrement());
                 break;
             default: // Not used for 388+
-                Server.getInstance().getLogger().alert("Tried to register mapping for unsupported protocol version: " + protocol);
-                break;
+                throw new IllegalArgumentException("Tried to register mapping for unsupported protocol version: " + protocol);
         }
     }
 
@@ -341,8 +340,7 @@ public class GlobalBlockPalette {
             case 389:
                 return compiledTable389;
             default:
-                Server.getInstance().getLogger().alert("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
-                return null;
+                throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
         }
     }
 
