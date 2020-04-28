@@ -71,11 +71,11 @@ public class EntityWitch extends EntityWalkingMob {
 
                     EntityPotion thrownPotion = (EntityPotion) Entity.createEntity("ThrownPotion", pos, this);
 
-                    if (this.distance(player) <= 8 && !player.hasEffect(Effect.SLOWNESS)) {
+                    if (!player.hasEffect(Effect.SLOWNESS) && this.distance(player) <= 8) {
                         thrownPotion.potionId = Potion.SLOWNESS;
                     } else if (player.getHealth() >= 8) {
                         thrownPotion.potionId = Potion.POISON;
-                    } else if (this.distance(player) <= 3 && !player.hasEffect(Effect.WEAKNESS) && Utils.rand(0, 4) == 0) {
+                    } else if (!player.hasEffect(Effect.WEAKNESS) && Utils.rand(0, 4) == 0 && this.distance(player) <= 3) {
                         thrownPotion.potionId = Potion.WEAKNESS;
                     } else {
                         thrownPotion.potionId = Potion.HARMING;

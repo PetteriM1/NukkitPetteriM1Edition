@@ -18,7 +18,7 @@ public class EntityChicken extends EntityWalkingAnimal {
 
     public static final int NETWORK_ID = 10;
 
-    private int EggLayTime = getRandomEggLayTime();
+    private int eggLayTime = getRandomEggLayTime();
     private boolean IsChickenJockey = false;
 
     public EntityChicken(FullChunk chunk, CompoundTag nbt) {
@@ -61,9 +61,9 @@ public class EntityChicken extends EntityWalkingAnimal {
         super.initEntity();
 
         if (this.namedTag.contains("EggLayTime")) {
-            this.EggLayTime = this.namedTag.getInt("EggLayTime");
+            this.eggLayTime = this.namedTag.getInt("EggLayTime");
         } else {
-            this.EggLayTime = getRandomEggLayTime();
+            this.eggLayTime = getRandomEggLayTime();
         }
         if (this.namedTag.contains("IsChickenJockey")) {
             this.IsChickenJockey = this.namedTag.getBoolean("IsChickenJockey");
@@ -78,13 +78,13 @@ public class EntityChicken extends EntityWalkingAnimal {
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        if (!this.isBaby()) {
-            if (this.EggLayTime > 0) {
-                EggLayTime -= tickDiff;
+        if (this.getServer().blockListener && !this.isBaby()) {
+            if (this.eggLayTime > 0) {
+                eggLayTime -= tickDiff;
             } else {
                 this.level.dropItem(this, Item.get(Item.EGG, 0, 1));
                 this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_PLOP);
-                this.EggLayTime = getRandomEggLayTime();
+                this.eggLayTime = getRandomEggLayTime();
             }
         }
 
@@ -138,7 +138,7 @@ public class EntityChicken extends EntityWalkingAnimal {
     public void saveNBT() {
         super.saveNBT();
 
-        this.namedTag.putInt("EggLayTime", this.EggLayTime);
+        this.namedTag.putInt("EggLayTime", this.eggLayTime);
         this.namedTag.putBoolean("IsChickenJockey", this.IsChickenJockey);
     }
 

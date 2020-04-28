@@ -161,7 +161,7 @@ public class Anvil extends BaseLevelProvider {
                 stream.putByte((byte) 0);
                 stream.put(sections[i].getBytes());
             } else {
-                sections[i].writeTo(protocol, stream); //TODO: This may need multiversion support later because it uses the block palette
+                sections[i].writeTo(protocol, stream);
             }
         }
         if (protocol < ProtocolInfo.v1_12_0) {
