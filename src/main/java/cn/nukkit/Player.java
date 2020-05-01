@@ -685,7 +685,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setButtonText(String text) {
         if (!text.equals(buttonText)) {
             this.buttonText = text;
-            this.setDataProperty(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
+            this.setDataPropertyAndSendOnlyToSelf(new StringEntityData(Entity.DATA_INTERACTIVE_TAG, this.buttonText));
         }
     }
 
@@ -1775,7 +1775,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.checkTeleportPosition();
 
-        if (currentTick % 10 == 0) {
+        if (currentTick % 20 == 0) {
             this.checkInteractNearby();
         }
 
