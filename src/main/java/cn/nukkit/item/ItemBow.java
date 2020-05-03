@@ -137,10 +137,6 @@ public class ItemBow extends ItemTool {
                 } else {
                     proj.spawnToAll();
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);
-
-                    if (this.hasEnchantment(Enchantment.ID_BOW_INFINITY)) {
-                        proj.namedTag.putBoolean("canNotPickup", true);
-                    }
                 }
             }
         }

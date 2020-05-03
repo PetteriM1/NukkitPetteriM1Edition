@@ -11,6 +11,7 @@ import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -82,12 +83,6 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     @Override
-    public boolean entityBaseTick(int tickDiff) {
-        updatePassengers();
-        return super.entityBaseTick(tickDiff);
-    }
-
-    @Override
     public boolean onUpdate(int currentTick) {
         Iterator<Entity> linkedIterator = this.passengers.iterator();
 
@@ -143,5 +138,21 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
         }
 
         return super.canDespawn();
+    }
+
+    @Override
+    public void updatePassengers() {
+        if (this.passengers.isEmpty()) {
+            return;
+        }
+
+        for (Entity passenger : new ArrayList<>(this.passengers)) {
+            if (!passenger.isAlive() || this.isInsideOfWater()) {
+                dismountEntity(passenger);
+                continue;
+            }
+
+            updatePassengerPosition(passenger);
+        }
     }
 }
