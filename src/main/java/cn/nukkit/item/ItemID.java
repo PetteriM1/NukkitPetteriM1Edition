@@ -168,6 +168,7 @@ public interface ItemID {
     int EMPTY_MAP = 395;
     int GOLDEN_CARROT = 396;
     int SKULL = 397;
+    int CARROTONASTICK = 398;
     int CARROT_ON_A_STICK = 398;
     int NETHER_STAR = 399;
     int PUMPKIN_PIE = 400;
