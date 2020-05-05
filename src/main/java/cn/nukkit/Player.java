@@ -1547,7 +1547,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!to.equals(ev.getTo())) {
                         this.teleport(ev.getTo(), null);
                     } else {
-                        this.addMovement(this.x, this.y, this.z, this.yaw, this.pitch, this.yaw);
+                        this.addMovement(this.x, this.y + this.getEyeHeight(), this.z, this.yaw, this.pitch, this.yaw);
                     }
                 } else {
                     this.blocksAround = blocksAround;
@@ -1614,8 +1614,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.lastPitch = from.pitch;
 
             // We have to send slightly above otherwise the player will fall into the ground
-            this.sendPosition(from.add(0, 0.00001, 0), from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
-            this.forceMovement = new Vector3(from.x, from.y + 0.00001, from.z);
+            Vector3 vec = new Vector3(from.x, from.y + 0.00001, from.z);
+            this.sendPosition(vec, from.yaw, from.pitch, MovePlayerPacket.MODE_RESET);
+            this.forceMovement = vec;
         } else {
             this.forceMovement = null;
             if (distanceSquared != 0 && this.nextChunkOrderRun > 20) {
@@ -1775,9 +1776,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.checkTeleportPosition();
 
-        if (currentTick % 20 == 0) {
+        /*if (currentTick % 20 == 0) {
             this.checkInteractNearby();
-        }
+        }*/
 
         if (this.spawned && !this.dummyBossBars.isEmpty() && currentTick % 100 == 0) {
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
@@ -4263,7 +4264,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         MovePlayerPacket pk = new MovePlayerPacket();
         pk.eid = this.getId();
         pk.x = (float) x;
-        pk.y = (float) y + this.getEyeHeight();
+        pk.y = (float) y;
         pk.z = (float) z;
         pk.headYaw = (float) yaw;
         pk.pitch = (float) pitch;
@@ -5071,8 +5072,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (toRepair instanceof ItemTool || toRepair instanceof ItemArmor) {
                         if (toRepair.getDamage() > 0) {
                             int dmg = toRepair.getDamage() - 2;
-                            if (dmg < 0)
+                            if (dmg < 0) {
                                 dmg = 0;
+                            }
                             toRepair.setDamage(dmg);
                             inventory.setItem(itemToRepair, toRepair);
                             return true;
