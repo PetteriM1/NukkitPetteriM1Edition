@@ -35,11 +35,6 @@ public class EntityBlaze extends EntityFlyingMob {
     }
 
     @Override
-    public float getGravity() {
-        return 0.04f;
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
 

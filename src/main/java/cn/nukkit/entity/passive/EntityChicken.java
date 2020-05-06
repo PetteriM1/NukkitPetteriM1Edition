@@ -53,7 +53,7 @@ public class EntityChicken extends EntityWalkingAnimal {
 
     @Override
     public float getGravity() {
-        return 0.02f;
+        return 0.08f; //Should be lower but that breaks jumping
     }
 
     @Override

@@ -2520,6 +2520,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.scheduleUpdate();
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
+                            this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
                             break packetswitch;
                         case PlayerActionPacket.ACTION_START_SPRINT:
                             PlayerToggleSprintEvent playerToggleSprintEvent = new PlayerToggleSprintEvent(this, true);
