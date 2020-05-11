@@ -236,7 +236,6 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError("Unable to write block palette 389", e);
         }
-        GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
@@ -266,9 +265,9 @@ public class GlobalBlockPalette {
             case 361:
                 return legacyToRuntimeId361.get(legacyId);
             case 388:
-            case 390:
                 return legacyToRuntimeId388.get(legacyId);
-            default: // Current protocol
+            case 389:
+            case 390:
                 int id389 = legacyToRuntimeId389.get(legacyId);
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
@@ -277,6 +276,8 @@ public class GlobalBlockPalette {
                     }
                 }
                 return id389;
+            default:
+                throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }
     }
 
@@ -335,9 +336,9 @@ public class GlobalBlockPalette {
             case 361:
                 return compiledTable361;
             case 388:
-            case 390:
                 return compiledTable388;
             case 389:
+            case 390:
                 return compiledTable389;
             default:
                 throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);

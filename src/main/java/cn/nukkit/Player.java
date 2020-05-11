@@ -4898,6 +4898,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.checkMovement = checkMovement;
     }
 
+    /**
+     * @return player movement checks enabled
+     */
+    public boolean isCheckingMovement() {
+        return this.checkMovement;
+    }
 
     /**
      * Set locale

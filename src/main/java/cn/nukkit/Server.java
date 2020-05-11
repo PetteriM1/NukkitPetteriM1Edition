@@ -27,6 +27,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.biome.EnumBiome;
@@ -358,6 +359,7 @@ public class Server {
         Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
+        GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
 
         this.serverID = UUID.randomUUID();
 

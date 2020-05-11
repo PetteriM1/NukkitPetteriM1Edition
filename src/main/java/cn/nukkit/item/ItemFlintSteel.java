@@ -33,7 +33,7 @@ public class ItemFlintSteel extends ItemTool {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        if (block.getId() == AIR && (target instanceof BlockSolid || target instanceof BlockSolidMeta)) {
+        if (block.getId() == AIR && (target instanceof BlockSolid || target instanceof BlockSolidMeta || target instanceof BlockLeaves)) {
             if (target.getId() == OBSIDIAN) {
                 if (level.createPortal(target, false)) {
                     return true;
