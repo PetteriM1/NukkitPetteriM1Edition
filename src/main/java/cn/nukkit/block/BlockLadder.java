@@ -120,7 +120,7 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent() || target instanceof BlockGlass) {
+        if (!target.isTransparent()) {
             if (face.getIndex() >= 2 && face.getIndex() <= 5) {
                 this.setDamage(face.getIndex());
                 this.getLevel().setBlock(block, this, true, true);
@@ -133,8 +133,7 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            Block b = this.getSide(BlockFace.fromIndex(faces[this.getDamage()]));
-            if (!b.isSolid() && !(b instanceof BlockGlass)) {
+            if (!this.getSide(BlockFace.fromIndex(faces[this.getDamage()])).isSolid()) {
                 this.getLevel().useBreakOn(this);
                 return Level.BLOCK_UPDATE_NORMAL;
             }
