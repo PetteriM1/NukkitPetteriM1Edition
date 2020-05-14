@@ -2,6 +2,7 @@ package cn.nukkit.level.particle;
 
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * @author MagicDroidX
@@ -93,4 +94,18 @@ public abstract class Particle extends Vector3 {
     }
 
     abstract public DataPacket[] encode();
+
+    public static int getMultiversionId(int protocol, int particle) {
+        if (protocol == ProtocolInfo.v1_13_0) {
+            if (particle > TYPE_DRIP_LAVA) {
+                return particle - 1;
+            } else {
+                return particle;
+            }
+        } else {
+            return particle;
+        }
+    }
+
+    public abstract DataPacket mvEncode(int protocol);
 }

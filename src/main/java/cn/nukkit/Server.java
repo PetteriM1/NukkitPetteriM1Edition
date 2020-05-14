@@ -28,6 +28,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.biome.EnumBiome;
@@ -374,6 +375,7 @@ public class Server {
         Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
+        GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
 
         // Convert legacy data before plugins get the chance to mess with it
         try {
@@ -1141,7 +1143,7 @@ public class Server {
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
 
-            this.network.resetStatistics();
+            //this.network.resetStatistics(); // Unnecessary since addStatistics is not used in the new raknet
             this.maxTick = 20;
             this.maxUse = 0;
 

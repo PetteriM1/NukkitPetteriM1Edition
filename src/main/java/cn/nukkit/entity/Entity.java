@@ -138,6 +138,11 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_PUFFERFISH_SIZE = 85;
     public static final int DATA_FLAGS_EXTENDED = 91, DATA_FLAGS2 = DATA_FLAGS_EXTENDED; //long (extended data flags)
     public static final int DATA_SKIN_ID = 103; // int ???
+    public static final int DATA_COMMAND_BLOCK_TICK_DELAY = 105; //int
+    public static final int DATA_COMMAND_BLOCK_EXECUTE_ON_FIRST_TICK = 106; //byte
+    public static final int DATA_AMBIENT_SOUND_INTERVAL_MIN = 107; //float
+    public static final int DATA_AMBIENT_SOUND_INTERVAL_RANGE = 108; //float
+    public static final int DATA_AMBIENT_SOUND_EVENT = 109; //string
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -200,6 +205,29 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_BRIBED = 57;
     public static final int DATA_FLAG_PREGNANT = 58;
     public static final int DATA_FLAG_LAYING_EGG = 59;
+    public static final int DATA_FLAG_RIDER_CAN_PICK = 60;
+    public static final int DATA_FLAG_TRANSITION_SITTING = 61;
+    public static final int DATA_FLAG_EATING = 62;
+    public static final int DATA_FLAG_LAYING_DOWN = 63;
+    public static final int DATA_FLAG_SNEEZING = 64;
+    public static final int DATA_FLAG_TRUSTING = 65;
+    public static final int DATA_FLAG_ROLLING = 66;
+    public static final int DATA_FLAG_SCARED = 67;
+    public static final int DATA_FLAG_IN_SCAFFOLDING = 68;
+    public static final int DATA_FLAG_OVER_SCAFFOLDING = 69;
+    public static final int DATA_FLAG_FALL_THROUGH_SCAFFOLDING = 70;
+    public static final int DATA_FLAG_BLOCKING = 71;
+    public static final int DATA_FLAG_DISABLE_BLOCKING = 72;
+    public static final int DATA_FLAG_SLEEPING = 75;
+    public static final int DATA_FLAG_TRADE_INTEREST = 77;
+    public static final int DATA_FLAG_DOOR_BREAKER = 78;
+    public static final int DATA_FLAG_BREAKING_OBSTRUCTION = 79;
+    public static final int DATA_FLAG_DOOR_OPENER = 80;
+    public static final int DATA_FLAG_ILLAGER_CAPTAIN = 81;
+    public static final int DATA_FLAG_STUNNED = 82;
+    public static final int DATA_FLAG_ROARING = 83;
+    public static final int DATA_FLAG_DELAYED_ATTACKING = 84;
+    public static final int DATA_FLAG_AVOIDING_MOBS = 85;
 
     public static long entityCount = 1;
 
@@ -1239,9 +1267,9 @@ public abstract class Entity extends Location implements Metadatable {
             Timings.entityBaseTickTimer.stopTiming();
             return false;
         }
-        if (riding != null && !riding.isAlive() && riding instanceof EntityRideable) {
+        /*if (riding != null && !riding.isAlive() && riding instanceof EntityRideable) {
             ((EntityRideable) riding).mountEntity(this);
-        }
+        }*/
 
         updatePassengers();
 

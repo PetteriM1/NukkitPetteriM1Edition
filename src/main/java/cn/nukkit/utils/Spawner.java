@@ -5,6 +5,8 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.passive.EntityCod;
+import cn.nukkit.entity.passive.EntitySalmon;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -80,7 +82,7 @@ public class Spawner implements Runnable {
                     count++;
                 }
             }
-            return count < 2;
+            return count < ((networkId == EntitySalmon.NETWORK_ID || networkId == EntityCod.NETWORK_ID) ? 4 : 2);
         } catch (Exception e) {
             return false;
         }

@@ -166,4 +166,9 @@ public class FloatingTextParticle extends Particle {
 
         return packets.toArray(new DataPacket[0]);
     }
+
+    @Override
+    public DataPacket mvEncode(int protocol) {
+        throw new UnsupportedOperationException("Unable to perform mvEncode for a FloatingTextParticle");
+    }
 }

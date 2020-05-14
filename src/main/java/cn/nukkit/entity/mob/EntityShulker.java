@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityShulkerBullet;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -60,6 +61,11 @@ public class EntityShulker extends EntityWalkingMob {
         double pitch = this.pitch + Utils.rand(-7.0, 7.0);
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+
+        if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
+            return;
+        }
+
             Entity k = Entity.createEntity("ShulkerBullet", pos, this);
             if (!(k instanceof EntityShulkerBullet)) {
                 return;

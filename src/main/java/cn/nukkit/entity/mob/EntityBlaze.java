@@ -1,5 +1,6 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.projectile.EntityBlazeFireBall;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -35,11 +36,6 @@ public class EntityBlaze extends EntityFlyingMob {
     }
 
     @Override
-    public float getGravity() {
-        return 0.04f;
-    }
-
-    @Override
     public void initEntity() {
         super.initEntity();
 
@@ -57,6 +53,11 @@ public class EntityBlaze extends EntityFlyingMob {
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+
+            if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
+                return;
+            }
+
             EntityBlazeFireBall fireball = (EntityBlazeFireBall) Entity.createEntity("BlazeFireBall", pos, this);
 
             fireball.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,

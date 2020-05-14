@@ -2,7 +2,10 @@ package cn.nukkit.level;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockGrass;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
@@ -38,6 +41,7 @@ import cn.nukkit.level.generator.task.GenerationTask;
 import cn.nukkit.level.generator.task.LightPopulationTask;
 import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
+import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
@@ -561,6 +565,44 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addParticle(Particle particle, Player[] players) {
+        if (!(particle instanceof FloatingTextParticle)) {
+            // Check for multiversion players and send correct particles for them
+            int x = 0;
+            boolean mv = false;
+            if (players == null) {
+                /*Collection<Player> pl = getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values();
+                for (Player p : pl) {
+                    if (x == 0) {
+                        x = p.protocol;
+                    } else if (x != p.protocol) {
+                        mv = true;
+                        break;
+                    }
+                }
+                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
+                    for (Player mvPlayer : pl) {
+                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
+                    }
+                    return;
+                }*/
+            } else {
+                for (Player p : players) {
+                    if (x == 0) {
+                        x = p.protocol;
+                    } else if (x != p.protocol) {
+                        mv = true;
+                        break;
+                    }
+                }
+                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
+                    for (Player mvPlayer : players) {
+                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
+                    }
+                    return;
+                }
+            }
+        }
+
         DataPacket[] packets = particle.encode();
 
         if (players == null) {
@@ -3571,6 +3613,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.yaw = (float) yaw;
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
+        pk.onGround = entity.onGround;
         pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         Server.broadcastPacket(entity.getViewers().values(), pk);
