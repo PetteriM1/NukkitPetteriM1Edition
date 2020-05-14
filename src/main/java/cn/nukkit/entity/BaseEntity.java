@@ -29,7 +29,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
-    protected byte attackDelay = 0;
+    protected int attackDelay = 0;
     private short inLoveTicks = 0;
 
     private boolean baby = false;
@@ -147,7 +147,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return true;
         }
 
-        if (this instanceof EntityMob && this.attackDelay < Byte.MAX_VALUE) {
+        if (this instanceof EntityMob && this.attackDelay < 200) {
             this.attackDelay++;
         }
 

@@ -244,7 +244,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean formOpen;
     public boolean initialized;
     private boolean foodEnabled = true;
-    private byte failedTransactions;
+    private int failedTransactions;
 
     private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET);
 

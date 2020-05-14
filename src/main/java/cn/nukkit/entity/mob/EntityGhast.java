@@ -1,6 +1,7 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.projectile.EntityGhastFireBall;
@@ -71,6 +72,10 @@ public class EntityGhast extends EntityFlyingMob {
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
             Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+
+            if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
+                return;
+            }
 
             EntityGhastFireBall fireball = (EntityGhastFireBall) Entity.createEntity("GhastFireBall", pos, this);
             fireball.setExplode(true);
