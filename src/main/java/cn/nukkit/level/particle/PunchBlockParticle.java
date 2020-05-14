@@ -10,7 +10,9 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class PunchBlockParticle extends Particle {
 
-    protected final int data;
+    protected final int blockId;
+    protected final int blockDamage;
+    protected final int index;
 
     public PunchBlockParticle(Vector3 pos, Block block, BlockFace face) {
         this(pos, block.getId(), block.getDamage(), face);
@@ -18,7 +20,9 @@ public class PunchBlockParticle extends Particle {
 
     public PunchBlockParticle(Vector3 pos, int blockId, int blockDamage, BlockFace face) {
         super(pos.x, pos.y, pos.z);
-        this.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, blockId, blockDamage) | (face.getIndex() << 24);
+        this.blockId = blockId;
+        this.blockDamage = blockDamage;
+        this.index = face.getIndex() << 24;
     }
 
     @Override
@@ -28,8 +32,20 @@ public class PunchBlockParticle extends Particle {
         pk.x = (float) this.x;
         pk.y = (float) this.y;
         pk.z = (float) this.z;
-        pk.data = this.data;
+        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, blockId, blockDamage) | index;
 
         return new DataPacket[]{pk};
+    }
+
+    @Override
+    public DataPacket mvEncode(int protocol) {
+        LevelEventPacket pk = new LevelEventPacket();
+        pk.evid = LevelEventPacket.EVENT_PARTICLE_PUNCH_BLOCK;
+        pk.x = (float) this.x;
+        pk.y = (float) this.y;
+        pk.z = (float) this.z;
+        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
+
+        return pk;
     }
 }

@@ -13,11 +13,11 @@ import cn.nukkit.network.protocol.ProtocolInfo;
  */
 public class DestroyBlockParticle extends Particle {
 
-    protected final int data;
+    protected final Block block;
 
     public DestroyBlockParticle(Vector3 pos, Block block) {
         super(pos.x, pos.y, pos.z);
-        this.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, block.getId(), block.getDamage());
+        this.block = block;
     }
 
     @Override
@@ -27,8 +27,20 @@ public class DestroyBlockParticle extends Particle {
         pk.x = (float) this.x;
         pk.y = (float) this.y;
         pk.z = (float) this.z;
-        pk.data = this.data;
+        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, block.getId(), block.getDamage());
 
         return new DataPacket[]{pk};
+    }
+
+    @Override
+    public DataPacket mvEncode(int protocol) {
+        LevelEventPacket pk = new LevelEventPacket();
+        pk.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
+        pk.x = (float) this.x;
+        pk.y = (float) this.y;
+        pk.z = (float) this.z;
+        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
+
+        return pk;
     }
 }
