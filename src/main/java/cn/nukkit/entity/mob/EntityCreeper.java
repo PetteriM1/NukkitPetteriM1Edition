@@ -106,8 +106,8 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         }
 
         if (this.isKnockback()) {
-            this.move(this.motionX * tickDiff, this.motionY, this.motionZ * tickDiff);
-            this.motionY -= this.getGravity() * tickDiff;
+            this.move(this.motionX, this.motionY, this.motionZ);
+            this.motionY -= this.getGravity();
             this.updateMovement();
             return true;
         }
@@ -146,19 +146,19 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
             if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
         }
 
-        double dx = this.motionX * tickDiff;
-        double dz = this.motionZ * tickDiff;
+        double dx = this.motionX;
+        double dz = this.motionZ;
         boolean isJump = this.checkJump(dx, dz);
         if (this.stayTime > 0) {
             this.stayTime -= tickDiff;
-            this.move(0, this.motionY * tickDiff, 0);
+            this.move(0, this.motionY, 0);
         } else {
             Vector2 be = new Vector2(this.x + dx, this.z + dz);
-            this.move(dx, this.motionY * tickDiff, dz);
+            this.move(dx, this.motionY, dz);
             Vector2 af = new Vector2(this.x, this.z);
 
             if ((be.x != af.x || be.y != af.y) && !isJump) {
-                this.moveTime -= 90 * tickDiff;
+                this.moveTime -= 90;
             }
         }
 
@@ -171,7 +171,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
                     this.motionY -= this.getGravity();
                 }
             } else {
-                this.motionY -= this.getGravity() * tickDiff;
+                this.motionY -= this.getGravity();
             }
         }
         this.updateMovement();

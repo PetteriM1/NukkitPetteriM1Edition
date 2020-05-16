@@ -94,7 +94,7 @@ public abstract class EntityFlying extends BaseEntity {
             }
 
             if (this.isKnockback()) {
-                this.move(this.motionX * tickDiff, this.motionY * tickDiff, this.motionZ * tickDiff);
+                this.move(this.motionX, this.motionY, this.motionZ);
                 this.updateMovement();
                 return null;
             }
@@ -135,9 +135,9 @@ public abstract class EntityFlying extends BaseEntity {
                 if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
             }
 
-            double dx = this.motionX * tickDiff;
-            double dy = this.motionY * tickDiff;
-            double dz = this.motionZ * tickDiff;
+            double dx = this.motionX;
+            double dy = this.motionY;
+            double dz = this.motionZ;
             Vector3 target = this.target;
             if (this.stayTime > 0) {
                 this.stayTime -= tickDiff;
@@ -148,7 +148,7 @@ public abstract class EntityFlying extends BaseEntity {
                 Vector2 af = new Vector2(this.x, this.z);
 
                 if (be.x != af.x || be.y != af.y) {
-                    this.moveTime -= 90 * tickDiff;
+                    this.moveTime -= 90;
                 }
             }
 
