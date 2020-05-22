@@ -81,8 +81,8 @@ public abstract class EntitySwimming extends BaseEntity {
             }
 
             if (this.isKnockback()) {
-                this.move(this.motionX * tickDiff, this.motionY, this.motionZ * tickDiff);
-                this.motionY -= this.getGravity() * tickDiff;
+                this.move(this.motionX, this.motionY, this.motionZ);
+                this.motionY -= this.getGravity();
                 this.updateMovement();
                 return null;
             }
@@ -120,8 +120,8 @@ public abstract class EntitySwimming extends BaseEntity {
                 if (this.stayTime <= 0 || Utils.rand()) if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
             }
 
-            double dx = this.motionX * tickDiff;
-            double dz = this.motionZ * tickDiff;
+            double dx = this.motionX;
+            double dz = this.motionZ;
 
             if (this.isInsideOfWater() && (this.motionX > 0 || this.motionZ > 0)) {
                 this.motionY = Utils.rand(-0.12, 0.12);
@@ -133,14 +133,14 @@ public abstract class EntitySwimming extends BaseEntity {
 
             if (this.stayTime > 0) {
                 this.stayTime -= tickDiff;
-                this.move(0, this.motionY * tickDiff, 0);
+                this.move(0, this.motionY, 0);
             } else {
                 Vector2 be = new Vector2(this.x + dx, this.z + dz);
-                this.move(dx, this.motionY * tickDiff, dz);
+                this.move(dx, this.motionY, dz);
                 Vector2 af = new Vector2(this.x, this.z);
 
                 if (be.x != af.x || be.y != af.y) {
-                    this.moveTime -= 90 * tickDiff;
+                    this.moveTime -= 90;
                 }
             }
 

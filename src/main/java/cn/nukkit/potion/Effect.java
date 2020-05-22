@@ -248,10 +248,11 @@ public class Effect implements Cloneable {
             player.dataPacket(pk);
 
             if (this.id == Effect.SPEED) {
-                if (oldEffect != null) {
+                /*if (oldEffect != null) {
                     player.setMovementSpeed(player.getMovementSpeed() / (1 + 0.2f * (oldEffect.amplifier + 1)), false);
                 }
-                player.setMovementSpeed(player.getMovementSpeed() * (1 + 0.2f * (this.amplifier + 1)));
+                player.setMovementSpeed(player.getMovementSpeed() * (1 + 0.2f * (this.amplifier + 1)));*/
+                player.setMovementSpeed(0.1f * (1 + 0.2f * (this.amplifier + 1))); //HACK: Fix beacon exploit
             }
 
             if (this.id == Effect.SLOWNESS) {
