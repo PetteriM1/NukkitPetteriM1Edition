@@ -1082,7 +1082,9 @@ public class Server {
             return;
         }
 
-        Timings.fullServerTickTimer.startTiming();
+        if (Timings.isTimingsEnabled()) {
+            Timings.fullServerTickTimer.startTiming();
+        }
 
         ++this.tickCounter;
 
@@ -1136,7 +1138,10 @@ public class Server {
             }
         }
 
-        Timings.fullServerTickTimer.stopTiming();
+        if (Timings.isTimingsEnabled()) {
+            Timings.fullServerTickTimer.stopTiming();
+        }
+
         long nowNano = System.nanoTime();
 
         float tick = (float) Math.min(20, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
