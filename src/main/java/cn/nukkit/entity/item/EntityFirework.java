@@ -92,7 +92,7 @@ public class EntityFirework extends Entity {
 
                 level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LARGE_BLAST, -1, NETWORK_ID);
 
-                this.close();
+                this.kill(); // Using close() here would remove the firework before the explosion is displayed
 
                 hasUpdate = true;
             }
