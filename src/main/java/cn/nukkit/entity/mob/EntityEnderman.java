@@ -20,7 +20,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 38;
 
-    private boolean angry = false;
+    private int angry = 0;
 
     public EntityEnderman(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -43,7 +43,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
     @Override
     public double getSpeed() {
-        return 1.21;
+        return this.isAngry() ? 1.4 : 1.21;
     }
 
     @Override
@@ -82,14 +82,14 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (!ev.isCancelled()) {
             if (ev.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-                if (!angry) {
-                    setAngry(true);
+                if (!isAngry()) {
+                    setAngry(2400);
                 }
             }
 
             if (ev.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
-                if (!angry) {
-                    setAngry(true);
+                if (!isAngry()) {
+                    setAngry(2400);
                 }
                 ev.setCancelled(true);
                 tp();
@@ -120,8 +120,8 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockWater) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            if (angry) {
-                setAngry(false);
+            if (isAngry()) {
+                setAngry(0);
             }
             tp();
         } else if (this.getLevel().isRaining() && this.getLevel().canBlockSeeSky(this) && Utils.rand(1, 5) == 1) {
@@ -133,10 +133,14 @@ public class EntityEnderman extends EntityWalkingMob {
 
         if (this.age % 20 == 0 && this.level.isRaining() && this.level.canBlockSeeSky(this)) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
-            if (angry) {
-                setAngry(false);
+            if (isAngry()) {
+                setAngry(0);
             }
             tp();
+        }
+
+        if (this.angry > 0) {
+            this.angry--;
         }
 
         return super.entityBaseTick(tickDiff);
@@ -158,23 +162,23 @@ public class EntityEnderman extends EntityWalkingMob {
     }
 
     public boolean isAngry() {
-        return angry;
+        return this.angry > 0;
     }
 
-    public void setAngry(boolean bool) {
-        this.angry = bool;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, bool);
+    public void setAngry(int val) {
+        this.angry = val;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, val > 0);
     }
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
-        if (!angry) return false;
+        if (!isAngry()) return false;
         return super.targetOption(creature, distance);
     }
 
     public void stareToAngry() {
-        if (!angry) {
-            setAngry(true);
+        if (!isAngry()) {
+            setAngry(2400);
         }
     }
 }

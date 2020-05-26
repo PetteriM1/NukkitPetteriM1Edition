@@ -1286,7 +1286,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Override
     public Item[] getDrops() {
         if (!this.isCreative() && !this.isSpectator()) {
-            return super.getDrops();
+            if (this.inventory != null) {
+                List<Item> drops = new ArrayList<>(this.inventory.getContents().values());
+                drops.addAll(this.offhandInventory.getContents().values());
+                drops.addAll(this.playerUIInventory.getContents().values());
+                return drops.toArray(new Item[0]);
+            }
+            return new Item[0];
         }
 
         return new Item[0];
@@ -4014,8 +4020,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (this.inventory != null) {
                     this.inventory.clearAll();
                 }
-                if (this.offhandInventory != null) {
-                    this.offhandInventory.clearAll();
+
+                // Offhand inventory is already cleared in inventory.clearAll()
+
+                if (this.playerUIInventory != null) {
+                    this.playerUIInventory.clearAll();
                 }
             }
 

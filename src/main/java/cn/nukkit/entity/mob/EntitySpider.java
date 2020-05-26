@@ -112,7 +112,7 @@ public class EntitySpider extends EntityWalkingMob implements EntityArthropod {
 
         if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
             if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
-                this.setAngry(1000);
+                this.setAngry(2400);
             }
         }
 
@@ -165,7 +165,7 @@ public class EntitySpider extends EntityWalkingMob implements EntityArthropod {
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
         if (distance <= 100 && this.isAngry() && creature instanceof EntitySpider && !((EntitySpider) creature).isAngry()) {
-            ((EntitySpider) creature).setAngry(1000);
+            ((EntitySpider) creature).setAngry(2400);
         }
         return this.isAngry() && super.targetOption(creature, distance);
     }
