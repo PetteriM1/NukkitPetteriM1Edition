@@ -35,7 +35,7 @@ public class EntityDolphin extends EntityWaterAnimal {
 
     @Override
     public double getSpeed() {
-        return 1.1;
+        return 1.2;
     }
 
     @Override

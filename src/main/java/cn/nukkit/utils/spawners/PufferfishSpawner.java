@@ -2,7 +2,6 @@ package cn.nukkit.utils.spawners;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.passive.EntityPufferfish;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
