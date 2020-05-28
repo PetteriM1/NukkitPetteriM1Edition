@@ -24,7 +24,8 @@ public class SalmonSpawner extends AbstractEntitySpawner {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (level.isNether || level.isEnd) {
         } else {
-            if (level.getBlock(pos.add(0, -1, 0)) instanceof BlockWater) {
+            int b = level.getBlockIdAt((int) pos.x, (int) (pos.y -1), (int) pos.z);
+            if (b == Block.WATER || b == Block.STILL_WATER) {
                 this.spawnTask.createEntity("Salmon", pos.add(0, -1, 0));
             }
         }

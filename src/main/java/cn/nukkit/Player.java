@@ -4182,7 +4182,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             source.setCancelled();
             return false;
         } else if (source.getCause() == DamageCause.FALL) {
-            if (this.getLevel().getBlock(this.getPosition().floor().add(0.5, -1, 0.5)).getId() == Block.SLIME_BLOCK) {
+            Position pos = this.getPosition().floor().add(0.5, -1, 0.5);
+            if (this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.SLIME_BLOCK) {
                 if (!this.isSneaking()) {
                     source.setCancelled();
                     this.resetFallDistance();
