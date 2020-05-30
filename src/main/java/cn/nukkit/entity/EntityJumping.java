@@ -1,5 +1,6 @@
 package cn.nukkit.entity;
 
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.level.format.FullChunk;
@@ -80,9 +81,11 @@ public abstract class EntityJumping extends BaseEntity {
 
     protected boolean checkJump() {
         if (this.motionY == this.getGravity() * 2) {
-            return this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z))) instanceof BlockLiquid;
+            int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
+            return b == BlockID.WATER || b == BlockID.STILL_WATER;
         } else {
-            if (this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z))) instanceof BlockLiquid) {
+            int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+            if (b == BlockID.WATER || b == BlockID.STILL_WATER) {
                 this.motionY = this.getGravity() * 2;
                 return true;
             }

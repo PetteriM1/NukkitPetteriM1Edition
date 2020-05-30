@@ -1286,7 +1286,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Override
     public Item[] getDrops() {
         if (!this.isCreative() && !this.isSpectator()) {
-            return super.getDrops();
+            if (this.inventory != null) {
+                List<Item> drops = new ArrayList<>(this.inventory.getContents().values());
+                drops.addAll(this.offhandInventory.getContents().values());
+                drops.addAll(this.playerUIInventory.getContents().values());
+                return drops.toArray(new Item[0]);
+            }
+            return new Item[0];
         }
 
         return new Item[0];
@@ -4040,8 +4046,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (this.inventory != null) {
                     this.inventory.clearAll();
                 }
-                if (this.offhandInventory != null) {
-                    this.offhandInventory.clearAll();
+
+                // Offhand inventory is already cleared in inventory.clearAll()
+
+                if (this.playerUIInventory != null) {
+                    this.playerUIInventory.clearAll();
                 }
             }
 
@@ -4199,7 +4208,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             source.setCancelled();
             return false;
         } else if (source.getCause() == DamageCause.FALL) {
-            if (this.getLevel().getBlock(this.getPosition().floor().add(0.5, -1, 0.5)).getId() == Block.SLIME_BLOCK) {
+            Position pos = this.getPosition().floor().add(0.5, -1, 0.5);
+            if (this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.SLIME_BLOCK) {
                 if (!this.isSneaking()) {
                     source.setCancelled();
                     this.resetFallDistance();

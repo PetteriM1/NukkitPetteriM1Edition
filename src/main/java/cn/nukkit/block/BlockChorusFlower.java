@@ -1,5 +1,7 @@
 package cn.nukkit.block;
 
+import cn.nukkit.item.Item;
+
 public class BlockChorusFlower extends BlockChorusPlant {
 
     @Override
@@ -10,5 +12,10 @@ public class BlockChorusFlower extends BlockChorusPlant {
     @Override
     public String getName() {
         return "Chorus Flower";
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{this.toItem()};
     }
 }

@@ -26,25 +26,28 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     }
 
     private void spawnTo(Player player) {
-        Position pos = player.getPosition();
         Level level = player.getLevel();
 
         if (Spawner.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
+            Position pos = player.getPosition();
+
             if (pos != null) {
                 pos.x += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
                 pos.z += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
-                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return;
-                pos.y = Spawner.getSafeYCoord(level, pos);
-            } else {
-                return;
-            }
-        } else {
-            return;
-        }
 
-		try {
-        	spawn(player, pos, level);
-		} catch (Exception ignored) {}
+                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) {
+                    return;
+                }
+
+                pos.y = Spawner.getSafeYCoord(level, pos);
+
+                if (!level.isInSpawnRadius(pos)) { // Do not spawn mobs in the world spawn area
+                    try {
+                        spawn(player, pos, level);
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
     }
 
     private static boolean isSpawnAllowedByDifficulty() {

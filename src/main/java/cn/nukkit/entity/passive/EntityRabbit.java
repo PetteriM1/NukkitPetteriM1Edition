@@ -5,8 +5,6 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.PunchBlockParticle;
-import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 import java.util.ArrayList;
@@ -81,14 +79,5 @@ public class EntityRabbit extends EntityJumpingAnimal {
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
-    }
-    
-    @Override
-    public boolean onUpdate(int currentTick) {
-        boolean hasUpdate = super.onUpdate(currentTick);
-        try {
-            if (this.isOnGround()) this.level.addParticle(new PunchBlockParticle(this, this.level.getBlock((int) x, (int) y - 1, (int) z), BlockFace.UP));
-        } catch (Exception ignored) {}
-        return hasUpdate;
     }
 }
