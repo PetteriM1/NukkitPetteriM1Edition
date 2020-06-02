@@ -1140,6 +1140,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    public Vector3 getSleepingPos() {
+        return this.sleeping;
+    }
+
     public boolean awardAchievement(String achievementId) {
         if (!Server.getInstance().achievements) {
             return false;
