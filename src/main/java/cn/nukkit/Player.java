@@ -3095,7 +3095,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             Item oldItem = i.clone();
                                             if ((i = this.level.useItemOn(blockVector.asVector3(), i, face, useItemData.clickPos.x, useItemData.clickPos.y, useItemData.clickPos.z, this)) != null) {
                                                 if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
-                                                    inventory.setItemInHand(i);
+                                                    if (oldItem.getId() == i.getId() || i.getId() == 0) {
+                                                        inventory.setItemInHand(i);
+                                                    } else {
+                                                        server.getLogger().debug("Tried to set item " + i.getId() + " but " + this.username + " had item " + oldItem.getId() + " in their hand slot");
+                                                    }
                                                     inventory.sendHeldItem(this.getViewers().values());
                                                 }
                                                 break packetswitch;
@@ -3145,7 +3149,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         if (this.isSurvival() || this.isAdventure()) {
                                             this.foodData.updateFoodExpLevel(0.025);
                                             if (!i.equals(oldItem) || i.getCount() != oldItem.getCount()) {
-                                                inventory.setItemInHand(i);
+                                                if (oldItem.getId() == i.getId() || i.getId() == 0) {
+                                                    inventory.setItemInHand(i);
+                                                } else {
+                                                    server.getLogger().debug("Tried to set item " + i.getId() + " but " + this.username + " had item " + oldItem.getId() + " in their hand slot");
+                                                }
                                                 inventory.sendHeldItem(this.getViewers().values());
                                             }
                                         }
@@ -3188,7 +3196,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                     if (item.onClickAir(this, directionVector)) {
                                         if (this.isSurvival() || this.isAdventure()) {
-                                            this.inventory.setItemInHand(item);
+                                            if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
+                                                this.inventory.setItemInHand(item);
+                                            } else {
+                                                server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHand().getId() + " in their hand slot");
+                                            }
                                         }
 
                                         if (!this.isUsingItem()) {
@@ -3248,7 +3260,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             }
                                         }
 
-                                        this.inventory.setItemInHand(item);
+                                        if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
+                                            this.inventory.setItemInHand(item);
+                                        } else {
+                                            server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHand().getId() + " in their hand slot");
+                                        }
                                     }
                                     break;
                                 case InventoryTransactionPacket.USE_ITEM_ON_ENTITY_ACTION_ATTACK:
@@ -3290,9 +3306,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                     if (item.isTool() && !this.isCreative()) {
                                         if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
-                                            this.inventory.setItemInHand(new ItemBlock(Block.get(BlockID.AIR)));
+                                            this.inventory.setItemInHand(Item.get(0));
                                         } else {
-                                            this.inventory.setItemInHand(item);
+                                            if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
+                                                this.inventory.setItemInHand(item);
+                                            } else {
+                                                server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHand().getId() + " in their hand slot");
+                                            }
                                         }
                                     }
                                     return;
@@ -3418,6 +3438,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     BookEditPacket bookEditPacket = (BookEditPacket) packet;
                     Item oldBook = this.inventory.getItem(bookEditPacket.inventorySlot);
                     if (oldBook.getId() != Item.BOOK_AND_QUILL) {
+                        return;
+                    }
+
+                    if (bookEditPacket.text.length() > 256) {
                         return;
                     }
 
