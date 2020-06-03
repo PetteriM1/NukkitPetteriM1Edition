@@ -163,33 +163,47 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onBreak(Item item) {
-        Block blockNorth = this.north(); //Gets the blocks around them
+        Block blockNorth = this.north();
         Block blockSouth = this.south();
         Block blockEast = this.east();
         Block blockWest = this.west();
 
-        if ((this.getDamage() & 0x08) == 0x08) { //This is the Top part of bed
-            if (blockNorth.getId() == BED_BLOCK && (blockNorth.getDamage() & 0x08) != 0x08) { //Checks if the block ID & meta are right
-                this.getLevel().setBlock(blockNorth, Block.get(BlockID.AIR), true, true);
+        Block secondPart = null;
+        if ((this.getDamage() & 0x08) == 0x08) { // Top part of the bed
+            if (blockNorth.getId() == BED_BLOCK && (blockNorth.getDamage() & 0x08) != 0x08) { // Check if the block ID & meta are right
+                secondPart = blockNorth;
             } else if (blockSouth.getId() == BED_BLOCK && (blockSouth.getDamage() & 0x08) != 0x08) {
-                this.getLevel().setBlock(blockSouth, Block.get(BlockID.AIR), true, true);
+                secondPart = blockSouth;
             } else if (blockEast.getId() == BED_BLOCK && (blockEast.getDamage() & 0x08) != 0x08) {
-                this.getLevel().setBlock(blockEast, Block.get(BlockID.AIR), true, true);
+                secondPart = blockEast;
             } else if (blockWest.getId() == BED_BLOCK && (blockWest.getDamage() & 0x08) != 0x08) {
-                this.getLevel().setBlock(blockWest, Block.get(BlockID.AIR), true, true);
+                secondPart = blockWest;
             }
-        } else { //Bottom Part of Bed
+        } else { // Bottom part of the bed
             if (blockNorth.getId() == BED_BLOCK && (blockNorth.getDamage() & 0x08) == 0x08) {
-                this.getLevel().setBlock(blockNorth, Block.get(BlockID.AIR), true, true);
+                secondPart = blockNorth;
             } else if (blockSouth.getId() == BED_BLOCK && (blockSouth.getDamage() & 0x08) == 0x08) {
-                this.getLevel().setBlock(blockSouth, Block.get(BlockID.AIR), true, true);
+                secondPart = blockSouth;
             } else if (blockEast.getId() == BED_BLOCK && (blockEast.getDamage() & 0x08) == 0x08) {
-                this.getLevel().setBlock(blockEast, Block.get(BlockID.AIR), true, true);
+                secondPart = blockEast;
             } else if (blockWest.getId() == BED_BLOCK && (blockWest.getDamage() & 0x08) == 0x08) {
-                this.getLevel().setBlock(blockWest, Block.get(BlockID.AIR), true, true);
+                secondPart = blockWest;
             }
         }
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, false); // Do not update both parts to prevent duplication bug if there is two fallable blocks top of the bed
+
+        if (secondPart != null) {
+            this.getLevel().setBlock(secondPart, Block.get(BlockID.AIR), true, true);
+        }
+
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, false); // Don't update both parts to prevent duplication bug if there are two fallable blocks on top of the bed
+
+        for (Entity entity : this.level.getNearbyEntities(new AxisAlignedBB(this, this).grow(2, 1, 2))) {
+            if (!(entity instanceof Player)) continue;
+            Player player = (Player) entity;
+
+            if (!player.getSleepingPos().equals(this) && !player.getSleepingPos().equals(secondPart)) continue;
+            player.stopSleep();
+        }
 
         return true;
     }
