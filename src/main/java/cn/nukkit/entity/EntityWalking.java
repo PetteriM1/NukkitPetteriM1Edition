@@ -199,7 +199,8 @@ public abstract class EntityWalking extends BaseEntity {
                 if (this.onGround) {
                     this.motionY = 0;
                 } else if (this.motionY > -this.getGravity() * 4) {
-                    if (!(this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z))) instanceof BlockLiquid)) {
+                    int b = this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+                    if (b != Block.WATER && b != Block.STILL_WATER && b != Block.LAVA && b != Block.STILL_LAVA) {
                         this.motionY -= this.getGravity();
                     }
                 } else {

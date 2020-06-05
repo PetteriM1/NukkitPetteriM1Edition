@@ -1341,7 +1341,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z));
+                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z), false);
 
                         if (!block.canPassThrough() && block.collidesWithBB(realBB)) {
                             onGround = true;
@@ -1749,7 +1749,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
-                        int block = level.getBlock(this).getId();
+                        int block = level.getBlockIdAt((int) this.x, (int) this.y, (int) this.z);
                         if (block == Block.LADDER || block == Block.VINES || block == Block.COBWEB) {
                             this.resetFallDistance();
                         } else {
@@ -2684,7 +2684,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.BLOCK_PICK_REQUEST_PACKET:
                     BlockPickRequestPacket pickRequestPacket = (BlockPickRequestPacket) packet;
-                    Block block = this.level.getBlock(this.temporalVector.setComponents(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
+                    Block block = this.level.getBlock(this.temporalVector.setComponents(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z), false);
                     item = block.toItem();
                     if (pickRequestPacket.addUserData) {
                         BlockEntity blockEntity = this.getLevel().getBlockEntity(new Vector3(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
