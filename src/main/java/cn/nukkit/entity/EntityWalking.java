@@ -102,7 +102,7 @@ public abstract class EntityWalking extends BaseEntity {
 
         Block block = that.getSide(this.getHorizontalFacing());
         Block down = block.down();
-        if (down.isTransparent() && block.isTransparent() && down.down().isTransparent()) {
+        if (!down.isSolid() && !block.isSolid() && !down.down().isSolid()) {
             this.stayTime = 10; // "hack": try to make mobs not to be so suicidal
         } else if (!block.canPassThrough() && block.up().canPassThrough() && that.up(2).canPassThrough()) {
             if (block instanceof BlockFence || block instanceof BlockFenceGate) {
