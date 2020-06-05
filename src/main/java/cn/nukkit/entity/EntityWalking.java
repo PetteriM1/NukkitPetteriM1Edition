@@ -96,12 +96,15 @@ public abstract class EntityWalking extends BaseEntity {
         }
 
         Block that = this.getLevel().getBlock(new Vector3(NukkitMath.floorDouble(this.x + dx), (int) this.y, NukkitMath.floorDouble(this.z + dz)));
-        if (this.getDirection() == null) {
+        /*if (this.getDirection() == null) {
             return false;
-        }
+        }*/
 
         Block block = that.getSide(this.getHorizontalFacing());
-        if (!block.canPassThrough() && block.up().canPassThrough() && that.up(2).canPassThrough()) {
+        Block down = block.down();
+        if (down.isTransparent() && block.isTransparent() && down.down().isTransparent()) {
+            this.stayTime = 10; // "hack": try to make mobs not to be so suicidal
+        } else if (!block.canPassThrough() && block.up().canPassThrough() && that.up(2).canPassThrough()) {
             if (block instanceof BlockFence || block instanceof BlockFenceGate) {
                 this.motionY = this.getGravity();
             } else if (this.motionY <= this.getGravity() * 4) {
