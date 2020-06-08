@@ -293,16 +293,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             // Check collisions with blocks
             if (this instanceof Player) {
                 if (this.age % 5 == 0) {
-                    Block block = this.level.getBlock(getFloorX(), getFloorY() - 1, getFloorZ());
-                    int id = block.getId();
-                    if (id == Block.MAGMA || id == Block.CACTUS) {
-                        block.onEntityCollide(this);
+                    int block = this.level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                    if (block == Block.MAGMA || block == Block.CACTUS) {
+                        Block.get(Block.MAGMA).onEntityCollide(this);
                     }
-                    if (id == Block.MAGMA && this.isInsideOfWater()) {
+                    if (block == Block.MAGMA && this.isInsideOfWater()) {
                         this.level.addParticle(new BubbleParticle(this));
                         this.setMotion(this.getMotion().add(0, -0.3, 0));
                     }
-                    if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
+                    if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
                         this.level.addParticle(new BubbleParticle(this));
                         this.setMotion(this.getMotion().add(0, 0.3, 0));
                     }

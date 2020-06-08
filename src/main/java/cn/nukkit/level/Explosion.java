@@ -175,6 +175,9 @@ public class Explosion {
         for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(Utils.rand(10, 30), this.what instanceof Entity ? (Entity) this.what : null);
+            } else if (block.getId() == Block.BED_BLOCK && (block.getDamage() & 0x08) == 0x08) {
+                this.level.setBlockAt((int) block.x, (int) block.y, (int) block.z, Block.AIR);
+                continue; // We don't want drops from both bed parts
             } else if ((container = block.getLevel().getBlockEntity(block)) instanceof InventoryHolder) {
                 if (block.getLevel().getGameRules().getBoolean(GameRule.DO_TILE_DROPS)) {
                     if (container instanceof BlockEntityShulkerBox) {
