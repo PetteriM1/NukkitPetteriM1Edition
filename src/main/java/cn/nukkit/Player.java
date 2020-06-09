@@ -55,7 +55,6 @@ import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.ContainerIds;
@@ -199,7 +198,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected boolean checkMovement = true;
 
-    private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
+    //private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
+
+    private final List<DataPacket> batchedPackets = new ArrayList<>();
 
     private PermissibleBase perm;
 
@@ -747,9 +748,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.chunkZ = z;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
-        pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
+        //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
-        this.batchDataPacket(pk);
+        //this.batchDataPacket(pk);
+        this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
@@ -986,11 +988,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            if (!this.batchedPackets.containsKey(packet.getChannel())) {
+            /*if (!this.batchedPackets.containsKey(packet.getChannel())) {
                 this.batchedPackets.put(packet.getChannel(), new ArrayList<>());
             }
 
-            this.batchedPackets.get(packet.getChannel()).add(packet.clone());
+            this.batchedPackets.get(packet.getChannel()).add(packet.clone());*/
+            batchedPackets.add(packet.clone());
         }
         return true;
     }
@@ -1652,7 +1655,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.motionX = (float) motion.x;
                 pk.motionY = (float) motion.y;
                 pk.motionZ = (float) motion.z;
-                pk.setChannel(Network.CHANNEL_MOVEMENT);
+                //pk.setChannel(Network.CHANNEL_MOVEMENT);
                 this.dataPacket(pk);
             }
 
@@ -1863,12 +1866,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.batchedPackets.isEmpty()) {
             Player[] pArr = new Player[]{this};
-            for (Entry<Integer, List<DataPacket>> entry : this.batchedPackets.entrySet()) {
+            /*for (Entry<Integer, List<DataPacket>> entry : this.batchedPackets.entrySet()) {
                 List<DataPacket> packets = entry.getValue();
                 DataPacket[] arr = packets.toArray(new DataPacket[0]);
                 packets.clear();
                 this.server.batchPackets(pArr, arr, false);
-            }
+            }*/
+            this.server.batchPackets(pArr, batchedPackets.toArray(new DataPacket[0]), false);
             this.batchedPackets.clear();
         }
 
@@ -3590,7 +3594,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
-        pk.setChannel(Network.CHANNEL_TEXT);
+        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3621,7 +3625,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message, parameters);
         }
-        pk.setChannel(Network.CHANNEL_TEXT);
+        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3634,7 +3638,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.type = TextPacket.TYPE_CHAT;
         pk.source = source;
         pk.message = this.server.getLanguage().translateString(message);
-        pk.setChannel(Network.CHANNEL_TEXT);
+        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3642,7 +3646,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_POPUP;
         pk.message = message;
-        pk.setChannel(Network.CHANNEL_TEXT);
+        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3654,7 +3658,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
-        pk.setChannel(Network.CHANNEL_TEXT);
+        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -4302,7 +4306,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
-        pk.setChannel(Network.CHANNEL_MOVEMENT);
+        //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
@@ -4322,7 +4326,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
-        pk.setChannel(Network.CHANNEL_MOVEMENT);
+        //pk.setChannel(Network.CHANNEL_MOVEMENT);
         Server.broadcastPacket(targets, pk);
     }
 
@@ -4459,7 +4463,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 chunk.chunkX = chunkPositionX + x;
                 chunk.chunkZ = chunkPositionZ + z;
                 chunk.data = new byte[0];
-                chunk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
+                //chunk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
                 this.dataPacket(chunk);
             }
         }
@@ -4835,7 +4839,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
         pk.protocol = protocol;
-        pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
+        //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
         pk.encode();
 
         BatchPacket batch = new BatchPacket();

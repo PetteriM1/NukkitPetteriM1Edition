@@ -51,7 +51,6 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
@@ -257,6 +256,8 @@ public class Level implements ChunkManager, Metadatable {
 
     public GameRules gameRules;
 
+    private boolean randomTickingEnabled;
+
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
 
         this.levelId = levelIdCounter++;
@@ -317,6 +318,8 @@ public class Level implements ChunkManager, Metadatable {
 
         this.isNether = name.equals("nether");
         this.isEnd = name.equals("end");
+
+        this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
     }
 
     public static long chunkHash(int x, int z) {
@@ -1107,7 +1110,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
-            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
+            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             for (Player p : target) {
                 try {
@@ -1138,7 +1141,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = flags;
-            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
+            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
                 if (b instanceof Block) {
@@ -3614,7 +3617,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
         pk.onGround = entity.onGround;
-        pk.setChannel(Network.CHANNEL_MOVEMENT);
+        //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         Server.broadcastPacket(entity.getViewers().values(), pk);
     }
@@ -3838,7 +3841,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean randomTickingEnabled() {
-        return !Server.noTickingWorlds.contains(this.getName());
+        return this.randomTickingEnabled;
     }
 
     public boolean isAnimalSpawningAllowedByTime() {
