@@ -44,7 +44,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.CompressBatchedTask;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
@@ -624,40 +623,72 @@ public class Server {
             }
         }
 
-        Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload = new byte[(packets.length << 1)][];
-        int size = 0;
-        for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
-                p.encode();
-            }
-            byte[] buf = p.getBuffer();
-            int i2 = i << 1;
-            payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-            payload[i2 + 1] = buf;
-            packets[i] = null;
-            size += payload[i2].length;
-            size += payload[i2 + 1].length;
-        }
-
-        List<InetSocketAddress> targets = new ArrayList<>();
-        for (Player p : players) {
-            if (p.isConnected()) {
-                targets.add(p.getSocketAddress());
-            }
-        }
-
         if (!forceSync && this.networkCompressionAsync) {
-            this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            getScheduler().scheduleTask(null, () -> {
+                byte[][] payload = new byte[(packets.length << 1)][];
+                int size = 0;
+                for (int i = 0; i < packets.length; i++) {
+                    DataPacket p = packets[i];
+                    if (!p.isEncoded) {
+                        p.encode();
+                    }
+                    byte[] buf = p.getBuffer();
+                    int i2 = i << 1;
+                    payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                    payload[i2 + 1] = buf;
+                    packets[i] = null;
+                    size += payload[i2].length;
+                    size += payload[i2 + 1].length;
+                }
+
+                List<InetSocketAddress> targets = new ArrayList<>();
+                for (Player p : players) {
+                    if (p.isConnected()) {
+                        targets.add(p.getSocketAddress());
+                    }
+                }
+
+                try {
+                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else {
+            Timings.playerNetworkSendTimer.startTiming();
+            byte[][] payload = new byte[(packets.length << 1)][];
+            int size = 0;
+            for (int i = 0; i < packets.length; i++) {
+                DataPacket p = packets[i];
+                if (!p.isEncoded) {
+                    p.encode();
+                }
+                byte[] buf = p.getBuffer();
+                int i2 = i << 1;
+                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                payload[i2 + 1] = buf;
+                packets[i] = null;
+                size += payload[i2].length;
+                size += payload[i2 + 1].length;
+            }
+
+            List<InetSocketAddress> targets = new ArrayList<>();
+            for (Player p : players) {
+                if (p.isConnected()) {
+                    targets.add(p.getSocketAddress());
+                }
+            }
+
+            //if (!forceSync && this.networkCompressionAsync) {
+            //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            //} else {
             try {
                 this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            Timings.playerNetworkSendTimer.stopTiming();
         }
-        Timings.playerNetworkSendTimer.stopTiming();
     }
 
     public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
