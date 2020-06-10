@@ -81,6 +81,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import org.apache.commons.math3.util.FastMath;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -5203,8 +5204,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 						.add(new FloatTag("", (float) pitch)));
 		double f = 1.1;
 		EntityFishingHook fishingHook = new EntityFishingHook(chunk, nbt, this);
-		fishingHook.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+		fishingHook.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
 		ProjectileLaunchEvent ev = new ProjectileLaunchEvent(fishingHook);
 		this.getServer().getPluginManager().callEvent(ev);
 		if (ev.isCancelled()) {

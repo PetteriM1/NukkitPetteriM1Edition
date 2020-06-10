@@ -20,6 +20,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +144,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
                 this.motionX = this.getSpeed() * 0.15 * (x / diff);
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
             }
-            if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+            if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
         }
 
         double dx = this.motionX;

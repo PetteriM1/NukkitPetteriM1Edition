@@ -126,7 +126,7 @@ public class ItemBucket extends Item {
                 ev.setCancelled(true);
             }
 
-            if (player.getLevel().isNether && this.getDamage() != 10) {
+            if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
 

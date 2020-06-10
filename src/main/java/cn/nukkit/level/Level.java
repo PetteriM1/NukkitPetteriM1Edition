@@ -2109,7 +2109,7 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (block.y > 127 && this.isNether) {
+        if (block.y > 127 && this.dimension == DIMENSION_NETHER) {
             return null;
         }
 

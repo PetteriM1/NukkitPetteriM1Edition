@@ -39,6 +39,7 @@ import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
 import com.google.common.collect.Iterables;
+import org.apache.commons.math3.util.FastMath;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -1391,7 +1392,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Vector2 getDirectionPlane() {
-        return (new Vector2((float) (-Math.cos(Math.toRadians(this.yaw) - 1.5707963267948966)), (float) (-Math.sin(Math.toRadians(this.yaw) - 1.5707963267948966)))).normalize();
+        return (new Vector2((float) (-Math.cos(FastMath.toRadians(this.yaw) - 1.5707963267948966)), (float) (-Math.sin(FastMath.toRadians(this.yaw) - 1.5707963267948966)))).normalize();
     }
 
     public BlockFace getHorizontalFacing() {
