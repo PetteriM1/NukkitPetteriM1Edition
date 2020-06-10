@@ -296,7 +296,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public void applyEntityCollision(cn.nukkit.entity.Entity entity) {
-        if (entity != riding) {
+        if (entity != riding && !(entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR)) {
             double motiveX = entity.x - x;
             double motiveZ = entity.z - z;
             double square = motiveX * motiveX + motiveZ * motiveZ;
