@@ -88,9 +88,8 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
                     .putList(new ListTag<FloatTag>("Rotation")
                             .add(new FloatTag("", 0))
                             .add(new FloatTag("", 0)))
-                    .putShort("Fuse", 0);
-            Entity explosion = new EntityPrimedTNT(this.level.getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4), nbt);
-            explosion.spawnToAll();
+                    .putShort("Fuse", 0); // create an instant explosion
+            new EntityPrimedTNT(this.level.getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4), nbt); // we don't even have to spawn the tnt entity for players
             return true;
         }
 
@@ -201,6 +200,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
             if (!(entity instanceof Player)) continue;
             Player player = (Player) entity;
 
+            if (player.getSleepingPos() == null) continue;
             if (!player.getSleepingPos().equals(this) && !player.getSleepingPos().equals(secondPart)) continue;
             player.stopSleep();
         }
