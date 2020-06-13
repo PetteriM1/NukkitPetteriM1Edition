@@ -31,7 +31,7 @@ public class TaskHandler {
         this.plugin = plugin;
         this.task = task;
         this.taskId = taskId;
-        this.timing = Timings.getTaskTiming(this, period);
+        this.timing = asynchronous ? null : Timings.getTaskTiming(this, period);
     }
 
     public boolean isCancelled() {

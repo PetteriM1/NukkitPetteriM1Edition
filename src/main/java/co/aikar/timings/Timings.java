@@ -203,11 +203,11 @@ public final class Timings {
     }
 
     public static Timing getTaskTiming(TaskHandler handler, long period) {
-        String repeating = " ";
+        String repeating;
         if (period > 0) {
-            repeating += "(interval:" + period + ')';
+            repeating = " (interval:" + period + ')';
         } else {
-            repeating += "(Single)";
+            repeating = " (Single)";
         }
 
         if (handler.getTask() instanceof PluginTask) {
