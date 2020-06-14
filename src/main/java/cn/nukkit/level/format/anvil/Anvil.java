@@ -10,6 +10,7 @@ import cn.nukkit.level.format.generic.BaseRegionLoader;
 import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
@@ -144,22 +145,26 @@ public class Anvil extends BaseLevelProvider {
         }
 
         BinaryStream stream = ThreadCache.binaryStream.get().reset();
-        int count = 0;
+        int subChunkCount = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
         for (int i = sections.length - 1; i >= 0; i--) {
             if (!sections[i].isEmpty()) {
-                count = i + 1;
+                subChunkCount = i + 1;
                 break;
             }
         }
-        if (protocol < 361) {
-            stream.putByte((byte) count);
+        if (protocol < ProtocolInfo.v1_12_0) {
+            stream.putByte((byte) subChunkCount);
         }
-        for (int i = 0; i < count; i++) {
-            stream.putByte((byte) 0);
-            stream.put(sections[i].getBytes());
+        for (int i = 0; i < subChunkCount; i++) {
+            if (protocol < ProtocolInfo.v1_13_0) {
+                stream.putByte((byte) 0);
+                stream.put(sections[i].getBytes());
+            } else {
+                sections[i].writeTo(protocol, stream);
+            }
         }
-        if (protocol < 361) {
+        if (protocol < ProtocolInfo.v1_12_0) {
             for (byte height : chunk.getHeightMapArray()) {
                 stream.putByte(height);
             }
@@ -174,7 +179,7 @@ public class Anvil extends BaseLevelProvider {
         }
         stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, count, stream.getBuffer());
+        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, subChunkCount, stream.getBuffer());
 
         return null;
     }
@@ -214,7 +219,7 @@ public class Anvil extends BaseLevelProvider {
         this.level.timings.syncChunkLoadDataTimer.startTiming();
         BaseFullChunk chunk;
         try {
-            chunk = region.readChunk(chunkX - regionX * 32, chunkZ - regionZ * 32);
+            chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

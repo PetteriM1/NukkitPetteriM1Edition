@@ -168,6 +168,7 @@ public interface ItemID {
     int EMPTY_MAP = 395;
     int GOLDEN_CARROT = 396;
     int SKULL = 397;
+    int CARROTONASTICK = 398;
     int CARROT_ON_A_STICK = 398;
     int NETHER_STAR = 399;
     int PUMPKIN_PIE = 400;
@@ -249,7 +250,8 @@ public interface ItemID {
     int ACACIA_SIGN = 475;
     int DARKOAK_SIGN = 476;
     int SWEET_BERRIES = 477;
-    // 478 - 498 not yet in Minecraft
+    // 478 - 497 not yet in Minecraft
+    int CAMERA = 498;
     int COMPOUND = 499;
     int RECORD_13 = 500;
     int RECORD_CAT = 501;
@@ -265,4 +267,9 @@ public interface ItemID {
     int RECORD_WAIT = 511;
     // 512 not yet in Minecraft
     int SHIELD = 513;
+    // 514 - 733 not yet in Minecraft
+    int SUSPICIOUS_STEW = 734;
+    // 735 not yet in Minecraft
+    int HONEYCOMB = 736;
+    int HONEY_BOTTLE = 737;
 }

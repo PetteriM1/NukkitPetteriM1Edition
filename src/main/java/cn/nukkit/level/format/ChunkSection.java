@@ -1,6 +1,7 @@
 package cn.nukkit.level.format;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.utils.BinaryStream;
 
 /**
  * @author MagicDroidX
@@ -46,7 +47,11 @@ public interface ChunkSection {
 
     boolean isEmpty();
 
+    // for < 1.13 chunk format
     byte[] getBytes();
+
+    // for >= 1.13 chunk format
+    void writeTo(int protocol, BinaryStream stream);
 
     ChunkSection copy();
 }

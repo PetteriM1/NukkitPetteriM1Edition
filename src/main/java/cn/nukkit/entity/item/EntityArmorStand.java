@@ -257,11 +257,12 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 					if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
 						this.level.dropItem(this, new ItemArmorStand());
 						this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+						this.equipmentInventory.clearAll();
 						this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+						this.armorInventory.clearAll();
 					}
 				}
 			}
-
 		}
 
 		if (source.getCause() == EntityDamageEvent.DamageCause.CONTACT) {

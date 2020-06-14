@@ -24,7 +24,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     protected static final AxisAlignedBB[] NORTH = new AxisAlignedBB[]{new AxisAlignedBB(0.375D, 0.4375D, 0.0625D, 0.625D, 0.75D, 0.3125D), new AxisAlignedBB(0.3125D, 0.3125D, 0.0625D, 0.6875D, 0.75D, 0.4375D), new AxisAlignedBB(0.3125D, 0.3125D, 0.0625D, 0.6875D, 0.75D, 0.4375D)};
     protected static final AxisAlignedBB[] SOUTH = new AxisAlignedBB[]{new AxisAlignedBB(0.375D, 0.4375D, 0.6875D, 0.625D, 0.75D, 0.9375D), new AxisAlignedBB(0.3125D, 0.3125D, 0.5625D, 0.6875D, 0.75D, 0.9375D), new AxisAlignedBB(0.3125D, 0.3125D, 0.5625D, 0.6875D, 0.75D, 0.9375D)};
 
-    private static final int[] faces = new int[]{
+    private static final short[] faces = new short[]{
             0,
             0,
             0,
@@ -33,7 +33,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
             1,
     };
 
-    private static final int[] faces2 = new int[]{
+    private static final short[] faces2 = new short[]{
             3, 4, 2, 5, 3, 4, 2, 5, 3, 4, 2, 5
     };
 
@@ -99,7 +99,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
                 break;
         }
 
-        return bbs[this.getDamage() / 4].getOffsetBoundingBox(x, y, z);
+        return bbs[(this.getDamage() >> 2)].getOffsetBoundingBox(x, y, z);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (Utils.random.nextInt(2) == 1) {
-                if (this.getDamage() / 4 < 2) {
+                if (this.getDamage() >> 2 < 2) {
                     BlockCocoa block = (BlockCocoa) this.clone();
                     block.setDamage(block.getDamage() + 4);
                     BlockGrowEvent ev = new BlockGrowEvent(this, block);
@@ -154,7 +154,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0f) {
             Block block = this.clone();
-            if (this.getDamage() / 4 < 2) {
+            if (this.getDamage() >> 2 < 2) {
                 block.setDamage(block.getDamage() + 4);
                 BlockGrowEvent ev = new BlockGrowEvent(this, block);
                 Server.getInstance().getPluginManager().callEvent(ev);

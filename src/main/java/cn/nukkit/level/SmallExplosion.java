@@ -1,20 +1,27 @@
 package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockTNT;
+import cn.nukkit.blockentity.BlockEntity;
+import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityItem;
+import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.event.block.BlockUpdateEvent;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityExplodeEvent;
+import cn.nukkit.inventory.InventoryHolder;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.particle.HugeExplodeSeedParticle;
-import cn.nukkit.math.*;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.NukkitMath;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Hash;
 import cn.nukkit.utils.Utils;
@@ -88,8 +95,6 @@ public class SmallExplosion extends Explosion {
     @Override
     public boolean explodeB() {
         LongArraySet updateBlocks = new LongArraySet();
-        List<Vector3> send = new ArrayList<>();
-        Vector3 source = (new Vector3(this.source.x, this.source.y, this.source.z)).floor();
         double yield = (1d / this.size) * 100d;
         if (this.what instanceof Entity) {
             EntityExplodeEvent ev = new EntityExplodeEvent((Entity) this.what, this.source, this.affectedBlocks, yield);
@@ -124,13 +129,28 @@ public class SmallExplosion extends Explosion {
                 } else {
                     entity.attack(new EntityDamageEvent(entity, DamageCause.BLOCK_EXPLOSION, damage));
                 }
-                entity.setMotion(motion.multiply(impact));
+                if (!(entity instanceof EntityItem || entity instanceof EntityXPOrb)) {
+                    entity.setMotion(motion.multiply(impact));
+                }
             }
         }
-        ItemBlock air = new ItemBlock(new BlockAir());
+        ItemBlock air = new ItemBlock(Block.get(BlockID.AIR));
+        BlockEntity container;
         for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(Utils.rand(10, 30), this.what instanceof Entity ? (Entity) this.what : null);
+            } else if ((container = block.getLevel().getBlockEntity(block)) instanceof InventoryHolder) {
+                if (block.getLevel().getGameRules().getBoolean(GameRule.DO_TILE_DROPS)) {
+                    if (container instanceof BlockEntityShulkerBox) {
+                        this.level.dropItem(block.add(0.5, 0.5, 0.5), block.toItem());
+                        ((InventoryHolder) container).getInventory().clearAll();
+                    } else {
+                        for (Item drop : ((InventoryHolder) container).getInventory().getContents().values()) {
+                            this.level.dropItem(block.add(0.5, 0.5, 0.5), drop);
+                        }
+                        ((InventoryHolder) container).getInventory().clearAll();
+                    }
+                }
             } else if (Math.random() * 100 < yield) {
                 for (Item drop : block.getDrops(air)) {
                     this.level.dropItem(block.add(0.5, 0.5, 0.5), drop);
@@ -150,7 +170,6 @@ public class SmallExplosion extends Explosion {
                     updateBlocks.add(index);
                 }
             }
-            send.add(new Vector3(block.x - source.x, block.y - source.y, block.z - source.z));
         }
         this.level.addParticle(new HugeExplodeSeedParticle(this.source));
         this.level.addLevelSoundEvent(source, LevelSoundEventPacket.SOUND_EXPLODE);

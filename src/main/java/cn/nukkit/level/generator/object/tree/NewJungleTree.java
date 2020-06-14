@@ -25,12 +25,12 @@ public class NewJungleTree extends TreeGenerator {
     /**
      * The metadata value of the wood to use in tree generation.
      */
-    private final Block metaWood = new BlockWood(BlockWood.JUNGLE);
+    private final Block metaWood = Block.get(BlockID.WOOD, BlockWood.JUNGLE);
 
     /**
      * The metadata value of the leaves to use in tree generation.
      */
-    private final Block metaLeaves = new BlockLeaves(BlockLeaves.JUNGLE);
+    private final Block metaLeaves = Block.get(BlockID.LEAVES, BlockLeaves.JUNGLE);
 
     public NewJungleTree(int minTreeHeight) {
         this(minTreeHeight, 3);
@@ -87,7 +87,7 @@ public class NewJungleTree extends TreeGenerator {
 
                     for (int i3 = position.getY() - 3 + i; i3 <= position.getY() + i; ++i3) {
                         int i4 = i3 - (position.getY() + i);
-                        int j1 = 1 - i4 / 2;
+                        int j1 = 1 - (i4 >> 1);
 
                         for (int k1 = position.getX() - j1; k1 <= position.getX() + j1; ++k1) {
                             int l1 = k1 - position.getX();
@@ -136,7 +136,7 @@ public class NewJungleTree extends TreeGenerator {
 
                     for (int k3 = position.getY() - 3 + i; k3 <= position.getY() + i; ++k3) {
                         int j4 = k3 - (position.getY() + i);
-                        int k4 = 2 - j4 / 2;
+                        int k4 = 2 - (j4 >> 1);
                         BlockVector3 pos2 = new BlockVector3();
 
                         for (int l4 = position.getX() - k4; l4 <= position.getX() + k4; ++l4) {
@@ -191,11 +191,11 @@ public class NewJungleTree extends TreeGenerator {
     }
 
     private void placeCocoa(ChunkManager worldIn, int age, BlockVector3 pos, BlockFace side) {
-        this.setBlockAndNotifyAdequately(worldIn, pos, new BlockUnknown(127, getCocoaMeta(age, side.getIndex())));
+        this.setBlockAndNotifyAdequately(worldIn, pos, new BlockUnknown(127, getCocoaMeta(side.getIndex())));
     }
 
     private void addVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
-        this.setBlockAndNotifyAdequately(worldIn, pos, new BlockVine(meta));
+        this.setBlockAndNotifyAdequately(worldIn, pos, Block.get(BlockID.VINE, meta));
     }
 
     private void addHangingVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
@@ -212,10 +212,8 @@ public class NewJungleTree extends TreeGenerator {
         return level.getBlockIdAt(v.x, v.y, v.z) == 0;
     }
 
-    private static int getCocoaMeta(int age, int side) {
+    private static int getCocoaMeta(int side) {
         int meta = 0;
-
-        meta *= age;
 
         //3 4 2 5
         switch (side) {

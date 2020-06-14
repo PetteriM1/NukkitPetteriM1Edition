@@ -391,13 +391,11 @@ public abstract class BaseLevelProvider implements LevelProvider {
         synchronized (chunks) {
             lastChunk.set(tmp = chunks.get(index));
         }
-        if (tmp != null) {
-            return tmp;
-        } else {
+        if (tmp == null) {
             tmp = this.loadChunk(index, chunkX, chunkZ, create);
             lastChunk.set(tmp);
-            return tmp;
         }
+        return tmp;
     }
 
     @Override
@@ -444,6 +442,6 @@ public abstract class BaseLevelProvider implements LevelProvider {
     @Override
     public boolean isChunkGenerated(int chunkX, int chunkZ) {
         BaseRegionLoader region = this.getRegion(chunkX >> 5, chunkZ >> 5);
-        return region != null && region.chunkExists(chunkX - region.getX() * 32, chunkZ - region.getZ() * 32) && this.getChunk(chunkX - region.getX() * 32, chunkZ - region.getZ() * 32, true).isGenerated();
+        return region != null && region.chunkExists(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5)) && this.getChunk(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5), true).isGenerated();
     }
 }

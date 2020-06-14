@@ -12,7 +12,7 @@ public final class BitArray256 {
 
     public BitArray256(int bitsPerEntry) {
         this.bitsPerEntry = bitsPerEntry;
-        int longLen = (this.bitsPerEntry * 256) >> 6;
+        int longLen = (this.bitsPerEntry << 8) >> 6;
         this.data = new long[longLen];
     }
 

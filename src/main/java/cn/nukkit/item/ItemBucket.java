@@ -89,14 +89,14 @@ public class ItemBucket extends Item {
                 PlayerBucketFillEvent ev;
                 player.getServer().getPluginManager().callEvent(ev = new PlayerBucketFillEvent(player, block, face, this, result));
                 if (!ev.isCancelled()) {
-                    player.getLevel().setBlock(target, new BlockAir(), true, true);
+                    player.getLevel().setBlock(target, Block.get(BlockID.AIR), true, true);
 
                     // When water is removed ensure any adjacent still water is
                     // replaced with water that can flow.
                     for (BlockFace side : Plane.HORIZONTAL) {
                         Block b = target.getSide(side);
                         if (b.getId() == STILL_WATER) {
-                            level.setBlock(b, new BlockWater());
+                            level.setBlock(b, Block.get(BlockID.WATER));
                         }
                     }
 
@@ -122,8 +122,11 @@ public class ItemBucket extends Item {
             Item result = Item.get(BUCKET, 0, 1);
             PlayerBucketEmptyEvent ev;
             player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
+            if (!block.canBeFlowedInto()) {
+                ev.setCancelled(true);
+            }
 
-            if (player.getLevel().isNether && this.getDamage() != 10) {
+            if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
 

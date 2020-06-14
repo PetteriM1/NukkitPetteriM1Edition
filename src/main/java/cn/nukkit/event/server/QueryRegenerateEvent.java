@@ -38,8 +38,6 @@ public class QueryRegenerateEvent extends ServerEvent {
     private final int port;
     private final String ip;
 
-    private Map<String, String> extraData = new HashMap<>();
-
     public QueryRegenerateEvent(Server server) {
         this(server, 5);
     }
@@ -50,7 +48,7 @@ public class QueryRegenerateEvent extends ServerEvent {
         this.listPlugins = server.queryPlugins;
         this.plugins = server.getPluginManager().getPlugins().values().toArray(new Plugin[0]);
         this.players = server.getOnlinePlayers().values().toArray(new Player[0]);
-        this.gameType = (server.getGamemode() & 0x01) == 0 ? "SMP" : "CMP";
+        this.gameType = server.getGamemode() == 1 ? "CMP" : "SMP";
         this.version = server.getVersion();
         this.map = server.getDefaultLevel() == null ? "unknown" : server.getDefaultLevel().getName();
         this.numPlayers = this.players.length;
@@ -124,18 +122,10 @@ public class QueryRegenerateEvent extends ServerEvent {
         this.map = world;
     }
 
-    public Map<String, String> getExtraData() {
-        return extraData;
-    }
-
-    public void setExtraData(Map<String, String> extraData) {
-        this.extraData = extraData;
-    }
-
     public byte[] getLongQuery() {
         ByteBuffer query = ByteBuffer.allocate(65536);
         StringBuilder plist = new StringBuilder(Nukkit.NUKKIT);
-        if (this.plugins.length > 0 && this.listPlugins) {
+        if (this.listPlugins && this.plugins.length > 0) {
             plist.append(':');
             for (Plugin p : this.plugins) {
                 PluginDescription d = p.getDescription();

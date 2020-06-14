@@ -120,16 +120,16 @@ public class ItemCrossbow extends ItemBow {
 
             Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
             if (entityShootBowEvent.isCancelled()) {
-                entityShootBowEvent.getProjectile().kill();
+                entityShootBowEvent.getProjectile().close();
                 player.getInventory().sendContents(player);
             } else {
                 entityShootBowEvent.getProjectile().setMotion(entityShootBowEvent.getProjectile().getMotion().multiply(entityShootBowEvent.getForce()));
-                if (entityShootBowEvent.getProjectile() instanceof EntityProjectile) {
+                if (entityShootBowEvent.getProjectile() != null) {
                     EntityProjectile proj = entityShootBowEvent.getProjectile();
                     ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(proj);
                     Server.getInstance().getPluginManager().callEvent(projectev);
                     if (projectev.isCancelled()) {
-                        proj.kill();
+                        proj.close();
                     } else {
                         proj.spawnToAll();
                         player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_SHOOT);

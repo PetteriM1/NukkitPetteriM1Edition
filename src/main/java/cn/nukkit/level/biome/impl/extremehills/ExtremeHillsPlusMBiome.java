@@ -21,5 +21,4 @@ public class ExtremeHillsPlusMBiome extends ExtremeHillsMBiome {
     public String getName() {
         return "Extreme Hills+ M";
     }
-
 }

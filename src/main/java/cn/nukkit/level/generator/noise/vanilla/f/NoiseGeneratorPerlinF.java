@@ -2,6 +2,8 @@ package cn.nukkit.level.generator.noise.vanilla.f;
 
 import cn.nukkit.math.NukkitRandom;
 
+import java.util.Arrays;
+
 public class NoiseGeneratorPerlinF {
     private final NoiseGeneratorSimplexF[] noiseLevels;
     private final int levels;
@@ -33,9 +35,7 @@ public class NoiseGeneratorPerlinF {
 
     public float[] getRegion(float[] p_151600_1_, float p_151600_2_, float p_151600_4_, int p_151600_6_, int p_151600_7_, float p_151600_8_, float p_151600_10_, float p_151600_12_, float p_151600_14_) {
         if (p_151600_1_ != null && p_151600_1_.length >= p_151600_6_ * p_151600_7_) {
-            for (int i = 0; i < p_151600_1_.length; ++i) {
-                p_151600_1_[i] = 0.0f;
-            }
+            Arrays.fill(p_151600_1_, 0.0f);
         } else {
             p_151600_1_ = new float[p_151600_6_ * p_151600_7_];
         }

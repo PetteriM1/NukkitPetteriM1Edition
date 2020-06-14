@@ -54,7 +54,7 @@ public class BlockGlowstone extends BlockTransparent {
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override

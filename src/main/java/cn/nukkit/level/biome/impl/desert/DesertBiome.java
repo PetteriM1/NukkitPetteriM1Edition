@@ -19,8 +19,7 @@ public class DesertBiome extends SandyBiome {
         deadbush.setBaseAmount(2);
         this.addPopulator(deadbush);
 
-        PopulatorWell well = new PopulatorWell();
-        this.addPopulator(well);
+        this.addPopulator(new PopulatorWell());
 
         this.setBaseHeight(0.125f);
         this.setHeightVariation(0.05f);
@@ -29,5 +28,10 @@ public class DesertBiome extends SandyBiome {
     @Override
     public String getName() {
         return "Desert";
+    }
+
+    @Override
+    public boolean canRain() {
+        return false;
     }
 }

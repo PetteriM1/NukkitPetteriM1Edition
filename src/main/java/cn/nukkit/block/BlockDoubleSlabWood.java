@@ -56,7 +56,7 @@ public class BlockDoubleSlabWood extends BlockSolidMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockSlabWood(), this.getDamage() & 0x07);
+        return new ItemBlock(Block.get(WOOD_SLAB), this.getDamage() & 0x07);
     }
 
     public Item[] getDrops(Item item) {
@@ -67,6 +67,20 @@ public class BlockDoubleSlabWood extends BlockSolidMeta {
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+        switch (this.getDamage() & 0x07) {
+            default:
+            case 0: //OAK
+                return BlockColor.WOOD_BLOCK_COLOR;
+            case 1: //SPRUCE
+                return BlockColor.SPRUCE_BLOCK_COLOR;
+            case 2: //BIRCH
+                return BlockColor.SAND_BLOCK_COLOR;
+            case 3: //JUNGLE
+                return BlockColor.DIRT_BLOCK_COLOR;
+            case 4: //Acacia
+                return BlockColor.ORANGE_BLOCK_COLOR;
+            case 5: //DARK OAK
+                return BlockColor.BROWN_BLOCK_COLOR;
+        }
     }
 }

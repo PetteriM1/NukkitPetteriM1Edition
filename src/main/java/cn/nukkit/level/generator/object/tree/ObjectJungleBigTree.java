@@ -1,7 +1,7 @@
 package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockVine;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
@@ -20,7 +20,7 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
         } else {
             this.createCrown(level, position.up(height), 2);
 
-            for (int j = (int) position.getY() + height - 2 - rand.nextBoundedInt(4); j > position.getY() + height / 2; j -= 2 + rand.nextBoundedInt(4)) {
+            for (int j = (int) position.getY() + height - 2 - rand.nextBoundedInt(4); j > position.getY() + (height >> 1); j -= 2 + rand.nextBoundedInt(4)) {
                 float f = rand.nextFloat() * (6.2831855f);
                 int k = (int) (position.getX() + (0.5F + MathHelper.cos(f) * 4.0F));
                 int l = (int) (position.getZ() + (0.5F + MathHelper.sin(f) * 4.0F));
@@ -28,7 +28,7 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
                 for (int i1 = 0; i1 < 5; ++i1) {
                     k = (int) (position.getX() + (1.5F + MathHelper.cos(f) * (float) i1));
                     l = (int) (position.getZ() + (1.5F + MathHelper.sin(f) * (float) i1));
-                    this.setBlockAndNotifyAdequately(level, new Vector3(k, j - 3 + i1 / 2, l), this.woodMetadata);
+                    this.setBlockAndNotifyAdequately(level, new Vector3(k, j - 3 + (i1 >> 1), l), this.woodMetadata);
                 }
 
                 int j2 = 1 + rand.nextBoundedInt(2);
@@ -93,7 +93,7 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
 
     private void placeVine(ChunkManager level, NukkitRandom random, Vector3 pos, int meta) {
         if (random.nextBoundedInt(3) > 0 && level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == 0) {
-            this.setBlockAndNotifyAdequately(level, pos, new BlockVine(meta));
+            this.setBlockAndNotifyAdequately(level, pos, Block.get(BlockID.VINES, meta));
         }
     }
 

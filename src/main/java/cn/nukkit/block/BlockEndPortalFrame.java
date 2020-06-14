@@ -6,6 +6,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -140,5 +141,10 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
             }
         }
         return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.GREEN_BLOCK_COLOR;
     }
 }

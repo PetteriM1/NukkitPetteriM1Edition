@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -42,7 +43,7 @@ public class BlockHugeMushroomRed extends BlockSolidMeta {
     public Item[] getDrops(Item item) {
         if (Utils.rand(1, 10) == 5) {
             return new Item[]{
-                    new ItemBlock(new BlockMushroomRed())
+                    new ItemBlock(Block.get(RED_MUSHROOM))
             };
         } else {
             return new Item[0];
@@ -52,5 +53,10 @@ public class BlockHugeMushroomRed extends BlockSolidMeta {
     @Override
     public boolean canSilkTouch() {
         return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 }

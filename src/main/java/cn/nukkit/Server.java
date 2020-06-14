@@ -13,6 +13,7 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.*;
+import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
@@ -43,7 +44,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.CompressBatchedTask;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
@@ -71,8 +71,11 @@ import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
+import io.sentry.SentryClient;
+import io.sentry.SentryClientFactory;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
@@ -138,10 +141,10 @@ public class Server {
     private boolean alwaysTickPlayers;
     private int baseTickRate;
     private int difficulty;
-    private int defaultGamemode = Integer.MAX_VALUE;
+    private int defaultGameMode = Integer.MAX_VALUE;
 
-    private int autoSaveTicker = 0;
-    private int autoSaveTicks = 6000;
+    private int autoSaveTicker;
+    private int autoSaveTicks;
 
     private BaseLang baseLang;
     private boolean forceLanguage;
@@ -156,8 +159,10 @@ public class Server {
     private QueryRegenerateEvent queryRegenerateEvent;
     private Config properties;
 
+    public SentryClient sentry;
+
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
-    private final Map<UUID, Player> playerList = new HashMap<>();
+    final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
     private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
@@ -186,6 +191,7 @@ public class Server {
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
+    public static List<String> noTickingWorlds = new ArrayList<>();
 
     /* Some settings */
     private String motd;
@@ -194,6 +200,7 @@ public class Server {
     private int viewDistance;
     private int gamemode;
     private int skinChangeCooldown;
+    private int spawnRadius;
     private boolean suomicraftMode;
     private boolean doLevelGC;
     private boolean mobAI;
@@ -204,20 +211,23 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
+    private boolean asyncAutosave;
     public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
     public boolean xpBottlesOnCreative;
+    public boolean dimensionsEnabled;
     boolean callDataPkEv;
     boolean bedSpawnpoints;
     boolean achievements;
-    boolean dimensionsEndbled;
     boolean banAuthFailed;
     boolean endEnabled;
     boolean pvp;
     boolean announceAchievements;
     boolean checkOpMovement;
+    boolean doNotLimitInteractions;
+    public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
     public boolean vanillaBB;
@@ -226,8 +236,11 @@ public class Server {
     public boolean lightUpdates;
     public boolean queryPlugins;
     public boolean despawnEntities;
+    public boolean strongIPBans;
+    public boolean spawnAnimals;
+    public boolean spawnMobs;
 
-    Server(final String filePath, String dataPath, String pluginPath) {
+    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
@@ -256,6 +269,11 @@ public class Server {
 
         this.loadSettings();
 
+        if (this.getPropertyBoolean("automatic-bug-report", true)) {
+            ExceptionHandler.registerExceptionHandler();
+            this.sentry = SentryClientFactory.sentryClient("https://0e094ce5464f4663a0b521d61f4bfe54@o381665.ingest.sentry.io/5209314");
+        }
+
         if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
             new File(dataPath + "players/").mkdirs();
         }
@@ -274,9 +292,9 @@ public class Server {
 
         ServerScheduler.WORKERS = (int) poolSize;
 
-        Zlib.setProvider(this.getPropertyInt("zlib-provider", 0));
+        Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 5);
+        this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
         this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
 
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
@@ -314,21 +332,15 @@ public class Server {
             this.setDifficulty(this.getPropertyInt("difficulty", 2));
         }
 
-        Nukkit.DEBUG = Math.max(this.getPropertyInt("debug-level", 1), 1);
+        Nukkit.DEBUG = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
 
+        org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
-            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100) {
+            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100  && level.intLevel() > currentLevel.intLevel()) {
                 Nukkit.setLogLevel(level);
                 break;
             }
         }
-
-        log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
-        this.serverID = UUID.randomUUID();
-
-        this.network = new Network(this);
-        this.network.setName(this.getMotd());
-        this.network.setSubName(this.getSubMotd());
 
         log.info("\u00A7b-- \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7b--");
 
@@ -346,7 +358,9 @@ public class Server {
         Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
-        GlobalBlockPalette.getOrCreateRuntimeId(0, 0, 0);
+        GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
+
+        this.serverID = UUID.randomUUID();
 
         this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(new File(Nukkit.DATA_PATH, "resource_packs"));
@@ -358,11 +372,16 @@ public class Server {
 
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
 
+        log.info(this.baseLang.translateString("nukkit.server.networkStart", new String[]{this.getIp().isEmpty() ? "*" : this.getIp(), String.valueOf(this.getPort())}));
+        this.network = new Network(this);
+        this.network.setName(this.getMotd());
+        this.network.setSubName(this.getSubMotd());
         this.network.registerInterface(new RakNetInterface(this));
 
-        this.pluginManager.loadPlugins(this.pluginPath);
-
-        this.enablePlugins(PluginLoadOrder.STARTUP);
+        if (loadPlugins) {
+            this.pluginManager.loadPlugins(this.pluginPath);
+            this.enablePlugins(PluginLoadOrder.STARTUP);
+        }
 
         LevelProviderManager.addProvider(this, Anvil.class);
 
@@ -404,8 +423,6 @@ public class Server {
             return;
         }
 
-        this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
-
         // Load levels
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             try {
@@ -427,7 +444,9 @@ public class Server {
             }
         }
 
-        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        if (loadPlugins) {
+            this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        }
 
         if (this.getPropertyBoolean("thread-watchdog", true)) {
             this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 50000));
@@ -451,19 +470,23 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            this.scheduler.scheduleRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            this.scheduler.scheduleDelayedRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
 
         // Check for updates
         this.scheduler.scheduleTask(null, () -> {
             try {
-                URL url = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master");
-                URLConnection request = url.openConnection();
+                URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
-                String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                content.close();
 
-                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null")) {
+                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
                     this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                    this.getLogger().info("\u00A7c[Update] \u00A7eYou can download the latest build from https://github.com/PetteriM1/NukkitPetteriM1Edition/releases");
+                } else if (!Nukkit.isMasterBranchBuild()) {
+                    this.getLogger().warning("\u00A7eYou are running a dev build! Do not use in production!");
                 }
 
                 this.getLogger().debug("Update check done");
@@ -545,26 +568,32 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        broadcastPacket(players.toArray(new Player[0]), packet);
+        boolean mvplayers = false;
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
+            }
+        }
+        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+            packet.encode();
+            packet.isEncoded = true;
+            instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
+        } else { // Need to force multiversion
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         boolean mvplayers = false;
-        //packet.encode();
-        //packet.isEncoded = true;
-
-        //if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-            for (Player player : players) {
-                //player.dataPacket(packet); // HACK: Force multiversion
-                if (player.protocol <= 274) { // 1.5 or lower
-                    mvplayers = true;
-                    break;
-                }
+        for (Player player : players) {
+            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
+                mvplayers = true;
+                break;
             }
-        //} else {
-        //    getInstance().batchPackets(players, new DataPacket[]{packet}, true);
-        //}
-
+        }
         if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
@@ -594,39 +623,72 @@ public class Server {
             }
         }
 
-        Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload = new byte[packets.length * 2][];
-        int size = 0;
-        for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
-                p.encode();
-            }
-            byte[] buf = p.getBuffer();
-            payload[i * 2] = Binary.writeUnsignedVarInt(buf.length);
-            payload[i * 2 + 1] = buf;
-            packets[i] = null;
-            size += payload[i * 2].length;
-            size += payload[i * 2 + 1].length;
-        }
-
-        List<InetSocketAddress> targets = new ArrayList<>();
-        for (Player p : players) {
-            if (p.isConnected()) {
-                targets.add(p.getSocketAddress());
-            }
-        }
-
         if (!forceSync && this.networkCompressionAsync) {
-            this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            getScheduler().scheduleTask(null, () -> {
+                byte[][] payload = new byte[(packets.length << 1)][];
+                int size = 0;
+                for (int i = 0; i < packets.length; i++) {
+                    DataPacket p = packets[i];
+                    if (!p.isEncoded) {
+                        p.encode();
+                    }
+                    byte[] buf = p.getBuffer();
+                    int i2 = i << 1;
+                    payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                    payload[i2 + 1] = buf;
+                    packets[i] = null;
+                    size += payload[i2].length;
+                    size += payload[i2 + 1].length;
+                }
+
+                List<InetSocketAddress> targets = new ArrayList<>();
+                for (Player p : players) {
+                    if (p.isConnected()) {
+                        targets.add(p.getSocketAddress());
+                    }
+                }
+
+                try {
+                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else {
+            Timings.playerNetworkSendTimer.startTiming();
+            byte[][] payload = new byte[(packets.length << 1)][];
+            int size = 0;
+            for (int i = 0; i < packets.length; i++) {
+                DataPacket p = packets[i];
+                if (!p.isEncoded) {
+                    p.encode();
+                }
+                byte[] buf = p.getBuffer();
+                int i2 = i << 1;
+                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                payload[i2 + 1] = buf;
+                packets[i] = null;
+                size += payload[i2].length;
+                size += payload[i2 + 1].length;
+            }
+
+            List<InetSocketAddress> targets = new ArrayList<>();
+            for (Player p : players) {
+                if (p.isConnected()) {
+                    targets.add(p.getSocketAddress());
+                }
+            }
+
+            //if (!forceSync && this.networkCompressionAsync) {
+            //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            //} else {
             try {
                 this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            Timings.playerNetworkSendTimer.stopTiming();
         }
-        Timings.playerNetworkSendTimer.stopTiming();
     }
 
     public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
@@ -953,13 +1015,17 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol < 354) {
-            player.dataPacket(CraftingManager.packetPre354);
-        } else if (player.protocol < 361) {
-            player.dataPacket(CraftingManager.packet354);
-        } else {
+        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
             player.dataPacket(CraftingManager.packet);
+        } else if (player.protocol == ProtocolInfo.v1_12_0) {
+            player.dataPacket(CraftingManager.packet361);
+        } else if (player.protocol == ProtocolInfo.v1_11_0) {
+             player.dataPacket(CraftingManager.packet354);
+        } else if (player.protocol == ProtocolInfo.v1_10_0) {
+            player.dataPacket(CraftingManager.packet340);
         }
+        // Don't send recipes if they wouldn't work anyways
+        // TODO: Support for older versions
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -992,10 +1058,10 @@ public class Server {
                     } else if (tickMs >= 50) {
                         if (level.getTickRate() == this.baseTickRate) {
                             level.setTickRate(Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, tickMs / 50)));
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
                         } else if ((tickMs / level.getTickRate()) >= 50 && level.getTickRate() < this.autoTickRateLimit) {
                             level.setTickRate(level.getTickRate() + 1);
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + NukkitMath.round(tickMs, 2) + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
                         }
                         level.tickRateCounter = level.getTickRate();
                     }
@@ -1019,7 +1085,11 @@ public class Server {
 
             for (Level level : this.levelArray) {
                 if (!nonAutoSaveWorlds.contains(level.getName())) {
-                    this.scheduler.scheduleTask(null, level::save, true);
+                    if (asyncAutosave) {
+                        this.scheduler.scheduleTask(null, level::save, true);
+                    } else {
+                        level.save();
+                    }
                 }
             }
             Timings.levelSaveTimer.stopTiming();
@@ -1043,7 +1113,9 @@ public class Server {
             return;
         }
 
-        Timings.fullServerTickTimer.startTiming();
+        if (Timings.isTimingsEnabled()) {
+            Timings.fullServerTickTimer.startTiming();
+        }
 
         ++this.tickCounter;
 
@@ -1068,7 +1140,7 @@ public class Server {
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
 
-            this.network.resetStatistics();
+            //this.network.resetStatistics(); // Unnecessary since addStatistics is not used in the new raknet
             this.maxTick = 20;
             this.maxUse = 0;
 
@@ -1097,7 +1169,10 @@ public class Server {
             }
         }
 
-        Timings.fullServerTickTimer.stopTiming();
+        if (Timings.isTimingsEnabled()) {
+            Timings.fullServerTickTimer.stopTiming();
+        }
+
         long nowNano = System.nanoTime();
 
         float tick = (float) Math.min(20, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
@@ -1317,7 +1392,7 @@ public class Server {
     }
 
     public int getSpawnRadius() {
-        return this.getPropertyInt("spawn-protection", 10);
+        return spawnRadius;
     }
 
     public boolean getAllowFlight() {
@@ -1329,10 +1404,10 @@ public class Server {
     }
 
     public int getDefaultGamemode() {
-        if (this.defaultGamemode == Integer.MAX_VALUE) {
-            this.defaultGamemode = this.getGamemode();
+        if (this.defaultGameMode == Integer.MAX_VALUE) {
+            this.defaultGameMode = this.getGamemode();
         }
-        return this.defaultGamemode;
+        return this.defaultGameMode;
     }
 
     public String getMotd() {
@@ -1417,7 +1492,11 @@ public class Server {
     }
 
     public Map<UUID, Player> getOnlinePlayers() {
-        return new HashMap<>(playerList);
+        return ImmutableMap.copyOf(playerList);
+    }
+
+    public int getOnlinePlayersCount() {
+        return this.playerList.size();
     }
 
     public void addRecipe(Recipe recipe) {
@@ -1919,7 +1998,7 @@ public class Server {
         Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
         Entity.registerEntity("WitherSkull", EntityWitherSkull.class);
         Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);
-        Entity.registerEntity("LlamaSplit", EntityLlamaSpit.class);
+        Entity.registerEntity("LlamaSpit", EntityLlamaSpit.class);
         Entity.registerEntity("EvocationFangs", EntityEvocationFangs.class);
         Entity.registerEntity("EnderCharge", EntityEnderCharge.class);
         Entity.registerEntity("FishingHook", EntityFishingHook.class);
@@ -1988,6 +2067,7 @@ public class Server {
         Entity.registerEntity("WanderingTrader", EntityWanderingTrader.class);
         Entity.registerEntity("VillagerV2", EntityVillagerV2.class);
         Entity.registerEntity("Fox", EntityFox.class);
+        Entity.registerEntity("Bee", EntityBee.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("MinecartChest", EntityMinecartChest.class);
@@ -1996,6 +2076,7 @@ public class Server {
         Entity.registerEntity("Boat", EntityBoat.class);
         //Others
         Entity.registerEntity("Human", EntityHuman.class, true);
+        Entity.registerEntity("Lightning", EntityLightning.class);
     }
 
     /**
@@ -2053,7 +2134,7 @@ public class Server {
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
         this.achievements = this.getPropertyBoolean("achievements", true);
-        this.dimensionsEndbled = this.getPropertyBoolean("dimensions", false);
+        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", false);
         this.banAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
         this.pvp = this.getPropertyBoolean("pvp", true);
         this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
@@ -2074,16 +2155,31 @@ public class Server {
         this.whitelistEnabled = this.getPropertyBoolean("white-list", false);
         this.checkOpMovement = this.getPropertyBoolean("check-op-movement", false);
         this.forceGamemode = this.getPropertyBoolean("force-gamemode", true);
+        this.doNotLimitInteractions = this.getPropertyBoolean("do-not-limit-interactions", false);
         this.motd = this.getPropertyString("motd", "Minecraft Server");
         this.viewDistance = this.getPropertyInt("view-distance", 8);
-        this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 6000);
+        this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 12000);
         this.port = this.getPropertyInt("server-port", 19132);
         this.ip = this.getPropertyString("server-ip", "0.0.0.0");
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
+        this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
+        this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
+        this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
+        this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
+        this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
+        this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
+        this.asyncAutosave = this.getPropertyBoolean("async-autosave", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
             this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode")) & 0b11;
+        }
+        String list = this.getPropertyString("do-not-tick-worlds");
+        if (!list.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                noTickingWorlds.add(tokenizer.nextToken());
+            }
         }
     }
 
@@ -2102,6 +2198,8 @@ public class Server {
             put("announce-player-achievements", false);
             put("spawn-protection", 10);
             put("max-players", 50);
+            put("spawn-animals", true);
+            put("spawn-mobs", true);
             put("gamemode", 0);
             put("force-gamemode", true);
             put("hardcore", false);
@@ -2133,9 +2231,9 @@ public class Server {
             put("query-plugins", false);
             put("debug-level", 1);
             put("async-workers", "auto");
-            put("zlib-provider", 0);
+            put("zlib-provider", 2);
             put("async-compression", true);
-            put("compression-level", 5);
+            put("compression-level", 4);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);
             put("base-tick-rate", 1);
@@ -2157,7 +2255,7 @@ public class Server {
             put("chunk-generation-population-queue-size", 8);
             put("ticks-per-autosave", 6000);
             put("ticks-per-entity-spawns", 200);
-            put("ticks-per-entity-despawns", 6000);
+            put("ticks-per-entity-despawns", 12000);
             put("thread-watchdog", true);
             put("thread-watchdog-tick", 50000);
             put("nether", true);
@@ -2175,7 +2273,7 @@ public class Server {
             put("dimensions", false);
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
-            put("strong-ip-bans", true);
+            put("strong-ip-bans", false);
             put("worlds-level-auto-save-disabled", "");
             put("temp-ip-ban-failed-xbox-auth", false);
             put("call-data-pk-send-event", true);
@@ -2183,6 +2281,10 @@ public class Server {
             put("do-level-gc", true);
             put("skin-change-cooldown", 30);
             put("check-op-movement", false);
+            put("do-not-limit-interactions", false);
+            put("do-not-limit-skin-geometry", true);
+            put("async-autosave", false);
+            put("automatic-bug-report", true);
         }
     }
 

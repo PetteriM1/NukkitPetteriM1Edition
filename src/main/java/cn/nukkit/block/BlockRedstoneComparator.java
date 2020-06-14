@@ -10,6 +10,7 @@ import cn.nukkit.level.sound.ClickSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.utils.BlockColor;
 
 /**
  * @author CreeperFace
@@ -40,12 +41,12 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
 
     @Override
     protected BlockRedstoneComparator getUnpowered() {
-        return new BlockRedstoneComparatorUnpowered(this.getDamage());
+        return (BlockRedstoneComparator) Block.get(UNPOWERED_COMPARATOR, this.getDamage());
     }
 
     @Override
     protected BlockRedstoneComparator getPowered() {
-        return new BlockRedstoneComparatorPowered(this.getDamage());
+        return (BlockRedstoneComparator) Block.get(POWERED_COMPARATOR, this.getDamage());
     }
 
     @Override
@@ -191,5 +192,10 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
     public enum Mode {
         COMPARE,
         SUBTRACT
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 }

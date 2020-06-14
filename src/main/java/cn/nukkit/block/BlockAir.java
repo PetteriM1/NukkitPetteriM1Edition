@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.utils.BlockColor;
 
 /**
  * @author MagicDroidX
@@ -67,5 +68,10 @@ public class BlockAir extends BlockTransparent {
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 }

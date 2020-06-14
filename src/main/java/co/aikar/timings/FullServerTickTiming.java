@@ -53,6 +53,7 @@ public class FullServerTickTiming extends Timing {
     @Override
     public void stopTiming() {
         super.stopTiming();
+
         if (!this.enabled) {
             return;
         }

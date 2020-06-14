@@ -4,6 +4,11 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 
 /**
+ * Legacy sound class
+ *
+ * Everything in package cn.nukkit.level.sound will be removed in the future.
+ * Please use cn.nukkit.level.Sound class instead.
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

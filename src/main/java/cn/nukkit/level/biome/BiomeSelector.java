@@ -99,7 +99,7 @@ public class BiomeSelector {
                 // normal
                 if (temperature < 0.25f) {
                     if (rainfall < 0f)  {
-                        if (noiseOcean < 0f){
+                        if (noiseOcean < 0f) {
                             biome = EnumBiome.SUNFLOWER_PLAINS;
                         } else {
                             biome = EnumBiome.PLAINS;

@@ -9,16 +9,15 @@ import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
-import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,29 +60,29 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
             double f = 1.3;
             double yaw = this.yaw + Utils.rand(-12.0, 12.0);
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
-                    this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
-            if (this.getLevel().getBlockIdAt((int)pos.getX(),(int)pos.getY(),(int)pos.getZ()) == Block.AIR) {
+            Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
+                    this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+            if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) == Block.AIR) {
                 Entity k = Entity.createEntity("Arrow", pos, this);
                 if (!(k instanceof EntityArrow)) {
                     return;
                 }
 
                 EntityArrow arrow = (EntityArrow) k;
-                arrow.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+                arrow.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
 
                 EntityShootBowEvent ev = new EntityShootBowEvent(this, Item.get(Item.ARROW, 0, 1), arrow, f);
                 this.server.getPluginManager().callEvent(ev);
 
                 EntityProjectile projectile = ev.getProjectile();
                 if (ev.isCancelled()) {
-                    projectile.kill();
+                    projectile.close();
                 } else {
                     ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
                     this.server.getPluginManager().callEvent(launch);
                     if (launch.isCancelled()) {
-                        projectile.kill();
+                        projectile.close();
                     } else {
                         projectile.spawnToAll();
                         ((EntityArrow) projectile).setPickupMode(EntityArrow.PICKUP_NONE);
@@ -104,12 +103,12 @@ public class EntitySkeleton extends EntityWalkingMob implements EntitySmite {
         pk.hotbarSlot = 0;
         player.dataPacket(pk);
 
-        if (java.time.LocalDate.now().toString().contains("-10-31")) {
+        /*if (java.time.LocalDate.now().toString().contains("-10-31")) {
             MobArmorEquipmentPacket pk2 = new MobArmorEquipmentPacket();
             pk2.eid = this.getId();
             pk2.slots[0] = new ItemBlock(Block.get(Block.PUMPKIN));
             player.dataPacket(pk2);
-        }
+        }*/
     }
 
     @Override

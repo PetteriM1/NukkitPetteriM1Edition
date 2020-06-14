@@ -22,6 +22,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
     public EntityMinecartHopper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         setDisplayBlock(Block.get(Block.HOPPER_BLOCK), false);
+        setName("Minecart with Hopper");
     }
 
     @Override
@@ -30,7 +31,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
     }
 
     @Override
-    public boolean isRideable(){
+    public boolean isRideable() {
         return false;
     }
 
@@ -47,6 +48,7 @@ public class EntityMinecartHopper extends EntityMinecartAbstract implements Inve
         for (Item item : this.inventory.getContents().values()) {
             this.level.dropItem(this, item);
         }
+        this.inventory.clearAll();
     }
 
     @Override

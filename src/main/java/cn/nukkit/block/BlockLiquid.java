@@ -22,12 +22,12 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public abstract class BlockLiquid extends BlockTransparentMeta {
 
-    private static final byte CAN_FLOW_DOWN = 1;
-    private static final byte CAN_FLOW = 0;
-    private static final byte BLOCKED = -1;
+    protected static final byte CAN_FLOW_DOWN = 1;
+    protected static final byte CAN_FLOW = 0;
+    protected static final byte BLOCKED = -1;
     public int adjacentSources = 0;
     protected Vector3 flowVector = null;
-    private Long2ByteMap flowCostVisited = new Long2ByteOpenHashMap();
+    protected Long2ByteMap flowCostVisited = new Long2ByteOpenHashMap();
 
     protected BlockLiquid(int meta) {
         super(meta);
@@ -80,7 +80,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
 
     @Override
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 1 - getFluidHeightPercent(), this.z + 1);
+        return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.9, this.z + 1);
     }
 
     public float getFluidHeightPercent() {
@@ -224,14 +224,14 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                     boolean decayed = decay < 0;
                     Block to;
                     if (decayed) {
-                        to = new BlockAir();
+                        to = Block.get(BlockID.AIR);
                     } else {
                         to = getBlock(decay);
                     }
                     BlockFromToEvent event = new BlockFromToEvent(this, to);
                     level.getServer().getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
-                        this.level.setBlock(this, to, true, true);
+                        this.level.setBlock(this, event.getTo(), true, true);
                         if (!decayed) {
                             this.level.scheduleUpdate(this, this.tickRate());
                         }
@@ -284,7 +284,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
         }
     }
 
-    private int calculateFlowCost(int blockX, int blockY, int blockZ, int accumulatedCost, int maxCost, int originOpposite, int lastOpposite) {
+    protected int calculateFlowCost(int blockX, int blockY, int blockZ, int accumulatedCost, int maxCost, int originOpposite, int lastOpposite) {
         int cost = 1000;
         for (int j = 0; j < 4; ++j) {
             if (j == originOpposite || j == lastOpposite) {
@@ -298,7 +298,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
                 ++x;
             } else if (j == 2) {
                 --z;
-            } else if (j == 3) {
+            } else {
                 ++z;
             }
             long hash = Level.blockHash(x, blockY, z);
@@ -339,14 +339,14 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
         return 500;
     }
 
-    private boolean[] getOptimalFlowDirections() {
+    protected boolean[] getOptimalFlowDirections() {
         int[] flowCost = new int[]{
                 1000,
                 1000,
                 1000,
                 1000
         };
-        int maxCost = 4 / this.getFlowDecayPerBlock();
+        int maxCost = 4;
         for (int j = 0; j < 4; ++j) {
             int x = (int) this.x;
             int y = (int) this.y;
@@ -428,7 +428,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
         if (event.isCancelled()) {
             return false;
         }
-        this.level.setBlock(this, result, true, true);
+        this.level.setBlock(this, event.getTo(), true, true);
         this.getLevel().addLevelSoundEvent(this.add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_FIZZ);
         return true;
     }
@@ -439,6 +439,6 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockAir());
+        return new ItemBlock(Block.get(BlockID.AIR));
     }
 }

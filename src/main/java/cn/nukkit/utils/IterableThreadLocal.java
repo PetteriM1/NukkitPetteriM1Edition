@@ -45,7 +45,7 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
             Thread[] threads = new Thread[ rootGroup.activeCount() ];
             if (threads.length != 0) {
                 while (rootGroup.enumerate(threads, true) == threads.length) {
-                    threads = new Thread[threads.length * 2];
+                    threads = new Thread[(threads.length << 1)];
                 }
             }
             Field tl = Thread.class.getDeclaredField("threadLocals");
@@ -59,11 +59,9 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
                             methodRemove = tlm.getClass().getDeclaredMethod("remove", ThreadLocal.class);
                             methodRemove.setAccessible(true);
                         }
-                        if (methodRemove != null) {
-                            try {
-                                methodRemove.invoke(tlm, instance);
-                            } catch (Throwable ignore) {}
-                        }
+                        try {
+                            methodRemove.invoke(tlm, instance);
+                        } catch (Throwable ignore) {}
                     }
                 }
             }

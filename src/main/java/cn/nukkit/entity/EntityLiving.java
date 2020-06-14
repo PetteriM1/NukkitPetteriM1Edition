@@ -68,7 +68,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             this.namedTag.putFloat("Health", this.getMaxHealth());
         }
 
-        this.setHealth(this.namedTag.getFloat("Health"));
+        this.health = this.namedTag.getFloat("Health");
     }
 
     @Override
@@ -100,7 +100,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        if (this.attackTime > 0 || this.noDamageTicks > 0) {
+        if (this.noDamageTicks > 0) {
+            return false;
+        } else if (this.attackTime > 0) {
             EntityDamageEvent lastCause = this.getLastDamageCause();
             if (lastCause != null && lastCause.getDamage() >= source.getDamage()) {
                 return false;
@@ -137,7 +139,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
             EntityEventPacket pk = new EntityEventPacket();
             pk.eid = this.getId();
-            pk.event = this.getHealth() <= 0 ? EntityEventPacket.DEATH_ANIMATION : EntityEventPacket.HURT_ANIMATION;
+            pk.event = this.getHealth() < 1 ? EntityEventPacket.DEATH_ANIMATION : EntityEventPacket.HURT_ANIMATION;
             Server.broadcastPacket(this.hasSpawned.values(), pk);
 
             this.attackTime = source.getAttackCooldown();
@@ -192,10 +194,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 BaseEntity baseEntity = (BaseEntity) ev.getEntity();
                 if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                     if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
-                        int killExperience = baseEntity.getKillExperience();
-                        if (killExperience > 0) {
-                            this.getLevel().dropExpOrb(this, killExperience);
-                        }
+                        this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
                     }
                 }
             }
@@ -234,12 +233,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         // HACK!
         if (this instanceof Player && ((Player) this).protocol <= 282) {
             if (((Player) this).protocol <= 201) {
-                this.setDataFlag(DATA_FLAGS, 33, isBreathing);
+                this.setDataFlagSelfOnly(DATA_FLAGS, 33, isBreathing);
             } else {
-                this.setDataFlag(DATA_FLAGS, 34, isBreathing);
+                this.setDataFlagSelfOnly(DATA_FLAGS, 34, isBreathing);
             }
         } else {
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
+            this.setDataFlagSelfOnly(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
         }
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);
@@ -293,18 +292,19 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
             // Check collisions with blocks
             if (this instanceof Player) {
-                Block block = this.level.getBlock(getFloorX(), getFloorY() - 1, getFloorZ());
-                int id = block.getId();
-                if (id == Block.MAGMA || id == Block.CACTUS) {
-                    block.onEntityCollide(this);
-                }
-                if (id == Block.MAGMA && this.isInsideOfWater()) {
-                    this.level.addParticle(new BubbleParticle(this));
-                    this.setMotion(new Vector3(0, -0.3, 0));
-                }
-                if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
-                    this.level.addParticle(new BubbleParticle(this));
-                    this.setMotion(new Vector3(0, 0.3, 0));
+                if (this.age % 5 == 0) {
+                    int block = this.level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                    if (block == Block.MAGMA || block == Block.CACTUS) {
+                        Block.get(Block.MAGMA).onEntityCollide(this);
+                    }
+                    if (block == Block.MAGMA && this.isInsideOfWater()) {
+                        this.level.addParticle(new BubbleParticle(this));
+                        this.setMotion(this.getMotion().add(0, -0.3, 0));
+                    }
+                    if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
+                        this.level.addParticle(new BubbleParticle(this));
+                        this.setMotion(this.getMotion().add(0, 0.3, 0));
+                    }
                 }
             }
         }
@@ -312,8 +312,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         if (this.attackTime > 0) {
             this.attackTime -= tickDiff;
         }
+
         if (this.riding == null) {
-            for (Entity entity : level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this)) {
+            Entity[] e = level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
+            for (Entity entity : e) {
                 if (entity instanceof EntityRideable) {
                     this.collidingWith(entity);
                 }
@@ -417,6 +419,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void setAirTicks(int ticks) {
-        this.setDataProperty(new ShortEntityData(DATA_AIR, ticks));
+        this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
     }
 }

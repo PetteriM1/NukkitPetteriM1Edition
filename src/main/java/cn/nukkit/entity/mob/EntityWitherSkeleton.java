@@ -53,7 +53,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
         if (this.attackDelay > 23 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, getDamage()));
-            player.addEffect(Effect.getEffect(Effect.WITHER).setAmplifier(1).setDuration(200));
+            player.addEffect(Effect.getEffect(Effect.WITHER).setDuration(200));
         }
     }
 

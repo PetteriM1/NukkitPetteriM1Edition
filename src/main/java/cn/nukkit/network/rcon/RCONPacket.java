@@ -24,6 +24,10 @@ public class RCONPacket {
     public RCONPacket(ByteBuffer buffer) throws IOException {
         int size = buffer.getInt();
 
+        if (size > 250000) {
+            throw new RuntimeException("Too big RCON packet: " + size);
+        }
+
         this.id = buffer.getInt();
         this.type = buffer.getInt();
         this.payload = new byte[size - 10];

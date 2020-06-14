@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-public class ItemBookAndQuill extends Item {
+public class ItemBookAndQuill extends ItemBookWritable {
 
     public ItemBookAndQuill() {
         this(0, 1);
@@ -11,6 +11,11 @@ public class ItemBookAndQuill extends Item {
     }
 
     public ItemBookAndQuill(Integer meta, int count) {
-        super(BOOK_AND_QUILL, 0, count, "Book And Quill");
+        super(Item.BOOK_AND_QUILL, 0, count, "Book & Quill");
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 1;
     }
 }

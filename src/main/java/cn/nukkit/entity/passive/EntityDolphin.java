@@ -1,6 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.ItemBreakParticle;
@@ -33,6 +34,11 @@ public class EntityDolphin extends EntityWaterAnimal {
     }
 
     @Override
+    public double getSpeed() {
+        return 1.2;
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
 
@@ -59,5 +65,14 @@ public class EntityDolphin extends EntityWaterAnimal {
             return true;
         }
         return super.onInteract(player, item, clickedPos);
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return player.spawned && player.isAlive() && !player.closed && (player.getInventory().getItemInHand().getId() == Item.RAW_FISH || player.getInventory().getItemInHand().getId() == Item.RAW_SALMON) && distance <= 40;
+        }
+        return false;
     }
 }

@@ -16,7 +16,7 @@ public class EnchantmentDurability extends Enchantment {
 
     @Override
     public int getMinEnchantAbility(int level) {
-        return 5 + (level - 1) * 8;
+        return 5 + ((level - 1) << 3);
     }
 
     @Override

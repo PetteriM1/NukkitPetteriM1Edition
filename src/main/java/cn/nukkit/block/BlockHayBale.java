@@ -12,7 +12,7 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
-    private static final int[] faces = new int[]{
+    private static final short[] faces = new short[]{
             0,
             0,
             0b1000,
@@ -69,7 +69,7 @@ public class BlockHayBale extends BlockSolidMeta implements Faceable {
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.GRASS_BLOCK_COLOR;
+        return BlockColor.YELLOW_BLOCK_COLOR;
     }
 
     @Override

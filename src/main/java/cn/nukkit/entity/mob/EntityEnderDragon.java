@@ -15,6 +15,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
@@ -77,19 +78,15 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
             double f = 1.1;
             double yaw = this.yaw + Utils.rand(-12.0, 12.0);
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Entity k = Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
-            if (!(k instanceof EntityEnderCharge)) {
-                return;
-            }
 
-            EntityEnderCharge charge = (EntityEnderCharge) k;
-            charge.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+            EntityEnderCharge charge = (EntityEnderCharge) Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
+            charge.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                    Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
 
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(charge);
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                charge.kill();
+                charge.close();
             } else {
                 charge.spawnToAll();
             }
@@ -98,7 +95,8 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        for (Entity e : this.getLevel().getEntities()) {
+        Entity[] entities = this.getLevel().getEntities();
+        for (Entity e : entities) {
             if (e instanceof EntityEndCrystal) {
                 if (e.distanceSquared(this) <= 32) {
                     float health = this.getHealth();
@@ -134,6 +132,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(200).setValue(200)};
+        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 }

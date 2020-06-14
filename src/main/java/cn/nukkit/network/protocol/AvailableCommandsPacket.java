@@ -6,7 +6,6 @@ import lombok.ToString;
 
 import java.util.*;
 import java.util.function.ObjIntConsumer;
-import java.util.function.ToIntFunction;
 
 /**
  * @author MagicDroidX
@@ -18,9 +17,9 @@ public class AvailableCommandsPacket extends DataPacket {
     private static final ObjIntConsumer<BinaryStream> WRITE_BYTE = (s, v) -> s.putByte((byte) v);
     private static final ObjIntConsumer<BinaryStream> WRITE_SHORT = BinaryStream::putLShort;
     private static final ObjIntConsumer<BinaryStream> WRITE_INT = BinaryStream::putLInt;
-    private static final ToIntFunction<BinaryStream> READ_BYTE = BinaryStream::getByte;
-    private static final ToIntFunction<BinaryStream> READ_SHORT = BinaryStream::getLShort;
-    private static final ToIntFunction<BinaryStream> READ_INT = BinaryStream::getLInt;
+    //private static final ToIntFunction<BinaryStream> READ_BYTE = BinaryStream::getByte;
+    //private static final ToIntFunction<BinaryStream> READ_SHORT = BinaryStream::getLShort;
+    //private static final ToIntFunction<BinaryStream> READ_INT = BinaryStream::getLInt;
 
     public static final int ARG_FLAG_VALID = 0x100000;
     public static final int ARG_FLAG_ENUM = 0x200000;
@@ -36,7 +35,8 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_WILDCARD_TARGET = 7;
     public static final int ARG_TYPE_FILE_PATH = 14;
     public static final int ARG_TYPE_STRING = 29;
-    public static final int ARG_TYPE_POSITION = 37;
+    public static final int ARG_TYPE_BLOCK_POSITION = 37;
+    public static final int ARG_TYPE_POSITION = 38;
     public static final int ARG_TYPE_STRING_PRE388 = 27;
     public static final int ARG_TYPE_POSITION_PRE388 = 29;
     public static final int ARG_TYPE_MESSAGE = 41;
@@ -58,7 +58,7 @@ public class AvailableCommandsPacket extends DataPacket {
 
     @Override
     public void decode() {
-        commands = new HashMap<>();
+        /*commands = new HashMap<>();
 
         List<String> enumValues = new ArrayList<>();
         List<String> postFixes = new ArrayList<>();
@@ -167,7 +167,7 @@ public class AvailableCommandsPacket extends DataPacket {
             versions.versions.add(data);
 
             this.commands.put(name, versions);
-        }
+        }*/
     }
 
     @Override

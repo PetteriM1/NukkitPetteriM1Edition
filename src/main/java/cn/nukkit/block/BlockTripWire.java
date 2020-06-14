@@ -121,7 +121,8 @@ public class BlockTripWire extends BlockFlowable {
             }
 
             boolean found = false;
-            for (Entity entity : this.level.getCollidingEntities(this.getCollisionBoundingBox())) {
+            Entity[] e = this.level.getCollidingEntities(this.getCollisionBoundingBox());
+            for (Entity entity : e) {
                 if (!entity.doesTriggerPressurePlate()) {
                     continue;
                 }
@@ -156,10 +157,10 @@ public class BlockTripWire extends BlockFlowable {
             this.setDisarmed(true);
             this.level.setBlock(this, this, true, false);
             this.updateHook(false);
-            this.getLevel().setBlock(this, new BlockAir(), true, true);
+            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
         } else {
             this.setPowered(true);
-            this.getLevel().setBlock(this, new BlockAir(), true, true);
+            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
             this.updateHook(true);
         }
 

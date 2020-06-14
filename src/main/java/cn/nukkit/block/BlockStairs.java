@@ -12,7 +12,7 @@ import cn.nukkit.utils.Faceable;
  */
 public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
-    private static final int[] faces = new int[]{2, 1, 3, 0};
+    private static final short[] faces = new short[]{2, 1, 3, 0};
 
     protected BlockStairs(int meta) {
         super(meta);

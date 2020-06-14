@@ -1,6 +1,8 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.entity.data.Skin;
+import cn.nukkit.utils.PersonaPiece;
+import cn.nukkit.utils.PersonaPieceTint;
 import cn.nukkit.utils.SerializedImage;
 import cn.nukkit.utils.SkinAnimation;
 import com.google.gson.Gson;
@@ -10,10 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import lombok.ToString;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @ToString
 public class LoginPacket extends DataPacket {
@@ -50,7 +49,14 @@ public class LoginPacket extends DataPacket {
     }
 
     private void decodeChainData() {
-        Map<String, List<String>> map = new Gson().fromJson(new String(this.get(getLInt()), StandardCharsets.UTF_8), new MapTypeToken().getType());
+        int size = this.getLInt();
+        if (size > 3000000) {
+            throw new IllegalArgumentException("The chain data is too big: " + size);
+        }
+
+        String data = new String(this.get(size), StandardCharsets.UTF_8);
+
+        Map<String, List<String>> map = new Gson().fromJson(data, new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
         for (String c : map.get("chain")) {
             JsonObject chainMap = decodeToken(c);
@@ -64,7 +70,15 @@ public class LoginPacket extends DataPacket {
     }
 
     private void decodeSkinData() {
-        JsonObject skinToken = decodeToken(new String(this.get(this.getLInt())));
+        int size = this.getLInt();
+        if (size > 3000000) {
+            throw new IllegalArgumentException("The skin data is too big: " + size);
+        }
+
+        String data = new String(this.get(size));
+        JsonObject skinToken = decodeToken(data);
+
+        if (skinToken == null) return;
 
         if (skinToken.has("ClientRandomId")) {
             this.clientId = skinToken.get("ClientRandomId").getAsLong();
@@ -129,6 +143,26 @@ public class LoginPacket extends DataPacket {
                     skin.getAnimations().add(getAnimation(element.getAsJsonObject()));
                 }
             }
+
+            if (skinToken.has("SkinColor")) {
+                skin.setSkinColor(skinToken.get("SkinColor").getAsString());
+            }
+
+            if (skinToken.has("ArmSize")) {
+                skin.setArmSize(skinToken.get("ArmSize").getAsString());
+            }
+
+            if (skinToken.has("PersonaPieces")) {
+                for (JsonElement object : skinToken.get("PersonaPieces").getAsJsonArray()) {
+                    skin.getPersonaPieces().add(getPersonaPiece(object.getAsJsonObject()));
+                }
+            }
+
+            if (skinToken.has("PieceTintColors")) {
+                for (JsonElement object : skinToken.get("PieceTintColors").getAsJsonArray()) {
+                    skin.getTintColors().add(getTint(object.getAsJsonObject()));
+                }
+            }
         }
     }
 
@@ -159,6 +193,24 @@ public class LoginPacket extends DataPacket {
             }
         }
         return SerializedImage.EMPTY;
+    }
+
+    private static PersonaPiece getPersonaPiece(JsonObject object) {
+        String pieceId = object.get("PieceId").getAsString();
+        String pieceType = object.get("PieceType").getAsString();
+        String packId = object.get("PackId").getAsString();
+        boolean isDefault = object.get("IsDefault").getAsBoolean();
+        String productId = object.get("ProductId").getAsString();
+        return new PersonaPiece(pieceId, pieceType, packId, isDefault, productId);
+    }
+
+    public static PersonaPieceTint getTint(JsonObject object) {
+        String pieceType = object.get("PieceType").getAsString();
+        List<String> colors = new ArrayList<>();
+        for (JsonElement element : object.get("Colors").getAsJsonArray()) {
+            colors.add(element.getAsString()); // remove #
+        }
+        return new PersonaPieceTint(pieceType, colors);
     }
 
     private static class MapTypeToken extends TypeToken<Map<String, List<String>>> {

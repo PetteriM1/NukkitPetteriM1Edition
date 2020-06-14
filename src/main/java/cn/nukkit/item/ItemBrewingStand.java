@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockBrewingStand;
+import cn.nukkit.block.Block;
 
 public class ItemBrewingStand extends Item {
 
@@ -14,6 +14,6 @@ public class ItemBrewingStand extends Item {
 
     public ItemBrewingStand(Integer meta, int count) {
         super(BREWING_STAND, 0, count, "Brewing Stand");
-        this.block = new BlockBrewingStand();
+        this.block = Block.get(BREWING_STAND_BLOCK);
     }
 }

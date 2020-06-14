@@ -1,11 +1,16 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.entity.projectile.EntityWitherSkull;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityExplosionPrimeEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Explosion;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
@@ -14,6 +19,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public class EntityWither extends EntityFlyingMob implements EntityBoss, EntitySmite {
 
@@ -48,7 +54,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         super.initEntity();
 
         this.fireProof = true;
-        this.setMaxHealth(600);
+        this.setMaxHealth(witherMaxHealth());
         this.setDamage(new int[]{0, 2, 4, 6});
     }
 
@@ -56,7 +62,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && (player.isSurvival() || player.isAdventure()) && distance <= 200;
+            if (!player.isSurvival() && !player.isAdventure()) {
+                return false;
+            }
         }
         return creature.isAlive() && !creature.closed && distance <= 200;
     }
@@ -68,14 +76,18 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+    if (this.age > 220 && this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
             double yaw = this.yaw + Utils.rand(-12.0, 12.0);
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
-                    this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+            Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
+                    this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+
+        if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
+            return;
+        }
 
             Entity k;
             ProjectileLaunchEvent launch;
@@ -83,32 +95,22 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             if (Utils.rand(0, 200) > 180 || Utils.rand(0, 200) < 20) {
                 f = 0.8;
                 k = Entity.createEntity("BlueWitherSkull", pos, this);
-                if (!(k instanceof EntityBlueWitherSkull)) {
-                    return;
-                }
-
                 skull = (EntityBlueWitherSkull) k;
                 ((EntityBlueWitherSkull) skull).setExplode(true);
-                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
+                skull.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
                 launch = new ProjectileLaunchEvent(skull);
             } else {
                 k = Entity.createEntity("WitherSkull", pos, this);
-                if (!(k instanceof EntityWitherSkull)) {
-                    return;
-                }
-
                 skull = (EntityWitherSkull) k;
-                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
-
+                skull.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
                 launch = new ProjectileLaunchEvent(skull);
             }
 
             this.server.getPluginManager().callEvent(launch);
             if (launch.isCancelled()) {
-                skull.kill();
+                skull.close();
             } else {
                 skull.spawnToAll();
                 this.level.addSound(this, Sound.MOB_WITHER_SHOOT);
@@ -137,7 +139,8 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
-        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(600).setValue(600)};
+        addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(witherMaxHealth()).setValue(witherMaxHealth())};
+        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 
@@ -148,11 +151,59 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             return true;
         }
 
+        if (this.age == 200) {
+            this.explode();
+        }
+
         return super.entityBaseTick(tickDiff);
     }
 
     @Override
     public int nearbyDistanceMultiplier() {
         return 30;
+    }
+
+    @Override
+    public void kill() {
+        if (this.lastDamageCause != null && EntityDamageEvent.DamageCause.SUICIDE != this.lastDamageCause.getCause()) {
+            this.explode();
+        }
+
+        super.kill();
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (this.age <= 200 && ev.getCause() != EntityDamageEvent.DamageCause.SUICIDE) {
+            return false;
+        }
+
+        return super.attack(ev);
+    }
+
+    private int witherMaxHealth() {
+        switch (this.getServer().getDifficulty()) {
+            case 2:
+                return 450;
+            case 3:
+                return 600;
+            default:
+                return 300;
+        }
+    }
+
+    private void explode() {
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 5);
+        this.server.getPluginManager().callEvent(ev);
+
+        if (!ev.isCancelled()) {
+            Explosion explosion = new Explosion(this, (float) ev.getForce(), this);
+
+            if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+                explosion.explodeA();
+            }
+
+            explosion.explodeB();
+        }
     }
 }

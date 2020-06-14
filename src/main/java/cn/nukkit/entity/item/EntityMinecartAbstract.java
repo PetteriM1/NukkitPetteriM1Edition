@@ -5,7 +5,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRail;
 import cn.nukkit.block.BlockRailActivator;
 import cn.nukkit.block.BlockRailPowered;
-import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
@@ -25,6 +24,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.MinecartType;
 import cn.nukkit.utils.Rail;
 import cn.nukkit.utils.Rail.Orientation;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -185,7 +185,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             double diffZ = this.lastZ - this.z;
             double yawToChange = yaw;
             if (diffX * diffX + diffZ * diffZ > 0.001D) {
-                yawToChange = (Math.atan2(diffZ, diffX) * 180 / Math.PI);
+                yawToChange = (FastMath.atan2(diffZ, diffX) * 180 / Math.PI);
             }
 
             // Reverse yaw if yaw is below 0
@@ -283,7 +283,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             return false;
         }
 
-        if (!passengers.isEmpty() && isRideable()) {
+        if (!passengers.isEmpty()) {
             return false;
         }
 
@@ -296,15 +296,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public void applyEntityCollision(cn.nukkit.entity.Entity entity) {
-        if (entity != riding) {
-            if (entity instanceof EntityLiving
-                    && !(entity instanceof EntityHuman)
-                    && motionX * motionX + motionZ * motionZ > 0.01D
-                    && passengers.isEmpty()
-                    && entity.riding == null
-                    && blockInside == null) {
-            }
-
+        if (entity != riding && !(entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR)) {
             double motiveX = entity.x - x;
             double motiveZ = entity.z - z;
             double square = motiveX * motiveX + motiveZ * motiveZ;
@@ -531,7 +523,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
         x = playerYawNeg + facing1 * expectedSpeed;
         z = playerYawPos + facing2 * expectedSpeed;
-        setPosition(new Vector3(x, y, z)); // Hehe, my minstake :3
+        setPosition(new Vector3(x, y, z));
 
         motX = motionX;
         motZ = motionZ;
@@ -595,7 +587,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
                 }
             }
         }
-
     }
 
     private void applyDrag() {
@@ -718,7 +709,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      * @param block The block that will changed. Set {@code null} for BlockAir
      * @return {@code true} if the block is normal block
      */
-    public boolean setDisplayBlock(Block block){
+    public boolean setDisplayBlock(Block block) {
         return setDisplayBlock(block, true);
     }
 
@@ -730,7 +721,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
      * @return {@code true} if the block is normal block
      */
     public boolean setDisplayBlock(Block block, boolean update) {
-        if (!update){
+        if (!update) {
             if (block.isNormalBlock()) {
                 blockInside = block;
             } else {

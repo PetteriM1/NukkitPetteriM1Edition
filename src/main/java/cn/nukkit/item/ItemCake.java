@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockCake;
+import cn.nukkit.block.Block;
 
 /**
  * @author MagicDroidX
@@ -18,7 +18,7 @@ public class ItemCake extends Item {
 
     public ItemCake(Integer meta, int count) {
         super(CAKE, 0, count, "Cake");
-        this.block = new BlockCake();
+        this.block = Block.get(CAKE_BLOCK);
     }
 
     @Override
