@@ -3,8 +3,7 @@ package cn.nukkit.blockentity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
@@ -245,7 +244,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
 
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BEACON_POWER);
 
-        player.getWindowById(Player.BEACON_WINDOW_ID).setItem(0, new ItemBlock(Block.get(BlockID.AIR), 0, 0));
+        player.getWindowById(Player.BEACON_WINDOW_ID).setItem(0, Item.get(Item.AIR));
         return true;
     }
 }

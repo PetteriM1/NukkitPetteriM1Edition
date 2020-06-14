@@ -1424,7 +1424,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void checkNearEntities() {
         Entity[] e = this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this);
         for (Entity entity : e) {
-            entity.scheduleUpdate();
+            //entity.scheduleUpdate();
 
             if (!entity.isAlive() || !this.isAlive()) {
                 continue;
@@ -1494,11 +1494,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                 }
 
-                this.x = newPos.x;
-                this.y = newPos.y;
-                this.z = newPos.z;
-                double radius = this.getWidth() / 2;
-                this.boundingBox.setBounds(this.x - radius, this.y, this.z - radius, this.x + radius, this.y + this.getHeight(), this.z + radius);
+                if (!revert) {
+                    this.x = newPos.x;
+                    this.y = newPos.y;
+                    this.z = newPos.z;
+                    double radius = this.getWidth() / 2;
+                    this.boundingBox.setBounds(this.x - radius, this.y, this.z - radius, this.x + radius, this.y + this.getHeight(), this.z + radius);
+                }
             }
         }
 
