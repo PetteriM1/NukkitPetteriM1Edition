@@ -113,15 +113,14 @@ public class Binary {
             int id2 = entry.getKey();
 
             // HACK: Multiversion entity data
-            if (protocol < 361) {
-                if (protocol <= 201) {
-                    if (id2 > 35 && id2 < 400) {
+            if (protocol < ProtocolInfo.v1_12_0) {
+                if (protocol == ProtocolInfo.v1_11_0) {
+                    if (id2 >= 40) {
                         id2 = id2 + 1;
                     }
-                }
-                if (protocol == 354) {
-                    if (id2 > 40 && id2 < 400) {
-                        id2 = id2 + 1;
+                } else if (protocol <= ProtocolInfo.v1_2_10) {
+                    if (id2 > 35) {
+                        id2 = id2 - 1;
                     }
                 }
             }
@@ -149,7 +148,7 @@ public class Binary {
                     break;
                 case Entity.DATA_TYPE_NBT:
                     NBTEntityData slot = (NBTEntityData) d;
-                    if (protocol < 361) {
+                    if (protocol < ProtocolInfo.v1_12_0) {
                         stream.putSlot(protocol, slot.item);
                     } else {
                         try {
@@ -460,11 +459,11 @@ public class Binary {
         }
         String str = "0123456789ABCDEF";
         hexString = hexString.toUpperCase().replace(" ", "");
-        int length = hexString.length() / 2;
+        int length = hexString.length() >> 1;
         char[] hexChars = hexString.toCharArray();
         byte[] d = new byte[length];
         for (int i = 0; i < length; i++) {
-            int pos = i * 2;
+            int pos = i << 1;
             d[i] = (byte) (((byte) str.indexOf(hexChars[pos]) << 4) | ((byte) str.indexOf(hexChars[pos + 1])));
         }
         return d;

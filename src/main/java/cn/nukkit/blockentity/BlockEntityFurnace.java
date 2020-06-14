@@ -1,10 +1,9 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
-import cn.nukkit.block.BlockFurnace;
-import cn.nukkit.block.BlockFurnaceBurning;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.event.inventory.FurnaceBurnEvent;
 import cn.nukkit.event.inventory.FurnaceSmeltEvent;
 import cn.nukkit.inventory.FurnaceInventory;
@@ -115,6 +114,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         for (Item content : inventory.getContents().values()) {
             level.dropItem(this, content);
         }
+        inventory.clearAll();
     }
 
     @Override
@@ -156,7 +156,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     public Item getItem(int index) {
         int i = this.getSlotIndex(index);
         if (i < 0) {
-            return new ItemBlock(new BlockAir(), 0, 0);
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
         } else {
             CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
             return NBTIO.getItemHelper(data);
@@ -198,7 +198,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         burnTime = ev.getBurnTime();
         burnDuration = 0;
         if (this.getBlock().getId() == Item.FURNACE) {
-            this.getLevel().setBlock(this, new BlockFurnaceBurning(this.getBlock().getDamage()), true);
+            this.getLevel().setBlock(this, Block.get(BlockID.BURNING_FURNACE, this.getBlock().getDamage()), true);
         }
 
         if (burnTime > 0 && ev.isBurning()) {
@@ -208,7 +208,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
                     fuel.setDamage(0);
                     fuel.setCount(1);
                 } else {
-                    fuel = new ItemBlock(new BlockAir(), 0, 0);
+                    fuel = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
                 }
             }
             this.inventory.setFuel(fuel);
@@ -249,7 +249,7 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
                         this.inventory.setResult(ev.getResult());
                         raw.setCount(raw.getCount() - 1);
                         if (raw.getCount() == 0) {
-                            raw = new ItemBlock(new BlockAir(), 0, 0);
+                            raw = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
                         }
                         this.inventory.setSmelting(raw);
                     }
@@ -266,27 +266,29 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
             ret = true;
         } else {
             if (this.getBlock().getId() == Item.BURNING_FURNACE) {
-                this.getLevel().setBlock(this, new BlockFurnace(this.getBlock().getDamage()), true);
+                this.getLevel().setBlock(this, Block.get(BlockID.FURNACE, this.getBlock().getDamage()), true);
             }
             burnTime = 0;
             cookTime = 0;
             burnDuration = 0;
         }
 
-        for (Player player : this.inventory.getViewers()) {
-            int windowId = player.getWindowId(this.inventory);
-            if (windowId > 0) {
-                ContainerSetDataPacket pk = new ContainerSetDataPacket();
-                pk.windowId = windowId;
-                pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_TICK_COUNT;
-                pk.value = cookTime;
-                player.dataPacket(pk);
+        if (Server.getInstance().getTick() % 4 == 0) {
+            for (Player player : this.inventory.getViewers()) {
+                int windowId = player.getWindowId(this.inventory);
+                if (windowId > 0) {
+                    ContainerSetDataPacket pk = new ContainerSetDataPacket();
+                    pk.windowId = windowId;
+                    pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_TICK_COUNT;
+                    pk.value = cookTime;
+                    player.dataPacket(pk);
 
-                pk = new ContainerSetDataPacket();
-                pk.windowId = windowId;
-                pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_LIT_TIME;
-                pk.value = burnDuration;
-                player.dataPacket(pk);
+                    pk = new ContainerSetDataPacket();
+                    pk.windowId = windowId;
+                    pk.property = ContainerSetDataPacket.PROPERTY_FURNACE_LIT_TIME;
+                    pk.value = burnDuration;
+                    player.dataPacket(pk);
+                }
             }
         }
 

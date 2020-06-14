@@ -52,7 +52,7 @@ public class BlockEndPortal extends BlockFlowable {
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
+        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override
@@ -64,7 +64,12 @@ public class BlockEndPortal extends BlockFlowable {
     public boolean canHarvestWithHand() {
         return false;
     }
-    
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
@@ -79,6 +84,6 @@ public class BlockEndPortal extends BlockFlowable {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockAir());
+        return new ItemBlock(Block.get(BlockID.AIR));
     }
 }

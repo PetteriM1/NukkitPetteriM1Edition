@@ -62,7 +62,7 @@ public class BlockStemMelon extends BlockCrops {
                     Block side = this.getSide(Plane.HORIZONTAL.random(random));
                     Block d = side.down();
                     if (side.getId() == AIR && (d.getId() == FARMLAND || d.getId() == GRASS || d.getId() == DIRT)) {
-                        BlockGrowEvent ev = new BlockGrowEvent(side, new BlockMelon());
+                        BlockGrowEvent ev = new BlockGrowEvent(side, Block.get(MELON_BLOCK));
                         Server.getInstance().getPluginManager().callEvent(ev);
                         if (!ev.isCancelled()) {
                             this.getLevel().setBlock(side, ev.getNewState(), true);
@@ -82,8 +82,9 @@ public class BlockStemMelon extends BlockCrops {
 
     @Override
     public Item[] getDrops(Item item) {
+        if (this.getDamage() < 4) return new Item[0];
         return new Item[]{
-                new ItemSeedsMelon(0, Utils.rand(0, 3))
+                new ItemSeedsMelon(0, Utils.rand(0, 48) >> 4)
         };
     }
 }

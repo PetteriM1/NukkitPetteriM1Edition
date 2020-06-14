@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockDoorJungle;
+import cn.nukkit.block.Block;
 
 public class ItemDoorJungle extends Item {
 
@@ -14,6 +14,6 @@ public class ItemDoorJungle extends Item {
 
     public ItemDoorJungle(Integer meta, int count) {
         super(JUNGLE_DOOR, 0, count, "Jungle Door");
-        this.block = new BlockDoorJungle();
+        this.block = Block.get(JUNGLE_DOOR_BLOCK);
     }
 }

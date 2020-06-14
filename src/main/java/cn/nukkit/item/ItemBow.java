@@ -100,7 +100,7 @@ public class ItemBow extends ItemTool {
 
         Server.getInstance().getPluginManager().callEvent(entityShootBowEvent);
         if (entityShootBowEvent.isCancelled()) {
-            entityShootBowEvent.getProjectile().kill();
+            entityShootBowEvent.getProjectile().close();
             player.getInventory().sendContents(player);
             player.getOffhandInventory().sendContents(player);
         } else {
@@ -133,14 +133,10 @@ public class ItemBow extends ItemTool {
                 ProjectileLaunchEvent projectev = new ProjectileLaunchEvent(proj);
                 Server.getInstance().getPluginManager().callEvent(projectev);
                 if (projectev.isCancelled()) {
-                    proj.kill();
+                    proj.close();
                 } else {
                     proj.spawnToAll();
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_BOW);
-
-                    if (this.hasEnchantment(Enchantment.ID_BOW_INFINITY)) {
-                        proj.namedTag.putBoolean("canNotPickup", true);
-                    }
                 }
             }
         }

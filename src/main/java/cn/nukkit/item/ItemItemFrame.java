@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockItemFrame;
+import cn.nukkit.block.Block;
 
 /**
  * Created by Pub4Game on 03.07.2016.
@@ -17,6 +17,6 @@ public class ItemItemFrame extends Item {
 
     public ItemItemFrame(Integer meta, int count) {
         super(ITEM_FRAME, meta, count, "Item Frame");
-        this.block = new BlockItemFrame();
+        this.block = Block.get(ITEM_FRAME_BLOCK);
     }
 }

@@ -101,4 +101,10 @@ public abstract class BlockSlab extends BlockTransparentMeta {
 
         return true;
     }
+
+    @Override
+    public boolean isTransparent() {
+        //HACK: Fix unable to place many blocks on slabs
+        return (this.getDamage() & 0x08) <= 0;
+    }
 }

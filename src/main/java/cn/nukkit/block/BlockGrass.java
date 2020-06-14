@@ -56,13 +56,19 @@ public class BlockGrass extends BlockDirt {
             }
             return true;
         } else if (item.isHoe()) {
-            item.useOn(this);
-            this.getLevel().setBlock(this, new BlockFarmland());
-            return true;
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, Block.get(FARMLAND));
+                return true;
+            }
         } else if (item.isShovel()) {
-            item.useOn(this);
-            this.getLevel().setBlock(this, new BlockGrassPath());
-            return true;
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
+                return true;
+            }
         }
 
         return false;
@@ -75,9 +81,9 @@ public class BlockGrass extends BlockDirt {
             y = Utils.rand((int) y - 2, (int) y + 2);
             z = Utils.rand((int) z - 1, (int) z + 1);
             Block block = this.getLevel().getBlock(new Vector3(x, y, z));
-            if (block.getId() == Block.DIRT) {
+            if (block.getId() == Block.DIRT && block.getDamage() == 0) {
                 if (block.up() instanceof BlockAir) {
-                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, new BlockGrass());
+                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, Block.get(GRASS));
                     Server.getInstance().getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.getLevel().setBlock(block, ev.getNewState());
@@ -85,7 +91,7 @@ public class BlockGrass extends BlockDirt {
                 }
             } else if (block.getId() == Block.GRASS) {
                 if (block.up() instanceof BlockSolid) {
-                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, new BlockDirt());
+                    BlockSpreadEvent ev = new BlockSpreadEvent(block, this, Block.get(DIRT));
                     Server.getInstance().getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
                         this.getLevel().setBlock(block, ev.getNewState());

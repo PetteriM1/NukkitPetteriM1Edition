@@ -4,6 +4,7 @@ import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDurable;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.math.BlockFace;
@@ -264,17 +265,17 @@ public class BinaryStream {
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
-        if (protocol < 388) {
+        if (protocol < ProtocolInfo.v1_13_0) {
             if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
                 this.putByteArray(Base64.getDecoder().decode(Skin.STEVE_SKIN));
-                if (protocol >= 223) {
+                if (protocol >= ProtocolInfo.v1_2_13) {
                     this.putByteArray(skin.getCapeData().data);
                 }
                 this.putString("geometry.humanoid.custom");
                 this.putString(Skin.STEVE_GEOMETRY);
             } else {
                 this.putByteArray(skin.getSkinData().data);
-                if (protocol >= 223) {
+                if (protocol >= ProtocolInfo.v1_2_13) {
                     this.putByteArray(skin.getCapeData().data);
                 }
                 this.putString(skin.isLegacySlim ? "geometry.humanoid.customSlim" : "geometry.humanoid.custom");
@@ -299,7 +300,32 @@ public class BinaryStream {
             this.putBoolean(skin.isPersona());
             this.putBoolean(skin.isCapeOnClassic());
             this.putString(skin.getCapeId());
-            this.putString(UUID.randomUUID().toString()/*skin.getFullSkinId()*/);
+            this.putString(skin.getFullSkinId());
+            if (protocol == ProtocolInfo.v1_14_60) {
+                this.putString(skin.getArmSize());
+                this.putString(skin.getSkinColor());
+
+                List<PersonaPiece> pieces = skin.getPersonaPieces();
+                this.putLInt(pieces.size());
+                for (PersonaPiece piece : pieces) {
+                    this.putString(piece.id);
+                    this.putString(piece.type);
+                    this.putString(piece.packId);
+                    this.putBoolean(piece.isDefault);
+                    this.putString(piece.productId);
+                }
+
+                List<PersonaPieceTint> tints = skin.getTintColors();
+                this.putLInt(tints.size());
+                for (PersonaPieceTint tint : tints) {
+                    this.putString(tint.pieceType);
+                    List<String> colors = tint.colors;
+                    this.putLInt(colors.size());
+                    for (String color : colors) {
+                        this.putString(color);
+                    }
+                }
+            }
         }
     }
 
@@ -316,14 +342,18 @@ public class BinaryStream {
         return new SerializedImage(width, height, data);
     }
 
-    public Skin getSkin() { // Can be used only with protocol >= 388
+    public Skin getSkin() {
+        return getSkin(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public Skin getSkin(int protocol) { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
         skin.setSkinResourcePatch(this.getString());
         skin.setSkinData(this.getImage());
 
         int animationCount = this.getLInt();
-        for (int i = 0; i < animationCount; i++) {
+        for (int i = 0; i < Math.min(animationCount, 1024); i++) {
             SerializedImage image = this.getImage();
             int type = this.getLInt();
             float frames = this.getLFloat();
@@ -338,6 +368,31 @@ public class BinaryStream {
         skin.setCapeOnClassic(this.getBoolean());
         skin.setCapeId(this.getString());
         this.getString(); // TODO: Full skin id
+        if (protocol == ProtocolInfo.v1_14_60) {
+            skin.setArmSize(this.getString());
+            skin.setSkinColor(this.getString());
+
+            int piecesLength = this.getLInt();
+            for (int i = 0; i < Math.min(piecesLength, 1024); i++) {
+                String pieceId = this.getString();
+                String pieceType = this.getString();
+                String packId = this.getString();
+                boolean isDefault = this.getBoolean();
+                String productId = this.getString();
+                skin.getPersonaPieces().add(new PersonaPiece(pieceId, pieceType, packId, isDefault, productId));
+            }
+
+            int tintsLength = this.getLInt();
+            for (int i = 0; i < Math.min(tintsLength, 1024); i++) {
+                String pieceType = this.getString();
+                List<String> colors = new ArrayList<>();
+                int colorsLength = this.getLInt();
+                for (int i2 = 0; i2 < Math.min(colorsLength, 1024); i2++) {
+                    colors.add(this.getString());
+                }
+                skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+            }
+        }
         return skin;
     }
 
@@ -423,7 +478,7 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
-        if (item.getId() == 513) {
+        if (item.getId() == ItemID.SHIELD) {
             this.getVarLong();
         }
 
@@ -446,7 +501,7 @@ public class BinaryStream {
 
         int auxValue;
 
-        if (protocol < 361) {
+        if (protocol < ProtocolInfo.v1_12_0) {
             auxValue = (((item.hasMeta() ? item.getDamage() : -1) & 0x7fff) << 8) | item.getCount();
         } else {
             auxValue = item.getCount();
@@ -457,8 +512,8 @@ public class BinaryStream {
 
         this.putVarInt(auxValue);
 
-        if (item.hasCompoundTag() || (isDurable && protocol >= 361)) {
-            if (protocol < 361) {
+        if (item.hasCompoundTag() || (isDurable && protocol >= ProtocolInfo.v1_12_0)) {
+            if (protocol < ProtocolInfo.v1_12_0) {
                 byte[] nbt = item.getCompoundTag();
                 this.putLShort(nbt.length);
                 this.put(nbt);
@@ -500,7 +555,7 @@ public class BinaryStream {
             this.putString(block);
         }
 
-        if (item.getId() == 513) {
+        if (item.getId() == ItemID.SHIELD) {
             this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
     }

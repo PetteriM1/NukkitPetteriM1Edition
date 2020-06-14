@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -97,7 +96,7 @@ public class BanIpCommand extends VanillaCommand {
     private static void processIPBan(String ip, CommandSender sender, String reason) {
         sender.getServer().getIPBans().addBan(ip, reason, null, sender.getName());
 
-        for (Player player : new ArrayList<>(sender.getServer().getOnlinePlayers().values())) {
+        for (Player player : /*new ArrayList<>(*/sender.getServer().getOnlinePlayers().values()/*)*/) {
             if (player.getAddress().equals(ip)) {
                 player.kick(PlayerKickEvent.Reason.IP_BANNED, !reason.isEmpty() ? reason : "IP banned");
             }

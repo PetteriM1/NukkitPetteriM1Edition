@@ -67,7 +67,7 @@ public class EffectCommand extends Command {
             }
         }
         int duration = 300;
-        int amplification = 0;
+        int amplification = 1;
         if (args.length >= 3) {
             try {
                 duration = Integer.parseInt(args[2]);

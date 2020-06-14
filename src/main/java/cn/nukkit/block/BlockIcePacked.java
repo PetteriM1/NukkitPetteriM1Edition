@@ -21,7 +21,7 @@ public class BlockIcePacked extends BlockIce {
 
     @Override
     public boolean onBreak(Item item) {
-        return this.getLevel().setBlock(this, new BlockAir(), true);
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
     }
 
     @Override

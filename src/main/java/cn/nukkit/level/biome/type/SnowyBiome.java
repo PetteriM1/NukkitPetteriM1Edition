@@ -22,4 +22,9 @@ public abstract class SnowyBiome extends GrassyBiome {
     public boolean isFreezing() {
         return true;
     }
+
+    @Override
+    public boolean canRain() {
+        return false;
+    }
 }

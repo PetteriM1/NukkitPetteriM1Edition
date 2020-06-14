@@ -84,11 +84,11 @@ public class BlockPurpur extends BlockSolidMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockPurpur(), this.getDamage() & 0x03, 1);
+        return new ItemBlock(Block.get(Block.PURPUR_BLOCK), this.getDamage() & 0x03, 1);
     }
 
     @Override
     public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
+        return BlockColor.MAGENTA_BLOCK_COLOR;
     }
 }

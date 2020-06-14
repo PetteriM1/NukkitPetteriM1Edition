@@ -47,11 +47,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     public RakNetInterface(Server server) {
         this.server = server;
-
-        InetSocketAddress bindAddress = new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort());
-
-        this.raknet = new RakNetServer(bindAddress, Runtime.getRuntime().availableProcessors());
-        this.raknet.strongIPBans = server.getPropertyBoolean("strong-ip-bans");
+        this.raknet = new RakNetServer(new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort()), Runtime.getRuntime().availableProcessors());
         this.raknet.bind().join();
         this.raknet.setListener(this);
     }
@@ -66,9 +62,8 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         Iterator<NukkitSessionListener> iterator = this.sessionListeners.iterator();
         while (iterator.hasNext()) {
             NukkitSessionListener listener = iterator.next();
-            Player player = listener.player;
             if (listener.disconnectReason != null) {
-                player.close(player.getLeaveMessage(), listener.disconnectReason, false);
+                listener.player.close(listener.player.getLeaveMessage(), listener.disconnectReason, false);
                 iterator.remove();
                 continue;
             }
@@ -132,7 +127,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
     @Override
     public void setName(String name) {
         QueryRegenerateEvent info = this.server.getQueryInformation();
-        String[] names = name.split("!@#");  // Split double names within the program
+        String[] names = name.split("!@#"); // Split double names within the program
         String motd = Utils.rtrim(names[0].replace(";", "\\;"), '\\');
         String subMotd = names.length > 1 ? Utils.rtrim(names[1].replace(";", "\\;"), '\\') : "";
         StringJoiner joiner = new StringJoiner(";")
@@ -244,8 +239,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
         public void onEncapsulated(EncapsulatedPacket packet) {
             ByteBuf buffer = packet.getBuffer();
-            short packetId = buffer.readUnsignedByte();
-            if (packetId == 0xfe) {
+            if (buffer.readUnsignedByte() == 0xfe) {
                 DataPacket batchPacket = RakNetInterface.this.network.getPacket(ProtocolInfo.BATCH_PACKET);
                 if (batchPacket == null) {
                     return;

@@ -23,6 +23,7 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
 
     public EntityMinecartEmpty(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+        setName("Minecart");
     }
 
     @Override

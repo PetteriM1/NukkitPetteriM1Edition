@@ -113,7 +113,7 @@ public class ItemPainting extends Item {
         EntityPainting entity = new EntityPainting(chunk, nbt);
 
         if (!player.isCreative()) {
-            this.count--;
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
         }
         entity.spawnToAll();
 

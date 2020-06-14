@@ -62,19 +62,19 @@ public class BlockFarmland extends BlockTransparentMeta {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
-            Vector3 v = new Vector3();
+            Block up = this.up();
 
-            if (this.level.getBlock(v.setComponents(x, this.y + 1, z)) instanceof BlockCrops) {
+            if (up instanceof BlockCrops) {
                 return 0;
             }
 
-            if (this.level.getBlock(v.setComponents(x, this.y + 1, z)).isSolid()) {
-                this.level.setBlock(this, new BlockDirt(), false, true);
-
+            if (up.isSolid()) {
+                this.level.setBlock(this, Block.get(BlockID.DIRT), false, true);
                 return Level.BLOCK_UPDATE_RANDOM;
             }
 
             boolean found = false;
+            Vector3 v = new Vector3();
 
             if (this.level.isRaining()) {
                 found = true;
@@ -115,6 +115,11 @@ public class BlockFarmland extends BlockTransparentMeta {
             }
 
             return Level.BLOCK_UPDATE_RANDOM;
+        } else if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.up().isSolid()) {
+                this.level.setBlock(this, Block.get(DIRT), false, false);
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
         }
 
         return 0;
@@ -122,7 +127,7 @@ public class BlockFarmland extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockDirt());
+        return new ItemBlock(Block.get(BlockID.DIRT));
     }
 
     @Override

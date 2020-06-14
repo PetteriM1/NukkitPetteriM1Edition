@@ -72,7 +72,7 @@ public class EntityPolarBear extends EntityWalkingMob {
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
         if (distance <= 100 && this.isAngry() && creature instanceof EntityPolarBear && !((EntityPolarBear) creature).isAngry()) {
-            ((EntityPolarBear) creature).setAngry(1000);
+            ((EntityPolarBear) creature).setAngry(2400);
         }
         return this.isAngry() && super.targetOption(creature, distance);
     }
@@ -113,7 +113,7 @@ public class EntityPolarBear extends EntityWalkingMob {
 
         if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
             if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
-                this.setAngry(1000);
+                this.setAngry(2400);
             }
         }
 

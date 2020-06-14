@@ -16,41 +16,38 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
 
     @Override
     public void spawn() {
-        if (isSpawnAllowedByDifficulty()) {
-            SpawnResult lastSpawnResult;
-            for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-                if (player.getLevel().isSpawningAllowed()) {
-                    lastSpawnResult = spawn(player);
-                    if (lastSpawnResult.equals(SpawnResult.MAX_SPAWN_REACHED)) {
-                        break;
-                    }
+        for (Player player : Server.getInstance().getOnlinePlayers().values()) {
+            if (player.getLevel().isSpawningAllowed()) {
+                if (isSpawnAllowedByDifficulty()) {
+                    spawnTo(player);
                 }
             }
         }
     }
 
-    protected SpawnResult spawn(Player player) {
-        Position pos = player.getPosition();
+    private void spawnTo(Player player) {
         Level level = player.getLevel();
 
         if (Spawner.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
+            Position pos = player.getPosition();
+
             if (pos != null) {
                 pos.x += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
                 pos.z += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
-                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) return SpawnResult.ERROR;
-                pos.y = Spawner.getSafeYCoord(level, pos, 3);
-            } else {
-                return SpawnResult.POSITION_MISMATCH;
-            }
-        } else {
-            return SpawnResult.MAX_SPAWN_REACHED;
-        }
 
-		try {
-        	return spawn(player, pos, level);
-		} catch (Exception e) {
-			return SpawnResult.ERROR;
-		}
+                if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) {
+                    return;
+                }
+
+                pos.y = Spawner.getSafeYCoord(level, pos);
+
+                if (!level.isInSpawnRadius(pos)) { // Do not spawn mobs in the world spawn area
+                    try {
+                        spawn(player, pos, level);
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
     }
 
     private static boolean isSpawnAllowedByDifficulty() {

@@ -54,9 +54,12 @@ public class BlockDirt extends BlockSolidMeta {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (item.isHoe()) {
-            item.useOn(this);
-            this.getLevel().setBlock(this, this.getDamage() == 0 ? get(FARMLAND) : get(DIRT), true);
-            return true;
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, this.getDamage() == 0 ? get(FARMLAND) : get(DIRT), true);
+                return true;
+            }
         }
 
         return false;
@@ -64,7 +67,7 @@ public class BlockDirt extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[]{new ItemBlock(new BlockDirt())};
+        return new Item[]{new ItemBlock(Block.get(BlockID.DIRT))};
     }
 
     @Override

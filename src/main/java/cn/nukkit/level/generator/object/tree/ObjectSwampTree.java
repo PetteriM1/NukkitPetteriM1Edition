@@ -1,8 +1,8 @@
 package cn.nukkit.level.generator.object.tree;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLeaves;
-import cn.nukkit.block.BlockVine;
 import cn.nukkit.block.BlockWood;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.math.BlockVector3;
@@ -14,12 +14,12 @@ public class ObjectSwampTree extends TreeGenerator {
     /**
      * The metadata value of the wood to use in tree generation.
      */
-    private final Block metaWood = new BlockWood(BlockWood.OAK);
+    private final Block metaWood = Block.get(BlockID.WOOD, BlockWood.OAK);
 
     /**
      * The metadata value of the leaves to use in tree generation.
      */
-    private final Block metaLeaves = new BlockLeaves(BlockLeaves.OAK);
+    private final Block metaLeaves = Block.get(BlockID.LEAVES, BlockLeaves.OAK);
 
     @Override
     public boolean generate(ChunkManager worldIn, NukkitRandom rand, Vector3 vectorPosition) {
@@ -67,7 +67,7 @@ public class ObjectSwampTree extends TreeGenerator {
 
                     for (int k1 = position.getY() - 3 + i; k1 <= position.getY() + i; ++k1) {
                         int j2 = k1 - (position.getY() + i);
-                        int l2 = 2 - j2 / 2;
+                        int l2 = 2 - (j2 >> 1);
 
                         for (int j3 = position.getX() - l2; j3 <= position.getX() + l2; ++j3) {
                             int k3 = j3 - position.getX();
@@ -98,7 +98,7 @@ public class ObjectSwampTree extends TreeGenerator {
 
                     for (int i2 = position.getY() - 3 + i; i2 <= position.getY() + i; ++i2) {
                         int k2 = i2 - (position.getY() + i);
-                        int i3 = 2 - k2 / 2;
+                        int i3 = 2 - (k2 >> 1);
                         BlockVector3 pos2 = new BlockVector3();
 
                         for (int l3 = position.getX() - i3; l3 <= position.getX() + i3; ++l3) {
@@ -141,7 +141,7 @@ public class ObjectSwampTree extends TreeGenerator {
     }
 
     private void addVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
-        this.setBlockAndNotifyAdequately(worldIn, pos, new BlockVine(meta));
+        this.setBlockAndNotifyAdequately(worldIn, pos, Block.get(BlockID.VINE, meta));
     }
 
     private void addHangingVine(ChunkManager worldIn, BlockVector3 pos, int meta) {

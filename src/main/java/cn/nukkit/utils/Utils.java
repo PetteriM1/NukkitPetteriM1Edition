@@ -176,6 +176,13 @@ public class Utils {
         return result & 0xFFFFFFFFL;
     }
 
+    public static long toABGR(int argb) {
+        long result = argb & 0xFF00FF00L;
+        result |= (argb << 16) & 0x00FF0000L; // B to R
+        result |= (argb >>> 16) & 0xFFL; // R to B
+        return result & 0xFFFFFFFFL;
+    }
+
     public static Object[][] splitArray(Object[] arrayToSplit, int chunkSize) {
         if (chunkSize <= 0) {
             return null;
@@ -267,15 +274,15 @@ public class Utils {
         if (len % 2 != 0)
             throw new IllegalArgumentException("hexBinary needs to be even-length: " + s);
 
-        byte[] out = new byte[len / 2];
+        byte[] out = new byte[(len >> 1)];
 
-        for(int i = 0; i < len; i += 2) {
+        for (int i = 0; i < len; i += 2) {
             int h = hexToBin(s.charAt(i));
             int l = hexToBin(s.charAt(i + 1));
             if (h == -1 || l == -1)
                 throw new IllegalArgumentException("contains illegal character for hexBinary: " + s);
 
-            out[i / 2] = (byte)((h << 4) + l);
+            out[(i >> 1)] = (byte)((h << 4) + l);
         }
 
         return out;
@@ -318,6 +325,9 @@ public class Utils {
         switch (protocol) {
             case 388:
                 return "1.13.0";
+            case 389:
+            case 390:
+                return "1.14.0";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
         }

@@ -1,7 +1,6 @@
 package cn.nukkit.level.generator.populator.impl.tree;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockSapling;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.object.tree.ObjectBigSpruceTree;
@@ -17,10 +16,7 @@ public class SpruceBigTreePopulator extends Populator {
     private int baseAmount;
 
     public SpruceBigTreePopulator() {
-        this(BlockSapling.SPRUCE);
     }
-
-    private SpruceBigTreePopulator(int type) {}
 
     public void setRandomAmount(int randomAmount) {
         this.randomAmount = randomAmount;

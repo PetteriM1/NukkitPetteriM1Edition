@@ -6,7 +6,6 @@ import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.SpawnResult;
 import cn.nukkit.utils.Spawner;
 
 public class WolfSpawner extends AbstractEntitySpawner {
@@ -16,24 +15,16 @@ public class WolfSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public SpawnResult spawn(Player player, Position pos, Level level) {
-        SpawnResult result = SpawnResult.OK;
-
+    public void spawn(Player player, Position pos, Level level) {
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
         if (level.isNether || level.isEnd) {
-            result = SpawnResult.WRONG_BIOME;
         } else if (biomeId != 4 && biomeId != 5 && biomeId != 20 && biomeId != 27 && biomeId != 30 && biomeId != 32 && biomeId != 133 && biomeId != 158) {
-            result = SpawnResult.WRONG_BIOME;
         } else if (pos.y > 255 || pos.y < 1) {
-            result = SpawnResult.POSITION_MISMATCH;
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
-            result = SpawnResult.WRONG_BLOCK;
         } else if (level.isAnimalSpawningAllowedByTime()) {
             this.spawnTask.createEntity("Wolf", pos.add(0, 1, 0));
         }
-
-        return result;
     }
 
     @Override

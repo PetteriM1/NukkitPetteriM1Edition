@@ -6,6 +6,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -103,7 +104,7 @@ public class BlockRedstoneTorch extends BlockTorch implements Faceable {
             BlockFace face = getBlockFace().getOpposite();
             Vector3 pos = getLocation();
 
-            this.level.setBlock(pos, new BlockRedstoneTorchUnlit(getDamage()), false, true);
+            this.level.setBlock(pos, Block.get(UNLIT_REDSTONE_TORCH, getDamage()), false, true);
 
             for (BlockFace side : BlockFace.values()) {
                 if (side == face) {
@@ -131,5 +132,10 @@ public class BlockRedstoneTorch extends BlockTorch implements Faceable {
     @Override
     public boolean isPowerSource() {
         return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
     }
 }

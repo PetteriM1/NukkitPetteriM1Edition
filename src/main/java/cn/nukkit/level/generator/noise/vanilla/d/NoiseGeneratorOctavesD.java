@@ -3,6 +3,8 @@ package cn.nukkit.level.generator.noise.vanilla.d;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitRandom;
 
+import java.util.Arrays;
+
 public class NoiseGeneratorOctavesD {
     /**
      * Collection of noise generation functions.  Output is combined to produce different octaves of noise.
@@ -27,9 +29,7 @@ public class NoiseGeneratorOctavesD {
         if (noiseArray == null) {
             noiseArray = new double[xSize * ySize * zSize];
         } else {
-            for (int i = 0; i < noiseArray.length; ++i) {
-                noiseArray[i] = 0.0D;
-            }
+            Arrays.fill(noiseArray, 0.0D);
         }
 
         double d3 = 1.0D;

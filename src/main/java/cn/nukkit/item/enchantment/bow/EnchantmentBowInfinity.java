@@ -20,5 +20,4 @@ public class EnchantmentBowInfinity extends EnchantmentBow {
     public int getMaxEnchantAbility(int level) {
         return 50;
     }
-
 }

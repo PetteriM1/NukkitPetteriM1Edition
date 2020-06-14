@@ -90,7 +90,7 @@ public class BlockFire extends BlockFlowable {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_RANDOM) {
             if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
-                this.getLevel().setBlock(this, new BlockAir(), true);
+                this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
             }
 
             return Level.BLOCK_UPDATE_NORMAL;
@@ -106,19 +106,21 @@ public class BlockFire extends BlockFlowable {
                             this.getLevel().canBlockSeeSky(this.north()))
                     ) {
 
-                this.getLevel().setBlock(this, new BlockAir(), true);
+                this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
             }
 
             if (Server.getInstance().suomiCraftPEMode()) {
                 if (forever) return 0;
-                if (!remove) this.getLevel().scheduleUpdate(this, Utils.random.nextInt(250, 300));
-                this.remove = true;
-                if (remove) this.getLevel().setBlock(this, new BlockAir(), true);
+                if (!remove) {
+                    this.getLevel().scheduleUpdate(this, Utils.random.nextInt(250, 300));
+                    this.remove = true;
+                }
+                this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
                 return 0;
             }
 
             if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
-                this.getLevel().setBlock(this, new BlockAir(), true);
+                this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
                 return 0;
             }
 
@@ -135,10 +137,10 @@ public class BlockFire extends BlockFlowable {
 
             if (!forever && !this.canNeighborBurn()) {
                 if (!this.isBlockTopFacingSurfaceSolid(this.down()) || meta > 3) {
-                    this.getLevel().setBlock(this, new BlockAir(), true);
+                    this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
                 }
             } else if (!forever && !(this.down().getBurnAbility() > 0) && meta == 15 && Utils.random.nextInt(4) == 0) {
-                this.getLevel().setBlock(this, new BlockAir(), true);
+                this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
             } else {
                 int o = 0;
 
@@ -170,7 +172,7 @@ public class BlockFire extends BlockFlowable {
                                     //TODO: decrease the t if the rainfall values are high
 
                                     if (t > 0 && Utils.random.nextInt(k) <= t) {
-                                        int damage = meta + Utils.random.nextInt(5) / 4;
+                                        int damage = meta + (Utils.random.nextInt(5) >> 2);
 
                                         if (damage > 15) {
                                             damage = 15;
@@ -180,7 +182,7 @@ public class BlockFire extends BlockFlowable {
                                         this.level.getServer().getPluginManager().callEvent(e);
 
                                         if (!e.isCancelled()) {
-                                            this.getLevel().setBlock(block, new BlockFire(damage), true);
+                                            this.getLevel().setBlock(block, Block.get(FIRE, damage), true);
                                             this.getLevel().scheduleUpdate(block, this.tickRate());
                                         }
                                     }
@@ -199,7 +201,7 @@ public class BlockFire extends BlockFlowable {
         if (Utils.random.nextInt(bound) < block.getBurnAbility()) {
 
             if (Utils.random.nextInt(damage + 10) < 5) {
-                int meta = damage + Utils.random.nextInt(5) / 4;
+                int meta = damage + (Utils.random.nextInt(5) >> 2);
 
                 if (meta > 15) {
                     meta = 15;
@@ -209,7 +211,7 @@ public class BlockFire extends BlockFlowable {
                 this.level.getServer().getPluginManager().callEvent(e);
 
                 if (!e.isCancelled()) {
-                    this.getLevel().setBlock(block, new BlockFire(meta), true);
+                    this.getLevel().setBlock(block, Block.get(FIRE, meta), true);
                     this.getLevel().scheduleUpdate(block, this.tickRate());
                 }
             } else {
@@ -217,7 +219,7 @@ public class BlockFire extends BlockFlowable {
                 this.getLevel().getServer().getPluginManager().callEvent(ev);
 
                 if (!ev.isCancelled()) {
-                    this.getLevel().setBlock(block, new BlockAir(), true);
+                    this.getLevel().setBlock(block, Block.get(BlockID.AIR), true);
                 }
             }
 
@@ -292,6 +294,6 @@ public class BlockFire extends BlockFlowable {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(new BlockAir());
+        return new ItemBlock(Block.get(BlockID.AIR));
     }
 }

@@ -23,7 +23,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     public static final int NETWORK_ID = 13;
 
     public boolean sheared = false;
-    public int color = 0;
+    public int color = DyeColor.WHITE.getDyeData();
     public int unshearTicks = -1;
 
     public EntitySheep(FullChunk chunk, CompoundTag nbt) {

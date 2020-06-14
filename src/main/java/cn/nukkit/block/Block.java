@@ -312,8 +312,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[RESERVED6] = BlockReserved6.class; //255
 
             for (int id = 0; id < 256; id++) {
-                @SuppressWarnings("rawtypes")
-                Class c = list[id];
+                Class<?> c = list[id];
                 if (c != null) {
                     Block block;
                     try {
@@ -420,7 +419,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public boolean onBreak(Item item) {
-        return this.getLevel().setBlock(this, new BlockAir(), true, true);
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
     }
 
     public int onUpdate(int type) {
@@ -621,8 +620,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         if (correctTool) speed *= toolBreakTimeBonus0(toolType, toolTier, isWoolBlock, isCobweb);
         speed += speedBonusByEfficiencyLore0(efficiencyLoreLevel);
         speed *= speedRateByHasteLore0(hasteEffectLevel);
-        if (insideOfWaterWithoutAquaAffinity) speed *= 0.2;
-        if (outOfWaterButNotOnGround) speed *= 0.2;
+        if (insideOfWaterWithoutAquaAffinity || outOfWaterButNotOnGround) speed *= 0.25;
         return 1.0 / speed;
     }
 
@@ -630,6 +628,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         Objects.requireNonNull(item, "getBreakTime: Item can not be null");
         Objects.requireNonNull(player, "getBreakTime: Player can not be null");
         double blockHardness = getHardness();
+        if (blockHardness  == 0) {
+            return 0;
+        }
         boolean correctTool = correctTool0(getToolType(), item);
         boolean canHarvestWithHand = canHarvestWithHand();
         int blockId = getId();

@@ -112,19 +112,21 @@ public class Normal extends Generator {
 
         this.populators = ImmutableList.of(
                 new PopulatorOre(STONE, new OreType[]{
-                        new OreType(new BlockOreCoal(), 20, 17, 0, 128),
-                        new OreType(new BlockOreIron(), 20, 9, 0, 64),
-                        new OreType(new BlockOreRedstone(), 8, 8, 0, 16),
-                        new OreType(new BlockOreLapis(), 1, 7, 0, 16),
-                        new OreType(new BlockOreGold(), 2, 9, 0, 32),
-                        new OreType(new BlockOreDiamond(), 1, 8, 0, 16),
-                        new OreType(new BlockDirt(), 10, 33, 0, 128),
-                        new OreType(new BlockGravel(), 8, 33, 0, 128),
-                        new OreType(new BlockStone(BlockStone.GRANITE), 10, 33, 0, 80),
-                        new OreType(new BlockStone(BlockStone.DIORITE), 10, 33, 0, 80),
-                        new OreType(new BlockStone(BlockStone.ANDESITE), 10, 33, 0, 80)
+                        new OreType(Block.get(BlockID.COAL_ORE), 20, 17, 0, 128),
+                        new OreType(Block.get(BlockID.IRON_ORE), 20, 9, 0, 64),
+                        new OreType(Block.get(BlockID.REDSTONE_ORE), 8, 8, 0, 16),
+                        new OreType(Block.get(BlockID.LAPIS_ORE), 1, 7, 0, 16),
+                        new OreType(Block.get(BlockID.GOLD_ORE), 2, 9, 0, 32),
+                        new OreType(Block.get(BlockID.DIAMOND_ORE), 1, 8, 0, 16),
+                        new OreType(Block.get(BlockID.EMERALD_ORE), 1, 1, 0, 32),
+                        new OreType(Block.get(DIRT), 10, 33, 0, 128),
+                        new OreType(Block.get(BlockID.GRAVEL), 8, 33, 0, 128),
+                        new OreType(Block.get(STONE, BlockStone.GRANITE), 10, 33, 0, 80),
+                        new OreType(Block.get(STONE, BlockStone.DIORITE), 10, 33, 0, 80),
+                        new OreType(Block.get(STONE, BlockStone.ANDESITE), 10, 33, 0, 80)
                 }),
-                new PopulatorCaves()
+                new PopulatorCaves(),
+                new PopulatorDungeon()
         );
     }
 
@@ -137,13 +139,13 @@ public class Normal extends Generator {
         BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
 
         //generate base noise values
-        float[] depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion.get(), chunkX * 4, chunkZ * 4, 5, 5, 200f, 200f, 0.5f);
+        float[] depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion.get(), chunkX << 2, chunkZ << 2, 5, 5, 200f, 200f, 0.5f);
         this.depthRegion.set(depthRegion);
-        float[] mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion.get(), chunkX * 4, 0, chunkZ * 4, 5, 33, 5, 11.406866f, 4.277575f, 11.406866f);
+        float[] mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion.get(), chunkX << 2, 0, chunkZ << 2, 5, 33, 5, 11.406866f, 4.277575f, 11.406866f);
         this.mainNoiseRegion.set(mainNoiseRegion);
-        float[] minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion.get(), chunkX * 4, 0, chunkZ * 4, 5, 33, 5, 684.412f, 684.412f, 684.412f);
+        float[] minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion.get(), chunkX << 2, 0, chunkZ << 2, 5, 33, 5, 684.412f, 684.412f, 684.412f);
         this.minLimitRegion.set(minLimitRegion);
-        float[] maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion.get(), chunkX * 4, 0, chunkZ * 4, 5, 33, 5, 684.412f, 684.412f, 684.412f);
+        float[] maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion.get(), chunkX << 2, 0, chunkZ << 2, 5, 33, 5, 684.412f, 684.412f, 684.412f);
         this.maxLimitRegion.set(maxLimitRegion);
         float[] heightMap = this.heightMap.get();
 
@@ -155,11 +157,11 @@ public class Normal extends Generator {
                 float heightVariationSum = 0.0F;
                 float baseHeightSum = 0.0F;
                 float biomeWeightSum = 0.0F;
-                Biome biome = pickBiome(baseX + (xSeg * 4), baseZ + (zSeg * 4));
+                Biome biome = pickBiome(baseX + (xSeg << 2), baseZ + (zSeg << 2));
 
                 for (int xSmooth = -2; xSmooth <= 2; ++xSmooth) {
                     for (int zSmooth = -2; zSmooth <= 2; ++zSmooth) {
-                        Biome biome1 = pickBiome(baseX + (xSeg * 4) + xSmooth, baseZ + (zSeg * 4) + zSmooth);
+                        Biome biome1 = pickBiome(baseX + (xSeg << 2) + xSmooth, baseZ + (zSeg << 2) + zSmooth);
                         float baseHeight = biome1.getBaseHeight();
                         float heightVariation = biome1.getHeightVariation();
 
@@ -267,9 +269,9 @@ public class Normal extends Generator {
 
                             for (int xIn = 0; xIn < 4; ++xIn) {
                                 if ((scaleZ2 += scaleZ) > 0.0f) {
-                                    chunk.setBlockId(xSeg * 4 + zIn, ySeg * 8 + yIn, zSeg * 4 + xIn, STONE);
-                                } else if (ySeg * 8 + yIn <= seaHeight) {
-                                    chunk.setBlockId(xSeg * 4 + zIn, ySeg * 8 + yIn, zSeg * 4 + xIn, STILL_WATER);
+                                    chunk.setBlockId((xSeg << 2) + zIn, (ySeg << 3) + yIn, (zSeg << 2) + xIn, STONE);
+                                } else if ((ySeg << 3) + yIn <= seaHeight) {
+                                    chunk.setBlockId((xSeg << 2) + zIn, (ySeg << 3) + yIn, (zSeg << 2) + xIn, STILL_WATER);
                                 }
                             }
 

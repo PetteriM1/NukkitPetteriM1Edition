@@ -8,7 +8,7 @@ public interface EntitySpawner {
 
     void spawn();
 
-    SpawnResult spawn(Player player, Position pos, Level level);
+    void spawn(Player player, Position pos, Level level);
 
     int getEntityNetworkId();
 }

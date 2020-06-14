@@ -18,6 +18,9 @@ import cn.nukkit.utils.Faceable;
  */
 public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
 
+    public static int TRAPDOOR_OPEN_BIT = 0x08;
+    public static int TRAPDOOR_TOP_BIT = 0x04;
+
     private static final int[] faces = {2, 1, 3, 0};
 
     public BlockTrapdoor() {
@@ -63,7 +66,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
         int damage = this.getDamage();
         AxisAlignedBB bb;
         double f = 0.1875;
-        if ((damage & 0x08) > 0) {
+        if ((damage & TRAPDOOR_TOP_BIT) > 0) {
             bb = new AxisAlignedBB(
                     this.x,
                     this.y + 1 - f,
@@ -82,7 +85,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
                     this.z + 1
             );
         }
-        if ((damage & 0x04) > 0) {
+        if ((damage & TRAPDOOR_OPEN_BIT) > 0) {
             if ((damage & 0x03) == 0) {
                 bb.setBounds(
                         this.x,
@@ -131,7 +134,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
         if (type == Level.BLOCK_UPDATE_REDSTONE) {
             if ((!isOpen() && this.level.isBlockPowered(this.getLocation())) || (isOpen() && !this.level.isBlockPowered(this.getLocation()))) {
                 this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isOpen() ? 15 : 0, isOpen() ? 0 : 15));
-                this.setDamage(this.getDamage() ^ 0x08);
+                this.setDamage(this.getDamage() ^ TRAPDOOR_OPEN_BIT);
                 this.level.setBlock(this, this, true);
                 this.level.addSound(new DoorSound(this));
                 return type;
@@ -145,6 +148,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         BlockFace facing;
         boolean top;
+        int meta = 0;
 
         if (face.getAxis().isHorizontal() || player == null) {
             facing = face;
@@ -154,13 +158,14 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
             top = face != BlockFace.UP;
         }
 
-        this.setDamage(this.getDamage() | faces[facing.getHorizontalIndex()]);
-
         if (top) {
-            this.setDamage(this.getDamage() | 0x04);
+            meta |= TRAPDOOR_TOP_BIT;
+        } else {
+            meta |= faces[facing.getHorizontalIndex()];
         }
 
-        this.getLevel().setBlock(block, this, true, true);
+        this.setDamage(meta);
+        this.level.setBlock(block, this, true, true);
         return true;
     }
 
@@ -171,12 +176,21 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        DoorToggleEvent event = new DoorToggleEvent(this, player);
-        this.level.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) return false;
-        this.setDamage(this.getDamage() ^ 0x08);
-        this.level.setBlock(this, this, true);
-        this.level.addSound(new DoorSound(this));
+        if (toggle(player)) {
+            this.level.addSound(new DoorSound(this));
+            return true;
+        }
+        return false;
+    }
+
+    public boolean toggle(Player player) {
+        DoorToggleEvent ev = new DoorToggleEvent(this, player);
+        level.getServer().getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return false;
+        }
+        this.setDamage(this.getDamage() ^ TRAPDOOR_OPEN_BIT);
+        level.setBlock(this, this, true, true);
         return true;
     }
 
@@ -186,11 +200,11 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     }
 
     public boolean isOpen() {
-        return (this.getDamage() & 0x08) != 0;
+        return (this.getDamage() & TRAPDOOR_OPEN_BIT) != 0;
     }
 
     public boolean isTop() {
-        return (this.getDamage() & 0x04) != 0;
+        return (this.getDamage() & TRAPDOOR_TOP_BIT) != 0;
     }
 
     @Override

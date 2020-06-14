@@ -51,5 +51,4 @@ public class BlockHardGlassPaneStained extends BlockHardGlassPane {
     public final void setDamage(int meta) {
         this.meta = meta;
     }
-
 }

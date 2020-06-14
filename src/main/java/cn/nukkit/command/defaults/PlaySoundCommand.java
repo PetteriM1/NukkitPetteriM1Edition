@@ -47,36 +47,34 @@ public class PlaySoundCommand extends VanillaCommand {
             return true;
         }
 
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("@a")) {
-                for (Player p : Server.getInstance().getOnlinePlayers().values()) {
-                    p.getLevel().addSound(p, args[0], p);
-                }
-                
-                sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], "@a"));
-
-                return true;
-            }
-
-            if (args[1].equalsIgnoreCase("@s") && sender instanceof Player) {
-                Player p = (Player) sender;
-
+        if (args[1].equalsIgnoreCase("@a")) {
+            for (Player p : Server.getInstance().getOnlinePlayers().values()) {
                 p.getLevel().addSound(p, args[0], p);
-                sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
-
-                return true;
             }
 
-            Player p = Server.getInstance().getPlayer(args[1]);
-            
-            if (p == null) {
-                sender.sendMessage(new TranslationContainer("commands.generic.player.notFound"));
-                return true;
-            }
+            sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], "@a"));
+
+            return true;
+        }
+
+        if (args[1].equalsIgnoreCase("@s") && sender instanceof Player) {
+            Player p = (Player) sender;
 
             p.getLevel().addSound(p, args[0], p);
             sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
+
+            return true;
         }
+
+        Player p = Server.getInstance().getPlayer(args[1]);
+
+        if (p == null) {
+            sender.sendMessage(new TranslationContainer("commands.generic.player.notFound"));
+            return true;
+        }
+
+        p.getLevel().addSound(p, args[0], p);
+        sender.sendMessage(new TranslationContainer("commands.playsound.success", args[0], p.getName()));
 
         return true;
     }

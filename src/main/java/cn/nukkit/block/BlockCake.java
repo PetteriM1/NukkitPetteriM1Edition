@@ -50,7 +50,7 @@ public class BlockCake extends BlockTransparentMeta {
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
-                x + ((1 + getDamage() * 2) >> 4),
+                x + ((1 + (getDamage() << 1)) >> 4),
                 y,
                 z + 0.0625,
                 x - 0.0625 + 1,
@@ -73,7 +73,7 @@ public class BlockCake extends BlockTransparentMeta {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (down().getId() == Block.AIR) {
-                getLevel().setBlock(this, new BlockAir(), true);
+                getLevel().setBlock(this, Block.get(BlockID.AIR), true);
 
                 return Level.BLOCK_UPDATE_NORMAL;
             }
@@ -97,7 +97,7 @@ public class BlockCake extends BlockTransparentMeta {
         if (player != null && player.getFoodData().getLevel() < player.getFoodData().getMaxLevel()) {
             if (getDamage() <= 0x06) setDamage(getDamage() + 1);
             if (getDamage() >= 0x06) {
-                getLevel().setBlock(this, new BlockAir(), true);
+                getLevel().setBlock(this, Block.get(BlockID.AIR), true);
             } else {
                 Food.getByRelative(this).eatenBy(player);
                 getLevel().setBlock(this, this, true);
@@ -113,7 +113,7 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     public int getComparatorInputOverride() {
-        return (7 - this.getDamage()) * 2;
+        return (7 - this.getDamage()) << 1;
     }
 
     public boolean hasComparatorInputOverride() {

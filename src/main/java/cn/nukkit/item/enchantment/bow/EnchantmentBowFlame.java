@@ -20,5 +20,4 @@ public class EnchantmentBowFlame extends EnchantmentBow {
     public int getMaxEnchantAbility(int level) {
         return 50;
     }
-
 }

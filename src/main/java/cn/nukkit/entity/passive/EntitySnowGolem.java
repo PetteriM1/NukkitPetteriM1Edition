@@ -14,11 +14,15 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public class EntitySnowGolem extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 21;
+
+    public boolean sheared = false;
 
     public EntitySnowGolem(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -45,6 +49,10 @@ public class EntitySnowGolem extends EntityWalkingMob {
         super.initEntity();
 
         this.setMaxHealth(4);
+
+        if (this.namedTag.getBoolean("Sheared")) {
+            this.shear(true);
+        }
     }
 
     @Override
@@ -60,27 +68,27 @@ public class EntitySnowGolem extends EntityWalkingMob {
             double f = 1.2;
             double yaw = this.yaw + Utils.rand(-12.0, 12.0);
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Location location = new Location(this.x + (-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5), this.y + this.getEyeHeight(),
-                    this.z + (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5), yaw, pitch, this.level);
+            Location location = new Location(this.x + (-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5), this.y + this.getEyeHeight(),
+                    this.z + (Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5), yaw, pitch, this.level);
             Entity k = Entity.createEntity("Snowball", location, this);
             if (k == null) {
                 return;
             }
 
             EntitySnowball snowball = (EntitySnowball) k;
-            snowball.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f, Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f).multiply(f));
+            snowball.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f, Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f).multiply(f));
 
             EntityShootBowEvent ev = new EntityShootBowEvent(this, Item.get(Item.ARROW, 0, 1), snowball, f);
             this.server.getPluginManager().callEvent(ev);
 
             EntityProjectile projectile = ev.getProjectile();
             if (ev.isCancelled()) {
-                projectile.kill();
+                projectile.close();
             } else if (projectile != null) {
                 ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
                 this.server.getPluginManager().callEvent(launch);
                 if (launch.isCancelled()) {
-                    projectile.kill();
+                    projectile.close();
                 } else {
                     projectile.spawnToAll();
                 }
@@ -115,5 +123,28 @@ public class EntitySnowGolem extends EntityWalkingMob {
     @Override
     public int nearbyDistanceMultiplier() {
         return 10;
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (item.equals(Item.get(Item.SHEARS, 0, 1), false) && !this.sheared) {
+            this.shear(true);
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SHEAR);
+            player.getInventory().getItemInHand().setDamage(item.getDamage() + 1);
+            return true;
+        }
+
+        return super.onInteract(player, item, clickedPos);
+    }
+
+    public void shear(boolean shear) {
+        this.sheared = shear;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHEARED, shear);
+    }
+
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putBoolean("Sheared", this.sheared);
     }
 }

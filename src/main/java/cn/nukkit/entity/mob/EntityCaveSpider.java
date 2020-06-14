@@ -73,7 +73,7 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
                 player.attack(ev);
 
                 if (!ev.isCancelled() && this.server.getDifficulty() > 0) {
-                    player.addEffect(Effect.getEffect(Effect.POISON).setAmplifier(1).setDuration(this.server.getDifficulty() > 1 ? 300 : 140));
+                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(this.server.getDifficulty() > 1 ? 300 : 140));
                 }
             }
         }

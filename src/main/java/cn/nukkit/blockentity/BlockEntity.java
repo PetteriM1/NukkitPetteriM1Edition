@@ -18,6 +18,7 @@ import java.lang.reflect.Constructor;
  * @author MagicDroidX
  */
 public abstract class BlockEntity extends Position {
+
     //WARNING: DO NOT CHANGE ANY NAME HERE, OR THE CLIENT WILL CRASH
     public static final String CHEST = "Chest";
     public static final String ENDER_CHEST = "EnderChest";
@@ -85,7 +86,6 @@ public abstract class BlockEntity extends Position {
     protected void initBlockEntity() {}
 
     public static BlockEntity createBlockEntity(String type, FullChunk chunk, CompoundTag nbt, Object... args) {
-        type = type.replaceFirst("BlockEntity", "");
         BlockEntity blockEntity = null;
 
         if (knownBlockEntities.containsKey(type)) {
@@ -95,7 +95,7 @@ public abstract class BlockEntity extends Position {
                 return null;
             }
 
-            for (Constructor constructor : clazz.getConstructors()) {
+            for (Constructor<?> constructor : clazz.getConstructors()) {
                 if (blockEntity != null) {
                     break;
                 }
@@ -118,6 +118,8 @@ public abstract class BlockEntity extends Position {
                     }
                 } catch (Exception ignored) {}
             }
+        } else {
+            Server.getInstance().getLogger().warning("Tried to create block entity that doesn't exists: " + type);
         }
 
         return blockEntity;

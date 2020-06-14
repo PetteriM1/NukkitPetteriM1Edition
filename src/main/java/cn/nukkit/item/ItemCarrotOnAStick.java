@@ -16,5 +16,4 @@ public class ItemCarrotOnAStick extends ItemTool {
     public ItemCarrotOnAStick(Integer meta, int count) {
         super(CARROT_ON_A_STICK, meta, count, "Carrot on a stick");
     }
-
 }

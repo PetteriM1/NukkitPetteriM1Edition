@@ -95,6 +95,12 @@ public class NBTIO {
         }
     }
 
+    public static Tag readTag(InputStream inputStream, ByteOrder endianness, boolean network) throws IOException {
+        try (NBTInputStream stream = new NBTInputStream(inputStream, endianness, network)) {
+            return Tag.readNamedTag(stream);
+        }
+    }
+
     public static CompoundTag read(byte[] data) throws IOException {
         return read(data, ByteOrder.BIG_ENDIAN);
     }

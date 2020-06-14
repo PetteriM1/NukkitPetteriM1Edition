@@ -9,7 +9,6 @@ import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Spawner;
-import cn.nukkit.utils.SpawnResult;
 
 public class ZombieSpawner extends AbstractEntitySpawner {
 
@@ -18,17 +17,11 @@ public class ZombieSpawner extends AbstractEntitySpawner {
     }
 
     @Override
-    public SpawnResult spawn(Player player, Position pos, Level level) {
-        SpawnResult result = SpawnResult.OK;
-
+    public void spawn(Player player, Position pos, Level level) {
         if (pos.y > 255 || pos.y < 1) {
-            result = SpawnResult.POSITION_MISMATCH;
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
-            result = SpawnResult.WRONG_LIGHTLEVEL;
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
-            result = SpawnResult.WRONG_BLOCK;
         } else if (level.isNether || level.isEnd) {
-            result = SpawnResult.WRONG_BIOME;
         } else if (level.isMobSpawningAllowedByTime()) {
             if (Utils.rand(1, 40) == 30) {
                 BaseEntity entity = this.spawnTask.createEntity("ZombieVillager", pos.add(0, 1, 0));
@@ -42,8 +35,6 @@ public class ZombieSpawner extends AbstractEntitySpawner {
                 }
             }
         }
-
-        return result;
     }
 
     @Override

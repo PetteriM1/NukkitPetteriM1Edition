@@ -1,5 +1,8 @@
 package cn.nukkit.level.format.anvil.util;
 
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.util.PalettedBlockStorage;
+import cn.nukkit.utils.BinaryStream;
 import com.google.common.base.Preconditions;
 
 import java.util.Arrays;
@@ -21,7 +24,7 @@ public class BlockStorage {
 
     private static int getIndex(int x, int y, int z) {
         int index = (x << 8) + (z << 4) + y; // XZY = Bedrock format
-        Preconditions.checkArgument(index >= 0 && index < SECTION_SIZE, "Invalid index");
+        if (index < 0 || index >= SECTION_SIZE) throw new IllegalArgumentException("Invalid index");
         return index;
     }
 
@@ -89,6 +92,14 @@ public class BlockStorage {
 
     public byte[] getBlockData() {
         return blockData.getData();
+    }
+
+    public void writeTo(int protocol, BinaryStream stream) {
+        PalettedBlockStorage storage = new PalettedBlockStorage();
+        for (int i = 0; i < SECTION_SIZE; i++) {
+            storage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockIds[i] & 0xff, blockData.get(i)));
+        }
+        storage.writeTo(protocol, stream);
     }
 
     public BlockStorage copy() {

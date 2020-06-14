@@ -1,6 +1,6 @@
 package cn.nukkit.item;
 
-import cn.nukkit.block.BlockNetherWart;
+import cn.nukkit.block.Block;
 
 /**
  * Created by Leonidius20 on 22.03.17.
@@ -17,6 +17,6 @@ public class ItemNetherWart extends Item {
 
     public ItemNetherWart(Integer meta, int count) {
         super(NETHER_WART, meta, count, "Nether Wart");
-        this.block = new BlockNetherWart(meta);
+        this.block = Block.get(NETHER_WART_BLOCK, meta);
     }
 }

@@ -4,8 +4,10 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.format.anvil.util.BlockStorage;
 import cn.nukkit.level.format.anvil.util.NibbleArray;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
+import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Binary;
+import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.Zlib;
 
@@ -17,6 +19,8 @@ import java.util.Arrays;
  * Nukkit Project
  */
 public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
+
+    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage();
 
     private final int y;
 
@@ -306,14 +310,22 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     @Override
     public byte[] getBytes() {
         synchronized (storage) {
-
             byte[] ids = storage.getBlockIds();
             byte[] data = storage.getBlockData();
             byte[] merged = new byte[ids.length + data.length];
-
             System.arraycopy(ids, 0, merged, 0, ids.length);
             System.arraycopy(data, 0, merged, ids.length, data.length);
             return merged;
+        }
+    }
+
+    @Override
+    public void writeTo(int protocol, BinaryStream stream) {
+        synchronized (storage) {
+            stream.putByte((byte) 8); // Paletted chunk because Mojang messed up the old one
+            stream.putByte((byte) 2);
+            this.storage.writeTo(protocol, stream);
+            EMPTY_STORAGE.writeTo(protocol, stream);
         }
     }
 

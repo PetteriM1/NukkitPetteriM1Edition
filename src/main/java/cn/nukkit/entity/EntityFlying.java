@@ -6,6 +6,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public abstract class EntityFlying extends BaseEntity {
 
@@ -21,8 +22,8 @@ public abstract class EntityFlying extends BaseEntity {
         Vector3 target = this.target;
         if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))) {
             double near = Integer.MAX_VALUE;
-
-            for (Entity entity : this.getLevel().getEntities()) {
+            Entity[] e = this.getLevel().getEntities();
+            for (Entity entity : e) {
                 if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
                     continue;
                 }
@@ -72,7 +73,7 @@ public abstract class EntityFlying extends BaseEntity {
             }
             this.stayTime = Utils.rand(100, 200);
             this.target = this.add(Utils.rand() ? x : -x, y, Utils.rand() ? z : -z);
-        } else if (this.moveTime <= 0 || !(this.target instanceof Vector3)) {
+        } else if (this.moveTime <= 0 || this.target == null) {
             x = Utils.rand(20, 100);
             z = Utils.rand(20, 100);
             if (this.y > maxY) {
@@ -94,7 +95,7 @@ public abstract class EntityFlying extends BaseEntity {
             }
 
             if (this.isKnockback()) {
-                this.move(this.motionX * tickDiff, this.motionY * tickDiff, this.motionZ * tickDiff);
+                this.move(this.motionX, this.motionY, this.motionZ);
                 this.updateMovement();
                 return null;
             }
@@ -113,7 +114,7 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
             }
 
             Vector3 before = this.target;
@@ -132,12 +133,12 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
             }
 
-            double dx = this.motionX * tickDiff;
-            double dy = this.motionY * tickDiff;
-            double dz = this.motionZ * tickDiff;
+            double dx = this.motionX;
+            double dy = this.motionY;
+            double dz = this.motionZ;
             Vector3 target = this.target;
             if (this.stayTime > 0) {
                 this.stayTime -= tickDiff;
@@ -148,7 +149,7 @@ public abstract class EntityFlying extends BaseEntity {
                 Vector2 af = new Vector2(this.x, this.z);
 
                 if (be.x != af.x || be.y != af.y) {
-                    this.moveTime -= 90 * tickDiff;
+                    this.moveTime -= 90;
                 }
             }
 

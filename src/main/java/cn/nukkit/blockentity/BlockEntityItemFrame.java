@@ -1,7 +1,7 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockAir;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.format.FullChunk;
@@ -20,11 +20,13 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
     @Override
     protected void initBlockEntity() {
         if (!namedTag.contains("Item")) {
-            namedTag.putCompound("Item", NBTIO.putItemHelper(new ItemBlock(new BlockAir())));
+            namedTag.putCompound("Item", NBTIO.putItemHelper(new ItemBlock(Block.get(BlockID.AIR))));
         }
+
         if (!namedTag.contains("ItemRotation")) {
             namedTag.putByte("ItemRotation", 0);
         }
+
         if (!namedTag.contains("ItemDropChance")) {
             namedTag.putFloat("ItemDropChance", 1.0f);
         }
@@ -88,18 +90,22 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
     @Override
     public CompoundTag getSpawnCompound() {
         if (!this.namedTag.contains("Item")) {
-            this.setItem(new ItemBlock(new BlockAir()), false);
+            this.setItem(new ItemBlock(Block.get(BlockID.AIR)), false);
         }
-        CompoundTag NBTItem = namedTag.getCompound("Item").copy();
-        NBTItem.setName("Item");
-        boolean item = NBTItem.getShort("id") == Item.AIR;
-        return new CompoundTag()
+
+        CompoundTag item = namedTag.getCompound("Item").copy();
+        item.setName("Item");
+        CompoundTag tag = new CompoundTag()
                 .putString("id", BlockEntity.ITEM_FRAME)
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putCompound("Item", item ? NBTIO.putItemHelper(new ItemBlock(new BlockAir())) : NBTItem)
-                .putByte("ItemRotation", item ? 0 : this.getItemRotation());
+                .putInt("z", (int) this.z);
+
+        if (item.getShort("id") != Item.AIR) {
+            tag.putCompound("Item", item)
+                    .putByte("ItemRotation", this.getItemRotation());
+        }
+        return tag;
     }
 
     public int getAnalogOutput() {

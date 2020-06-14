@@ -173,9 +173,7 @@ public class Permission {
                     Object v = entry.getValue();
                     if (v instanceof Map) {
                         Permission permission = loadPermission(k, (Map<String, Object>) v, defaultValue, output);
-                        if (permission != null) {
-                            output.add(permission);
-                        }
+                        output.add(permission);
                     }
                     children.put(k, true);
                 }

@@ -37,19 +37,20 @@ public class VersionCommand extends VanillaCommand {
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage("\u00A76Version " + Nukkit.VERSION + ". \u00A7bThis server is running \u00A7cNukkit \u00A7aPetteriM1 Edition \u00A7bfor Minecraft Bedrock Edition \u00A76" + ProtocolInfo.MINECRAFT_VERSION_NETWORK + " \u00A7b(Protocol \u00A76" + ProtocolInfo.CURRENT_PROTOCOL + "\u00A7b) including experimental multiversion support.");
+            sender.sendMessage("§e###############################################\n§cNukkit §aPetteriM1 Edition\n§6Build: §b" + Nukkit.VERSION + "\n§6Multiversion: §b1.2.0 - " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§dhttps://github.com/PetteriM1/NukkitPetteriM1Edition\n§e###############################################");
 
             if (sender.isOp()) {
                 sender.getServer().getScheduler().scheduleTask(() -> {
                     try {
-                        URL url = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master");
-                        URLConnection request = url.openConnection();
+                        URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                         request.connect();
-                        String latest = "git-" + new JsonParser().parse(new InputStreamReader((InputStream) request.getContent())).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                        InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                        String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                        content.close();
 
-                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null")) {
+                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
                             sender.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + sender.getServer().getNukkitVersion() + " Latest: " + latest);
-                        } else {
+                        } else if (Nukkit.isMasterBranchBuild()) {
                             sender.sendMessage("\u00A7aYou are running the latest version.");
                         }
                     } catch (Exception ignore) {}

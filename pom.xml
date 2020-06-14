@@ -14,7 +14,7 @@
         <log4j2.version>2.12.1</log4j2.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jline.version>3.12.1</jline.version>
-        <netty.version>4.1.43.Final</netty.version>
+        <netty.version>[4.1.47.Final,4.1.999.Final]</netty.version>
     </properties>
     
     <distributionManagement>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.25</version>
+            <version>1.17</version>
         </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
@@ -165,6 +165,17 @@
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
             <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -309,6 +320,14 @@
                         <tags>false</tags>
                         <forceLongFormat>false</forceLongFormat>
                     </gitDescribe>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
         </plugins>

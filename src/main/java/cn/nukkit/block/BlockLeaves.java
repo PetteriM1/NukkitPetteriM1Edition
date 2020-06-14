@@ -78,7 +78,7 @@ public class BlockLeaves extends BlockTransparentMeta {
 
     @Override
     public Item toItem() {
-        return new ItemBlock(this, 0, 1);
+        return new ItemBlock(this, this.getDamage() & 0x3, 1);
     }
 
     @Override
@@ -197,7 +197,7 @@ public class BlockLeaves extends BlockTransparentMeta {
         if (checkDecay) {
             this.setDamage(this.getDamage() | 0x08);
         } else {
-            this.setDamage(this.getDamage() & ~0x08);
+            this.setDamage(this.getDamage() & -9);
         }
     }
 
@@ -209,7 +209,7 @@ public class BlockLeaves extends BlockTransparentMeta {
         if (persistent) {
             this.setDamage(this.getDamage() | 0x04);
         } else {
-            this.setDamage(this.getDamage() & ~0x04);
+            this.setDamage(this.getDamage() & -5);
         }
     }
 
@@ -228,6 +228,6 @@ public class BlockLeaves extends BlockTransparentMeta {
     }
 
     protected Item getSapling() {
-        return new ItemBlock(get(SAPLING), this.getDamage() & 0x03);
+        return Item.get(BlockID.SAPLING, this.getDamage() & 0x03);
     }
 }

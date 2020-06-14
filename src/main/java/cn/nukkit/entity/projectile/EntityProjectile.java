@@ -12,6 +12,7 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -67,16 +68,19 @@ public abstract class EntityProjectile extends Entity {
         } else {
             ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, entity, DamageCause.PROJECTILE, damage);
         }
-        entity.attack(ev);
-        this.hadCollision = true;
 
-        if (this.fireTicks > 0) {
-            EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this, entity, 5);
-            this.server.getPluginManager().callEvent(ev);
-            if (!event.isCancelled()) {
-                entity.setOnFire(event.getDuration());
+        if (entity.attack(ev)) {
+            this.hadCollision = true;
+
+            if (this.fireTicks > 0) {
+                EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this, entity, 5);
+                this.server.getPluginManager().callEvent(ev);
+                if (!event.isCancelled()) {
+                    entity.setOnFire(event.getDuration());
+                }
             }
         }
+
         this.close();
     }
 
@@ -196,8 +200,8 @@ public abstract class EntityProjectile extends Entity {
 
     public void updateRotation() {
         double f = Math.sqrt((this.motionX * this.motionX) + (this.motionZ * this.motionZ));
-        this.yaw = Math.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
-        this.pitch = Math.atan2(this.motionY, f) * 180 / Math.PI;
+        this.yaw = FastMath.atan2(this.motionX, this.motionZ) * 180 / Math.PI;
+        this.pitch = FastMath.atan2(this.motionY, f) * 180 / Math.PI;
     }
 
     public void inaccurate(float modifier) {

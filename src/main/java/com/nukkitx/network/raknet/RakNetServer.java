@@ -40,7 +40,6 @@ public class RakNetServer extends RakNet {
     private volatile RakNetServerListener listener = null;
     private final int bindThreads;
     private int maxConnections = 1024;
-    public boolean strongIPBans;
 
     public RakNetServer(InetSocketAddress bindAddress) {
         this(bindAddress, 1);
@@ -157,11 +156,11 @@ public class RakNetServer extends RakNet {
 
         if (session != null) {
             this.sendAlreadyConnected(ctx, packet.sender());
-        } else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
-            this.sendNoFreeIncomingConnections(ctx, packet.sender());
+        /*} else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
+            this.sendNoFreeIncomingConnections(ctx, packet.sender());*/
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
             this.sendConnectionBanned(ctx, packet.sender());
-        } else if (strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
+        } else if (Server.getInstance().strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
             this.sendConnectionBanned(ctx, packet.sender());
             Server.getInstance().getLogger().info("\u00A7c" + packet.sender().getHostName() + " disconnected due to IP banned");
         } else {
@@ -173,6 +172,8 @@ public class RakNetServer extends RakNet {
                 session.sendOpenConnectionReply1();
                 if (listener != null) {
                     listener.onSessionCreation(session);
+                } else {
+                    Server.getInstance().getLogger().warning("Unable to create session for " + packet.sender().getHostName() + ": listener is null");
                 }
             }
         }
@@ -221,6 +222,7 @@ public class RakNetServer extends RakNet {
         buffer.writeLong(this.guid);
 
         RakNet.send(ctx, recipient, buffer);
+        Server.getInstance().getLogger().debug("Already connected");
     }
 
     private void sendConnectionBanned(ChannelHandlerContext ctx, InetSocketAddress recipient) {
@@ -230,6 +232,7 @@ public class RakNetServer extends RakNet {
         buffer.writeLong(this.guid);
 
         RakNet.send(ctx, recipient, buffer);
+        Server.getInstance().getLogger().debug("Connection banned");
     }
 
     private void sendNoFreeIncomingConnections(ChannelHandlerContext ctx, InetSocketAddress recipient) {
@@ -239,6 +242,7 @@ public class RakNetServer extends RakNet {
         buffer.writeLong(this.guid);
 
         RakNet.send(ctx, recipient, buffer);
+        Server.getInstance().getLogger().debug("No free incoming connections");
     }
 
     @ChannelHandler.Sharable

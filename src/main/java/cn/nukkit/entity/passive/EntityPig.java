@@ -3,6 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.entity.mob.EntityZombiePigman;
@@ -23,7 +24,7 @@ import java.util.Objects;
 
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
 
-public class EntityPig extends EntityWalkingAnimal {
+public class EntityPig extends EntityWalkingAnimal implements EntityRideable {
 
     public static final int NETWORK_ID = 12;
 
@@ -257,6 +258,22 @@ public class EntityPig extends EntityWalkingAnimal {
             ent.spawnToAll();
         } else {
             super.onStruckByLightning(entity);
+        }
+    }
+
+    @Override
+    public void updatePassengers() {
+        if (this.passengers.isEmpty()) {
+            return;
+        }
+
+        for (Entity passenger : new ArrayList<>(this.passengers)) {
+            if (!passenger.isAlive() || this.isInsideOfWater()) {
+                dismountEntity(passenger);
+                continue;
+            }
+
+            updatePassengerPosition(passenger);
         }
     }
 }

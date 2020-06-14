@@ -7,10 +7,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.utils.TextFormat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2015/11/11 by xtypr.
@@ -18,10 +16,10 @@ import java.util.Objects;
  */
 public class StatusCommand extends VanillaCommand {
 
-    private static final DateFormat format = new SimpleDateFormat("'" + TextFormat.RED + "'d'" + TextFormat.GOLD + " days " +
-            TextFormat.RED + "'H'" + TextFormat.GOLD + " hours " +
-            TextFormat.RED + "'m'" + TextFormat.GOLD + " minutes " +
-            TextFormat.RED + "'s'" + TextFormat.GOLD + " seconds'");
+    private static final String UPTIME_FORMAT = TextFormat.RED + "%d" + TextFormat.GOLD + " days " +
+            TextFormat.RED + "%d" + TextFormat.GOLD + " hours " +
+            TextFormat.RED + "%d" + TextFormat.GOLD + " minutes " +
+            TextFormat.RED + "%d" + TextFormat.GOLD + " seconds";
 
     public StatusCommand(String name) {
         super(name, "%nukkit.command.status.description", "%nukkit.command.status.usage");
@@ -40,7 +38,7 @@ public class StatusCommand extends VanillaCommand {
 
         long time = System.currentTimeMillis() - Nukkit.START_TIME;
 
-        sender.sendMessage(TextFormat.GOLD + "Uptime: " + format.format(new Date(time)));
+        sender.sendMessage(TextFormat.GOLD + "Uptime: " + formatUptime(time));
 
         TextFormat tpsColor = TextFormat.GREEN;
         float tps = server.getTicksPerSecond();
@@ -81,12 +79,14 @@ public class StatusCommand extends VanillaCommand {
         sender.sendMessage(TextFormat.GOLD + "Available processors: " + TextFormat.GREEN + runtime.availableProcessors());
 
 
+        int players = server.getOnlinePlayersCount();
+
         TextFormat playerColor = TextFormat.GREEN;
-        if (((float) server.getOnlinePlayers().size() / (float) server.getMaxPlayers()) > 0.85) {
+        if (((float) players / (float) server.getMaxPlayers()) > 0.85) {
             playerColor = TextFormat.GOLD;
         }
 
-        sender.sendMessage(TextFormat.GOLD + "Players: " + playerColor + server.getOnlinePlayers().size() + TextFormat.GREEN + " online, " +
+        sender.sendMessage(TextFormat.GOLD + "Players: " + playerColor + players + TextFormat.GREEN + " online, " +
                 TextFormat.RED + server.getMaxPlayers() + TextFormat.GREEN + " max. ");
 
         for (Level level : server.getLevels().values()) {
@@ -101,5 +101,16 @@ public class StatusCommand extends VanillaCommand {
         }
 
         return true;
+    }
+
+    private static String formatUptime(long uptime) {
+        long days = TimeUnit.MILLISECONDS.toDays(uptime);
+        uptime -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(uptime);
+        uptime -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(uptime);
+        uptime -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(uptime);
+        return String.format(UPTIME_FORMAT, days, hours, minutes, seconds);
     }
 }

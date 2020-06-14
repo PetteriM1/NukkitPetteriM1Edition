@@ -10,6 +10,7 @@ import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -75,9 +76,9 @@ public class EntityFirework extends Entity {
             this.updateMovement();
 
             float f = (float) Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-            this.yaw = (float) (Math.atan2(this.motionX, this.motionZ) * (57.29577951308232));
+            this.yaw = (float) (FastMath.atan2(this.motionX, this.motionZ) * (57.29577951308232));
 
-            this.pitch = (float) (Math.atan2(this.motionY, (double) f) * (57.29577951308232));
+            this.pitch = (float) (FastMath.atan2(this.motionY, f) * (57.29577951308232));
 
             if (this.age == 0) {
                 this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LAUNCH);
@@ -92,7 +93,7 @@ public class EntityFirework extends Entity {
 
                 level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_LARGE_BLAST, -1, NETWORK_ID);
 
-                this.kill();
+                this.kill(); // Using close() here would remove the firework before the explosion is displayed
 
                 hasUpdate = true;
             }

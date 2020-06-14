@@ -17,5 +17,4 @@ public class EnchantmentTridentChanneling extends EnchantmentTrident {
     public int getMaxEnchantAbility(int level) {
         return this.getMinEnchantAbility(level) + 50;
     }
-
 }

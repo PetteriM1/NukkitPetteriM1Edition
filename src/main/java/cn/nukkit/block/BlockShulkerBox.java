@@ -61,7 +61,7 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     public Item toItem() {
         ItemBlock item = new ItemBlock(this, this.getDamage(), 1);
 
-        BlockEntityShulkerBox t = (BlockEntityShulkerBox)this.getLevel().getBlockEntity(this);
+        BlockEntityShulkerBox t = (BlockEntityShulkerBox) this.getLevel().getBlockEntity(this);
 
         if (t != null) {
             ShulkerBoxInventory i = t.getRealInventory();
@@ -92,17 +92,6 @@ public class BlockShulkerBox extends BlockTransparentMeta {
         }
 
         return item;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
     }
 
     @Override

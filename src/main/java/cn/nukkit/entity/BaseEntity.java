@@ -29,7 +29,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
-    protected byte attackDelay = 0;
+    protected int attackDelay = 0;
     private short inLoveTicks = 0;
 
     private boolean baby = false;
@@ -52,7 +52,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean isMovement() {
-        return this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty() && this.movement;
+        return this.getServer().getMobAiEnabled() && this.movement;
     }
 
     public boolean isKnockback() {
@@ -147,7 +147,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return true;
         }
 
-        if (this instanceof EntityMob && this.attackDelay < Byte.MAX_VALUE) {
+        if (this instanceof EntityMob && this.attackDelay < 200) {
             this.attackDelay++;
         }
 
@@ -198,7 +198,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean setMotion(Vector3 motion) {
-        if (this.getServer().getMobAiEnabled() && !this.getServer().getOnlinePlayers().isEmpty()) {
+        if (this.getServer().getMobAiEnabled()) {
             super.setMotion(motion);
         }
         return false;
@@ -206,6 +206,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean move(double dx, double dy, double dz) {
+        if (dy < -10 || dy > 10) {
+            this.kill();
+            return false;
+        }
+
         Timings.entityMoveTimer.startTiming();
 
         this.blocksAround = null;
@@ -214,7 +219,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         double movY = dy;
         double movZ = dz * moveMultifier;
 
-        AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.getOffsetBoundingBox(dx, dy, dz));
+        AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
+
         for (AxisAlignedBB bb : list) {
             dx = bb.calculateXOffset(this.boundingBox, dx);
         }
@@ -256,7 +262,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public void setInLove() {
         this.inLoveTicks = 600;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_INLOVE, true);
     }
 
     public boolean isInLove() {
@@ -460,7 +466,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     private void addHealth(int health) {
-        this.setMaxHealth(this.getMaxHealth() + health);
+        this.maxHealth = this.maxHealth + health;
         this.setHealth(this.getHealth() + health);
     }
 

@@ -93,7 +93,7 @@ public class BlockLava extends BlockLiquid {
                             this.level.getServer().getPluginManager().callEvent(e);
 
                             if (!e.isCancelled()) {
-                                BlockFire fire = new BlockFire();
+                                Block fire = Block.get(BlockID.FIRE);
                                 this.getLevel().setBlock(v, fire, true);
                                 this.getLevel().scheduleUpdate(fire, fire.tickRate());
                                 return Level.BLOCK_UPDATE_RANDOM;
@@ -115,7 +115,7 @@ public class BlockLava extends BlockLiquid {
                         this.level.getServer().getPluginManager().callEvent(e);
 
                         if (!e.isCancelled()) {
-                            BlockFire fire = new BlockFire();
+                            Block fire = Block.get(BlockID.FIRE);
                             this.getLevel().setBlock(v, fire, true);
                             this.getLevel().scheduleUpdate(fire, fire.tickRate());
                         }
@@ -144,7 +144,7 @@ public class BlockLava extends BlockLiquid {
 
     @Override
     public BlockLiquid getBlock(int meta) {
-        return new BlockLava(meta);
+        return (BlockLiquid) Block.get(LAVA, meta);
     }
     
     @Override
@@ -172,9 +172,9 @@ public class BlockLava extends BlockLiquid {
         }
         if (colliding != null) {
             if (this.getDamage() == 0) {
-                this.liquidCollide(colliding, new BlockObsidian());
+                this.liquidCollide(colliding, Block.get(OBSIDIAN));
             } else if (this.getDamage() <= 4) {
-                this.liquidCollide(colliding, new BlockCobblestone());
+                this.liquidCollide(colliding, Block.get(COBBLESTONE));
             }
         }
     }
@@ -182,7 +182,7 @@ public class BlockLava extends BlockLiquid {
     @Override
     protected void flowIntoBlock(Block block, int newFlowDecay) {
         if (block instanceof BlockWater) {
-            ((BlockLiquid) block).liquidCollide(this, new BlockStone());
+            ((BlockLiquid) block).liquidCollide(this, Block.get(STONE));
         } else {
             super.flowIntoBlock(block, newFlowDecay);
         }
@@ -193,5 +193,54 @@ public class BlockLava extends BlockLiquid {
         if (!(entity instanceof EntityPrimedTNT)) {
             super.addVelocityToEntity(entity, vector);
         }
+    }
+
+    @Override
+    protected boolean[] getOptimalFlowDirections() {
+        int[] flowCost = new int[]{
+                1000,
+                1000,
+                1000,
+                1000
+        };
+        int maxCost = 4 / this.getFlowDecayPerBlock();
+        for (int j = 0; j < 4; ++j) {
+            int x = (int) this.x;
+            int y = (int) this.y;
+            int z = (int) this.z;
+            if (j == 0) {
+                --x;
+            } else if (j == 1) {
+                ++x;
+            } else if (j == 2) {
+                --z;
+            } else {
+                ++z;
+            }
+            Block block = this.level.getBlock(x, y, z);
+            if (!this.canFlowInto(block)) {
+                this.flowCostVisited.put(Level.blockHash(x, y, z), BLOCKED);
+            } else if (this.level.getBlock(x, y - 1, z).canBeFlowedInto()) {
+                this.flowCostVisited.put(Level.blockHash(x, y, z), CAN_FLOW_DOWN);
+                flowCost[j] = maxCost = 0;
+            } else if (maxCost > 0) {
+                this.flowCostVisited.put(Level.blockHash(x, y, z), CAN_FLOW);
+                flowCost[j] = this.calculateFlowCost(x, y, z, 1, maxCost, j ^ 0x01, j ^ 0x01);
+                maxCost = Math.min(maxCost, flowCost[j]);
+            }
+        }
+        this.flowCostVisited.clear();
+        double minCost = Double.MAX_VALUE;
+        for (int i = 0; i < 4; i++) {
+            double d = flowCost[i];
+            if (d < minCost) {
+                minCost = d;
+            }
+        }
+        boolean[] isOptimalFlowDirection = new boolean[4];
+        for (int i = 0; i < 4; ++i) {
+            isOptimalFlowDirection[i] = (flowCost[i] == minCost);
+        }
+        return isOptimalFlowDirection;
     }
 }

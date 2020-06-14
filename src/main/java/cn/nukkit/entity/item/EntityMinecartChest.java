@@ -26,6 +26,7 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
     public EntityMinecartChest(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         setDisplayBlock(Block.get(Block.CHEST), false);
+        setName("Minecart with Chest");
     }
 
     @Override
@@ -34,7 +35,7 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
     }
 
     @Override
-    public boolean isRideable(){
+    public boolean isRideable() {
         return false;
     }
 
@@ -51,6 +52,7 @@ public class EntityMinecartChest extends EntityMinecartAbstract implements Inven
         for (Item item : this.inventory.getContents().values()) {
             this.level.dropItem(this, item);
         }
+        this.inventory.clearAll();
     }
 
     @Override
