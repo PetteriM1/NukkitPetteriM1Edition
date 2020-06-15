@@ -11,6 +11,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.NumberTag;
 import cn.nukkit.network.protocol.BatchPacket;
+import co.aikar.timings.Timing;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -127,7 +128,8 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
         if (this.getProvider() != null && !this.isInit) {
             boolean changed = false;
             if (this.NBTentities != null) {
-                this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.startTiming();
+                Timing timing = this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer;
+                if (timing != null) timing.startTiming();
                 for (CompoundTag nbt : NBTentities) {
                     if (!nbt.contains("id")) {
                         this.setChanged();
@@ -143,12 +145,13 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                         changed = true;
                     }
                 }
-                this.getProvider().getLevel().timings.syncChunkLoadEntitiesTimer.stopTiming();
+                if (timing != null) timing.stopTiming();
                 this.NBTentities = null;
             }
 
             if (this.NBTtiles != null) {
-                this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.startTiming();
+                Timing timing = this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer;
+                if (timing != null) timing.startTiming();
                 for (CompoundTag nbt : NBTtiles) {
                     if (nbt != null) {
                         if (!nbt.contains("id")) {
@@ -165,7 +168,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
                         }
                     }
                 }
-                this.getProvider().getLevel().timings.syncChunkLoadBlockEntitiesTimer.stopTiming();
+                if (timing != null) timing.stopTiming();
                 this.NBTtiles = null;
             }
 

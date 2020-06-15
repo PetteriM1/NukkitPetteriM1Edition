@@ -87,7 +87,7 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
     @Override
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate;
-        Timings.entityBaseTickTimer.startTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
 
         if (getServer().getDifficulty() == 0) {
             this.close();
@@ -100,7 +100,7 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
             this.setOnFire(100);
         }
 
-        Timings.entityBaseTickTimer.stopTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
 

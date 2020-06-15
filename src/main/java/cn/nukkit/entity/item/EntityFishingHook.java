@@ -92,7 +92,7 @@ public class EntityFishingHook extends EntityProjectile {
 			return false;
 		}
 
-		this.timing.startTiming();
+		if (this.timing != null) this.timing.startTiming();
 
 		if (this.isInsideOfWater()) {
 			this.motionX = 0;
@@ -138,7 +138,7 @@ public class EntityFishingHook extends EntityProjectile {
 			hasUpdate = true;
 		}
 
-		this.timing.stopTiming();
+		if (this.timing != null) this.timing.stopTiming();
 
 		return hasUpdate;
 	}

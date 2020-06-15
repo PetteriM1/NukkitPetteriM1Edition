@@ -140,7 +140,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        Timings.entityBaseTickTimer.startTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
 
         if (this.canDespawn() && this.age > Server.getInstance().despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
@@ -166,7 +166,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             }
         }
 
-        Timings.entityBaseTickTimer.stopTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
 
         return hasUpdate;
     }
@@ -211,7 +211,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return false;
         }
 
-        Timings.entityMoveTimer.startTiming();
+        if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.startTiming();
 
         this.blocksAround = null;
 
@@ -242,7 +242,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         this.checkGroundState(movX, movY, movZ, dx, dy, dz);
         this.updateFallState(this.onGround);
 
-        Timings.entityMoveTimer.stopTiming();
+        if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.stopTiming();
         return true;
     }
 

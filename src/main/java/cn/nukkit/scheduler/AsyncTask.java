@@ -76,7 +76,7 @@ public abstract class AsyncTask implements Runnable {
     }
 
     public static void collectTask() {
-        Timings.schedulerAsyncTimer.startTiming();
+        if (Timings.schedulerAsyncTimer != null) Timings.schedulerAsyncTimer.startTiming();
         while (!FINISHED_LIST.isEmpty()) {
             AsyncTask task = FINISHED_LIST.poll();
             try {
@@ -87,6 +87,6 @@ public abstract class AsyncTask implements Runnable {
                         + " invoking onCompletion", e);
             }
         }
-        Timings.schedulerAsyncTimer.stopTiming();
+        if (Timings.schedulerAsyncTimer != null) Timings.schedulerAsyncTimer.stopTiming();
     }
 }

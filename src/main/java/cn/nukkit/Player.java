@@ -768,7 +768,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        Timings.playerChunkSendTimer.startTiming();
+        if (Timings.playerChunkSendTimer != null) Timings.playerChunkSendTimer.startTiming();
 
         if (!loadQueue.isEmpty()) {
             int count = 0;
@@ -816,7 +816,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.spawnChunkLoadCount = -1;
         }
 
-        Timings.playerChunkSendTimer.stopTiming();
+        if (Timings.playerChunkSendTimer != null) Timings.playerChunkSendTimer.stopTiming();
     }
 
     protected void doFirstSpawn() {
@@ -889,7 +889,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        Timings.playerChunkOrderTimer.startTiming();
+        if (Timings.playerChunkOrderTimer != null) Timings.playerChunkOrderTimer.startTiming();
 
         this.nextChunkOrderRun = 200;
 
@@ -969,7 +969,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        Timings.playerChunkOrderTimer.stopTiming();
+        if (Timings.playerChunkOrderTimer != null) Timings.playerChunkOrderTimer.stopTiming();
         return true;
     }
 
@@ -1824,7 +1824,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return Entity|null    either NULL if no entity is found or an instance of the entity
      */
     public EntityInteractable getEntityPlayerLookingAt(int maxDistance) {
-        timing.startTiming();
+        if (timing != null) timing.startTiming();
 
         EntityInteractable entity = null;
 
@@ -1846,7 +1846,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             } catch (Exception ignored) {}
         }
 
-        timing.stopTiming();
+        if (timing != null) timing.stopTiming();
 
         return entity;
     }
@@ -2838,9 +2838,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    Timings.playerCommandTimer.startTiming();
+                    if (Timings.playerCommandTimer != null) Timings.playerCommandTimer.startTiming();
                     this.server.dispatchCommand(playerCommandPreprocessEvent.getPlayer(), playerCommandPreprocessEvent.getMessage().substring(1));
-                    Timings.playerCommandTimer.stopTiming();
+                    if (Timings.playerCommandTimer != null) Timings.playerCommandTimer.stopTiming();
                     break;
                 case ProtocolInfo.TEXT_PACKET:
                     if (!this.spawned || !this.isAlive()) {

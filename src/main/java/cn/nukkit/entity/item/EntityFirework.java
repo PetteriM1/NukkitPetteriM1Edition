@@ -62,7 +62,7 @@ public class EntityFirework extends Entity {
 
         this.lastUpdate = currentTick;
 
-        this.timing.startTiming();
+        if (this.timing != null) this.timing.startTiming();
 
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
@@ -99,7 +99,7 @@ public class EntityFirework extends Entity {
             }
         }
 
-        this.timing.stopTiming();
+        if (this.timing != null) this.timing.stopTiming();
 
         return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
     }
