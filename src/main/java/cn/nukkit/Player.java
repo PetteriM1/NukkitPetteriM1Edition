@@ -451,11 +451,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return false;
     }
 
-    public boolean canCollide(){
+    public boolean canCollide() {
         return true;
     }
 
-    public boolean canPickupXP(){
+    public boolean canPickupXP() {
         return this.canPickupOrb;
     }
 
