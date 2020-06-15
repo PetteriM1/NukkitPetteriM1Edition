@@ -212,7 +212,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        Timings.livingEntityBaseTickTimer.startTiming();
+        if (Timings.livingEntityBaseTickTimer != null) Timings.livingEntityBaseTickTimer.startTiming();
 
         boolean isBreathing = !this.isSubmerged();
         if (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator())) {
@@ -322,7 +322,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        Timings.livingEntityBaseTickTimer.stopTiming();
+        if (Timings.livingEntityBaseTickTimer != null) Timings.livingEntityBaseTickTimer.stopTiming();
 
         return hasUpdate;
     }

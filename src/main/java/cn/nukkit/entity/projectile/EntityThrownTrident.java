@@ -93,7 +93,7 @@ public class EntityThrownTrident extends EntityProjectile {
             return false;
         }
 
-        this.timing.startTiming();
+        if (this.timing != null) this.timing.startTiming();
 
         if (this.onGround || this.hadCollision) {
             if (this.firstTickOnGround) {
@@ -106,7 +106,7 @@ public class EntityThrownTrident extends EntityProjectile {
             this.close();
         }
 
-        this.timing.stopTiming();
+        if (this.timing != null) this.timing.stopTiming();
 
         return super.onUpdate(currentTick);
     }

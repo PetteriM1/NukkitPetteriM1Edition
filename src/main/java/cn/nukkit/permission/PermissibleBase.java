@@ -118,7 +118,7 @@ public class PermissibleBase implements Permissible {
 
     @Override
     public void recalculatePermissions() {
-        Timings.permissibleCalculationTimer.startTiming();
+        if (Timings.permissibleCalculationTimer != null) Timings.permissibleCalculationTimer.startTiming();
 
         this.clearPermissions();
         Map<String, Permission> defaults = Server.getInstance().getPluginManager().getDefaultPermissions(this.isOp());
@@ -134,7 +134,7 @@ public class PermissibleBase implements Permissible {
         for (PermissionAttachment attachment : this.attachments) {
             this.calculateChildPermissions(attachment.getPermissions(), false, attachment);
         }
-        Timings.permissibleCalculationTimer.stopTiming();
+        if (Timings.permissibleCalculationTimer != null) Timings.permissibleCalculationTimer.stopTiming();
     }
 
     public void clearPermissions() {

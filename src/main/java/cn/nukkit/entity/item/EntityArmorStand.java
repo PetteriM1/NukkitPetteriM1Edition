@@ -324,7 +324,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			return false;
 		}
 
-		this.timing.startTiming();
+		if (this.timing != null) this.timing.startTiming();
 
 		boolean hasUpdate = super.onUpdate(currentTick);
 
@@ -336,7 +336,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 		this.move(this.motionX, this.motionY, this.motionZ);
 
-		this.timing.stopTiming();
+		if (this.timing != null) this.timing.stopTiming();
 
 		return hasUpdate;
 	}
