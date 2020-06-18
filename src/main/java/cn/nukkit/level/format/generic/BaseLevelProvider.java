@@ -303,8 +303,17 @@ public abstract class BaseLevelProvider implements LevelProvider {
 
     @Override
     public void saveLevelData() {
+        String file = this.path + "level.dat";
+        File old = new File(file);
+        if (old.exists()) {
+            try {
+                com.google.common.io.Files.copy(old, new File(file + ".bak"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
-            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), new FileOutputStream(this.path + "level.dat"));
+            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), new FileOutputStream(file));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
