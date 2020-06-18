@@ -2263,7 +2263,7 @@ public class Level implements ChunkManager, Metadatable {
 
                         if (second != null) {
                             block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                            block.getLevel().setBlock(block.add(0, 1, 0), Block.get(BlockID.AIR)); // block is set to BlockFace.DOWN above
+                            block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
 
                             CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
                             server.getPluginManager().callEvent(ev);
@@ -2302,7 +2302,7 @@ public class Level implements ChunkManager, Metadatable {
                         block.getLevel().setBlock(first2, Block.get(BlockID.AIR));
                         block.getLevel().setBlock(second2, Block.get(BlockID.AIR));
                         block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                        block.getLevel().setBlock(block.add(0, 1, 0), Block.get(BlockID.AIR)); // block is set to BlockFace.DOWN above
+                        block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
 
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_WITHER);
                         server.getPluginManager().callEvent(ev);
@@ -2316,7 +2316,9 @@ public class Level implements ChunkManager, Metadatable {
                             player.getInventory().setItemInHand(item);
                         }
 
-                        Entity.createEntity("Wither", block.add(0.5, -1, 0.5)).spawnToAll();
+                        EntityWither wither = (EntityWither) Entity.createEntity("Wither", block.add(0.5, -1, 0.5));
+                        wither.stayTime = 220;
+                        wither.spawnToAll();
                         this.addSound(block, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
                         return null;
                     }

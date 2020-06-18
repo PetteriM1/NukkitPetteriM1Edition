@@ -22,7 +22,7 @@ import co.aikar.timings.Timings;
  */
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
-    protected int stayTime = 0;
+    public int stayTime = 0;
     protected int moveTime = 0;
 
     protected float moveMultifier = 1.0f;
