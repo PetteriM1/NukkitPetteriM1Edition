@@ -211,7 +211,6 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
-    private boolean asyncAutosave;
     public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
@@ -1085,11 +1084,7 @@ public class Server {
 
             for (Level level : this.levelArray) {
                 if (!nonAutoSaveWorlds.contains(level.getName())) {
-                    if (asyncAutosave) {
-                        this.scheduler.scheduleTask(null, level::save, true);
-                    } else {
-                        level.save();
-                    }
+                    level.save();
                 }
             }
             if (Timings.levelSaveTimer != null) Timings.levelSaveTimer.stopTiming();
@@ -2168,7 +2163,6 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
-        this.asyncAutosave = this.getPropertyBoolean("async-autosave", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2283,7 +2277,6 @@ public class Server {
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
-            put("async-autosave", false);
             put("automatic-bug-report", true);
         }
     }

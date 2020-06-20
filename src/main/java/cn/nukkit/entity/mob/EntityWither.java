@@ -193,7 +193,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     }
 
     private void explode() {
-        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 5);
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 7);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
