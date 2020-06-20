@@ -1809,27 +1809,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
         }
 
-        updateBlockingFlag(true);
+        updateBlockingFlag();
 
         return true;
     }
 
-    private void updateBlockingFlag(boolean delayed) {
-        if (isBlocking() && (!isSneaking() || (this.getInventory().getItemInHand().getId() != ItemID.SHIELD && this.getOffhandInventory().getItem(0).getId() != ItemID.SHIELD))) {
-            this.setBlocking(false);
-            return;
-        }
-
+    private void updateBlockingFlag() {
+        boolean shieldInHand = this.getInventory().getItemInHand().getId() == ItemID.SHIELD;
+        boolean shieldInOffhand = this.getOffhandInventory().getItem(0).getId() == ItemID.SHIELD;
         if (isBlocking()) {
-            return;
+            if (!isSneaking() || (!shieldInHand && !shieldInOffhand)) {
+                this.setBlocking(false);
+            }
+        } else if (isSneaking() && (shieldInHand || shieldInOffhand)) {
+            this.setBlocking(true);
         }
-
-        /*if (delayed) {
-            getServer().getScheduler().scheduleDelayedTask(null, () -> updateBlockingFlag(false), 2);
-            return;
-        }*/
-
-        this.setBlocking(true);
     }
 
     public void checkInteractNearby() {
