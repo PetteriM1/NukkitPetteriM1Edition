@@ -1022,9 +1022,10 @@ public class Server {
              player.dataPacket(CraftingManager.packet354);
         } else if (player.protocol == ProtocolInfo.v1_10_0) {
             player.dataPacket(CraftingManager.packet340);
+        } else if (player.protocol == ProtocolInfo.v1_9_0 || player.protocol == ProtocolInfo.v1_8_0 || player.protocol == ProtocolInfo.v1_7_0) { // these should work just fine
+            player.dataPacket(CraftingManager.packet313);
         }
         // Don't send recipes if they wouldn't work anyways
-        // TODO: Support for older versions
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -2261,7 +2262,7 @@ public class Server {
             put("worlds-entity-spawning-disabled", "");
             put("block-listener", true);
             put("allow-flight", false);
-            put("timeout-milliseconds", 30000);
+            put("timeout-milliseconds", 25000);
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
             put("dimensions", false);
