@@ -22,7 +22,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Utils;
@@ -93,7 +92,7 @@ public class EntityFishingHook extends EntityProjectile {
 			return false;
 		}
 
-		this.timing.startTiming();
+		if (this.timing != null) this.timing.startTiming();
 
 		if (this.isInsideOfWater()) {
 			this.motionX = 0;
@@ -139,7 +138,7 @@ public class EntityFishingHook extends EntityProjectile {
 			hasUpdate = true;
 		}
 
-		this.timing.stopTiming();
+		if (this.timing != null) this.timing.stopTiming();
 
 		return hasUpdate;
 	}
@@ -274,7 +273,7 @@ public class EntityFishingHook extends EntityProjectile {
 			ownerId = this.shootingEntity.getId();
 		}
 		pk.metadata = this.dataProperties.putLong(DATA_OWNER_EID, ownerId);
-		pk.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
+		//pk.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
 		player.dataPacket(pk);
 		super.spawnTo(player);
 	}

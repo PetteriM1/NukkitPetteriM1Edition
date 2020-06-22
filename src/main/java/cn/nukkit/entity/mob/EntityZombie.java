@@ -103,7 +103,7 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
     @Override
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate;
-        Timings.entityBaseTickTimer.startTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
 
         if (getServer().getDifficulty() == 0) {
             this.close();
@@ -120,7 +120,7 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
             }
         }
 
-        Timings.entityBaseTickTimer.stopTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
 

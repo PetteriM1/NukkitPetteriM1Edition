@@ -82,7 +82,7 @@ public class EntityZombieVillager extends EntityWalkingMob implements EntitySmit
     @Override
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate;
-        Timings.entityBaseTickTimer.startTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
 
         if (getServer().getDifficulty() == 0) {
             this.close();
@@ -95,7 +95,7 @@ public class EntityZombieVillager extends EntityWalkingMob implements EntitySmit
             this.setOnFire(100);
         }
 
-        Timings.entityBaseTickTimer.stopTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
         return hasUpdate;
     }
 

@@ -57,7 +57,7 @@ public class TimingsCommand extends VanillaCommand {
                 break;
             case "verboff":
                 sender.sendMessage(new TranslationContainer("nukkit.command.timings.verboseDisable"));
-                Timings.setVerboseEnabled(true);
+                Timings.setVerboseEnabled(false);
                 break;
             case "reset":
                 Timings.reset();

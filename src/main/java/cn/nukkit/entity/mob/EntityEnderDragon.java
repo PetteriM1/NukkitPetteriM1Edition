@@ -12,10 +12,10 @@ import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
@@ -80,8 +80,8 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
 
             EntityEnderCharge charge = (EntityEnderCharge) Entity.createEntity("EnderCharge", new Location(this.x + this.getLocation().getDirectionVector().multiply(5.0).x, this.y, this.z + this.getDirectionVector().multiply(5.0).z, this.level), this);
-            charge.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+            charge.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                    Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
 
             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(charge);
             this.server.getPluginManager().callEvent(launch);
@@ -132,7 +132,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(200).setValue(200)};
-        addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
+        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 }

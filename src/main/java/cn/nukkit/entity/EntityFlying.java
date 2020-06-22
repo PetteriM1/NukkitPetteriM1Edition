@@ -6,6 +6,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public abstract class EntityFlying extends BaseEntity {
 
@@ -113,7 +114,7 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
             }
 
             Vector3 before = this.target;
@@ -132,7 +133,7 @@ public abstract class EntityFlying extends BaseEntity {
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                     this.motionY = this.getSpeed() * 0.27 * (y / diff);
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
             }
 
             double dx = this.motionX;

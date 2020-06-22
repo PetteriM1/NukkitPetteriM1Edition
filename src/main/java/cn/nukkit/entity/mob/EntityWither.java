@@ -16,10 +16,10 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public class EntityWither extends EntityFlyingMob implements EntityBoss, EntitySmite {
 
@@ -82,8 +82,8 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             double f = 1;
             double yaw = this.yaw + Utils.rand(-12.0, 12.0);
             double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
-                    this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+            Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
+                    this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 
         if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
             return;
@@ -97,14 +97,14 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
                 k = Entity.createEntity("BlueWitherSkull", pos, this);
                 skull = (EntityBlueWitherSkull) k;
                 ((EntityBlueWitherSkull) skull).setExplode(true);
-                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+                skull.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
                 launch = new ProjectileLaunchEvent(skull);
             } else {
                 k = Entity.createEntity("WitherSkull", pos, this);
                 skull = (EntityWitherSkull) k;
-                skull.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                        Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+                skull.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
                 launch = new ProjectileLaunchEvent(skull);
             }
 
@@ -140,7 +140,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(witherMaxHealth()).setValue(witherMaxHealth())};
-        addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
+        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 
@@ -193,7 +193,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
     }
 
     private void explode() {
-        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 5);
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 7);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {

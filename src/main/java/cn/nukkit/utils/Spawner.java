@@ -76,13 +76,17 @@ public class Spawner implements Runnable {
     static boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
         try {
             int count = 0;
+            int max = (networkId == EntitySalmon.NETWORK_ID || networkId == EntityCod.NETWORK_ID) ? 4 : 2;
             Entity[] e = level.getEntities();
             for (Entity entity : e) {
                 if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
                     count++;
+                    if (count > max) {
+                        return false;
+                    }
                 }
             }
-            return count < ((networkId == EntitySalmon.NETWORK_ID || networkId == EntityCod.NETWORK_ID) ? 4 : 2);
+            return count < max;
         } catch (Exception e) {
             return false;
         }

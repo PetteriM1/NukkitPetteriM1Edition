@@ -87,11 +87,12 @@ public class PopulationTask extends AsyncTask {
                         BaseFullChunk ck = this.chunks[index];
                         if (ck == centerChunk) continue;
                         if (ck == null) {
-                            try {
-                                this.chunks[index] = (BaseFullChunk) centerChunk.getClass().getMethod("getEmptyChunk", int.class, int.class).invoke(null, centerChunk.getX() + x, centerChunk.getZ() + z);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
+                            //try {
+                                //this.chunks[index] = (BaseFullChunk) centerChunk.getClass().getMethod("getEmptyChunk", int.class, int.class).invoke(null, centerChunk.getX() + x, centerChunk.getZ() + z);
+                                this.chunks[index] = level.getProvider().getEmptyChunk(centerChunk.getX() + x, centerChunk.getZ() + z);
+                            //} catch (Exception e) {
+                            //    throw new RuntimeException(e);
+                            //}
                         } else {
                             this.chunks[index] = ck;
                         }

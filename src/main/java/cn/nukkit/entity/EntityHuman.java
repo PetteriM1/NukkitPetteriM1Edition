@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.IntPositionEntityData;
 import cn.nukkit.entity.data.Skin;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -343,5 +345,22 @@ public class EntityHuman extends EntityHumanType {
         if (value != oldValue) {
             setDataProperty(new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight()), true);
         }
+    }
+
+    @Override
+    protected void onBlock(Entity entity, boolean animate) {
+        super.onBlock(entity, animate);
+        Item shield = getInventory().getItemInHand();
+        Item shieldOffhand = getOffhandInventory().getItem(0);
+        if (shield.getId() == ItemID.SHIELD) {
+            shield = damageArmor(shield, entity);
+            getInventory().setItemInHand(shield);
+        } else if (shieldOffhand.getId() == ItemID.SHIELD) {
+            shieldOffhand = damageArmor(shieldOffhand, entity);
+            getOffhandInventory().setItem(0, shieldOffhand);
+        }
+        /*if (animate) {
+            //TODO
+        }*/
     }
 }

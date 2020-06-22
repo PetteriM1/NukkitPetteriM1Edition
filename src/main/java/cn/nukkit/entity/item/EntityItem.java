@@ -128,11 +128,11 @@ public class EntityItem extends Entity {
 
         this.lastUpdate = currentTick;
 
-        this.timing.startTiming();
+        if (this.timing != null) this.timing.startTiming();
 
         if (this.isInsideOfFire()) {
             this.close();
-            this.timing.stopTiming();
+            if (this.timing != null) this.timing.stopTiming();
             return true;
         }
 
@@ -150,7 +150,7 @@ public class EntityItem extends Entity {
                 for (Entity entity : e) {
                     if (entity instanceof Player) {
                         if (((Player) entity).pickupEntity(this, true)) {
-                            this.timing.stopTiming();
+                            if (this.timing != null) this.timing.stopTiming();
                             return true;
                         }
                     }
@@ -164,7 +164,7 @@ public class EntityItem extends Entity {
                     this.age = 0;
                 } else {
                     this.close();
-                    this.timing.stopTiming();
+                    if (this.timing != null) this.timing.stopTiming();
                     return true;
                 }
             }
@@ -231,7 +231,7 @@ public class EntityItem extends Entity {
             this.updateMovement();
         }
 
-        this.timing.stopTiming();
+        if (this.timing != null) this.timing.stopTiming();
 
         return hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
     }

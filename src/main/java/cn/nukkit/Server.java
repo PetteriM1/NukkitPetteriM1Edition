@@ -45,7 +45,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.CompressBatchedTask;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
@@ -222,7 +221,6 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
-    private boolean asyncAutosave;
     public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
@@ -305,7 +303,7 @@ public class Server {
 
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
-        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", false);
+        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
 
         if (this.networkCompressionLevel < -1) {
@@ -651,41 +649,73 @@ public class Server {
             }
         }
 
-        Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload = new byte[(packets.length << 1)][];
-        int size = 0;
-        for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
-                p.encode();
-            }
-            byte[] buf = p.getBuffer();
-            int i2 = i << 1;
-            payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-            payload[i2 + 1] = buf;
-            packets[i] = null;
-            size += payload[i2].length;
-            size += payload[i2 + 1].length;
-        }
-
-        List<InetSocketAddress> targets = new ArrayList<>();
-        for (Player p : players) {
-            if (p.isConnected()) {
-                targets.add(p.getSocketAddress());
-            }
-        }
-
         if (!forceSync && this.networkCompressionAsync) {
-            this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            getScheduler().scheduleTask(null, () -> {
+                byte[][] payload = new byte[(packets.length << 1)][];
+                int size = 0;
+                for (int i = 0; i < packets.length; i++) {
+                    DataPacket p = packets[i];
+                    if (!p.isEncoded) {
+                        p.encode();
+                    }
+                    byte[] buf = p.getBuffer();
+                    int i2 = i << 1;
+                    payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                    payload[i2 + 1] = buf;
+                    packets[i] = null;
+                    size += payload[i2].length;
+                    size += payload[i2 + 1].length;
+                }
+
+                List<InetSocketAddress> targets = new ArrayList<>();
+                for (Player p : players) {
+                    if (p.isConnected()) {
+                        targets.add(p.getSocketAddress());
+                    }
+                }
+
+                try {
+                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, true);
         } else {
+            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.startTiming();
+            byte[][] payload = new byte[(packets.length << 1)][];
+            int size = 0;
+            for (int i = 0; i < packets.length; i++) {
+                DataPacket p = packets[i];
+                if (!p.isEncoded) {
+                    p.encode();
+                }
+                byte[] buf = p.getBuffer();
+                int i2 = i << 1;
+                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                payload[i2 + 1] = buf;
+                packets[i] = null;
+                size += payload[i2].length;
+                size += payload[i2 + 1].length;
+            }
+
+            List<InetSocketAddress> targets = new ArrayList<>();
+            for (Player p : players) {
+                if (p.isConnected()) {
+                    targets.add(p.getSocketAddress());
+                }
+            }
+
+            //if (!forceSync && this.networkCompressionAsync) {
+            //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            //} else {
             try {
                 byte[] data = Binary.appendBytes(payload);
                 this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.stopTiming();
         }
-        Timings.playerNetworkSendTimer.stopTiming();
     }
 
     public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
@@ -1028,9 +1058,10 @@ public class Server {
              player.dataPacket(CraftingManager.packet354);
         } else if (player.protocol == ProtocolInfo.v1_10_0) {
             player.dataPacket(CraftingManager.packet340);
+        } else if (player.protocol == ProtocolInfo.v1_9_0 || player.protocol == ProtocolInfo.v1_8_0 || player.protocol == ProtocolInfo.v1_7_0) { // these should work just fine
+            player.dataPacket(CraftingManager.packet313);
         }
         // Don't send recipes if they wouldn't work anyways
-        // TODO: Support for older versions
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -1079,7 +1110,7 @@ public class Server {
 
     public void doAutoSave() {
         if (this.autoSave) {
-            Timings.levelSaveTimer.startTiming();
+            if (Timings.levelSaveTimer != null) Timings.levelSaveTimer.startTiming();
             for (Player player : new ArrayList<>(this.players.values())) {
                 if (player.isOnline()) {
                     player.save(true);
@@ -1090,14 +1121,10 @@ public class Server {
 
             for (Level level : this.levelArray) {
                 if (!nonAutoSaveWorlds.contains(level.getName())) {
-                    if (asyncAutosave) {
-                        this.scheduler.scheduleTask(null, level::save, true);
-                    } else {
-                        level.save();
-                    }
+                    level.save();
                 }
             }
-            Timings.levelSaveTimer.stopTiming();
+            if (Timings.levelSaveTimer != null) Timings.levelSaveTimer.stopTiming();
         }
     }
 
@@ -1124,17 +1151,17 @@ public class Server {
 
         ++this.tickCounter;
 
-        Timings.connectionTimer.startTiming();
+        if (Timings.connectionTimer != null) Timings.connectionTimer.startTiming();
         this.network.processInterfaces();
 
         if (this.rcon != null) {
             this.rcon.check();
         }
-        Timings.connectionTimer.stopTiming();
+        if (Timings.connectionTimer != null) Timings.connectionTimer.stopTiming();
 
-        Timings.schedulerTimer.startTiming();
+        if (Timings.schedulerTimer != null) Timings.schedulerTimer.startTiming();
         this.scheduler.mainThreadHeartbeat(this.tickCounter);
-        Timings.schedulerTimer.stopTiming();
+        if (Timings.schedulerTimer != null) Timings.schedulerTimer.stopTiming();
 
         this.checkTickUpdates(this.tickCounter);
 
@@ -2327,7 +2354,6 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
-        this.asyncAutosave = this.getPropertyBoolean("async-autosave", false);
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2391,7 +2417,7 @@ public class Server {
             put("debug-level", 1);
             put("async-workers", "auto");
             put("zlib-provider", 2);
-            put("async-compression", false);
+            put("async-compression", true);
             put("compression-level", 4);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);
@@ -2426,7 +2452,7 @@ public class Server {
             put("worlds-entity-spawning-disabled", "");
             put("block-listener", true);
             put("allow-flight", false);
-            put("timeout-milliseconds", 30000);
+            put("timeout-milliseconds", 25000);
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
             put("dimensions", false);
@@ -2442,7 +2468,6 @@ public class Server {
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
-            put("async-autosave", false);
             put("automatic-bug-report", true);
         }
     }

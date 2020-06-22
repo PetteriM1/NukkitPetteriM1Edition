@@ -14,6 +14,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -75,14 +76,14 @@ public class EntityLlama extends EntityHorseBase {
                             double f = 2;
                             double yaw = this.yaw;
                             double pitch = this.pitch;
-                            Location pos = new Location(this.x - Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
-                                    this.z + Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+                            Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
+                                    this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
                             Entity k = Entity.createEntity("LlamaSpit", pos, this);
                             if (!(k instanceof EntityLlamaSpit)) return;
                             
                             EntityLlamaSpit spit = (EntityLlamaSpit) k;
-                            spit.setMotion(new Vector3(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f, -Math.sin(Math.toRadians(pitch)) * f * f,
-                                    Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)) * f * f));
+                            spit.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                                    Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
 
                             ProjectileLaunchEvent launch = new ProjectileLaunchEvent(spit);
                             this.server.getPluginManager().callEvent(launch);

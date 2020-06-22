@@ -27,7 +27,7 @@ public class RakNetConstants {
     /**
      * Time after {@link RakNetSession} is closed due to no activity.
      */
-    public static final int SESSION_TIMEOUT_MS = Server.getInstance().getPropertyInt("timeout-milliseconds", 30000);
+    public static final int SESSION_TIMEOUT_MS = Server.getInstance().getPropertyInt("timeout-milliseconds", 25000);
 
     /*
         Flags

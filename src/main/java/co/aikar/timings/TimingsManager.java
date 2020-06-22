@@ -107,6 +107,7 @@ public class TimingsManager {
     }
 
     static Timing getTiming(String group, String name, Timing groupTiming) {
+        if (!Timings.isTimingsEnabled()) return null;
         TimingIdentifier id = new TimingIdentifier(group, name, groupTiming);
         return TIMING_MAP.computeIfAbsent(id, k -> new Timing(id));
     }

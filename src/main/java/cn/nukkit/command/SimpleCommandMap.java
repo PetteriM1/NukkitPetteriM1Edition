@@ -257,7 +257,7 @@ public class SimpleCommandMap implements CommandMap {
             return false;
         }
 
-        target.timing.startTiming();
+        if (target.timing != null) target.timing.startTiming();
         try {
             target.execute(sender, sentCommandLabel, args);
         } catch (Exception e) {
@@ -268,7 +268,7 @@ public class SimpleCommandMap implements CommandMap {
                 logger.logException(e);
             }
         }
-        target.timing.stopTiming();
+        if (target.timing != null) target.timing.stopTiming();
 
         return true;
     }

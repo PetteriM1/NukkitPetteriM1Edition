@@ -24,6 +24,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.MinecartType;
 import cn.nukkit.utils.Rail;
 import cn.nukkit.utils.Rail.Orientation;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -184,7 +185,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
             double diffZ = this.lastZ - this.z;
             double yawToChange = yaw;
             if (diffX * diffX + diffZ * diffZ > 0.001D) {
-                yawToChange = (Math.atan2(diffZ, diffX) * 180 / Math.PI);
+                yawToChange = (FastMath.atan2(diffZ, diffX) * 180 / Math.PI);
             }
 
             // Reverse yaw if yaw is below 0
@@ -295,7 +296,7 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public void applyEntityCollision(cn.nukkit.entity.Entity entity) {
-        if (entity != riding) {
+        if (entity != riding && !(entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR)) {
             double motiveX = entity.x - x;
             double motiveZ = entity.z - z;
             double square = motiveX * motiveX + motiveZ * motiveZ;

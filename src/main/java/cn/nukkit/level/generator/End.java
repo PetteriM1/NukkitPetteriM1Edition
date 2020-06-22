@@ -102,7 +102,7 @@ public class End extends Generator {
             populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
         }
 
-        Biome biome = EnumBiome.getBiome(chunk.getBiomeId(7, 7));
+        Biome biome = EnumBiome.getBiome(EnumBiome.END.id);
         biome.populateChunk(this.level, chunkX, chunkZ, this.nukkitRandom);*/
     }
 
