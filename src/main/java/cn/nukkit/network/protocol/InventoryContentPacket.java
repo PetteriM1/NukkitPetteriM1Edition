@@ -48,6 +48,9 @@ public class InventoryContentPacket extends DataPacket {
         this.putUnsignedVarInt(this.inventoryId);
         this.putUnsignedVarInt(this.slots.length);
         for (Item slot : this.slots) {
+            if (protocol >= 407) {
+                this.putVarInt(1); //network id
+            }
             this.putSlot(protocol, slot);
         }
     }

@@ -748,11 +748,14 @@ public class BinaryStream {
         this.putVarInt(face.getIndex());
     }
 
-    public void putEntityLink(EntityLink link) {
+    public void putEntityLink(int protocol, EntityLink link) {
         putEntityUniqueId(link.fromEntityUniquieId);
         putEntityUniqueId(link.toEntityUniquieId);
         putByte(link.type);
         putBoolean(link.immediate);
+        if (protocol >= 407) {
+            putBoolean(false);
+        }
     }
 
     public EntityLink getEntityLink() {

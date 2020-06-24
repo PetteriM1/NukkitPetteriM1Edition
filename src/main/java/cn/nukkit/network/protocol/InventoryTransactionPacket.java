@@ -36,6 +36,8 @@ public class InventoryTransactionPacket extends DataPacket {
     public int transactionType;
     public NetworkInventoryAction[] actions;
     public TransactionData transactionData;
+    public boolean hasNetworkIds = false;
+    public int legacyRequestId;
 
     /**
      * NOTE: THIS FIELD DOES NOT EXIST IN THE PROTOCOL, it's merely used to easily
@@ -51,8 +53,14 @@ public class InventoryTransactionPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putUnsignedVarInt(this.transactionType);
 
+        this.putVarInt(legacyRequestId);
+        if (this.legacyRequestId > 0) {
+            //TODO
+        }
+
+        this.putUnsignedVarInt(this.transactionType);
+        this.putBoolean(hasNetworkIds);
         this.putUnsignedVarInt(this.actions.length);
 
         for (NetworkInventoryAction action : this.actions) {
@@ -102,7 +110,14 @@ public class InventoryTransactionPacket extends DataPacket {
 
     @Override
     public void decode() {
+        this.legacyRequestId = this.getVarInt();
+        if (this.legacyRequestId > 0) {
+            //TODO
+        }
+
         this.transactionType = (int) this.getUnsignedVarInt();
+
+        this.hasNetworkIds = this.getBoolean();
 
         this.actions = new NetworkInventoryAction[Math.min((int) this.getUnsignedVarInt(), 4096)];
         for (int i = 0; i < this.actions.length; i++) {

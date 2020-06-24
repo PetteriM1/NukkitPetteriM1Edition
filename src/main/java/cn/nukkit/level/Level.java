@@ -187,10 +187,12 @@ public class Level implements ChunkManager, Metadatable {
     private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue361 = new ConcurrentHashMap<>(); // 1.12
     private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue388 = new ConcurrentHashMap<>(); // 1.13
     private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue389 = new ConcurrentHashMap<>(); // 1.14
+    //private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue407 = new ConcurrentHashMap<>(); // 1.16
     private final LongSet chunkSendTasks0 = new LongOpenHashSet(); // < 1.12
     private final LongSet chunkSendTasks361 = new LongOpenHashSet(); // 1.12
     private final LongSet chunkSendTasks388 = new LongOpenHashSet(); // 1.13
     private final LongSet chunkSendTasks389 = new LongOpenHashSet(); // 1.14
+    //private final LongSet chunkSendTasks407 = new LongOpenHashSet(); // 1.16
     private final Long2ObjectOpenHashMap<Boolean> chunkPopulationQueue = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Boolean> chunkPopulationLock = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Boolean> chunkGenerationQueue = new Long2ObjectOpenHashMap<>();
@@ -4097,6 +4099,8 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendQueue388;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return chunkSendQueue389;
+        } else if (protocol == ProtocolInfo.v1_16_0) {
+            return chunkSendQueue389; //TODO: palette for 1.16
         } else {
             throw new IllegalArgumentException("Missing chunk send queue for protocol " + protocol);
         }
@@ -4111,13 +4115,15 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendTasks388;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return chunkSendTasks389;
+        } else if (protocol == ProtocolInfo.v1_16_0) {
+            return chunkSendTasks389; //TODO: palette for 1.16
         } else {
             throw new IllegalArgumentException("Missing chunk send task for protocol " + protocol);
         }
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) || (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60));
+        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) || (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_14_0 && player == ProtocolInfo.v1_16_0);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

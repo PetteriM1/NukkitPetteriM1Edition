@@ -648,7 +648,7 @@ public class Server {
                 }
 
                 try {
-                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                    this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);//TODO: MV
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -682,7 +682,7 @@ public class Server {
             //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
             //} else {
             try {
-                this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);//TODO: MV
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1014,8 +1014,10 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
-            player.dataPacket(CraftingManager.packet);
+        if (player.protocol == ProtocolInfo.v1_16_0) {
+            //player.dataPacket(CraftingManager.packet407); //TODO
+        } else if (player.protocol > ProtocolInfo.v1_12_0) {
+            player.dataPacket(CraftingManager.packet338);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
         } else if (player.protocol == ProtocolInfo.v1_11_0) {

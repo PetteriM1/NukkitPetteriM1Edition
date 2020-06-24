@@ -154,8 +154,11 @@ public class CraftingDataPacket extends DataPacket {
             if (protocol >= 388) {
                 this.putUnsignedVarInt(this.brewingEntries.size());
                 for (BrewingRecipe recipe : brewingEntries) {
+                    this.putVarInt(0/*recipe.getInputPotionId()*/);
                     this.putVarInt(recipe.getInput().getDamage());
                     this.putVarInt(recipe.getIngredient().getId());
+                    this.putVarInt(0/*recipe.getIngredientItemType()*/);
+                    this.putVarInt(0/*recipe.getOutputPotionId()*/);
                     this.putVarInt(recipe.getResult().getDamage());
                 }
 

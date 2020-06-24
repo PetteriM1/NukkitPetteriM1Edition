@@ -268,6 +268,7 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId388.get(legacyId);
             case 389:
             case 390:
+            case 407: //TODO: palette for 1.16
                 int id389 = legacyToRuntimeId389.get(legacyId);
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
@@ -339,6 +340,7 @@ public class GlobalBlockPalette {
                 return compiledTable388;
             case 389:
             case 390:
+            case 407: //TODO: palette for 1.16
                 return compiledTable389;
             default:
                 throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
