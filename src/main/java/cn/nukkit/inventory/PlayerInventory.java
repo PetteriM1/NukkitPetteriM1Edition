@@ -465,12 +465,15 @@ public class PlayerInventory extends BaseInventory {
         }
         Player p = (Player) this.getHolder();
 
-        InventoryContentPacket pk = new InventoryContentPacket();
+        /*InventoryContentPacket pk = new InventoryContentPacket();
         pk.inventoryId = ContainerIds.CREATIVE;
 
         if (!p.isSpectator()) { //fill it for all gamemodes except spectator
             pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
-        }
+        }*/
+
+        CreativeContentPacket pk = new CreativeContentPacket();
+        pk.entries = p.isSpectator() ? new Item[0] : Item.getCreativeItems(p.protocol).toArray(new Item[0]);
 
         p.dataPacket(pk);
     }

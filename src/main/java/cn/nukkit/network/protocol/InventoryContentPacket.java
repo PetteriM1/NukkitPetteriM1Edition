@@ -23,6 +23,7 @@ public class InventoryContentPacket extends DataPacket {
     public static final int SPECIAL_FIXED_INVENTORY = 0x7b;
 
     public int inventoryId;
+    public int networkId;
     public Item[] slots = new Item[0];
 
     @Override
@@ -49,7 +50,7 @@ public class InventoryContentPacket extends DataPacket {
         this.putUnsignedVarInt(this.slots.length);
         for (Item slot : this.slots) {
             if (protocol >= 407) {
-                this.putVarInt(1); //network id
+                this.putVarInt(networkId);
             }
             this.putSlot(protocol, slot);
         }

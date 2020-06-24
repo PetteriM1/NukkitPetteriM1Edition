@@ -16,6 +16,7 @@ public class InventorySlotPacket extends DataPacket {
     }
 
     public int inventoryId;
+    public int networkId;
     public int slot;
     public Item item;
 
@@ -32,7 +33,7 @@ public class InventorySlotPacket extends DataPacket {
         this.putUnsignedVarInt((byte) this.inventoryId);
         this.putUnsignedVarInt(this.slot);
         if (protocol >= 407) {
-            this.putVarInt(1); //network id
+            this.putVarInt(networkId);
         }
         this.putSlot(protocol, this.item);
     }
