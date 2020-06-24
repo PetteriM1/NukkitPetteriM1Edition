@@ -4884,7 +4884,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         batchPayload[0] = Binary.writeUnsignedVarInt(buf.length);
         batchPayload[1] = buf;
         try {
-            batch.payload = Zlib.deflateRaw(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);//TODO: MV
+            if (protocol >= 407) {
+                batch.payload = Zlib.deflateRaw(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);
+            } else {
+                batch.payload = Zlib.deflate(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

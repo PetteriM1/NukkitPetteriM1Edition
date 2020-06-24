@@ -74,7 +74,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         batchPayload[1] = buf;
         byte[] data = Binary.appendBytes(batchPayload);
         try {
-            if (protocol > ProtocolInfo.v1_16_0) {
+            if (protocol >= ProtocolInfo.v1_16_0) {
                 batch.payload = Zlib.deflateRaw(data, level);
             } else {
                 batch.payload = Zlib.deflate(data, level);

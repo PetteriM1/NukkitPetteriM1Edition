@@ -100,6 +100,7 @@ public class CraftingDataPacket extends DataPacket {
                             this.putString(CRAFTING_TAG_CRAFTING_TABLE);
                             if (protocol >= 361) {
                                 this.putVarInt(shapeless.getPriority());
+                                this.putUnsignedVarInt(shapeless.getNetworkId());
                             }
                         }
                         break;
@@ -132,6 +133,7 @@ public class CraftingDataPacket extends DataPacket {
                             this.putString(CRAFTING_TAG_CRAFTING_TABLE);
                             if (protocol >= 361) {
                                 this.putVarInt(shaped.getPriority());
+                                this.putUnsignedVarInt(shaped.getNetworkId());
                             }
                         }
                         break;
@@ -152,14 +154,22 @@ public class CraftingDataPacket extends DataPacket {
             }
 
             if (protocol >= 388) {
-                this.putUnsignedVarInt(this.brewingEntries.size());
-                for (BrewingRecipe recipe : brewingEntries) {
-                    this.putVarInt(0/*recipe.getInputPotionId()*/);
-                    this.putVarInt(recipe.getInput().getDamage());
-                    this.putVarInt(recipe.getIngredient().getId());
-                    this.putVarInt(0/*recipe.getIngredientItemType()*/);
-                    this.putVarInt(0/*recipe.getOutputPotionId()*/);
-                    this.putVarInt(recipe.getResult().getDamage());
+                if (protocol >= 407) { //TODO
+                    this.putUnsignedVarInt(0);
+                } else {
+                    this.putUnsignedVarInt(this.brewingEntries.size());
+                    for (BrewingRecipe recipe : brewingEntries) {
+                        if (protocol >= 407) {
+                            this.putVarInt(0/*recipe.getInputPotionId()*/);
+                        }
+                        this.putVarInt(recipe.getInput().getDamage());
+                        this.putVarInt(recipe.getIngredient().getId());
+                        if (protocol >= 407) {
+                            this.putVarInt(0/*recipe.getIngredientItemType()*/);
+                            this.putVarInt(0/*recipe.getOutputPotionId()*/);
+                        }
+                        this.putVarInt(recipe.getResult().getDamage());
+                    }
                 }
 
                 this.putUnsignedVarInt(this.containerEntries.size());

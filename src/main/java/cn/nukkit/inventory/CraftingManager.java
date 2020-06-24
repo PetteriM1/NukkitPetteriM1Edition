@@ -39,6 +39,7 @@ public class CraftingManager {
 
     private static int RECIPE_COUNT = 0;
     protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
+    public static int nextNetworkId = 0;
 
     public static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {

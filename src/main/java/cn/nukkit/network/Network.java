@@ -145,8 +145,12 @@ public class Network {
 
     public void processBatch(BatchPacket packet, Player player) {
         byte[] data;
-        try {//TODO: MV
-            data = Zlib.inflateRaw(packet.payload, 2097152); // 2 * 1024 * 1024
+        try {
+            if (player.protocol >= 407) {
+                data = Zlib.inflateRaw(packet.payload, 2097152); // 2 * 1024 * 1024
+            } else {
+                data = Zlib.inflate(packet.payload, 2097152); // 2 * 1024 * 1024
+            }
         } catch (Exception e) {
             return;
         }
