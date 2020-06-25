@@ -1,5 +1,6 @@
 package com.nukkitx.network.raknet;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import com.nukkitx.network.NetworkUtils;
 import com.nukkitx.network.util.DisconnectReason;
 import io.netty.buffer.ByteBuf;
@@ -13,10 +14,16 @@ import java.net.InetSocketAddress;
 public class RakNetServerSession extends RakNetSession {
 
     private final RakNetServer rakNet;
+    public final int protocol;
 
     RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop) {
+        this(rakNet, remoteAddress, channel, mtu, eventLoop, ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop, int protocol) {
         super(remoteAddress, channel, mtu, eventLoop);
         this.rakNet = rakNet;
+        this.protocol = protocol;
     }
 
     @Override

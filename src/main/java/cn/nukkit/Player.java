@@ -167,6 +167,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String displayName;
 
     public int protocol = 999;
+    public int raknetProtocol;
     protected String version;
 
     protected int startAction = -1;
@@ -2158,8 +2159,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.loggedIn) {
                         break;
                     }
-
-                    this.getServer().getNetwork().hack.remove(this);
 
                     LoginPacket loginPacket = (LoginPacket) packet;
 

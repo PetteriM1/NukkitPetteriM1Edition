@@ -148,7 +148,7 @@ public class RakNetServer extends RakNet {
         if (!RakNetUtils.verifyUnconnectedMagic(buffer)) {
             return;
         }
-        buffer.readUnsignedByte(); // Protocol version
+        int protocol = buffer.readUnsignedByte(); // Protocol version
         int mtu = buffer.readableBytes() + 18 + (packet.sender().getAddress() instanceof Inet6Address ? 40 : 20)
                 + UDP_HEADER_SIZE; // 1 (Packet ID), 16 (Magic), 1 (Protocol Version), 20/40 (IP Header)
 
@@ -166,7 +166,7 @@ public class RakNetServer extends RakNet {
         } else {
             // Passed all checks. Now create the session and send the first reply.
             session = new RakNetServerSession(this, packet.sender(), ctx.channel(), mtu,
-                    this.eventLoopGroup.next());
+                    this.eventLoopGroup.next(), protocol);
             session.setState(RakNetState.INITIALIZING);
             if (this.sessionsByAddress.putIfAbsent(packet.sender(), session) == null) {
                 session.sendOpenConnectionReply1();

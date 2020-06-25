@@ -8,7 +8,6 @@ import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.VarInt;
 import cn.nukkit.utils.Zlib;
-import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author MagicDroidX
@@ -53,8 +51,6 @@ public class Network {
 
     private String name;
     private String subName;
-
-    public List<Player> hack = new CopyOnWriteArrayList<>();
 
     public Network(Server server) {
         this.registerPackets();
@@ -149,22 +145,10 @@ public class Network {
     public void processBatch(BatchPacket packet, Player player) {
         byte[] data;
         try {
-            if (player.protocol >= 407) {
-                if (packet.protocol == 999 && player.protocol == 999) {
-                    hack.add(player);
-                    getServer().getScheduler().scheduleDelayedTask(null, () -> {
-                        if (hack.contains(player)) {
-                            try {
-                                processBatch(Zlib.inflate(packet.payload, 2097152), player);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }, 20, false);
-                }
-                data = Zlib.inflateRaw(packet.payload, 2097152);
+            if (player.raknetProtocol >= 10) {
+                data = Zlib.inflateRaw(packet.payload, 2097152); // 2 * 1024 * 1024
             } else {
-                data = Zlib.inflate(packet.payload, 2097152); // 2 * 1024 * 1024
+                data = Zlib.inflate(packet.payload, 2097152);
             }
         } catch (Exception e) {
             return;
@@ -188,43 +172,9 @@ public class Network {
                 if (pk != null) {
                     pk.protocol = player.protocol;
 
-                    pk.decode();
-
-                    packets.add(pk);
-                }
-            }
-
-            processPackets(player, packets);
-
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error whilst decoding batch packet", e);
-            }
-        }
-    }
-
-    public void processBatch(byte[] data, Player player) {
-        int len = data.length;
-        BinaryStream stream = new BinaryStream(data);
-        try {
-            List<DataPacket> packets = new ArrayList<>();
-            int count = 0;
-            while (stream.offset < len) {
-                count++;
-                if (count > 780) {
-                    player.close("", "Illegal Batch Packet");
-                    return;
-                }
-                byte[] buf = stream.getByteArray();
-
-                DataPacket pk = this.getPacketFromBuffer(player.protocol, buf);
-
-                if (pk != null) {
-                    pk.protocol = player.protocol;
-
-                    try {
+                    if (player.raknetProtocol > 8) {
                         pk.decode();
-                    } catch (JsonSyntaxException | ArrayIndexOutOfBoundsException e) { // LoginPacket < 1.6
+                    } else { // version < 1.6
                         pk.setBuffer(buf, 3);
                         pk.decode();
                     }
