@@ -301,7 +301,7 @@ public class BinaryStream {
             this.putBoolean(skin.isCapeOnClassic());
             this.putString(skin.getCapeId());
             this.putString(skin.getFullSkinId());
-            if (protocol == ProtocolInfo.v1_14_60) {
+            if (protocol >= ProtocolInfo.v1_14_60) {
                 this.putString(skin.getArmSize());
                 this.putString(skin.getSkinColor());
 
@@ -368,7 +368,7 @@ public class BinaryStream {
         skin.setCapeOnClassic(this.getBoolean());
         skin.setCapeId(this.getString());
         this.getString(); // TODO: Full skin id
-        if (protocol == ProtocolInfo.v1_14_60) {
+        if (protocol >= ProtocolInfo.v1_14_60) {
             skin.setArmSize(this.getString());
             skin.setSkinColor(this.getString());
 

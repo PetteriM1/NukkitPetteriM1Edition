@@ -1020,7 +1020,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        if (this.protocol == 407 && (packet instanceof AvailableCommandsPacket || packet instanceof PlayerListPacket)) {
+        if (this.protocol == 407 && (packet instanceof AvailableCommandsPacket /*|| packet instanceof PlayerListPacket*/)) {
             return false; //TODO: fix
         }
 
