@@ -59,7 +59,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable361;
     private static byte[] compiledTable388;
     private static byte[] compiledTable389;
-    //private static byte[] compiledTable407;
+    private static byte[] compiledTable407;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -240,6 +240,15 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError("Unable to write block palette 389", e);
         }
+        // 407
+        // TODO: full 1.16 palette support
+        InputStream stream407 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_407.dat");
+        if (stream407 == null) throw new AssertionError("Unable to locate block state nbt 407");
+        try {
+            compiledTable407 = ByteStreams.toByteArray(stream407);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
@@ -344,8 +353,9 @@ public class GlobalBlockPalette {
                 return compiledTable388;
             case 389:
             case 390:
-            case 407: //TODO
                 return compiledTable389;
+            case 407:
+                return compiledTable407;
             default:
                 throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
         }
