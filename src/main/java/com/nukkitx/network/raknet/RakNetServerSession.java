@@ -17,7 +17,7 @@ public class RakNetServerSession extends RakNetSession {
     public final int protocol;
 
     RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop) {
-        this(rakNet, remoteAddress, channel, mtu, eventLoop, ProtocolInfo.CURRENT_PROTOCOL);
+        this(rakNet, remoteAddress, channel, mtu, eventLoop, RakNetConstants.RAKNET_PROTOCOL_VERSION);
     }
 
     RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop, int protocol) {
