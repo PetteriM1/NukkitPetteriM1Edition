@@ -54,13 +54,17 @@ public class InventoryTransactionPacket extends DataPacket {
     public void encode() {
         this.reset();
 
-        this.putVarInt(legacyRequestId);
-        if (this.legacyRequestId > 0 && protocol >= 407) {
-            //TODO
+        if (protocol >= 407) {
+            this.putVarInt(legacyRequestId);
+            if (this.legacyRequestId > 0 && protocol >= 407) {
+                //TODO
+            }
         }
 
         this.putUnsignedVarInt(this.transactionType);
-        this.putBoolean(this.hasNetworkIds);
+        if (protocol >= 407) {
+            this.putBoolean(this.hasNetworkIds);
+        }
         this.putUnsignedVarInt(this.actions.length);
 
         for (NetworkInventoryAction action : this.actions) {
@@ -110,21 +114,25 @@ public class InventoryTransactionPacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.legacyRequestId = this.getVarInt();
-        if (this.legacyRequestId > 0 && protocol >= 407) {
-            long size = this.getUnsignedVarInt();
-            for (int i = 0; i < size; i++) {
-                this.getByte(); //container id
-                long slots = getUnsignedVarInt();
-                for (int i2 = 0; i2 < slots; i2++) {
-                    this.getByte(); //slots
+        if (protocol >= 407) {
+            this.legacyRequestId = this.getVarInt();
+            if (this.legacyRequestId > 0 && protocol >= 407) {
+                long size = this.getUnsignedVarInt();
+                for (int i = 0; i < size; i++) {
+                    this.getByte(); //container id
+                    long slots = getUnsignedVarInt();
+                    for (int i2 = 0; i2 < slots; i2++) {
+                        this.getByte(); //slots
+                    }
                 }
             }
         }
 
         this.transactionType = (int) this.getUnsignedVarInt();
 
-        this.hasNetworkIds = this.getBoolean();
+        if (protocol >= 407) {
+            this.hasNetworkIds = this.getBoolean();
+        }
 
         this.actions = new NetworkInventoryAction[Math.min((int) this.getUnsignedVarInt(), 4096)];
         for (int i = 0; i < this.actions.length; i++) {

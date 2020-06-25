@@ -465,17 +465,18 @@ public class PlayerInventory extends BaseInventory {
         }
         Player p = (Player) this.getHolder();
 
-        /*InventoryContentPacket pk = new InventoryContentPacket();
-        pk.inventoryId = ContainerIds.CREATIVE;
-
-        if (!p.isSpectator()) { //fill it for all gamemodes except spectator
-            pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
-        }*/
-
-        CreativeContentPacket pk = new CreativeContentPacket();
-        pk.entries = p.isSpectator() ? new Item[0] : Item.getCreativeItems(p.protocol).toArray(new Item[0]);
-
-        p.dataPacket(pk);
+        if (p.protocol < 407) {
+            InventoryContentPacket pk = new InventoryContentPacket();
+            pk.inventoryId = ContainerIds.CREATIVE;
+            if (!p.isSpectator()) { //fill it for all gamemodes except spectator
+                pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            }
+            p.dataPacket(pk);
+        } else {
+            CreativeContentPacket pk = new CreativeContentPacket();
+            pk.entries = p.isSpectator() ? new Item[0] : Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            p.dataPacket(pk);
+        }
     }
 
     @Override
@@ -493,7 +494,7 @@ public class PlayerInventory extends BaseInventory {
         pk.y = ((Player) holder).getFloorY();
         pk.z = ((Player) holder).getFloorZ();
         pk.windowId = ((Player) holder).getWindowId(this);
-        pk.type = -1;
+        pk.type = InventoryType.PLAYER.getNetworkType();
         ((Player) holder).dataPacket(pk);
     }
 

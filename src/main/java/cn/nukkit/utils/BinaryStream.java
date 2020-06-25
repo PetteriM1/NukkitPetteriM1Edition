@@ -764,7 +764,7 @@ public class BinaryStream {
                 getEntityUniqueId(),
                 (byte) getByte(),
                 getBoolean(),
-                getBoolean()
+                getBoolean() //1.16+
         );
     }
 

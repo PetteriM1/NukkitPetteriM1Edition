@@ -653,11 +653,12 @@ public class Server {
                 }
 
                 try {
+                    byte[] bytes = Binary.appendBytes(payload);
                     if (!targets.isEmpty()) {
-                        this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                        this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
                     }
                     if (!targetsOld.isEmpty()) {
-                        this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targetsOld);
+                        this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -697,11 +698,12 @@ public class Server {
             //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
             //} else {
             try {
+                byte[] bytes = Binary.appendBytes(payload);
                 if (!targets.isEmpty()) {
-                    this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
                 }
                 if (!targetsOld.isEmpty()) {
-                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targetsOld);
+                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

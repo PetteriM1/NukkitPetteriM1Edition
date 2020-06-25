@@ -99,7 +99,7 @@ public class NetworkInventoryAction {
         this.oldItem = packet.getSlot();
         this.newItem = packet.getSlot();
 
-        if (packet.hasNetworkIds) {//TODO: protocol check
+        if (packet.hasNetworkIds && packet.protocol >= 407) {
             this.stackNetworkId = packet.getVarInt();
         }
 
@@ -128,7 +128,7 @@ public class NetworkInventoryAction {
         packet.putSlot(packet.protocol, this.oldItem);
         packet.putSlot(packet.protocol, this.newItem);
 
-        if (packet.hasNetworkIds) {//TODO: protocol check
+        if (packet.hasNetworkIds && packet.protocol >= 407) {
             packet.putVarInt(this.stackNetworkId);
         }
     }

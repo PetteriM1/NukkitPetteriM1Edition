@@ -100,7 +100,9 @@ public class CraftingDataPacket extends DataPacket {
                             this.putString(CRAFTING_TAG_CRAFTING_TABLE);
                             if (protocol >= 361) {
                                 this.putVarInt(shapeless.getPriority());
-                                this.putUnsignedVarInt(shapeless.getNetworkId());
+                                if (protocol >= 407) {
+                                    this.putUnsignedVarInt(shapeless.getNetworkId());
+                                }
                             }
                         }
                         break;
@@ -133,7 +135,9 @@ public class CraftingDataPacket extends DataPacket {
                             this.putString(CRAFTING_TAG_CRAFTING_TABLE);
                             if (protocol >= 361) {
                                 this.putVarInt(shaped.getPriority());
-                                this.putUnsignedVarInt(shaped.getNetworkId());
+                                if (protocol >= 407) {
+                                    this.putUnsignedVarInt(shaped.getNetworkId());
+                                }
                             }
                         }
                         break;

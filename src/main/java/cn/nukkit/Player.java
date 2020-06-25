@@ -1020,7 +1020,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        if (this.protocol == 407 && (packet instanceof AvailableCommandsPacket /*|| packet instanceof PlayerListPacket*/)) {
+        if (this.protocol == 407 && (packet instanceof AvailableCommandsPacket || packet instanceof PlayerListPacket)) {
             return false; //TODO: fix
         }
 
@@ -1259,17 +1259,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.adventureSettings.set(Type.FLYING, true);
             this.teleport(this.temporalVector.setComponents(this.x, this.y + 0.1, this.z));
 
-            /*InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            this.dataPacket(inventoryContentPacket);*/
+            if (this.protocol < 407) {
+                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
+                this.dataPacket(inventoryContentPacket);
+            }
         } else {
             if (this.isSurvival() || this.isAdventure()) {
                 this.adventureSettings.set(Type.FLYING, false);
             }
-            /*InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
-            this.dataPacket(inventoryContentPacket);*/
+            if (this.protocol < 407) {
+                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
+                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
+                this.dataPacket(inventoryContentPacket);
+            }
         }
 
         this.resetFallDistance();
@@ -2087,14 +2091,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.sendData(this);
                 this.sendAllInventories();
 
-                /*if (this.gamemode == Player.SPECTATOR) {
-                    InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                    inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-                    this.dataPacket(inventoryContentPacket);
+                if (this.protocol < 407) {
+                    if (this.gamemode == Player.SPECTATOR) {
+                        InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                        inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
+                        this.dataPacket(inventoryContentPacket);
 
-                } else {*/
+                    } else {
+                        this.inventory.sendCreativeContents();
+                    }
+                } else {
                     this.inventory.sendCreativeContents();
-                //}
+                }
 
                 this.inventory.sendHeldItem(this);
                 this.server.sendRecipeList(this);
@@ -2711,7 +2719,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_OPEN_INVENTORY:
-                            this.inventory.sendInventory();
+                            if (this.protocol >= 407) {
+                                this.inventory.sendInventory();
+                            }
                             break;
                         case InteractPacket.ACTION_MOUSEOVER:
                             if (interactPacket.target == 0 && this.protocol >= 313) {
@@ -2894,7 +2904,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.CONTAINER_CLOSE_PACKET:
                     ContainerClosePacket containerClosePacket = (ContainerClosePacket) packet;
-                    if (!this.spawned || containerClosePacket.windowId == 0) {
+                    if (!this.spawned || (containerClosePacket.windowId == 0 && this.protocol >= 407)) {
                         this.inventory.closeInventory();
                         break;
                     }
