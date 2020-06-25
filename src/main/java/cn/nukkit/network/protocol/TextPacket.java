@@ -19,7 +19,7 @@ public class TextPacket extends DataPacket {
     public static final byte TYPE_SYSTEM = 6;
     public static final byte TYPE_WHISPER = 7;
     public static final byte TYPE_ANNOUNCEMENT = 8;
-    public static final byte TYPE_JSON = 9; //TYPE_OBJECT
+    public static final byte TYPE_OBJECT = 9;
     public static final byte TYPE_OBJECT_WHISPER = 10;
 
     public byte type;
@@ -46,7 +46,7 @@ public class TextPacket extends DataPacket {
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
-            case TYPE_JSON:
+            case TYPE_OBJECT:
             case TYPE_OBJECT_WHISPER:
                 this.message = this.getString();
                 break;
@@ -86,7 +86,7 @@ public class TextPacket extends DataPacket {
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
-            case TYPE_JSON:
+            case TYPE_OBJECT:
             case TYPE_OBJECT_WHISPER:
                 this.putString(this.message);
                 break;

@@ -27,7 +27,7 @@ public class SetEntityLinkPacket extends DataPacket {
         this.putByte(this.type);
         this.putByte(this.immediate);
         if (protocol >= 407) {
-            this.putBoolean(riderInitiated);
+            this.putBoolean(this.riderInitiated);
         }
     }
 

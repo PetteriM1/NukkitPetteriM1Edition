@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author MagicDroidX
@@ -52,6 +53,8 @@ public class Network {
 
     private String name;
     private String subName;
+
+    public List<Player> hack = new CopyOnWriteArrayList<>();
 
     public Network(Server server) {
         this.registerPackets();
@@ -147,7 +150,19 @@ public class Network {
         byte[] data;
         try {
             if (player.protocol >= 407) {
-                data = Zlib.inflateRaw(packet.payload, 2097152); // 2 * 1024 * 1024
+                if (packet.protocol == 999 && player.protocol == 999) {
+                    hack.add(player);
+                    getServer().getScheduler().scheduleDelayedTask(null, () -> {
+                        if (hack.contains(player)) {
+                            try {
+                                processBatch(Zlib.inflate(packet.payload, 2097152), player);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, 20, false);
+                }
+                data = Zlib.inflateRaw(packet.payload, 2097152);
             } else {
                 data = Zlib.inflate(packet.payload, 2097152); // 2 * 1024 * 1024
             }
@@ -155,6 +170,40 @@ public class Network {
             return;
         }
 
+        int len = data.length;
+        BinaryStream stream = new BinaryStream(data);
+        try {
+            List<DataPacket> packets = new ArrayList<>();
+            int count = 0;
+            while (stream.offset < len) {
+                count++;
+                if (count > 780) {
+                    player.close("", "Illegal Batch Packet");
+                    return;
+                }
+                byte[] buf = stream.getByteArray();
+
+                DataPacket pk = this.getPacketFromBuffer(player.protocol, buf);
+
+                if (pk != null) {
+                    pk.protocol = player.protocol;
+
+                    pk.decode();
+
+                    packets.add(pk);
+                }
+            }
+
+            processPackets(player, packets);
+
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error whilst decoding batch packet", e);
+            }
+        }
+    }
+
+    public void processBatch(byte[] data, Player player) {
         int len = data.length;
         BinaryStream stream = new BinaryStream(data);
         try {

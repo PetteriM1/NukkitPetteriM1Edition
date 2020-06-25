@@ -55,12 +55,12 @@ public class InventoryTransactionPacket extends DataPacket {
         this.reset();
 
         this.putVarInt(legacyRequestId);
-        if (this.legacyRequestId > 0) {
+        if (this.legacyRequestId > 0 && protocol >= 407) {
             //TODO
         }
 
         this.putUnsignedVarInt(this.transactionType);
-        this.putBoolean(hasNetworkIds);
+        this.putBoolean(this.hasNetworkIds);
         this.putUnsignedVarInt(this.actions.length);
 
         for (NetworkInventoryAction action : this.actions) {
@@ -111,8 +111,15 @@ public class InventoryTransactionPacket extends DataPacket {
     @Override
     public void decode() {
         this.legacyRequestId = this.getVarInt();
-        if (this.legacyRequestId > 0) {
-            //TODO
+        if (this.legacyRequestId > 0 && protocol >= 407) {
+            long size = this.getUnsignedVarInt();
+            for (int i = 0; i < size; i++) {
+                this.getByte(); //container id
+                long slots = getUnsignedVarInt();
+                for (int i2 = 0; i2 < slots; i2++) {
+                    this.getByte(); //slots
+                }
+            }
         }
 
         this.transactionType = (int) this.getUnsignedVarInt();

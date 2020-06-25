@@ -640,15 +640,25 @@ public class Server {
                     size += payload[i2 + 1].length;
                 }
 
+                List<InetSocketAddress> targetsOld = new ArrayList<>();
                 List<InetSocketAddress> targets = new ArrayList<>();
                 for (Player p : players) {
                     if (p.isConnected()) {
-                        targets.add(p.getSocketAddress());
+                        if (p.protocol >= ProtocolInfo.v1_16_0) {
+                            targets.add(p.getSocketAddress());
+                        } else {
+                            targetsOld.add(p.getSocketAddress());
+                        }
                     }
                 }
 
                 try {
-                    this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);//TODO: MV
+                    if (!targets.isEmpty()) {
+                        this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                    }
+                    if (!targetsOld.isEmpty()) {
+                        this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targetsOld);
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -671,10 +681,15 @@ public class Server {
                 size += payload[i2 + 1].length;
             }
 
+            List<InetSocketAddress> targetsOld = new ArrayList<>();
             List<InetSocketAddress> targets = new ArrayList<>();
             for (Player p : players) {
                 if (p.isConnected()) {
-                    targets.add(p.getSocketAddress());
+                    if (p.protocol >= ProtocolInfo.v1_16_0) {
+                        targets.add(p.getSocketAddress());
+                    } else {
+                        targetsOld.add(p.getSocketAddress());
+                    }
                 }
             }
 
@@ -682,7 +697,12 @@ public class Server {
             //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
             //} else {
             try {
-                this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);//TODO: MV
+                if (!targets.isEmpty()) {
+                    this.broadcastPacketsCallback(Zlib.deflateRaw(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                }
+                if (!targetsOld.isEmpty()) {
+                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targetsOld);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

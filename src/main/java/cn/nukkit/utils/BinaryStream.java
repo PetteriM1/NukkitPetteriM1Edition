@@ -754,7 +754,7 @@ public class BinaryStream {
         putByte(link.type);
         putBoolean(link.immediate);
         if (protocol >= 407) {
-            putBoolean(false);
+            putBoolean(link.riderInitiated);
         }
     }
 
@@ -763,6 +763,7 @@ public class BinaryStream {
                 getEntityUniqueId(),
                 getEntityUniqueId(),
                 (byte) getByte(),
+                getBoolean(),
                 getBoolean()
         );
     }

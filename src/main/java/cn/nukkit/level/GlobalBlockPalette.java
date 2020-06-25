@@ -35,6 +35,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator361 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator388 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator389 = new AtomicInteger(0);
+    //private static final AtomicInteger runtimeIdAllocator407 = new AtomicInteger(0);
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -47,6 +48,7 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId361 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId388 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId389 = new Int2IntOpenHashMap();
+    //private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -57,6 +59,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable361;
     private static byte[] compiledTable388;
     private static byte[] compiledTable389;
+    //private static byte[] compiledTable407;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -71,6 +74,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId361.defaultReturnValue(-1);
         legacyToRuntimeId388.defaultReturnValue(-1);
         legacyToRuntimeId389.defaultReturnValue(-1);
+        //legacyToRuntimeId407.defaultReturnValue(-1);
 
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
@@ -268,7 +272,7 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId388.get(legacyId);
             case 389:
             case 390:
-            case 407: //TODO: palette for 1.16
+            case 407: //TODO
                 int id389 = legacyToRuntimeId389.get(legacyId);
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
@@ -340,7 +344,7 @@ public class GlobalBlockPalette {
                 return compiledTable388;
             case 389:
             case 390:
-            case 407: //TODO: palette for 1.16
+            case 407: //TODO
                 return compiledTable389;
             default:
                 throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);

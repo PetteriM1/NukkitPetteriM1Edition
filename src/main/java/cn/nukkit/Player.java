@@ -166,7 +166,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String iusername;
     protected String displayName;
 
-    public int protocol = ProtocolInfo.CURRENT_PROTOCOL;
+    public int protocol = 999;
     protected String version;
 
     protected int startAction = -1;
@@ -1020,7 +1020,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        if (packet instanceof AvailableCommandsPacket || packet instanceof PlayerListPacket) return false; //TODO: fix
+        if (this.protocol == 407 && (packet instanceof AvailableCommandsPacket /*|| packet instanceof PlayerListPacket*/)) {
+            return false; //TODO: fix
+        }
 
         packet.protocol = this.protocol;
 
@@ -2148,6 +2150,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (this.loggedIn) {
                         break;
                     }
+
+                    this.getServer().getNetwork().hack.remove(this);
 
                     LoginPacket loginPacket = (LoginPacket) packet;
 
