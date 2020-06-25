@@ -55,7 +55,7 @@ public class InventoryTransactionPacket extends DataPacket {
         this.reset();
 
         if (protocol >= 407) {
-            this.putVarInt(legacyRequestId);
+            this.putVarInt(this.legacyRequestId);
             if (this.legacyRequestId > 0 && protocol >= 407) {
                 //TODO
             }
@@ -116,13 +116,13 @@ public class InventoryTransactionPacket extends DataPacket {
     public void decode() {
         if (protocol >= 407) {
             this.legacyRequestId = this.getVarInt();
-            if (this.legacyRequestId > 0 && protocol >= 407) {
+            if (this.legacyRequestId > 0) {
                 long size = this.getUnsignedVarInt();
                 for (int i = 0; i < size; i++) {
-                    this.getByte(); //container id
-                    long slots = getUnsignedVarInt();
-                    for (int i2 = 0; i2 < slots; i2++) {
-                        this.getByte(); //slots
+                    this.getVarInt(); //container id
+                    long slots = getVarInt();
+                    for (int j = 0; j < slots; j++) {
+                        this.getVarInt(); //slot
                     }
                 }
             }

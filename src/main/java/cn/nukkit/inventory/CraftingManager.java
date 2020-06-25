@@ -246,6 +246,7 @@ public class CraftingManager {
     public void rebuildPacket() {
         CraftingDataPacket pk407 = new CraftingDataPacket();
         pk407.cleanRecipes = true;
+        pk407.protocol = 407;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk407.addShapedRecipe((ShapedRecipe) recipe);
@@ -267,6 +268,7 @@ public class CraftingManager {
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
         pk388.cleanRecipes = true;
+        pk388.protocol = 388;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk388.addShapedRecipe((ShapedRecipe) recipe);
