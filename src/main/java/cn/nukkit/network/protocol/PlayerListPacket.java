@@ -62,9 +62,7 @@ public class PlayerListPacket extends DataPacket {
                         this.putUUID(entry.uuid);
                     }
                 }
-                if (protocol >= 407) {
-                    this.putBoolean(true);
-                } else if (protocol == ProtocolInfo.v1_14_60) {
+                if (protocol >= ProtocolInfo.v1_14_60) {
                     for (Entry entry : this.entries) { // WTF Mojang
                         this.putBoolean(entry.skin.isTrusted());
                     }
