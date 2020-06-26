@@ -1,6 +1,5 @@
 package com.nukkitx.network.raknet;
 
-import cn.nukkit.network.protocol.ProtocolInfo;
 import com.nukkitx.network.NetworkUtils;
 import com.nukkitx.network.util.DisconnectReason;
 import io.netty.buffer.ByteBuf;

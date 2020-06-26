@@ -35,7 +35,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator361 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator388 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator389 = new AtomicInteger(0);
-    //private static final AtomicInteger runtimeIdAllocator407 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator407 = new AtomicInteger(0);
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -48,7 +48,7 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId361 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId388 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId389 = new Int2IntOpenHashMap();
-    //private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -74,7 +74,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId361.defaultReturnValue(-1);
         legacyToRuntimeId388.defaultReturnValue(-1);
         legacyToRuntimeId389.defaultReturnValue(-1);
-        //legacyToRuntimeId407.defaultReturnValue(-1);
+        legacyToRuntimeId407.defaultReturnValue(-1);
 
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
@@ -244,10 +244,24 @@ public class GlobalBlockPalette {
         // TODO: full 1.16 palette support
         InputStream stream407 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_407.dat");
         if (stream407 == null) throw new AssertionError("Unable to locate block state nbt 407");
+        ListTag<CompoundTag> tag407;
         try {
             compiledTable407 = ByteStreams.toByteArray(stream407);
+            //noinspection unchecked
+            tag407 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable407));
         } catch (IOException e) {
             throw new AssertionError(e);
+        }
+        for (CompoundTag state407 : tag407.getAll()) {
+            int runtimeId = runtimeIdAllocator407.getAndIncrement();
+            if (!state407.contains("meta")) {
+                legacyToRuntimeId407.put(state407.getShort("id") << 6, runtimeId);
+                continue;
+            }
+            for (int val : state407.getIntArray("meta")) {
+                legacyToRuntimeId407.put(state407.getShort("id") << 6 | val, runtimeId);
+            }
+            state407.remove("meta"); // No point in sending this since the client doesn't use it
         }
     }
 
@@ -281,7 +295,6 @@ public class GlobalBlockPalette {
                 return legacyToRuntimeId388.get(legacyId);
             case 389:
             case 390:
-            case 407: //TODO
                 int id389 = legacyToRuntimeId389.get(legacyId);
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
@@ -290,6 +303,15 @@ public class GlobalBlockPalette {
                     }
                 }
                 return id389;
+            case 407:
+                int id407 = legacyToRuntimeId407.get(legacyId);
+                if (id407 == -1) {
+                    id407 = legacyToRuntimeId407.get(id << 6);
+                    if (id407 == -1) {
+                        throw new NoSuchElementException("Unmapped block registered id:" + id + " meta:" + meta);
+                    }
+                }
+            return id407;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }
