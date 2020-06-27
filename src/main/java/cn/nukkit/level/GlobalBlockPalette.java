@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,9 +19,11 @@ import java.io.InputStreamReader;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Log4j2
 public class GlobalBlockPalette {
 
     private static final AtomicInteger runtimeIdAllocator223 = new AtomicInteger(0);
@@ -215,7 +218,7 @@ public class GlobalBlockPalette {
             for (int val : state388.getIntArray("meta")) {
                 legacyToRuntimeId388.put(state388.getShort("id") << 6 | val, runtimeId);
             }
-            state388.remove("meta"); // No point in sending this since the client doesn't use it
+            state388.remove("meta");
         }
         // 389
         InputStream stream389 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_389.dat");
@@ -227,13 +230,13 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError("Unable to load block palette 389", e);
         }
-        for (CompoundTag state389 : tag389.getAll()) {
+        for (CompoundTag state : tag389.getAll()) {
             int runtimeId = runtimeIdAllocator389.getAndIncrement();
-            if (!state389.contains("meta")) continue;
-            for (int val : state389.getIntArray("meta")) {
-                legacyToRuntimeId389.put(state389.getShort("id") << 6 | val, runtimeId);
+            if (!state.contains("meta")) continue;
+            for (int val : state.getIntArray("meta")) {
+                legacyToRuntimeId389.put(state.getShort("id") << 6 | val, runtimeId);
             }
-            state389.remove("meta"); // No point in sending this since the client doesn't use it
+            state.remove("meta");
         }
         try {
             compiledTable389 = NBTIO.write(tag389, ByteOrder.LITTLE_ENDIAN, true);
@@ -241,27 +244,30 @@ public class GlobalBlockPalette {
             throw new AssertionError("Unable to write block palette 389", e);
         }
         // 407
-        // TODO: full 1.16 palette support
-        InputStream stream407 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_407.dat");
-        if (stream407 == null) throw new AssertionError("Unable to locate block state nbt 407");
         ListTag<CompoundTag> tag407;
-        try {
-            compiledTable407 = ByteStreams.toByteArray(stream407);
+        try (InputStream stream407 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_407.dat")) {
+            if (stream407 == null) {
+                throw new AssertionError("Unable to locate block state nbt 407");
+            }
             //noinspection unchecked
-            tag407 = (ListTag<CompoundTag>) NBTIO.readNetwork(new ByteArrayInputStream(compiledTable407));
+            tag407 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream407)), ByteOrder.LITTLE_ENDIAN, false);
         } catch (IOException e) {
-            throw new AssertionError(e);
+            throw new AssertionError("Unable to load block palette 407", e);
         }
-        for (CompoundTag state407 : tag407.getAll()) {
+        for (CompoundTag state : tag407.getAll()) {
             int runtimeId = runtimeIdAllocator407.getAndIncrement();
-            if (!state407.contains("meta")) {
-                legacyToRuntimeId407.put(state407.getShort("id") << 6, runtimeId);
-                continue;
+            if (!state.contains("LegacyStates")) continue;
+            List<CompoundTag> legacyStates = state.getList("LegacyStates", CompoundTag.class).getAll();
+            for (CompoundTag legacyState : legacyStates) {
+                int legacyId = legacyState.getInt("id") << 6 | legacyState.getShort("val");
+                legacyToRuntimeId407.put(legacyId, runtimeId);
             }
-            for (int val : state407.getIntArray("meta")) {
-                legacyToRuntimeId407.put(state407.getShort("id") << 6 | val, runtimeId);
-            }
-            state407.remove("meta"); // No point in sending this since the client doesn't use it
+            state.remove("meta");
+        }
+        try {
+            compiledTable407 = NBTIO.write(tag407, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to write block palette 407", e);
         }
     }
 
@@ -308,7 +314,9 @@ public class GlobalBlockPalette {
                 if (id407 == -1) {
                     id407 = legacyToRuntimeId407.get(id << 6);
                     if (id407 == -1) {
-                        throw new NoSuchElementException("Unmapped block registered id:" + id + " meta:" + meta);
+                        log.info("Creating new runtime ID for unknown block {}", id);
+                        id407 = runtimeIdAllocator407.getAndIncrement();
+                        legacyToRuntimeId407.put(id << 6, id407);
                     }
                 }
             return id407;

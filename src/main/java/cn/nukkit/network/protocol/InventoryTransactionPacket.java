@@ -116,15 +116,14 @@ public class InventoryTransactionPacket extends DataPacket {
     public void decode() {
         if (protocol >= 407) {
             this.legacyRequestId = this.getVarInt();
-            if (this.legacyRequestId > 0) {
-                long size = this.getUnsignedVarInt();
-                for (int i = 0; i < size; i++) {
-                    this.getVarInt(); //container id
-                    long slots = getVarInt();
-                    for (int j = 0; j < slots; j++) {
-                        this.getVarInt(); //slot
-                    }
+            if (legacyRequestId < -1 && (legacyRequestId & 1) == 0) {
+                int length = (int) this.getUnsignedVarInt();
+                for (int i = 0; i < length; i++) {
+                    this.getByte();
+                    int bufLen = (int) this.getUnsignedVarInt();
+                    this.get(bufLen);
                 }
+
             }
         }
 

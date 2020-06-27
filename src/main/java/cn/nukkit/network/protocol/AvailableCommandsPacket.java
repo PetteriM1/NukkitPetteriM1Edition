@@ -316,5 +316,9 @@ public class AvailableCommandsPacket extends DataPacket {
                 values.forEach(this::putString);
             });
         }
+
+        if (protocol >= 407) {
+            this.putUnsignedVarInt(0);
+        }
     }
 }
