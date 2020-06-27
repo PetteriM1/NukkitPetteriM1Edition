@@ -24,8 +24,14 @@ public class ShapedRecipe implements CraftingRecipe {
 
     private final CharObjectHashMap<Item> ingredients = new CharObjectHashMap<>();
 
+    private int networkId;
+
     public ShapedRecipe(Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
         this(null, 1, primaryResult, shape, ingredients, extraResults);
+    }
+
+    public ShapedRecipe(String recipeId, int priority, Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
+        this(recipeId, priority, primaryResult, shape, ingredients, extraResults, null);
     }
 
     /**
@@ -40,10 +46,11 @@ public class ShapedRecipe implements CraftingRecipe {
      *                         array MUST have a corresponding item in this list. Space character is automatically treated as air.
      * @param extraResults<br> List of additional result items to leave in the crafting grid afterwards. Used for things like cake recipe
      *                         empty buckets.
+     * @param networkId        Unique network id of this recipe. If null, a new networkId will be assigned to this recipe.
      *
      *                         Note: Recipes **do not** need to be square. Do NOT add padding for empty rows/columns.
      */
-    public ShapedRecipe(String recipeId, int priority, Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
+    public ShapedRecipe(String recipeId, int priority, Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults, Integer networkId) {
         this.recipeId = recipeId;
         this.priority = priority;
         int rowCount = shape.length;
@@ -96,6 +103,7 @@ public class ShapedRecipe implements CraftingRecipe {
                 this.ingredientsAggregate.add(ingredient);
         }
         this.ingredientsAggregate.sort(CraftingManager.recipeComparator);
+        this.networkId = networkId != null ? networkId : ++CraftingManager.nextNetworkId;
     }
 
     public int getWidth() {
@@ -217,7 +225,7 @@ public class ShapedRecipe implements CraftingRecipe {
             haveInputs.add(item.clone());
         }
         List<Item> needInputs = new ArrayList<>();
-        if(multiplier != 1){
+        if (multiplier != 1) {
             for (Item item : ingredientsAggregate) {
                 if (item.isNull())
                     continue;
@@ -245,7 +253,7 @@ public class ShapedRecipe implements CraftingRecipe {
         }
         haveOutputs.sort(CraftingManager.recipeComparator);
         List<Item> needOutputs = new ArrayList<>();
-        if(multiplier != 1){
+        if (multiplier != 1) {
             for (Item item : getExtraResults()) {
                 if (item.isNull())
                     continue;
@@ -314,6 +322,10 @@ public class ShapedRecipe implements CraftingRecipe {
     @Override
     public List<Item> getIngredientsAggregate() {
         return ingredientsAggregate;
+    }
+
+    public int getNetworkId() {
+        return this.networkId;
     }
 
     public static class Entry {

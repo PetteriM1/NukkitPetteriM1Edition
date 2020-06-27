@@ -7,17 +7,15 @@ import lombok.ToString;
 @ToString(exclude = "tag")
 public class BiomeDefinitionListPacket extends DataPacket {
 
-    private static final byte[] TAG;
+    private static final byte[] TAG361;
 
     static {
         try {
-            TAG = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat"));
+            TAG361 = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat"));
         } catch (Exception e) {
-            throw new AssertionError("Error whilst loading biome_definitions_361.dat", e);
+            throw new AssertionError("Error whilst loading biome definitions", e);
         }
     }
-
-    public byte[] tag = TAG;
 
     @Override
     public byte pid() {
@@ -31,6 +29,6 @@ public class BiomeDefinitionListPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.put(tag);
+        this.put(TAG361);
     }
 }

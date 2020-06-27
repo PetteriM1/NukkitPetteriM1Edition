@@ -166,7 +166,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String iusername;
     protected String displayName;
 
-    public int protocol = ProtocolInfo.CURRENT_PROTOCOL;
+    public int protocol = 999;
+    public int raknetProtocol;
     protected String version;
 
     protected int startAction = -1;
@@ -249,7 +250,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private boolean foodEnabled = true;
     private int failedTransactions;
 
-    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET);
+    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET, ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET);
 
     public int getStartActionTick() {
         return startAction;
@@ -1255,17 +1256,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.adventureSettings.set(Type.FLYING, true);
             this.teleport(this.temporalVector.setComponents(this.x, this.y + 0.1, this.z));
 
-            InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            this.dataPacket(inventoryContentPacket);
+            if (this.protocol < 407) {
+                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
+                this.dataPacket(inventoryContentPacket);
+            }
         } else {
             if (this.isSurvival() || this.isAdventure()) {
                 this.adventureSettings.set(Type.FLYING, false);
             }
-            InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
-            this.dataPacket(inventoryContentPacket);
+            if (this.protocol < 407) {
+                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
+                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
+                this.dataPacket(inventoryContentPacket);
+            }
         }
 
         this.resetFallDistance();
@@ -2104,10 +2109,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.sendData(this);
                 this.sendAllInventories();
 
-                if (this.gamemode == Player.SPECTATOR) {
-                    InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                    inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-                    this.dataPacket(inventoryContentPacket);
+                if (this.protocol < 407) {
+                    if (this.gamemode == Player.SPECTATOR) {
+                        InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                        inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
+                        this.dataPacket(inventoryContentPacket);
+
+                    } else {
+                        this.inventory.sendCreativeContents();
+                    }
                 } else {
                     this.inventory.sendCreativeContents();
                 }
@@ -2718,17 +2728,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     Entity targetEntity = this.level.getEntity(interactPacket.target);
 
-                    if (targetEntity == null || !this.isAlive() || !targetEntity.isAlive()) {
+                    if (interactPacket.action != InteractPacket.ACTION_OPEN_INVENTORY && (targetEntity == null || !this.isAlive() || !targetEntity.isAlive())) {
                         break;
                     }
 
-                    if (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow || targetEntity instanceof EntityXPOrb) {
+                    if (interactPacket.action != InteractPacket.ACTION_OPEN_INVENTORY && (targetEntity instanceof EntityItem || targetEntity instanceof EntityArrow || targetEntity instanceof EntityXPOrb)) {
                         //this.kick(PlayerKickEvent.Reason.INVALID_PVE, "Attempting to interact with an invalid entity");
                         this.server.getLogger().warning(this.getServer().getLanguage().translateString("nukkit.player.invalidEntity", this.username));
                         break;
                     }
 
                     switch (interactPacket.action) {
+                        case InteractPacket.ACTION_OPEN_INVENTORY:
+                            if (this.protocol >= 407) {
+                                this.inventory.sendInventory();
+                            }
+                            break;
                         case InteractPacket.ACTION_MOUSEOVER:
                             if (interactPacket.target == 0 && this.protocol >= 313) {
                                 break packetswitch;
@@ -2910,7 +2925,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.CONTAINER_CLOSE_PACKET:
                     ContainerClosePacket containerClosePacket = (ContainerClosePacket) packet;
-                    if (!this.spawned) {
+                    if (!this.spawned || (containerClosePacket.windowId == 0 && this.protocol >= 407)) {
+                        this.inventory.closeInventory();
                         break;
                     }
 
@@ -2924,6 +2940,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.craftingType = CRAFTING_SMALL;
                         this.resetCraftingGridType();
                         this.addWindow(this.craftingGrid, ContainerIds.NONE);
+                        if (protocol >= 407) {
+                            ContainerClosePacket pk = new ContainerClosePacket();
+                            pk.windowId = -1;
+                            this.dataPacket(pk);
+                        }
                     }
                     break;
                 case ProtocolInfo.BLOCK_ENTITY_DATA_PACKET:
@@ -3544,6 +3565,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.inventory.setItem(bookEditPacket.inventorySlot, editBookEvent.getNewBook());
                         }
                     }
+                    break;
+                case ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET:
+                    PacketViolationWarningPacket PVWpk = (PacketViolationWarningPacket) packet;
+                    this.getServer().getLogger().info("PacketViolationWarningPacket from " + this.username + ": " + PVWpk.toString());
                     break;
                 default:
                     break;
@@ -4900,7 +4925,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         batchPayload[0] = Binary.writeUnsignedVarInt(buf.length);
         batchPayload[1] = buf;
         try {
-            batch.payload = Zlib.deflate(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);
+            if (protocol >= 407) {
+                batch.payload = Zlib.deflateRaw(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);
+            } else {
+                batch.payload = Zlib.deflate(Binary.appendBytes(batchPayload), Server.getInstance().networkCompressionLevel);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -177,7 +177,7 @@ public class AddEntityPacket extends DataPacket {
         this.put(Binary.writeMetadata(protocol, this.metadata));
         this.putUnsignedVarInt(this.links.length);
         for (EntityLink link : links) {
-            putEntityLink(link);
+            putEntityLink(protocol, link);
         }
     }
 }
