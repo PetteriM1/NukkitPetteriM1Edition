@@ -8,7 +8,6 @@ import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
 import cn.nukkit.utils.VarInt;
 import cn.nukkit.utils.Zlib;
-import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import lombok.extern.log4j.Log4j2;
 
@@ -146,7 +145,11 @@ public class Network {
     public void processBatch(BatchPacket packet, Player player) {
         byte[] data;
         try {
-            data = Zlib.inflate(packet.payload, 2097152); // 2 * 1024 * 1024
+            if (player.raknetProtocol >= 10) {
+                data = Zlib.inflateRaw(packet.payload, 2097152); // 2 * 1024 * 1024
+            } else {
+                data = Zlib.inflate(packet.payload, 2097152);
+            }
         } catch (Exception e) {
             return;
         }
@@ -169,9 +172,9 @@ public class Network {
                 if (pk != null) {
                     pk.protocol = player.protocol;
 
-                    try {
+                    if (player.raknetProtocol > 8) {
                         pk.decode();
-                    } catch (JsonSyntaxException | ArrayIndexOutOfBoundsException e) { // LoginPacket < 1.6
+                    } else { // version < 1.6
                         pk.setBuffer(buf, 3);
                         pk.decode();
                     }
@@ -351,5 +354,13 @@ public class Network {
         this.registerPacket(ProtocolInfo.MAP_CREATE_LOCKED_COPY_PACKET, MapCreateLockedCopyPacket.class);
         this.registerPacket(ProtocolInfo.ON_SCREEN_TEXTURE_ANIMATION_PACKET, OnScreenTextureAnimationPacket.class);
         this.registerPacket(ProtocolInfo.COMPLETED_USING_ITEM_PACKET, CompletedUsingItemPacket.class);
+        this.registerPacket(ProtocolInfo.CODE_BUILDER_PACKET, CodeBuilderPacket.class);
+        this.registerPacket(ProtocolInfo.CREATIVE_CONTENT_PACKET, CreativeContentPacket.class);
+        this.registerPacket(ProtocolInfo.DEBUG_INFO_PACKET, DebugInfoPacket.class);
+        this.registerPacket(ProtocolInfo.EMOTE_LIST_PACKET, EmoteListPacket.class);
+        this.registerPacket(ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET, PacketViolationWarningPacket.class);
+        this.registerPacket(ProtocolInfo.PLAYER_ARMOR_DAMAGE_PACKET, PlayerArmorDamagePacket.class);
+        this.registerPacket(ProtocolInfo.PLAYER_ENCHANT_OPTIONS_PACKET, PlayerEnchantOptionsPacket.class);
+        this.registerPacket(ProtocolInfo.UPDATE_PLAYER_GAME_TYPE_PACKET, UpdatePlayerGameTypePacket.class);
     }
 }
