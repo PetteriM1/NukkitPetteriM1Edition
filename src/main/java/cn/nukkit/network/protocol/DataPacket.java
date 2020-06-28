@@ -13,7 +13,7 @@ import com.nukkitx.network.raknet.RakNetReliability;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
-    public int protocol = ProtocolInfo.CURRENT_PROTOCOL;
+    public int protocol = 999;
 
     public boolean isEncoded = false;
     private int channel = Network.CHANNEL_NONE;
@@ -74,7 +74,11 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         batchPayload[1] = buf;
         byte[] data = Binary.appendBytes(batchPayload);
         try {
-            batch.payload = Zlib.deflate(data, level);
+            if (protocol >= ProtocolInfo.v1_16_0) {
+                batch.payload = Zlib.deflateRaw(data, level);
+            } else {
+                batch.payload = Zlib.deflate(data, level);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

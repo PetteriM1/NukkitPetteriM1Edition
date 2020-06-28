@@ -21,11 +21,17 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     private final int priority;
 
+    private int networkId;
+
     public ShapelessRecipe(Item result, Collection<Item> ingredients) {
         this(null, 10, result, ingredients);
     }
 
     public ShapelessRecipe(String recipeId, int priority, Item result, Collection<Item> ingredients) {
+        this(recipeId, priority, result, ingredients, null);
+    }
+
+    public ShapelessRecipe(String recipeId, int priority, Item result, Collection<Item> ingredients, Integer networkId) {
         this.recipeId = recipeId;
         this.priority = priority;
         this.output = result.clone();
@@ -54,6 +60,7 @@ public class ShapelessRecipe implements CraftingRecipe {
         }
 
         this.ingredientsAggregate.sort(CraftingManager.recipeComparator);
+        this.networkId = networkId != null ? networkId : ++CraftingManager.nextNetworkId;
     }
 
     @Override
@@ -132,7 +139,7 @@ public class ShapelessRecipe implements CraftingRecipe {
             haveInputs.add(item.clone());
         }
         List<Item> needInputs = new ArrayList<>();
-        if(multiplier != 1){
+        if (multiplier != 1) {
             for (Item item : ingredientsAggregate) {
                 if (item.isNull())
                     continue;
@@ -160,7 +167,7 @@ public class ShapelessRecipe implements CraftingRecipe {
         }
         haveOutputs.sort(CraftingManager.recipeComparator);
         List<Item> needOutputs = new ArrayList<>();
-        if(multiplier != 1){
+        if (multiplier != 1) {
             for (Item item : getExtraResults()) {
                 if (item.isNull())
                     continue;
@@ -216,5 +223,9 @@ public class ShapelessRecipe implements CraftingRecipe {
     @Override
     public List<Item> getIngredientsAggregate() {
         return ingredientsAggregate;
+    }
+
+    public int getNetworkId() {
+        return this.networkId;
     }
 }

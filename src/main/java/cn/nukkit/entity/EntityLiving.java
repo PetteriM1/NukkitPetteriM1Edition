@@ -54,7 +54,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected int turtleTicks = 200;
 
-    private boolean blocking;
+    private boolean blocking = false;
 
     @Override
     protected void initEntity() {

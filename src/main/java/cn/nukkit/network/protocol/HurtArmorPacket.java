@@ -8,7 +8,8 @@ import lombok.ToString;
 @ToString
 public class HurtArmorPacket extends DataPacket {
 
-    public int health;
+    public int cause;
+    public int damage;
 
     @Override
     public void decode() {
@@ -17,7 +18,10 @@ public class HurtArmorPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt(this.health);
+        if (protocol >= 407) {
+            this.putVarInt(this.cause);
+        }
+        this.putVarInt(this.damage);
     }
 
     @Override

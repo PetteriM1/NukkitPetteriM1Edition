@@ -58,6 +58,12 @@ public class EntityEventPacket extends DataPacket {
     public static final int ENTITY_SPAWN = 67;
     public static final int DRAGON_PUKE = 68;
     public static final int MERGE_ITEMS = 69;
+    public static final int START_SWIM = 70;
+    public static final int BALLOON_POP = 71;
+    public static final int TREASURE_HUNT = 72;
+    public static final int AGENT_SUMMON = 73;
+    public static final int CHARGED_CROSSBOW = 74;
+    public static final int FALL = 75;
 
     @Override
     public byte pid() {

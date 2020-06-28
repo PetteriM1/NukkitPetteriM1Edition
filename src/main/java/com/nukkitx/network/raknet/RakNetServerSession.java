@@ -13,10 +13,16 @@ import java.net.InetSocketAddress;
 public class RakNetServerSession extends RakNetSession {
 
     private final RakNetServer rakNet;
+    public final int protocol;
 
     RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop) {
+        this(rakNet, remoteAddress, channel, mtu, eventLoop, RakNetConstants.RAKNET_PROTOCOL_VERSION);
+    }
+
+    RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop, int protocol) {
         super(remoteAddress, channel, mtu, eventLoop);
         this.rakNet = rakNet;
+        this.protocol = protocol;
     }
 
     @Override

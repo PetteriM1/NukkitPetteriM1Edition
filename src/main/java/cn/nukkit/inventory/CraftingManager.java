@@ -22,12 +22,15 @@ import java.util.zip.Deflater;
 public class CraftingManager {
 
     public final Collection<Recipe> recipes = new ArrayDeque<>();
-    private final Collection<Recipe> recipesVeryOld = new ArrayDeque<>();
+    private final Collection<Recipe> recipes313 = new ArrayDeque<>();
+    private final Collection<Recipe> recipes340 = new ArrayDeque<>();
 
-    public static BatchPacket packet = null;
+    public static BatchPacket packet313 = null;
+    public static BatchPacket packet340 = null;
     public static BatchPacket packet361 = null;
     public static BatchPacket packet354 = null;
-    public static BatchPacket packet340 = null;
+    public static BatchPacket packet338 = null;
+    public static BatchPacket packet407 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -36,6 +39,7 @@ public class CraftingManager {
 
     private static int RECIPE_COUNT = 0;
     protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
+    public static int nextNetworkId = 0;
 
     public static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {
@@ -53,7 +57,8 @@ public class CraftingManager {
     public CraftingManager() {
         MainLogger.getLogger().debug("Loading recipes...");
         List<Map> recipes = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection().getMapList("recipes");
-        List<Map> recipesOld = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes340.json")).getMapList("recipes");
+        List<Map> recipes_313 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes313.json")).getMapList("recipes");
+        List<Map> recipes_340 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes340.json")).getMapList("recipes");
         for (Map<String, Object> recipe : recipes) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
@@ -137,8 +142,7 @@ public class CraftingManager {
             }
         }
 
-        // Hack: Crafting for old game versions
-        for (Map<String, Object> recipe : recipesOld) {
+        for (Map<String, Object> recipe : recipes_313) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
                     case 0:
@@ -148,7 +152,7 @@ public class CraftingManager {
                             sorted.add(Item.fromJsonOld(ingredient));
                         }
                         sorted.sort(recipeComparator);
-                        recipesVeryOld.add(new ShapelessRecipe(Item.fromJsonOld(first), sorted));
+                        recipes313.add(new ShapelessRecipe(Item.fromJsonOld(first), sorted));
                         break;
                     case 1:
                         List<Map> output = (List<Map>) recipe.get("output");
@@ -165,13 +169,50 @@ public class CraftingManager {
                         for (Map<String, Object> data : output) {
                             extraResults.add(Item.fromJsonOld(data));
                         }
-                        recipesVeryOld.add(new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults));
+                        recipes313.add(new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults));
                         break;
                     default:
                         break;
                 }
             } catch (Exception e) {
-                MainLogger.getLogger().error("Exception during registering (old) recipe", e);
+                MainLogger.getLogger().error("Exception during registering (protocol 313) recipe", e);
+            }
+        }
+
+        for (Map<String, Object> recipe : recipes_340) {
+            try {
+                switch (Utils.toInt(recipe.get("type"))) {
+                    case 0:
+                        Map<String, Object> first = ((List<Map>) recipe.get("output")).get(0);
+                        List<Item> sorted = new ArrayList<>();
+                        for (Map<String, Object> ingredient : ((List<Map>) recipe.get("input"))) {
+                            sorted.add(Item.fromJsonOld(ingredient));
+                        }
+                        sorted.sort(recipeComparator);
+                        recipes340.add(new ShapelessRecipe(Item.fromJsonOld(first), sorted));
+                        break;
+                    case 1:
+                        List<Map> output = (List<Map>) recipe.get("output");
+                        first = output.remove(0);
+                        String[] shape = ((List<String>) recipe.get("shape")).toArray(new String[0]);
+                        Map<Character, Item> ingredients = new CharObjectHashMap<>();
+                        List<Item> extraResults = new ArrayList<>();
+                        Map<String, Map<String, Object>> input = (Map) recipe.get("input");
+                        for (Map.Entry<String, Map<String, Object>> ingredientEntry : input.entrySet()) {
+                            char ingredientChar = ingredientEntry.getKey().charAt(0);
+                            Item ingredient = Item.fromJsonOld(ingredientEntry.getValue());
+                            ingredients.put(ingredientChar, ingredient);
+                        }
+                        for (Map<String, Object> data : output) {
+                            extraResults.add(Item.fromJsonOld(data));
+                        }
+                        recipes340.add(new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults));
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception e) {
+                MainLogger.getLogger().error("Exception during registering (protocol 340) recipe", e);
             }
         }
 
@@ -203,27 +244,49 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
-        // Current protocol
-        CraftingDataPacket pk = new CraftingDataPacket();
-        pk.cleanRecipes = true;
+        CraftingDataPacket pk407 = new CraftingDataPacket();
+        pk407.cleanRecipes = true;
+        pk407.protocol = 407;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
-                pk.addShapedRecipe((ShapedRecipe) recipe);
+                pk407.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
-                pk.addShapelessRecipe((ShapelessRecipe) recipe);
+                pk407.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pk.addFurnaceRecipe(recipe);
+            pk407.addFurnaceRecipe(recipe);
         }
         for (BrewingRecipe recipe : brewingRecipes.values()) {
-            pk.addBrewingRecipe(recipe);
+            pk407.addBrewingRecipe(recipe);
         }
         for (ContainerRecipe recipe : containerRecipes.values()) {
-            pk.addContainerRecipe(recipe);
+            pk407.addContainerRecipe(recipe);
         }
-        pk.encode();
-        packet = pk.compress(Deflater.BEST_COMPRESSION);
+        pk407.encode();
+        packet407 = pk407.compress(Deflater.BEST_COMPRESSION);
+        // 388
+        CraftingDataPacket pk388 = new CraftingDataPacket();
+        pk388.cleanRecipes = true;
+        pk388.protocol = 388;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk388.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk388.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk388.addFurnaceRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk388.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk388.addContainerRecipe(recipe);
+        }
+        pk388.encode();
+        packet338 = pk388.compress(Deflater.BEST_COMPRESSION);
         // 361
         CraftingDataPacket pk361 = new CraftingDataPacket();
         pk361.cleanRecipes = true;
@@ -260,7 +323,7 @@ public class CraftingManager {
         CraftingDataPacket pk340 = new CraftingDataPacket();
         pk340.cleanRecipes = true;
         pk340.protocol = 340;
-        for (Recipe recipe : this.recipesVeryOld) {
+        for (Recipe recipe : this.recipes340) {
             if (recipe instanceof ShapedRecipe) {
                 pk340.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
@@ -272,6 +335,23 @@ public class CraftingManager {
         }
         pk340.encode();
         packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
+        // 313
+        CraftingDataPacket pk313 = new CraftingDataPacket();
+        pk313.cleanRecipes = true;
+        pk313.protocol = 313;
+        for (Recipe recipe : this.recipes313) {
+            if (recipe instanceof ShapedRecipe) {
+                pk313.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk313.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        //TODO furnace recipes?
+        /*for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk313.addFurnaceRecipe(recipe);
+        }*/
+        pk313.encode();
+        packet313 = pk313.compress(Deflater.BEST_COMPRESSION);
     }
 
     public Collection<Recipe> getRecipes() {

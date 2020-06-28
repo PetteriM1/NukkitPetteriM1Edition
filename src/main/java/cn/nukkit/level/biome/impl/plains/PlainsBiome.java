@@ -18,9 +18,7 @@ public class PlainsBiome extends GrassyBiome {
         trees.setRandomAmount(1);
         this.addPopulator(trees);
 
-        PopulatorPumpkin pumpkins = new PopulatorPumpkin();
-        pumpkins.setRandomAmount(1);
-        this.addPopulator(pumpkins);
+        this.addPopulator(new PopulatorPumpkin());
 
         this.setBaseHeight(0.125f);
         this.setHeightVariation(0.05f);

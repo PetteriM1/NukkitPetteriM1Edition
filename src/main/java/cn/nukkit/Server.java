@@ -640,15 +640,26 @@ public class Server {
                     size += payload[i2 + 1].length;
                 }
 
+                List<InetSocketAddress> targetsOld = new ArrayList<>();
                 List<InetSocketAddress> targets = new ArrayList<>();
                 for (Player p : players) {
                     if (p.isConnected()) {
-                        targets.add(p.getSocketAddress());
+                        if (p.protocol >= ProtocolInfo.v1_16_0) {
+                            targets.add(p.getSocketAddress());
+                        } else {
+                            targetsOld.add(p.getSocketAddress());
+                        }
                     }
                 }
 
                 try {
-                    this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                    byte[] bytes = Binary.appendBytes(payload);
+                    if (!targets.isEmpty()) {
+                        this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
+                    }
+                    if (!targetsOld.isEmpty()) {
+                        this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -671,10 +682,15 @@ public class Server {
                 size += payload[i2 + 1].length;
             }
 
+            List<InetSocketAddress> targetsOld = new ArrayList<>();
             List<InetSocketAddress> targets = new ArrayList<>();
             for (Player p : players) {
                 if (p.isConnected()) {
-                    targets.add(p.getSocketAddress());
+                    if (p.protocol >= ProtocolInfo.v1_16_0) {
+                        targets.add(p.getSocketAddress());
+                    } else {
+                        targetsOld.add(p.getSocketAddress());
+                    }
                 }
             }
 
@@ -682,7 +698,13 @@ public class Server {
             //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
             //} else {
             try {
-                this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                byte[] bytes = Binary.appendBytes(payload);
+                if (!targets.isEmpty()) {
+                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
+                }
+                if (!targetsOld.isEmpty()) {
+                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -1014,17 +1036,20 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
-            player.dataPacket(CraftingManager.packet);
+        if (player.protocol == ProtocolInfo.v1_16_0) {
+            player.dataPacket(CraftingManager.packet407);
+        } else if (player.protocol > ProtocolInfo.v1_12_0) {
+            player.dataPacket(CraftingManager.packet338);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
         } else if (player.protocol == ProtocolInfo.v1_11_0) {
              player.dataPacket(CraftingManager.packet354);
         } else if (player.protocol == ProtocolInfo.v1_10_0) {
             player.dataPacket(CraftingManager.packet340);
+        } else if (player.protocol == ProtocolInfo.v1_9_0 || player.protocol == ProtocolInfo.v1_8_0 || player.protocol == ProtocolInfo.v1_7_0) { // these should work just fine
+            player.dataPacket(CraftingManager.packet313);
         }
         // Don't send recipes if they wouldn't work anyways
-        // TODO: Support for older versions
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -2261,7 +2286,7 @@ public class Server {
             put("worlds-entity-spawning-disabled", "");
             put("block-listener", true);
             put("allow-flight", false);
-            put("timeout-milliseconds", 30000);
+            put("timeout-milliseconds", 25000);
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
             put("dimensions", false);

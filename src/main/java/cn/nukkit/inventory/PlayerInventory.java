@@ -11,10 +11,7 @@ import cn.nukkit.event.entity.EntityInventoryChangeEvent;
 import cn.nukkit.event.player.PlayerItemHeldEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.network.protocol.InventoryContentPacket;
-import cn.nukkit.network.protocol.InventorySlotPacket;
-import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
-import cn.nukkit.network.protocol.MobEquipmentPacket;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.ContainerIds;
 
 import java.util.Collection;
@@ -468,18 +465,46 @@ public class PlayerInventory extends BaseInventory {
         }
         Player p = (Player) this.getHolder();
 
-        InventoryContentPacket pk = new InventoryContentPacket();
-        pk.inventoryId = ContainerIds.CREATIVE;
-
-        if (!p.isSpectator()) { //fill it for all gamemodes except spectator
-            pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+        if (p.protocol < 407) {
+            InventoryContentPacket pk = new InventoryContentPacket();
+            pk.inventoryId = ContainerIds.CREATIVE;
+            if (!p.isSpectator()) { //fill it for all gamemodes except spectator
+                pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            }
+            p.dataPacket(pk);
+        } else {
+            CreativeContentPacket pk = new CreativeContentPacket();
+            pk.entries = p.isSpectator() ? new Item[0] : Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            p.dataPacket(pk);
         }
-
-        p.dataPacket(pk);
     }
 
     @Override
     public EntityHuman getHolder() {
         return (EntityHuman) super.getHolder();
+    }
+
+    public void sendInventory() {
+        if (!(holder instanceof Player)) {
+            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
+        }
+
+        ContainerOpenPacket pk = new ContainerOpenPacket();
+        pk.x = ((Player) holder).getFloorX();
+        pk.y = ((Player) holder).getFloorY();
+        pk.z = ((Player) holder).getFloorZ();
+        pk.windowId = ((Player) holder).getWindowId(this);
+        pk.type = InventoryType.PLAYER.getNetworkType();
+        ((Player) holder).dataPacket(pk);
+    }
+
+    public void closeInventory() {
+        if (!(holder instanceof Player)) {
+            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
+        }
+
+        ContainerClosePacket pk = new ContainerClosePacket();
+        pk.windowId = ((Player) holder).getWindowId(this);
+        ((Player) holder).dataPacket(pk);
     }
 }
