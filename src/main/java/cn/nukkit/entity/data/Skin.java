@@ -55,7 +55,7 @@ public class Skin {
     public boolean isLegacySlim;
     private String skinColor = "#0";
     private String armSize = "wide";
-    private boolean trusted = false;
+    private boolean trusted = true;
 
     public boolean isValid() {
         return isValidSkin() && isValidResourcePatch();
