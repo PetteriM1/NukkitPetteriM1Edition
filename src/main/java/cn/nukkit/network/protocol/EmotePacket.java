@@ -2,9 +2,9 @@ package cn.nukkit.network.protocol;
 
 public class EmotePacket extends DataPacket {
 
-    public long entityRuntimeId;
-    public String emoteId;
-    public int flags;
+    public long runtimeId;
+    public String emoteID;
+    public byte flags;
 
     @Override
     public byte pid() {
@@ -13,16 +13,16 @@ public class EmotePacket extends DataPacket {
 
     @Override
     public void decode() {
-        this.entityRuntimeId = this.getEntityUniqueId();
-        this.emoteId = this.getString();
-        this.flags = this.getByte();
+        this.runtimeId = this.getEntityUniqueId();
+        this.emoteID = this.getString();
+        this.flags = (byte) this.getByte();
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putEntityUniqueId(this.entityRuntimeId);
-        this.putString(this.emoteId);
-        this.putByte((byte) this.flags);
+        this.putEntityUniqueId(this.runtimeId);
+        this.putString(this.emoteID);
+        this.putByte(flags);
     }
 }
