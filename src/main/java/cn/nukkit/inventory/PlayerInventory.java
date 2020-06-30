@@ -439,8 +439,11 @@ public class PlayerInventory extends BaseInventory {
 
     @Override
     public void sendSlot(int index, Player... players) {
-        if (players.length == 0) {
-            players = new Player[]{(Player) this.getHolder()};
+        if (players.length == 0 && this.getHolder() instanceof Player) {
+            Player p = (Player) this.getHolder();
+            if (p.protocol >= 407) {
+                players = new Player[]{p};
+            }
         }
 
         InventorySlotPacket pk = new InventorySlotPacket();
