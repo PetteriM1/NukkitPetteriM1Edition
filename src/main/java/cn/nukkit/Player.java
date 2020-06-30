@@ -3544,6 +3544,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     PacketViolationWarningPacket PVWpk = (PacketViolationWarningPacket) packet;
                     this.getServer().getLogger().info("PacketViolationWarningPacket from " + this.username + ": " + PVWpk.toString());
                     break;
+                case ProtocolInfo.EMOTE_PACKET:
+                    EmotePacket emotePacket = (EmotePacket) packet;
+                    this.emote(emotePacket);
+                    break;
                 default:
                     break;
             }
@@ -3574,6 +3578,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         return true;
+    }
+
+    public void emote(EmotePacket emote) {
+        for (Player player : this.getViewers().values()) {
+            if (player.protocol >= ProtocolInfo.v1_16_0) {
+                player.dataPacket(emote);
+            }
+        }
     }
 
     public boolean kick() {
