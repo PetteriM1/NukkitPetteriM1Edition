@@ -1,5 +1,7 @@
 package cn.nukkit.block;
 
+import cn.nukkit.item.Item;
+
 /**
  * Created by PetteriM1
  */
@@ -21,5 +23,10 @@ public class BlockGlowStick extends BlockTransparentMeta {
     @Override
     public String getName() {
         return "Glow Stick";
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(AIR);
     }
 }

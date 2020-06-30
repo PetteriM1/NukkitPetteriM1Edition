@@ -439,6 +439,13 @@ public class PlayerInventory extends BaseInventory {
 
     @Override
     public void sendSlot(int index, Player... players) {
+        if (players.length == 0 && this.getHolder() instanceof Player) {
+            Player p = (Player) this.getHolder();
+            if (p.protocol >= 407) {
+                players = new Player[]{p};
+            }
+        }
+
         InventorySlotPacket pk = new InventorySlotPacket();
         pk.slot = index;
         pk.item = this.getItem(index).clone();
@@ -489,13 +496,14 @@ public class PlayerInventory extends BaseInventory {
             throw new RuntimeException("Cannot send inventory to non-player inventory holder");
         }
 
+        Player p = (Player) holder;
         ContainerOpenPacket pk = new ContainerOpenPacket();
-        pk.x = ((Player) holder).getFloorX();
-        pk.y = ((Player) holder).getFloorY();
-        pk.z = ((Player) holder).getFloorZ();
-        pk.windowId = ((Player) holder).getWindowId(this);
+        pk.x = p.getFloorX();
+        pk.y = p.getFloorY();
+        pk.z = p.getFloorZ();
+        pk.windowId = p.getWindowId(this);
         pk.type = InventoryType.PLAYER.getNetworkType();
-        ((Player) holder).dataPacket(pk);
+        p.dataPacket(pk);
     }
 
     public void closeInventory() {
@@ -503,8 +511,9 @@ public class PlayerInventory extends BaseInventory {
             throw new RuntimeException("Cannot send inventory to non-player inventory holder");
         }
 
+        Player p = (Player) holder;
         ContainerClosePacket pk = new ContainerClosePacket();
-        pk.windowId = ((Player) holder).getWindowId(this);
-        ((Player) holder).dataPacket(pk);
+        pk.windowId = p.getWindowId(this);
+        p.dataPacket(pk);
     }
 }

@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.Sound;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -58,6 +59,9 @@ public class BlockDirt extends BlockSolidMeta {
             if (up instanceof BlockAir || up instanceof BlockFlowable) {
                 item.useOn(this);
                 this.getLevel().setBlock(this, this.getDamage() == 0 ? get(FARMLAND) : get(DIRT), true);
+                if (player != null) {
+                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                }
                 return true;
             }
         }
