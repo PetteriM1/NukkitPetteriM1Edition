@@ -81,6 +81,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.math3.util.FastMath;
 
 import java.awt.*;
@@ -101,6 +102,7 @@ import java.util.function.Consumer;
  * @author MagicDroidX &amp; Box
  * Nukkit Project
  */
+@Log4j2
 public class Player extends EntityHuman implements CommandSender, InventoryHolder, ChunkLoader, IPlayer {
 
     public static final int SURVIVAL = 0;
@@ -1030,6 +1032,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (ev.isCancelled()) {
                     return false;
                 }
+            }
+
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
+                log.trace("Outbound {}: {}", this.getName(), packet);
             }
 
             this.interfaz.putPacket(this, packet, false, false);
@@ -2145,6 +2151,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 return;
             }
 
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
+                log.trace("Inbound {}: {}", this.getName(), packet);
+            }
+
             packetswitch:
             switch (packet.pid()) {
                 case ProtocolInfo.LOGIN_PACKET:
@@ -3076,7 +3086,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                         }
 
-                        if (this.craftingTransaction.getPrimaryOutput() != null) {
+                        if (this.craftingTransaction.getPrimaryOutput() != null && this.craftingTransaction.canExecute()) {
                             try {
                                 this.craftingTransaction.execute();
                             } catch (Exception e) {

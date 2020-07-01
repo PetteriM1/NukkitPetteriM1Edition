@@ -94,7 +94,7 @@ public class StatusCommand extends VanillaCommand {
                     TextFormat.GOLD + "World \"" + level.getFolderName() + '"' + (!Objects.equals(level.getFolderName(), level.getName()) ? " (" + level.getName() + ')' : "") + ": " +
                             TextFormat.RED + level.getChunks().size() + TextFormat.GREEN + " chunks, " +
                             TextFormat.RED + level.getEntities().length + TextFormat.GREEN + " entities, " +
-                            TextFormat.RED + level.getBlockEntities().size() + TextFormat.GREEN + " blockEntities." +
+                            TextFormat.RED + level.getBlockEntities().size() + TextFormat.GREEN + " block entities." +
                             " Time " + ((level.getTickRate() > 1 || level.getTickRateTime() > 40) ? TextFormat.RED : TextFormat.YELLOW) + NukkitMath.round(level.getTickRateTime(), 2) + "ms" +
                             (level.getTickRate() > 1 ? " (tick rate " + level.getTickRate() + ')' : "")
             );

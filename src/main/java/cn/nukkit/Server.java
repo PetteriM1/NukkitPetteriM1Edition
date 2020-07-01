@@ -242,7 +242,7 @@ public class Server {
     public boolean spawnAnimals;
     public boolean spawnMobs;
 
-    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
+    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
@@ -268,6 +268,12 @@ public class Server {
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ServerProperties());
 
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
+
+        int debugLvl = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
+        if (debug && debugLvl < 2) {
+            debugLvl = 2;
+        }
+        Nukkit.DEBUG = debugLvl;
 
         this.loadSettings();
 
@@ -333,8 +339,6 @@ public class Server {
         } else {
             this.setDifficulty(this.getPropertyInt("difficulty", 2));
         }
-
-        Nukkit.DEBUG = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
 
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
