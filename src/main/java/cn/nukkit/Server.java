@@ -211,7 +211,6 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
-    public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
@@ -226,6 +225,10 @@ public class Server {
     boolean announceAchievements;
     boolean checkOpMovement;
     boolean doNotLimitInteractions;
+    public int despawnTicks;
+    int chunksPerTick;
+    int spawnThreshold;
+    int c_s_spawnThreshold;
     public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
@@ -2188,6 +2191,9 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
+        this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
+        this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
+        this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {

@@ -188,8 +188,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected int chunkRadius;
     protected int viewDistance;
-    protected final int chunksPerTick;
-    protected final int spawnThreshold;
 
     protected Position spawnPosition;
 
@@ -601,8 +599,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server = Server.getInstance();
         this.socketAddress = socketAddress;
         this.loaderId = Level.generateChunkLoaderId(this);
-        this.chunksPerTick = this.server.getPropertyInt("chunk-sending-per-tick", 5);
-        this.spawnThreshold = this.server.getPropertyInt("spawn-threshold", 50);
         this.gamemode = this.server.getGamemode();
         this.setLevel(this.server.getDefaultLevel());
         this.viewDistance = this.server.getViewDistance();
@@ -784,7 +780,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             int count = 0;
             ObjectIterator<Long2ObjectMap.Entry<Boolean>> iter = loadQueue.long2ObjectEntrySet().fastIterator();
             while (iter.hasNext()) {
-                if (count >= this.chunksPerTick) {
+                if (count >= server.chunksPerTick) {
                     break;
                 }
 
@@ -816,7 +812,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= this.spawnThreshold) {
+        if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= server.spawnThreshold) {
             if (this.protocol < 274) {
                 this.initialized = true;
                 this.doFirstSpawn();
@@ -909,7 +905,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int centerX = (int) this.x >> 4;
         int centerZ = (int) this.z >> 4;
 
-        int radius = spawned ? this.chunkRadius : (int) Math.ceil(Math.sqrt(spawnThreshold));
+        int radius = spawned ? this.chunkRadius : server.c_s_spawnThreshold;
         int radiusSqr = radius * radius;
 
         long index;
@@ -2071,6 +2067,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.getServer().getScheduler().scheduleTask(null, () -> {
             try {
+                if (!this.connected) return;
                 if (this.protocol >= 313) {
                     if (this.protocol >= 361) {
                         this.dataPacket(new BiomeDefinitionListPacket());
@@ -2093,7 +2090,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
                         inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
                         this.dataPacket(inventoryContentPacket);
-
                     } else {
                         this.inventory.sendCreativeContents();
                     }
