@@ -119,6 +119,15 @@ public class PlayerInventory extends BaseInventory {
         }
     }
 
+    public Item getItemInHandFast() {
+        Item item = this.getItemFast(this.getHeldItemIndex());
+        if (item != null) {
+            return item;
+        } else {
+            return air;
+        }
+    }
+
     public boolean setItemInHand(Item item) {
         return this.setItem(this.itemInHandIndex, item);
     }
