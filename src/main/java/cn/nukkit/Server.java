@@ -221,7 +221,6 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
-    public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
@@ -236,6 +235,10 @@ public class Server {
     boolean announceAchievements;
     boolean checkOpMovement;
     boolean doNotLimitInteractions;
+    public int despawnTicks;
+    int chunksPerTick;
+    int spawnThreshold;
+    int c_s_spawnThreshold;
     public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
@@ -249,7 +252,7 @@ public class Server {
     public boolean spawnAnimals;
     public boolean spawnMobs;
 
-    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
+    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
@@ -275,6 +278,12 @@ public class Server {
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ServerProperties());
 
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
+
+        int debugLvl = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
+        if (debug && debugLvl < 2) {
+            debugLvl = 2;
+        }
+        Nukkit.DEBUG = debugLvl;
 
         this.loadSettings();
 
@@ -346,8 +355,6 @@ public class Server {
         } else {
             this.setDifficulty(this.getPropertyInt("difficulty", 2));
         }
-
-        Nukkit.DEBUG = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
 
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
@@ -2244,6 +2251,9 @@ public class Server {
         Entity.registerEntity("Zombie", EntityZombie.class);
         Entity.registerEntity("Pillager", EntityPillager.class);
         Entity.registerEntity("ZombieVillagerV2", EntityZombieVillagerV2.class);
+        Entity.registerEntity("Hoglin", EntityHoglin.class);
+        Entity.registerEntity("Piglin", EntityPiglin.class);
+        Entity.registerEntity("Zoglin", EntityZoglin.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
@@ -2277,6 +2287,7 @@ public class Server {
         Entity.registerEntity("VillagerV2", EntityVillagerV2.class);
         Entity.registerEntity("Fox", EntityFox.class);
         Entity.registerEntity("Bee", EntityBee.class);
+        Entity.registerEntity("Strider", EntityStrider.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("MinecartChest", EntityMinecartChest.class);
@@ -2377,6 +2388,9 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
+        this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
+        this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
+        this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {

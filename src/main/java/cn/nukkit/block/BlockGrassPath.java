@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
@@ -50,6 +51,9 @@ public class BlockGrassPath extends BlockGrass {
             if (up instanceof BlockAir || up instanceof BlockFlowable) {
                 item.useOn(this);
                 this.getLevel().setBlock(this, get(FARMLAND), true);
+                if (player != null) {
+                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                }
                 return true;
             }
         }

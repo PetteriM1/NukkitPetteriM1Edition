@@ -60,8 +60,10 @@ public class Nukkit {
         System.setProperty("leveldb.mmap", "true");
 
         boolean loadPlugins = true;
+        boolean debug = false;
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("-DEBUG")) {
+        if (args.length > 0 && args[0].equalsIgnoreCase("-debug")) {
+            debug = true;
             InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
             System.out.print("Debug stuff enabled!\n");
@@ -73,7 +75,7 @@ public class Nukkit {
             if (TITLE) {
                 System.out.print("\u001B]0;Nukkit PetteriM1 Edition\u0007");
             }
-            new Server(PATH, DATA_PATH, PLUGIN_PATH, loadPlugins);
+            new Server(PATH, DATA_PATH, PLUGIN_PATH, loadPlugins, debug);
         } catch (Throwable t) {
             log.throwing(t);
         }

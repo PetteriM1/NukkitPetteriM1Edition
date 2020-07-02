@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.generator.object.ObjectTallGrass;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.NukkitRandom;
@@ -60,6 +61,9 @@ public class BlockGrass extends BlockDirt {
             if (up instanceof BlockAir || up instanceof BlockFlowable) {
                 item.useOn(this);
                 this.getLevel().setBlock(this, Block.get(FARMLAND));
+                if (player != null) {
+                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                }
                 return true;
             }
         } else if (item.isShovel()) {
@@ -67,6 +71,9 @@ public class BlockGrass extends BlockDirt {
             if (up instanceof BlockAir || up instanceof BlockFlowable) {
                 item.useOn(this);
                 this.getLevel().setBlock(this, Block.get(GRASS_PATH));
+                if (player != null) {
+                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                }
                 return true;
             }
         }
