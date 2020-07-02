@@ -35,6 +35,7 @@ import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.CraftingTransaction;
+import cn.nukkit.inventory.transaction.EnchantTransaction;
 import cn.nukkit.inventory.transaction.InventoryTransaction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.data.ReleaseItemData;
@@ -153,6 +154,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected PlayerUIInventory playerUIInventory;
     protected CraftingGrid craftingGrid;
     protected CraftingTransaction craftingTransaction;
+    protected EnchantTransaction enchantTransaction;
 
     protected long randomClientId;
 
@@ -2861,6 +2863,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             Server.broadcastPacket(this.getViewers().values(), entityEventPacket);
                             break;
                         case EntityEventPacket.ENCHANT:
+                            if (this.protocol >= ProtocolInfo.v1_16_0) {
+                                break;
+                            }
+
                             if (entityEventPacket.eid != this.id) {
                                 break;
                             }
@@ -3096,7 +3102,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                             this.craftingTransaction = null;
                         }
-
+                        return;
+                    } else if (this.protocol >= ProtocolInfo.v1_16_0 && transactionPacket.isEnchantingPart) {
+                        if (this.enchantTransaction == null) {
+                            this.enchantTransaction = new EnchantTransaction(this, actions);
+                        } else {
+                            for (InventoryAction action : actions) {
+                                this.enchantTransaction.addAction(action);
+                            }
+                        }
+                        if (this.enchantTransaction.canExecute()) {
+                            this.enchantTransaction.execute();
+                            this.enchantTransaction = null;
+                        }
                         return;
                     } else if (this.craftingTransaction != null) {
                         if (craftingTransaction.checkForCraftingPart(actions)) {
@@ -3106,7 +3124,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             return;
                         } else {
                             this.server.getLogger().debug("Got unexpected normal inventory action with incomplete crafting transaction from " + this.username + ", refusing to execute crafting");
+                            if (this.protocol >= ProtocolInfo.v1_16_0) {
+                                this.removeAllWindows(false);
+                                this.sendAllInventories();
+                            }
                             this.craftingTransaction = null;
+                        }
+                    } else if (this.protocol >= ProtocolInfo.v1_16_0 && this.enchantTransaction != null) {
+                        if (enchantTransaction.checkForEnchantPart(actions)) {
+                            for (InventoryAction action : actions) {
+                                enchantTransaction.addAction(action);
+                            }
+                            return;
+                        } else {
+                            this.server.getLogger().debug("Got unexpected normal inventory action with incomplete enchanting transaction from " + this.username + ", refusing to execute enchant " + transactionPacket.toString());
+                            this.removeAllWindows(false);
+                            this.sendAllInventories();
+                            this.enchantTransaction = null;
                         }
                     }
 
