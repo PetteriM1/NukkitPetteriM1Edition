@@ -1735,8 +1735,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.processMovement(tickDiff);
             this.motionX = this.motionY = this.motionZ = 0; // HACK: fix player knockback being messed up
 
-            if (!this.isSpectator()) {
-                this.checkNearEntities();
+            if (currentTick % 2 == 0) {
+                if (!this.isSpectator()) {
+                    this.checkNearEntities();
+                }
             }
 
             this.entityBaseTick(tickDiff);
@@ -1822,8 +1824,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     private void updateBlockingFlag() {
-        boolean shieldInHand = this.getInventory().getItemInHand().getId() == ItemID.SHIELD;
-        boolean shieldInOffhand = this.getOffhandInventory().getItem(0).getId() == ItemID.SHIELD;
+        boolean shieldInHand = this.getInventory().getItemInHandFast().getId() == ItemID.SHIELD;
+        boolean shieldInOffhand = this.getOffhandInventory().getItemFast(0).getId() == ItemID.SHIELD;
         if (isBlocking()) {
             if (!isSneaking() || (!shieldInHand && !shieldInOffhand)) {
                 this.setBlocking(false);
