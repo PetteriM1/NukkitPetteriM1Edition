@@ -2472,7 +2472,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isOnLadder() {
-        int b = this.getLevelBlock().getId();
+        int b = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
         return b == Block.LADDER || b == Block.VINES;
     }
 

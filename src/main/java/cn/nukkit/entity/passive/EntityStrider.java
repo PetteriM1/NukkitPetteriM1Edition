@@ -40,9 +40,4 @@ public class EntityStrider extends EntityWalkingAnimal {
     public float getHeight() {
         return 1.7f;
     }
-
-    @Override
-    public String getName() {
-        return "Strider";
-    }
 }

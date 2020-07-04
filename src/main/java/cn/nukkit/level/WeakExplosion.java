@@ -31,61 +31,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Angelic47
- * Nukkit Project
+ * Explosion that can't break stone (for fireballs)
  */
-public class Explosion {
+public class WeakExplosion extends Explosion {
 
-    private static final int rays = 16;
     private final Level level;
     private final Position source;
     private final double size;
-
-    private List<Block> affectedBlocks = new ArrayList<>();
-    private static final double stepLen = 0.3d;
-
     private final Object what;
+    private List<Block> affectedBlocks = new ArrayList<>();
 
-    public Explosion(Position center, double size, Entity what) {
+    public WeakExplosion(Position center, double size, Entity what) {
+        super(center, size, what);
         this.level = center.getLevel();
         this.source = center;
         this.size = Math.max(size, 0);
         this.what = what;
     }
 
-    /**
-     * @return bool
-     */
-    public boolean explode() {
-        if (explodeA()) {
-            return explodeB();
-        }
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
+    @Override
     public boolean explodeA() {
-        if (this.size < 0.1) {
-            return false;
-        }
-
+        if (this.size < 0.1) return false;
+        if (!level.getServer().explosionBreakBlocks) return false;
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
-
-        int mRays = 15;
-        for (int i = 0; i < rays; ++i) {
-            for (int j = 0; j < rays; ++j) {
-                for (int k = 0; k < rays; ++k) {
-                    if (i == 0 || i == mRays || j == 0 || j == mRays || k == 0 || k == mRays) {
-                        vector.setComponents((double) i / (double) mRays * 2d - 1, (double) j / (double) mRays * 2d - 1, (double) k / (double) mRays * 2d - 1);
+        for (int i = 0; i < 16; ++i) {
+            for (int j = 0; j < 16; ++j) {
+                for (int k = 0; k < 16; ++k) {
+                    if (i == 0 || i == 15 || j == 0 || j == 15 || k == 0 || k == 15) {
+                        vector.setComponents((double) i / (double) 15 * 2d - 1, (double) j / (double) 15 * 2d - 1, (double) k / (double) 15 * 2d - 1);
                         double len = vector.length();
-                        vector.setComponents((vector.x / len) * stepLen, (vector.y / len) * stepLen, (vector.z / len) * stepLen);
+                        vector.setComponents((vector.x / len) * 0.3d, (vector.y / len) * 0.3d, (vector.z / len) * 0.3d);
                         double pointerX = this.source.x;
                         double pointerY = this.source.y;
                         double pointerZ = this.source.z;
-
                         for (double blastForce = this.size * (Utils.random.nextInt(700, 1301)) / 1000d; blastForce > 0; blastForce -= 0.22499999999999998) {
                             int x = (int) pointerX;
                             int y = (int) pointerY;
@@ -97,14 +76,11 @@ public class Explosion {
                                 break;
                             }
                             Block block = this.level.getBlock(vBlock);
-
-                            if (block.getId() != 0 && block.getId() != 7) {
-                                blastForce -= (block.getResistance() / 5 + 0.3d) * stepLen;
+                            if (block.getId() != 0 && block.getResistance() < 20) {
+                                blastForce -= (block.getResistance() / 5 + 0.3d) * 0.3d;
                                 if (blastForce > 0) {
-                                    if (level.getServer().explosionBreakBlocks) {
-                                        if (!this.affectedBlocks.contains(block)) {
-                                            this.affectedBlocks.add(block);
-                                        }
+                                    if (!this.affectedBlocks.contains(block)) {
+                                        this.affectedBlocks.add(block);
                                     }
                                 }
                             }
@@ -116,14 +92,13 @@ public class Explosion {
                 }
             }
         }
-
         return true;
     }
 
+    @Override
     public boolean explodeB() {
         LongArraySet updateBlocks = new LongArraySet();
         double yield = (1d / this.size) * 100d;
-
         if (this.what instanceof Entity) {
             EntityExplodeEvent ev = new EntityExplodeEvent((Entity) this.what, this.source, this.affectedBlocks, yield);
             this.level.getServer().getPluginManager().callEvent(ev);
@@ -134,7 +109,6 @@ public class Explosion {
                 this.affectedBlocks = ev.getBlockList();
             }
         }
-
         double explosionSize = this.size * 2d;
         double minX = NukkitMath.floorDouble(this.source.x - explosionSize - 1);
         double maxX = NukkitMath.ceilDouble(this.source.x + explosionSize + 1);
@@ -142,19 +116,15 @@ public class Explosion {
         double maxY = NukkitMath.ceilDouble(this.source.y + explosionSize + 1);
         double minZ = NukkitMath.floorDouble(this.source.z - explosionSize - 1);
         double maxZ = NukkitMath.ceilDouble(this.source.z + explosionSize + 1);
-
         AxisAlignedBB explosionBB = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
-
         Entity[] list = this.level.getNearbyEntities(explosionBB, this.what instanceof Entity ? (Entity) this.what : null);
         for (Entity entity : list) {
             double distance = entity.distance(this.source) / explosionSize;
-
             if (distance <= 1) {
                 Vector3 motion = entity.subtract(this.source).normalize();
                 int exposure = 1;
                 double impact = (1 - distance) * exposure;
-                int damage = (int) (((impact * impact + impact) / 2) * 8 * explosionSize + 1);
-
+                int damage = (int) (((impact * impact + impact) / 2) * 5 * explosionSize + 1);
                 if (this.what instanceof Entity) {
                     entity.attack(new EntityDamageByEntityEvent((Entity) this.what, entity, DamageCause.ENTITY_EXPLOSION, damage));
                 } else if (this.what instanceof Block) {
@@ -162,16 +132,13 @@ public class Explosion {
                 } else {
                     entity.attack(new EntityDamageEvent(entity, DamageCause.BLOCK_EXPLOSION, damage));
                 }
-
                 if (!(entity instanceof EntityItem || entity instanceof EntityXPOrb)) {
                     entity.setMotion(motion.multiply(impact));
                 }
             }
         }
-
         ItemBlock air = new ItemBlock(Block.get(BlockID.AIR));
         BlockEntity container;
-
         for (Block block : this.affectedBlocks) {
             if (block.getId() == Block.TNT) {
                 ((BlockTNT) block).prime(Utils.rand(10, 30), this.what instanceof Entity ? (Entity) this.what : null);
@@ -195,11 +162,8 @@ public class Explosion {
                     this.level.dropItem(block.add(0.5, 0.5, 0.5), drop);
                 }
             }
-
-            this.level.setBlockAt((int) block.x, (int) block.y, (int) block.z, Block.AIR);
-
+            this.level.setBlockAt((int) block.x, (int) block.y, (int) block.z, BlockID.AIR);
             Vector3 pos = new Vector3(block.x, block.y, block.z);
-
             for (BlockFace side : BlockFace.values()) {
                 Vector3 sideBlock = pos.getSide(side);
                 long index = Hash.hashBlock((int) sideBlock.x, (int) sideBlock.y, (int) sideBlock.z);
@@ -213,7 +177,6 @@ public class Explosion {
                 }
             }
         }
-
         this.level.addParticle(new HugeExplodeSeedParticle(this.source));
         this.level.addLevelSoundEvent(source, LevelSoundEventPacket.SOUND_EXPLODE);
         return true;
