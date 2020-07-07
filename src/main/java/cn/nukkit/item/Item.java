@@ -308,7 +308,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             }
         }
 
-        Server.getInstance().getScheduler().scheduleTask(null, Item::initCreativeItems, true);
+        initCreativeItems();
     }
 
     private static final ArrayList<Item> creative137 = new ArrayList<>();

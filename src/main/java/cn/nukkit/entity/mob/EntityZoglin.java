@@ -43,11 +43,6 @@ public class EntityZoglin extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "Zoglin";
-    }
-
-    @Override
     public void attackEntity(Entity player) {
         //TODO
     }

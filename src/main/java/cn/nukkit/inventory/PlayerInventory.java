@@ -219,6 +219,10 @@ public class PlayerInventory extends BaseInventory {
         return this.getItem(this.getSize() + 3);
     }
 
+    public Item getBootsFast() {
+        return this.getItemFast(39);
+    }
+
     public boolean setHelmet(Item helmet) {
         return this.setItem(this.getSize(), helmet);
     }

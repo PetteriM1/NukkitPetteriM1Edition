@@ -93,6 +93,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -1620,7 +1621,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         // Frost Walker
         if (!revert && delta > 0.0001d) {
-            Enchantment frostWalker = inventory.getBoots().getEnchantment(Enchantment.ID_FROST_WALKER);
+            Enchantment frostWalker = inventory.getBootsFast().getEnchantment(Enchantment.ID_FROST_WALKER);
             if (frostWalker != null && frostWalker.getLevel() > 0 && !this.isSpectator() && this.y >= 1 && this.y <= 255) {
                 int radius = 2 + frostWalker.getLevel();
                 for (int coordX = this.getFloorX() - radius; coordX < this.getFloorX() + radius + 1; coordX++) {
@@ -2096,7 +2097,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.getAddress(),
                 String.valueOf(this.getPort())));
 
-        this.getServer().getScheduler().scheduleTask(null, () -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 if (!this.connected) return;
                 if (this.protocol >= 313) {
@@ -2144,7 +2145,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.close("", "Internal Server Error");
                 getServer().getLogger().logException(e);
             }
-        }, true);
+        });
 
         this.setEnableClientCommand(true);
 
@@ -5375,7 +5376,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         super.onBlock(entity, animate);
         if (animate) {
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHIELD_SHAKING, true);
-            this.getServer().getScheduler().scheduleTask(null, ()-> {
+            CompletableFuture.runAsync(() -> {
                 if (this.isOnline()) {
                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHIELD_SHAKING, false);
                 }

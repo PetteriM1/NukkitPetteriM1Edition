@@ -42,11 +42,6 @@ public class EntityPiglin extends EntityWalkingMob {
     }
 
     @Override
-    public String getName() {
-        return "Piglin";
-    }
-
-    @Override
     public void attackEntity(Entity player) {
         //TODO
     }
