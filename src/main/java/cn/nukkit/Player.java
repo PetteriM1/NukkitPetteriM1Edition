@@ -5350,7 +5350,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         super.onBlock(entity, animate);
         if (animate) {
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHIELD_SHAKING, true);
-            CompletableFuture.runAsync(() -> {
+            this.getServer().getScheduler().scheduleTask(null, ()-> {
                 if (this.isOnline()) {
                     this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHIELD_SHAKING, false);
                 }
