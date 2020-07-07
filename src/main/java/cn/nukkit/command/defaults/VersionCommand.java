@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created on 2015/11/12 by xtypr.
@@ -40,7 +41,7 @@ public class VersionCommand extends VanillaCommand {
             sender.sendMessage("§e###############################################\n§cNukkit §aPetteriM1 Edition\n§6Build: §b" + Nukkit.VERSION + "\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§dhttps://github.com/PetteriM1/NukkitPetteriM1Edition\n§e###############################################");
 
             if (sender.isOp()) {
-                sender.getServer().getScheduler().scheduleTask(() -> {
+                CompletableFuture.runAsync(() -> {
                     try {
                         URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                         request.connect();
@@ -54,7 +55,7 @@ public class VersionCommand extends VanillaCommand {
                             sender.sendMessage("\u00A7aYou are running the latest version.");
                         }
                     } catch (Exception ignore) {}
-                }, true);
+                });
             }
         } else {
             StringBuilder pluginName = new StringBuilder();

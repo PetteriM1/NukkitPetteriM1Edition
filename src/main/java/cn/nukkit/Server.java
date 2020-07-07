@@ -82,6 +82,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -480,7 +481,7 @@ public class Server {
         }
 
         // Check for updates
-        this.scheduler.scheduleTask(null, () -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
@@ -499,7 +500,7 @@ public class Server {
             } catch (Exception ignore) {
                 this.getLogger().debug("Update check failed");
             }
-        }, true);
+        });
 
         this.start();
     }
@@ -630,7 +631,7 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            getScheduler().scheduleTask(null, () -> {
+            CompletableFuture.runAsync(() -> {
                 byte[][] payload = new byte[(packets.length << 1)][];
                 int size = 0;
                 for (int i = 0; i < packets.length; i++) {
@@ -670,7 +671,7 @@ public class Server {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            }, true);
+            });
         } else {
             if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.startTiming();
             byte[][] payload = new byte[(packets.length << 1)][];

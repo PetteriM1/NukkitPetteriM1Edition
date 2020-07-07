@@ -104,7 +104,11 @@ public class ItemBucket extends Item {
                         Item clone = this.clone();
                         clone.setCount(this.getCount() - 1);
                         player.getInventory().setItemInHand(clone);
-                        player.getInventory().addItem(ev.getItem());
+                        if (player.getInventory().canAddItem(ev.getItem())) {
+                            player.getInventory().addItem(ev.getItem());
+                        } else {
+                            player.dropItem(ev.getItem());
+                        }
                     }
 
                     if (target instanceof BlockLava) {
@@ -136,7 +140,11 @@ public class ItemBucket extends Item {
                     Item clone = this.clone();
                     clone.setCount(this.getCount() - 1);
                     player.getInventory().setItemInHand(clone);
-                    player.getInventory().addItem(ev.getItem());
+                    if (player.getInventory().canAddItem(ev.getItem())) {
+                        player.getInventory().addItem(ev.getItem());
+                    } else {
+                        player.dropItem(ev.getItem());
+                    }
                 }
 
                 if (this.getDamage() == 10) {
