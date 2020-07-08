@@ -139,10 +139,11 @@ public class Nukkit {
         return ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME).getLevel();
     }
 
-    public static boolean isMasterBranchBuild() {
-        if (GIT_INFO == null || (GIT_INFO.getProperty("git.branch")) == null) {
-            return false;
+    public static String getBranch() {
+        String branch;
+        if (GIT_INFO == null || (branch = GIT_INFO.getProperty("git.branch")) == null) {
+            return "null";
         }
-        return GIT_INFO.getProperty("git.branch").equals("master");
+        return branch;
     }
 }
