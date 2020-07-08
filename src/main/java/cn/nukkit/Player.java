@@ -2725,7 +2725,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_OPEN_INVENTORY:
-                            if (this.protocol >= 407) {
+                            if (this.protocol >= 407 && this.spawned) {
                                 this.inventory.sendInventory();
                             }
                             break;
