@@ -37,6 +37,8 @@ public abstract class BaseInventory implements Inventory {
 
     protected InventoryHolder holder;
 
+    Item air;
+
     public BaseInventory(InventoryHolder holder, InventoryType type) {
         this(holder, type, new HashMap<>());
     }
@@ -50,6 +52,8 @@ public abstract class BaseInventory implements Inventory {
     }
 
     public BaseInventory(InventoryHolder holder, InventoryType type, Map<Integer, Item> items, Integer overrideSize, String overrideTitle) {
+        air = new ItemBlock(Block.get(BlockID.AIR, null), 0, 0);
+
         this.holder = holder;
 
         this.type = type;
@@ -100,6 +104,10 @@ public abstract class BaseInventory implements Inventory {
     @Override
     public Item getItem(int index) {
         return this.slots.containsKey(index) ? this.slots.get(index).clone() : new ItemBlock(Block.get(BlockID.AIR), null, 0);
+    }
+
+    public Item getItemFast(int index) {
+        return this.slots.containsKey(index) ? this.slots.get(index) : air;
     }
 
     @Override

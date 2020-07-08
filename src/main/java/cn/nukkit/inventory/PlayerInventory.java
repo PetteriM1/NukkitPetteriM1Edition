@@ -119,6 +119,15 @@ public class PlayerInventory extends BaseInventory {
         }
     }
 
+    public Item getItemInHandFast() {
+        Item item = this.getItemFast(this.getHeldItemIndex());
+        if (item != null) {
+            return item;
+        } else {
+            return air;
+        }
+    }
+
     public boolean setItemInHand(Item item) {
         return this.setItem(this.itemInHandIndex, item);
     }
@@ -208,6 +217,10 @@ public class PlayerInventory extends BaseInventory {
 
     public Item getBoots() {
         return this.getItem(this.getSize() + 3);
+    }
+
+    public Item getBootsFast() {
+        return this.getItemFast(39);
     }
 
     public boolean setHelmet(Item helmet) {

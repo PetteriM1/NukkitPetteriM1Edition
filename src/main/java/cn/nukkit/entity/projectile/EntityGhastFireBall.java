@@ -7,7 +7,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
 import cn.nukkit.level.GameRule;
-import cn.nukkit.level.SmallExplosion;
+import cn.nukkit.level.WeakExplosion;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -103,7 +103,7 @@ public class EntityGhastFireBall extends EntityProjectile implements EntityExplo
         ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 1.2);
         this.server.getPluginManager().callEvent(ev);
         if (!ev.isCancelled()) {
-            SmallExplosion explosion = new SmallExplosion(this, (float) ev.getForce(), this.shootingEntity);
+            WeakExplosion explosion = new WeakExplosion(this, (float) ev.getForce(), this.shootingEntity);
             if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
                 explosion.explodeA();
             }

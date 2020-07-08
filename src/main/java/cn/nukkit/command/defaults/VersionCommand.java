@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created on 2015/11/12 by xtypr.
@@ -37,10 +38,10 @@ public class VersionCommand extends VanillaCommand {
             return true;
         }
         if (args.length == 0) {
-            sender.sendMessage("§e###############################################\n§cNukkit §aPetteriM1 Edition\n§6Build: §b" + Nukkit.VERSION + "\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§dhttps://github.com/PetteriM1/NukkitPetteriM1Edition\n§e###############################################");
+            sender.sendMessage("§e###############################################\n§cNukkit §aPetteriM1 Edition\n§6Build: §b" + Nukkit.getBranch() + '/' + Nukkit.VERSION.substring(4) + "\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§dhttps://github.com/PetteriM1/NukkitPetteriM1Edition\n§e###############################################");
 
             if (sender.isOp()) {
-                sender.getServer().getScheduler().scheduleTask(() -> {
+                CompletableFuture.runAsync(() -> {
                     try {
                         URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                         request.connect();
@@ -48,13 +49,14 @@ public class VersionCommand extends VanillaCommand {
                         String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
                         content.close();
 
-                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
+                        boolean isMaster = Nukkit.getBranch().equals("master");
+                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null") && isMaster) {
                             sender.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + sender.getServer().getNukkitVersion() + " Latest: " + latest);
-                        } else if (Nukkit.isMasterBranchBuild()) {
+                        } else if (isMaster) {
                             sender.sendMessage("\u00A7aYou are running the latest version.");
                         }
                     } catch (Exception ignore) {}
-                }, true);
+                });
             }
         } else {
             StringBuilder pluginName = new StringBuilder();
