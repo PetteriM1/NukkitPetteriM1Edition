@@ -20,11 +20,21 @@ public class SimpleChunkManager implements ChunkManager {
 
     @Override
     public int getBlockIdAt(int x, int y, int z) {
+        return this.getBlockIdAt(x, y, z, 0);
+    }
+
+    @Override
+    public int getBlockIdAt(int x, int y, int z, int layer) {
         FullChunk chunk = this.getChunk(x >> 4, z >> 4);
         if (chunk != null) {
-            return chunk.getBlockId(x & 0xf, y & 0xff, z & 0xf);
+            return chunk.getBlockId(x & 0xf, y & 0xff, z & 0xf, layer);
         }
         return 0;
+    }
+
+    @Override
+    public void setBlockFullIdAt(int x, int y, int z, int layer, int fullId) {
+        //noop
     }
 
     @Override
@@ -33,6 +43,11 @@ public class SimpleChunkManager implements ChunkManager {
         if (chunk != null) {
             chunk.setBlockId(x & 0xf, y & 0xff, z & 0xf, id);
         }
+    }
+
+    @Override
+    public boolean setBlockAtLayer(int x, int y, int z, int layer, int id, int data) {
+        return false; //TODO: layers
     }
 
     @Override
@@ -52,19 +67,34 @@ public class SimpleChunkManager implements ChunkManager {
     }
 
     @Override
+    public void setBlockIdAt(int x, int y, int z, int layer, int id) {
+
+    }
+
+    @Override
     public int getBlockDataAt(int x, int y, int z) {
+       return this.getBlockDataAt(x, y, z, 0);
+    }
+
+    @Override
+    public int getBlockDataAt(int x, int y, int z, int layer) {
         FullChunk chunk = this.getChunk(x >> 4, z >> 4);
         if (chunk != null) {
-            return chunk.getBlockData(x & 0xf, y & 0xff, z & 0xf);
+            return chunk.getBlockData(x & 0xf, y & 0xff, z & 0xf, layer);
         }
         return 0;
     }
 
     @Override
     public void setBlockDataAt(int x, int y, int z, int data) {
+        this.setBlockDataAt(x, y, z, 0, data);
+    }
+
+    @Override
+    public void setBlockDataAt(int x, int y, int z, int layer, int data) {
         FullChunk chunk = this.getChunk(x >> 4, z >> 4);
         if (chunk != null) {
-            chunk.setBlockData(x & 0xf, y & 0xff, z & 0xf, data);
+            chunk.setBlockData(x & 0xf, y & 0xff, z & 0xf, data, layer);
         }
     }
 

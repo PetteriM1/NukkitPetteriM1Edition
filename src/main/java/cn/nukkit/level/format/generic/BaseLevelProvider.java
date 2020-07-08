@@ -303,17 +303,8 @@ public abstract class BaseLevelProvider implements LevelProvider {
 
     @Override
     public void saveLevelData() {
-        String file = this.path + "level.dat";
-        File old = new File(file);
-        if (old.exists()) {
-            try {
-                com.google.common.io.Files.copy(old, new File(file + ".bak"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         try {
-            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), new FileOutputStream(file));
+            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), new FileOutputStream(this.getPath() + "level.dat"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -451,6 +442,6 @@ public abstract class BaseLevelProvider implements LevelProvider {
     @Override
     public boolean isChunkGenerated(int chunkX, int chunkZ) {
         BaseRegionLoader region = this.getRegion(chunkX >> 5, chunkZ >> 5);
-        return region != null && region.chunkExists(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5)) && this.getChunk(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5), true).isGenerated();
+        return region != null && region.chunkExists(chunkX - region.getX() * 32, chunkZ - region.getZ() * 32) && this.getChunk(chunkX - region.getX() * 32, chunkZ - region.getZ() * 32, true).isGenerated();
     }
 }

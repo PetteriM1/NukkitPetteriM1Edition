@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * @author MagicDroidX
+ * author: MagicDroidX
  * Nukkit Project
  */
 public class Anvil extends BaseLevelProvider {
-
+    public static final int VERSION = 19133;
     static private final byte[] PAD_256 = new byte[256];
 
     public Anvil(Level level, String path) throws IOException {
@@ -75,6 +75,7 @@ public class Anvil extends BaseLevelProvider {
 
         CompoundTag levelData = new CompoundTag("Data")
                 .putCompound("GameRules", new CompoundTag())
+
                 .putLong("DayTime", 0)
                 .putInt("GameType", 0)
                 .putString("generatorName", Generator.getGeneratorName(generator))
@@ -92,7 +93,7 @@ public class Anvil extends BaseLevelProvider {
                 .putInt("SpawnZ", 128)
                 .putBoolean("thundering", false)
                 .putInt("thunderTime", 0)
-                .putInt("version", 19133)
+                .putInt("version", VERSION)
                 .putLong("Time", 0)
                 .putLong("SizeOnDisk", 0);
 
@@ -157,12 +158,15 @@ public class Anvil extends BaseLevelProvider {
             stream.putByte((byte) subChunkCount);
         }
         for (int i = 0; i < subChunkCount; i++) {
-            if (protocol < ProtocolInfo.v1_13_0) {
+            stream.put(sections[i].getBytes(protocol));
+
+            //TODO: support older chunks
+            /*if (protocol < ProtocolInfo.v1_13_0) {
                 stream.putByte((byte) 0);
                 stream.put(sections[i].getBytes());
             } else {
                 sections[i].writeTo(protocol, stream);
-            }
+            }*/
         }
         if (protocol < ProtocolInfo.v1_12_0) {
             for (byte height : chunk.getHeightMapArray()) {
@@ -203,6 +207,7 @@ public class Anvil extends BaseLevelProvider {
                 BaseFullChunk chunk = iter.next();
                 if (chunk == null) continue;
                 if (chunk.isGenerated() && chunk.isPopulated() && chunk instanceof Chunk) {
+                    Chunk anvilChunk = (Chunk) chunk;
                     chunk.compress();
                     if (System.currentTimeMillis() - start >= time) break;
                 }
@@ -219,7 +224,7 @@ public class Anvil extends BaseLevelProvider {
         if (this.level.timings.syncChunkLoadDataTimer != null) this.level.timings.syncChunkLoadDataTimer.startTiming();
         BaseFullChunk chunk;
         try {
-            chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
+            chunk = region.readChunk(chunkX - regionX * 32, chunkZ - regionZ * 32); //TODO: check
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -290,5 +295,10 @@ public class Anvil extends BaseLevelProvider {
             lastRegion.set(region);
             return region;
         }
+    }
+    
+    @Override
+    public int getMaximumLayer() {
+        return 1;
     }
 }

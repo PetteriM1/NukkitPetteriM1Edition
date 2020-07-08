@@ -30,6 +30,11 @@ import java.util.Optional;
  */
 public abstract class Block extends Position implements Metadatable, Cloneable, BlockID {
 
+    public static final int MAX_BLOCK_ID = 600;
+    public static final int DATA_BITS = 6;
+    public static final int DATA_SIZE = 1 << DATA_BITS;
+    public static final int DATA_MASK = DATA_SIZE - 1;
+
     @SuppressWarnings("rawtypes")
     public static Class[] list = null;
     public static Block[] fullList = null;
@@ -38,6 +43,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static boolean[] solid = null;
     public static double[] hardness = null;
     public static boolean[] transparent = null;
+    public static boolean[] diffusesSkyLight = null;
+
     public AxisAlignedBB boundingBox = null;
     public AxisAlignedBB collisionBoundingBox = null;
     public static boolean[] hasMeta = null;
@@ -47,14 +54,15 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     @SuppressWarnings("unchecked")
     public static void init() {
         if (list == null) {
-            list = new Class[256];
-            fullList = new Block[4096];
-            light = new int[256];
-            lightFilter = new int[256];
-            solid = new boolean[256];
-            hardness = new double[256];
-            transparent = new boolean[256];
-            hasMeta = new boolean[256];
+            list = new Class[MAX_BLOCK_ID];
+            fullList = new Block[MAX_BLOCK_ID * 16];
+            light = new int[MAX_BLOCK_ID];
+            lightFilter = new int[MAX_BLOCK_ID];
+            solid = new boolean[MAX_BLOCK_ID];
+            hardness = new double[MAX_BLOCK_ID];
+            transparent = new boolean[MAX_BLOCK_ID];
+            diffusesSkyLight = new boolean[MAX_BLOCK_ID];
+            hasMeta = new boolean[MAX_BLOCK_ID];
 
             list[AIR] = BlockAir.class; //0
             list[STONE] = BlockStone.class; //1
@@ -311,7 +319,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[HARD_STAINED_GLASS] = BlockHardGlassStained.class; //254
             list[RESERVED6] = BlockReserved6.class; //255
 
-            for (int id = 0; id < 256; id++) {
+            list[PRISMARINE_STAIRS] = BlockStairsPrismarine.class; //257
+            list[BARRIER] = BlockBarrier.class; //416
+
+            for (int id = 0; id < MAX_BLOCK_ID; id++) {
                 Class<?> c = list[id];
                 if (c != null) {
                     Block block;
@@ -340,6 +351,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
                     solid[id] = block.isSolid();
                     transparent[id] = block.isTransparent();
+                    diffusesSkyLight[id] = block.diffusesSkyLight();
                     hardness[id] = block.getHardness();
                     light[id] = block.getLightLevel();
 
@@ -367,38 +379,103 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public static Block get(int id) {
-        return fullList[id << 4].clone();
+        if (id < 0) {
+            id = 255 - id;
+        }
+        return fullList[id << DATA_BITS].clone();
     }
 
     public static Block get(int id, Integer meta) {
-      if (meta != null) {
-            return fullList[(id << 4) + meta].clone();
+        if (id < 0) {
+            id = 255 - id;
+        }
+        if (meta != null) {
+            int iMeta = meta;
+            if (iMeta <= DATA_SIZE) {
+                return fullList[(id << DATA_BITS) | meta].clone();
+            } else {
+                Block block = fullList[id << DATA_BITS].clone();
+                block.setDamage(iMeta);
+                return block;
+            }
         } else {
-            return fullList[id << 4].clone();
+            return fullList[id << DATA_BITS].clone();
         }
     }
 
     public static Block get(int id, Integer meta, Position pos) {
-        Block block = fullList[(id << 4) | (meta == null ? 0 : meta)].clone();
+        return get(id, meta, pos, 0);
+    }
+
+    public static Block get(int id, Integer meta, Position pos, int layer) {
+        if (id < 0) {
+            id = 255 - id;
+        }
+
+        Block block;
+        if (meta != null && meta > DATA_SIZE) {
+            block = fullList[id << DATA_BITS].clone();
+            block.setDamage(meta);
+        } else {
+            block = fullList[(id << DATA_BITS) | (meta == null ? 0 : meta)].clone();
+        }
+
         if (pos != null) {
             block.x = pos.x;
             block.y = pos.y;
             block.z = pos.z;
             block.level = pos.level;
+            //block.layer = layer; //TODO: layers
         }
         return block;
     }
 
     public static Block get(int id, int data) {
-        return fullList[(id << 4) + data].clone();
+        if (id < 0) {
+            id = 255 - id;
+        }
+        if (data < DATA_SIZE) {
+            return fullList[(id << DATA_BITS) | data].clone();
+        } else {
+            Block block = fullList[(id << DATA_BITS)].clone();
+            block.setDamage(data);
+            return block;
+        }
     }
 
+    @Deprecated
     public static Block get(int fullId, Level level, int x, int y, int z) {
+        return get(fullId, level, x, y, z, 0);
+    }
+
+    @Deprecated
+    public static Block get(int fullId, Level level, int x, int y, int z, int layer) {
         Block block = fullList[fullId].clone();
         block.x = x;
         block.y = y;
         block.z = z;
         block.level = level;
+        //block.layer = layer;
+        return block;
+    }
+
+    public static Block get(int id, int meta, Level level, int x, int y, int z) {
+        return get(id, meta, level, x, y, z, 0);
+    }
+
+    public static Block get(int id, int meta, Level level, int x, int y, int z, int layer) {
+        Block block;
+        if (meta <= DATA_SIZE) {
+            block = fullList[id << DATA_BITS | meta].clone();
+        } else {
+            block = fullList[id << DATA_BITS].clone();
+            block.setDamage(meta);
+        }
+        block.x = x;
+        block.y = y;
+        block.z = z;
+        block.level = level;
+        //block.layer = layer;
         return block;
     }
 
@@ -478,6 +555,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return true;
     }
 
+    public boolean diffusesSkyLight() {
+        return false;
+    }
+
     public boolean canBeFlowedInto() {
         return false;
     }
@@ -521,6 +602,15 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public abstract String getName();
 
     public abstract int getId();
+
+    public int getItemId() {
+        int id = getId();
+        if (id > 255) {
+            return 255 - id;
+        } else {
+            return id;
+        }
+    }
 
     /**
      * The full id is a combination of the id and data.

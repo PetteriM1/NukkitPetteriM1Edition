@@ -322,4 +322,7 @@ public interface BlockID {
     int HARD_GLASS = 253;
     int HARD_STAINED_GLASS = 254;
     int RESERVED6 = 255;
+
+    int PRISMARINE_STAIRS = 257;
+    int BARRIER = 416;
 }

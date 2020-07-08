@@ -15,9 +15,10 @@ import java.util.Map;
  */
 abstract public class BaseRegionLoader {
 
+    public static final int VERSION = 1;
     public static final byte COMPRESSION_GZIP = 1;
     public static final byte COMPRESSION_ZLIB = 2;
-    public static final int MAX_SECTOR_LENGTH = 1048576;
+    public static final int MAX_SECTOR_LENGTH = 256 << 12;
     public static final int COMPRESSION_LEVEL = 7;
 
     protected int x;
@@ -37,7 +38,7 @@ abstract public class BaseRegionLoader {
             this.x = regionX;
             this.z = regionZ;
             this.levelProvider = level;
-            String filePath = this.levelProvider.getPath() + "region/r." + regionX + '.' + regionZ + '.' + ext;
+            String filePath = this.levelProvider.getPath() + "region/r." + regionX + "." + regionZ + "." + ext;
             File file = new File(filePath);
             boolean exists = file.exists();
             if (!exists) {
@@ -56,6 +57,10 @@ abstract public class BaseRegionLoader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void compress() {
+        // TODO
     }
 
     public RandomAccessFile getRandomAccessFile() {

@@ -3,6 +3,8 @@ package cn.nukkit.level.format;
 import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.biome.Biome;
 
 import java.io.IOException;
 import java.util.Map;
@@ -32,25 +34,65 @@ public interface FullChunk extends Cloneable {
 
     void setProvider(LevelProvider provider);
 
+    @Deprecated
     int getFullBlock(int x, int y, int z);
+    
+    @Deprecated
+    int getFullBlock(int x, int y, int z, int layer);
 
-    Block getAndSetBlock(int x, int y, int z, Block block);
-
-    default boolean setFullBlockId(int x, int y, int z, int fullId) {
-        return setBlock(x, y, z, fullId >> 4, fullId & 0xF);
+    default int getBlockRuntimeId(int x, int y, int z) {
+        return getBlockRuntimeId(x, y, z, 0);
     }
 
-    boolean setBlock(int x, int y, int z, int  blockId);
+    default int getBlockRuntimeId(int x, int y, int z, int layer) {
+        return GlobalBlockPalette.getOrCreateRuntimeId(getBlockId(x, y, z, layer), getBlockData(x, y, z, layer));
+    }
+
+    default int[] getBlockState(int x, int y, int z) {
+        return getBlockState(x, y, z, 0);
+    }
+
+    default int[] getBlockState(int x, int y, int z, int layer) {
+        int full = getFullBlock(x, y, z, layer);
+        return new int[] { full >> Block.DATA_BITS, full & Block.DATA_MASK };
+    }
+
+    Block getAndSetBlock(int x, int y, int z, Block block);
+    Block getAndSetBlock(int x, int y, int z, int layer, Block block);
+
+    @Deprecated
+    default boolean setFullBlockId(int x, int y, int z, int fullId) {
+        return setFullBlockId(x, y, z, 0, fullId >> Block.DATA_BITS);
+    }
+
+    @Deprecated
+    default boolean setFullBlockId(int x, int y, int z, int layer, int fullId) {
+        return setBlockAtLayer(x, y, z, layer, fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK);
+    }
+
+    boolean setBlock(int x, int y, int z, int blockId);
+
+    boolean setBlockAtLayer(int x, int y, int z, int layer, int  blockId);
 
     boolean setBlock(int x, int y, int z, int  blockId, int  meta);
 
+    boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId, int  meta);
+
     int getBlockId(int x, int y, int z);
+
+    int getBlockId(int x, int y, int z, int layer);
 
     void setBlockId(int x, int y, int z, int id);
 
+    void setBlockId(int x, int y, int z, int layer, int id);
+
     int getBlockData(int x, int y, int z);
 
+    int getBlockData(int x, int y, int z, int layer);
+
     void setBlockData(int x, int y, int z, int data);
+
+    void setBlockData(int x, int y, int z, int layer, int data);
 
     int getBlockExtraData(int x, int y, int z);
 
@@ -73,6 +115,8 @@ public interface FullChunk extends Cloneable {
     void setHeightMap(int x, int z, int value);
 
     void recalculateHeightMap();
+
+    int recalculateHeightMapColumn(int chunkX, int chunkZ);
 
     void populateSkyLight();
 
@@ -146,9 +190,17 @@ public interface FullChunk extends Cloneable {
 
     byte[] getHeightMapArray();
 
-    byte[] getBlockIdArray();
+    byte[] getBlockIdArray(int layer);
 
-    byte[] getBlockDataArray();
+    default byte[] getBlockIdArray() {
+        return getBlockIdArray(0);
+    }
+
+    byte[] getBlockDataArray(int layer);
+
+    default byte[] getBlockDataArray() {
+        return getBlockDataArray(0);
+    }
 
     Map<Integer, Integer> getBlockExtraDataArray();
 
