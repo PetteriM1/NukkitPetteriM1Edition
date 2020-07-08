@@ -3313,8 +3313,15 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Position getSafeSpawn(Vector3 spawn) {
-        if (spawn == null || spawn.y < 1) {
+        if (spawn == null /*|| spawn.y < 1*/) {
             spawn = this.getSpawnLocation();
+        }
+
+        // Hack: Fix the y1 glitch, do not teleport players standing at y=1 to spawn on join
+        // For some reason player's y coord is 0.999 instead of 1 when they join
+        // This may need a better fix later
+        if (spawn.y < 1) {
+            spawn.y = 1.01;
         }
 
         if (spawn != null) {

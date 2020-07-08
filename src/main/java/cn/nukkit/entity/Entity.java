@@ -2,10 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockFire;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.block.BlockWater;
+import cn.nukkit.block.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
@@ -1812,8 +1809,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         AxisAlignedBB bb = block.getBoundingBox();
 
-        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.boundingBox);
-
+        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.boundingBox) && !(block instanceof BlockSlab); // The instanceof BlockSlab check is a hack to fix issues with the solid slab hack
     }
 
     public boolean isInsideOfFire() {
