@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
@@ -97,7 +97,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
             
             byte[] dataBytes = storageTag.getByteArray("Data");
             if (dataBytes.length == 0) {
-                dataBytes = new byte[BlockStorage.SECTION_SIZE / 2];
+                dataBytes = new byte[2048];
             } else {
                 hasBlockIds = true;
             }

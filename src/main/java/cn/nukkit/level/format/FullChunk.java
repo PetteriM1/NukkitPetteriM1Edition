@@ -4,7 +4,6 @@ import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.GlobalBlockPalette;
-import cn.nukkit.level.biome.Biome;
 
 import java.io.IOException;
 import java.util.Map;
@@ -34,10 +33,8 @@ public interface FullChunk extends Cloneable {
 
     void setProvider(LevelProvider provider);
 
-    @Deprecated
     int getFullBlock(int x, int y, int z);
     
-    @Deprecated
     int getFullBlock(int x, int y, int z, int layer);
 
     default int getBlockRuntimeId(int x, int y, int z) {
@@ -60,12 +57,10 @@ public interface FullChunk extends Cloneable {
     Block getAndSetBlock(int x, int y, int z, Block block);
     Block getAndSetBlock(int x, int y, int z, int layer, Block block);
 
-    @Deprecated
     default boolean setFullBlockId(int x, int y, int z, int fullId) {
         return setFullBlockId(x, y, z, 0, fullId >> Block.DATA_BITS);
     }
 
-    @Deprecated
     default boolean setFullBlockId(int x, int y, int z, int layer, int fullId) {
         return setBlockAtLayer(x, y, z, layer, fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK);
     }

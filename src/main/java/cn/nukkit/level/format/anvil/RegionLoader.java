@@ -78,7 +78,7 @@ public class RegionLoader extends BaseRegionLoader {
             return null;
         }
         } catch (EOFException e) {
-            MainLogger.getLogger().error("Your world is corrupt, because some code is bad and corrupted it. oops. ");
+            MainLogger.getLogger().error("Your world is corrupted because some code is bad and corrupted it");
             return null;
         }
     }
@@ -215,8 +215,8 @@ public class RegionLoader extends BaseRegionLoader {
         RandomAccessFile raf = this.getRandomAccessFile();
         raf.seek(0);
         this.lastSector = 1;
-        int[] data = new int[1024 * 2]; //1024 records * 2 times
-        for (int i = 0; i < 1024 * 2; i++) {
+        int[] data = new int[2048]; //1024 records * 2 times
+        for (int i = 0; i < 2048; i++) {
             data[i] = raf.readInt();
         }
         for (int i = 0; i < 1024; ++i) {

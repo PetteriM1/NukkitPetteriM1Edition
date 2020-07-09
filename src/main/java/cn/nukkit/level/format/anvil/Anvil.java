@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class Anvil extends BaseLevelProvider {
-    public static final int VERSION = 19133;
+
     static private final byte[] PAD_256 = new byte[256];
 
     public Anvil(Level level, String path) throws IOException {
@@ -93,7 +93,7 @@ public class Anvil extends BaseLevelProvider {
                 .putInt("SpawnZ", 128)
                 .putBoolean("thundering", false)
                 .putInt("thunderTime", 0)
-                .putInt("version", VERSION)
+                .putInt("version", 19133)
                 .putLong("Time", 0)
                 .putLong("SizeOnDisk", 0);
 
@@ -207,7 +207,6 @@ public class Anvil extends BaseLevelProvider {
                 BaseFullChunk chunk = iter.next();
                 if (chunk == null) continue;
                 if (chunk.isGenerated() && chunk.isPopulated() && chunk instanceof Chunk) {
-                    Chunk anvilChunk = (Chunk) chunk;
                     chunk.compress();
                     if (System.currentTimeMillis() - start >= time) break;
                 }
@@ -224,7 +223,7 @@ public class Anvil extends BaseLevelProvider {
         if (this.level.timings.syncChunkLoadDataTimer != null) this.level.timings.syncChunkLoadDataTimer.startTiming();
         BaseFullChunk chunk;
         try {
-            chunk = region.readChunk(chunkX - regionX * 32, chunkZ - regionZ * 32); //TODO: check
+            chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

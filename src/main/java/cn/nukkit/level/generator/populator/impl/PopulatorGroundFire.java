@@ -20,7 +20,7 @@ public class PopulatorGroundFire extends PopulatorSurfaceBlock {
 
     @Override
     protected int getBlockId(int x, int z, NukkitRandom random, FullChunk chunk) {
-        return 816;
+        return FIRE << Block.DATA_BITS;
     }
 
     @Override

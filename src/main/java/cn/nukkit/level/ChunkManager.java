@@ -3,7 +3,7 @@ package cn.nukkit.level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 
 /**
- * author: MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public interface ChunkManager {
@@ -11,10 +11,8 @@ public interface ChunkManager {
     int getBlockIdAt(int x, int y, int z, int layer);
     int getBlockIdAt(int x, int y, int z);
     
-    @Deprecated
     void setBlockFullIdAt(int x, int y, int z, int layer, int fullId);
 
-    @Deprecated
     void setBlockFullIdAt(int x, int y, int z, int fullId);
 
     void setBlockIdAt(int x, int y, int z, int layer, int id);

@@ -167,12 +167,10 @@ public class BlockStorage {
         setBlockData(index, data);
     }
 
-    @Deprecated
     public int getFullBlock(int x, int y, int z) {
         return this.getFullBlock(getIndex(x, y, z));
     }
 
-    @Deprecated
     public void setFullBlock(int x, int y, int z, int value) {
         this.setFullBlock(getIndex(x, y, z), value);
     }
@@ -189,22 +187,20 @@ public class BlockStorage {
         return new int[] {oldId, oldData};
     }
     
-    @Deprecated
     public int getAndSetFullBlock(int x, int y, int z, int value) {
         return this.getAndSetFullBlock(getIndex(x, y, z), value);
     }
 
-    @Deprecated
     private int getAndSetFullBlock(int index, int value) {
-        Preconditions.checkArgument(value < (0x1FF << Block.DATA_BITS | Block.DATA_MASK), "Invalid full block");
+        Preconditions.checkArgument(value < (32767), "Invalid full block");
         byte oldBlockExtra = hasBlockIdExtras? blockIdsExtra[index] : 0;
         byte oldBlock = hasBlockIds? blockIds[index] : 0;
         byte oldData = hasBlockIds? blockData.get(index) : 0;
         byte oldDataExtra = hasBlockDataExtras? blockDataExtra.get(index) : 0;
-        byte newBlockExtra = (byte) ((value >> (Block.DATA_BITS + 8)) & 0xFF);
+        byte newBlockExtra = (byte) ((value >> (14)) & 0xFF);
         byte newBlock = (byte) ((value >> Block.DATA_BITS) & 0xFF);
         byte newData = (byte) (value & 0xf);
-        byte newDataExtra = (byte) (value >> 4 & Block.DATA_MASK >> 4 & 0xF);
+        byte newDataExtra = (byte) (value >> 4 & 3 & 0xF);
         if (oldBlock != newBlock) {
             blockIds[index] = newBlock;
         }
@@ -223,10 +219,9 @@ public class BlockStorage {
         hasBlockDataExtras |= newDataExtra != 0;
         hasBlockIds |= newBlock != 0 || hasBlockIdExtras || hasBlockDataExtras;
         
-        return (oldBlockExtra & 0xff) << Block.DATA_BITS + 8 | (oldBlock & 0xff) << Block.DATA_BITS | (oldDataExtra & 0xF) << 4 | oldData;
+        return (oldBlockExtra & 0xff) << 14 | (oldBlock & 0xff) << Block.DATA_BITS | (oldDataExtra & 0xF) << 4 | oldData;
     }
 
-    @Deprecated
     private int getFullBlock(int index) {
         if (!hasBlockIds) {
             return 0;
@@ -235,7 +230,7 @@ public class BlockStorage {
         byte extra = hasBlockIdExtras ? blockIdsExtra[index] : 0;
         byte data = blockData.get(index);
         byte dataExtra = hasBlockDataExtras ? blockDataExtra.get(index) : 0;
-        return (extra & 0xff) << Block.DATA_BITS + 8 | ((block & 0xff) << Block.DATA_BITS) | ((dataExtra & 0xF) << 4) | data;
+        return (extra & 0xff) << 14 | ((block & 0xff) << Block.DATA_BITS) | ((dataExtra & 0xF) << 4) | data;
     }
 
     private int[] getBlockState(int index) {
@@ -245,12 +240,11 @@ public class BlockStorage {
         return new int[]{getBlockId(index), getBlockData(index)};
     }
 
-    @Deprecated
     private void setFullBlock(int index, int value) {
-        Preconditions.checkArgument(value < (0x1FF << Block.DATA_BITS | Block.DATA_MASK), "Invalid full block");
-        byte extra = (byte) ((value >> (Block.DATA_BITS + 8)) & 0xFF);
+        Preconditions.checkArgument(value < (32767), "Invalid full block");
+        byte extra = (byte) ((value >> (14)) & 0xFF);
         byte block = (byte) ((value >> Block.DATA_BITS) & 0xFF);
-        byte dataExtra = (byte) (value >> 4 & Block.DATA_MASK >> 4 & 0xF);
+        byte dataExtra = (byte) (value >> 4 & 3 & 0xF);
         byte data = (byte) (value & 0xf);
 
         blockIds[index] = block;
@@ -305,7 +299,7 @@ public class BlockStorage {
         if (hasBlockIds) {
             return blockData.getData();
         } else {
-            return new byte[SECTION_SIZE / 2];
+            return new byte[2048];
         }
     }
 
@@ -313,7 +307,7 @@ public class BlockStorage {
         if (hasBlockDataExtras) {
             return blockDataExtra.getData();
         } else {
-            return new byte[SECTION_SIZE / 2];
+            return new byte[2048];
         }
     }
 

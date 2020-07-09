@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome.impl.iceplains;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.level.ChunkManager;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.populator.type.Populator;
@@ -20,7 +21,7 @@ public class IcePlainsSpikesBiome extends IcePlainsBiome {
 
     @Override
     public int getSurfaceId(int x, int y, int z) {
-        return 1280;
+        return SNOW_BLOCK << Block.DATA_BITS;
     }
 
     public String getName() {

@@ -2,17 +2,11 @@ package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.block.BlockWall;
 import cn.nukkit.blockentity.BlockEntity;
-import cn.nukkit.level.Level;
 import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.LevelProvider;
-import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.ChunkException;
-import cn.nukkit.utils.Faceable;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -102,13 +96,11 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
         }
     }
 
-    @Deprecated
     @Override
     public boolean setFullBlockId(int x, int y, int z, int fullId) {
         return this.setFullBlockId(x, y, z, 0, fullId);
     }
 
-    @Deprecated
     @Override
     public boolean setFullBlockId(int x, int y, int z, int layer, int fullId) {
         int Y = y >> 4;
@@ -298,7 +290,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockIdArray(int layer) {
-        ByteBuffer buffer = ByteBuffer.allocate(4096 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(65536);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getIdArray(layer));
         }
@@ -307,7 +299,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockDataArray(int layer) {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(32768);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getDataArray(layer));
         }
@@ -316,7 +308,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockSkyLightArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(32768);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getSkyLightArray());
         }
@@ -325,7 +317,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public byte[] getBlockLightArray() {
-        ByteBuffer buffer = ByteBuffer.allocate(2048 * SECTION_COUNT);
+        ByteBuffer buffer = ByteBuffer.allocate(32768);
         for (int y = 0; y < SECTION_COUNT; y++) {
             buffer.put(this.sections[y].getLightArray());
         }

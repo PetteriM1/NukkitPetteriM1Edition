@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome.impl.beach;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.level.biome.type.SandyBiome;
 import cn.nukkit.level.generator.populator.impl.WaterIcePopulator;
 
@@ -13,7 +14,7 @@ public class ColdBeachBiome extends SandyBiome {
 
     @Override
     public int getCoverId(int x, int z) {
-        return 1248;
+        return SNOW_LAYER << Block.DATA_BITS;
     }
 
     @Override

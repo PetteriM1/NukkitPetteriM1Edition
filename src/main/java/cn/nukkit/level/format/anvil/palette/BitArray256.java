@@ -12,7 +12,7 @@ public final class BitArray256 {
 
     public BitArray256(int bitsPerEntry) {
         this.bitsPerEntry = bitsPerEntry;
-        int longLen = (this.bitsPerEntry * 256) >> 6;
+        int longLen = (this.bitsPerEntry << 8) >> 6;
         this.data = new long[longLen];
     }
 
@@ -27,7 +27,7 @@ public final class BitArray256 {
         int localBitIndexStart = bitIndexStart & 63;
         this.data[longIndexStart] = this.data[longIndexStart] & ~((long) ((1 << bitsPerEntry) - 1) << localBitIndexStart) | ((long) value) << localBitIndexStart;
 
-        if(localBitIndexStart > 64 - bitsPerEntry) {
+        if (localBitIndexStart > 64 - bitsPerEntry) {
             int longIndexEnd = longIndexStart + 1;
             int localShiftStart = 64 - localBitIndexStart;
             int localShiftEnd = bitsPerEntry - localShiftStart;
@@ -41,7 +41,7 @@ public final class BitArray256 {
         int longIndexStart = bitIndexStart >> 6;
 
         int localBitIndexStart = bitIndexStart & 63;
-        if(localBitIndexStart <= 64 - bitsPerEntry) {
+        if (localBitIndexStart <= 64 - bitsPerEntry) {
             return (int)(this.data[longIndexStart] >>> localBitIndexStart & ((1 << bitsPerEntry) - 1));
         } else {
             int localShift = 64 - localBitIndexStart;

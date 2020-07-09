@@ -20,7 +20,6 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -333,7 +332,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             @SuppressWarnings("rawtypes")
                             Constructor constructor = c.getDeclaredConstructor(int.class);
                             constructor.setAccessible(true);
-                            for (int data = 0; data < (1 << DATA_BITS); ++data) {
+                            for (int data = 0; data < 64; ++data) {
                                 int fullId = (id << DATA_BITS) | data;
                                 Block b;
                                 try {
@@ -460,12 +459,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
     }
 
-    @Deprecated
     public static Block get(int fullId, Level level, int x, int y, int z) {
         return get(fullId, level, x, y, z, 0);
     }
 
-    @Deprecated
     public static Block get(int fullId, Level level, int x, int y, int z, int layer) {
         Block block = fullList[fullId].clone();
         block.x = x;

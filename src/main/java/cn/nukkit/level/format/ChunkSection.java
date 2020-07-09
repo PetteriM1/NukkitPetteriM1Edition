@@ -18,7 +18,6 @@ public interface ChunkSection {
 
     void setBlockId(int x, int y, int z, int id);
 
-    @Deprecated
     boolean setFullBlockId(int x, int y, int z, int layer, int fullId);
 
     int getBlockData(int x, int y, int z);
@@ -29,7 +28,6 @@ public interface ChunkSection {
 
     void setBlockData(int x, int y, int z, int layer, int data);
 
-    @Deprecated
     int getFullBlock(int x, int y, int z);
 
     default int[] getBlockState(int x, int y, int z) {
@@ -46,10 +44,8 @@ public interface ChunkSection {
 
     void setBlockId(int x, int y, int z, int layer, int id);
 
-    @Deprecated
     boolean setFullBlockId(int x, int y, int z, int fullId);
 
-    @Deprecated
     int getFullBlock(int x, int y, int z, int layer);
 
     boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId);

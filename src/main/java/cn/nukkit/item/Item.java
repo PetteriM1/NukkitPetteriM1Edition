@@ -573,11 +573,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 if (id > 255) {
                     id = 255 - id;
                 }
-            }catch (Exception ignore){
+            }catch (Exception ignore) {
                 try {
                     id = ItemID.class.getField(b[0].toUpperCase()).getInt(null);
                 } catch (Exception ignore1) {
-                    //ignore
                 }
             }
         }
