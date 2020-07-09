@@ -20,6 +20,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static void init() {
         if (list == null) {
             list = new Class[MAX_BLOCK_ID];
-            fullList = new Block[MAX_BLOCK_ID * 16];
+            fullList = new Block[MAX_BLOCK_ID * (1 << DATA_BITS)];
             light = new int[MAX_BLOCK_ID];
             lightFilter = new int[MAX_BLOCK_ID];
             solid = new boolean[MAX_BLOCK_ID];
@@ -332,19 +333,31 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             @SuppressWarnings("rawtypes")
                             Constructor constructor = c.getDeclaredConstructor(int.class);
                             constructor.setAccessible(true);
-                            for (int data = 0; data < 16; ++data) {
-                                fullList[(id << 4) | data] = (Block) constructor.newInstance(data);
+                            for (int data = 0; data < (1 << DATA_BITS); ++data) {
+                                int fullId = (id << DATA_BITS) | data;
+                                Block b;
+                                try {
+                                    b = (Block) constructor.newInstance(data);
+                                    if (b.getDamage() != data) {
+                                        b = new BlockUnknown(id, data);
+                                    }
+                                } catch (Exception e) {
+                                    Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
+                                    b = new BlockUnknown(id, data);
+                                }
+                                fullList[fullId] = b;
                             }
                             hasMeta[id] = true;
                         } catch (NoSuchMethodException ignore) {
-                            for (int data = 0; data < 16; ++data) {
-                                fullList[(id << 4) | data] = block;
+                            for (int data = 0; data < DATA_SIZE; ++data) {
+                                int fullId = (id << DATA_BITS) | data;
+                                fullList[fullId] = block;
                             }
                         }
                     } catch (Exception e) {
                         Server.getInstance().getLogger().error("Error while registering " + c.getName(), e);
-                        for (int data = 0; data < 16; ++data) {
-                            fullList[(id << 4) | data] = new BlockUnknown(id, data);
+                        for (int data = 0; data < DATA_SIZE; ++data) {
+                            fullList[(id << DATA_BITS) | data] = new BlockUnknown(id, data);
                         }
                         return;
                     }
@@ -362,6 +375,10 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             } else {
                                 lightFilter[id] = 1;
                             }
+                        } else if (block instanceof BlockSlime) {
+                            lightFilter[id] = 1;
+                        } else if (id == CAULDRON_BLOCK) {
+                            lightFilter[id] = 3;
                         } else {
                             lightFilter[id] = 15;
                         }
@@ -370,8 +387,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                     }
                 } else {
                     lightFilter[id] = 1;
-                    for (int data = 0; data < 16; ++data) {
-                        fullList[(id << 4) | data] = new BlockUnknown(id, data);
+                    for (int data = 0; data < DATA_SIZE; ++data) {
+                        fullList[(id << DATA_BITS) | data] = new BlockUnknown(id, data);
                     }
                 }
             }

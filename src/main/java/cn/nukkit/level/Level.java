@@ -1612,7 +1612,7 @@ public class Level implements ChunkManager, Metadatable {
                 chunk = getChunkIfLoaded(cx, cz);
             }
             if (chunk != null) {
-                fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF);
+                fullState = chunk.getFullBlock(x & 0xF, y, z & 0xF, 0); //TODO: layer
             } else {
                 fullState = 0;
             }
@@ -1815,7 +1815,7 @@ public class Level implements ChunkManager, Metadatable {
         }
         BaseFullChunk chunk = this.getChunk(x >> 4, z >> 4, true);
         Block blockPrevious;
-        blockPrevious = chunk.getAndSetBlock(x & 0xF, y, z & 0xF, block);
+        blockPrevious = chunk.getAndSetBlock(x & 0xF, y, z & 0xF, 0, block); //TODO: layer
         if (blockPrevious.getFullId() == block.getFullId()) {
             return false;
         }
