@@ -75,4 +75,9 @@ public class BlockWaterLily extends BlockFlowable {
     public boolean canPassThrough() {
         return false;
     }
+
+    @Override
+    public int getFullId() {
+        return this.getId() << DATA_BITS;
+    }
 }

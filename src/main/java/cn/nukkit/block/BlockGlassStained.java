@@ -20,7 +20,7 @@ public class BlockGlassStained extends BlockGlass {
 
     @Override
     public int getFullId() {
-        return (3856) + meta;
+        return (getId() << DATA_BITS) + getDamage();
     }
 
     @Override

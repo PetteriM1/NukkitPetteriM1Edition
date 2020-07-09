@@ -21,7 +21,7 @@ public class BlockConcretePowder extends BlockFallableMeta {
 
     @Override
     public int getFullId() {
-        return (3792) + getDamage();
+        return (getId() << DATA_BITS) + getDamage();
     }
 
     @Override

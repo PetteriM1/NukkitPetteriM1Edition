@@ -20,7 +20,7 @@ public class BlockGlassPaneStained extends BlockGlassPane {
 
     @Override
     public int getFullId() {
-        return (2560) + meta;
+        return (getId() << DATA_BITS) + getDamage();
     }
 
     @Override

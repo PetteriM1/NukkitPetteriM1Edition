@@ -121,7 +121,7 @@ public class BlockGrass extends BlockDirt {
 
     @Override
     public int getFullId() {
-        return this.getId() << 4;
+        return getId() << DATA_BITS;
     }
 
     @Override

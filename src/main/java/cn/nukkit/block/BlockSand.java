@@ -53,4 +53,9 @@ public class BlockSand extends BlockFallableMeta {
     public BlockColor getColor() {
         return BlockColor.SAND_BLOCK_COLOR;
     }
+
+    @Override
+    public int getFullId() {
+        return (getId() << DATA_BITS) + getDamage();
+    }
 }

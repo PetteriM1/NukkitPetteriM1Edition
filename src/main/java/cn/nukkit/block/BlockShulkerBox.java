@@ -153,4 +153,9 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     public DyeColor getDyeColor() {
         return DyeColor.getByWoolData(this.getDamage());
     }
+
+    @Override
+    public int getFullId() {
+        return (this.getId() << DATA_BITS) + this.getDamage();
+    }
 }
