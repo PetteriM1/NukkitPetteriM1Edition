@@ -420,7 +420,7 @@ public class GlobalBlockPalette {
             case 361:
                 return legacyToRuntimeId361.get(legacyId);
             default: // 388+
-                return getOrCreateRuntimeId(protocol, legacyId >> Block.DATA_BITS, legacyId & Block.DATA_MASK); //TODO: multiversion
+                return getOrCreateRuntimeId(protocol, legacyId >> Block.DATA_BITS, legacyId & Block.DATA_MASK);
         }
     }
 

@@ -356,7 +356,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                             @SuppressWarnings("rawtypes")
                             Constructor constructor = c.getDeclaredConstructor(int.class);
                             constructor.setAccessible(true);
-                            for (int data = 0; data < 64; ++data) {
+                            for (int data = 0; data < (1 << DATA_BITS); ++data) {
                                 int fullId = (id << DATA_BITS) | data;
                                 Block b;
                                 try {
