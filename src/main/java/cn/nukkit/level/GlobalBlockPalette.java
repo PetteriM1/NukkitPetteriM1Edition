@@ -306,7 +306,9 @@ public class GlobalBlockPalette {
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
                     if (id389 == -1) {
-                        throw new NoSuchElementException("Unmapped block registered id:" + id + " meta:" + meta);
+                        log.info("Creating new runtime ID for unknown block {}", id);
+                        id389 = runtimeIdAllocator389.getAndIncrement();
+                        legacyToRuntimeId389.put(id << 6, id389);
                     }
                 }
                 return id389;

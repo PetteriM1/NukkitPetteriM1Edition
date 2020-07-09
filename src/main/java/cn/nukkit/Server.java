@@ -242,6 +242,7 @@ public class Server {
     public boolean strongIPBans;
     public boolean spawnAnimals;
     public boolean spawnMobs;
+    public int requiredProtocol;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2138,6 +2139,7 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.DISPENSER, BlockEntityDispenser.class);
         BlockEntity.registerBlockEntity(BlockEntity.MOB_SPAWNER, BlockEntitySpawner.class);
         BlockEntity.registerBlockEntity(BlockEntity.MUSIC, BlockEntityMusic.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CAMPFIRE, BlockEntityCampfire.class);
     }
 
     public static Server getInstance() {
@@ -2203,6 +2205,7 @@ public class Server {
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
+        this.requiredProtocol = this.getPropertyInt("multiversion-min-protocol");
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;

@@ -15,6 +15,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
@@ -23,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * @author MagicDroidX
@@ -48,6 +50,8 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public AxisAlignedBB boundingBox = null;
     public AxisAlignedBB collisionBoundingBox = null;
     public static boolean[] hasMeta = null;
+
+    public int layer = 0;
 
     protected Block() {}
 
@@ -278,6 +282,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             // 212 Border in Education Edition
             list[MAGMA] = BlockMagma.class; //213
             list[BLOCK_NETHER_WART_BLOCK] = BlockNetherWartBlock.class; //214
+            list[RED_NETHER_BRICK] = BlockBricksRedNether.class; //215
             list[BONE_BLOCK] = BlockBone.class; //216
             // 217 not yet in Minecraft
             list[SHULKER_BOX] = BlockShulkerBox.class; //218
@@ -319,8 +324,27 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[HARD_STAINED_GLASS] = BlockHardGlassStained.class; //254
             list[RESERVED6] = BlockReserved6.class; //255
 
-            list[PRISMARINE_STAIRS] = BlockStairsPrismarine.class; //257
-            list[BARRIER] = BlockBarrier.class; //416
+            if (Server.getInstance().requiredProtocol >= ProtocolInfo.v1_13_0){
+                list[PRISMARINE_STAIRS] = BlockStairsPrismarine.class; //257
+                list[DARK_PRISMARINE_STAIRS] = BlockStairsDarkPrismarine.class; //258
+                list[PRISMARINE_BRICKS_STAIRS] = BlockStairsPrismarineBrick.class; //259
+                list[STRIPPED_SPRUCE_LOG] = BlockWoodStrippedSpruce.class; //260
+                list[STRIPPED_BIRCH_LOG] = BlockWoodStrippedBirch.class; //261
+                list[STRIPPED_JUNGLE_LOG] = BlockWoodStrippedJungle.class; //262
+                list[STRIPPED_ACACIA_LOG] = BlockWoodStrippedAcacia.class; //263
+                list[STRIPPED_DARK_OAK_LOG] = BlockWoodStrippedDarkOak.class; //264
+                list[STRIPPED_OAK_LOG] = BlockWoodStrippedOak.class; //265
+                list[BLUE_ICE] = BlockBlueIce.class; //266
+
+                list[BARRIER] = BlockBarrier.class; //416
+                list[STONE_SLAB3] = BlockSlabStone3.class ; //417
+                list[BAMBOO] = BlockBamboo.class; //418
+                list[BAMBOO_SAPLING] = BlockBambooSapling.class; //419
+
+                list[LANTERN] = BlockLantern.class; //463
+                list[CAMPFIRE_BLOCK] = BlockCampfire.class; //464
+                list[WOOD_BARK] = BlockWoodBark.class; //467
+            }
 
             for (int id = 0; id < MAX_BLOCK_ID; id++) {
                 Class<?> c = list[id];
@@ -1057,6 +1081,22 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public boolean canSilkTouch() {
        return false;
+    }
+
+    public Optional<Block> firstInLayers(Predicate<Block> condition) {
+        return firstInLayers(0, condition);
+    }
+
+    public Optional<Block> firstInLayers(int startingLayer, Predicate<Block> condition) {
+        int maximumLayer = this.level.getProvider().getMaximumLayer();
+        for (int layer = startingLayer; layer <= maximumLayer; layer++) {
+            Block block = this.getLevelBlockAtLayer(layer);
+            if (condition.test(block)) {
+                return Optional.of(block);
+            }
+        }
+
+        return Optional.empty();
     }
 
     public double getMinX() {

@@ -324,5 +324,28 @@ public interface BlockID {
     int RESERVED6 = 255;
 
     int PRISMARINE_STAIRS = 257;
+    int DARK_PRISMARINE_STAIRS = 258;
+    int PRISMARINE_BRICKS_STAIRS = 259;
+    int STRIPPED_SPRUCE_LOG = 260;
+    int STRIPPED_BIRCH_LOG = 261;
+    int STRIPPED_JUNGLE_LOG = 262;
+    int STRIPPED_ACACIA_LOG = 263;
+    int STRIPPED_DARK_OAK_LOG = 264;
+    int STRIPPED_OAK_LOG = 265;
+    int BLUE_ICE = 266;
+
     int BARRIER = 416;
+    int STONE_SLAB3 = 417;
+    int BAMBOO = 418;
+    int BAMBOO_SAPLING = 419;
+    int SCAFFOLDING = 420;
+    int STONE_SLAB4 = 421;
+    int DOUBLE_STONE_SLAB3 = 422;
+    int DOUBLE_STONE_SLAB4 = 423;
+
+    int BELL = 461;
+    int SWEET_BERRY_BUSH = 462;
+    int LANTERN = 463;
+    int CAMPFIRE_BLOCK = 464;
+    int WOOD_BARK = 467;
 }

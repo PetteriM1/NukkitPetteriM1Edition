@@ -37,6 +37,7 @@ public class CraftingManager {
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, CampfireRecipe> campfireRecipes = new Int2ObjectOpenHashMap<>();
 
     private static int RECIPE_COUNT = 0;
     protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
@@ -120,7 +121,7 @@ public class CraftingManager {
                     case 2:
                     case 3:
                         craftingBlock = (String) recipe.get("block");
-                        if (!"furnace".equals(craftingBlock)) {
+                        if (!"furnace".equals(craftingBlock) && !"campfire".equals(craftingBlock)) {
                             // Ignore other recipes than furnaces
                             continue;
                         }
@@ -133,7 +134,15 @@ public class CraftingManager {
                         } catch (Exception old) {
                             inputItem = Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : -1, 1);
                         }
-                        this.registerRecipe(new FurnaceRecipe(resultItem, inputItem));
+
+                        switch (craftingBlock){
+                            case "furnace":
+                                this.registerRecipe(new FurnaceRecipe(resultItem, inputItem));
+                                break;
+                            case "campfire":
+                                this.registerRecipe(new CampfireRecipe(resultItem, inputItem));
+                                break;
+                        }
                         break;
                     default:
                         break;
@@ -385,6 +394,11 @@ public class CraftingManager {
         this.furnaceRecipes.put(getItemHash(recipe.getInput()), recipe);
     }
 
+    public void registerCampfireRecipe(CampfireRecipe recipe) {
+        Item input = recipe.getInput();
+        this.campfireRecipes.put(getItemHash(input), recipe);
+    }
+
     private static int getItemHash(Item item) {
         return getItemHash(item.getId(), item.getDamage());
     }
@@ -452,6 +466,12 @@ public class CraftingManager {
         }
 
         return null;
+    }
+
+    public CampfireRecipe matchCampfireRecipe(Item input) {
+        CampfireRecipe recipe = this.campfireRecipes.get(getItemHash(input));
+        if (recipe == null) recipe = this.campfireRecipes.get(getItemHash(input.getId(), 0));
+        return recipe;
     }
 
     public ContainerRecipe matchContainerRecipe(Item input, Item potion) {
