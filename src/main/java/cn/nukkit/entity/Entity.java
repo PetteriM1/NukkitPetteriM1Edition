@@ -302,6 +302,7 @@ public abstract class Entity extends Location implements Metadatable {
     public AxisAlignedBB boundingBox;
     public boolean onGround;
     public int deadTicks = 0;
+    public boolean positionChanged;
     public int age = 0;
 
     protected float health = 20;
@@ -1392,6 +1393,9 @@ public abstract class Entity extends Location implements Metadatable {
             this.lastPitch = this.pitch;
 
             this.addMovement(this.x, this.y + this.getBaseOffset(), this.z, this.yaw, this.pitch, this.yaw);
+            this.positionChanged = true;
+        }else {
+            this.positionChanged = false;
         }
 
         if (diffMotion > 0.0025 || (diffMotion > 0.0001 && this.getMotion().lengthSquared() <= 0.0001)) { //0.05 ** 2
