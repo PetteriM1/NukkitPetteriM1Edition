@@ -184,7 +184,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			} else {
 				this.equipmentInventory.setItem(slot, handItem);
 			}
-			Server.getInstance().getScheduler().scheduleDelayedTask(new Hack(player, item), 1);
+			Server.getInstance().getScheduler().scheduleDelayedTask(new Hack(player, item, player.getInventory().getHeldItemIndex()), 1);
 		}
 	}
 
@@ -345,15 +345,17 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 		private final Player player;
 		private final Item item;
+		private final int index;
 
-		public Hack(Player player, Item item) {
+		public Hack(Player player, Item item, int index) {
 			this.player = player;
 			this.item = item;
+			this.index = index;
 		}
 
 		@Override
 		public void onRun(int i) {
-			player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+			player.getInventory().decreaseCount(index);
 			player.getInventory().addItem(item);
 		}
 	}

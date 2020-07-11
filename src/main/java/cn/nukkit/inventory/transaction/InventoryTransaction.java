@@ -164,7 +164,7 @@ public class InventoryTransaction {
             }
             SlotChangeAction slotChange = (SlotChangeAction) action;
 
-            if (slotChange.getInventory() instanceof PlayerInventory) {
+            if (slotChange.getInventory().getHolder() instanceof Player) {
                 who = (Player) slotChange.getInventory().getHolder();
             }
 
