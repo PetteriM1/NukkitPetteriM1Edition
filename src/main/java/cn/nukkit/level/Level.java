@@ -1230,7 +1230,7 @@ public class Level implements ChunkManager, Metadatable {
 
                                     int[] state = section.getBlockState(x, y, z);
                                     if (randomTickBlocks[state[0]]) {
-                                        Block block = Block.get(state[0], state[1], this, (chunkX << 4) + x, (Y << 4) + y, (chunkZ << 4) + z);
+                                        Block block = Block.get(state[0], state[1], this, chunkX * 16 + x, (Y << 4) + y, chunkZ * 16 + z);
                                         block.onUpdate(BLOCK_UPDATE_RANDOM);
                                     }
                                 }
@@ -3373,8 +3373,8 @@ public class Level implements ChunkManager, Metadatable {
                 int y = (int) NukkitMath.clamp(v.y, 0, 254);
                 boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
                 for (; y > 0; --y) {
-                    int b = chunk.getFullBlock(x, y, z);
-                    Block block = Block.get(b >> 4, b & 0x0f);
+                    int[] b = chunk.getBlockState(x, y, z);
+                    Block block = Block.get(b[0], b[1]);
                     if (this.isFullBlock(block)) {
                         if (wasAir) {
                             y++;
@@ -3386,11 +3386,11 @@ public class Level implements ChunkManager, Metadatable {
                 }
 
                 for (; y >= 0 && y < 255; y++) {
-                    int b = chunk.getFullBlock(x, y + 1, z);
-                    Block block = Block.get(b >> 4, b & 0x0f);
+                    int[] b = chunk.getBlockState(x, y + 1, z);
+                    Block block = Block.get(b[0], b[1]);
                     if (!this.isFullBlock(block)) {
-                        b = chunk.getFullBlock(x, y, z);
-                        block = Block.get(b >> 4, b & 0x0f);
+                        b = chunk.getBlockState(x, y, z);
+                        block = Block.get(b[0], b[1]);
                         if (!this.isFullBlock(block)) {
                             return new Position(spawn.x, y == (int) spawn.y ? spawn.y : y, spawn.z, this);
                         }
