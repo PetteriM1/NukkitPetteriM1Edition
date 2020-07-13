@@ -1949,40 +1949,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        Player oldPlayer = null;
         for (Player p : new ArrayList<>(this.server.playerList.values())) {
-            if (p != this && p.username != null && p.username.equalsIgnoreCase(this.username) ||
-                    this.getUniqueId().equals(p.getUniqueId())) {
-                oldPlayer = p;
-                break;
+            if (p != this && p.username != null) {
+                if (p.username.equalsIgnoreCase(this.username) || this.getUniqueId().equals(p.getUniqueId())) {
+                    p.close("", "disconnectionScreen.loggedinOtherLocation");
+                    break;
+                }
             }
         }
 
         CompoundTag nbt;
-        if (oldPlayer != null) {
-            oldPlayer.saveNBT();
-            nbt = oldPlayer.namedTag;
-            oldPlayer.close("", "disconnectionScreen.loggedinOtherLocation");
-        } else {
-            File legacyDataFile = new File(server.getDataPath() + "players/" + this.username.toLowerCase() + ".dat");
-            File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
-            if (this.server.savePlayerDataByUuid) {
-                boolean dataFound = dataFile.exists();
-                if (!dataFound && legacyDataFile.exists()) {
-                    nbt = this.server.getOfflinePlayerData(this.username, false);
-                    if (!legacyDataFile.delete()) {
-                        this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
-                    }
-                } else {
-                    nbt = this.server.getOfflinePlayerData(this.uuid, !dataFound);
+        File legacyDataFile = new File(server.getDataPath() + "players/" + this.username.toLowerCase() + ".dat");
+        File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
+        if (this.server.savePlayerDataByUuid) {
+            boolean dataFound = dataFile.exists();
+            if (!dataFound && legacyDataFile.exists()) {
+                nbt = this.server.getOfflinePlayerData(this.username, false);
+                if (!legacyDataFile.delete()) {
+                    this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
                 }
             } else {
-                boolean legacyMissing = !legacyDataFile.exists();
-                if (legacyMissing && dataFile.exists()) {
-                    nbt = this.server.getOfflinePlayerData(this.uuid, false);
-                } else {
-                    nbt = this.server.getOfflinePlayerData(this.username, legacyMissing);
-                }
+                nbt = this.server.getOfflinePlayerData(this.uuid, !dataFound);
+            }
+        } else {
+            boolean legacyMissing = !legacyDataFile.exists();
+            if (legacyMissing && dataFile.exists()) {
+                nbt = this.server.getOfflinePlayerData(this.uuid, false);
+            } else {
+                nbt = this.server.getOfflinePlayerData(this.username, legacyMissing);
             }
         }
 
