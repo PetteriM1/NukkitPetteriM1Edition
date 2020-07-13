@@ -4,7 +4,6 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.plugin.Plugin;
 
-import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +17,6 @@ import java.util.UUID;
  */
 public class OfflinePlayer implements IPlayer {
 
-    private final String name;
     private final Server server;
     private final CompoundTag namedTag;
 
@@ -28,18 +26,50 @@ public class OfflinePlayer implements IPlayer {
      *
      * @param server 这个玩家所在服务器的{@code Server}对象。<br>
      *               The server this player is in, as a {@code Server} object.
-     * @param name   这个玩家所的名字。<br>
-     *               Name of this player.
+     * @param uuid   这个玩家的UUID。<br>
+     *               UUID of this player.
      * @since Nukkit 1.0 | Nukkit API 1.0.0
      */
-    public OfflinePlayer(Server server, String name) {
-        this.server = server;
-        this.name = name;
+    public OfflinePlayer(Server server, UUID uuid) {
+        this(server, uuid, null);
+    }
 
-        if (new File(this.server.getDataPath() + "players/" + name.toLowerCase() + ".dat").exists()) {
-            this.namedTag = this.server.getOfflinePlayerData(this.name);
+    public OfflinePlayer(Server server, String name) {
+        this(server, null, name);
+    }
+
+    public OfflinePlayer(Server server, UUID uuid, String name) {
+        this.server = server;
+
+        CompoundTag nbt;
+        if (server.savePlayerDataByUuid) {
+            if (uuid != null) {
+                nbt = this.server.getOfflinePlayerData(uuid, false);
+            } else if (name != null) {
+                nbt = this.server.getOfflinePlayerData(name, false);
+            } else {
+                throw new IllegalArgumentException("Name and UUID cannot both be null");
+            }
+        } else { // When not using UUIDs check for the data saved by name first
+            if (name != null) {
+                nbt = this.server.getOfflinePlayerData(name, false);
+            } else if (uuid != null) {
+                nbt = this.server.getOfflinePlayerData(uuid, false);
+            } else {
+                throw new IllegalArgumentException("Name and UUID cannot both be null");
+            }
+        }
+
+        if (nbt == null) {
+            nbt = new CompoundTag();
+        }
+        this.namedTag = nbt;
+
+        if (uuid != null) {
+            this.namedTag.putLong("UUIDMost", uuid.getMostSignificantBits());
+            this.namedTag.putLong("UUIDLeast", uuid.getLeastSignificantBits());
         } else {
-            this.namedTag = null;
+            this.namedTag.putString("NameTag", name);
         }
     }
 
@@ -50,15 +80,19 @@ public class OfflinePlayer implements IPlayer {
 
     @Override
     public String getName() {
-        return name;
+        if (namedTag != null && namedTag.contains("NameTag")) {
+            return namedTag.getString("NameTag");
+        }
+        return null;
     }
-    
+
     @Override
     public UUID getUniqueId() {
         if (namedTag != null) {
             long least = namedTag.getLong("UUIDLeast");
             long most = namedTag.getLong("UUIDMost");
-             if (least != 0 && most != 0) {
+
+            if (least != 0 && most != 0) {
                 return new UUID(most, least);
             }
         }
@@ -71,53 +105,58 @@ public class OfflinePlayer implements IPlayer {
 
     @Override
     public boolean isOp() {
-        return this.server.isOp(this.name.toLowerCase());
+        return this.server.isOp(this.getName().toLowerCase());
     }
 
     @Override
     public void setOp(boolean value) {
+        if (this.getName() == null) {
+            Server.getInstance().getLogger().warning("Tried to OP invalid OfflinePlayer");
+            return;
+        }
+
         if (value == this.isOp()) {
             return;
         }
 
         if (value) {
-            this.server.addOp(this.name.toLowerCase());
+            this.server.addOp(this.getName().toLowerCase());
         } else {
-            this.server.removeOp(this.name.toLowerCase());
+            this.server.removeOp(this.getName().toLowerCase());
         }
     }
 
     @Override
     public boolean isBanned() {
-        return this.server.getNameBans().isBanned(this.name);
+        return this.server.getNameBans().isBanned(this.getName());
     }
 
     @Override
     public void setBanned(boolean value) {
         if (value) {
-            this.server.getNameBans().addBan(this.name, null, null, null);
+            this.server.getNameBans().addBan(this.getName(), null, null, null);
         } else {
-            this.server.getNameBans().remove(this.name);
+            this.server.getNameBans().remove(this.getName());
         }
     }
 
     @Override
     public boolean isWhitelisted() {
-        return this.server.isWhitelisted(this.name.toLowerCase());
+        return this.server.isWhitelisted(this.getName().toLowerCase());
     }
 
     @Override
     public void setWhitelisted(boolean value) {
         if (value) {
-            this.server.addWhitelist(this.name.toLowerCase());
+            this.server.addWhitelist(this.getName().toLowerCase());
         } else {
-            this.server.removeWhitelist(this.name.toLowerCase());
+            this.server.removeWhitelist(this.getName().toLowerCase());
         }
     }
 
     @Override
     public Player getPlayer() {
-        return this.server.getPlayerExact(this.name);
+        return this.server.getPlayerExact(this.getName());
     }
 
     @Override
