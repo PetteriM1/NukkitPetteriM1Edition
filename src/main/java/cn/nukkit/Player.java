@@ -1966,14 +1966,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             File legacyDataFile = new File(server.getDataPath() + "players/" + this.username.toLowerCase() + ".dat");
             File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
-            if (legacyDataFile.exists() && !dataFile.exists()) {
-                nbt = this.server.getOfflinePlayerData(this.username, false);
-
-                if (!legacyDataFile.delete()) {
-                    this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
+            if (this.server.savePlayerDataByUuid) {
+                boolean dataFound = dataFile.exists();
+                if (!dataFound && legacyDataFile.exists()) {
+                    nbt = this.server.getOfflinePlayerData(this.username, false);
+                    if (!legacyDataFile.delete()) {
+                        this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
+                    }
+                } else {
+                    nbt = this.server.getOfflinePlayerData(this.uuid, !dataFound);
                 }
             } else {
-                nbt = this.server.getOfflinePlayerData(this.uuid, true);
+                boolean legacyMissing = !legacyDataFile.exists();
+                if (legacyMissing && dataFile.exists()) {
+                    nbt = this.server.getOfflinePlayerData(this.uuid, false);
+                } else {
+                    nbt = this.server.getOfflinePlayerData(this.username, legacyMissing);
+                }
             }
         }
 
@@ -2035,7 +2044,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         nbt.putLong("UUIDMost", uuid.getMostSignificantBits());
 
         if (this.server.getAutoSave()) {
-            this.server.saveOfflinePlayerData(this.uuid, nbt, true);
+            if (this.server.savePlayerDataByUuid) {
+                this.server.saveOfflinePlayerData(this.uuid, nbt, true);
+            } else {
+                this.server.saveOfflinePlayerData(this.username, nbt, true);
+            }
         }
 
         this.sendPlayStatus(PlayStatusPacket.LOGIN_SUCCESS);
@@ -4013,7 +4026,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
 
             if (!this.username.isEmpty() && this.namedTag != null) {
-                this.server.saveOfflinePlayerData(this.uuid, this.namedTag, async);
+                if (this.server.savePlayerDataByUuid) {
+                    this.server.saveOfflinePlayerData(this.uuid, this.namedTag, async);
+                } else {
+                    this.server.saveOfflinePlayerData(this.username, this.namedTag, async);
+                }
             }
         }
     }

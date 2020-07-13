@@ -254,6 +254,7 @@ public class Server {
     public boolean strongIPBans;
     public boolean spawnAnimals;
     public boolean spawnMobs;
+    public boolean savePlayerDataByUuid;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -388,7 +389,9 @@ public class Server {
             throw new RuntimeException(e);
         }
 
-        convertLegacyPlayerData();
+        if (this.savePlayerDataByUuid) {
+            convertLegacyPlayerData();
+        }
 
         this.serverID = UUID.randomUUID();
 
@@ -1628,8 +1631,12 @@ public class Server {
     }
 
     public CompoundTag getOfflinePlayerData(String name, boolean create) {
-        Optional<UUID> uuid = lookupName(name);
-        return getOfflinePlayerDataInternal(uuid.map(UUID::toString).orElse(name), true, create);
+        if (this.savePlayerDataByUuid) {
+            Optional<UUID> uuid = lookupName(name);
+            return getOfflinePlayerDataInternal(uuid.map(UUID::toString).orElse(name), true, create);
+        } else {
+            return getOfflinePlayerDataInternal(name, true, create);
+        }
     }
 
     private CompoundTag getOfflinePlayerDataInternal(String name, boolean runEvent, boolean create) {
@@ -1703,8 +1710,12 @@ public class Server {
     }
 
     public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
-        Optional<UUID> uuid = lookupName(name);
-        saveOfflinePlayerData(uuid.map(UUID::toString).orElse(name), tag, async, true);
+        if (this.savePlayerDataByUuid) {
+            Optional<UUID> uuid = lookupName(name);
+            saveOfflinePlayerData(uuid.map(UUID::toString).orElse(name), tag, async, true);
+        } else {
+            saveOfflinePlayerData(name, tag, async, true);
+        }
     }
 
     private void saveOfflinePlayerData(String name, CompoundTag tag, boolean async, boolean runEvent) {
@@ -2387,6 +2398,7 @@ public class Server {
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
+        this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2503,6 +2515,7 @@ public class Server {
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
             put("automatic-bug-report", true);
+            put("save-player-data-by-uuid", true);
         }
     }
 
