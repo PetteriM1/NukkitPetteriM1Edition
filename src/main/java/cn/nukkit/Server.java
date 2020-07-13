@@ -176,6 +176,8 @@ public class Server {
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
     private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
 
+    private static final Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
+
     @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
@@ -313,14 +315,8 @@ public class Server {
 
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
-        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
-
-        if (this.networkCompressionLevel < -1) {
-            this.networkCompressionLevel = -1;
-        } else if (this.networkCompressionLevel > 9) {
-            this.networkCompressionLevel = 9;
-        }
+        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
 
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
@@ -1749,7 +1745,6 @@ public class Server {
 
     private void convertLegacyPlayerData() {
         File dataDirectory = new File(getDataPath(), "players/");
-        Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
 
         File[] files = dataDirectory.listFiles(file -> {
             String name = file.getName();
