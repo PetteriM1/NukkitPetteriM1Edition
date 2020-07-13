@@ -1982,7 +1982,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        server.updateName(this.uuid, this.username);
+        if (loginChainData.isXboxAuthed() || !server.xboxAuth) {
+            server.updateName(this.uuid, this.username);
+        }
 
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
 
