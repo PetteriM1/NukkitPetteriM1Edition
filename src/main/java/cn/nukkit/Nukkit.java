@@ -56,6 +56,9 @@ public class Nukkit {
         System.setProperty("log4j.skipJansi", "false");
         System.getProperties().putIfAbsent("io.netty.allocator.type", "unpooled"); // Disable memory pooling unless specified
 
+        // Force Mapped ByteBuffers for LevelDB till fixed
+        System.setProperty("leveldb.mmap", "true");
+
         boolean loadPlugins = true;
         boolean debug = false;
 

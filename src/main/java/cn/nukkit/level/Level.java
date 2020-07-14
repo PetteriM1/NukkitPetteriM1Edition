@@ -3519,7 +3519,7 @@ public class Level implements ChunkManager, Metadatable {
     public void doGarbageCollection(long allocatedTime) {
         long start = System.currentTimeMillis();
         if (unloadChunks(start, allocatedTime, false)) {
-            allocatedTime = allocatedTime - (System.currentTimeMillis() - start);
+            allocatedTime -= (System.currentTimeMillis() - start);
             provider.doGarbageCollection(allocatedTime);
         }
     }
@@ -3616,8 +3616,8 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (toUnload != null) {
-                long[] arr = toUnload.toLongArray();
-                for (long index : arr) {
+                //long[] arr = toUnload.toLongArray();
+                for (long index : toUnload) {
                     int X = getHashX(index);
                     int Z = getHashZ(index);
                     if (this.unloadChunk(X, Z, true)) {

@@ -21,8 +21,6 @@ public class BlockRedstoneWire extends BlockFlowable {
 
     private boolean canProvidePower = true;
 
-    private boolean hack;
-
     public BlockRedstoneWire() {
         this(0);
     }
@@ -82,12 +80,6 @@ public class BlockRedstoneWire extends BlockFlowable {
     }
 
     private void calculateCurrentChanges(boolean force) {
-        if (hack) {
-            level.getServer().getLogger().debug("Tried to run calculateCurrentChanges while previous operation was still in progress");
-            return;
-        }
-        hack = true;
-
         Vector3 pos = this.getLocation();
 
         int meta = this.getDamage();
@@ -151,8 +143,6 @@ public class BlockRedstoneWire extends BlockFlowable {
                 this.level.updateAroundRedstone(pos.getSide(face), face.getOpposite());
             }
         }
-
-        hack = false;
     }
 
     private int getMaxCurrentStrength(Vector3 pos, int maxStrength) {
