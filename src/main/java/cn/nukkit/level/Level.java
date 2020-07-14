@@ -1780,7 +1780,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public synchronized boolean setBlock(Vector3 pos, Block block) {
-        return setBlock(pos, 0, block);
+        return this.setBlock(pos, 0, block);
     }
 
     public synchronized boolean setBlock(Vector3 pos, int layer, Block block) {
@@ -1796,15 +1796,15 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public synchronized boolean setBlock(Vector3 pos, Block block, boolean direct, boolean update) {
-        return setBlock(pos, 0, block, direct, update);
+        return this.setBlock(pos, 0, block, direct, update);
     }
 
     public synchronized boolean setBlock(Vector3 pos, int layer, Block block, boolean direct, boolean update) {
-        return setBlock(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), layer, block, direct, update);
+        return this.setBlock(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), layer, block, direct, update);
     }
 
     public synchronized boolean setBlock(int x, int y, int z, Block block, boolean direct, boolean update) {
-        return setBlock(x, y, z, 0, block, direct, update);
+        return this.setBlock(x, y, z, 0, block, direct, update);
     }
 
     public synchronized boolean setBlock(int x, int y, int z, int layer, Block block, boolean direct, boolean update) {
@@ -1813,7 +1813,7 @@ public class Level implements ChunkManager, Metadatable {
         }
         BaseFullChunk chunk = this.getChunk(x >> 4, z >> 4, true);
         Block blockPrevious;
-        blockPrevious = chunk.getAndSetBlock(x & 0xF, y, z & 0xF, 0, block); //TODO: layer
+        blockPrevious = chunk.getAndSetBlock(x & 0xF, y, z & 0xF, layer, block);
         if (blockPrevious.getFullId() == block.getFullId()) {
             return false;
         }
@@ -1827,7 +1827,7 @@ public class Level implements ChunkManager, Metadatable {
         if (direct) {
             this.sendBlocks(this.getChunkPlayers(cx, cz).values().toArray(new Player[0]), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
         } else {
-            addBlockChange(index, x, y, z);
+            this.addBlockChange(index, x, y, z);
         }
 
         for (ChunkLoader loader : this.getChunkLoaders(cx, cz)) {

@@ -656,7 +656,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
      * @return full id
      */
     public int getFullId() {
-        return (getId() << 4);
+        return (getId() << DATA_BITS);
     }
 
     public void addVelocityToEntity(Entity entity, Vector3 vector) {
