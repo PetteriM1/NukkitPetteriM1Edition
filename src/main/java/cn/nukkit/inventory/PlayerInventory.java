@@ -516,7 +516,7 @@ public class PlayerInventory extends BaseInventory {
         pk.z = p.getFloorZ();
         pk.windowId = p.getWindowId(this);
         pk.type = InventoryType.PLAYER.getNetworkType();
-        p.dataPacket(pk);
+        p.directDataPacket(pk);
     }
 
     public void closeInventory() {
@@ -527,6 +527,6 @@ public class PlayerInventory extends BaseInventory {
         Player p = (Player) holder;
         ContainerClosePacket pk = new ContainerClosePacket();
         pk.windowId = p.getWindowId(this);
-        p.dataPacket(pk);
+        p.directDataPacket(pk);
     }
 }

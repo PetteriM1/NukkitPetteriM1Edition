@@ -51,7 +51,6 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
-import cn.nukkit.level.sound.ItemFrameItemRemovedSound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
@@ -87,6 +86,7 @@ import org.apache.commons.math3.util.FastMath;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
@@ -1558,7 +1558,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.server.getPluginManager().callEvent(ev);
 
                 if (!(revert = ev.isCancelled())) {
-                    if (this.level.getCurrentTick() % 20 == 0) {
+                    if (this.server.getMobAiEnabled() && this.level.getCurrentTick() % 20 == 0) {
                         AxisAlignedBB aab = new AxisAlignedBB(
                                 this.getX() - 0.6f,
                                 this.getY() + 1.45f,
@@ -1950,17 +1950,43 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         for (Player p : new ArrayList<>(this.server.playerList.values())) {
-            if (p != this && p.username != null && (p.username.equalsIgnoreCase(this.username) || this.getUniqueId().equals(p.getUniqueId()))) {
-                p.close("", "disconnectionScreen.loggedinOtherLocation");
-                break;
+            if (p != this && p.username != null) {
+                if (p.username.equalsIgnoreCase(this.username) || this.getUniqueId().equals(p.getUniqueId())) {
+                    p.close("", "disconnectionScreen.loggedinOtherLocation");
+                    break;
+                }
             }
         }
 
-        CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
+        CompoundTag nbt;
+        File legacyDataFile = new File(server.getDataPath() + "players/" + this.username.toLowerCase() + ".dat");
+        File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
+        if (this.server.savePlayerDataByUuid) {
+            boolean dataFound = dataFile.exists();
+            if (!dataFound && legacyDataFile.exists()) {
+                nbt = this.server.getOfflinePlayerData(this.username, false);
+                if (!legacyDataFile.delete()) {
+                    this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
+                }
+            } else {
+                nbt = this.server.getOfflinePlayerData(this.uuid, !dataFound);
+            }
+        } else {
+            boolean legacyMissing = !legacyDataFile.exists();
+            if (legacyMissing && dataFile.exists()) {
+                nbt = this.server.getOfflinePlayerData(this.uuid, false);
+            } else {
+                nbt = this.server.getOfflinePlayerData(this.username, legacyMissing);
+            }
+        }
 
         if (nbt == null) {
             this.close(this.getLeaveMessage(), "Invalid data");
             return;
+        }
+
+        if (loginChainData.isXboxAuthed() || !server.xboxAuth) {
+            server.updateName(this.uuid, this.username);
         }
 
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
@@ -2012,7 +2038,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         nbt.putLong("UUIDMost", uuid.getMostSignificantBits());
 
         if (this.server.getAutoSave()) {
-            this.server.saveOfflinePlayerData(this.username, nbt, true);
+            if (this.server.savePlayerDataByUuid) {
+                this.server.saveOfflinePlayerData(this.uuid, nbt, true);
+            } else {
+                this.server.saveOfflinePlayerData(this.username, nbt, true);
+            }
         }
 
         this.sendPlayStatus(PlayStatusPacket.LOGIN_SUCCESS);
@@ -2725,7 +2755,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_OPEN_INVENTORY:
-                            if (this.protocol >= 407) {
+                            if (this.protocol >= 407 && this.spawned) {
                                 this.inventory.sendInventory();
                             }
                             break;
@@ -3000,7 +3030,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.dropItem(vector3, itemDrop);
                                 itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
                                 itemFrame.setItemRotation(0);
-                                this.getLevel().addSound(new ItemFrameItemRemovedSound(this));
+                                this.getLevel().addSound(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
                             }
                         } else {
                             itemFrame.spawnTo(this);
@@ -3990,7 +4020,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
 
             if (!this.username.isEmpty() && this.namedTag != null) {
-                this.server.saveOfflinePlayerData(this.username, this.namedTag, async);
+                if (this.server.savePlayerDataByUuid) {
+                    this.server.saveOfflinePlayerData(this.uuid, this.namedTag, async);
+                } else {
+                    this.server.saveOfflinePlayerData(this.username, this.namedTag, async);
+                }
             }
         }
     }
@@ -4248,7 +4282,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         int level = this.expLevel;
         int most = calculateRequireExperience(level);
         while (added >= most) {
-            added = added - most;
+            added -= most;
             level++;
             most = calculateRequireExperience(level);
         }

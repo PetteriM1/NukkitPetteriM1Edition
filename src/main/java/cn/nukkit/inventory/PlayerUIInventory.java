@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.ContainerIds;
 
 import java.util.HashMap;
@@ -51,7 +52,9 @@ public class PlayerUIInventory extends BaseInventory {
         for (Player p : target) {
             if (p == this.getHolder()) {
                 pk.inventoryId = ContainerIds.UI;
-                p.dataPacket(pk);
+                if (p.protocol < ProtocolInfo.v1_16_0) {
+                    p.dataPacket(pk);
+                }
             } else {
                 int id;
 
@@ -60,6 +63,11 @@ public class PlayerUIInventory extends BaseInventory {
                     continue;
                 }
                 pk.inventoryId = id;
+                if (p.protocol < ProtocolInfo.v1_16_0) {
+                    p.dataPacket(pk);
+                }
+            }
+            if (p.protocol >= ProtocolInfo.v1_16_0) {
                 p.dataPacket(pk);
             }
         }
@@ -67,6 +75,8 @@ public class PlayerUIInventory extends BaseInventory {
 
     @Override
     public void sendContents(Player... target) {
+        sendSlot(0, target); //update cursor slot
+
         InventoryContentPacket pk = new InventoryContentPacket();
         pk.slots = new Item[this.getSize()];
         for (int i = 0; i < this.getSize(); ++i) {
@@ -76,7 +86,9 @@ public class PlayerUIInventory extends BaseInventory {
         for (Player p : target) {
             if (p == this.getHolder()) {
                 pk.inventoryId = ContainerIds.UI;
-                p.dataPacket(pk);
+                if (p.protocol < ProtocolInfo.v1_16_0) {
+                    p.dataPacket(pk);
+                }
             } else {
                 int id;
 
@@ -85,6 +97,11 @@ public class PlayerUIInventory extends BaseInventory {
                     continue;
                 }
                 pk.inventoryId = id;
+                if (p.protocol < ProtocolInfo.v1_16_0) {
+                    p.dataPacket(pk);
+                }
+            }
+            if (p.protocol >= ProtocolInfo.v1_16_0) {
                 p.dataPacket(pk);
             }
         }
