@@ -1883,7 +1883,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void dropItem(Vector3 source, Item item, Vector3 motion, boolean dropAround, int delay) {
-        if (item.getId() > 0 && item.getCount() > 0) {
+        if (item.getId() != 0 && item.getCount() > 0) {
             if (motion == null) {
                 if (dropAround) {
                     float f = ThreadLocalRandom.current().nextFloat() * 0.5f;
