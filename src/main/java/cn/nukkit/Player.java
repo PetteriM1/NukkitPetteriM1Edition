@@ -1964,9 +1964,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.server.savePlayerDataByUuid) {
             boolean dataFound = dataFile.exists();
             if (!dataFound && legacyDataFile.exists()) {
-                nbt = this.server.getOfflinePlayerData(this.username, false);
+                nbt = this.server.getOfflinePlayerData(this.username.toLowerCase(), false);
                 if (!legacyDataFile.delete()) {
-                    this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
+                    this.server.getLogger().warning("Could not delete legacy player data for " + this.username.toLowerCase());
                 }
             } else {
                 nbt = this.server.getOfflinePlayerData(this.uuid, !dataFound);
@@ -1976,7 +1976,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (legacyMissing && dataFile.exists()) {
                 nbt = this.server.getOfflinePlayerData(this.uuid, false);
             } else {
-                nbt = this.server.getOfflinePlayerData(this.username, legacyMissing);
+                nbt = this.server.getOfflinePlayerData(this.username.toLowerCase(), legacyMissing);
             }
         }
 
