@@ -72,8 +72,9 @@ public abstract class EntityJumpingMob extends EntityJumping implements EntityMo
     }
 
     public void setDamage(int[] damage) {
-        if (damage.length < 4)
-            return;
+        if (damage.length < 4) {
+            throw new IllegalArgumentException("Invalid damage array length");
+        }
 
         if (minDamage == null || minDamage.length < 4) {
             minDamage = Utils.emptyDamageArray;

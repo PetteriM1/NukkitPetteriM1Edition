@@ -75,7 +75,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
 
     public void setDamage(int[] damage) {
         if (damage.length < 4) {
-            return;
+            throw new IllegalArgumentException("Invalid damage array length");
         }
 
         if (minDamage == null || minDamage.length < 4) {
