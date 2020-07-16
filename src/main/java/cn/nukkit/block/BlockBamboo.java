@@ -289,7 +289,6 @@ public class BlockBamboo extends BlockTransparentMeta {
 
                 Block block = this.level.getBlock(this.getFloorX(), top, this.getFloorZ());
                 if (block.getId() != BAMBOO){
-                    System.out.println("noop");
                     return false;
                 }
 
