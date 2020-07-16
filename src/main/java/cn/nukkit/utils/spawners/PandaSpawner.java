@@ -17,15 +17,15 @@ public class PandaSpawner extends AbstractEntitySpawner {
     }
 
     public void spawn(Player player, Position pos, Level level) {
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+        if ((biomeId == 21 && Utils.rand(1, 10) != 1) || biomeId != 168 && biomeId != 169 && biomeId != 21){
+            return;
+        }
+
         if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS ||
                 pos.y > 255 || pos.y < 1 ||
                 level.isNether || level.isEnd ||
                 level.isAnimalSpawningAllowedByTime()){
-            return;
-        }
-
-        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
-        if ((biomeId == 21 && Utils.rand(1, 10) != 1) || biomeId != 168 && biomeId != 169 && biomeId != 21){
             return;
         }
 
