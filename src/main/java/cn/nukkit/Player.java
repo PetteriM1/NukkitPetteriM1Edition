@@ -1959,12 +1959,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         CompoundTag nbt;
-        File legacyDataFile = new File(server.getDataPath() + "players/" + this.username.toLowerCase() + ".dat");
+        String lowerName = this.username.toLowerCase();
+        File legacyDataFile = new File(server.getDataPath() + "players/" + lowerName + ".dat");
         File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
         if (this.server.savePlayerDataByUuid) {
             boolean dataFound = dataFile.exists();
             if (!dataFound && legacyDataFile.exists()) {
-                nbt = this.server.getOfflinePlayerData(this.username, false);
+                nbt = this.server.getOfflinePlayerData(lowerName, false);
                 if (!legacyDataFile.delete()) {
                     this.server.getLogger().warning("Could not delete legacy player data for " + this.username);
                 }
@@ -1976,7 +1977,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (legacyMissing && dataFile.exists()) {
                 nbt = this.server.getOfflinePlayerData(this.uuid, false);
             } else {
-                nbt = this.server.getOfflinePlayerData(this.username, legacyMissing);
+                nbt = this.server.getOfflinePlayerData(lowerName, legacyMissing);
             }
         }
 
