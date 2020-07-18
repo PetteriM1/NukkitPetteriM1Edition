@@ -37,7 +37,8 @@ public class Spawner implements Runnable {
             new SquidSpawner(this),
             new TropicalFishSpawner(this),
             new TurtleSpawner(this),
-            new WolfSpawner(this)
+            new WolfSpawner(this),
+            new PandaSpawner(this)
     );
 
     private final List<EntitySpawner> mobSpawners = Arrays.asList(
