@@ -22,10 +22,8 @@ public class PandaSpawner extends AbstractEntitySpawner {
             return;
         }
 
-        if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS ||
-                pos.y > 255 || pos.y < 1 ||
-                level.isNether || level.isEnd ||
-                level.isAnimalSpawningAllowedByTime()) {
+        if (pos.y > 255 || pos.y < 1 || level.isNether || level.isEnd || !level.isAnimalSpawningAllowedByTime() ||
+                level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
             return;
         }
 
