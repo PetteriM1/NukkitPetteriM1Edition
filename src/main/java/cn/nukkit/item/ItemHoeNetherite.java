@@ -2,15 +2,15 @@ package cn.nukkit.item;
 
 public class ItemHoeNetherite extends ItemTool {
 
-    public ItemHoeNetherite(){
+    public ItemHoeNetherite() {
         this(0, 1);
     }
 
-    public ItemHoeNetherite(Integer meta){
+    public ItemHoeNetherite(Integer meta) {
         this(meta, 1);
     }
 
-    public ItemHoeNetherite(Integer meta, int count){
+    public ItemHoeNetherite(Integer meta, int count) {
         super(NETHERITE_HOE, meta, count, "Netherite Hoe");
     }
 

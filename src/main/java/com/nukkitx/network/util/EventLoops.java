@@ -27,9 +27,9 @@ public final class EventLoops {
     static {
         boolean disableNative = System.getProperties().contains("disableNativeEventLoop");
 
-        if (Epoll.isAvailable() && !disableNative) {
+        if (!disableNative && Epoll.isAvailable()) {
             CHANNEL_TYPE = ChannelType.EPOLL;
-        } else if (KQueue.isAvailable() && !disableNative) {
+        } else if (!disableNative && KQueue.isAvailable()) {
             CHANNEL_TYPE = ChannelType.KQUEUE;
         } else {
             CHANNEL_TYPE = ChannelType.NIO;
