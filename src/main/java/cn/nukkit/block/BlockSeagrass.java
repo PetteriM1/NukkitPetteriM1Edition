@@ -29,7 +29,7 @@ public class BlockSeagrass extends BlockFlowable {
     public String getName() {
         return "Seagrass";
     }
-    
+
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = this.down();
@@ -126,17 +126,22 @@ public class BlockSeagrass extends BlockFlowable {
     public boolean canBeReplaced() {
         return true;
     }
-    
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
+
     @Override
     public BlockColor getColor() {
         return BlockColor.WATER_BLOCK_COLOR;
     }
-    
+
     @Override
     public int getToolType() {
         return ItemTool.TYPE_SHEARS;
     }
-    
+
     @Override
     public Item toItem() {
         return new ItemBlock(new BlockSeagrass(), 0);

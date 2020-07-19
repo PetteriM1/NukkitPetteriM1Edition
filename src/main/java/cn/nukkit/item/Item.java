@@ -303,6 +303,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
 
             if (Server.getInstance().requiredProtocol >= ProtocolInfo.v1_13_0){
+                list[KELP] = ItemKelp.class; //335
                 list[CAMPFIRE] = ItemCampfire.class; //720
             }
 

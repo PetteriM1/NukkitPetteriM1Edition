@@ -345,6 +345,7 @@ public interface BlockID {
     int BLOCK_KELP = 393;
     int DRIED_KELP_BLOCK = 394;
 
+    int SEA_PICKLE = 411;
     int BARRIER = 416;
     int STONE_SLAB3 = 417;
     int BAMBOO = 418;

@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
 import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -97,7 +98,8 @@ public class BlockCoralBlock extends BlockSolidMeta {
         } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
             if (!this.isDead()) {
                 for (BlockFace face : BlockFace.values()) {
-                    if (this.getSide( face) instanceof BlockWater || this.getSide( face) instanceof BlockIceFrosted) {
+                    if (this.getSideAtLayer(0, face) instanceof BlockWater || this.getSideAtLayer(1, face) instanceof BlockWater
+                            || this.getSideAtLayer(0, face) instanceof BlockIceFrosted || this.getSideAtLayer(1, face) instanceof BlockIceFrosted) {
                         return type;
                     }
                 }
@@ -116,9 +118,9 @@ public class BlockCoralBlock extends BlockSolidMeta {
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
             if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
-                return new Item[]{ toItem() };
+                return new Item[]{this.toItem() };
             } else {
-                return new Item[]{ new ItemBlock(clone(), this.getDamage() | 0x8) };
+                return new Item[]{ new ItemBlock(this.clone(), this.getDamage() | 0x8) };
             }
         } else {
             return new Item[0];

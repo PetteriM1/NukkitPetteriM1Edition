@@ -65,6 +65,10 @@ public class BlockCoral extends BlockFlowable {
         Block layer1 = block.getLevelBlockAtLayer(1);
         boolean hasWater = layer1 instanceof BlockWater;
         int waterDamage;
+
+        System.out.println("Is DEATH? "+isDead());
+        System.out.println("Colour: "+getColor().toString());
+
         if (layer1.getId() != Block.AIR && (!hasWater || ((waterDamage = layer1.getDamage()) != 0) && waterDamage != 8)) {
             return false;
         }
@@ -136,7 +140,7 @@ public class BlockCoral extends BlockFlowable {
     }
 
     public boolean isDead() {
-        return (getDamage() & 0x8) == 0x8;
+        return (this.getDamage() & 0x8) == 0x8;
     }
 
     public void setDead(boolean dead) {
