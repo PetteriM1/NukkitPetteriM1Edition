@@ -129,6 +129,13 @@ public class Level implements ChunkManager, Metadatable {
         if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.FIRE] = true;
         randomTickBlocks[Block.GLOWING_REDSTONE_ORE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
+
+        if (Server.getInstance().requiredProtocol >= 388){
+            randomTickBlocks[Block.BAMBOO] = true;
+            randomTickBlocks[Block.BAMBOO_SAPLING] = true;
+            randomTickBlocks[Block.CORAL_FAN] = true;
+            randomTickBlocks[Block.CORAL_FAN_DEAD] = true;
+        }
     }
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();

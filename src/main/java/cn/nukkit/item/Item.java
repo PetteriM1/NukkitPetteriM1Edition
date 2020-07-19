@@ -568,7 +568,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         int id = 0;
         int meta = 0;
 
-        Pattern integerPattern = Pattern.compile("^[1-9]\\d*$");
+        Pattern integerPattern = Pattern.compile("^[-1-9]\\d*$");
         if (integerPattern.matcher(b[0]).matches()) {
             id = Integer.parseInt(b[0]);
         } else {

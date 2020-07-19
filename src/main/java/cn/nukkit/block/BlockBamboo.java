@@ -42,16 +42,16 @@ public class BlockBamboo extends BlockTransparentMeta {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (isSupportInvalid()) {
-                level.scheduleUpdate(this, 0);
+            if (this.isSupportInvalid()) {
+                this.level.scheduleUpdate(this, 0);
             }
             return type;
         } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            level.useBreakOn(this, null, null, true);
+            this.level.useBreakOn(this, null, null, true);
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            Block up = up();
-            if (getAge() == 0 && up.getId() == AIR && level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL && ThreadLocalRandom.current().nextInt(3) == 0) {
-                grow(up);
+            Block up = this.up();
+            if (this.getAge() == 0 && up.getId() == AIR && this.level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL && ThreadLocalRandom.current().nextInt(3) == 0) {
+                this.grow(up);
             }
             return type;
         }
@@ -60,7 +60,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
     public boolean grow(Block up) {
         BlockBamboo newState = new BlockBamboo();
-        if (isThick()) {
+        if (this.isThick()) {
             newState.setThick(true);
             newState.setLeafSize(LEAF_SIZE_LARGE);
         } else {
@@ -95,7 +95,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = down();
+        Block down = this.down();
         int downId = down.getId();
         if (downId != BAMBOO && downId != BAMBOO_SAPLING) {
             BlockBambooSapling sampling = new BlockBambooSapling();
@@ -115,7 +115,7 @@ public class BlockBamboo extends BlockTransparentMeta {
                 animatePacket.eid = player.getId();
                 this.getLevel().addChunkPacket(player.getChunkX(), player.getChunkZ(), animatePacket);
             }
-            setLeafSize(LEAF_SIZE_SMALL);
+            this.setLeafSize(LEAF_SIZE_SMALL);
         } if (down instanceof BlockBamboo) {
             BlockBamboo bambooDown = (BlockBamboo) down;
             canGrow = bambooDown.getAge() == 0;
@@ -123,13 +123,13 @@ public class BlockBamboo extends BlockTransparentMeta {
             if (!thick) {
                 boolean setThick = true;
                 for (int i = 2; i <= 3; i++) {
-                    if (getSide(BlockFace.DOWN, i).getId() != BAMBOO) {
+                    if (this.getSide(BlockFace.DOWN, i).getId() != BAMBOO) {
                         setThick = false;
                     }
                 }
                 if (setThick) {
-                    setThick(true);
-                    setLeafSize(LEAF_SIZE_LARGE);
+                    this.setThick(true);
+                    this.setLeafSize(LEAF_SIZE_LARGE);
                     bambooDown.setLeafSize(LEAF_SIZE_SMALL);
                     bambooDown.setThick(true);
                     bambooDown.setAge(1);
@@ -142,14 +142,14 @@ public class BlockBamboo extends BlockTransparentMeta {
                         this.level.setBlock(bambooDown, bambooDown, false, true);
                     }
                 } else {
-                    setLeafSize(LEAF_SIZE_SMALL);
+                    this.setLeafSize(LEAF_SIZE_SMALL);
                     bambooDown.setAge(1);
                     this.level.setBlock(bambooDown, bambooDown, false, true);
                 }
             } else {
-                setThick(true);
-                setLeafSize(LEAF_SIZE_LARGE);
-                setAge(0);
+                this.setThick(true);
+                this.setLeafSize(LEAF_SIZE_LARGE);
+                this.setAge(0);
                 bambooDown.setLeafSize(LEAF_SIZE_LARGE);
                 bambooDown.setAge(1);
                 this.level.setBlock(bambooDown, bambooDown, false, true);
@@ -168,13 +168,13 @@ public class BlockBamboo extends BlockTransparentMeta {
                     }
                 }
             }
-        } else if (isSupportInvalid()) {
+        } else if (this.isSupportInvalid()) {
             return false;
         }
 
-        int height = canGrow? countHeight() : 0;
+        int height = canGrow? this.countHeight() : 0;
         if (!canGrow || height >= 15 || height >= 11 && ThreadLocalRandom.current().nextFloat() < 0.25F) {
-            setAge(1);
+            this.setAge(1);
         }
 
         this.level.setBlock(this, this, false, true);
@@ -183,7 +183,7 @@ public class BlockBamboo extends BlockTransparentMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        Optional<Block> down = down().firstInLayers(b-> b instanceof BlockBamboo);
+        Optional<Block> down = this.down().firstInLayers(b-> b instanceof BlockBamboo);
         if (down.isPresent()) {
             BlockBamboo bambooDown = (BlockBamboo) down.get();
             int height = bambooDown.countHeight();
@@ -201,7 +201,7 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     private boolean isSupportInvalid() {
-        int downId = down().getId();
+        int downId = this.down().getId();
         return downId != BAMBOO && downId != DIRT && downId != GRASS && downId != SAND && downId != GRAVEL && downId != PODZOL && downId != BAMBOO_SAPLING;
     }
 
@@ -226,11 +226,11 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     public boolean isThick() {
-        return (getDamage() & 0x1) == 0x1;
+        return (this.getDamage() & 0x1) == 0x1;
     }
 
     public void setThick(boolean thick) {
-        setDamage(getDamage() & (DATA_MASK ^ 0x1) | (thick? 0x1 : 0x0));
+        this.setDamage(this.getDamage() & (DATA_MASK ^ 0x1) | (thick? 0x1 : 0x0));
     }
 
     @Override
@@ -239,12 +239,12 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     public int getLeafSize() {
-        return (getDamage() >> 1) & 0x3;
+        return (this.getDamage() >> 1) & 0x3;
     }
 
     public void setLeafSize(int leafSize) {
         leafSize = MathHelper.clamp(leafSize, LEAF_SIZE_NONE, LEAF_SIZE_LARGE) & 0b11;
-        setDamage(getDamage() & (DATA_MASK ^ 0b110) | (leafSize << 1));
+        this.setDamage(this.getDamage() & (DATA_MASK ^ 0b110) | (leafSize << 1));
     }
 
     @Override
@@ -312,11 +312,11 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     public int getAge() {
-        return (getDamage() & 0x8) >> 3;
+        return (this.getDamage() & 0x8) >> 3;
     }
 
     public void setAge(int age) {
         age = MathHelper.clamp(age, 0, 1) << 3;
-        setDamage(getDamage() & (DATA_MASK ^ 0b1000) | age);
+        this.setDamage(this.getDamage() & (DATA_MASK ^ 0b1000) | age);
     }
 }
