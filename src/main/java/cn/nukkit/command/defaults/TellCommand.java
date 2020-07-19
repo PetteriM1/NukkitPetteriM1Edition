@@ -33,7 +33,6 @@ public class TellCommand extends VanillaCommand {
 
         if (args.length < 2) {
             sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
-
             return false;
         }
 
@@ -54,7 +53,10 @@ public class TellCommand extends VanillaCommand {
         for (int i = 1; i < args.length; i++) {
             msg.append(args[i]).append(' ');
         }
-        if (msg.length() > 0) {
+        if (msg.length() > 512) {
+            sender.sendMessage(TextFormat.RED + "The message is too long");
+            return true;
+        } else if (msg.length() > 0) {
             msg = new StringBuilder(msg.substring(0, msg.length() - 1));
         }
 
