@@ -28,7 +28,7 @@ public abstract class EntityWalking extends BaseEntity {
         }
 
         Vector3 target = this.target;
-        if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))) {
+        if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target)) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
 
             Entity[] e = this.getLevel().getEntities();
