@@ -23,7 +23,7 @@ public abstract class EntityWalking extends BaseEntity {
             return;
         }
 
-        if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
+        if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
             return;
         }
 
@@ -33,7 +33,7 @@ public abstract class EntityWalking extends BaseEntity {
 
             Entity[] e = this.getLevel().getEntities();
             for (Entity entity : e) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
+                if (entity == this || !(entity instanceof EntityCreature) || (entity instanceof EntityAnimal || !entity.canBeFollowed())) {
                     continue;
                 }
 
@@ -135,7 +135,7 @@ public abstract class EntityWalking extends BaseEntity {
                 return null;
             }
 
-            if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
+            if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
                 double x = this.followTarget.x - this.x;
                 double z = this.followTarget.z - this.z;
 
