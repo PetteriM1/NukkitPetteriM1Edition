@@ -224,7 +224,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             if (extending) {
                 // Extension block entity
                 Vector3 pistonHead = pos.getSide(direction);
-                this.level.setBlockFullIdAt(pistonHead.getFloorX(), pistonHead.getFloorY(), pistonHead.getFloorZ(), (544) | (this.getDamage() & 0x7));
+                this.level.setBlockFullIdAt(pistonHead.getFloorX(), pistonHead.getFloorY(), pistonHead.getFloorZ(), (PISTON_HEAD << DATA_BITS) | (this.getDamage() & 0x7));
                 //this.level.setBlock(pistonHead, Block.get(PISTON_HEAD, this.getDamage()));
             }
             return true;
