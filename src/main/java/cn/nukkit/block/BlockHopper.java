@@ -42,6 +42,11 @@ public class BlockHopper extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public double getResistance() {
         return 24;
     }

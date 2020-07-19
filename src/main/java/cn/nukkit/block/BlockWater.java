@@ -3,14 +3,16 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
 /**
- * @author MagicDroidX
+ * author: MagicDroidX
  * Nukkit Project
  */
 public class BlockWater extends BlockLiquid {
+
 
     public BlockWater() {
         this(0);
@@ -45,7 +47,7 @@ public class BlockWater extends BlockLiquid {
 
     @Override
     public BlockLiquid getBlock(int meta) {
-        return (BlockLiquid) Block.get(WATER, meta);
+        return (BlockLiquid) Block.get(BlockID.WATER, meta);
     }
 
     @Override
@@ -56,9 +58,14 @@ public class BlockWater extends BlockLiquid {
             entity.extinguish();
         }
     }
-    
+
     @Override
     public int tickRate() {
         return 5;
+    }
+
+    @Override
+    public boolean usesWaterLogging() {
+        return true;
     }
 }

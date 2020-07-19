@@ -51,6 +51,11 @@ public class BlockBeacon extends BlockTransparent {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
 

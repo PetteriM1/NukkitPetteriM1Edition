@@ -1395,6 +1395,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             block.onEntityCollide(this);
+            block.getLevelBlockAtLayer(1).onEntityCollide(this);
         }
 
         if (portal) {
@@ -3254,7 +3255,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     Block target = this.level.getBlock(blockVector.asVector3());
                                     block = target.getSide(face);
 
-                                    this.level.sendBlocks(this, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_NOGRAPHIC);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1), block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
 
                                     if (target instanceof BlockDoor) {
                                         BlockDoor door = (BlockDoor) target;
@@ -3266,8 +3268,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                             if (part.getId() == target.getId()) {
                                                 target = part;
-
-                                                this.level.sendBlocks(this, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                                this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_NOGRAPHIC);
+                                                this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
                                             }
                                         }
                                     }
@@ -3302,7 +3304,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     target = this.level.getBlock(blockVector.asVector3());
                                     BlockEntity blockEntity = this.level.getBlockEntity(blockVector.asVector3());
 
-                                    this.level.sendBlocks(this, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
 
                                     inventory.sendHeldItem(this);
 

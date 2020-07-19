@@ -48,6 +48,11 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
                 x + ((1 + (getDamage() << 1)) >> 4),

@@ -33,6 +33,11 @@ public class BlockCraftingTable extends BlockSolid {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public double getResistance() {
         return 15;
     }

@@ -81,6 +81,11 @@ public class BlockWall extends BlockTransparentMeta {
         );
     }
 
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
     public boolean canConnect(Block block) {
         return (!(block.getId() != COBBLE_WALL && block.getId() != FENCE_GATE)) || block.isSolid() && !block.isTransparent();
     }

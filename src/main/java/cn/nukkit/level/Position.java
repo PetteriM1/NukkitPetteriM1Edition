@@ -96,7 +96,7 @@ public class Position extends Vector3 {
     }
 
     public Block getLevelBlockAtLayer(int layer) {
-        if (this.isValid()) return this.level.getBlock(this); //TODO: layers
+        if (this.isValid()) return this.level.getBlock(this, layer);
         else throw new LevelException("Undefined Level reference");
     }
 

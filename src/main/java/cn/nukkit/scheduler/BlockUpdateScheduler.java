@@ -53,7 +53,7 @@ public class BlockUpdateScheduler {
             if (updates != null) {
                 for (BlockUpdateEntry entry : updates) {
                     if (level.isAreaLoaded(new AxisAlignedBB(entry.pos, entry.pos))) {
-                        Block block = level.getBlock(entry.pos);
+                        Block block = level.getBlock(entry.pos, entry.block.layer);
 
                         if (Block.equals(block, entry.block, false)) {
                             block.onUpdate(Level.BLOCK_UPDATE_SCHEDULED);

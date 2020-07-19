@@ -56,6 +56,11 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean isTransparent() {
         return true;
     }

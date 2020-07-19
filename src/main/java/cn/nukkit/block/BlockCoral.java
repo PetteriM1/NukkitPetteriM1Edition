@@ -30,6 +30,11 @@ public class BlockCoral extends BlockFlowable {
     public int getId() {
         return CORAL;
     }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
     
     @Override
     public int onUpdate(int type) {

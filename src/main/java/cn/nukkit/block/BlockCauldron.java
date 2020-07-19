@@ -65,6 +65,11 @@ public class BlockCauldron extends BlockSolidMeta {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean onActivate(Item item, Player player) {
         BlockEntity be = this.level.getBlockEntity(this);
 

@@ -171,4 +171,14 @@ public class BlockTripWire extends BlockFlowable {
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
         return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.5, this.z + 1);
     }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
 }

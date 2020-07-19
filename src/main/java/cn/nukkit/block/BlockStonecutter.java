@@ -45,4 +45,9 @@ public class BlockStonecutter extends BlockSolid {
     public boolean canHarvestWithHand() {
         return false;
     }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
 }

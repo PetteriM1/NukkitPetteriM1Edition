@@ -476,7 +476,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             block.y = pos.y;
             block.z = pos.z;
             block.level = pos.level;
-            //block.layer = layer; //TODO: layers
+            block.layer = layer;
         }
         return block;
     }
@@ -606,6 +606,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
 
     public boolean diffusesSkyLight() {
         return false;
+    }
+
+    public int getWaterloggingLevel() {
+        return 0;
+    }
+
+    public final boolean canWaterloggingFlowInto() {
+        return this.canBeFlowedInto() || this.getWaterloggingLevel() > 1;
     }
 
     public boolean canBeFlowedInto() {
@@ -835,10 +843,30 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public Block getSide(BlockFace face, int step) {
+        return this.getSideAtLayer(layer, face, step);
+    }
+
+    public Block getSideAtLayer(int layer, BlockFace face) {
         if (this.isValid()) {
-            return this.getLevel().getBlock(super.getSide(face, step));
+            return this.getLevel().getBlock((int) x + face.getXOffset(), (int) y + face.getYOffset(), (int) z + face.getZOffset(), layer);
         }
-        return Block.get(Item.AIR, 0, Position.fromObject(new Vector3(this.x, this.y, this.z).getSide(face, step)));
+        return this.getSide(face, 1);
+    }
+
+    public Block getSideAtLayer(int layer, BlockFace face, int step) {
+        if (this.isValid()) {
+            if (step == 1) {
+                return this.getLevel().getBlock((int) x + face.getXOffset(), (int) y + face.getYOffset(), (int) z + face.getZOffset(), layer);
+            } else {
+                return this.getLevel().getBlock((int) x + face.getXOffset() * step, (int) y + face.getYOffset() * step, (int) z + face.getZOffset() * step, layer);
+            }
+        }
+        Block block = Block.get(Item.AIR, 0);
+        block.x = (int) x + face.getXOffset() * step;
+        block.y = (int) y + face.getYOffset() * step;
+        block.z = (int) z + face.getZOffset() * step;
+        block.layer = layer;
+        return block;
     }
 
     public Block up() {
@@ -849,12 +877,20 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return getSide(BlockFace.UP, step);
     }
 
+    public Block up(int step, int layer) {
+        return this.getSideAtLayer(layer, BlockFace.UP, step);
+    }
+
     public Block down() {
         return down(1);
     }
 
     public Block down(int step) {
         return getSide(BlockFace.DOWN, step);
+    }
+
+    public Block down(int step, int layer) {
+        return this.getSideAtLayer(layer, BlockFace.DOWN, step);
     }
 
     public Block north() {
@@ -865,12 +901,20 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return getSide(BlockFace.NORTH, step);
     }
 
+    public Block north(int step, int layer) {
+        return this.getSideAtLayer(layer, BlockFace.NORTH, step);
+    }
+
     public Block south() {
         return south(1);
     }
 
     public Block south(int step) {
         return getSide(BlockFace.SOUTH, step);
+    }
+
+    public Block south(int step, int layer) {
+        return this.getSideAtLayer(layer, BlockFace.SOUTH, step);
     }
 
     public Block east() {
@@ -881,12 +925,20 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return getSide(BlockFace.EAST, step);
     }
 
+    public Block east(int step, int layer) {
+        return this.getSideAtLayer(layer, BlockFace.EAST, step);
+    }
+
     public Block west() {
         return west(1);
     }
 
     public Block west(int step) {
         return getSide(BlockFace.WEST, step);
+    }
+
+    public Block west(int step, int layer) {
+        return this.getSideAtLayer(layer, BlockFace.WEST, step);
     }
 
     @Override

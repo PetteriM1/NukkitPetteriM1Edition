@@ -50,6 +50,11 @@ public class BlockMobSpawner extends BlockSolid {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean canHarvestWithHand() {
         return false;
     }

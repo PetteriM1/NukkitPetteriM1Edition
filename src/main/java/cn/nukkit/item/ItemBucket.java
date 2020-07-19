@@ -12,6 +12,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
 
 /**
  * @author MagicDroidX
@@ -124,10 +125,29 @@ public class ItemBucket extends Item {
             }
         } else if (targetBlock instanceof BlockLiquid) {
             Item result = Item.get(BUCKET, 0, 1);
-            PlayerBucketEmptyEvent ev;
-            player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
-            if (!block.canBeFlowedInto()) {
-                ev.setCancelled(true);
+            boolean usesWaterlogging = ((BlockLiquid) targetBlock).usesWaterLogging();
+            Block placementBlock;
+            if (usesWaterlogging) {
+                if (block.getId() == BlockID.BAMBOO) {
+                    placementBlock = block;
+                } else if (target.getWaterloggingLevel() > 0) {
+                    placementBlock = target.getLevelBlockAtLayer(1);
+                } else if (block.getWaterloggingLevel() > 0) {
+                    placementBlock = block.getLevelBlockAtLayer(1);
+                } else {
+                    placementBlock = block;
+                }
+            } else {
+                placementBlock = block;
+            }
+
+            PlayerBucketEmptyEvent ev = new PlayerBucketEmptyEvent(player, placementBlock, face, this, result);
+            player.getServer().getPluginManager().callEvent(ev);
+            boolean canBeFlowedInto = placementBlock.canBeFlowedInto() || placementBlock.getId() == BlockID.BAMBOO;
+            if (usesWaterlogging) {
+                ev.setCancelled(placementBlock.getWaterloggingLevel() <= 0 && !canBeFlowedInto);
+            } else {
+                ev.setCancelled(!canBeFlowedInto);
             }
 
             if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
@@ -135,7 +155,7 @@ public class ItemBucket extends Item {
             }
 
             if (!ev.isCancelled()) {
-                player.getLevel().setBlock(block, targetBlock, true, true);
+                player.getLevel().setBlock(placementBlock, placementBlock.layer, targetBlock, true, true);
                 if (player.isSurvival()) {
                     Item clone = this.clone();
                     clone.setCount(this.getCount() - 1);
@@ -176,6 +196,7 @@ public class ItemBucket extends Item {
 
                 return true;
             } else {
+                player.getLevel().sendBlocks(new Player[] {player}, new Block[] {block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_ALL_PRIORITY, 1); //TODO: maybe not here
                 player.getInventory().sendContents(player);
             }
         }

@@ -2044,6 +2044,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             block.onEntityCollide(this);
+            block.getLevelBlockAtLayer(1).onEntityCollide(this);
             block.addVelocityToEntity(this, vector);
         }
 

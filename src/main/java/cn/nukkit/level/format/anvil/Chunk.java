@@ -158,7 +158,7 @@ public class Chunk extends BaseChunk {
                 block.x = entryNBT.getInt("x");
                 block.y = entryNBT.getInt("y");
                 block.z = entryNBT.getInt("z");
-                //block.layer = 0; TODO: disable for now
+                block.layer = 0;
 
                 this.provider.getLevel().scheduleUpdate(block, block, entryNBT.getInt("t"), entryNBT.getInt("p"), false);
             }

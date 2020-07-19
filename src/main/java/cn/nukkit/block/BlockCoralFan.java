@@ -49,6 +49,11 @@ public class BlockCoralFan extends BlockFlowable implements Faceable {
         };
         return colors[this.getType()];
     }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
     
     @Override
     public int onUpdate(int type) {

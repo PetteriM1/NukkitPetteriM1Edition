@@ -33,42 +33,43 @@ public class SimpleChunkManager implements ChunkManager {
     }
 
     @Override
-    public void setBlockFullIdAt(int x, int y, int z, int layer, int fullId) {
-        //noop
-    }
-
-    @Override
     public void setBlockIdAt(int x, int y, int z, int id) {
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.setBlockId(x & 0xf, y & 0xff, z & 0xf, id);
-        }
-    }
-
-    @Override
-    public boolean setBlockAtLayer(int x, int y, int z, int layer, int id, int data) {
-        return false; //TODO: layers
-    }
-
-    @Override
-    public void setBlockAt(int x, int y, int z, int id, int data) {
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.setBlock(x & 0xf, y & 0xff, z & 0xf, id, data);
-        }
-    }
-    
-    @Override
-    public void setBlockFullIdAt(int x, int y, int z, int fullId) {
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.setFullBlockId(x & 0xf, y & 0xff, z & 0xf, fullId);
-        }
+        this.setBlockIdAt(x, y, z, 0, id);
     }
 
     @Override
     public void setBlockIdAt(int x, int y, int z, int layer, int id) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setBlockId(x & 0xf, y & 0xff, z & 0xf, layer, id);
+        }
+    }
 
+    @Override
+    public void setBlockAt(int x, int y, int z, int id, int data) {
+        this.setBlockAtLayer(x, y, z, 0, id, data);
+    }
+
+    @Override
+    public boolean setBlockAtLayer(int x, int y, int z, int layer, int id, int data) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.setBlock(x & 0xf, y & 0xff, z & 0xf, id, data);
+        }
+        return false;
+    }
+
+    @Override
+    public void setBlockFullIdAt(int x, int y, int z, int fullId) {
+        this.setBlockFullIdAt(x, y, z, 0, fullId);
+    }
+
+    @Override
+    public void setBlockFullIdAt(int x, int y, int z, int layer, int fullId) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setFullBlockId(x & 0xf, y & 0xff, z & 0xf, layer, fullId);
+        }
     }
 
     @Override
@@ -94,7 +95,7 @@ public class SimpleChunkManager implements ChunkManager {
     public void setBlockDataAt(int x, int y, int z, int layer, int data) {
         FullChunk chunk = this.getChunk(x >> 4, z >> 4);
         if (chunk != null) {
-            chunk.setBlockData(x & 0xf, y & 0xff, z & 0xf, data, layer);
+            chunk.setBlockData(x & 0xf, y & 0xff, z & 0xf, layer, data);
         }
     }
 
