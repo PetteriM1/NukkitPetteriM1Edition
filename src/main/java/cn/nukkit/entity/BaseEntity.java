@@ -25,6 +25,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public int stayTime = 0;
     protected int moveTime = 0;
 
+    private int airTicks = 0;
+
     protected float moveMultifier = 1.0f;
 
     protected Vector3 target = null;
@@ -476,5 +478,15 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public int nearbyDistanceMultiplier() {
         return 1;
+    }
+
+    @Override
+    public int getAirTicks() {
+        return this.airTicks;
+    }
+
+    @Override
+    public void setAirTicks(int ticks) {
+        this.airTicks = ticks;
     }
 }

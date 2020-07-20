@@ -19,16 +19,16 @@ public abstract class EntitySwimming extends BaseEntity {
             return;
         }
 
-        if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
+        if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
             return;
         }
 
         Vector3 target = this.target;
-        if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))) {
+        if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target)) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
             Entity[] e = this.getLevel().getEntities();
             for (Entity entity : e) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal || !entity.canBeFollowed()) {
                     continue;
                 }
 
@@ -88,7 +88,7 @@ public abstract class EntitySwimming extends BaseEntity {
                 return null;
             }
 
-            if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
+            if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
                 double x = this.followTarget.x - this.x;
                 double z = this.followTarget.z - this.z;
 

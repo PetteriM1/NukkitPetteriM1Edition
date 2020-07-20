@@ -256,6 +256,7 @@ public class Server {
     public boolean spawnMobs;
     public boolean savePlayerDataByUuid;
     public int requiredProtocol;
+    public boolean vanillaPortals;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2403,6 +2404,7 @@ public class Server {
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
         this.requiredProtocol = this.getPropertyInt("multiversion-min-protocol");
+        this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2520,6 +2522,7 @@ public class Server {
             put("do-not-limit-skin-geometry", true);
             put("automatic-bug-report", true);
             put("save-player-data-by-uuid", true);
+            put("vanilla-portals", true);
         }
     }
 

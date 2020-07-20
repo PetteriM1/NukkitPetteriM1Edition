@@ -204,8 +204,8 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable {
                 }
 
                 f = friction / f;
-                strafe = strafe * f;
-                forward = forward * f;
+                strafe *= f;
+                forward *= f;
                 double f1 = Math.sin(this.yaw * 0.017453292);
                 double f2 = Math.cos(this.yaw * 0.017453292);
                 this.motionX = (strafe * f2 - forward * f1);
