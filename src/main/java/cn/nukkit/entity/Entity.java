@@ -371,6 +371,10 @@ public abstract class Entity extends Location implements Metadatable {
         return true;
     }
 
+    public boolean canBeFollowed() {
+        return true;
+    }
+
     protected float getGravity() {
         return 0;
     }
