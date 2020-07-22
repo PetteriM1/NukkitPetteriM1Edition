@@ -39,7 +39,8 @@ public class Spawner implements Runnable {
             new TropicalFishSpawner(this),
             new TurtleSpawner(this),
             new WolfSpawner(this),
-            new PandaSpawner(this)
+            new PandaSpawner(this),
+            new FoxSpawner(this)
     );
 
     private final List<EntitySpawner> mobSpawners = Arrays.asList(
@@ -56,7 +57,8 @@ public class Spawner implements Runnable {
             new ZombieSpawner(this),
             new ZombiePigmanSpawner(this),
             new WitchSpawner(this),
-            new WitherSkeletonSpawner(this)
+            new WitherSkeletonSpawner(this),
+            new DrownedSpawner(this)
     );
 
     @Override
