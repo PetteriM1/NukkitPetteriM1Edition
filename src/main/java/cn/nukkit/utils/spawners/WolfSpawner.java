@@ -18,8 +18,7 @@ public class WolfSpawner extends AbstractEntitySpawner {
     public void spawn(Player player, Position pos, Level level) {
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.isNether || level.isEnd) {
-        } else if (biomeId != 4 && biomeId != 5 && biomeId != 20 && biomeId != 27 && biomeId != 30 && biomeId != 32 && biomeId != 133 && biomeId != 158) {
+        if (biomeId != 4 && biomeId != 5 && biomeId != 20 && biomeId != 27 && biomeId != 30 && biomeId != 32 && biomeId != 133 && biomeId != 158) {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
         } else if (level.isAnimalSpawningAllowedByTime()) {

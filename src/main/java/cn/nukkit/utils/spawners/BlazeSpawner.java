@@ -6,6 +6,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.Utils;
 
 public class BlazeSpawner extends AbstractEntitySpawner {
 
@@ -15,7 +16,11 @@ public class BlazeSpawner extends AbstractEntitySpawner {
 
     @Override
     public void spawn(Player player, Position pos, Level level) {
-        if (level.isNether && (!(pos.y > 127) && !(pos.y < 1))) {
+        if (Utils.rand(1, 3) == 1) {
+            return;
+        }
+
+        if (!(pos.y > 127) && !(pos.y < 1)) {
             this.spawnTask.createEntity("Blaze", pos);
         }
     }

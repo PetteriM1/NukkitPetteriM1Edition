@@ -224,6 +224,8 @@ public class Level implements ChunkManager, Metadatable {
     public int tickRateTime = 0;
     public int tickRateCounter = 0;
 
+    // Notice: These shouldn't be used in the internal methods
+    // Check the dimension id instead
     public final boolean isNether;
     public final boolean isEnd;
 
@@ -319,7 +321,7 @@ public class Level implements ChunkManager, Metadatable {
         this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
 
         this.isNether = name.equals("nether");
-        this.isEnd = name.equals("end");
+        this.isEnd = name.equals("the_end");
 
         this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
     }
@@ -830,7 +832,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         // Tick Weather
-        if (!this.isNether && !this.isEnd && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && this.randomTickingEnabled()) {
+        if (this.dimension != DIMENSION_NETHER && this.dimension != DIMENSION_THE_END && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && this.randomTickingEnabled()) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {

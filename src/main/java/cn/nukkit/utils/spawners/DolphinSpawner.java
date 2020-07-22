@@ -22,7 +22,6 @@ public class DolphinSpawner extends AbstractEntitySpawner {
         if (blockId != Block.WATER && blockId != Block.STILL_WATER) {
         } else if (biomeId != 0) {
         } else if (pos.y > 255 || pos.y < 1) {
-        } else if (level.isNether || level.isEnd) {
         } else {
             if (level.getBlock(pos.add(0, -1, 0)) instanceof BlockWater) {
                 this.spawnTask.createEntity("Dolphin", pos.add(0, -1, 0));

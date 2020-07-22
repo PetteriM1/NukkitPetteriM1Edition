@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.EntityCod;
 import cn.nukkit.entity.passive.EntitySalmon;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
@@ -75,22 +76,19 @@ public class Spawner implements Runnable {
     }
 
     static boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
-        try {
-            int count = 0;
-            int max = (networkId == EntitySalmon.NETWORK_ID || networkId == EntityCod.NETWORK_ID) ? 4 : 2;
-            Entity[] e = level.getEntities();
-            for (Entity entity : e) {
-                if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
-                    count++;
-                    if (count > max) {
-                        return false;
-                    }
+        int max = getMaxSpawns(networkId, level.getDimension() == Level.DIMENSION_NETHER, level.getDimension() == Level.DIMENSION_THE_END);
+        if (max == 0) return false;
+        int count = 0;
+        Entity[] e = level.getEntities();
+        for (Entity entity : e) {
+            if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
+                count++;
+                if (count > max) {
+                    return false;
                 }
             }
-            return count < max;
-        } catch (Exception e) {
-            return false;
         }
+        return count < max;
     }
 
     public BaseEntity createEntity(Object type, Position pos) {
@@ -195,5 +193,26 @@ public class Spawner implements Runnable {
             }
         }
         return y;
+    }
+
+    private static int getMaxSpawns(int id, boolean nether, boolean end) {
+        switch (id) {
+            case EntityZombiePigman.NETWORK_ID:
+                return nether ? 4 : 0;
+            case EntityGhast.NETWORK_ID:
+            case EntityBlaze.NETWORK_ID:
+            case EntityWitherSkeleton.NETWORK_ID:
+            case EntityMagmaCube.NETWORK_ID:
+                return nether ? 2 : 0;
+            case EntityEnderman.NETWORK_ID:
+                return end ? 10 : 2;
+            case EntityCod.NETWORK_ID:
+            case EntitySalmon.NETWORK_ID:
+                return end || nether ? 0 : 4;
+            case EntityWitch.NETWORK_ID:
+                return end || nether ? 0 : 1;
+            default:
+                return end || nether ? 0 : 2;
+        }
     }
 }

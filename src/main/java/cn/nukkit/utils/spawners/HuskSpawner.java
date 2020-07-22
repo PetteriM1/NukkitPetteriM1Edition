@@ -20,8 +20,7 @@ public class HuskSpawner extends AbstractEntitySpawner {
     public void spawn(Player player, Position pos, Level level) {
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.isNether || level.isEnd) {
-        } else if (biomeId != 2 && biomeId != 130) {
+        if (biomeId != 2 && biomeId != 130) {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.SAND) {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {

@@ -7,6 +7,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.Utils;
 
 public class RabbitSpawner extends AbstractEntitySpawner {
 
@@ -16,10 +17,13 @@ public class RabbitSpawner extends AbstractEntitySpawner {
 
     @Override
     public void spawn(Player player, Position pos, Level level) {
+        if (Utils.rand(1, 3) == 1) {
+            return;
+        }
+
         final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
 
-        if (level.isNether || level.isEnd) {
-        } else if (biomeId != 2 && biomeId != 130 && biomeId != 30 && biomeId != 5 && biomeId != 12) {
+        if (biomeId != 2 && biomeId != 130 && biomeId != 30 && biomeId != 5 && biomeId != 12) {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
         } else if (level.isAnimalSpawningAllowedByTime()) {
