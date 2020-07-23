@@ -19,7 +19,6 @@ public class PolarBearSpawner extends AbstractEntitySpawner {
     @Override
     public void spawn(Player player, Position pos, Level level) {
         if (level.getBiomeId((int) pos.x, (int) pos.z) != 12) {
-        } else if (level.isNether || level.isEnd) {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
         } else if (level.isAnimalSpawningAllowedByTime()) {

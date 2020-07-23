@@ -54,7 +54,7 @@ public class End extends Generator {
 
     @Override
     public String getName() {
-        return "end";
+        return "the_end";
     }
 
     @Override

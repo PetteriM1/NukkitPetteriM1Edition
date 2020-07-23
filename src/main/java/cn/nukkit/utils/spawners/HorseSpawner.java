@@ -22,7 +22,6 @@ public class HorseSpawner extends AbstractEntitySpawner {
 
         if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
         } else if (biomeId != 1 && biomeId != 35 && biomeId != 128 && biomeId != 129) {
-        } else if (level.isNether || level.isEnd) {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (level.isAnimalSpawningAllowedByTime()) {
             BaseEntity entity = this.spawnTask.createEntity("Horse", pos.add(0, 1, 0));

@@ -19,7 +19,6 @@ public class SheepSpawner extends AbstractEntitySpawner {
     public void spawn(Player player, Position pos, Level level) {
         if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
         } else if (pos.y > 255 || pos.y < 1) {
-        } else if (level.isNether || level.isEnd) {
         } else if (level.isAnimalSpawningAllowedByTime()) {
             BaseEntity entity = this.spawnTask.createEntity("Sheep", pos.add(0, 1, 0));
             if (Utils.rand(1, 20) == 1) {

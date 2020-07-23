@@ -9,12 +9,11 @@ import java.util.zip.Inflater;
 
 public class ZlibSingleThreadLowMem implements ZlibProvider {
 
-    private static final int BUFFER_SIZE = 8192;
-    private static final Deflater DEFLATER = new Deflater(Deflater.BEST_COMPRESSION);
+    private static final Deflater DEFLATER = new Deflater(7);
     private static final Inflater INFLATER = new Inflater();
-    private static final Deflater DEFLATER_RAW = new Deflater(Deflater.BEST_COMPRESSION, true);
+    private static final Deflater DEFLATER_RAW = new Deflater(7, true);
     private static final Inflater INFLATER_RAW = new Inflater(true);
-    private static final byte[] BUFFER = new byte[BUFFER_SIZE];
+    private static final byte[] BUFFER = new byte[8192];
 
     @Override
     public synchronized byte[] deflate(byte[][] datas, int level) throws IOException {
@@ -113,7 +112,7 @@ public class ZlibSingleThreadLowMem implements ZlibProvider {
             }
             return bos.toByteArray();
         } catch (DataFormatException e) {
-            throw new IOException("Unable to inflate zlib stream", e);
+            throw new IOException("Unable to inflate Zlib stream", e);
         }
     }
 
@@ -128,6 +127,9 @@ public class ZlibSingleThreadLowMem implements ZlibProvider {
             int length = 0;
             while (!INFLATER_RAW.finished()) {
                 int i = INFLATER_RAW.inflate(BUFFER);
+                if (i == 0) {
+                    throw new IOException("Could not decompress data");
+                }
                 length += i;
                 if (maxSize > 0 && length >= maxSize) {
                     throw new IOException("Inflated data exceeds maximum size");
@@ -136,7 +138,7 @@ public class ZlibSingleThreadLowMem implements ZlibProvider {
             }
             return bos.toByteArray();
         } catch (DataFormatException e) {
-            throw new IOException("Unable to inflate zlib stream", e);
+            throw new IOException("Unable to inflate Zlib stream", e);
         }
     }
 }

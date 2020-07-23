@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.data.ShortEntityData;
+import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -55,6 +56,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     protected int turtleTicks = 200;
 
     private boolean blocking = false;
+
+    protected final boolean isDrowned = this instanceof EntityDrowned;
 
     @Override
     protected void initEntity() {
@@ -296,7 +299,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof EntitySwimming || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
+                if (this instanceof EntitySwimming || this.isDrowned || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
                     this.setAirTicks(400);
                 } else {
                     if (turtleTicks == 0 || turtleTicks == 200) {

@@ -15,7 +15,7 @@ public class GhastSpawner extends AbstractEntitySpawner {
 
     @Override
     public void spawn(Player player, Position pos, Level level) {
-        if (level.isNether && (!(pos.y > 127) && !(pos.y < 1))) {
+        if (!(pos.y > 127) && !(pos.y < 1)) {
             this.spawnTask.createEntity("Ghast", pos);
         }
     }
