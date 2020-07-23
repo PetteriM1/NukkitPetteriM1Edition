@@ -1,5 +1,7 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -323,12 +325,13 @@ public class Utils {
      */
     public static String getVersionByProtocol(int protocol) {
         switch (protocol) {
-            case 388:
+            case ProtocolInfo.v1_13_0:
                 return "1.13.0";
-            case 389:
-            case 390:
+            case ProtocolInfo.v1_14_0:
+            case ProtocolInfo.v1_14_60:
                 return "1.14.0";
-            case 407:
+            case ProtocolInfo.v1_16_0:
+            case ProtocolInfo.v1_16_20:
                 return "1.16.0";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
