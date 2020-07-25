@@ -125,14 +125,14 @@ public abstract class EntityJumping extends BaseEntity {
                 double z = this.followTarget.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
-                if (this.stayTime > 0 || this.distance(this.followTarget) <= (this.getWidth() + 0.0d) / 2 + 0.05) {
+                if (this.stayTime > 0 || this.distance(this.followTarget) <= (this.getWidth() / 2 + 0.05)) {
                     this.motionX = 0;
                     this.motionZ = 0;
                 } else {
                     if (this.isInsideOfWater()) {
                         this.motionX = this.getSpeed() * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.05 * (z / diff);
-                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0,2.0),Utils.rand(-0.5,0),Utils.rand(-2.0,2.0))));
+                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0, 2.0), Utils.rand(-0.5, 0), Utils.rand(-2.0, 2.0))));
                     } else {
                         this.motionX = this.getSpeed() * 0.1 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.1 * (z / diff);
@@ -149,14 +149,14 @@ public abstract class EntityJumping extends BaseEntity {
                 double z = this.target.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
-                if (this.stayTime > 0 || (this.distance(this.target) <= ((this.getWidth() + 0.0d) / 2 + 0.05) * nearbyDistanceMultiplier() && !this.isInsideOfWater())) {
+                if (this.stayTime > 0 || (this.distance(this.target) <= (this.getWidth() / 2 + 0.05) * nearbyDistanceMultiplier() && !this.isInsideOfWater())) {
                     this.motionX = 0;
                     this.motionZ = 0;
                 } else {
                     if (this.isInsideOfWater()) {
                         this.motionX = this.getSpeed() * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.05 * (z / diff);
-                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0,2.0),Utils.rand(-0.5,0),Utils.rand(-2.0,2.0))));
+                        this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0, 2.0), Utils.rand(-0.5, 0), Utils.rand(-2.0, 2.0))));
                     } else {
                         this.motionX = this.getSpeed() * 0.15 * (x / diff);
                         this.motionZ = this.getSpeed() * 0.15 * (z / diff);
