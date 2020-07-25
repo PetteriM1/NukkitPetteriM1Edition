@@ -352,6 +352,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[STONE_SLAB3] = BlockSlabStone3.class ; //417
                 list[BAMBOO] = BlockBamboo.class; //418
                 list[BAMBOO_SAPLING] = BlockBambooSapling.class; //419
+                list[STONE_SLAB4] = BlockSlabStone4.class ; //421
+                list[DOUBLE_STONE_SLAB3] = BlockDoubleSlabStone3.class; //422
+                list[DOUBLE_STONE_SLAB4] = BlockDoubleSlabStone4.class; //422
+
+                list[BARREL] = BlockBarrel.class; //458
 
                 list[BELL] = BlockBell.class; //462
                 list[LANTERN] = BlockLantern.class; //463

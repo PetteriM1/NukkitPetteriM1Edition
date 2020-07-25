@@ -355,6 +355,7 @@ public interface BlockID {
     int DOUBLE_STONE_SLAB3 = 422;
     int DOUBLE_STONE_SLAB4 = 423;
 
+    int BARREL = 458;
     int BELL = 461;
     int SWEET_BERRY_BUSH = 462;
     int LANTERN = 463;
