@@ -3669,7 +3669,10 @@ public class Level implements ChunkManager, Metadatable {
         pk.onGround = entity.onGround;
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
-        Server.broadcastPacket(entity.getViewers().values(), pk);
+        //Server.broadcastPacket(entity.getViewers().values(), pk);
+        for (Player p : entity.getViewers().values()) {
+            p.batchDataPacket(pk);
+        }
     }
 
     public boolean isRaining() {
