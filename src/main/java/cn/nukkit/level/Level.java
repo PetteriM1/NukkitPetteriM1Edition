@@ -1299,7 +1299,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void updateAroundRedstone(Vector3 pos, BlockFace face) {
         for (BlockFace side : BlockFace.values()) {
-            if (face != null && side == face) {
+            if (face != null /*&&*/|| side == face) {
                 continue;
             }
 
