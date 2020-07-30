@@ -249,7 +249,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private Vector3 lastRightClickPos = null;
     public EntityFishingHook fishing = null;
     public boolean formOpen;
-    public boolean initialized;
+    public boolean locallyInitialized;
     private boolean foodEnabled = true;
     private int failedTransactions;
 
@@ -819,12 +819,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= server.spawnThreshold) {
             if (this.protocol < 274) {
-                this.initialized = true;
+                this.locallyInitialized = true;
                 this.doFirstSpawn();
             }
 
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
             this.spawnChunkLoadCount = -1;
+
+            // Not really needed on Nukkit PM1E but it's here for plugin compatibility
+            this.server.getPluginManager().callEvent(new PlayerLocallyInitializedEvent(this));
         }
 
         if (Timings.playerChunkSendTimer != null) Timings.playerChunkSendTimer.stopTiming();
@@ -3590,11 +3593,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET:
-                    if (this.initialized || this.protocol < 274) {
+                    if (this.locallyInitialized || this.protocol < 274) {
                         return;
                     }
 
-                    this.initialized = true;
+                    this.locallyInitialized = true;
                     this.doFirstSpawn();
                     break;
                 case ProtocolInfo.RESPAWN_PACKET:
