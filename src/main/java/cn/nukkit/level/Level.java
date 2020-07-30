@@ -4148,7 +4148,7 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendQueue388;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return chunkSendQueue389;
-        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20) {
+        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100) {
             return chunkSendQueue407;
         } else {
             throw new IllegalArgumentException("Missing chunk send queue for protocol " + protocol);
@@ -4164,7 +4164,7 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendTasks388;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return chunkSendTasks389;
-        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20) {
+        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100) {
             return chunkSendTasks407;
         } else {
             throw new IllegalArgumentException("Missing chunk send task for protocol " + protocol);
@@ -4172,7 +4172,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) || (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_20);
+        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) || (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_20) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {
