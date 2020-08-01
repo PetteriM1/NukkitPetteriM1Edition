@@ -9,13 +9,15 @@ import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.inventory.transaction.action.TakeLevelAction;
 import cn.nukkit.item.Item;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.ContainerClosePacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.scheduler.Task;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -96,7 +98,7 @@ public class CraftingTransaction extends InventoryTransaction {
             if (inventory instanceof AnvilInventory) {
                 AnvilInventory anvil = (AnvilInventory) inventory;
                 addInventory(anvil);
-                if (this.primaryOutput.equals(anvil.getResult(), true, true)) {
+                if (equalsIgnoringEnchantmentOrder(this.primaryOutput, anvil.getResult())) {
                     TakeLevelAction takeLevel = new TakeLevelAction(anvil.getLevelCost());
                     addAction(takeLevel);
                     if (takeLevel.isValid(source)) {
@@ -114,10 +116,10 @@ public class CraftingTransaction extends InventoryTransaction {
                                     actions.remove(a);
                                     actions.add(a);
                                 });
-                        anvil.setResult(Item.get(0), false);
                     }
                 }
             }
+            source.getUIInventory().setItem(AnvilInventory.RESULT, Item.get(0), false);
         } else {
             recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);
         }
@@ -134,6 +136,12 @@ public class CraftingTransaction extends InventoryTransaction {
 
     protected void sendInventories() {
         super.sendInventories();
+
+        Optional<Inventory> topWindow = source.getTopWindow();
+        if (topWindow.isPresent()) {
+            //source.removeWindow(topWindow.get());
+            return;
+        }
 
         /*
          * TODO: HACK!
@@ -205,5 +213,53 @@ public class CraftingTransaction extends InventoryTransaction {
             }
         }
         return false;
+    }
+
+    private boolean equalsIgnoringEnchantmentOrder(Item thisItem, Item item) {
+        if (!thisItem.equals(item, true, false)) {
+            return false;
+        }
+
+        if (Arrays.equals(thisItem.getCompoundTag(), item.getCompoundTag())) {
+            return true;
+        }
+
+        if (!thisItem.hasCompoundTag() || !item.hasCompoundTag()) {
+            return false;
+        }
+
+        CompoundTag thisTags = thisItem.getNamedTag();
+        CompoundTag otherTags = item.getNamedTag();
+        if (thisTags.equals(otherTags)) {
+            return true;
+        }
+
+        if (!thisTags.contains("ench") || !otherTags.contains("ench")
+                || !(thisTags.get("ench") instanceof ListTag)
+                || !(otherTags.get("ench") instanceof ListTag)
+                || thisTags.getList("ench").size() != otherTags.getList("ench").size()) {
+            return false;
+        }
+
+        ListTag<CompoundTag> thisEnchantmentTags = thisTags.getList("ench", CompoundTag.class);
+        ListTag<CompoundTag> otherEnchantmentTags = otherTags.getList("ench", CompoundTag.class);
+
+        int size = thisEnchantmentTags.size();
+        Int2IntMap enchantments = new Int2IntArrayMap(size);
+        enchantments.defaultReturnValue(Integer.MIN_VALUE);
+
+        for (int i = 0; i < size; i++) {
+            CompoundTag tag = thisEnchantmentTags.get(i);
+            enchantments.put(tag.getShort("id"), tag.getShort("lvl"));
+        }
+
+        for (int i = 0; i < size; i++) {
+            CompoundTag tag = otherEnchantmentTags.get(i);
+            if (enchantments.get(tag.getShort("id")) != tag.getShort("lvl")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

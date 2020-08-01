@@ -7,6 +7,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Position;
 import cn.nukkit.nbt.tag.CompoundTag;
 import io.netty.util.internal.StringUtil;
+import lombok.NonNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,10 +25,12 @@ public class AnvilInventory extends FakeBlockUIComponent {
     public static final int TARGET = 0;
     public static final int SACRIFICE = 1;
     public static final int RESULT = 50;
-    private static final int SLOT_RESULT = RESULT - OFFSET;
 
     private int levelCost;
     private String newItemName;
+
+    @NonNull
+    private Item currentResult = Item.get(0);
 
     public AnvilInventory(PlayerUIInventory playerUI, Position position) {
         super(playerUI, InventoryType.ANVIL, OFFSET, position);
@@ -254,7 +257,7 @@ public class AnvilInventory extends FakeBlockUIComponent {
             return Item.get(0);
         }
         if (index == 2) {
-            index = SLOT_RESULT;
+            return getResult();
         }
 
         return super.getItem(index);
@@ -267,10 +270,19 @@ public class AnvilInventory extends FakeBlockUIComponent {
         }
 
         if (index == 2) {
-            index = SLOT_RESULT;
+            return setResult(item);
         }
 
         return super.setItem(index, item, send);
+    }
+
+    @Override
+    public void sendContents(Player... players) {
+        super.sendContents(players);
+        // Fixes desync when transactions are cancelled.
+        for (Player player : players) {
+            player.sendExperienceLevel();
+        }
     }
 
     public Item getFirstItem() {
@@ -306,7 +318,12 @@ public class AnvilInventory extends FakeBlockUIComponent {
     }
 
     public boolean setResult(Item item) {
-        return setResult(item, true);
+        if (item == null || item.isNull()) {
+            this.currentResult = Item.get(0);
+        } else {
+            this.currentResult = item.clone();
+        }
+        return true;
     }
 
     private static int getRepairCost(Item item) {
