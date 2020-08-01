@@ -101,6 +101,6 @@ public class PlayerUIComponent extends BaseInventory {
 
     @Override
     public void onSlotChange(int index, Item before, boolean send) {
-        this.playerUI.onSlotChangeBase(index + this.offset, before, send);
+        this.playerUI.onSlotChange(index + this.offset, before, send);
     }
 }
