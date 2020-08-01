@@ -4,14 +4,14 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.data.ShortEntityData;
-import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
-import cn.nukkit.event.entity.EntityDamageByEntityEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.entity.mob.EntityDrowned;
+import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
-import cn.nukkit.event.entity.EntityDeathEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTurtleShell;
 import cn.nukkit.level.GameRule;
+import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.Vector3;
@@ -54,6 +54,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     protected float movementSpeed = 0.1f;
 
     protected int turtleTicks = 200;
+
+    private boolean blocking = false;
+
+    protected final boolean isDrowned = this instanceof EntityDrowned;
 
     @Override
     protected void initEntity() {
@@ -109,6 +113,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
+        if (this.blockedByShield(source)) {
+            return false;
+        }
+
         if (super.attack(source)) {
             if (source instanceof EntityDamageByEntityEvent) {
                 Entity damager = ((EntityDamageByEntityEvent) source).getDamager();
@@ -143,10 +151,47 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             Server.broadcastPacket(this.hasSpawned.values(), pk);
 
             this.attackTime = source.getAttackCooldown();
-
+            this.scheduleUpdate();
             return true;
         } else {
             return false;
+        }
+    }
+
+    protected boolean blockedByShield(EntityDamageEvent source) {
+        Entity damager = source instanceof EntityDamageByEntityEvent? ((EntityDamageByEntityEvent) source).getDamager() : null;
+        if (damager == null || !this.isBlocking()) {
+            return false;
+        }
+
+        Vector3 entityPos = damager.getPosition();
+        Vector3 direction = this.getDirectionVector();
+        Vector3 normalizedVector = this.getPosition().subtract(entityPos).normalize();
+        boolean blocked = (normalizedVector.x * direction.x) + (normalizedVector.z * direction.z) < 0.0;
+        boolean knockBack = !(damager instanceof EntityProjectile);
+        EntityDamageBlockedEvent event = new EntityDamageBlockedEvent(this, source, knockBack, true);
+        if (!blocked || !source.canBeReducedByArmor()/* || damager instanceof EntityProjectile && ((EntityProjectile) damager).getPierceLevel() > 0*/) {
+            event.setCancelled();
+        }
+
+        getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
+
+        if (event.getKnockBackAttacker() && damager instanceof EntityLiving) {
+            double deltaX = damager.getX() - this.getX();
+            double deltaZ = damager.getZ() - this.getZ();
+            ((EntityLiving) damager).knockBack(this, 0, deltaX, deltaZ);
+        }
+
+        onBlock(damager, event.getAnimation());
+        return true;
+    }
+
+    protected void onBlock(Entity entity, boolean animate) {
+        if (animate) {
+            getLevel().addSound(this, Sound.ITEM_SHIELD_BLOCK);
         }
     }
 
@@ -212,7 +257,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        Timings.livingEntityBaseTickTimer.startTiming();
+        if (Timings.livingEntityBaseTickTimer != null) Timings.livingEntityBaseTickTimer.startTiming();
 
         boolean isBreathing = !this.isSubmerged();
         if (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator())) {
@@ -254,7 +299,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
 
             if (!this.hasEffect(Effect.WATER_BREATHING) && this.isSubmerged()) {
-                if (this instanceof EntitySwimming || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
+                if (this instanceof EntitySwimming || this.isDrowned || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
                     this.setAirTicks(400);
                 } else {
                     if (turtleTicks == 0 || turtleTicks == 200) {
@@ -293,16 +338,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             // Check collisions with blocks
             if (this instanceof Player) {
                 if (this.age % 5 == 0) {
-                    Block block = this.level.getBlock(getFloorX(), getFloorY() - 1, getFloorZ());
-                    int id = block.getId();
-                    if (id == Block.MAGMA || id == Block.CACTUS) {
-                        block.onEntityCollide(this);
+                    int block = this.level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                    if (block == Block.MAGMA || block == Block.CACTUS) {
+                        Block.get(Block.MAGMA).onEntityCollide(this);
                     }
-                    if (id == Block.MAGMA && this.isInsideOfWater()) {
+                    if (block == Block.MAGMA && this.isInsideOfWater()) {
                         this.level.addParticle(new BubbleParticle(this));
                         this.setMotion(this.getMotion().add(0, -0.3, 0));
                     }
-                    if (id == Block.SOUL_SAND && this.isInsideOfWater()) {
+                    if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
                         this.level.addParticle(new BubbleParticle(this));
                         this.setMotion(this.getMotion().add(0, 0.3, 0));
                     }
@@ -312,6 +356,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
         if (this.attackTime > 0) {
             this.attackTime -= tickDiff;
+            hasUpdate = true;
         }
 
         if (this.riding == null) {
@@ -323,7 +368,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             }
         }
 
-        Timings.livingEntityBaseTickTimer.stopTiming();
+        if (Timings.livingEntityBaseTickTimer != null) Timings.livingEntityBaseTickTimer.stopTiming();
 
         return hasUpdate;
     }
@@ -421,5 +466,14 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public void setAirTicks(int ticks) {
         this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+    }
+
+    public boolean isBlocking() {
+        return this.blocking;
+    }
+
+    public void setBlocking(boolean value) {
+        this.blocking = value;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_BLOCKING, value);
     }
 }

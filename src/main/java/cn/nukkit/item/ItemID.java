@@ -168,6 +168,7 @@ public interface ItemID {
     int EMPTY_MAP = 395;
     int GOLDEN_CARROT = 396;
     int SKULL = 397;
+    int CARROTONASTICK = 398;
     int CARROT_ON_A_STICK = 398;
     int NETHER_STAR = 399;
     int PUMPKIN_PIE = 400;
@@ -271,4 +272,16 @@ public interface ItemID {
     // 735 not yet in Minecraft
     int HONEYCOMB = 736;
     int HONEY_BOTTLE = 737;
+    //
+    int NETHERITE_INGOT = 742;
+    int NETHERITE_SWORD = 743;
+    int NETHERITE_SHOVEL = 744;
+    int NETHERITE_PICKAXE = 745;
+    int NETHERITE_AXE = 746;
+    int NETHERITE_HOE = 747;
+    int NETHERITE_HELMET = 748;
+    int NETHERITE_CHESTPLATE = 749;
+    int NETHERITE_LEGGINGS = 750;
+    int NETHERITE_BOOTS = 751;
+    int NETHERITE_SCRAP = 752;
 }

@@ -117,6 +117,10 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.yaw);
         this.putLFloat(this.pitch);
         this.putVarInt(this.seed);
+        if (protocol >= 407) {
+            this.putShort(0);
+            this.putString("");
+        }
         this.putVarInt(this.dimension);
         this.putVarInt(this.generator);
         this.putVarInt(this.worldGamemode);
@@ -131,6 +135,9 @@ public class StartGamePacket extends DataPacket {
         }
         if (protocol > 224) {
             this.putBoolean(this.hasEduFeaturesEnabled);
+            if (protocol >= 407) {
+                this.putString("");
+            }
         }
         this.putLFloat(this.rainLevel);
         this.putLFloat(this.lightningLevel);
@@ -184,6 +191,12 @@ public class StartGamePacket extends DataPacket {
                     }
                 }
             }
+            if (protocol >= 407) {
+                this.putLInt(0);
+                this.putLInt(0);
+                this.putBoolean(false);
+                this.putBoolean(false);
+            }
         }
         this.putString(this.levelId);
         this.putString(this.worldName);
@@ -202,6 +215,8 @@ public class StartGamePacket extends DataPacket {
             this.putString(this.multiplayerCorrelationId);
             if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
                 this.putBoolean(this.isOnlySpawningV1Villagers);
+            } else if (protocol >= 407) {
+                this.putBoolean(false);
             }
         }
     }

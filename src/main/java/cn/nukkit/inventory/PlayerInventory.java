@@ -11,10 +11,7 @@ import cn.nukkit.event.entity.EntityInventoryChangeEvent;
 import cn.nukkit.event.player.PlayerItemHeldEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
-import cn.nukkit.network.protocol.InventoryContentPacket;
-import cn.nukkit.network.protocol.InventorySlotPacket;
-import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
-import cn.nukkit.network.protocol.MobEquipmentPacket;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.protocol.types.ContainerIds;
 
 import java.util.Collection;
@@ -122,6 +119,15 @@ public class PlayerInventory extends BaseInventory {
         }
     }
 
+    public Item getItemInHandFast() {
+        Item item = this.getItemFast(this.getHeldItemIndex());
+        if (item != null) {
+            return item;
+        } else {
+            return air;
+        }
+    }
+
     public boolean setItemInHand(Item item) {
         return this.setItem(this.itemInHandIndex, item);
     }
@@ -211,6 +217,10 @@ public class PlayerInventory extends BaseInventory {
 
     public Item getBoots() {
         return this.getItem(this.getSize() + 3);
+    }
+
+    public Item getBootsFast() {
+        return this.getItemFast(39);
     }
 
     public boolean setHelmet(Item helmet) {
@@ -442,6 +452,13 @@ public class PlayerInventory extends BaseInventory {
 
     @Override
     public void sendSlot(int index, Player... players) {
+        if (players.length == 0 && this.getHolder() instanceof Player) {
+            Player p = (Player) this.getHolder();
+            if (p.protocol >= 407) {
+                players = new Player[]{p};
+            }
+        }
+
         InventorySlotPacket pk = new InventorySlotPacket();
         pk.slot = index;
         pk.item = this.getItem(index).clone();
@@ -468,18 +485,48 @@ public class PlayerInventory extends BaseInventory {
         }
         Player p = (Player) this.getHolder();
 
-        InventoryContentPacket pk = new InventoryContentPacket();
-        pk.inventoryId = ContainerIds.CREATIVE;
-
-        if (!p.isSpectator()) { //fill it for all gamemodes except spectator
-            pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+        if (p.protocol < 407) {
+            InventoryContentPacket pk = new InventoryContentPacket();
+            pk.inventoryId = ContainerIds.CREATIVE;
+            if (!p.isSpectator()) { //fill it for all gamemodes except spectator
+                pk.slots = Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            }
+            p.dataPacket(pk);
+        } else {
+            CreativeContentPacket pk = new CreativeContentPacket();
+            pk.entries = p.isSpectator() ? new Item[0] : Item.getCreativeItems(p.protocol).toArray(new Item[0]);
+            p.dataPacket(pk);
         }
-
-        p.dataPacket(pk);
     }
 
     @Override
     public EntityHuman getHolder() {
         return (EntityHuman) super.getHolder();
+    }
+
+    public void sendInventory() {
+        if (!(holder instanceof Player)) {
+            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
+        }
+
+        Player p = (Player) holder;
+        ContainerOpenPacket pk = new ContainerOpenPacket();
+        pk.x = p.getFloorX();
+        pk.y = p.getFloorY();
+        pk.z = p.getFloorZ();
+        pk.windowId = p.getWindowId(this);
+        pk.type = InventoryType.PLAYER.getNetworkType();
+        p.directDataPacket(pk);
+    }
+
+    public void closeInventory() {
+        if (!(holder instanceof Player)) {
+            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
+        }
+
+        Player p = (Player) holder;
+        ContainerClosePacket pk = new ContainerClosePacket();
+        pk.windowId = p.getWindowId(this);
+        p.directDataPacket(pk);
     }
 }

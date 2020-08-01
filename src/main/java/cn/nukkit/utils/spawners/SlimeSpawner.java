@@ -20,7 +20,6 @@ public class SlimeSpawner extends AbstractEntitySpawner {
 
         if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.GRASS) {
         } else if (biomeId != 6 && biomeId != 134) {
-        } else if (level.isNether || level.isEnd) {
         } else if (pos.y > 70 || pos.y < 1) {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
         } else if (level.isMobSpawningAllowedByTime()) {

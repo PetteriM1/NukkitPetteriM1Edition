@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class RakNetConstants {
 
-    public static final byte RAKNET_PROTOCOL_VERSION = 9; // Mojang's version.
+    public static final byte RAKNET_PROTOCOL_VERSION = 10; // Mojang's version.
     public static final short MINIMUM_MTU_SIZE = 576;
     public static final short MAXIMUM_MTU_SIZE = 1492;
 
@@ -27,7 +27,7 @@ public class RakNetConstants {
     /**
      * Time after {@link RakNetSession} is closed due to no activity.
      */
-    public static final int SESSION_TIMEOUT_MS = Server.getInstance().getPropertyInt("timeout-milliseconds", 30000);
+    public static final int SESSION_TIMEOUT_MS = Server.getInstance().getPropertyInt("timeout-milliseconds", 25000);
 
     /*
         Flags

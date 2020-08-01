@@ -6,6 +6,7 @@ import cn.nukkit.math.Vector2;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 public abstract class EntitySwimming extends BaseEntity {
 
@@ -18,16 +19,16 @@ public abstract class EntitySwimming extends BaseEntity {
             return;
         }
 
-        if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
+        if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
             return;
         }
 
         Vector3 target = this.target;
-        if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target))) {
+        if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target)) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
             Entity[] e = this.getLevel().getEntities();
             for (Entity entity : e) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal || !entity.canBeFollowed()) {
                     continue;
                 }
 
@@ -81,25 +82,25 @@ public abstract class EntitySwimming extends BaseEntity {
             }
 
             if (this.isKnockback()) {
-                this.move(this.motionX * tickDiff, this.motionY, this.motionZ * tickDiff);
-                this.motionY -= this.getGravity() * tickDiff;
+                this.move(this.motionX, this.motionY, this.motionZ);
+                this.motionY -= this.getGravity();
                 this.updateMovement();
                 return null;
             }
 
-            if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive()) {
+            if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
                 double x = this.followTarget.x - this.x;
                 double z = this.followTarget.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
-                if (this.stayTime > 0 || this.distance(this.followTarget) <= (this.getWidth() + 0.0d) / 2 + 0.05) {
+                if (this.stayTime > 0 || this.distance(this.followTarget) <= (this.getWidth() / 2 + 0.05)) {
                     this.motionX = 0;
                     this.motionZ = 0;
                 } else {
                     this.motionX = this.getSpeed() * 0.1 * (x / diff);
                     this.motionZ = this.getSpeed() * 0.1 * (z / diff);
                 }
-                if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
                 return this.followTarget;
             }
 
@@ -110,18 +111,18 @@ public abstract class EntitySwimming extends BaseEntity {
                 double z = this.target.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
-                if (this.stayTime > 0 || this.distance(this.target) <= ((this.getWidth() + 0.0d) / 2 + 0.05) * nearbyDistanceMultiplier()) {
+                if (this.stayTime > 0 || this.distance(this.target) <= (this.getWidth() / 2 + 0.05) * nearbyDistanceMultiplier()) {
                     this.motionX = 0;
                     this.motionZ = 0;
                 } else {
                     this.motionX = this.getSpeed() * 0.15 * (x / diff);
                     this.motionZ = this.getSpeed() * 0.15 * (z / diff);
                 }
-                if (this.stayTime <= 0 || Utils.rand()) if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+                if (this.stayTime <= 0 || Utils.rand()) if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
             }
 
-            double dx = this.motionX * tickDiff;
-            double dz = this.motionZ * tickDiff;
+            double dx = this.motionX;
+            double dz = this.motionZ;
 
             if (this.isInsideOfWater() && (this.motionX > 0 || this.motionZ > 0)) {
                 this.motionY = Utils.rand(-0.12, 0.12);
@@ -133,14 +134,14 @@ public abstract class EntitySwimming extends BaseEntity {
 
             if (this.stayTime > 0) {
                 this.stayTime -= tickDiff;
-                this.move(0, this.motionY * tickDiff, 0);
+                this.move(0, this.motionY, 0);
             } else {
                 Vector2 be = new Vector2(this.x + dx, this.z + dz);
-                this.move(dx, this.motionY * tickDiff, dz);
+                this.move(dx, this.motionY, dz);
                 Vector2 af = new Vector2(this.x, this.z);
 
                 if (be.x != af.x || be.y != af.y) {
-                    this.moveTime -= 90 * tickDiff;
+                    this.moveTime -= 90;
                 }
             }
 

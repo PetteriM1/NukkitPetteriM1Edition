@@ -16,8 +16,7 @@ public class SkeletonSpawner extends AbstractEntitySpawner {
 
     @Override
     public void spawn(Player player, Position pos, Level level) {
-        if (level.isNether || level.isEnd) {
-        } else if (pos.y > 255 || pos.y < 1) {
+        if (pos.y > 255 || pos.y < 1) {
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
         } else if (level.isMobSpawningAllowedByTime()) {

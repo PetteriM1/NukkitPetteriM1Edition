@@ -31,15 +31,19 @@ public interface ProtocolInfo {
     int v1_13_0 = 388;
     int v1_14_0 = 389;
     int v1_14_60 = 390;
+    int v1_16_0 = 407;
+    int v1_16_20 = 408;
+    int v1_16_100 = 409;
 
-    int CURRENT_PROTOCOL = v1_14_60;
+    int CURRENT_PROTOCOL = 407;
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
-            v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0, v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_60, v1_14_0
+            v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0,
+            v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0, v1_14_60, v1_16_0, v1_16_20, v1_16_100
     );
 
-    String MINECRAFT_VERSION = "v1.14.60";
-    String MINECRAFT_VERSION_NETWORK = "1.14.60";
+    String MINECRAFT_VERSION = "v1.16.1";
+    String MINECRAFT_VERSION_NETWORK = "1.16.1";
 
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
@@ -182,4 +186,16 @@ public interface ProtocolInfo {
     byte NETWORK_SETTINGS_PACKET = (byte) 0x8f;
     byte PLAYER_AUTH_INPUT_PACKET = (byte) 0x90;
     byte BATCH_PACKET = (byte) 0xff;
+    byte CREATIVE_CONTENT_PACKET = (byte) 0x91;
+    byte PLAYER_ENCHANT_OPTIONS_PACKET = (byte) 0x92;
+    byte ITEM_STACK_REQUEST_PACKET = (byte) 0x93;
+    byte ITEM_STACK_RESPONSE_PACKET = (byte) 0x94;
+    byte PLAYER_ARMOR_DAMAGE_PACKET = (byte) 0x95;
+    byte CODE_BUILDER_PACKET = (byte) 0x96;
+    byte UPDATE_PLAYER_GAME_TYPE_PACKET = (byte) 0x97;
+    byte EMOTE_LIST_PACKET = (byte) 0x98;
+    byte POS_TRACKING_SERVER_BROADCAST_PACKET = (byte) 0x99;
+    byte POS_TRACKING_CLIENT_REQUEST_PACKET = (byte) 0x9a;
+    byte DEBUG_INFO_PACKET = (byte) 0x9b;
+    byte PACKET_VIOLATION_WARNING_PACKET = (byte) 0x9c;
 }

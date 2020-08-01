@@ -184,7 +184,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			} else {
 				this.equipmentInventory.setItem(slot, handItem);
 			}
-			Server.getInstance().getScheduler().scheduleDelayedTask(new Hack(player, item), 1);
+			Server.getInstance().getScheduler().scheduleDelayedTask(new Hack(player, item, player.getInventory().getHeldItemIndex()), 1);
 		}
 	}
 
@@ -257,7 +257,9 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 					if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
 						this.level.dropItem(this, new ItemArmorStand());
 						this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+						this.equipmentInventory.clearAll();
 						this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+						this.armorInventory.clearAll();
 					}
 				}
 			}
@@ -322,7 +324,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			return false;
 		}
 
-		this.timing.startTiming();
+		if (this.timing != null) this.timing.startTiming();
 
 		boolean hasUpdate = super.onUpdate(currentTick);
 
@@ -334,7 +336,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 		this.move(this.motionX, this.motionY, this.motionZ);
 
-		this.timing.stopTiming();
+		if (this.timing != null) this.timing.stopTiming();
 
 		return hasUpdate;
 	}
@@ -343,15 +345,17 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 		private final Player player;
 		private final Item item;
+		private final int index;
 
-		public Hack(Player player, Item item) {
+		public Hack(Player player, Item item, int index) {
 			this.player = player;
 			this.item = item;
+			this.index = index;
 		}
 
 		@Override
 		public void onRun(int i) {
-			player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+			player.getInventory().decreaseCount(index);
 			player.getInventory().addItem(item);
 		}
 	}

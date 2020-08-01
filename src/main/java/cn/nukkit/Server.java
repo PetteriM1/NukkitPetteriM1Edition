@@ -18,6 +18,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
 import cn.nukkit.event.server.BatchPacketsEvent;
+import cn.nukkit.event.server.PlayerDataSerializeEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.event.server.ServerStopEvent;
 import cn.nukkit.inventory.CraftingManager;
@@ -27,6 +28,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.biome.EnumBiome;
@@ -43,7 +45,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.CompressBatchedTask;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
@@ -66,8 +67,8 @@ import cn.nukkit.plugin.service.ServiceManager;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.potion.Potion;
 import cn.nukkit.resourcepacks.ResourcePackManager;
-import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
+import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
@@ -77,12 +78,20 @@ import io.netty.buffer.ByteBuf;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
 import lombok.extern.log4j.Log4j2;
+import org.iq80.leveldb.CompressionType;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.impl.Iq80DBFactory;
 
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 /**
  * The main server class
@@ -167,6 +176,8 @@ public class Server {
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
     private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
 
+    private static final Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
+
     @SuppressWarnings("serial")
     private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
@@ -191,6 +202,8 @@ public class Server {
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
+    private DB nameLookup;
+    private PlayerDataSerializer playerDataSerializer = new DefaultPlayerDataSerializer(this);
     public static List<String> noTickingWorlds = new ArrayList<>();
 
     /* Some settings */
@@ -211,8 +224,6 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
-    private boolean asyncAutosave;
-    public int despawnTicks;
     public boolean netherEnabled;
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
@@ -227,6 +238,10 @@ public class Server {
     boolean announceAchievements;
     boolean checkOpMovement;
     boolean doNotLimitInteractions;
+    public int despawnTicks;
+    int chunksPerTick;
+    int spawnThreshold;
+    int c_s_spawnThreshold;
     public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
@@ -240,8 +255,10 @@ public class Server {
     public boolean spawnAnimals;
     public boolean spawnMobs;
     public boolean anvilsEnabled;
+    public boolean savePlayerDataByUuid;
+    public boolean vanillaPortals;
 
-    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins) {
+    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
@@ -267,6 +284,12 @@ public class Server {
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ServerProperties());
 
         if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
+
+        int debugLvl = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
+        if (debug && debugLvl < 2) {
+            debugLvl = 2;
+        }
+        Nukkit.DEBUG = debugLvl;
 
         this.loadSettings();
 
@@ -296,7 +319,7 @@ public class Server {
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
-        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", false);
+        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
 
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
@@ -333,8 +356,6 @@ public class Server {
             this.setDifficulty(this.getPropertyInt("difficulty", 2));
         }
 
-        Nukkit.DEBUG = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
-
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
             if (level.intLevel() == (Nukkit.DEBUG + 3) * 100  && level.intLevel() > currentLevel.intLevel()) {
@@ -359,6 +380,20 @@ public class Server {
         Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
+        GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
+
+        // Convert legacy data before plugins get the chance to mess with it
+        try {
+            nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
+                            .createIfMissing(true)
+                            .compressionType(CompressionType.ZLIB_RAW));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (this.savePlayerDataByUuid) {
+            convertLegacyPlayerData();
+        }
 
         this.serverID = UUID.randomUUID();
 
@@ -389,7 +424,7 @@ public class Server {
         Generator.addGenerator(Normal.class, "normal", Generator.TYPE_INFINITE);
         Generator.addGenerator(Normal.class, "default", Generator.TYPE_INFINITE);
         Generator.addGenerator(Nether.class, "nether", Generator.TYPE_NETHER);
-        Generator.addGenerator(End.class, "end", Generator.TYPE_THE_END);
+        Generator.addGenerator(End.class, "the_end", Generator.TYPE_THE_END);
         Generator.addGenerator(cn.nukkit.level.generator.Void.class, "void", Generator.TYPE_VOID);
 
         if (this.defaultLevel == null) {
@@ -435,9 +470,9 @@ public class Server {
                     this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
                     this.loadLevel("nether");
                 }
-                if (this.getLevelByName("end") == null && endEnabled) {
-                    this.generateLevel("end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
-                    this.loadLevel("end");
+                if (this.getLevelByName("the_end") == null && endEnabled) {
+                    this.generateLevel("the_end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
+                    this.loadLevel("the_end");
                 }
             } catch (Exception e) {
                 this.getLogger().debug("Unable to load levels", e);
@@ -474,7 +509,7 @@ public class Server {
         }
 
         // Check for updates
-        this.scheduler.scheduleTask(null, () -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
                 request.connect();
@@ -482,18 +517,19 @@ public class Server {
                 String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
                 content.close();
 
-                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && Nukkit.isMasterBranchBuild()) {
+                boolean isMaster = Nukkit.getBranch().equals("master");
+                if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && isMaster) {
                     this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
                     this.getLogger().info("\u00A7c[Update] \u00A7eYou can download the latest build from https://github.com/PetteriM1/NukkitPetteriM1Edition/releases");
-                } else if (!Nukkit.isMasterBranchBuild()) {
-                    this.getLogger().warning("\u00A7eYou are running a dev build! Do not use in production!");
+                } else if (!isMaster) {
+                    this.getLogger().warning("\u00A7eYou are running a dev build! Do not use in production! Branch: " + Nukkit.getBranch());
                 }
 
                 this.getLogger().debug("Update check done");
             } catch (Exception ignore) {
                 this.getLogger().debug("Update check failed");
             }
-        }, true);
+        });
 
         this.start();
     }
@@ -568,6 +604,12 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+            return;
+        }
         boolean mvplayers = false;
         for (Player player : players) {
             if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
@@ -575,7 +617,7 @@ public class Server {
                 break;
             }
         }
-        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+        if (!mvplayers) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
             instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
@@ -587,6 +629,12 @@ public class Server {
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+            return;
+        }
         boolean mvplayers = false;
         for (Player player : players) {
             if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
@@ -594,7 +642,7 @@ public class Server {
                 break;
             }
         }
-        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+        if (!mvplayers) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
             instance.batchPackets(players, new DataPacket[]{packet}, false); // forceSync should be true?
@@ -623,40 +671,94 @@ public class Server {
             }
         }
 
-        Timings.playerNetworkSendTimer.startTiming();
-        byte[][] payload = new byte[(packets.length << 1)][];
-        int size = 0;
-        for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
-                p.encode();
-            }
-            byte[] buf = p.getBuffer();
-            int i2 = i << 1;
-            payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-            payload[i2 + 1] = buf;
-            packets[i] = null;
-            size += payload[i2].length;
-            size += payload[i2 + 1].length;
-        }
-
-        List<InetSocketAddress> targets = new ArrayList<>();
-        for (Player p : players) {
-            if (p.isConnected()) {
-                targets.add(p.getSocketAddress());
-            }
-        }
-
         if (!forceSync && this.networkCompressionAsync) {
-            this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            CompletableFuture.runAsync(() -> {
+                byte[][] payload = new byte[(packets.length << 1)][];
+                int size = 0;
+                for (int i = 0; i < packets.length; i++) {
+                    DataPacket p = packets[i];
+                    if (!p.isEncoded) {
+                        p.encode();
+                    }
+                    byte[] buf = p.getBuffer();
+                    int i2 = i << 1;
+                    payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                    payload[i2 + 1] = buf;
+                    packets[i] = null;
+                    size += payload[i2].length;
+                    size += payload[i2 + 1].length;
+                }
+
+                List<InetSocketAddress> targetsOld = new ArrayList<>();
+                List<InetSocketAddress> targets = new ArrayList<>();
+                for (Player p : players) {
+                    if (p.isConnected()) {
+                        if (p.protocol >= ProtocolInfo.v1_16_0) {
+                            targets.add(p.getSocketAddress());
+                        } else {
+                            targetsOld.add(p.getSocketAddress());
+                        }
+                    }
+                }
+
+                try {
+                    byte[] bytes = Binary.appendBytes(payload);
+                    if (!targets.isEmpty()) {
+                        this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
+                    }
+                    if (!targetsOld.isEmpty()) {
+                        this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else {
+            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.startTiming();
+            byte[][] payload = new byte[(packets.length << 1)][];
+            int size = 0;
+            for (int i = 0; i < packets.length; i++) {
+                DataPacket p = packets[i];
+                if (!p.isEncoded) {
+                    p.encode();
+                }
+                byte[] buf = p.getBuffer();
+                int i2 = i << 1;
+                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
+                payload[i2 + 1] = buf;
+                packets[i] = null;
+                size += payload[i2].length;
+                size += payload[i2 + 1].length;
+            }
+
+            List<InetSocketAddress> targetsOld = new ArrayList<>();
+            List<InetSocketAddress> targets = new ArrayList<>();
+            for (Player p : players) {
+                if (p.isConnected()) {
+                    if (p.protocol >= ProtocolInfo.v1_16_0) {
+                        targets.add(p.getSocketAddress());
+                    } else {
+                        targetsOld.add(p.getSocketAddress());
+                    }
+                }
+            }
+
+            //if (!forceSync && this.networkCompressionAsync) {
+            //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
+            //} else {
             try {
-                this.broadcastPacketsCallback(Zlib.deflate(Binary.appendBytes(payload), this.networkCompressionLevel), targets);
+                byte[] bytes = Binary.appendBytes(payload);
+                if (!targets.isEmpty()) {
+                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
+                }
+                if (!targetsOld.isEmpty()) {
+                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.stopTiming();
         }
-        Timings.playerNetworkSendTimer.stopTiming();
     }
 
     public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
@@ -774,9 +876,11 @@ public class Server {
             pluginManager.callEvent(serverStopEvent);
 
             if (this.rcon != null) {
+                this.getLogger().debug("Closing RCON...");
                 this.rcon.close();
             }
 
+            this.getLogger().debug("Disconnecting all players...");
             for (Player player : new ArrayList<>(this.players.values())) {
                 player.close(player.getLeaveMessage(), reason);
             }
@@ -805,10 +909,16 @@ public class Server {
                 this.network.unregisterInterface(interfaz);
             }
 
+            if (nameLookup != null) {
+                this.getLogger().debug("Closing name lookup DB...");
+                nameLookup.close();
+            }
+
             this.getLogger().debug("Disabling timings...");
             Timings.stopServer();
 
             if (this.watchdog != null) {
+                this.getLogger().debug("Stopping Watchdog...");
                 this.watchdog.kill();
             }
         } catch (Exception e) {
@@ -983,17 +1093,20 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol > ProtocolInfo.v1_12_0) { // Current version(s)
-            player.dataPacket(CraftingManager.packet);
+        if (player.protocol >= ProtocolInfo.v1_16_0) {
+            player.dataPacket(CraftingManager.packet407);
+        } else if (player.protocol > ProtocolInfo.v1_12_0) {
+            player.dataPacket(CraftingManager.packet338);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
         } else if (player.protocol == ProtocolInfo.v1_11_0) {
              player.dataPacket(CraftingManager.packet354);
         } else if (player.protocol == ProtocolInfo.v1_10_0) {
             player.dataPacket(CraftingManager.packet340);
+        } else if (player.protocol == ProtocolInfo.v1_9_0 || player.protocol == ProtocolInfo.v1_8_0 || player.protocol == ProtocolInfo.v1_7_0) { // these should work just fine
+            player.dataPacket(CraftingManager.packet313);
         }
         // Don't send recipes if they wouldn't work anyways
-        // TODO: Support for older versions
     }
 
     private void checkTickUpdates(int currentTick) {
@@ -1042,7 +1155,7 @@ public class Server {
 
     public void doAutoSave() {
         if (this.autoSave) {
-            Timings.levelSaveTimer.startTiming();
+            if (Timings.levelSaveTimer != null) Timings.levelSaveTimer.startTiming();
             for (Player player : new ArrayList<>(this.players.values())) {
                 if (player.isOnline()) {
                     player.save(true);
@@ -1053,14 +1166,10 @@ public class Server {
 
             for (Level level : this.levelArray) {
                 if (!nonAutoSaveWorlds.contains(level.getName())) {
-                    if (asyncAutosave) {
-                        this.scheduler.scheduleTask(null, level::save, true);
-                    } else {
-                        level.save();
-                    }
+                    level.save();
                 }
             }
-            Timings.levelSaveTimer.stopTiming();
+            if (Timings.levelSaveTimer != null) Timings.levelSaveTimer.stopTiming();
         }
     }
 
@@ -1081,21 +1190,23 @@ public class Server {
             return;
         }
 
-        Timings.fullServerTickTimer.startTiming();
+        if (Timings.isTimingsEnabled()) {
+            Timings.fullServerTickTimer.startTiming();
+        }
 
         ++this.tickCounter;
 
-        Timings.connectionTimer.startTiming();
+        if (Timings.connectionTimer != null) Timings.connectionTimer.startTiming();
         this.network.processInterfaces();
 
         if (this.rcon != null) {
             this.rcon.check();
         }
-        Timings.connectionTimer.stopTiming();
+        if (Timings.connectionTimer != null) Timings.connectionTimer.stopTiming();
 
-        Timings.schedulerTimer.startTiming();
+        if (Timings.schedulerTimer != null) Timings.schedulerTimer.startTiming();
         this.scheduler.mainThreadHeartbeat(this.tickCounter);
-        Timings.schedulerTimer.stopTiming();
+        if (Timings.schedulerTimer != null) Timings.schedulerTimer.stopTiming();
 
         this.checkTickUpdates(this.tickCounter);
 
@@ -1106,7 +1217,7 @@ public class Server {
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
 
-            this.network.resetStatistics();
+            //this.network.resetStatistics(); // Unnecessary since addStatistics is not used in the new raknet
             this.maxTick = 20;
             this.maxUse = 0;
 
@@ -1135,7 +1246,10 @@ public class Server {
             }
         }
 
-        Timings.fullServerTickTimer.stopTiming();
+        if (Timings.isTimingsEnabled()) {
+            Timings.fullServerTickTimer.stopTiming();
+        }
+
         long nowNano = System.nanoTime();
 
         float tick = (float) Math.min(20, 1000000000 / Math.max(1000000, ((double) nowNano - tickTimeNano)));
@@ -1471,72 +1585,234 @@ public class Server {
         return Optional.ofNullable(playerList.get(uuid));
     }
 
-    public IPlayer getOfflinePlayer(String name) {
-        IPlayer result = this.getPlayerExact(name.toLowerCase());
-        if (result == null) {
-            return new OfflinePlayer(this, name);
+    public Optional<UUID> lookupName(String name) {
+        byte[] nameBytes = name.toLowerCase().getBytes(StandardCharsets.UTF_8);
+        byte[] uuidBytes = nameLookup.get(nameBytes);
+        if (uuidBytes == null) {
+            return Optional.empty();
         }
 
-        return result;
+        if (uuidBytes.length != 16) {
+            log.warn("Invalid uuid in name lookup database detected! Removing...");
+            nameLookup.delete(nameBytes);
+            return Optional.empty();
+        }
+
+        ByteBuffer buffer = ByteBuffer.wrap(uuidBytes);
+        return Optional.of(new UUID(buffer.getLong(), buffer.getLong()));
+    }
+
+    void updateName(UUID uuid, String name) {
+        byte[] nameBytes = name.toLowerCase().getBytes(StandardCharsets.UTF_8);
+
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+
+        nameLookup.put(nameBytes, buffer.array());
+    }
+
+    public IPlayer getOfflinePlayer(final String name) {
+        IPlayer result = this.getPlayerExact(name.toLowerCase());
+        if (result != null) {
+            return result;
+        }
+
+        return lookupName(name).map(uuid -> new OfflinePlayer(this, uuid))
+                .orElse(new OfflinePlayer(this, name));
+    }
+
+    public IPlayer getOfflinePlayer(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid");
+        Optional<Player> onlinePlayer = getPlayer(uuid);
+        if (onlinePlayer.isPresent()) {
+            return onlinePlayer.get();
+        }
+
+        return new OfflinePlayer(this, uuid);
+    }
+
+    public CompoundTag getOfflinePlayerData(UUID uuid) {
+        return getOfflinePlayerData(uuid, false);
+    }
+
+    public CompoundTag getOfflinePlayerData(UUID uuid, boolean create) {
+        return getOfflinePlayerDataInternal(uuid.toString(), true, create);
     }
 
     public CompoundTag getOfflinePlayerData(String name) {
-        name = name.toLowerCase();
-        String path = this.dataPath + "players/";
-        File file = new File(path + name + ".dat");
+        return getOfflinePlayerData(name, false);
+    }
 
-        if (this.shouldSavePlayerData() && file.exists()) {
-            try {
-                return NBTIO.readCompressed(new FileInputStream(file));
-            } catch (Exception e) {
-                file.renameTo(new File(path + name + ".dat.bak"));
-            }
+    public CompoundTag getOfflinePlayerData(String name, boolean create) {
+        if (this.savePlayerDataByUuid) {
+            Optional<UUID> uuid = lookupName(name);
+            return getOfflinePlayerDataInternal(uuid.map(UUID::toString).orElse(name), true, create);
+        } else {
+            return getOfflinePlayerDataInternal(name, true, create);
+        }
+    }
+
+    private CompoundTag getOfflinePlayerDataInternal(String name, boolean runEvent, boolean create) {
+        Preconditions.checkNotNull(name, "name");
+
+        PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(name, playerDataSerializer);
+        if (runEvent) {
+            pluginManager.callEvent(event);
         }
 
-        Position spawn = this.defaultLevel.getSafeSpawn();
-        CompoundTag nbt = new CompoundTag()
-                .putLong("firstPlayed", System.currentTimeMillis() / 1000)
-                .putLong("lastPlayed", System.currentTimeMillis() / 1000)
-                .putList(new ListTag<DoubleTag>("Pos")
-                        .add(new DoubleTag("0", spawn.x))
-                        .add(new DoubleTag("1", spawn.y))
-                        .add(new DoubleTag("2", spawn.z)))
-                .putString("Level", this.defaultLevel.getFolderName())
-                .putList(new ListTag<>("Inventory"))
-                .putCompound("Achievements", new CompoundTag())
-                .putInt("playerGameType", this.getGamemode())
-                .putList(new ListTag<DoubleTag>("Motion")
-                        .add(new DoubleTag("0", 0))
-                        .add(new DoubleTag("1", 0))
-                        .add(new DoubleTag("2", 0)))
-                .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("0", 0))
-                        .add(new FloatTag("1", 0)))
-                .putFloat("FallDistance", 0)
-                .putShort("Fire", 0)
-                .putShort("Air", 300)
-                .putBoolean("OnGround", true)
-                .putBoolean("Invulnerable", false)
-                .putString("NameTag", name);
+        Optional<InputStream> dataStream = Optional.empty();
+        try {
+            dataStream = event.getSerializer().read(name, event.getUuid().orElse(null));
+            if (dataStream.isPresent()) {
+                return NBTIO.readCompressed(dataStream.get());
+            }
+        } catch (IOException e) {
+            log.warn(this.getLanguage().translateString("nukkit.data.playerCorrupted", name));
+            log.throwing(e);
+        } finally {
+            if (dataStream.isPresent()) {
+                try {
+                    dataStream.get().close();
+                } catch (IOException e) {
+                    log.throwing(e);
+                }
+            }
+        }
+        CompoundTag nbt = null;
+        if (create) {
+            Position spawn = this.getDefaultLevel().getSafeSpawn();
+            long time = System.currentTimeMillis();
+            nbt = new CompoundTag()
+                    .putLong("firstPlayed", time / 1000)
+                    .putLong("lastPlayed", time / 1000)
+                    .putList(new ListTag<DoubleTag>("Pos")
+                            .add(new DoubleTag("0", spawn.x))
+                            .add(new DoubleTag("1", spawn.y))
+                            .add(new DoubleTag("2", spawn.z)))
+                    .putString("Level", this.getDefaultLevel().getName())
+                    .putList(new ListTag<>("Inventory"))
+                    .putCompound("Achievements", new CompoundTag())
+                    .putInt("playerGameType", this.getGamemode())
+                    .putList(new ListTag<DoubleTag>("Motion")
+                            .add(new DoubleTag("0", 0))
+                            .add(new DoubleTag("1", 0))
+                            .add(new DoubleTag("2", 0)))
+                    .putList(new ListTag<FloatTag>("Rotation")
+                            .add(new FloatTag("0", 0))
+                            .add(new FloatTag("1", 0)))
+                    .putFloat("FallDistance", 0)
+                    .putShort("Fire", 0)
+                    .putShort("Air", 300)
+                    .putBoolean("OnGround", true)
+                    .putBoolean("Invulnerable", false);
 
-        this.saveOfflinePlayerData(name, nbt);
+            this.saveOfflinePlayerData(name, nbt, true, runEvent);
+        }
         return nbt;
+    }
+
+    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag) {
+        this.saveOfflinePlayerData(uuid, tag, false);
     }
 
     public void saveOfflinePlayerData(String name, CompoundTag tag) {
         this.saveOfflinePlayerData(name, tag, false);
     }
 
+    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag, boolean async) {
+        this.saveOfflinePlayerData(uuid.toString(), tag, async);
+    }
+
     public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
+        if (this.savePlayerDataByUuid) {
+            Optional<UUID> uuid = lookupName(name);
+            saveOfflinePlayerData(uuid.map(UUID::toString).orElse(name), tag, async, true);
+        } else {
+            saveOfflinePlayerData(name, tag, async, true);
+        }
+    }
+
+    private void saveOfflinePlayerData(String name, CompoundTag tag, boolean async, boolean runEvent) {
+        String nameLower = name.toLowerCase();
         if (this.shouldSavePlayerData()) {
-            try {
-                if (async) {
-                    this.scheduler.scheduleAsyncTask(new FileWriteTask(this.dataPath + "players/" + name.toLowerCase() + ".dat", NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
-                } else {
-                    Utils.writeFile(this.dataPath + "players/" + name.toLowerCase() + ".dat", new ByteArrayInputStream(NBTIO.writeGZIPCompressed(tag, ByteOrder.BIG_ENDIAN)));
+            PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(nameLower, playerDataSerializer);
+            if (runEvent) {
+                pluginManager.callEvent(event);
+            }
+
+            this.getScheduler().scheduleTask(new Task() {
+                boolean hasRun = false;
+
+                @Override
+                public void onRun(int currentTick) {
+                    this.onCancel();
                 }
-            } catch (Exception e) {
-                log.error(this.baseLang.translateString("nukkit.data.saveError", new String[]{name, e.getMessage()}));
+
+                // Doing it like this ensures that the player data will be saved in a server shutdown
+                @Override
+                public void onCancel() {
+                    if (!this.hasRun)    {
+                        this.hasRun = true;
+                        saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                    }
+                }
+            }, async);
+        }
+    }
+
+    private void saveOfflinePlayerDataInternal(PlayerDataSerializer serializer, CompoundTag tag, String name, UUID uuid) {
+        try (OutputStream dataStream = serializer.write(name, uuid)) {
+            NBTIO.writeGZIPCompressed(tag, dataStream, ByteOrder.BIG_ENDIAN);
+        } catch (Exception e) {
+            log.error(this.getLanguage().translateString("nukkit.data.saveError", name, e));
+        }
+    }
+
+    private void convertLegacyPlayerData() {
+        File dataDirectory = new File(getDataPath(), "players/");
+
+        File[] files = dataDirectory.listFiles(file -> {
+            String name = file.getName();
+            return !uuidPattern.matcher(name).matches() && name.endsWith(".dat");
+        });
+
+        if (files == null) {
+            return;
+        }
+
+        for (File legacyData : files) {
+            String name = legacyData.getName();
+            // Remove file extension
+            name = name.substring(0, name.length() - 4);
+
+            log.debug("Attempting legacy player data conversion for {}", name);
+
+            CompoundTag tag = getOfflinePlayerDataInternal(name, false, false);
+
+            if (tag == null || !tag.contains("UUIDLeast") || !tag.contains("UUIDMost")) {
+                // No UUID so we cannot convert. Wait until player logs in.
+                continue;
+            }
+
+            UUID uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
+            if (!tag.contains("NameTag")) {
+                tag.putString("NameTag", name);
+            }
+
+            if (new File(getDataPath() + "players/" + uuid.toString() + ".dat").exists()) {
+                // We don't want to overwrite existing data.
+                continue;
+            }
+
+            saveOfflinePlayerData(uuid.toString(), tag, false, false);
+
+            // Add name to lookup table
+            updateName(uuid, name);
+
+            // Delete legacy data
+            if (!legacyData.delete()) {
+                log.warn("Unable to delete legacy data for {}", name);
             }
         }
     }
@@ -1998,6 +2274,9 @@ public class Server {
         Entity.registerEntity("Zombie", EntityZombie.class);
         Entity.registerEntity("Pillager", EntityPillager.class);
         Entity.registerEntity("ZombieVillagerV2", EntityZombieVillagerV2.class);
+        Entity.registerEntity("Hoglin", EntityHoglin.class);
+        Entity.registerEntity("Piglin", EntityPiglin.class);
+        Entity.registerEntity("Zoglin", EntityZoglin.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
@@ -2031,6 +2310,7 @@ public class Server {
         Entity.registerEntity("VillagerV2", EntityVillagerV2.class);
         Entity.registerEntity("Fox", EntityFox.class);
         Entity.registerEntity("Bee", EntityBee.class);
+        Entity.registerEntity("Strider", EntityStrider.class);
         //Vehicles
         Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
         Entity.registerEntity("MinecartChest", EntityMinecartChest.class);
@@ -2121,7 +2401,7 @@ public class Server {
         this.doNotLimitInteractions = this.getPropertyBoolean("do-not-limit-interactions", false);
         this.motd = this.getPropertyString("motd", "Minecraft Server");
         this.viewDistance = this.getPropertyInt("view-distance", 8);
-        this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 6000);
+        this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 12000);
         this.port = this.getPropertyInt("server-port", 19132);
         this.ip = this.getPropertyString("server-ip", "0.0.0.0");
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
@@ -2131,8 +2411,12 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
-        this.asyncAutosave = this.getPropertyBoolean("async-autosave", false);
         this.anvilsEnabled = this.getPropertyBoolean("anvils-enabled", true);
+        this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
+        this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
+        this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
+        this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
+        this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
         } catch (NumberFormatException exception) {
@@ -2196,7 +2480,7 @@ public class Server {
             put("debug-level", 1);
             put("async-workers", "auto");
             put("zlib-provider", 2);
-            put("async-compression", false);
+            put("async-compression", true);
             put("compression-level", 4);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);
@@ -2219,7 +2503,7 @@ public class Server {
             put("chunk-generation-population-queue-size", 8);
             put("ticks-per-autosave", 6000);
             put("ticks-per-entity-spawns", 200);
-            put("ticks-per-entity-despawns", 6000);
+            put("ticks-per-entity-despawns", 12000);
             put("thread-watchdog", true);
             put("thread-watchdog-tick", 50000);
             put("nether", true);
@@ -2231,7 +2515,7 @@ public class Server {
             put("worlds-entity-spawning-disabled", "");
             put("block-listener", true);
             put("allow-flight", false);
-            put("timeout-milliseconds", 30000);
+            put("timeout-milliseconds", 25000);
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
             put("dimensions", false);
@@ -2247,9 +2531,10 @@ public class Server {
             put("check-op-movement", false);
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
-            put("async-autosave", false);
             put("automatic-bug-report", true);
             put("anvils-enabled", true);
+            put("save-player-data-by-uuid", true);
+            put("vanilla-portals", true);
         }
     }
 

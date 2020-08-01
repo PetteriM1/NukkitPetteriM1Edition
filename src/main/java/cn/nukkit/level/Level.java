@@ -2,7 +2,10 @@ package cn.nukkit.level;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockGrass;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
@@ -38,6 +41,7 @@ import cn.nukkit.level.generator.task.GenerationTask;
 import cn.nukkit.level.generator.task.LightPopulationTask;
 import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
+import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
@@ -47,7 +51,6 @@ import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.network.Network;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
@@ -179,13 +182,17 @@ public class Level implements ChunkManager, Metadatable {
     //private final List<BlockUpdateEntry> nextTickUpdates = Lists.newArrayList();
     //private final Map<BlockVector3, Integer> updateQueueIndex = new HashMap<>();
 
+    //TODO: This is a bad way to handle multiversion chunks while the new format requires the correct block palette for every version
     private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue0 = new ConcurrentHashMap<>(); // < 1.12
     private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue361 = new ConcurrentHashMap<>(); // 1.12
-    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue388 = new ConcurrentHashMap<>(); // > 1.12
+    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue388 = new ConcurrentHashMap<>(); // 1.13
+    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue389 = new ConcurrentHashMap<>(); // 1.14
+    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue407 = new ConcurrentHashMap<>(); // 1.16
     private final LongSet chunkSendTasks0 = new LongOpenHashSet(); // < 1.12
     private final LongSet chunkSendTasks361 = new LongOpenHashSet(); // 1.12
-    private final LongSet chunkSendTasks388 = new LongOpenHashSet(); // > 1.12
-
+    private final LongSet chunkSendTasks388 = new LongOpenHashSet(); // 1.13
+    private final LongSet chunkSendTasks389 = new LongOpenHashSet(); // 1.14
+    private final LongSet chunkSendTasks407 = new LongOpenHashSet(); // 1.16
     private final Long2ObjectOpenHashMap<Boolean> chunkPopulationQueue = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Boolean> chunkPopulationLock = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Boolean> chunkGenerationQueue = new Long2ObjectOpenHashMap<>();
@@ -217,6 +224,8 @@ public class Level implements ChunkManager, Metadatable {
     public int tickRateTime = 0;
     public int tickRateCounter = 0;
 
+    // Notice: These shouldn't be used in the internal methods
+    // Check the dimension id instead
     public final boolean isNether;
     public final boolean isEnd;
 
@@ -250,6 +259,8 @@ public class Level implements ChunkManager, Metadatable {
     private int dimension;
 
     public GameRules gameRules;
+
+    private boolean randomTickingEnabled;
 
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
 
@@ -310,7 +321,9 @@ public class Level implements ChunkManager, Metadatable {
         this.skyLightSubtracted = this.calculateSkylightSubtracted(1);
 
         this.isNether = name.equals("nether");
-        this.isEnd = name.equals("end");
+        this.isEnd = name.equals("the_end");
+
+        this.randomTickingEnabled = !Server.noTickingWorlds.contains(name);
     }
 
     public static long chunkHash(int x, int z) {
@@ -559,6 +572,44 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addParticle(Particle particle, Player[] players) {
+        if (!(particle instanceof FloatingTextParticle)) {
+            // Check for multiversion players and send correct particles for them
+            int x = 0;
+            boolean mv = false;
+            if (players == null) {
+                /*Collection<Player> pl = getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values();
+                for (Player p : pl) {
+                    if (x == 0) {
+                        x = p.protocol;
+                    } else if (x != p.protocol) {
+                        mv = true;
+                        break;
+                    }
+                }
+                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
+                    for (Player mvPlayer : pl) {
+                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
+                    }
+                    return;
+                }*/
+            } else {
+                for (Player p : players) {
+                    if (x == 0) {
+                        x = p.protocol;
+                    } else if (x != p.protocol) {
+                        mv = true;
+                        break;
+                    }
+                }
+                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
+                    for (Player mvPlayer : players) {
+                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
+                    }
+                    return;
+                }
+            }
+        }
+
         DataPacket[] packets = particle.encode();
 
         if (players == null) {
@@ -771,7 +822,7 @@ public class Level implements ChunkManager, Metadatable {
 
     @SuppressWarnings("unchecked")
     public void doTick(int currentTick) {
-        this.timings.doTick.startTiming();
+        if (this.timings.doTick != null) this.timings.doTick.startTiming();
 
         updateBlockLight(lightQueue);
         this.checkTime();
@@ -781,7 +832,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         // Tick Weather
-        if (!this.isNether && !this.isEnd && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && this.randomTickingEnabled()) {
+        if (this.dimension != DIMENSION_NETHER && this.dimension != DIMENSION_THE_END && this.gameRules.getBoolean(GameRule.DO_WEATHER_CYCLE) && this.randomTickingEnabled()) {
             this.rainTime--;
             if (this.rainTime <= 0) {
                 if (!this.setRaining(!this.raining)) {
@@ -829,10 +880,10 @@ public class Level implements ChunkManager, Metadatable {
         this.levelCurrentTick++;
 
         this.unloadChunks();
-        this.timings.doTickPending.startTiming();
 
+        if (this.timings.doTickPending != null) this.timings.doTickPending.startTiming();
         this.updateQueue.tick(this.levelCurrentTick);
-        this.timings.doTickPending.stopTiming();
+        if (this.timings.doTickPending != null) this.timings.doTickPending.stopTiming();
         
         Block block;
         while ((block = this.normalUpdateQueue.poll()) != null) {
@@ -840,7 +891,7 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         TimingsHistory.entityTicks += this.updateEntities.size();
-        this.timings.entityTick.startTiming();
+        if (this.timings.entityTick != null) this.timings.entityTick.startTiming();
 
         if (!this.updateEntities.isEmpty()) {
             for (long id : new ArrayList<>(this.updateEntities.keySet())) {
@@ -854,16 +905,16 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
         }
-        this.timings.entityTick.stopTiming();
+        if (this.timings.entityTick != null) this.timings.entityTick.stopTiming();
 
         TimingsHistory.tileEntityTicks += this.updateBlockEntities.size();
-        this.timings.blockEntityTick.startTiming();
+        if (this.timings.blockEntityTick != null) this.timings.blockEntityTick.startTiming();
         this.updateBlockEntities.removeIf(blockEntity -> !blockEntity.isValid() || !blockEntity.onUpdate());
-        this.timings.blockEntityTick.stopTiming();
+        if (this.timings.blockEntityTick != null) this.timings.blockEntityTick.stopTiming();
 
-        this.timings.tickChunks.startTiming();
+        if (this.timings.tickChunks != null) this.timings.tickChunks.startTiming();
         this.tickChunks();
-        this.timings.tickChunks.stopTiming();
+        if (this.timings.tickChunks != null)  this.timings.tickChunks.stopTiming();
 
         synchronized (changedBlocks) {
             if (!this.changedBlocks.isEmpty()) {
@@ -923,7 +974,7 @@ public class Level implements ChunkManager, Metadatable {
             gameRules.refresh();
         }
 
-        this.timings.doTick.stopTiming();
+        if (this.timings.doTick != null) this.timings.doTick.stopTiming();
     }
 
     private void performThunder(long index, FullChunk chunk) {
@@ -1063,7 +1114,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
-            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
+            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             for (Player p : target) {
                 try {
@@ -1094,7 +1145,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = flags;
-            updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
+            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
                 if (b instanceof Block) {
@@ -1248,7 +1299,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void updateAroundRedstone(Vector3 pos, BlockFace face) {
         for (BlockFace side : BlockFace.values()) {
-            if (face != null && side == face) {
+            if (face != null /*&&*/|| side == face) {
                 continue;
             }
 
@@ -1475,7 +1526,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z));
+                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         return true;
                     }
@@ -1956,9 +2007,9 @@ public class Level implements ChunkManager, Metadatable {
             drops = target.getDrops(item);
         }
 
-        Block above = this.getBlock(new Vector3(target.x, target.y + 1, target.z));
+        Vector3 above = new Vector3(target.x, target.y + 1, target.z);
         if (above != null) {
-            if (above.getId() == Item.FIRE) {
+            if (this.getBlockIdAt((int) above.x, (int) above.y, (int) above.z) == Item.FIRE) {
                 this.setBlock(above, Block.get(BlockID.AIR), true);
             }
         }
@@ -2062,7 +2113,7 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        if (block.y > 127 && this.isNether) {
+        if (block.y > 127 && this.dimension == DIMENSION_NETHER) {
             return null;
         }
 
@@ -2133,7 +2184,7 @@ public class Level implements ChunkManager, Metadatable {
             Entity[] entities = this.getCollidingEntities(hand.getBoundingBox());
             int realCount = 0;
             for (Entity e : entities) {
-                if (e instanceof EntityArrow || e instanceof EntityItem || (e instanceof Player && ((Player) e).isSpectator())) {
+                if (e instanceof EntityArrow || e instanceof EntityItem || (e instanceof Player && ((Player) e).isSpectator() || !e.canCollide())) {
                     continue;
                 }
                 ++realCount;
@@ -2216,7 +2267,7 @@ public class Level implements ChunkManager, Metadatable {
 
                         if (second != null) {
                             block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                            block.getLevel().setBlock(block.add(0, 1, 0), Block.get(BlockID.AIR)); // block is set to BlockFace.DOWN above
+                            block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
 
                             CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityIronGolem.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM);
                             server.getPluginManager().callEvent(ev);
@@ -2255,7 +2306,7 @@ public class Level implements ChunkManager, Metadatable {
                         block.getLevel().setBlock(first2, Block.get(BlockID.AIR));
                         block.getLevel().setBlock(second2, Block.get(BlockID.AIR));
                         block.getLevel().setBlock(block, Block.get(BlockID.AIR));
-                        block.getLevel().setBlock(block.add(0, 1, 0), Block.get(BlockID.AIR)); // block is set to BlockFace.DOWN above
+                        block.getLevel().setBlock(block.add(0, -1, 0), Block.get(BlockID.AIR));
 
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, CreatureSpawnEvent.SpawnReason.BUILD_WITHER);
                         server.getPluginManager().callEvent(ev);
@@ -2269,7 +2320,9 @@ public class Level implements ChunkManager, Metadatable {
                             player.getInventory().setItemInHand(item);
                         }
 
-                        Entity.createEntity("Wither", block.add(0.5, -1, 0.5)).spawnToAll();
+                        EntityWither wither = (EntityWither) Entity.createEntity("Wither", block.add(0.5, -1, 0.5));
+                        wither.stayTime = 220;
+                        wither.spawnToAll();
                         this.addSound(block, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
                         return null;
                     }
@@ -2565,7 +2618,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void generateChunkCallback(int x, int z, BaseFullChunk chunk, boolean isPopulated) {
-        Timings.generationCallbackTimer.startTiming();
+        if (Timings.generationCallbackTimer != null) Timings.generationCallbackTimer.startTiming();
         long index = Level.chunkHash(x, z);
         if (this.chunkPopulationQueue.containsKey(index)) {
             FullChunk oldChunk = this.getChunk(x, z, false);
@@ -2595,7 +2648,7 @@ public class Level implements ChunkManager, Metadatable {
             chunk.setProvider(this.provider);
             this.setChunk(x, z, chunk, false);
         }
-        Timings.generationCallbackTimer.stopTiming();
+        if (Timings.generationCallbackTimer != null) Timings.generationCallbackTimer.stopTiming();
     }
 
     @Override
@@ -2829,40 +2882,61 @@ public class Level implements ChunkManager, Metadatable {
                     player.sendChunk(x, z, packet);
                 }
             }
-
             queue.remove(index);
             tasks0.remove(index);
         }
 
-        LongSet tasks361 = getChunkSendTasks(361);
+        LongSet tasks361 = getChunkSendTasks(ProtocolInfo.v1_12_0);
         if (tasks361.contains(index)) {
-            ConcurrentMap<Long, Int2ObjectMap<Player>> queue = getChunkSendQueue(361);
+            ConcurrentMap<Long, Int2ObjectMap<Player>> queue = getChunkSendQueue(ProtocolInfo.v1_12_0);
             for (Player player : queue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
                     player.sendChunk(x, z, packet);
                 }
             }
-
             queue.remove(index);
             tasks361.remove(index);
         }
 
-        LongSet tasks388 = getChunkSendTasks(388);
+        LongSet tasks388 = getChunkSendTasks(ProtocolInfo.v1_13_0);
         if (tasks388.contains(index)) {
-            ConcurrentMap<Long, Int2ObjectMap<Player>> queue = getChunkSendQueue(388);
+            ConcurrentMap<Long, Int2ObjectMap<Player>> queue = getChunkSendQueue(ProtocolInfo.v1_13_0);
             for (Player player : queue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
                     player.sendChunk(x, z, packet);
                 }
             }
-
             queue.remove(index);
             tasks388.remove(index);
+        }
+
+        LongSet tasks389 = getChunkSendTasks(ProtocolInfo.v1_14_0);
+        if (tasks389.contains(index)) {
+            ConcurrentMap<Long, Int2ObjectMap<Player>> queue = getChunkSendQueue(ProtocolInfo.v1_14_0);
+            for (Player player : queue.get(index).values()) {
+                if (player.isConnected() && player.usedChunks.containsKey(index)) {
+                    player.sendChunk(x, z, packet);
+                }
+            }
+            queue.remove(index);
+            tasks389.remove(index);
+        }
+
+        LongSet tasks407 = getChunkSendTasks(ProtocolInfo.v1_16_0);
+        if (tasks407.contains(index)) {
+            ConcurrentMap<Long, Int2ObjectMap<Player>> queue = getChunkSendQueue(ProtocolInfo.v1_16_0);
+            for (Player player : queue.get(index).values()) {
+                if (player.isConnected() && player.usedChunks.containsKey(index)) {
+                    player.sendChunk(x, z, packet);
+                }
+            }
+            queue.remove(index);
+            tasks407.remove(index);
         }
     }
 
     private void processChunkRequest() {
-        this.timings.syncChunkSendTimer.startTiming();
+        if (this.timings.syncChunkSendTimer != null) this.timings.syncChunkSendTimer.startTiming();
 
         int protocol = 0;
         for (long index : getChunkSendQueue(protocol).keySet()) {
@@ -2881,16 +2955,13 @@ public class Level implements ChunkManager, Metadatable {
                     continue;
                 }
             }
-
-            this.timings.syncChunkSendPrepareTimer.startTiming();
-
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.startTiming();
             AsyncTask task = this.provider.requestChunkTask(protocol, x, z);
 
             if (task != null) {
                 this.server.getScheduler().scheduleAsyncTask(task);
             }
-
-            this.timings.syncChunkSendPrepareTimer.stopTiming();
+            if (this.timings.syncChunkSendPrepareTimer != null)  this.timings.syncChunkSendPrepareTimer.stopTiming();
         }
 
         protocol = ProtocolInfo.v1_12_0;
@@ -2910,16 +2981,12 @@ public class Level implements ChunkManager, Metadatable {
                     continue;
                 }
             }
-
-            this.timings.syncChunkSendPrepareTimer.startTiming();
-
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.startTiming();
             AsyncTask task = this.provider.requestChunkTask(protocol, x, z);
-
             if (task != null) {
                 this.server.getScheduler().scheduleAsyncTask(task);
             }
-
-            this.timings.syncChunkSendPrepareTimer.stopTiming();
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.stopTiming();
         }
 
         protocol = ProtocolInfo.v1_13_0;
@@ -2939,23 +3006,69 @@ public class Level implements ChunkManager, Metadatable {
                     continue;
                 }
             }
-
-            this.timings.syncChunkSendPrepareTimer.startTiming();
-
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.startTiming();
             AsyncTask task = this.provider.requestChunkTask(protocol, x, z);
-
             if (task != null) {
                 this.server.getScheduler().scheduleAsyncTask(task);
             }
-
-            this.timings.syncChunkSendPrepareTimer.stopTiming();
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.stopTiming();
         }
 
-        this.timings.syncChunkSendTimer.stopTiming();
+        protocol = ProtocolInfo.v1_14_0;
+        for (long index : getChunkSendQueue(protocol).keySet()) {
+            LongSet tasks = getChunkSendTasks(protocol);
+            if (tasks.contains(index)) {
+                continue;
+            }
+            int x = getHashX(index);
+            int z = getHashZ(index);
+            tasks.add(index);
+            BaseFullChunk chunk = getChunk(x, z);
+            if (chunk != null) {
+                BatchPacket packet = chunk.getChunkPacket(protocol);
+                if (packet != null) {
+                    this.sendChunk(x, z, index, packet);
+                    continue;
+                }
+            }
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.startTiming();
+            AsyncTask task = this.provider.requestChunkTask(protocol, x, z);
+            if (task != null) {
+                this.server.getScheduler().scheduleAsyncTask(task);
+            }
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.stopTiming();
+        }
+
+        protocol = ProtocolInfo.v1_16_0;
+        for (long index : getChunkSendQueue(protocol).keySet()) {
+            LongSet tasks = getChunkSendTasks(protocol);
+            if (tasks.contains(index)) {
+                continue;
+            }
+            int x = getHashX(index);
+            int z = getHashZ(index);
+            tasks.add(index);
+            BaseFullChunk chunk = getChunk(x, z);
+            if (chunk != null) {
+                BatchPacket packet = chunk.getChunkPacket(protocol);
+                if (packet != null) {
+                    this.sendChunk(x, z, index, packet);
+                    continue;
+                }
+            }
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.startTiming();
+            AsyncTask task = this.provider.requestChunkTask(protocol, x, z);
+            if (task != null) {
+                this.server.getScheduler().scheduleAsyncTask(task);
+            }
+            if (this.timings.syncChunkSendPrepareTimer != null) this.timings.syncChunkSendPrepareTimer.stopTiming();
+        }
+
+        if (this.timings.syncChunkSendTimer != null) this.timings.syncChunkSendTimer.stopTiming();
     }
 
     public void chunkRequestCallback(int protocol, long timestamp, int x, int z, int subChunkCount, byte[] payload) {
-        this.timings.syncChunkSendTimer.startTiming();
+        if (this.timings.syncChunkSendTimer != null) this.timings.syncChunkSendTimer.startTiming();
         long index = Level.chunkHash(x, z);
 
         if (this.cacheChunks) {
@@ -2965,7 +3078,7 @@ public class Level implements ChunkManager, Metadatable {
                 chunk.setChunkPacket(protocol, data);
             }
             this.sendChunk(x, z, index, data);
-            this.timings.syncChunkSendTimer.stopTiming();
+            if (this.timings.syncChunkSendTimer != null) this.timings.syncChunkSendTimer.stopTiming();
             return;
         }
 
@@ -2984,7 +3097,7 @@ public class Level implements ChunkManager, Metadatable {
             tasks.remove(index);
         }
 
-        this.timings.syncChunkSendTimer.stopTiming();
+        if (this.timings.syncChunkSendTimer != null) this.timings.syncChunkSendTimer.stopTiming();
     }
 
     public void removeEntity(Entity entity) {
@@ -3057,7 +3170,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private synchronized BaseFullChunk forceLoadChunk(long index, int x, int z, boolean generate) {
-        this.timings.syncChunkLoadTimer.startTiming();
+        if (this.timings.syncChunkLoadTimer != null) this.timings.syncChunkLoadTimer.startTiming();
 
         BaseFullChunk chunk = this.provider.getChunk(x, z, generate);
 
@@ -3065,7 +3178,7 @@ public class Level implements ChunkManager, Metadatable {
             if (generate) {
                 throw new IllegalStateException("Could not create new chunk");
             }
-            this.timings.syncChunkLoadTimer.stopTiming();
+            if (this.timings.syncChunkLoadTimer != null) this.timings.syncChunkLoadTimer.stopTiming();
             return null;
         }
 
@@ -3073,7 +3186,7 @@ public class Level implements ChunkManager, Metadatable {
             this.server.getPluginManager().callEvent(new ChunkLoadEvent(chunk, !chunk.isGenerated()));
         } else {
             this.unloadChunk(x, z, false);
-            this.timings.syncChunkLoadTimer.stopTiming();
+            if (this.timings.syncChunkLoadTimer != null) this.timings.syncChunkLoadTimer.stopTiming();
             return chunk;
         }
 
@@ -3091,7 +3204,7 @@ public class Level implements ChunkManager, Metadatable {
         } else {
             this.unloadQueue.put(index, System.currentTimeMillis());
         }
-        this.timings.syncChunkLoadTimer.stopTiming();
+        if (this.timings.syncChunkLoadTimer != null) this.timings.syncChunkLoadTimer.stopTiming();
         return chunk;
     }
 
@@ -3139,7 +3252,7 @@ public class Level implements ChunkManager, Metadatable {
             return true;
         }
 
-        this.timings.doChunkUnload.startTiming();
+        if (this.timings.doChunkUnload != null) this.timings.doChunkUnload.startTiming();
 
         BaseFullChunk chunk = this.getChunk(x, z);
 
@@ -3147,7 +3260,7 @@ public class Level implements ChunkManager, Metadatable {
             ChunkUnloadEvent ev = new ChunkUnloadEvent(chunk);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
-                this.timings.doChunkUnload.stopTiming();
+                if (this.timings.doChunkUnload != null) this.timings.doChunkUnload.stopTiming();
                 return false;
             }
         }
@@ -3179,7 +3292,7 @@ public class Level implements ChunkManager, Metadatable {
             logger.logException(e);
         }
 
-        this.timings.doChunkUnload.stopTiming();
+        if (this.timings.doChunkUnload != null) this.timings.doChunkUnload.stopTiming();
 
         return true;
     }
@@ -3202,8 +3315,15 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Position getSafeSpawn(Vector3 spawn) {
-        if (spawn == null || spawn.y < 1) {
+        if (spawn == null /*|| spawn.y < 1*/) {
             spawn = this.getSpawnLocation();
+        }
+
+        // Hack: Fix the y1 glitch, do not teleport players standing at y=1 to spawn on join
+        // For some reason player's y coord is 0.999 instead of 1 when they join
+        // This may need a better fix later
+        if (spawn.y < 1) {
+            spawn.y = 1.01;
         }
 
         if (spawn != null) {
@@ -3307,7 +3427,7 @@ public class Level implements ChunkManager, Metadatable {
         BaseFullChunk chunk = this.getChunk(x, z, true);
         boolean populate;
         if (!chunk.isPopulated()) {
-            Timings.populationTimer.startTiming();
+            if (Timings.populationTimer != null) Timings.populationTimer.startTiming();
             populate = true;
             for (int xx = -1; xx <= 1; ++xx) {
                 for (int zz = -1; zz <= 1; ++zz) {
@@ -3330,7 +3450,7 @@ public class Level implements ChunkManager, Metadatable {
                     this.server.getScheduler().scheduleAsyncTask(new PopulationTask(this, chunk));
                 }
             }
-            Timings.populationTimer.stopTiming();
+            if (Timings.populationTimer != null) Timings.populationTimer.stopTiming();
             return false;
         }
 
@@ -3348,11 +3468,11 @@ public class Level implements ChunkManager, Metadatable {
 
         long index = Level.chunkHash(x, z);
         if (!this.chunkGenerationQueue.containsKey(index)) {
-            Timings.generationTimer.startTiming();
+            if (Timings.generationTimer != null) Timings.generationTimer.startTiming();
             this.chunkGenerationQueue.put(index, Boolean.TRUE);
             GenerationTask task = new GenerationTask(this, this.getChunk(x, z, true));
             this.server.getScheduler().scheduleAsyncTask(task);
-            Timings.generationTimer.stopTiming();
+            if (Timings.generationTimer != null) Timings.generationTimer.stopTiming();
         }
     }
 
@@ -3364,7 +3484,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void doChunkGarbageCollection() {
-        this.timings.doChunkGC.startTiming();
+        if (this.timings.doChunkGC != null) this.timings.doChunkGC.startTiming();
         // Remove all invalid block entities
         if (!blockEntities.isEmpty()) {
             ObjectIterator<BlockEntity> iter = blockEntities.values().iterator();
@@ -3394,14 +3514,14 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         this.provider.doGarbageCollection();
-        this.timings.doChunkGC.stopTiming();
+        if (this.timings.doChunkGC != null) this.timings.doChunkGC.stopTiming();
     }
 
 
     public void doGarbageCollection(long allocatedTime) {
         long start = System.currentTimeMillis();
         if (unloadChunks(start, allocatedTime, false)) {
-            allocatedTime = allocatedTime - (System.currentTimeMillis() - start);
+            allocatedTime -= (System.currentTimeMillis() - start);
             provider.doGarbageCollection(allocatedTime);
         }
     }
@@ -3498,8 +3618,8 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (toUnload != null) {
-                long[] arr = toUnload.toLongArray();
-                for (long index : arr) {
+                //long[] arr = toUnload.toLongArray();
+                for (long index : toUnload) {
                     int X = getHashX(index);
                     int Z = getHashZ(index);
                     if (this.unloadChunk(X, Z, true)) {
@@ -3546,9 +3666,13 @@ public class Level implements ChunkManager, Metadatable {
         pk.yaw = (float) yaw;
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
-        pk.setChannel(Network.CHANNEL_MOVEMENT);
+        pk.onGround = entity.onGround;
+        //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
-        Server.broadcastPacket(entity.getViewers().values(), pk);
+        //Server.broadcastPacket(entity.getViewers().values(), pk);
+        for (Player p : entity.getViewers().values()) {
+            p.batchDataPacket(pk);
+        }
     }
 
     public boolean isRaining() {
@@ -3770,7 +3894,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean randomTickingEnabled() {
-        return !Server.noTickingWorlds.contains(this.getName());
+        return this.randomTickingEnabled;
     }
 
     public boolean isAnimalSpawningAllowedByTime() {
@@ -4020,8 +4144,14 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendQueue0;
         } else if (protocol == ProtocolInfo.v1_12_0) {
             return chunkSendQueue361;
-        } else {
+        } else if (protocol == ProtocolInfo.v1_13_0) {
             return chunkSendQueue388;
+        } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
+            return chunkSendQueue389;
+        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100) {
+            return chunkSendQueue407;
+        } else {
+            throw new IllegalArgumentException("Missing chunk send queue for protocol " + protocol);
         }
     }
 
@@ -4030,13 +4160,19 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendTasks0;
         } else if (protocol == ProtocolInfo.v1_12_0) {
             return chunkSendTasks361;
-        } else {
+        } else if (protocol == ProtocolInfo.v1_13_0) {
             return chunkSendTasks388;
+        } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
+            return chunkSendTasks389;
+        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100) {
+            return chunkSendTasks407;
+        } else {
+            throw new IllegalArgumentException("Missing chunk send task for protocol " + protocol);
         }
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player >= ProtocolInfo.v1_13_0);
+        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) || (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_20) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

@@ -21,7 +21,6 @@ public class ZombieSpawner extends AbstractEntitySpawner {
         if (pos.y > 255 || pos.y < 1) {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
-        } else if (level.isNether || level.isEnd) {
         } else if (level.isMobSpawningAllowedByTime()) {
             if (Utils.rand(1, 40) == 30) {
                 BaseEntity entity = this.spawnTask.createEntity("ZombieVillager", pos.add(0, 1, 0));

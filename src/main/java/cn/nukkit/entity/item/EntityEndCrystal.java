@@ -16,14 +16,21 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
 
     public static final int NETWORK_ID = 71;
 
+    protected boolean detonated = false;
+
     @Override
     public float getLength() {
-        return 1f;
+        return 1.5f;
     }
 
     @Override
     public float getHeight() {
-        return 1f;
+        return 1.5f;
+    }
+
+    @Override
+    public float getWidth() {
+        return 1.5f;
     }
 
     @Override
@@ -84,8 +91,9 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     @Override
     public void explode() {
         this.close();
-        if ((level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) || (!level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING))) {
-            ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 5);
+        if (!detonated && ((level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) || (!level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)))) {
+            this.detonated = true;
+            ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 6);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) return;
             Explosion explode = new Explosion(this, (float) ev.getForce(), this);

@@ -161,7 +161,7 @@ public class Anvil extends BaseLevelProvider {
                 stream.putByte((byte) 0);
                 stream.put(sections[i].getBytes());
             } else {
-                sections[i].writeTo(protocol, stream); //TODO: This may need multiversion support later because it uses the block palette
+                sections[i].writeTo(protocol, stream);
             }
         }
         if (protocol < ProtocolInfo.v1_12_0) {
@@ -216,7 +216,7 @@ public class Anvil extends BaseLevelProvider {
         int regionX = getRegionIndexX(chunkX);
         int regionZ = getRegionIndexZ(chunkZ);
         BaseRegionLoader region = this.loadRegion(regionX, regionZ);
-        this.level.timings.syncChunkLoadDataTimer.startTiming();
+        if (this.level.timings.syncChunkLoadDataTimer != null) this.level.timings.syncChunkLoadDataTimer.startTiming();
         BaseFullChunk chunk;
         try {
             chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
@@ -231,7 +231,7 @@ public class Anvil extends BaseLevelProvider {
         } else {
             putChunk(index, chunk);
         }
-        this.level.timings.syncChunkLoadDataTimer.stopTiming();
+        if (this.level.timings.syncChunkLoadDataTimer != null) this.level.timings.syncChunkLoadDataTimer.stopTiming();
         return chunk;
     }
 

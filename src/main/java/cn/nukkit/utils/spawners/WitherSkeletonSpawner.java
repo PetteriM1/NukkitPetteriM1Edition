@@ -7,6 +7,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.Utils;
 
 public class WitherSkeletonSpawner extends AbstractEntitySpawner {
 
@@ -16,8 +17,11 @@ public class WitherSkeletonSpawner extends AbstractEntitySpawner {
 
     @Override
     public void spawn(Player player, Position pos, Level level) {
-        if (!level.isNether) {
-        } else if (pos.y > 127 || pos.y < 1) {
+        if (Utils.rand(1, 3) == 1) {
+            return;
+        }
+
+        if (pos.y > 127 || pos.y < 1) {
         } else if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.NETHERRACK) {
         } else {
             this.spawnTask.createEntity("WitherSkeleton", pos.add(0, 1, 0));

@@ -12,6 +12,7 @@ import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.DyeColor;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,9 +85,9 @@ public class ItemFirework extends Item {
             }
 
             player.setMotion(new Vector3(
-                    -Math.sin(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 2,
-                    -Math.sin(Math.toRadians(player.pitch)) * 2,
-                    Math.cos(Math.toRadians(player.yaw)) * Math.cos(Math.toRadians(player.pitch)) * 2));
+                    -Math.sin(FastMath.toRadians(player.yaw)) * Math.cos(FastMath.toRadians(player.pitch)) * 2,
+                    -Math.sin(FastMath.toRadians(player.pitch)) * 2,
+                    Math.cos(FastMath.toRadians(player.yaw)) * Math.cos(FastMath.toRadians(player.pitch)) * 2));
 
             return true;
         }

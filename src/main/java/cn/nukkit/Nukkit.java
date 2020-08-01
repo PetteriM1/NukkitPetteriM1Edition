@@ -56,21 +56,26 @@ public class Nukkit {
         System.setProperty("log4j.skipJansi", "false");
         System.getProperties().putIfAbsent("io.netty.allocator.type", "unpooled"); // Disable memory pooling unless specified
 
-        boolean loadPlugins = true;
+        // Force Mapped ByteBuffers for LevelDB till fixed
+        System.setProperty("leveldb.mmap", "true");
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("-DEBUG")) {
+        boolean loadPlugins = true;
+        boolean debug = false;
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("-debug")) {
+            debug = true;
             InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
             System.out.print("Debug stuff enabled!\n");
             System.out.print("Do you want to skip loading plugins? (yes/no) ");
-            loadPlugins = !"yes".equals(new Scanner(System.in).nextLine());
+            loadPlugins = !new Scanner(System.in).nextLine().startsWith("y");
         }
 
         try {
             if (TITLE) {
                 System.out.print("\u001B]0;Nukkit PetteriM1 Edition\u0007");
             }
-            new Server(PATH, DATA_PATH, PLUGIN_PATH, loadPlugins);
+            new Server(PATH, DATA_PATH, PLUGIN_PATH, loadPlugins, debug);
         } catch (Throwable t) {
             log.throwing(t);
         }
@@ -137,10 +142,11 @@ public class Nukkit {
         return ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(org.apache.logging.log4j.LogManager.ROOT_LOGGER_NAME).getLevel();
     }
 
-    public static boolean isMasterBranchBuild() {
-        if (GIT_INFO == null || (GIT_INFO.getProperty("git.branch")) == null) {
-            return false;
+    public static String getBranch() {
+        String branch;
+        if (GIT_INFO == null || (branch = GIT_INFO.getProperty("git.branch")) == null) {
+            return "null";
         }
-        return GIT_INFO.getProperty("git.branch").equals("master");
+        return branch;
     }
 }

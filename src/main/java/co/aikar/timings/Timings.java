@@ -54,35 +54,35 @@ public final class Timings {
     private static int historyLength = -1;
 
     public static final FullServerTickTiming fullServerTickTimer;
-    public static final Timing timingsTickTimer;
-    public static final Timing pluginEventTimer;
+    public static Timing timingsTickTimer;
+    public static Timing pluginEventTimer;
 
-    public static final Timing connectionTimer;
-    public static final Timing schedulerTimer;
-    public static final Timing schedulerAsyncTimer;
-    public static final Timing schedulerSyncTimer;
-    public static final Timing commandTimer;
-    public static final Timing serverCommandTimer;
-    public static final Timing levelSaveTimer;
+    public static Timing connectionTimer;
+    public static Timing schedulerTimer;
+    public static Timing schedulerAsyncTimer;
+    public static Timing schedulerSyncTimer;
+    public static Timing commandTimer;
+    public static Timing serverCommandTimer;
+    public static Timing levelSaveTimer;
 
-    public static final Timing playerNetworkSendTimer;
-    public static final Timing playerNetworkReceiveTimer;
-    public static final Timing playerChunkOrderTimer;
-    public static final Timing playerChunkSendTimer;
-    public static final Timing playerCommandTimer;
+    public static Timing playerNetworkSendTimer;
+    public static Timing playerNetworkReceiveTimer;
+    public static Timing playerChunkOrderTimer;
+    public static Timing playerChunkSendTimer;
+    public static Timing playerCommandTimer;
 
-    public static final Timing tickEntityTimer;
-    public static final Timing tickBlockEntityTimer;
-    public static final Timing entityMoveTimer;
-    public static final Timing entityBaseTickTimer;
-    public static final Timing livingEntityBaseTickTimer;
+    public static Timing tickEntityTimer;
+    public static Timing tickBlockEntityTimer;
+    public static Timing entityMoveTimer;
+    public static Timing entityBaseTickTimer;
+    public static Timing livingEntityBaseTickTimer;
 
-    public static final Timing generationTimer;
-    public static final Timing populationTimer;
-    public static final Timing generationCallbackTimer;
+    public static Timing generationTimer;
+    public static Timing populationTimer;
+    public static Timing generationCallbackTimer;
 
-    public static final Timing permissibleCalculationTimer;
-    public static final Timing permissionDefaultTimer;
+    public static Timing permissibleCalculationTimer;
+    public static Timing permissionDefaultTimer;
 
     private static final String empty = "?";
 
@@ -100,6 +100,10 @@ public final class Timings {
                 "History Length - " + historyLength);
 
         fullServerTickTimer = new FullServerTickTiming();
+        init();
+    }
+
+    public static void init() {
         timingsTickTimer = TimingsManager.getTiming(DEFAULT_GROUP.name, "Timings Tick", fullServerTickTimer);
         pluginEventTimer = TimingsManager.getTiming("Plugin Events");
 
@@ -137,6 +141,9 @@ public final class Timings {
 
     public static void setTimingsEnabled(boolean enabled) {
         timingsEnabled = enabled;
+        if (enabled) {
+            init();
+        }
         TimingsManager.reset();
     }
 
@@ -203,11 +210,11 @@ public final class Timings {
     }
 
     public static Timing getTaskTiming(TaskHandler handler, long period) {
-        String repeating = " ";
+        String repeating;
         if (period > 0) {
-            repeating += "(interval:" + period + ')';
+            repeating = " (interval:" + period + ')';
         } else {
-            repeating += "(Single)";
+            repeating = " (Single)";
         }
 
         if (handler.getTask() instanceof PluginTask) {

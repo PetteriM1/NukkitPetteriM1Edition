@@ -125,6 +125,10 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2")
             .put(EntityFox.NETWORK_ID, "minecraft:fox")
             .put(EntityBee.NETWORK_ID, "minecraft:bee")
+            .put(EntityPiglin.NETWORK_ID, "minecraft:piglin")
+            .put(EntityHoglin.NETWORK_ID, "minecraft:hoglin")
+            .put(EntityStrider.NETWORK_ID, "minecraft:strider")
+            .put(EntityZoglin.NETWORK_ID, "minecraft:zoglin")
             .build();
 
     @Override
@@ -177,7 +181,7 @@ public class AddEntityPacket extends DataPacket {
         this.put(Binary.writeMetadata(protocol, this.metadata));
         this.putUnsignedVarInt(this.links.length);
         for (EntityLink link : links) {
-            putEntityLink(link);
+            putEntityLink(protocol, link);
         }
     }
 }

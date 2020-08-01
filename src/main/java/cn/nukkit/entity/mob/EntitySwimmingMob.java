@@ -74,7 +74,7 @@ public abstract class EntitySwimmingMob extends EntitySwimming implements Entity
 
     public void setDamage(int[] damage) {
         if (damage.length < 4) {
-            return;
+            throw new IllegalArgumentException("Invalid damage array length");
         }
 
         if (minDamage == null || minDamage.length < 4) {

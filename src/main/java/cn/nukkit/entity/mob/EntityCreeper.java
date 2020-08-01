@@ -1,7 +1,7 @@
 package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
-import cn.nukkit.block.BlockLiquid;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityExplosive;
@@ -20,6 +20,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +67,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     }
 
     public void explode() {
-        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, this.isPowered() ? 3 : 2.8);
+        EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, this.isPowered() ? 6 : 3);
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
@@ -106,8 +107,8 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
         }
 
         if (this.isKnockback()) {
-            this.move(this.motionX * tickDiff, this.motionY, this.motionZ * tickDiff);
-            this.motionY -= this.getGravity() * tickDiff;
+            this.move(this.motionX, this.motionY, this.motionZ);
+            this.motionY -= this.getGravity();
             this.updateMovement();
             return true;
         }
@@ -143,22 +144,22 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
                 this.motionX = this.getSpeed() * 0.15 * (x / diff);
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
             }
-            if (this.stayTime <= 0 || Utils.rand()) this.yaw = Math.toDegrees(-Math.atan2(x / diff, z / diff));
+            if (this.stayTime <= 0 || Utils.rand()) this.yaw = FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff));
         }
 
-        double dx = this.motionX * tickDiff;
-        double dz = this.motionZ * tickDiff;
+        double dx = this.motionX;
+        double dz = this.motionZ;
         boolean isJump = this.checkJump(dx, dz);
         if (this.stayTime > 0) {
             this.stayTime -= tickDiff;
-            this.move(0, this.motionY * tickDiff, 0);
+            this.move(0, this.motionY, 0);
         } else {
             Vector2 be = new Vector2(this.x + dx, this.z + dz);
-            this.move(dx, this.motionY * tickDiff, dz);
+            this.move(dx, this.motionY, dz);
             Vector2 af = new Vector2(this.x, this.z);
 
             if ((be.x != af.x || be.y != af.y) && !isJump) {
-                this.moveTime -= 90 * tickDiff;
+                this.moveTime -= 90;
             }
         }
 
@@ -166,12 +167,12 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
             if (this.onGround) {
                 this.motionY = 0;
             } else if (this.motionY > -this.getGravity() * 4) {
-                if (!(this.level.getBlock(new Vector3(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8),
-                        NukkitMath.floorDouble(this.z))) instanceof BlockLiquid)) {
+                int b = this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+                if (b != BlockID.WATER && b != BlockID.STILL_WATER) {
                     this.motionY -= this.getGravity();
                 }
             } else {
-                this.motionY -= this.getGravity() * tickDiff;
+                this.motionY -= this.getGravity();
             }
         }
         this.updateMovement();

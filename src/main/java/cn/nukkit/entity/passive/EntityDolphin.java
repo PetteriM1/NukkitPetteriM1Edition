@@ -34,6 +34,11 @@ public class EntityDolphin extends EntityWaterAnimal {
     }
 
     @Override
+    public double getSpeed() {
+        return 1.2;
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
 

@@ -33,7 +33,8 @@ public class SummonCommand extends Command {
 
         // Convert Minecraft format to the format what Nukkit uses
         String mob = Character.toUpperCase(args[0].charAt(0)) + args[0].substring(1);
-        for (int x = 2; x < mob.length() - 1; x++) {
+        int max = mob.length() - 1;
+        for (int x = 2; x < max; x++) {
             if (mob.charAt(x) == '_') {
                 mob = mob.substring(0, x) + Character.toUpperCase(mob.charAt(x + 1)) + mob.substring(x + 2);
             }

@@ -1,14 +1,16 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
-import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.potion.Effect;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -218,18 +220,31 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
         }
     }
 
+    private static final List<Integer> allowedEffects = Arrays.asList(Effect.SPEED, Effect.HASTE, Effect.DAMAGE_RESISTANCE, Effect.JUMP, Effect.STRENGTH, Effect.REGENERATION);
+
     @Override
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {
         if (!nbt.getString("id").equals(BlockEntity.BEACON)) {
             return false;
         }
 
-        this.setPrimaryPower(nbt.getInt("primary"));
-        this.setSecondaryPower(nbt.getInt("secondary"));
+        int primary = nbt.getInt("primary");
+        if (allowedEffects.contains(primary)) {
+            this.setPrimaryPower(primary);
+        } else {
+            Server.getInstance().getLogger().debug(player.getName() + " tried to set an invalid primary effect to a beacon: " + primary);
+        }
+
+        int secondary = nbt.getInt("secondary");
+        if (allowedEffects.contains(secondary)) {
+            this.setSecondaryPower(secondary);
+        } else {
+            Server.getInstance().getLogger().debug(player.getName() + " tried to set an invalid secondary effect to a beacon: " + secondary);
+        }
 
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BEACON_POWER);
 
-        player.getWindowById(Player.BEACON_WINDOW_ID).setItem(0, new ItemBlock(Block.get(BlockID.AIR), 0, 0));
+        player.getWindowById(Player.BEACON_WINDOW_ID).setItem(0, Item.get(Item.AIR));
         return true;
     }
 }

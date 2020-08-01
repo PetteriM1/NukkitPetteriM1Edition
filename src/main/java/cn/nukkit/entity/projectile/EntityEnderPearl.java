@@ -65,7 +65,7 @@ public class EntityEnderPearl extends EntityProjectile {
             return false;
         }
 
-        this.timing.startTiming();
+        if (this.timing != null) this.timing.startTiming();
 
         if (this.isCollided && this.shootingEntity instanceof Player) {
             List<Block> b = this.getCollisionBlocks();
@@ -106,7 +106,7 @@ public class EntityEnderPearl extends EntityProjectile {
             this.close();
         }
 
-        this.timing.stopTiming();
+        if (this.timing != null) this.timing.stopTiming();
 
         return super.onUpdate(currentTick);
     }
@@ -121,6 +121,10 @@ public class EntityEnderPearl extends EntityProjectile {
     }
 
     private void teleport() {
+        if (!this.level.equals(this.shootingEntity.getLevel())) {
+            return;
+        }
+
         this.shootingEntity.teleport(new Vector3(NukkitMath.floorDouble(this.x) + 0.5, this.y, NukkitMath.floorDouble(this.z) + 0.5), TeleportCause.ENDER_PEARL);
 
         if ((((Player) this.shootingEntity).getGamemode() & 0x01) == 0) {

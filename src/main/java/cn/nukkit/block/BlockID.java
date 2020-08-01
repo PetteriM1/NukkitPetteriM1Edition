@@ -307,7 +307,7 @@ public interface BlockID {
     int UNDERWATER_TORCH = 239;
     int CHORUS_PLANT = 240;
     int STAINED_GLASS = 241;
-    // 242 Camera in Education Edition
+    int CAMERA_BLOCK = 242;
     int PODZOL = 243;
     int BEETROOT_BLOCK = 244;
     int STONECUTTER = 245;

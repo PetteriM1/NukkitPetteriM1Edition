@@ -10,6 +10,8 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
+import java.util.Collection;
+
 /**
  * Created by Pub4Game on 27.12.2015.
  */
@@ -82,19 +84,24 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent() || target.getId() == Block.SNOW_LAYER) {
-            int damage = this.getDamage();
-            this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
-            if (damage >= 4 && damage <= 7) {
-                this.setDamage(this.getDamage() | 0x04);
-            } else if (damage >= 8 && damage <= 11) {
-                this.setDamage(this.getDamage() | 0x08);
-            }
-            this.getLevel().setBlock(block, this, true);
-            this.getLevel().addSound(new AnvilFallSound(this));
-            return true;
+        int damage = this.getDamage();
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        if (damage >= 4 && damage <= 7) {
+            this.setDamage(this.getDamage() | 0x04);
+        } else if (damage >= 8 && damage <= 11) {
+            this.setDamage(this.getDamage() | 0x08);
         }
-        return false;
+        this.getLevel().setBlock(block, this, true);
+        if (player == null) {
+            this.getLevel().addSound(new AnvilFallSound(this));
+        } else {
+            Collection<Player> players = getLevel().getChunkPlayers(getChunkX(), getChunkZ()).values();
+            players.remove(player);
+            if (!players.isEmpty()) {
+                this.getLevel().addSound(new AnvilFallSound(this));
+            }
+        }
+        return true;
     }
 
     @Override

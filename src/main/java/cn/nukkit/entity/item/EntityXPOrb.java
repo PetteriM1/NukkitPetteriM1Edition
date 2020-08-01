@@ -187,7 +187,7 @@ public class EntityXPOrb extends Entity {
                 }
             }
 
-            if (this.closestPlayer != null && this.closestPlayer.isSpectator()) {
+            if (this.closestPlayer != null && (this.closestPlayer.isSpectator() || !this.closestPlayer.canPickupXP())) {
                 this.closestPlayer = null;
             }
 

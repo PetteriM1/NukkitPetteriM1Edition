@@ -67,6 +67,7 @@ public abstract class Enchantment implements Cloneable {
     public static final int ID_MULTISHOT = 33;
     public static final int ID_PIERCING = 34;
     public static final int ID_QUICK_CHARGE = 35;
+    public static final int ID_SOUL_SPEED = 36;
 
     public static void init() {
         enchantments = new Enchantment[256];

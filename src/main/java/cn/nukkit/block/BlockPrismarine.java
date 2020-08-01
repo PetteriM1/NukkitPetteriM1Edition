@@ -8,13 +8,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockPrismarine extends BlockSolidMeta {
 
     public static final int NORMAL = 0;
-    public static final int BRICKS = 1;
-    public static final int DARK = 2;
+    public static final int DARK = 1;
+    public static final int BRICKS = 2;
 
     private static final String[] NAMES = new String[]{
             "Prismarine",
-            "Prismarine bricks",
-            "Dark prismarine"
+            "Dark Prismarine",
+            "Prismarine Bricks"
     };
 
     public BlockPrismarine() {

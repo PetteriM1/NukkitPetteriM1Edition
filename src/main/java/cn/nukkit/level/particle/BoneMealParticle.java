@@ -24,4 +24,16 @@ public class BoneMealParticle extends Particle {
 
         return new DataPacket[]{pk};
     }
+
+    @Override
+    public DataPacket mvEncode(int protocol) {
+        LevelEventPacket pk = new LevelEventPacket();
+        pk.evid = LevelEventPacket.EVENT_PARTICLE_BONEMEAL;
+        pk.x = (float) this.x;
+        pk.y = (float) this.y;
+        pk.z = (float) this.z;
+        pk.data = 0;
+
+        return pk;
+    }
 }

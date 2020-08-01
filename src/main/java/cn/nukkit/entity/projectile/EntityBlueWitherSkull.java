@@ -3,6 +3,7 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.event.entity.ExplosionPrimeEvent;
+import cn.nukkit.level.StrongExplosion;
 import cn.nukkit.level.Explosion;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
@@ -44,7 +45,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
             return false;
         }
 
-        this.timing.startTiming();
+        if (this.timing != null) this.timing.startTiming();
 
         if (this.age > 1200 || this.hadCollision) {
             if (this.canExplode) {
@@ -56,7 +57,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
             this.level.addParticle(new SmokeParticle(this.add(this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getHeight() / 2 + Utils.rand(-100.0, 100.0) / 500, this.getWidth() / 2 + Utils.rand(-100.0, 100.0) / 500)));
         }
 
-        this.timing.stopTiming();
+        if (this.timing != null) this.timing.stopTiming();
 
         return super.onUpdate(currentTick);
     }
@@ -73,7 +74,7 @@ public class EntityBlueWitherSkull extends EntityWitherSkull implements EntityEx
         this.server.getPluginManager().callEvent(ev);
 
         if (!ev.isCancelled()) {
-            Explosion explosion = new Explosion(this, (float) ev.getForce(), this.shootingEntity);
+            Explosion explosion = new StrongExplosion(this, (float) ev.getForce(), this.shootingEntity);
             if (ev.isBlockBreaking() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
                 explosion.explodeA();
             }

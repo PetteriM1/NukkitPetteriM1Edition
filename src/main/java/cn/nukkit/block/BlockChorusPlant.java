@@ -2,9 +2,11 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Utils;
 
 public class BlockChorusPlant extends BlockTransparent {
 
@@ -64,5 +66,10 @@ public class BlockChorusPlant extends BlockTransparent {
     @Override
     public BlockColor getColor() {
         return BlockColor.PURPLE_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return Utils.rand() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : new Item[0];
     }
 }

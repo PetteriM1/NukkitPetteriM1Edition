@@ -48,6 +48,7 @@ public class BugReportGenerator extends Thread {
         Server.getInstance().sentry.getContext().addExtra("Plugin Error", String.valueOf(pluginError));
         Server.getInstance().sentry.getContext().addTag("plugin_error", String.valueOf(pluginError));
         Server.getInstance().sentry.getContext().addTag("nukkit_version", Nukkit.VERSION);
+        Server.getInstance().sentry.getContext().addTag("branch", Nukkit.getBranch());
         Server.getInstance().sentry.sendException(throwable);
     }
 

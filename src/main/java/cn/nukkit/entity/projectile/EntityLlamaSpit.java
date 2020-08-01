@@ -56,13 +56,9 @@ public class EntityLlamaSpit extends EntityProjectile {
             return false;
         }
 
-        this.timing.startTiming();
-
         if (this.age > 100 || this.isCollided) {
             this.close();
         }
-
-        this.timing.stopTiming();
 
         return super.onUpdate(currentTick);
     }

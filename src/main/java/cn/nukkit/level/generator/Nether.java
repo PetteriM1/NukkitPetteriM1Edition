@@ -24,10 +24,10 @@ public class Nether extends Generator {
 
     private ChunkManager level;
     private NukkitRandom nukkitRandom;
-    private double lavaHeight = 32;
+    private static final int lavaHeight = 32;
     private SimplexF[] noiseGen = new SimplexF[3];
     private final List<Populator> populators = new ArrayList<>();
-    private List<Populator> generationPopulators = new ArrayList<>();
+    //private List<Populator> generationPopulators = new ArrayList<>();
 
     private long localSeed1;
     private long localSeed2;
@@ -78,24 +78,23 @@ public class Nether extends Generator {
         this.localSeed1 = ThreadLocalRandom.current().nextLong();
         this.localSeed2 = ThreadLocalRandom.current().nextLong();
 
-        PopulatorOre ores = new PopulatorOre(Block.NETHERRACK, new OreType[]{
-                new OreType(Block.get(BlockID.QUARTZ_ORE), 20, 16, 0, 128),
-                new OreType(Block.get(BlockID.SOUL_SAND), 5, 64, 0, 128),
-                new OreType(Block.get(BlockID.GRAVEL), 5, 64, 0, 128),
-                new OreType(Block.get(BlockID.MAGMA), 5, 12, 30, 33),
-                new OreType(Block.get(BlockID.LAVA), 1, 16, 0, (int) this.lavaHeight),
+        PopulatorOre ores = new PopulatorOre(NETHERRACK, new OreType[]{
+                new OreType(Block.get(BlockID.QUARTZ_ORE), 20, 16, 0, 120, NETHERRACK),
+                new OreType(Block.get(BlockID.SOUL_SAND), 5, 64, 0, 120, NETHERRACK),
+                new OreType(Block.get(BlockID.GRAVEL), 5, 64, 0, 120, NETHERRACK),
+                new OreType(Block.get(BlockID.MAGMA), 5, 12, 30, 33, NETHERRACK),
+                new OreType(Block.get(BlockID.LAVA), 1, 16, 0, lavaHeight, NETHERRACK),
         });
         this.populators.add(ores);
 
         PopulatorGroundFire groundFire = new PopulatorGroundFire();
-        groundFire.setBaseAmount(1);
-        groundFire.setRandomAmount(2);
+        groundFire.setRandomAmount(3);
         this.populators.add(groundFire);
 
         PopulatorLava lava = new PopulatorLava();
-        lava.setBaseAmount(1);
         lava.setRandomAmount(2);
         this.populators.add(lava);
+
         this.populators.add(new PopulatorGlowStone());
 
         PopulatorNetherWart netherWart = new PopulatorNetherWart();
@@ -124,16 +123,17 @@ public class Nether extends Generator {
                 for (int y = 1; y < 127; ++y) {
                     if (getNoise(baseX | x, y, baseZ | z) > 0) {
                         chunk.setBlockId(x, y, z, Block.NETHERRACK);
-                    } else if (y <= this.lavaHeight) {
+                    } else if (y <= lavaHeight) {
                         chunk.setBlockId(x, y, z, Block.STILL_LAVA);
                         chunk.setBlockLight(x, y + 1, z, 15);
                     }
                 }
             }
         }
-        for (Populator populator : this.generationPopulators) {
+
+        /*for (Populator populator : this.generationPopulators) {
             populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
-        }
+        }*/
     }
 
     @Override
@@ -144,7 +144,7 @@ public class Nether extends Generator {
             populator.populate(this.level, chunkX, chunkZ, this.nukkitRandom, chunk);
         }
 
-        Biome biome = EnumBiome.getBiome(chunk.getBiomeId(7, 7));
+        Biome biome = EnumBiome.getBiome(EnumBiome.HELL.id);
         biome.populateChunk(this.level, chunkX, chunkZ, this.nukkitRandom);
     }
 

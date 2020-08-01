@@ -274,21 +274,32 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
             list[CROSSBOW] = ItemCrossbow.class; //471
             list[SWEET_BERRIES] = ItemSweetBerries.class; //477
-            list[RECORD_11] = ItemRecord11.class;
-            list[RECORD_CAT] = ItemRecordCat.class;
-            list[RECORD_13] = ItemRecord13.class;
-            list[RECORD_BLOCKS] = ItemRecordBlocks.class;
-            list[RECORD_CHIRP] = ItemRecordChirp.class;
-            list[RECORD_FAR] = ItemRecordFar.class;
-            list[RECORD_WARD] = ItemRecordWard.class;
-            list[RECORD_MALL] = ItemRecordMall.class;
-            list[RECORD_MELLOHI] = ItemRecordMellohi.class;
-            list[RECORD_STAL] = ItemRecordStal.class;
-            list[RECORD_STRAD] = ItemRecordStrad.class;
-            list[RECORD_WAIT] = ItemRecordWait.class;
+            list[RECORD_11] = ItemRecord11.class; //510
+            list[RECORD_CAT] = ItemRecordCat.class; //501
+            list[RECORD_13] = ItemRecord13.class; //500
+            list[RECORD_BLOCKS] = ItemRecordBlocks.class; //502
+            list[RECORD_CHIRP] = ItemRecordChirp.class; //503
+            list[RECORD_FAR] = ItemRecordFar.class; //504
+            list[RECORD_WARD] = ItemRecordWard.class; //509
+            list[RECORD_MALL] = ItemRecordMall.class; //505
+            list[RECORD_MELLOHI] = ItemRecordMellohi.class; //506
+            list[RECORD_STAL] = ItemRecordStal.class; //507
+            list[RECORD_STRAD] = ItemRecordStrad.class; //508
+            list[RECORD_WAIT] = ItemRecordWait.class; //511
             list[SHIELD] = ItemShield.class; //513
             list[SUSPICIOUS_STEW] = ItemSuspiciousStew.class; //734
             list[HONEY_BOTTLE] = ItemHoneyBottle.class; //737
+            list[NETHERITE_INGOT] = ItemIngotNetherite.class; //742
+            list[NETHERITE_SWORD] = ItemSwordNetherite.class; //743
+            list[NETHERITE_SHOVEL] = ItemShovelNetherite.class; //744
+            list[NETHERITE_PICKAXE] = ItemPickaxeNetherite.class; //745
+            list[NETHERITE_AXE] = ItemAxeNetherite.class; //746
+            list[NETHERITE_HOE] = ItemHoeNetherite.class; //747
+            list[NETHERITE_HELMET] = ItemHelmetNetherite.class; //748
+            list[NETHERITE_CHESTPLATE] = ItemChestplateNetherite.class; //749
+            list[NETHERITE_LEGGINGS] = ItemLeggingsNetherite.class; //750
+            list[NETHERITE_BOOTS] = ItemBootsNetherite.class; //751
+            list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
@@ -297,7 +308,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             }
         }
 
-        Server.getInstance().getScheduler().scheduleTask(null, Item::initCreativeItems, true);
+        initCreativeItems();
     }
 
     private static final ArrayList<Item> creative137 = new ArrayList<>();
@@ -429,13 +440,15 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_11_0:
             case v1_12_0:
             case v1_13_0:
-            case v1_14_60:
                 return new ArrayList<>(Item.creative354);
             case v1_14_0:
+            case v1_14_60:
+            case v1_16_0:
+            case v1_16_20:
+            case v1_16_100:
                 return new ArrayList<>(Item.creative389);
             default:
-                Server.getInstance().getLogger().alert("Tried to get creative items for unsupported protocol version: " + protocol);
-                return null;
+                throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
     }
 
@@ -468,8 +481,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 Item.creative389.add(item.clone());
                 break;
             default:
-                Server.getInstance().getLogger().alert("Tried to register creative items for unsupported protocol version: " + protocol);
-                break;
+                throw new IllegalArgumentException("Tried to register creative items for unsupported protocol version: " + protocol);
         }
     }
 

@@ -22,14 +22,16 @@ import co.aikar.timings.Timings;
  */
 public abstract class BaseEntity extends EntityCreature implements EntityAgeable {
 
-    protected int stayTime = 0;
+    public int stayTime = 0;
     protected int moveTime = 0;
+
+    private int airTicks = 0;
 
     protected float moveMultifier = 1.0f;
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
-    protected byte attackDelay = 0;
+    protected int attackDelay = 0;
     private short inLoveTicks = 0;
 
     private boolean baby = false;
@@ -140,14 +142,14 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        Timings.entityBaseTickTimer.startTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
 
         if (this.canDespawn() && this.age > Server.getInstance().despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
             return true;
         }
 
-        if (this instanceof EntityMob && this.attackDelay < Byte.MAX_VALUE) {
+        if (this instanceof EntityMob && this.attackDelay < 200) {
             this.attackDelay++;
         }
 
@@ -166,7 +168,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             }
         }
 
-        Timings.entityBaseTickTimer.stopTiming();
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
 
         return hasUpdate;
     }
@@ -211,7 +213,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return false;
         }
 
-        Timings.entityMoveTimer.startTiming();
+        if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.startTiming();
 
         this.blocksAround = null;
 
@@ -242,7 +244,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         this.checkGroundState(movX, movY, movZ, dx, dy, dz);
         this.updateFallState(this.onGround);
 
-        Timings.entityMoveTimer.stopTiming();
+        if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.stopTiming();
         return true;
     }
 
@@ -476,5 +478,15 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public int nearbyDistanceMultiplier() {
         return 1;
+    }
+
+    @Override
+    public int getAirTicks() {
+        return this.airTicks;
+    }
+
+    @Override
+    public void setAirTicks(int ticks) {
+        this.airTicks = ticks;
     }
 }
