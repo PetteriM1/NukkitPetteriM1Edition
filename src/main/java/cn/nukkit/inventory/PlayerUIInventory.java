@@ -122,6 +122,10 @@ public class PlayerUIInventory extends BaseInventory {
         super.onSlotChange(index, before, send);
     }
 
+    public void onSlotChangeBase(int index, Item before, boolean send) {
+        super.onSlotChange(index, before, send);
+    }
+
     @Override
     public int getSize() {
         return 51;
