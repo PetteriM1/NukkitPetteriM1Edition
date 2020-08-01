@@ -14,7 +14,7 @@ import cn.nukkit.network.protocol.types.ContainerIds;
 import cn.nukkit.scheduler.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -91,8 +91,6 @@ public class CraftingTransaction extends InventoryTransaction {
     }
 
     public boolean canExecute() {
-        Item[][] inputs = reindexInputs();
-
         if (craftingType == Player.CRAFTING_ANVIL) {
             Inventory inventory = source.getWindowById(Player.ANVIL_WINDOW_ID);
             if (inventory instanceof AnvilInventory) {
@@ -102,7 +100,7 @@ public class CraftingTransaction extends InventoryTransaction {
                     TakeLevelAction takeLevel = new TakeLevelAction(anvil.getLevelCost());
                     addAction(takeLevel);
                     if (takeLevel.isValid(source)) {
-                        recipe = new RepairRecipe(InventoryType.ANVIL, this.primaryOutput, Arrays.asList(inputs[0]));
+                        recipe = new RepairRecipe(InventoryType.ANVIL, this.primaryOutput, Collections.singletonList(inputs.get(0)));
                         PlayerUIInventory uiInventory = source.getUIInventory();
                         actions.add(new DamageAnvilAction(anvil, !source.isCreative() && ThreadLocalRandom.current().nextFloat() < 0.12F, this));
                         actions.stream()
