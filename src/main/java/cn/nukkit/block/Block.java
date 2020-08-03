@@ -97,12 +97,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[BED_BLOCK] = BlockBed.class; //26
             list[POWERED_RAIL] = BlockRailPowered.class; //27
             list[DETECTOR_RAIL] = BlockRailDetector.class; //28
-            list[STICKY_PISTON] = BlockPistonSticky.class; //29
             list[COBWEB] = BlockCobweb.class; //30
             list[TALL_GRASS] = BlockTallGrass.class; //31
             list[DEAD_BUSH] = BlockDeadBush.class; //32
-            list[PISTON] = BlockPiston.class; //33
-            list[PISTON_HEAD] = BlockPistonHead.class; //34
             list[WOOL] = BlockWool.class; //35
             list[DANDELION] = BlockDandelion.class; //37
             list[FLOWER] = BlockFlower.class; //38
@@ -317,7 +314,6 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[NETHER_REACTOR] = BlockNetherReactor.class; //247
             list[INFO_UPDATE] = BlockInfoUpdate.class; //248
             list[INFO_UPDATE2] = BlockInfoUpdate2.class; //249
-            list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
             list[OBSERVER] = BlockObserver.class; //251
             list[STRUCTURE_BLOCK] = BlockStructureBlock.class; //252
             list[HARD_GLASS] = BlockHardGlass.class; //253
@@ -362,6 +358,14 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[LANTERN] = BlockLantern.class; //463
                 list[CAMPFIRE_BLOCK] = BlockCampfire.class; //464
                 list[WOOD_BARK] = BlockWoodBark.class; //467
+
+                //PISTON_HEAD_STICKY will work with more-blocks only
+                //For this reason register piston blocks with more-block support only
+                list[STICKY_PISTON] = BlockPistonSticky.class; //29
+                list[PISTON] = BlockPiston.class; //33
+                list[PISTON_HEAD] = BlockPistonHead.class; //34
+                list[PISTON_EXTENSION] = BlockPistonExtension.class; //250
+                list[PISTON_HEAD_STICKY] = BlockPistonHeadSticky.class; //472
             }
 
             for (int id = 0; id < MAX_BLOCK_ID; id++) {
@@ -643,8 +647,16 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return this.level.getBlockEntity(this) == null;
     }
 
-    public boolean breakWhenPushed() {
+    public boolean canBePulled() {
+        return true;
+    }
+
+    public boolean breaksWhenMoved() {
         return false;
+    }
+
+    public boolean sticksToPiston() {
+        return true;
     }
 
     public boolean hasComparatorInputOverride() {

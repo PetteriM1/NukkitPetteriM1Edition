@@ -31,6 +31,16 @@ public class BlockChorusPlant extends BlockTransparent {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (block.down().isTransparent() &&
         !(block.down() instanceof BlockChorusPlant) &&

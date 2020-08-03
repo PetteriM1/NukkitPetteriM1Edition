@@ -361,4 +361,5 @@ public interface BlockID {
     int LANTERN = 463;
     int CAMPFIRE_BLOCK = 464;
     int WOOD_BARK = 467;
+    int PISTON_HEAD_STICKY = 472;
 }

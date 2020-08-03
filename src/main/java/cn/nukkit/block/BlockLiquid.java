@@ -72,6 +72,16 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public AxisAlignedBB getBoundingBox() {
         return null;
     }

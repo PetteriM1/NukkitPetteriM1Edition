@@ -51,6 +51,16 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public String getName() {
         return this.getDyeColor().getName() + " Bed Block";
     }

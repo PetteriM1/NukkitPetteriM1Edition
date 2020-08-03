@@ -55,6 +55,16 @@ public class BlockSkull extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public String getName() {
         int itemMeta = 0;
 

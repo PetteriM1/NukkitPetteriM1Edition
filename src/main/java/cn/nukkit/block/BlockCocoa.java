@@ -198,6 +198,16 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public Item toItem() {
         return new ItemDye(DyeColor.BROWN.getDyeData());
     }

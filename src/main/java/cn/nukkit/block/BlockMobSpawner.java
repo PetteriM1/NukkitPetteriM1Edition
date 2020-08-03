@@ -50,6 +50,11 @@ public class BlockMobSpawner extends BlockSolid {
     }
 
     @Override
+    public boolean canBePulled() {
+        return false;
+    }
+
+    @Override
     public int getWaterloggingLevel() {
         return 1;
     }

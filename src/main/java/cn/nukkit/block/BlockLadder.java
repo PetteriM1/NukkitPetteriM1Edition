@@ -74,6 +74,16 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
 
         double f = 0.1875;

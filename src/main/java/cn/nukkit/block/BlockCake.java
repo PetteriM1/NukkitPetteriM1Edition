@@ -53,6 +53,16 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return new AxisAlignedBB(
                 x + ((1 + (getDamage() << 1)) >> 4),

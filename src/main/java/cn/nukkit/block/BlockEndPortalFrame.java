@@ -76,6 +76,11 @@ public class BlockEndPortalFrame extends BlockTransparentMeta implements Faceabl
         return false;
     }
 
+    @Override
+    public boolean canBePulled() {
+        return false;
+    }
+
     public boolean hasComparatorInputOverride() {
         return true;
     }

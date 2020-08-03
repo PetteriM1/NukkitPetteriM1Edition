@@ -218,6 +218,16 @@ public class BlockRail extends BlockFlowable implements Faceable {
         return this.canBePowered;
     }
 
+    @Override
+    public boolean canBePushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        return true;
+    }
+
     public Orientation getOrientation() {
         return byMetadata(this.getRealMeta());
     }

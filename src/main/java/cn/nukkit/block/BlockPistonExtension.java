@@ -33,4 +33,14 @@ public class BlockPistonExtension extends BlockTransparent {
     public boolean canHarvestWithHand() {
         return false;
     }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        return false;
+    }
 }

@@ -42,6 +42,16 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         return false;
     }
 
+    @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
     private int getFullDamage() {
         int up;
         int down;

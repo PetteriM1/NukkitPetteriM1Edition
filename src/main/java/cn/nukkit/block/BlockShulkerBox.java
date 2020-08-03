@@ -63,6 +63,16 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public Item toItem() {
         ItemBlock item = new ItemBlock(this, this.getDamage(), 1);
 
