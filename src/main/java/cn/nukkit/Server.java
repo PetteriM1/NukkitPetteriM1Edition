@@ -604,6 +604,12 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+            return;
+        }
         boolean mvplayers = false;
         for (Player player : players) {
             if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
@@ -611,7 +617,7 @@ public class Server {
                 break;
             }
         }
-        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+        if (!mvplayers) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
             instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
@@ -623,6 +629,12 @@ public class Server {
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            for (Player player : players) {
+                player.dataPacket(packet);
+            }
+            return;
+        }
         boolean mvplayers = false;
         for (Player player : players) {
             if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
@@ -630,7 +642,7 @@ public class Server {
                 break;
             }
         }
-        if (!mvplayers && packet.pid() != ProtocolInfo.BATCH_PACKET) { // We can send same packet for everyone and save some resources
+        if (!mvplayers) { // We can send same packet for everyone and save some resources
             packet.encode();
             packet.isEncoded = true;
             instance.batchPackets(players, new DataPacket[]{packet}, false); // forceSync should be true?
@@ -1081,7 +1093,7 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol == ProtocolInfo.v1_16_0 || player.protocol == ProtocolInfo.v1_16_20) {
+        if (player.protocol >= ProtocolInfo.v1_16_0) {
             player.dataPacket(CraftingManager.packet407);
         } else if (player.protocol > ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet338);

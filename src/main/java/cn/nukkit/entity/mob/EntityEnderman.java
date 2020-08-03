@@ -7,6 +7,7 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.EndermanTeleportSound;
 import cn.nukkit.math.NukkitMath;
@@ -154,7 +155,7 @@ public class EntityEnderman extends EntityWalkingMob {
 
     @Override
     public boolean canDespawn() {
-        if (this.getLevel().isEnd) {
+        if (this.getLevel().getDimension() == Level.DIMENSION_THE_END) {
             return false;
         }
 

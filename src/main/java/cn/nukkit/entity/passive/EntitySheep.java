@@ -148,12 +148,12 @@ public class EntitySheep extends EntityWalkingAnimal {
     private int randomColor() {
         int rand = Utils.random.nextInt(0, 2500);
 
-        if (rand < 125 && 0 <= rand) return DyeColor.BLACK.getDyeData();
+        if (rand < 125 && 0 <= rand) return DyeColor.WHITE.getDyeData();
         else if (rand < 250 && 125 <= rand) return DyeColor.GRAY.getDyeData();
         else if (rand < 375 && 250 <= rand) return DyeColor.LIGHT_GRAY.getDyeData();
         else if (rand < 500 && 375 <= rand) return DyeColor.GRAY.getDyeData();
         else if (rand < 541 && 500 <= rand) return DyeColor.PINK.getDyeData();
-        else return DyeColor.WHITE.getDyeData();
+        else return DyeColor.BLACK.getDyeData();
     }
 
     @Override
