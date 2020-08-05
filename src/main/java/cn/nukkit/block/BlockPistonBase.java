@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityMovingBlock;
 import cn.nukkit.blockentity.BlockEntityPistonArm;
@@ -64,6 +65,11 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             }
         } else {
             this.setDamage(player.getHorizontalFacing().getIndex());
+        }
+        if(this.level.getBlockEntity(this) != null) {
+            BlockEntity blockEntity = this.level.getBlockEntity(this);
+            blockEntity.saveNBT();
+            blockEntity.close();
         }
         this.level.setBlock(block, this, true, true);
 
@@ -186,11 +192,22 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             attached = newBlocks.stream().map(Vector3::asBlockVector3).collect(Collectors.toList());
             BlockFace side = extending ? direction : direction.getOpposite();
 
-            for (Block newBlock : newBlocks) {
+            List<CompoundTag> namedTags = new ArrayList<>();
+            for (Block oldBlock : newBlocks){
+                CompoundTag tag = null;
+                BlockEntity blockEntity = this.level.getBlockEntity(oldBlock);
+                if (blockEntity != null && !(blockEntity instanceof BlockEntityMovingBlock)) {
+                    blockEntity.saveNBT();
+                    tag = new CompoundTag(blockEntity.namedTag.getTags());
+                    blockEntity.close();
+                }
+                namedTags.add(tag);
+            }
+
+            for (int i = 0; i < newBlocks.size(); i++){
+                Block newBlock = newBlocks.get(i);
                 Vector3 oldPos = newBlock.add(0);
                 newBlock.position(newBlock.add(0).getSide(side));
-
-                BlockEntity blockEntity = this.level.getBlockEntity(oldPos);
                 this.level.setBlock(newBlock, Block.get(BlockID.MOVING_BLOCK), true);
 
                 CompoundTag nbt = BlockEntity.getDefaultCompound(newBlock, BlockEntity.MOVING_BLOCK)
@@ -202,12 +219,8 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                                 .putInt("meta", newBlock.getDamage())
                         );
 
-                if (blockEntity != null && !(blockEntity instanceof BlockEntityMovingBlock)) {
-                    blockEntity.saveNBT();
-
-                    CompoundTag t = new CompoundTag(blockEntity.namedTag.getTags());
-                    nbt.putCompound("movingEntity", t);
-                    blockEntity.close();
+                if (namedTags.get(i) != null){
+                    nbt.putCompound("movingEntity", namedTags.get(i));
                 }
 
                 BlockEntity.createBlockEntity(BlockEntity.MOVING_BLOCK, newBlock, nbt);

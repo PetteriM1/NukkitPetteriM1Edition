@@ -31,6 +31,16 @@ public class BlockKelp extends BlockFlowable {
     public String getName() {
         return "Kelp";
     }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
     
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
@@ -89,13 +99,14 @@ public class BlockKelp extends BlockFlowable {
     }
     
     public boolean grow() {
-        int age = MathHelper.clamp(getDamage(), 0, 25);
+        int age = MathHelper.clamp(this.getDamage(), 0, 25);
         if (age < 25) {
             Block up = this.up();
             if (up instanceof BlockWater && (up.getDamage() == 0 || up.getDamage() == 8)) {
                 BlockKelp grown = new BlockKelp(age + 1);
                 BlockGrowEvent ev = new BlockGrowEvent(this, grown);
                 Server.getInstance().getPluginManager().callEvent(ev);
+
                 if (!ev.isCancelled()) {
                     this.setDamage(25);
                     this.getLevel().setBlock(this, 0, this, true, true);
@@ -144,23 +155,13 @@ public class BlockKelp extends BlockFlowable {
                     }
                 }
             }
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
     
     @Override
     public Item toItem() {
         return new ItemKelp();
-    }
-    
-    @Override
-    public int getWaterloggingLevel() {
-        return 2;
-    }
-    
-    @Override
-    public boolean canBeActivated() {
-        return true;
     }
 }
