@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.event.player.CraftingTableOpenEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.network.protocol.ContainerOpenPacket;
@@ -45,17 +46,21 @@ public class BlockCraftingTable extends BlockSolid {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            player.craftingType = Player.CRAFTING_BIG;
-            player.setCraftingGrid(player.getUIInventory().getBigCraftingGrid());
-            if (player.protocol >= 407) {
-                ContainerOpenPacket pk = new ContainerOpenPacket();
-                pk.windowId = -1;
-                pk.type = 1;
-                pk.x = (int) x;
-                pk.y = (int) y;
-                pk.z = (int) z;
-                pk.entityId = player.getId();
-                player.dataPacket(pk);
+            CraftingTableOpenEvent ev = new CraftingTableOpenEvent(player, this);
+            player.getServer().getPluginManager().callEvent(ev);
+            if (!ev.isCancelled()) {
+                player.craftingType = Player.CRAFTING_BIG;
+                player.setCraftingGrid(player.getUIInventory().getBigCraftingGrid());
+                if (player.protocol >= 407) {
+                    ContainerOpenPacket pk = new ContainerOpenPacket();
+                    pk.windowId = -1;
+                    pk.type = 1;
+                    pk.x = (int) x;
+                    pk.y = (int) y;
+                    pk.z = (int) z;
+                    pk.entityId = player.getId();
+                    player.dataPacket(pk);
+                }
             }
         }
         return true;
