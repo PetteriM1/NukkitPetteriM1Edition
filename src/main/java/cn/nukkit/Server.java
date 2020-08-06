@@ -461,7 +461,7 @@ public class Server {
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             try {
                 for (File fs : new File(new File("").getCanonicalPath() + "/worlds/").listFiles()) {
-                    if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
+                    if ((fs.isDirectory() && !this.isLevelLoaded(fs.getName()))) {
                         this.loadLevel(fs.getName());
                     }
                 }
@@ -474,7 +474,7 @@ public class Server {
                     this.loadLevel("the_end");
                 }
             } catch (Exception e) {
-                this.getLogger().debug("Unable to load levels", e);
+                this.getLogger().error("Unable to load levels", e);
             }
         }
 
