@@ -2704,6 +2704,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_START_GLIDE:
                             PlayerToggleGlideEvent playerToggleGlideEvent = new PlayerToggleGlideEvent(this, true);
+                            Item chestplate = this.getInventory().getChestplateFast();
+                            if (!server.getAllowFlight() && (chestplate == null || chestplate.getId() != ItemID.ELYTRA)) {
+                                playerToggleGlideEvent.setCancelled(true);
+                            }
                             this.server.getPluginManager().callEvent(playerToggleGlideEvent);
                             if (playerToggleGlideEvent.isCancelled()) {
                                 this.sendData(this);
