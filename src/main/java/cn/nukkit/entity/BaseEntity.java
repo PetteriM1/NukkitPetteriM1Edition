@@ -43,6 +43,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public BaseEntity(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         this.setHealth(this.getMaxHealth());
+        this.setAirTicks(400);
     }
 
     public abstract Vector3 updateMove(int tickDiff);
