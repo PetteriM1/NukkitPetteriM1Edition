@@ -70,6 +70,7 @@ import cn.nukkit.resourcepacks.ResourcePackManager;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.*;
+import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -652,122 +653,62 @@ public class Server {
         }
     }
 
+    private void batchDataPackets(Player[] players, DataPacket[] packets) {
+        byte[][] payload = new byte[(packets.length << 1)][];
+        for (int i = 0; i < packets.length; i++) {
+            DataPacket dataPacket = packets[i];
+            if (!dataPacket.isEncoded) {
+                dataPacket.encode();
+            }
+            int i2 = i << 1;
+            byte[] buffer = dataPacket.getBuffer();
+            payload[i2] = Binary.writeUnsignedVarInt(buffer.length);
+            payload[i2 + 1] = buffer;
+            packets[i] = null;
+        }
+
+        try {
+            for (Player player : players) {
+                if (player.isConnected()) {
+                    byte[] bytes = Binary.appendBytes(payload);
+                    BatchPacket batchPacket = new BatchPacket();
+                    if (player.raknetProtocol >= 10) {
+                        batchPacket.payload = Zlib.deflateRaw(bytes, this.networkCompressionLevel);
+                    } else {
+                        batchPacket.payload = Zlib.deflate(bytes, this.networkCompressionLevel);
+                    }
+                    player.dataPacket(batchPacket);
+                }
+            }
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     public void batchPackets(Player[] players, DataPacket[] packets) {
         this.batchPackets(players, packets, false);
     }
 
-    @SuppressWarnings("unused")
     public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync) {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
         }
 
         if (callBatchPkEv) {
-            BatchPacketsEvent ev = new BatchPacketsEvent(players, packets, forceSync);
-            pluginManager.callEvent(ev);
-            if (ev.isCancelled()) {
+            BatchPacketsEvent batchPacketsEvent = new BatchPacketsEvent(players, packets, forceSync);
+            this.getPluginManager().callEvent(batchPacketsEvent);
+            if (batchPacketsEvent.isCancelled()) {
                 return;
             }
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            CompletableFuture.runAsync(() -> {
-                byte[][] payload = new byte[(packets.length << 1)][];
-                int size = 0;
-                for (int i = 0; i < packets.length; i++) {
-                    DataPacket p = packets[i];
-                    if (!p.isEncoded) {
-                        p.encode();
-                    }
-                    byte[] buf = p.getBuffer();
-                    int i2 = i << 1;
-                    payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-                    payload[i2 + 1] = buf;
-                    packets[i] = null;
-                    size += payload[i2].length;
-                    size += payload[i2 + 1].length;
-                }
-
-                List<InetSocketAddress> targetsOld = new ArrayList<>();
-                List<InetSocketAddress> targets = new ArrayList<>();
-                for (Player p : players) {
-                    if (p.isConnected()) {
-                        if (p.protocol >= ProtocolInfo.v1_16_0) {
-                            targets.add(p.getSocketAddress());
-                        } else {
-                            targetsOld.add(p.getSocketAddress());
-                        }
-                    }
-                }
-
-                try {
-                    byte[] bytes = Binary.appendBytes(payload);
-                    if (!targets.isEmpty()) {
-                        this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
-                    }
-                    if (!targetsOld.isEmpty()) {
-                        this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } else {
-            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.startTiming();
-            byte[][] payload = new byte[(packets.length << 1)][];
-            int size = 0;
-            for (int i = 0; i < packets.length; i++) {
-                DataPacket p = packets[i];
-                if (!p.isEncoded) {
-                    p.encode();
-                }
-                byte[] buf = p.getBuffer();
-                int i2 = i << 1;
-                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-                payload[i2 + 1] = buf;
-                packets[i] = null;
-                size += payload[i2].length;
-                size += payload[i2 + 1].length;
-            }
-
-            List<InetSocketAddress> targetsOld = new ArrayList<>();
-            List<InetSocketAddress> targets = new ArrayList<>();
-            for (Player p : players) {
-                if (p.isConnected()) {
-                    if (p.protocol >= ProtocolInfo.v1_16_0) {
-                        targets.add(p.getSocketAddress());
-                    } else {
-                        targetsOld.add(p.getSocketAddress());
-                    }
-                }
-            }
-
-            //if (!forceSync && this.networkCompressionAsync) {
-            //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
-            //} else {
-            try {
-                byte[] bytes = Binary.appendBytes(payload);
-                if (!targets.isEmpty()) {
-                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
-                }
-                if (!targetsOld.isEmpty()) {
-                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.stopTiming();
+            CompletableFuture.runAsync(() -> this.batchDataPackets(players, packets));
+            return;
         }
-    }
 
-    public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
-        BatchPacket pk = new BatchPacket();
-        pk.payload = data;
-
-        for (InetSocketAddress i : targets) {
-            if (this.players.containsKey(i)) {
-                this.players.get(i).dataPacket(pk);
-            }
+        try (Timing ignored = Timings.playerNetworkSendTimer.startTiming()) {
+            this.batchDataPackets(players, packets);
         }
     }
 
