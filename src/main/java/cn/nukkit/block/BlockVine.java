@@ -8,6 +8,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -123,7 +124,7 @@ public class BlockVine extends BlockTransparentMeta {
             f3 = 0;
             f6 = 1;
         }
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x + f1,
                 this.y + f2,
                 this.z + f3,

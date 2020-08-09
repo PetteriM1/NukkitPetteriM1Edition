@@ -9,6 +9,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockVector3;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -95,7 +96,7 @@ public class BlockEntityPistonArm extends BlockEntitySpawnable {
             }
         }
 
-        AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1).getOffsetBoundingBox(
+        AxisAlignedBB bb = new SimpleAxisAlignedBB(0, 0, 0, 1, 1, 1).getOffsetBoundingBox(
                 this.x + (pushDir.getXOffset() * progress),
                 this.y + (pushDir.getYOffset() * progress),
                 this.z + (pushDir.getZOffset() * progress)

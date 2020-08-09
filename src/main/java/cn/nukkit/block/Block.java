@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  * @author MagicDroidX
  * Nukkit Project
  */
-public abstract class Block extends Position implements Metadatable, Cloneable, BlockID {
+public abstract class Block extends Position implements Metadatable, Cloneable, BlockID, AxisAlignedBB {
 
     public static final int MAX_BLOCK_ID = 600;
     public static final int DATA_BITS = 6;
@@ -349,9 +349,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[BAMBOO] = BlockBamboo.class; //418
                 list[BAMBOO_SAPLING] = BlockBambooSapling.class; //419
                 list[STONE_SLAB4] = BlockSlabStone4.class ; //421
-                list[DOUBLE_STONE_SLAB3] = BlockDoubleSlabStone3.class; //422
-                list[DOUBLE_STONE_SLAB4] = BlockDoubleSlabStone4.class; //422
 
+                list[SCAFFOLDING] = BlockScaffolding.class; //420
+                list[DOUBLE_STONE_SLAB3] = BlockDoubleSlabStone3.class; //422
+                list[DOUBLE_STONE_SLAB4] = BlockDoubleSlabStone4.class; //423
+
+                list[SMOOTH_STONE] = BlockSmoothStone.class; //438
                 list[BARREL] = BlockBarrel.class; //458
 
                 list[BELL] = BlockBell.class; //462
@@ -978,28 +981,45 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public AxisAlignedBB getBoundingBox() {
-        if (this.boundingBox == null) {
-            this.boundingBox = this.recalculateBoundingBox();
-        }
-        return this.boundingBox;
+        return this.recalculateBoundingBox();
     }
 
     public AxisAlignedBB getCollisionBoundingBox() {
-        if (this.collisionBoundingBox == null) {
-            this.collisionBoundingBox = this.recalculateCollisionBoundingBox();
-        }
-        return this.collisionBoundingBox;
+        return this.recalculateCollisionBoundingBox();
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x,
-                this.y,
-                this.z,
-                this.x + 1,
-                this.y + 1,
-                this.z + 1
-        );
+        return this;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x;
+    }
+
+    @Override
+    public double getMinY() {
+        return this.y;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 1;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 1;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 1;
     }
 
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
@@ -1012,12 +1032,12 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             return null;
         }
 
-        Vector3 v1 = pos1.getIntermediateWithXValue(pos2, bb.minX);
-        Vector3 v2 = pos1.getIntermediateWithXValue(pos2, bb.maxX);
-        Vector3 v3 = pos1.getIntermediateWithYValue(pos2, bb.minY);
-        Vector3 v4 = pos1.getIntermediateWithYValue(pos2, bb.maxY);
-        Vector3 v5 = pos1.getIntermediateWithZValue(pos2, bb.minZ);
-        Vector3 v6 = pos1.getIntermediateWithZValue(pos2, bb.maxZ);
+        Vector3 v1 = pos1.getIntermediateWithXValue(pos2, bb.getMinX());
+        Vector3 v2 = pos1.getIntermediateWithXValue(pos2, bb.getMaxX());
+        Vector3 v3 = pos1.getIntermediateWithYValue(pos2, bb.getMinY());
+        Vector3 v4 = pos1.getIntermediateWithYValue(pos2, bb.getMaxY());
+        Vector3 v5 = pos1.getIntermediateWithZValue(pos2, bb.getMinZ());
+        Vector3 v6 = pos1.getIntermediateWithZValue(pos2, bb.getMaxZ());
 
         if (v1 != null && !bb.isVectorInYZ(v1)) {
             v1 = null;
@@ -1179,29 +1199,5 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         }
 
         return Optional.empty();
-    }
-
-    public double getMinX() {
-        return this.x;
-    }
-
-    public double getMinY() {
-        return this.y;
-    }
-
-    public double getMinZ() {
-        return this.z;
-    }
-
-    public double getMaxX() {
-        return this.x + 1;
-    }
-
-    public double getMaxY() {
-        return this.y + 1;
-    }
-
-    public double getMaxZ() {
-        return this.z + 1;
     }
 }

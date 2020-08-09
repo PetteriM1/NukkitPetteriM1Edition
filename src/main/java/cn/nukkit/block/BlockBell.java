@@ -13,6 +13,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.BlockColor;
@@ -79,14 +80,7 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
         double d = down ? 0 : 0.25;
         double u = up ? 1 : 0.75;
 
-        return new AxisAlignedBB(
-                this.x + w,
-                this.y + d,
-                this.z + n,
-                this.x + e,
-                this.y + u,
-                this.z + s
-        );
+        return new SimpleAxisAlignedBB(this.x + w, this.y + d, this.z + n, this.x + e, this.y + u, this.z + s);
     }
 
     @Override

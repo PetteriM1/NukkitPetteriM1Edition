@@ -8,6 +8,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -74,7 +75,7 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         double f = 0.1875;
         int damage = this.getFullDamage();
 
-        AxisAlignedBB bb = new AxisAlignedBB(
+        AxisAlignedBB bb = new SimpleAxisAlignedBB(
                 this.x,
                 this.y,
                 this.z,

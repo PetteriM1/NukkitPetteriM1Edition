@@ -7,6 +7,7 @@ import cn.nukkit.item.food.Food;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -64,13 +65,13 @@ public class BlockCake extends BlockTransparentMeta {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                x + ((1 + (getDamage() << 1)) >> 4),
-                y,
-                z + 0.0625,
-                x - 0.0625 + 1,
-                y + 0.5,
-                z - 0.0625 + 1
+        return new SimpleAxisAlignedBB(
+                this.x + ((1 + (this.getDamage() << 1)) >> 4),
+                this.y,
+                this.z + 0.0625,
+                this.x - 0.0625 + 1,
+                this.y + 0.5,
+                this.z - 0.0625 + 1
         );
     }
 

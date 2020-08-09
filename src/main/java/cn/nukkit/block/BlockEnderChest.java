@@ -8,6 +8,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
@@ -74,7 +75,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
     @Override
     public AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x + 0.0625,
                 this.y,
                 this.z + 0.0625,

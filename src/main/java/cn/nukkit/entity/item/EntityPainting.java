@@ -11,6 +11,7 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddPaintingPacket;
@@ -85,7 +86,7 @@ public class EntityPainting extends EntityHanging {
             this.length = (float) size.z;
             this.height = (float) size.y;
 
-            this.boundingBox = new AxisAlignedBB(
+            this.boundingBox = new SimpleAxisAlignedBB(
                     this.x - size.x,
                     this.y - size.y,
                     this.z - size.z,

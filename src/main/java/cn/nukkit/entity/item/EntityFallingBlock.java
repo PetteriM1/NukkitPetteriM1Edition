@@ -1,6 +1,7 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockLava;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityBlockChangeEvent;
@@ -10,10 +11,12 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.sound.AnvilFallSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import sun.security.krb5.internal.crypto.Des;
 
 /**
  * @author MagicDroidX
@@ -59,6 +62,7 @@ public class EntityFallingBlock extends Entity {
 
     protected int blockId;
     protected int damage;
+    protected boolean breakOnLava;
 
     public EntityFallingBlock(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -79,6 +83,8 @@ public class EntityFallingBlock extends Entity {
             if (namedTag.contains("Data")) {
                 damage = namedTag.getByte("Data");
             }
+
+            breakOnLava = namedTag.getBoolean("BreakOnLava");
         }
 
         if (blockId == 0) {
@@ -102,7 +108,7 @@ public class EntityFallingBlock extends Entity {
 
     @Override
     public boolean onUpdate(int currentTick) {
-        if (closed) {
+        if (this.closed) {
             return false;
         }
 
@@ -115,49 +121,57 @@ public class EntityFallingBlock extends Entity {
 
         lastUpdate = currentTick;
 
-        boolean hasUpdate = entityBaseTick(tickDiff);
+        boolean hasUpdate = this.entityBaseTick(tickDiff);
 
-        if (isAlive()) {
-            motionY -= getGravity();
+        if (this.isAlive()) {
+            motionY -= this.getGravity();
 
-            move(motionX, motionY, motionZ);
+            this.move(motionX, motionY, motionZ);
 
-            float friction = 1 - getDrag();
+            float friction = 1 - this.getDrag();
 
             motionX *= friction;
-            motionY *= 1 - getDrag();
+            motionY *= 1 - this.getDrag();
             motionZ *= friction;
 
             Vector3 pos = (new Vector3(x - 0.5, y, z - 0.5)).round();
+            if (breakOnLava && level.getBlock(pos.subtract(0, 1, 0)) instanceof BlockLava) {
+                this.close();
+                if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.level.dropItem(this, Block.get(this.getBlock(), this.getDamage()).toItem());
+                }
+                level.addParticle(new DestroyBlockParticle(pos, Block.get(this.getBlock(), this.getDamage())));
+                return true;
+            }
 
-            if (onGround) {
-                close();
-                Block block = level.getBlock(pos);
+            if (this.onGround) {
+                this.close();
+                Block block = this.level.getBlock(pos);
                 if (block.isTransparent() && !block.canBeReplaced()) {
                     if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-                        getLevel().dropItem(this, Item.get(this.blockId, this.damage, 1));
+                        this.level.dropItem(this, Block.get(this.getBlock(), this.getDamage()).toItem());
                     }
                 } else {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(blockId, damage));
-                    server.getPluginManager().callEvent(event);
+                    this.server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
-                        getLevel().setBlock(pos, event.getTo(), true, true);
-                        getLevel().scheduleUpdate(getLevel().getBlock(pos), 1);
+                        this.level.setBlock(pos, event.getTo(), true, true);
+                        this.level.scheduleUpdate(this.level.getBlock(pos), 1);
 
                         if (event.getTo().getId() == Item.ANVIL) {
-                            getLevel().addSound(new AnvilFallSound(pos));
+                            this.level.addSound(new AnvilFallSound(pos));
                         }
                     }
                 }
                 hasUpdate = true;
             }
 
-            updateMovement();
+            this.updateMovement();
         }
 
         if (this.timing != null) this.timing.stopTiming();
 
-        return hasUpdate || !onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
+        return hasUpdate || !this.onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
     }
 
     public int getBlock() {

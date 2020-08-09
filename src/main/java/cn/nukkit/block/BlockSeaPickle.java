@@ -11,6 +11,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -132,7 +133,7 @@ public class BlockSeaPickle extends BlockFlowable {
         }
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        Block[] blocksAround = this.getLevel().getCollisionBlocks(new AxisAlignedBB(x - 2, y - 2, z - 2, x + 3, y, z + 3));
+        Block[] blocksAround = this.getLevel().getCollisionBlocks(new SimpleAxisAlignedBB(x - 2, y - 2, z - 2, x + 3, y, z + 3));
         for (Block blockNearby : blocksAround) {
             if (blockNearby.getId() == CORAL_BLOCK) {
                 Block up = blockNearby.up();

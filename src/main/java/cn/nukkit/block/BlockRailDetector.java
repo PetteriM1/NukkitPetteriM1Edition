@@ -7,6 +7,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 
 /**
  * Created on 2015/11/22 by CreeperFace.
@@ -70,7 +71,7 @@ public class BlockRailDetector extends BlockRail {
         boolean wasPowered = isActive();
         boolean isPowered = false;
 
-        for (Entity entity : level.getNearbyEntities(new AxisAlignedBB(
+        for (Entity entity : level.getNearbyEntities(new SimpleAxisAlignedBB(
                 getFloorX() + 0.125D,
                 getFloorY(),
                 getFloorZ() + 0.125D,

@@ -12,6 +12,7 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -67,7 +68,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x,
                 this.y,
                 this.z,
@@ -211,7 +212,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
 
         this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, false); // Don't update both parts to prevent duplication bug if there are two fallable blocks on top of the bed
 
-        for (Entity entity : this.level.getNearbyEntities(new AxisAlignedBB(this, this).grow(2, 1, 2))) {
+        for (Entity entity : this.level.getNearbyEntities(new SimpleAxisAlignedBB(this, this).grow(2, 1, 2))) {
             if (!(entity instanceof Player)) continue;
             Player player = (Player) entity;
 

@@ -608,7 +608,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setLevel(this.server.getDefaultLevel());
         this.viewDistance = this.server.getViewDistance();
         this.chunkRadius = viewDistance;
-        this.boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+        this.boundingBox = new SimpleAxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
 
     @Override
@@ -1350,19 +1350,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             boolean onGround = false;
 
             AxisAlignedBB bb = this.boundingBox.clone();
-            bb.maxY = bb.minY + 0.5;
-            bb.minY -= 1;
+            bb.setMaxY(bb.getMinY() + 0.5);
+            bb.setMinY(bb.getMinY() - 1);
 
             AxisAlignedBB realBB = this.boundingBox.clone();
-            realBB.maxY = realBB.minY + 0.1;
-            realBB.minY -= 0.2;
+            realBB.setMaxY(realBB.getMinY() + 0.1);
+            realBB.setMinY(realBB.getMinY() - 0.2);
 
-            int minX = NukkitMath.floorDouble(bb.minX);
-            int minY = NukkitMath.floorDouble(bb.minY);
-            int minZ = NukkitMath.floorDouble(bb.minZ);
-            int maxX = NukkitMath.ceilDouble(bb.maxX);
-            int maxY = NukkitMath.ceilDouble(bb.maxY);
-            int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+            int minX = NukkitMath.floorDouble(bb.getMinX());
+            int minY = NukkitMath.floorDouble(bb.getMinY());
+            int minZ = NukkitMath.floorDouble(bb.getMinZ());
+            int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+            int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
 
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
@@ -1387,19 +1387,32 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void checkBlockCollision() {
         boolean portal = false;
         boolean endPortal = false;
+        boolean scaffolding = false;
+        boolean overScaffolding = false;
 
         for (Block block : this.getCollisionBlocks()) {
-            if (block.getId() == Block.NETHER_PORTAL) {
-                portal = true;
-                continue;
-            } else if (block.getId() == Block.END_PORTAL) {
-                endPortal = true;
-                continue;
+            switch (block.getId()){
+                case Block.NETHER_PORTAL:
+                    portal = true;
+                    continue;
+                case Block.END_PORTAL:
+                    endPortal = true;
+                    continue;
+                case Block.SCAFFOLDING:
+                    scaffolding = true;
+                    break;
+            }
+
+            if (block.getFloorY() == getFloorY() && block.down().getId() == BlockID.SCAFFOLDING) {
+                overScaffolding = true;
             }
 
             block.onEntityCollide(this);
             block.getLevelBlockAtLayer(1).onEntityCollide(this);
         }
+
+        this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_IN_SCAFFOLDING, scaffolding);
+        this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_OVER_SCAFFOLDING, overScaffolding);
 
         if (endPortal) {
             inEndPortalTicks++;
@@ -1603,7 +1616,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 if (!(revert = ev.isCancelled())) {
                     if (this.server.getMobAiEnabled() && this.level.getCurrentTick() % 20 == 0) {
-                        AxisAlignedBB aab = new AxisAlignedBB(
+                        AxisAlignedBB aab = new SimpleAxisAlignedBB(
                                 this.getX() - 0.6f,
                                 this.getY() + 1.45f,
                                 this.getZ() - 0.6f,
