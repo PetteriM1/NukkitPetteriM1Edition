@@ -186,7 +186,6 @@ public class BlockEntityPistonArm extends BlockEntitySpawnable {
         }
 
         this.level.addChunkPacket(getChunkX(), getChunkZ(), this.createSpawnPacket());
-
         return super.onUpdate() || hasUpdate;
     }
 

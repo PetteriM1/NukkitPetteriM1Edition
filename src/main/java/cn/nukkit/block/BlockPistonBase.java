@@ -1,7 +1,6 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityMovingBlock;
 import cn.nukkit.blockentity.BlockEntityPistonArm;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable {
 
-    public boolean sticky;
+    public boolean sticky = false;
 
     public BlockPistonBase() {
         this(0);
@@ -53,7 +52,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
+        if (Math.abs(player.getFloorX() - this.x) < 2 && Math.abs(player.getFloorZ() - this.z) < 2) {
             double y = player.y + player.getEyeHeight();
 
             if (y - this.y > 2) {
@@ -96,7 +95,6 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
         if (block instanceof BlockPistonHead && ((BlockPistonHead) block).getBlockFace() == this.getBlockFace()) {
             block.onBreak(item);
         }
-
         return true;
     }
 
@@ -252,7 +250,6 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             }
 
             if (block.breaksWhenMoved()) {
-                block.level.useBreakOn(block);
                 return destroyBlocks || block.sticksToPiston();
             }
 
@@ -315,7 +312,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 return true;
             }
 
-            if (!this.addBlockLine(this.blockToMove, this.blockToMove.getSide(this.moveDirection.getOpposite()))) {
+            if (!this.addBlockLine(this.blockToMove, this.moveDirection)) {
                 return false;
             }
 
@@ -328,7 +325,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             return true;
         }
 
-        private boolean addBlockLine(Block origin, Block from) {
+        private boolean addBlockLine(Block origin, BlockFace from) {
             Block block = origin.clone();
 
             if (block.getId() == AIR) {
@@ -436,7 +433,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
 
         private boolean addBranchingBlocks(Block block) {
             for (BlockFace face : BlockFace.values()) {
-                if (face.getAxis() != this.moveDirection.getAxis() && !this.addBlockLine(block.getSide(face), block)) {
+                if (face.getAxis() != this.moveDirection.getAxis() && !this.addBlockLine(block.getSide(face), face)) {
                     return false;
                 }
             }
