@@ -46,7 +46,7 @@ public class BlockLantern extends BlockFlowable {
     }
 
     private boolean isBlockUnderValid() {
-        Block down = down();
+        Block down = this.down();
         if (down instanceof BlockLeaves) {
             return false;
         } else if (down instanceof BlockFence || down instanceof BlockWall) {
@@ -64,29 +64,20 @@ public class BlockLantern extends BlockFlowable {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if(this.getLevelBlock() instanceof BlockLiquid) {
+        if(this.getLevelBlock() instanceof BlockLiquid || this.getLevelBlockAtLayer(1) instanceof BlockLiquid) {
             return false;
         }
 
-        boolean hanging = false;
-        if (face == BlockFace.DOWN) {
-            if (isBlockAboveValid()) {
-                hanging = true;
-            } else if (!isBlockUnderValid()) {
-                return false;
-            }
-        } else if (face == BlockFace.UP && isBlockUnderValid()) {
-            hanging = false;
-        } else if (isBlockAboveValid()) {
-            hanging = true;
-        } else {
+        boolean isUnderValid = this.isBlockUnderValid();
+        boolean hanging = face != BlockFace.UP && this.isBlockAboveValid() && (!isUnderValid || face == BlockFace.DOWN);
+        if (!isUnderValid && !hanging) {
             return false;
         }
 
         if (hanging) {
-            setDamage(1);
+            this.setDamage(1);
         } else {
-            setDamage(0);
+            this.setDamage(0);
         }
 
         this.getLevel().setBlock(this, this, true, true);
@@ -96,11 +87,11 @@ public class BlockLantern extends BlockFlowable {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (getDamage() == 0) {
-                if (!isBlockUnderValid()) {
+            if (this.getDamage() == 0) {
+                if (!this.isBlockUnderValid()) {
                     level.useBreakOn(this);
                 }
-            } else if (!isBlockAboveValid()) {
+            } else if (!this.isBlockAboveValid()) {
                 level.useBreakOn(this);
             }
             return type;
@@ -140,7 +131,7 @@ public class BlockLantern extends BlockFlowable {
 
     @Override
     public double getMinY() {
-        return y + (getDamage()==0?0: 1./16);
+        return y + (this.getDamage()==0?0: 1./16);
     }
 
     @Override
@@ -155,7 +146,7 @@ public class BlockLantern extends BlockFlowable {
 
     @Override
     public double getMaxY() {
-        return y + (getDamage()==0? 7.0/16 : 8.0/16);
+        return y + (this.getDamage()==0? 7.0/16 : 8.0/16);
     }
 
     @Override

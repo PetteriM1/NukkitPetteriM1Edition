@@ -77,6 +77,11 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (this.down().getId() == CAMPFIRE_BLOCK) {
             return false;
@@ -84,13 +89,19 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
 
         this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
         Block layer1 = block.getLevelBlockAtLayer(1);
-        if (block instanceof BlockWater || block instanceof BlockIceFrosted || layer1 instanceof BlockWater || layer1 instanceof BlockIceFrosted) {
+        boolean defaultLayerCheck = (block instanceof BlockWater && block.getDamage() == 0 || block.getDamage() >= 8) || block instanceof BlockIceFrosted;
+        boolean layer1Check = (layer1 instanceof BlockWater && layer1.getDamage() == 0 || layer1.getDamage() >= 8) || layer1 instanceof BlockIceFrosted;
+        if (defaultLayerCheck || layer1Check) {
             this.setExtinguished(true);
             this.level.addSound(this, Sound.RANDOM_FIZZ, 0.5f, 2.2f);
+            this.level.setBlock(this, 1, defaultLayerCheck ? block : layer1, false, false);
+        } else {
+            this.level.setBlock(this, 1, Block.get(Block.AIR), false, false);
         }
 
         this.level.setBlock(block, this, true, false);
         this.createBlockEntity(item);
+        this.level.updateAround(this);
         return true;
     }
 
@@ -132,7 +143,7 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (!this.isExtinguished()) {
-                Block layer1 = getLevelBlockAtLayer(1);
+                Block layer1 = this.getLevelBlockAtLayer(1);
                 if (layer1 instanceof BlockWater || layer1 instanceof BlockIceFrosted) {
                     this.setExtinguished(true);
                     this.level.setBlock(this, this, true, true);
@@ -150,13 +161,13 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
             return false;
         }
 
-        BlockEntity entity = level.getBlockEntity(this);
+        BlockEntity entity = this.level.getBlockEntity(this);
         if (!(entity instanceof BlockEntityCampfire)) {
             entity = this.createBlockEntity(Item.get(0));
         }
 
         boolean itemUsed = false;
-        if (item.isShovel() && !isExtinguished()) {
+        if (item.isShovel() && !this.isExtinguished()) {
             this.setExtinguished(true);
             this.level.setBlock(this, this, true, true);
             this.level.addSound(this, Sound.RANDOM_FIZZ, 0.5f, 2.2f);
@@ -208,7 +219,7 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     public boolean isExtinguished() {
-        return (getDamage() & 0x4) == 0x4;
+        return (this.getDamage() & 0x4) == 0x4;
     }
 
     public void setExtinguished(boolean extinguished) {
@@ -225,7 +236,7 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
             return;
         }
 
-        this.setDamage((getDamage() & 0x4) | face.getHorizontalIndex());
+        this.setDamage((this.getDamage() & 0x4) | face.getHorizontalIndex());
     }
 
     @Override

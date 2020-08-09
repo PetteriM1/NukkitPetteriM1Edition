@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
@@ -90,12 +91,13 @@ public class BlockBambooSapling extends BlockFlowable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == 0x0F) { //Bonemeal
+        boolean isBoneMeal = item.getId() == ItemID.DYE && item.getDamage() == 0x0F; //Bonemeal
+        if (isBoneMeal || item.getBlock() != null && item.getBlock().getId() == BlockID.BAMBOO) {
 
             boolean success = false;
             Block block = this.up();
             if (block.getId() == AIR) {
-                success = grow(block);
+                success = this.grow(block);
             }
 
             if (success) {
