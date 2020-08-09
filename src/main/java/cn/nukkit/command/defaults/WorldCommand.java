@@ -36,6 +36,10 @@ public class WorldCommand extends Command {
         }
         
         if (args.length == 2) {
+            if (!sender.hasPermission("nukkit.command.world.others")) {
+                return false;
+            }
+
             if (Server.getInstance().getPlayer(args[1].replace("@s", sender.getName())) == null) {
                 sender.sendMessage("\u00A7cUnknown player");
                 return true;

@@ -211,6 +211,10 @@ public class PlayerInventory extends BaseInventory {
         return this.getItem(this.getSize() + 1);
     }
 
+    public Item getChestplateFast() {
+        return this.getItemFast(37);
+    }
+
     public Item getLeggings() {
         return this.getItem(this.getSize() + 2);
     }
