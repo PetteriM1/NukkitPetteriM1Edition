@@ -312,6 +312,7 @@ public class GlobalBlockPalette {
             case 407:
             case 408:
             case 409:
+            case 410:
                 int id407 = legacyToRuntimeId407.get(legacyId);
                 if (id407 == -1) {
                     id407 = legacyToRuntimeId407.get(id << 6);
@@ -389,6 +390,7 @@ public class GlobalBlockPalette {
             case 407:
             case 408:
             case 409:
+            case 410:
                 return compiledTable407;
             default:
                 throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
