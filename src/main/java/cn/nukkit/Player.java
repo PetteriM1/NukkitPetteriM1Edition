@@ -2317,7 +2317,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.close("", "disconnectionScreen.invalidSkin");
                         break;
                     } else {
-                        this.setSkin(loginPacket.skin);
+                        Skin skin = loginPacket.skin;
+                        this.setSkin(skin.isPersona() && !this.getServer().personaSkins? Skin.NO_PERSONA_SKIN : skin);
                     }
 
                     PlayerPreLoginEvent playerPreLoginEvent;
@@ -2424,7 +2425,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.server.getPluginManager().callEvent(playerChangeSkinEvent);
                     if (!playerChangeSkinEvent.isCancelled()) {
                         this.lastSkinChange = System.currentTimeMillis();
-                        this.setSkin(skin);
+                        this.setSkin(skin.isPersona() && !this.getServer().personaSkins? Skin.NO_PERSONA_SKIN : skin);
                     }
                     break;
                 case ProtocolInfo.PLAYER_INPUT_PACKET:
