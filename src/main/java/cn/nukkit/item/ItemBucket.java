@@ -85,17 +85,26 @@ public class ItemBucket extends Item {
         Block targetBlock = Block.get(getDamageByTarget(this.meta));
 
         if (targetBlock instanceof BlockAir) {
+            if (!(target instanceof BlockLiquid) || target.getDamage() != 0) {
+                target = target.getLevelBlockAtLayer(1);
+            }
+            if (!(target instanceof BlockLiquid) || target.getDamage() != 0) {
+                target = block;
+            }
+            if (!(target instanceof BlockLiquid) || target.getDamage() != 0) {
+                target = block.getLevelBlockAtLayer(1);
+            }
             if (target instanceof BlockLiquid && target.getDamage() == 0) {
                 Item result = Item.get(BUCKET, getDamageByTarget(target.getId()), 1);
                 PlayerBucketFillEvent ev;
                 player.getServer().getPluginManager().callEvent(ev = new PlayerBucketFillEvent(player, block, face, this, result));
                 if (!ev.isCancelled()) {
-                    player.getLevel().setBlock(target, Block.get(BlockID.AIR), true, true);
+                    player.getLevel().setBlock(target, target.layer, Block.get(BlockID.AIR), true, true);
 
                     // When water is removed ensure any adjacent still water is
                     // replaced with water that can flow.
                     for (BlockFace side : Plane.HORIZONTAL) {
-                        Block b = target.getSide(side);
+                        Block b = target.getSideAtLayer(0, side);
                         if (b.getId() == STILL_WATER) {
                             level.setBlock(b, Block.get(BlockID.WATER));
                         }
