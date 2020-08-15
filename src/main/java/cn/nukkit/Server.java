@@ -2277,6 +2277,7 @@ public class Server {
         Entity.registerEntity("Hoglin", EntityHoglin.class);
         Entity.registerEntity("Piglin", EntityPiglin.class);
         Entity.registerEntity("Zoglin", EntityZoglin.class);
+        Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
