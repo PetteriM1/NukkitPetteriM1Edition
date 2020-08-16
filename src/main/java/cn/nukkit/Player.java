@@ -1436,51 +1436,64 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.getServer().getPluginManager().callEvent(ev);
 
-            if (!ev.isCancelled()) {
-                if (server.vanillaPortals) {
-                    Position newPos = moveToNether(this);
-                    if (newPos != null) {
-                        for (int x = -1; x < 2; x++) {
-                            for (int z = -1; z < 2; z++) {
-                                int chunkX = (newPos.getFloorX() >> 4) + x, chunkZ = (newPos.getFloorZ() >> 4) + z;
-                                FullChunk chunk = newPos.level.getChunk(chunkX, chunkZ, false);
-                                if (chunk == null || !(chunk.isGenerated() || chunk.isPopulated())) {
-                                    newPos.level.generateChunk(chunkX, chunkZ, true);
-                                }
-                            }
-                        }
-                        BlockNetherPortal.spawnPortal(newPos);
-                        this.teleport(newPos.add(1.5, 1, 0.5));
-                    }
-                } else {
-                    if (this.getLevel().isNether) {
-                        this.teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.NETHER_PORTAL);
-                    } else {
-                        Level nether = this.getServer().getLevelByName("nether");
-                        if (nether != null) {
-                            this.teleport(nether.getSafeSpawn(), TeleportCause.NETHER_PORTAL);
+            if (ev.isCancelled()) {
+                return;
+            }
+
+            if (server.vanillaPortals) {
+                Position newPos = getPortalPos(this);
+                if (newPos == null) {
+                    return;
+                }
+
+                for (int x = -1; x < 2; x++) {
+                    for (int z = -1; z < 2; z++) {
+                        int chunkX = (newPos.getFloorX() >> 4) + x, chunkZ = (newPos.getFloorZ() >> 4) + z;
+                        FullChunk chunk = newPos.level.getChunk(chunkX, chunkZ, false);
+                        if (chunk == null || !(chunk.isGenerated() || chunk.isPopulated())) {
+                            newPos.level.generateChunk(chunkX, chunkZ, true);
                         }
                     }
+                }
+
+                Position foundPortal = BlockNetherPortal.findNearestPortal(newPos);
+                if (foundPortal == null){
+                    BlockNetherPortal.spawnPortal(newPos);
+                    this.teleport(newPos.add(1.5, 1, 0.5));
+                }else {
+                    this.teleport(foundPortal.add(1.5, 1, 0.5));
+                }
+                return;
+            }
+
+            if (this.getLevel().isNether) {
+                this.teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.NETHER_PORTAL);
+            } else {
+                Level nether = this.getServer().getLevelByName("nether");
+                if (nether != null) {
+                    this.teleport(nether.getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                 }
             }
         }
     }
 
-    private static Position moveToNether(Position current)   {
+    //TODO: probably not here
+    private static Position getPortalPos(Position current) {
         Level nether = Server.getInstance().getLevelByName("nether");
-        if (nether == null) {
+        if (nether == null){
             return null;
-        } else {
-            if (current.level == nether) {
-                return new Position(mRound(current.getFloorX() << 3, 1024), mRound(current.getFloorY(), 32), mRound(current.getFloorZ() << 3, 1024), Server.getInstance().getDefaultLevel());
-            } else {
-                return new Position(mRound(current.getFloorX() >> 3, 128), mRound(current.getFloorY(), 32), mRound(current.getFloorZ() >> 3, 128), nether);
-            }
         }
-    }
 
-    private static int mRound(int value, int factor) {
-        return Math.round((float) value / factor) * factor;
+        double x;
+        double z;
+        if (current.level == nether){
+            x = Math.floor(current.getFloorX() * 8);
+            z = Math.floor(current.getFloorZ() * 8);
+        }else {
+            x = Math.floor(current.getFloorX() / 8);
+            z = Math.floor(current.getFloorZ() / 8);
+        }
+        return new Position(x, current.getFloorY(), z, current.level == nether? Server.getInstance().getDefaultLevel() : nether);
     }
 
     protected void checkNearEntities() {
