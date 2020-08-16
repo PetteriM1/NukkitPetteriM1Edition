@@ -72,14 +72,20 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
-        drops.add(Item.get(Item.COAL, 0, Utils.rand(0, 1)));
-
         for (int i = 0; i < Utils.rand(0, 2); i++) {
             drops.add(Item.get(Item.BONE, 0, 1));
         }
 
         if (Utils.rand(1, 3) == 1) {
-            drops.add(Item.get(Item.SKULL, 1, Utils.rand(0, 1)));
+            drops.add(Item.get(Item.COAL, 0, 1));
+        }
+
+        if (Utils.rand(1, 40) == 1) {
+            drops.add(Item.get(Item.SKULL, 1, 1));
+        }
+
+        if (Utils.rand(1, 200) <= 17) {
+            drops.add(Item.get(Item.STONE_SWORD, Utils.rand(0, 131), 1));
         }
 
         return drops.toArray(new Item[0]);

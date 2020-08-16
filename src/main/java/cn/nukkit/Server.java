@@ -257,6 +257,7 @@ public class Server {
     public boolean savePlayerDataByUuid;
     public int requiredProtocol;
     public boolean vanillaPortals;
+    public boolean personaSkins;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2277,6 +2278,7 @@ public class Server {
         Entity.registerEntity("Hoglin", EntityHoglin.class);
         Entity.registerEntity("Piglin", EntityPiglin.class);
         Entity.registerEntity("Zoglin", EntityZoglin.class);
+        Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
@@ -2420,6 +2422,7 @@ public class Server {
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
         this.requiredProtocol = this.getPropertyInt("multiversion-min-protocol");
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
+        this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2538,6 +2541,7 @@ public class Server {
             put("automatic-bug-report", true);
             put("save-player-data-by-uuid", true);
             put("vanilla-portals", true);
+            put("persona-skins", true);
         }
     }
 
