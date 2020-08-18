@@ -257,6 +257,7 @@ public class Server {
     public boolean anvilsEnabled;
     public boolean savePlayerDataByUuid;
     public boolean vanillaPortals;
+    public boolean personaSkins;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -462,7 +463,7 @@ public class Server {
         if (this.getPropertyBoolean("load-all-worlds", true)) {
             try {
                 for (File fs : new File(new File("").getCanonicalPath() + "/worlds/").listFiles()) {
-                    if ((fs.isDirectory()) && (!this.isLevelLoaded(fs.getName()))) {
+                    if ((fs.isDirectory() && !this.isLevelLoaded(fs.getName()))) {
                         this.loadLevel(fs.getName());
                     }
                 }
@@ -475,7 +476,7 @@ public class Server {
                     this.loadLevel("the_end");
                 }
             } catch (Exception e) {
-                this.getLogger().debug("Unable to load levels", e);
+                this.getLogger().error("Unable to load levels", e);
             }
         }
 
@@ -2277,6 +2278,7 @@ public class Server {
         Entity.registerEntity("Hoglin", EntityHoglin.class);
         Entity.registerEntity("Piglin", EntityPiglin.class);
         Entity.registerEntity("Zoglin", EntityZoglin.class);
+        Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
         //Passive
         Entity.registerEntity("Bat", EntityBat.class);
         Entity.registerEntity("Cat", EntityCat.class);
@@ -2416,6 +2418,7 @@ public class Server {
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
+        this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2535,6 +2538,7 @@ public class Server {
             put("anvils-enabled", true);
             put("save-player-data-by-uuid", true);
             put("vanilla-portals", true);
+            put("persona-skins", true);
         }
     }
 

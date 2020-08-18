@@ -2317,7 +2317,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.close("", "disconnectionScreen.invalidSkin");
                         break;
                     } else {
-                        this.setSkin(loginPacket.skin);
+                        Skin skin = loginPacket.skin;
+                        this.setSkin(skin.isPersona() && !this.getServer().personaSkins? Skin.NO_PERSONA_SKIN : skin);
                     }
 
                     PlayerPreLoginEvent playerPreLoginEvent;
@@ -2345,10 +2346,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     playerInstance.close(e.getKickMessage(), e.getKickMessage());
                                 } else if (playerInstance.shouldLogin) {
                                     playerInstance.completeLoginSequence();
-                                }
 
-                                for (Consumer<Server> action : e.getScheduledActions()) {
-                                    action.accept(server);
+                                    for (Consumer<Server> action : e.getScheduledActions()) {
+                                        action.accept(server);
+                                    }
                                 }
                             }
                         }
@@ -2388,10 +2389,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.dataPacket(stackPacket);
                             break;
                         case ResourcePackClientResponsePacket.STATUS_COMPLETED:
+                            this.shouldLogin = true;
+
                             if (this.preLoginEventTask.isFinished()) {
-                                this.completeLoginSequence();
-                            } else {
-                                this.shouldLogin = true;
+                                this.preLoginEventTask.onCompletion(server);
                             }
                             break;
                     }
@@ -2424,7 +2425,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.server.getPluginManager().callEvent(playerChangeSkinEvent);
                     if (!playerChangeSkinEvent.isCancelled()) {
                         this.lastSkinChange = System.currentTimeMillis();
-                        this.setSkin(skin);
+                        this.setSkin(skin.isPersona() && !this.getServer().personaSkins? Skin.NO_PERSONA_SKIN : skin);
                     }
                     break;
                 case ProtocolInfo.PLAYER_INPUT_PACKET:
@@ -2704,6 +2705,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_START_GLIDE:
                             PlayerToggleGlideEvent playerToggleGlideEvent = new PlayerToggleGlideEvent(this, true);
+                            Item chestplate = this.getInventory().getChestplateFast();
+                            if (!server.getAllowFlight() && (chestplate == null || chestplate.getId() != ItemID.ELYTRA)) {
+                                playerToggleGlideEvent.setCancelled(true);
+                            }
                             this.server.getPluginManager().callEvent(playerToggleGlideEvent);
                             if (playerToggleGlideEvent.isCancelled()) {
                                 this.sendData(this);
@@ -4206,7 +4211,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         ev.setKeepInventory(this.level.gameRules.getBoolean(GameRule.KEEP_INVENTORY));
         ev.setKeepExperience(ev.getKeepInventory()); // Same as above
 
-        if (cause != null && cause.getCause() != DamageCause.VOID) {
+        if (cause != null && cause.getCause() != DamageCause.VOID && cause.getCause() != DamageCause.SUICIDE) {
             Inventory inventory = this.getOffhandInventory();
             Item totem = Item.get(Item.TOTEM, 0, 1);
             if (inventory.contains(totem) || ((PlayerInventory) (inventory = this.getInventory())).getItemInHand() instanceof ItemTotem) {
@@ -5168,7 +5173,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setSprinting(boolean value) {
         if (isSprinting() != value) {
             super.setSprinting(value);
-            this.setMovementSpeed(value ? getMovementSpeed() * 1.3f : getMovementSpeed() / 1.3f);
+            this.setMovementSpeed(value ? getMovementSpeed() * 1.3f : getMovementSpeed() / 1.3f, false);
         }
     }
 

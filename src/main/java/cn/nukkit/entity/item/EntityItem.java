@@ -14,6 +14,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddItemEntityPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import co.aikar.timings.Timings;
+import co.aikar.timings.TimingsHistory;
 
 /**
  * @author MagicDroidX
@@ -307,5 +309,61 @@ public class EntityItem extends Entity {
         addEntity.metadata = this.dataProperties;
         addEntity.item = this.item;
         return addEntity;
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
+
+        this.collisionBlocks = null;
+        this.justCreated = false;
+
+        if (!this.isAlive()) {
+            this.despawnFromAll();
+            this.close();
+            if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
+            return false;
+        }
+
+        boolean hasUpdate = false;
+
+        this.checkBlockCollision();
+
+        if (this.y <= -16 && this.isAlive()) {
+            this.attack(new EntityDamageEvent(this, DamageCause.VOID, 10));
+            hasUpdate = true;
+        }
+
+        if (this.fireTicks > 0) {
+            if (this.fireProof) {
+                this.fireTicks -= tickDiff << 2;
+                if (this.fireTicks < 0) {
+                    this.fireTicks = 0;
+                }
+            } else {
+                if ((this.fireTicks % 20) == 0 || tickDiff > 20) {
+                    this.attack(new EntityDamageEvent(this, DamageCause.FIRE_TICK, 1));
+                }
+                this.fireTicks -= tickDiff;
+            }
+            if (this.fireTicks <= 0) {
+                this.extinguish();
+            } else if (!this.fireProof) {
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_ONFIRE, true);
+                hasUpdate = true;
+            }
+        }
+
+        if (this.noDamageTicks > 0) {
+            this.noDamageTicks -= tickDiff;
+            if (this.noDamageTicks < 0) {
+                this.noDamageTicks = 0;
+            }
+        }
+
+        this.age += tickDiff;
+        TimingsHistory.activatedEntityTicks++;
+        if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
+        return hasUpdate;
     }
 }

@@ -18,6 +18,6 @@ public class ItemDoorWood extends Item {
 
     public ItemDoorWood(Integer meta, int count) {
         super(WOODEN_DOOR, 0, count, "Oak Door");
-        this.block = Block.get(DARK_OAK_DOOR_BLOCK);
+        this.block = Block.get(WOODEN_DOOR_BLOCK);
     }
 }

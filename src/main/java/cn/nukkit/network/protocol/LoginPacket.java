@@ -23,6 +23,8 @@ public class LoginPacket extends DataPacket {
     public long clientId;
     public Skin skin;
 
+    private static final Gson GSON = new Gson();
+
     @Override
     public byte pid() {
         return ProtocolInfo.LOGIN_PACKET;
@@ -56,7 +58,7 @@ public class LoginPacket extends DataPacket {
 
         String data = new String(this.get(size), StandardCharsets.UTF_8);
 
-        Map<String, List<String>> map = new Gson().fromJson(data, new MapTypeToken().getType());
+        Map<String, List<String>> map = GSON.fromJson(data, new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
         for (String c : map.get("chain")) {
             JsonObject chainMap = decodeToken(c);
@@ -169,7 +171,7 @@ public class LoginPacket extends DataPacket {
     private static JsonObject decodeToken(String token) {
         String[] base = token.split("\\.");
         if (base.length < 2) return null;
-        return new Gson().fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
+        return GSON.fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
     }
 
     private static SkinAnimation getAnimation(JsonObject element) {
