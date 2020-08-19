@@ -281,6 +281,7 @@ public class LevelSoundEventPacket extends DataPacket {
     public static final int SOUND_BLOCK_BLASTFURNACE_FIRE_CRACKLE = 279;
     public static final int SOUND_BLOCK_SMITHING_TABLE_USE = 280;
     public static final int SOUND_UNDEFINED = 281;
+    public static final int SOUND_RECORD_PIGSTEP = 314;
 
     public int sound;
     public float x;
