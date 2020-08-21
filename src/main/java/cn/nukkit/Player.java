@@ -1432,7 +1432,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inPortalTicks = 0;
         }
 
-        if (server.netherEnabled && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 1 && this.gamemode == CREATIVE))) {
+        if (server.isNetherAllowed() && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 1 && this.gamemode == CREATIVE))) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.getServer().getPluginManager().callEvent(ev);
 
