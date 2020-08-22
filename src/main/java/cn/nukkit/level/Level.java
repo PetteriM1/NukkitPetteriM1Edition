@@ -135,7 +135,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private final Long2ObjectOpenHashMap<Player> players = new Long2ObjectOpenHashMap<>();
 
-    private final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
+    public final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
 
     public final Long2ObjectOpenHashMap<Entity> updateEntities = new Long2ObjectOpenHashMap<>();
 

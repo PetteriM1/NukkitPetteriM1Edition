@@ -92,8 +92,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
 
             ArrayList<Entity> list = new ArrayList<>();
             boolean isValid = false;
-            Entity[] e = this.level.getEntities();
-            for (Entity entity : e) {
+            for (Entity entity : this.level.entities.values()) {
                 if (entity instanceof Player || entity instanceof BaseEntity) {
                     if (entity.distance(this) <= this.requiredPlayerRange) {
                         if (entity instanceof Player) {

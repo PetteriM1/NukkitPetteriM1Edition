@@ -49,11 +49,12 @@ public class VersionCommand extends VanillaCommand {
                         String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
                         content.close();
 
-                        boolean isMaster = Nukkit.getBranch().equals("master");
-                        if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null") && isMaster) {
-                            sender.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + sender.getServer().getNukkitVersion() + " Latest: " + latest);
-                        } else if (isMaster) {
-                            sender.sendMessage("\u00A7aYou are running the latest version.");
+                        if (Nukkit.getBranch().equals("master")) {
+                            if (!sender.getServer().getNukkitVersion().equals(latest) && !sender.getServer().getNukkitVersion().equals("git-null")) {
+                                sender.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + sender.getServer().getNukkitVersion() + " Latest: " + latest);
+                            } else {
+                                sender.sendMessage("\u00A7aYou are running the latest version.");
+                            }
                         }
                     } catch (Exception ignore) {}
                 });
