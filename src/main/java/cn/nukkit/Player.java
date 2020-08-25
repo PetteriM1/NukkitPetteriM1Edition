@@ -1432,7 +1432,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inPortalTicks = 0;
         }
 
-        if (server.isNetherAllowed() && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 1 && this.gamemode == CREATIVE))) {
+        if (server.isNetherAllowed() && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 25 && this.gamemode == CREATIVE))) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.getServer().getPluginManager().callEvent(ev);
 
@@ -1441,7 +1441,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
 
             if (server.vanillaPortals) {
-                Position newPos = getPortalPos(this);
+                Position newPos = this.level.calculatePortalMirror(this);
                 if (newPos == null) {
                     return;
                 }
@@ -1456,13 +1456,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                 }
 
-                Position foundPortal = BlockNetherPortal.findNearestPortal(newPos);
-                if (foundPortal == null){
-                    BlockNetherPortal.spawnPortal(newPos);
-                    this.teleport(newPos.add(1.5, 1, 0.5));
-                }else {
-                    this.teleport(foundPortal.add(1.5, 1, 0.5));
-                }
+                BlockNetherPortal.findNearestPortal(newPos).thenAccept(foundPortal -> {
+                    if (foundPortal == null){
+                        BlockNetherPortal.spawnPortal(newPos);
+                        this.teleport(newPos.add(1.5, 1, 0.5));
+                    }else {
+                        BlockNetherPortal.getSafePortal(foundPortal).thenAccept(this::teleport);
+                    }
+                });
                 return;
             }
 
@@ -1475,25 +1476,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
-    }
-
-    //TODO: probably not here
-    private static Position getPortalPos(Position current) {
-        Level nether = Server.getInstance().getLevelByName("nether");
-        if (nether == null){
-            return null;
-        }
-
-        double x;
-        double z;
-        if (current.level == nether){
-            x = Math.floor(current.getFloorX() * 8);
-            z = Math.floor(current.getFloorZ() * 8);
-        }else {
-            x = Math.floor(current.getFloorX() / 8);
-            z = Math.floor(current.getFloorZ() / 8);
-        }
-        return new Position(x, current.getFloorY(), z, current.level == nether? Server.getInstance().getDefaultLevel() : nether);
     }
 
     protected void checkNearEntities() {
