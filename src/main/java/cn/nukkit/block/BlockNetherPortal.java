@@ -11,8 +11,6 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
  * Created on 2016/1/5 by xtypr.
  * Package cn.nukkit.block in project nukkit .
@@ -267,52 +265,48 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
         }
     }
 
-    public static CompletableFuture<Position> getSafePortal(Position portal) {
-       return CompletableFuture.supplyAsync(() -> {
-           Level level = portal.getLevel();
-           Vector3 down = portal.down();
-           while (level.getBlockIdAt(down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL){
-               down = down.down();
-           }
+    public static Position getSafePortal(Position portal) {
+        Level level = portal.getLevel();
+        Vector3 down = portal.down();
+        while (level.getBlockIdAt(down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL){
+            down = down.down();
+        }
 
-           return Position.fromObject(down.up(), portal.getLevel());
-       });
+        return Position.fromObject(down.up(), portal.getLevel());
     }
 
-    public static CompletableFuture<Position> findNearestPortal(Position pos) {
-        return CompletableFuture.supplyAsync(() -> {
-            Level level = pos.getLevel();
-            Position found = null;
+    public static Position findNearestPortal(Position pos) {
+        Level level = pos.getLevel();
+        Position found = null;
 
-            for (int xx = -16; xx <= 16; xx++){
-                for (int zz = -16; zz <= 16; zz++){
-                    for (int y = 0; y  < 255; y++){
-                        int x = pos.getFloorX() + xx, z = pos.getFloorZ() + zz;
-                        if (level.getBlockIdAt(x, y, z) == NETHER_PORTAL){
-                            found = new Position(x, y, z, level);
-                            break;
-                        }
+        for (int xx = -16; xx <= 16; xx++){
+            for (int zz = -16; zz <= 16; zz++){
+                for (int y = 0; y  < 255; y++){
+                    int x = pos.getFloorX() + xx, z = pos.getFloorZ() + zz;
+                    if (level.getBlockIdAt(x, y, z) == NETHER_PORTAL){
+                        found = new Position(x, y, z, level);
+                        break;
                     }
                 }
             }
+        }
 
-            if (found == null){
-                return null;
-            }
-            Vector3 up = found.up();
-            int x = up.getFloorX(), y = up.getFloorY(), z = up.getFloorZ();
-            int id = level.getBlockIdAt(x, y, z);
-            if (id != AIR && id != OBSIDIAN && id != NETHER_PORTAL){
-                for (int xx = -1; xx < 4; xx++) {
-                    for (int yy = 1; yy < 4; yy++)  {
-                        for (int zz = -1; zz < 3; zz++) {
-                            level.setBlockAt(x + xx, y + yy, z + zz, AIR);
-                        }
+        if (found == null){
+            return null;
+        }
+        Vector3 up = found.up();
+        int x = up.getFloorX(), y = up.getFloorY(), z = up.getFloorZ();
+        int id = level.getBlockIdAt(x, y, z);
+        if (id != AIR && id != OBSIDIAN && id != NETHER_PORTAL){
+            for (int xx = -1; xx < 4; xx++) {
+                for (int yy = 1; yy < 4; yy++)  {
+                    for (int zz = -1; zz < 3; zz++) {
+                        level.setBlockAt(x + xx, y + yy, z + zz, AIR);
                     }
                 }
             }
-            return found;
-        });
+        }
+        return found;
     }
 
     public static void spawnPortal(Position pos) {
