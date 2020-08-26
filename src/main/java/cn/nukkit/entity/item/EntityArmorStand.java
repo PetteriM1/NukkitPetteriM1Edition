@@ -334,7 +334,9 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			this.motionZ = 0;
 		}
 
-		this.move(this.motionX, this.motionY, this.motionZ);
+		if (this.move(this.motionX, this.motionY, this.motionZ)) {
+			this.updateMovement();
+		}
 
 		if (this.timing != null) this.timing.stopTiming();
 

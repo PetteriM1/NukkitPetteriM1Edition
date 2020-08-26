@@ -19,8 +19,6 @@ public class GenerateWorldCommand extends Command {
                 new CommandParameter("seed", CommandParamType.INT, false)
         });
     }
-    
-    long seed;
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
@@ -30,20 +28,22 @@ public class GenerateWorldCommand extends Command {
 
         if (args.length == 3) {
             if (Server.getInstance().isLevelGenerated(args[0])) {
-                sender.sendMessage("\u00A7cLevel " + args[0] + " already exists");
+                sender.sendMessage("\u00A7cWorld \u00A77" + args[0] + " \u00A7calready exists");
                 return true;
             }
+
+            long seed;
 
             try {
                 seed = Long.parseLong(args[2]);
             } catch (NumberFormatException e) {
-                sender.sendMessage("\u00A7cLevel seed must be numeric");
+                sender.sendMessage("\u00A7cThe seed must be numeric");
                 return true;
             }
 
             Server.getInstance().generateLevel(args[0], seed, Generator.getGenerator(args[1]));
             
-            sender.sendMessage("\u00A72Generating world " + args[0] + "...");
+            sender.sendMessage("\u00A72Generating world \u00A77" + args[0] + "\u00A72...");
 
             return true;
         }

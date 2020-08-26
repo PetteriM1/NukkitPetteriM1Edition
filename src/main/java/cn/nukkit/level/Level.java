@@ -142,7 +142,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private final Long2ObjectOpenHashMap<Player> players = new Long2ObjectOpenHashMap<>();
 
-    private final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
+    public final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
 
     public final Long2ObjectOpenHashMap<Entity> updateEntities = new Long2ObjectOpenHashMap<>();
 
@@ -4275,7 +4275,7 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendQueue388;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return chunkSendQueue389;
-        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100 || protocol == ProtocolInfo.v1_16_100_51) {
+        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100 || protocol == ProtocolInfo.v1_16_100_51 || protocol == ProtocolInfo.v1_16_100_52) {
             return chunkSendQueue407;
         } else {
             throw new IllegalArgumentException("Missing chunk send queue for protocol " + protocol);
@@ -4291,7 +4291,7 @@ public class Level implements ChunkManager, Metadatable {
             return chunkSendTasks388;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return chunkSendTasks389;
-        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100 || protocol == ProtocolInfo.v1_16_100_51) {
+        } else if (protocol == ProtocolInfo.v1_16_0 || protocol == ProtocolInfo.v1_16_20 || protocol == ProtocolInfo.v1_16_100 || protocol == ProtocolInfo.v1_16_100_51 || protocol == ProtocolInfo.v1_16_100_52) {
             return chunkSendTasks407;
         } else {
             throw new IllegalArgumentException("Missing chunk send task for protocol " + protocol);
@@ -4299,7 +4299,10 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) || (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_20) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100_51);
+        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) ||
+                (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) ||
+                (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_20) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100_51) ||
+                (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_100_52);
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

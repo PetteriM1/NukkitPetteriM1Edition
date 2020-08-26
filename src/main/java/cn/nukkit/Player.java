@@ -1446,7 +1446,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.inPortalTicks = 0;
         }
 
-        if (server.netherEnabled && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 1 && this.gamemode == CREATIVE))) {
+        if (server.isNetherAllowed() && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 1 && this.gamemode == CREATIVE))) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.getServer().getPluginManager().callEvent(ev);
 
@@ -4226,7 +4226,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         ev.setKeepInventory(this.level.gameRules.getBoolean(GameRule.KEEP_INVENTORY));
         ev.setKeepExperience(ev.getKeepInventory()); // Same as above
 
-        if (cause != null && cause.getCause() != DamageCause.VOID) {
+        if (cause != null && cause.getCause() != DamageCause.VOID && cause.getCause() != DamageCause.SUICIDE) {
             Inventory inventory = this.getOffhandInventory();
             Item totem = Item.get(Item.TOTEM, 0, 1);
             if (inventory.contains(totem) || ((PlayerInventory) (inventory = this.getInventory())).getItemInHand() instanceof ItemTotem) {

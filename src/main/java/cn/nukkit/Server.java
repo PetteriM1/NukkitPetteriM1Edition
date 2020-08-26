@@ -224,7 +224,7 @@ public class Server {
     private boolean forceResources;
     private boolean whitelistEnabled;
     private boolean forceGamemode;
-    public boolean netherEnabled;
+    private boolean netherEnabled;
     public boolean xboxAuth;
     public boolean spawnEggsEnabled;
     public boolean xpBottlesOnCreative;
@@ -2354,6 +2354,18 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.BELL, BlockEntityBell.class);
         BlockEntity.registerBlockEntity(BlockEntity.BARREL, BlockEntityBarrel.class);
         BlockEntity.registerBlockEntity(BlockEntity.MOVING_BLOCK, BlockEntityMovingBlock.class);
+    }
+
+    public boolean isNetherAllowed() {
+        return this.netherEnabled;
+    }
+
+    public PlayerDataSerializer getPlayerDataSerializer() {
+        return playerDataSerializer;
+    }
+
+    public void setPlayerDataSerializer(PlayerDataSerializer playerDataSerializer) {
+        this.playerDataSerializer = Preconditions.checkNotNull(playerDataSerializer, "playerDataSerializer");
     }
 
     public static Server getInstance() {

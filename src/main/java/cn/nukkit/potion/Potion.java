@@ -1,6 +1,5 @@
 package cn.nukkit.potion;
 
-import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -107,7 +106,7 @@ public class Potion implements Cloneable {
         potions[Potion.TURTLE_MASTER_II] = new Potion(Potion.TURTLE_MASTER_II, 2);
         potions[Potion.SLOW_FALLING] = new Potion(Potion.SLOW_FALLING);
         potions[Potion.SLOW_FALLING_LONG] = new Potion(Potion.SLOW_FALLING_LONG);
-        potions[Potion.SLOWNESS_LONG_II] = new Potion(Potion.SLOWNESS_LONG_II);
+        potions[Potion.SLOWNESS_LONG_II] = new Potion(Potion.SLOWNESS_LONG_II, 2);
     }
 
     public static Potion getPotion(int id) {
@@ -183,11 +182,11 @@ public class Potion implements Cloneable {
             return;
         }
 
-        if (entity instanceof Player) {
+        /*if (entity instanceof Player) {
             if (!((Player) entity).isSurvival() && !((Player) entity).isAdventure() && applyEffect.isBad()) {
                 return;
             }
-        }
+        }*/
 
         PotionApplyEvent event = new PotionApplyEvent(this, applyEffect, entity);
 

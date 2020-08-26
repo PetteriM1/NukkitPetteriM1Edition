@@ -301,6 +301,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHERITE_LEGGINGS] = ItemLeggingsNetherite.class; //750
             list[NETHERITE_BOOTS] = ItemBootsNetherite.class; //751
             list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
+            list[RECORD_PIGSTEP] = ItemRecordPigstep.class; //759
 
             if (Server.getInstance().requiredProtocol >= ProtocolInfo.v1_13_0){
                 list[KELP] = ItemKelp.class; //335
@@ -325,6 +326,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     private static final ArrayList<Item> creative340 = new ArrayList<>();
     private static final ArrayList<Item> creative354 = new ArrayList<>();
     private static final ArrayList<Item> creative389 = new ArrayList<>();
+    private static final ArrayList<Item> creative407 = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -394,10 +396,19 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             }
         }
 
-        // Creative inventory for 389
+        // Creative inventory for 389, 390
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems389.json")).getMapList("items")) {
             try {
                 addCreativeItem(v1_14_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+            } catch (Exception e) {
+                MainLogger.getLogger().logException(e);
+            }
+        }
+
+        // Creative inventory for 407+
+        for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems407.json")).getMapList("items")) {
+            try {
+                addCreativeItem(v1_16_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -413,6 +424,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item.creative340.clear();
         Item.creative354.clear();
         Item.creative389.clear();
+        Item.creative407.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -449,11 +461,13 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 return new ArrayList<>(Item.creative354);
             case v1_14_0:
             case v1_14_60:
+                return new ArrayList<>(Item.creative389);
             case v1_16_0:
             case v1_16_20:
             case v1_16_100:
             case v1_16_100_51:
-                return new ArrayList<>(Item.creative389);
+            case v1_16_100_52:
+                return new ArrayList<>(Item.creative407);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
@@ -487,6 +501,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_14_0:
                 Item.creative389.add(item.clone());
                 break;
+            case v1_16_0:
+                Item.creative407.add(item.clone());
+                break;
             default:
                 throw new IllegalArgumentException("Tried to register creative items for unsupported protocol version: " + protocol);
         }
@@ -495,12 +512,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     public static void removeCreativeItem(Item item) {
         int index = getCreativeItemIndex(item);
         if (index != -1) {
-            Item.creative389.remove(index);
+            Item.creative407.remove(index);
         }
     }
 
     public static boolean isCreativeItem(Item item) {
-        for (Item aCreative : Item.creative389) {
+        for (Item aCreative : Item.creative407) {
             if (item.equals(aCreative, !item.isTool())) {
                 return true;
             }
@@ -509,12 +526,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public static Item getCreativeItem(int index) {
-        return (index >= 0 && index < Item.creative389.size()) ? Item.creative389.get(index) : null;
+        return (index >= 0 && index < Item.creative407.size()) ? Item.creative407.get(index) : null;
     }
 
     public static int getCreativeItemIndex(Item item) {
-        for (int i = 0; i < Item.creative389.size(); i++) {
-            if (item.equals(Item.creative389.get(i), !item.isTool())) {
+        for (int i = 0; i < Item.creative407.size(); i++) {
+            if (item.equals(Item.creative407.get(i), !item.isTool())) {
                 return i;
             }
         }

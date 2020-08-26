@@ -81,8 +81,7 @@ public class Spawner implements Runnable {
         int max = getMaxSpawns(networkId, level.getDimension() == Level.DIMENSION_NETHER, level.getDimension() == Level.DIMENSION_THE_END);
         if (max == 0) return false;
         int count = 0;
-        Entity[] e = level.getEntities();
-        for (Entity entity : e) {
+        for (Entity entity : level.entities.values()) {
             if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
                 count++;
                 if (count > max) {
