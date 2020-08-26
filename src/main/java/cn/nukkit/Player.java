@@ -1427,42 +1427,48 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (portal) {
-            inPortalTicks++;
+            this.inPortalTicks++;
         } else {
             this.inPortalTicks = 0;
+            this.portalPos = null;
         }
 
-        if (server.isNetherAllowed() && (inPortalTicks == 80 || (server.vanillaPortals && inPortalTicks == 25 && this.gamemode == CREATIVE))) {
+        if (this.server.isNetherAllowed() && this.server.vanillaPortals && (this.inPortalTicks == 40 || this.inPortalTicks == 10 && this.gamemode == CREATIVE) && this.portalPos == null){
+            Position portalPos = this.level.calculatePortalMirror(this);
+            if (portalPos == null) {
+                return;
+            }
+
+            for (int x = -1; x < 2; x++) {
+                for (int z = -1; z < 2; z++) {
+                    int chunkX = (portalPos.getFloorX() >> 4) + x, chunkZ = (portalPos.getFloorZ() >> 4) + z;
+                    FullChunk chunk = portalPos.level.getChunk(chunkX, chunkZ, false);
+                    if (chunk == null || !(chunk.isGenerated() || chunk.isPopulated())) {
+                        portalPos.level.generateChunk(chunkX, chunkZ, true);
+                    }
+                }
+            }
+            this.portalPos = portalPos;
+        }
+
+        if (this.server.isNetherAllowed() && (this.inPortalTicks == 80 || (this.server.vanillaPortals && this.inPortalTicks == 25 && this.gamemode == CREATIVE))) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.NETHER);
             this.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
+                this.portalPos = null;
                 return;
             }
 
             if (server.vanillaPortals) {
-                Position newPos = this.level.calculatePortalMirror(this);
-                if (newPos == null) {
-                    return;
-                }
-
-                for (int x = -1; x < 2; x++) {
-                    for (int z = -1; z < 2; z++) {
-                        int chunkX = (newPos.getFloorX() >> 4) + x, chunkZ = (newPos.getFloorZ() >> 4) + z;
-                        FullChunk chunk = newPos.level.getChunk(chunkX, chunkZ, false);
-                        if (chunk == null || !(chunk.isGenerated() || chunk.isPopulated())) {
-                            newPos.level.generateChunk(chunkX, chunkZ, true);
-                        }
-                    }
-                }
-
-                BlockNetherPortal.findNearestPortal(newPos).thenAccept(foundPortal -> {
+                BlockNetherPortal.findNearestPortal(this.portalPos).thenAccept(foundPortal -> {
                     if (foundPortal == null){
-                        BlockNetherPortal.spawnPortal(newPos);
-                        this.teleport(newPos.add(1.5, 1, 0.5));
+                        BlockNetherPortal.spawnPortal(this.portalPos);
+                        this.teleport(this.portalPos.add(1.5, 1, 0.5));
                     }else {
                         BlockNetherPortal.getSafePortal(foundPortal).thenAccept(this::teleport);
                     }
+                    this.portalPos = null;
                 });
                 return;
             }

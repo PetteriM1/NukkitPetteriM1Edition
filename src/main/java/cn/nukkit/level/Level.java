@@ -4139,7 +4139,7 @@ public class Level implements ChunkManager, Metadatable {
         return false;
     }
 
-    public Position calculatePortalMirror(Position portal) {
+    public Position calculatePortalMirror(Vector3 portal) {
         Level nether = Server.getInstance().getLevelByName("nether");
         if (nether == null){
             return null;
@@ -4154,7 +4154,7 @@ public class Level implements ChunkManager, Metadatable {
             x = Math.floor(portal.getFloorX() / 8);
             z = Math.floor(portal.getFloorZ() / 8);
         }
-        return new Position(x, portal.getFloorY(), z, this == nether? Server.getInstance().getDefaultLevel() : this);
+        return new Position(x, portal.getFloorY(), z, this == nether? Server.getInstance().getDefaultLevel() : nether);
     }
 
     private ConcurrentMap<Long, Int2ObjectMap<Player>> getChunkSendQueue(int protocol) {
