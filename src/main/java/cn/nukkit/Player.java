@@ -1466,7 +1466,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     BlockNetherPortal.spawnPortal(this.portalPos);
                     this.teleport(this.portalPos.add(1.5, 1, 0.5));
                 }else {
-                    this.teleport(BlockNetherPortal.getSafePortal(foundPortal);
+                    this.teleport(BlockNetherPortal.getSafePortal(foundPortal));
                 }
                 this.portalPos = null;
                 return;
