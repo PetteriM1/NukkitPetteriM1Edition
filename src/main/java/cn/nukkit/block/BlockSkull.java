@@ -84,7 +84,7 @@ public class BlockSkull extends BlockTransparentMeta {
                 nbt.put(aTag.getName(), aTag);
             }
         }
-        new BlockEntitySkull(getLevel().getChunk((int) block.x >> 4, (int) block.z >> 4), nbt);
+        BlockEntity.createBlockEntity(BlockEntity.SKULL, this.getLevel().getChunk(block.getChunkX(), block.getChunkZ()), nbt);
 
         // TODO: 2016/2/3 SPAWN WITHER
 

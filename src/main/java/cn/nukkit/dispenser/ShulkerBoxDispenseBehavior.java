@@ -36,7 +36,7 @@ public class ShulkerBoxDispenseBehavior extends DefaultDispenseBehavior {
                 }
             }
 
-            new BlockEntityShulkerBox(block.level.getChunk(target.getChunkX(), target.getChunkZ()), nbt);
+            BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, block.level.getChunk(target.getChunkX(), target.getChunkZ()), nbt);
             block.level.updateComparatorOutputLevel(target);
         }
 

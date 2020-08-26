@@ -88,8 +88,7 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
             }
         }
 
-        new BlockEntityFurnace(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
-
+        BlockEntity.createBlockEntity(BlockEntity.FURNACE, this.getChunk(), nbt);
         return true;
     }
 
@@ -113,7 +112,7 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
                         .putInt("x", (int) this.x)
                         .putInt("y", (int) this.y)
                         .putInt("z", (int) this.z);
-                furnace = new BlockEntityFurnace(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+                furnace = (BlockEntityFurnace) BlockEntity.createBlockEntity(BlockEntity.FURNACE, this.getChunk(), nbt);
             }
 
             if (furnace.namedTag.contains("Lock") && furnace.namedTag.get("Lock") instanceof StringTag) {

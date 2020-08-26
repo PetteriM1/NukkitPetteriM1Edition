@@ -76,7 +76,7 @@ public class ItemSpawnEgg extends Item {
                         .putInt("x", (int) target.x)
                         .putInt("y", (int) target.y)
                         .putInt("z", (int) target.z);
-                new BlockEntitySpawner(level.getChunk((int) target.x >> 4, (int) target.z >> 4), nbt);
+                BlockEntity.createBlockEntity(BlockEntity.MOB_SPAWNER, level.getChunk(target.getChunkX(), target.getChunkZ()), nbt);
 
                 if (!player.isCreative()) {
                     player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
