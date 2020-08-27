@@ -96,7 +96,7 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
 
         this.getLevel().setBlock(block, this, true);
 
-        new BlockEntityDropper(this.level.getChunk(getChunkX(), getChunkZ()), BlockEntity.getDefaultCompound(this, BlockEntity.DROPPER));
+        BlockEntity.createBlockEntity(BlockEntity.DROPPER, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.DROPPER));
         return true;
     }
 
