@@ -268,7 +268,7 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
     public static Position getSafePortal(Position portal) {
         Level level = portal.getLevel();
         Vector3 down = portal.down();
-        while (level.getBlockIdAt(down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL){
+        while (level.getBlockIdAt(down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL) {
             down = down.down();
         }
 
@@ -279,11 +279,11 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
         Level level = pos.getLevel();
         Position found = null;
 
-        for (int xx = -16; xx <= 16; xx++){
-            for (int zz = -16; zz <= 16; zz++){
-                for (int y = 0; y  < 255; y++){
+        for (int xx = -16; xx <= 16; xx++) {
+            for (int zz = -16; zz <= 16; zz++) {
+                for (int y = 0; y  < 255; y++) {
                     int x = pos.getFloorX() + xx, z = pos.getFloorZ() + zz;
-                    if (level.getBlockIdAt(x, y, z) == NETHER_PORTAL){
+                    if (level.getBlockIdAt(x, y, z) == NETHER_PORTAL) {
                         found = new Position(x, y, z, level);
                         break;
                     }
@@ -291,13 +291,13 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
             }
         }
 
-        if (found == null){
+        if (found == null) {
             return null;
         }
         Vector3 up = found.up();
         int x = up.getFloorX(), y = up.getFloorY(), z = up.getFloorZ();
         int id = level.getBlockIdAt(x, y, z);
-        if (id != AIR && id != OBSIDIAN && id != NETHER_PORTAL){
+        if (id != AIR && id != OBSIDIAN && id != NETHER_PORTAL) {
             for (int xx = -1; xx < 4; xx++) {
                 for (int yy = 1; yy < 4; yy++)  {
                     for (int zz = -1; zz < 3; zz++) {
