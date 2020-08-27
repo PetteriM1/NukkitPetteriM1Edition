@@ -265,7 +265,51 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
         }
     }
 
-    public static void spawnPortal(Position pos)   {
+    public static Position getSafePortal(Position portal) {
+        Level level = portal.getLevel();
+        Vector3 down = portal.down();
+        while (level.getBlockIdAt(down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL) {
+            down = down.down();
+        }
+
+        return Position.fromObject(down.up(), portal.getLevel());
+    }
+
+    public static Position findNearestPortal(Position pos) {
+        Level level = pos.getLevel();
+        Position found = null;
+
+        for (int xx = -16; xx <= 16; xx++) {
+            for (int zz = -16; zz <= 16; zz++) {
+                for (int y = 0; y  < 255; y++) {
+                    int x = pos.getFloorX() + xx, z = pos.getFloorZ() + zz;
+                    if (level.getBlockIdAt(x, y, z) == NETHER_PORTAL) {
+                        found = new Position(x, y, z, level);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (found == null) {
+            return null;
+        }
+        Vector3 up = found.up();
+        int x = up.getFloorX(), y = up.getFloorY(), z = up.getFloorZ();
+        int id = level.getBlockIdAt(x, y, z);
+        if (id != AIR && id != OBSIDIAN && id != NETHER_PORTAL) {
+            for (int xx = -1; xx < 4; xx++) {
+                for (int yy = 1; yy < 4; yy++)  {
+                    for (int zz = -1; zz < 3; zz++) {
+                        level.setBlockAt(x + xx, y + yy, z + zz, AIR);
+                    }
+                }
+            }
+        }
+        return found;
+    }
+
+    public static void spawnPortal(Position pos) {
         Level lvl = pos.level;
         int x = pos.getFloorX(), y = pos.getFloorY(), z = pos.getFloorZ();
 
