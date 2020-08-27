@@ -1980,6 +1980,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return (dV.dot(new Vector2(pos.x, pos.z)) - dV.dot(new Vector2(this.x, this.z))) >= -maxDiff;
     }
 
+    private boolean canInteractEntity(Vector3 pos, double maxDistance) {
+        if (this.distanceSquared(pos) > Math.pow(maxDistance, 2)) {
+            return false;
+        }
+
+        Vector2 dV = this.getDirectionPlane();
+        return (dV.dot(new Vector2(pos.x, pos.z)) - dV.dot(new Vector2(this.x, this.z))) >= -0.87;
+    }
+
     protected void processLogin() {
         if (!this.server.isWhitelisted((this.username).toLowerCase())) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason").replace("§n", "\n"));
@@ -2663,6 +2672,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.scheduleUpdate();
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
+                            if (this.checkMovement && (this.inAirTicks > 30 || this.isSwimming() || this.isGliding()) && !server.getAllowFlight()) {
+                                this.setMotion(new Vector3(0, 0, 0));
+                                break;
+                            }
                             this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
                             break packetswitch;
                         case PlayerActionPacket.ACTION_START_SPRINT:
@@ -2706,9 +2719,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_START_GLIDE:
                             PlayerToggleGlideEvent playerToggleGlideEvent = new PlayerToggleGlideEvent(this, true);
-                            Item chestplate = this.getInventory().getChestplateFast();
-                            if (!server.getAllowFlight() && (chestplate == null || chestplate.getId() != ItemID.ELYTRA)) {
-                                playerToggleGlideEvent.setCancelled(true);
+                            if (!server.getAllowFlight() && this.checkMovement) {
+                                Item chestplate = this.getInventory().getChestplateFast();
+                                if ((chestplate == null || chestplate.getId() != ItemID.ELYTRA)) {
+                                    playerToggleGlideEvent.setCancelled(true);
+                                    this.setMotion(new Vector3(0, 0, 0));
+                                }
                             }
                             this.server.getPluginManager().callEvent(playerToggleGlideEvent);
                             if (playerToggleGlideEvent.isCancelled()) {
@@ -3464,7 +3480,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     Map<DamageModifier, Float> damage = new EnumMap<>(DamageModifier.class);
                                     damage.put(DamageModifier.BASE, itemDamage);
 
-                                    if (!this.canInteract(target, isCreative() ? 8 : 5)) {
+                                    if (!this.canInteractEntity(target, isCreative() ? 8 : 5)) {
                                         break;
                                     } else if (target instanceof Player) {
                                         if ((((Player) target).gamemode & 0x01) > 0) {

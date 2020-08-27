@@ -1,10 +1,12 @@
 package cn.nukkit.inventory.transaction;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.event.inventory.InventoryClickEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.inventory.PlayerInventory;
+import cn.nukkit.inventory.ShulkerBoxInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
@@ -36,7 +38,7 @@ public class InventoryTransaction {
     }
 
     protected void init(Player source, List<InventoryAction> actions) {
-        creationTime = System.currentTimeMillis();
+        //creationTime = System.currentTimeMillis();
         this.source = source;
 
         for (InventoryAction action : actions) {
@@ -73,12 +75,14 @@ public class InventoryTransaction {
             while (iterator.hasNext()) {
                 InventoryAction existingAction = iterator.next();
                 if (existingAction instanceof SlotChangeAction) {
-                    SlotChangeAction existingSlotChangeAction = (SlotChangeAction)existingAction;
-                    if (!existingSlotChangeAction.getInventory().equals(slotChangeAction.getInventory()))
-                        continue;
                     Item targetItem = slotChangeAction.getTargetItem();
                     Item sourceItem = slotChangeAction.getSourceItem();
                     if (targetItem.getCount() > targetItem.getMaxStackSize() || sourceItem.getCount() > sourceItem.getMaxStackSize()) return;
+                    if (slotChangeAction.getInventory() instanceof ShulkerBoxInventory && (targetItem.getId() == BlockID.SHULKER_BOX || targetItem.getId() == BlockID.UNDYED_SHULKER_BOX)) return;
+
+                    SlotChangeAction existingSlotChangeAction = (SlotChangeAction)existingAction;
+                    if (!existingSlotChangeAction.getInventory().equals(slotChangeAction.getInventory()))
+                        continue;
                     Item existingTarget = existingSlotChangeAction.getTargetItem();
                     if (existingSlotChangeAction.getSlot() == slotChangeAction.getSlot() && slotChangeAction.getSourceItem().equals(existingTarget, existingTarget.hasMeta(), existingTarget.hasCompoundTag())) {
                         iterator.set(new SlotChangeAction(existingSlotChangeAction.getInventory(), existingSlotChangeAction.getSlot(), existingSlotChangeAction.getSourceItem(), slotChangeAction.getTargetItem()));

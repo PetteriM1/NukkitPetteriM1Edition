@@ -71,7 +71,7 @@ public class BlockHopper extends BlockTransparentMeta implements Faceable {
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z);
 
-        new BlockEntityHopper(this.level.getChunk(this.getFloorX() >> 4, this.getFloorZ() >> 4), nbt);
+        BlockEntity.createBlockEntity(BlockEntity.HOPPER, this.getChunk(), nbt);
         return true;
     }
 

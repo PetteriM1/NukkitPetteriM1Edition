@@ -64,7 +64,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                 .putInt("z", (int) this.z)
                 .putBoolean("Sticky", this.sticky);
 
-        BlockEntityPistonArm be = new BlockEntityPistonArm(this.level.getChunk(getChunkX(), getChunkZ()), nbt);
+        BlockEntityPistonArm be = (BlockEntityPistonArm) BlockEntity.createBlockEntity(BlockEntity.PISTON_ARM, this.getChunk(), nbt);
         be.sticky = this.sticky;
         be.spawnToAll();
 

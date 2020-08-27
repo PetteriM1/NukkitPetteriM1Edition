@@ -63,7 +63,7 @@ public class BlockFlowerPot extends BlockFlowable {
                 nbt.put(aTag.getName(), aTag);
             }
         }
-        new BlockEntityFlowerPot(getLevel().getChunk((int) block.x >> 4, (int) block.z >> 4), nbt);
+        BlockEntity.createBlockEntity(BlockEntity.FLOWER_POT, this.level.getChunk(block.getChunkX(), block.getChunkZ()), nbt);
 
         this.getLevel().setBlock(block, this, true, true);
         return true;

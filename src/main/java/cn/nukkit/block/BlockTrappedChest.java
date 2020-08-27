@@ -74,7 +74,7 @@ public class BlockTrappedChest extends BlockChest {
             }
         }
 
-        BlockEntityChest blockEntity = new BlockEntityChest(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+        BlockEntityChest blockEntity = (BlockEntityChest) BlockEntity.createBlockEntity(BlockEntity.CHEST, this.getChunk(), nbt);
 
         if (chest != null) {
             chest.pairWith(blockEntity);
