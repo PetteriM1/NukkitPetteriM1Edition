@@ -150,7 +150,7 @@ public class EntityItem extends Entity {
                 }
             } else {
                 for (Entity entity : e) {
-                    if (entity instanceof Player) {
+                    if (entity.isPlayer) {
                         if (((Player) entity).pickupEntity(this, true)) {
                             if (this.timing != null) this.timing.stopTiming();
                             return true;

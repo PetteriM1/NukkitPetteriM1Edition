@@ -68,7 +68,7 @@ public class Nukkit {
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
             System.out.print("Debug stuff enabled!\n");
             System.out.print("Do you want to skip loading plugins? (yes/no) ");
-            loadPlugins = !new Scanner(System.in).nextLine().startsWith("y");
+            loadPlugins = !new Scanner(System.in).nextLine().toLowerCase().startsWith("y");
         }
 
         try {

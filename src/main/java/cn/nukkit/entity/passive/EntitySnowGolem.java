@@ -109,7 +109,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
     @Override
     public String getName() {
-        return "Snow Golem";
+        return this.hasCustomName() ? this.getNameTag() : "Snow Golem";
     }
 
     @Override

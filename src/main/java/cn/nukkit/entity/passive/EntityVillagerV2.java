@@ -18,6 +18,6 @@ public class EntityVillagerV2 extends EntityVillager {
 
     @Override
     public String getName() {
-        return "Villager";
+        return this.hasCustomName() ? this.getNameTag() : "Villager";
     }
 }

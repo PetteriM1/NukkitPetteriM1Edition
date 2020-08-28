@@ -343,7 +343,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected Timing timing;
 
-    protected boolean isPlayer = false;
+    public boolean isPlayer = false;
 
     private volatile boolean initialized;
     private volatile boolean initialized2;
@@ -974,7 +974,7 @@ public abstract class Entity extends Location implements Metadatable {
                 player.dataPacket(pkk);
             }
 
-            if (this instanceof EntityBoss && this.server.vanillaBB) {
+            if (this.server.vanillaBB && this instanceof EntityBoss) {
                 BossEventPacket pkBoss = new BossEventPacket();
                 pkBoss.bossEid = this.id;
                 pkBoss.type = BossEventPacket.TYPE_SHOW;
@@ -1463,7 +1463,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.updateMovement();
 
-        /*if (server.vanillaBB && currentTick % 100 == 0) { //TODO: Figure out why doesn't the boss bar length change
+        /*if (server.vanillaBB && this instanceof EntityBoss && currentTick % 100 == 0) { //TODO: Figure out why doesn't the boss bar length change
             for (Player p : this.hasSpawned.values()) {
                 BossEventPacket pkBoss = new BossEventPacket();
                 pkBoss.bossEid = this.id;

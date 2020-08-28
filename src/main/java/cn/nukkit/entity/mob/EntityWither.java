@@ -76,7 +76,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     @Override
     public void attackEntity(Entity player) {
-    if (this.age > 220 && this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
+        if (this.age > 220 && this.attackDelay > 23 && Utils.rand(1, 5) < 3 && this.distance(player) <= 100) {
             this.attackDelay = 0;
 
             double f = 1;
@@ -85,9 +85,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
                     this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 
-        if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
-            return;
-        }
+            if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
+                return;
+            }
 
             Entity k;
             ProjectileLaunchEvent launch;

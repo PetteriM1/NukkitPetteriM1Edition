@@ -188,6 +188,6 @@ public class EntityWolf extends EntityTameableMob {
 
     @Override
     public String getName() {
-        return "Wolf";
+        return this.hasCustomName() ? this.getNameTag() : "Wolf";
     }
 }

@@ -283,7 +283,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 	@Override
 	public String getName() {
-		return "Armor Stand";
+		return this.hasCustomName() ? this.getNameTag() : "Armor Stand";
 	}
 
 	private static int getArmorSlot(ItemArmor armorItem) {

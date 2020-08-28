@@ -7,6 +7,7 @@ import cn.nukkit.block.BlockObsidian;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -41,6 +42,12 @@ public class ItemEndCrystal extends Item {
 
         if (chunk == null) {
             return false;
+        }
+
+        for (Entity e : level.getCollidingEntities(new AxisAlignedBB(block.x, block.y, block.z, block.x + 1, block.y + 1, block.z + 1))) {
+            if (e.isPlayer && !((Player) e).isSpectator()) {
+                return false;
+            }
         }
 
         CompoundTag nbt = new CompoundTag()

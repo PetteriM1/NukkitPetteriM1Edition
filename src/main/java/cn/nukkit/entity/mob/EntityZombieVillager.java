@@ -119,6 +119,6 @@ public class EntityZombieVillager extends EntityWalkingMob implements EntitySmit
 
     @Override
     public String getName() {
-        return "Zombie Villager";
+        return this.hasCustomName() ? this.getNameTag() : "Zombie Villager";
     }
 }

@@ -46,6 +46,6 @@ public class EntityTropicalFish extends EntityFish {
 
     @Override
     public String getName() {
-        return "Tropical Fish";
+        return this.hasCustomName() ? this.getNameTag() : "Tropical Fish";
     }
 }

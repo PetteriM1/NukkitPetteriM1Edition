@@ -113,7 +113,7 @@ public class EntityEnderDragon extends EntityFlyingMob implements EntityBoss {
 
     @Override
     public String getName() {
-        return "Ender Dragon";
+        return this.hasCustomName() ? this.getNameTag() : "Ender Dragon";
     }
 
     @Override

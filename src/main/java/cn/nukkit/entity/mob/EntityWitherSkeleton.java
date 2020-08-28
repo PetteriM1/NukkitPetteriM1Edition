@@ -98,7 +98,7 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
 
     @Override
     public String getName() {
-        return "Wither Skeleton";
+        return this.hasCustomName() ? this.getNameTag() : "Wither Skeleton";
     }
 
     @Override
