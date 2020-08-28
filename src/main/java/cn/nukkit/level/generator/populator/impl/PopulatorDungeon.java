@@ -118,7 +118,7 @@ public class PopulatorDungeon extends Populator {
                                 level.setBlockAt(tx, y, tz, CHEST, 2);
                                 Vector3 vec = new Vector3(tx, y, tz);
                                 FullChunk ck = level.getChunk(vec.getChunkX(), vec.getChunkZ());
-                                BlockEntityChest be = new BlockEntityChest(ck, BlockEntity.getDefaultCompound(vec, BlockEntity.CHEST));
+                                BlockEntityChest be = (BlockEntityChest) BlockEntity.createBlockEntity(BlockEntity.CHEST, ck, BlockEntity.getDefaultCompound(vec, BlockEntity.CHEST));
                                 be.getInventory().setContents(getChestLoot(be.getInventory().getSize()));
                                 ck.addBlockEntity(be);
                                 break;

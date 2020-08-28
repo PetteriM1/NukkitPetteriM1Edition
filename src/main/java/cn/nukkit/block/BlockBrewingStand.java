@@ -90,8 +90,7 @@ public class BlockBrewingStand extends BlockSolidMeta {
                 }
             }
 
-            new BlockEntityBrewingStand(getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
-
+            BlockEntity.createBlockEntity(BlockEntity.BREWING_STAND, this.getChunk(), nbt);
             return true;
         }
         return false;
@@ -111,7 +110,7 @@ public class BlockBrewingStand extends BlockSolidMeta {
                         .putInt("x", (int) this.x)
                         .putInt("y", (int) this.y)
                         .putInt("z", (int) this.z);
-                brewing = new BlockEntityBrewingStand(this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+                brewing = (BlockEntityBrewingStand) BlockEntity.createBlockEntity(BlockEntity.BREWING_STAND, this.getChunk(), nbt);
             }
 
             if (brewing.namedTag.contains("Lock") && brewing.namedTag.get("Lock") instanceof StringTag) {

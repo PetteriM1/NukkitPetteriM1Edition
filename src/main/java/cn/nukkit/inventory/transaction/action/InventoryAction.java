@@ -19,7 +19,7 @@ public abstract class InventoryAction {
         this.sourceItem = sourceItem;
         this.targetItem = targetItem;
 
-        this.creationTime = System.currentTimeMillis();
+        //this.creationTime = System.currentTimeMillis();
     }
 
     public long getCreationTime() {
