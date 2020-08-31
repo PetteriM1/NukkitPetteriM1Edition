@@ -1405,7 +1405,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             this.inEndPortalTicks = 0;
         }
-        
+
         if (server.endEnabled && inEndPortalTicks == 1) {
             EntityPortalEnterEvent ev = new EntityPortalEnterEvent(this, EntityPortalEnterEvent.PortalType.END);
             this.getServer().getPluginManager().callEvent(ev);
@@ -1773,7 +1773,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.isAlive() && this.spawned) {
             //++this.deadTicks;
             //if (this.deadTicks >= 10) {
-                this.despawnFromAll(); // HACK: fix "dead" players
+            this.despawnFromAll(); // HACK: fix "dead" players
             //}
             return true;
         }
@@ -2086,7 +2086,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         nbt.putLong("lastPlayed", System.currentTimeMillis() / 1000);
-        
+
         UUID uuid = getUniqueId();
         nbt.putLong("UUIDLeast", uuid.getLeastSignificantBits());
         nbt.putLong("UUIDMost", uuid.getMostSignificantBits());
@@ -3131,21 +3131,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(this, mapItem));
 
                         if (!event.isCancelled()) {
-				            try {
+                            try {
                                 BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-					            Graphics2D graphics = image.createGraphics();
+                                Graphics2D graphics = image.createGraphics();
 
-					            for (int x = 0; x < 128; x++) {
-						            for (int y = 0; y < 128; y++) {
-							            graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
-							            graphics.fillRect(x, y, x, y);
-						            }
+                                for (int x = 0; x < 128; x++) {
+                                    for (int y = 0; y < 128; y++) {
+                                        graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
+                                        graphics.fillRect(x, y, x, y);
+                                    }
                                 }
 
                                 ((ItemMap) mapItem).setImage(image);
                                 ((ItemMap) mapItem).sendImage(this);
-				            } catch (Exception ex) {
-				                this.getServer().getLogger().debug("There was an error while generating map image", ex);
+                            } catch (Exception ex) {
+                                this.getServer().getLogger().debug("There was an error while generating map image", ex);
                             }
                         }
                     }
@@ -3172,13 +3172,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     List<InventoryAction> actions = new ArrayList<>();
                     for (NetworkInventoryAction networkInventoryAction : transactionPacket.actions) {
                         InventoryAction a = networkInventoryAction.createInventoryAction(this);
-    
+
                         if (a == null) {
                             this.getServer().getLogger().debug("Unmatched inventory action from " + this.username + ": " + networkInventoryAction);
                             this.sendAllInventories();
                             break packetswitch;
                         }
-    
+
                         actions.add(a);
                     }
 
@@ -3494,6 +3494,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
                                     if ((target instanceof Player) && !this.level.getGameRules().getBoolean(GameRule.PVP)) {
                                         entityDamageByEntityEvent.setCancelled();
+                                    }
+
+                                    if (!entityDamageByEntityEvent.isCancelled() && this.isBlocking()) {
+                                        this.setBlocking(false);
                                     }
 
                                     if (!target.attack(entityDamageByEntityEvent)) {
@@ -5423,30 +5427,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     public void startFishing(Item fishingRod) {
         CompoundTag nbt = new CompoundTag()
-				.putList(new ListTag<DoubleTag>("Pos")
-						.add(new DoubleTag("", x))
-						.add(new DoubleTag("", y + this.getEyeHeight()))
-						.add(new DoubleTag("", z)))
-				.putList(new ListTag<DoubleTag>("Motion")
-						.add(new DoubleTag("", -Math.sin(yaw / 180 + Math.PI) * Math.cos(pitch / 180 * Math.PI)))
-						.add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
-						.add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
-				.putList(new ListTag<FloatTag>("Rotation")
-						.add(new FloatTag("", (float) yaw))
-						.add(new FloatTag("", (float) pitch)));
-		double f = 1.1;
-		EntityFishingHook fishingHook = new EntityFishingHook(chunk, nbt, this);
-		fishingHook.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                .putList(new ListTag<DoubleTag>("Pos")
+                        .add(new DoubleTag("", x))
+                        .add(new DoubleTag("", y + this.getEyeHeight()))
+                        .add(new DoubleTag("", z)))
+                .putList(new ListTag<DoubleTag>("Motion")
+                        .add(new DoubleTag("", -Math.sin(yaw / 180 + Math.PI) * Math.cos(pitch / 180 * Math.PI)))
+                        .add(new DoubleTag("", -Math.sin(pitch / 180 * Math.PI)))
+                        .add(new DoubleTag("", Math.cos(yaw / 180 * Math.PI) * Math.cos(pitch / 180 * Math.PI))))
+                .putList(new ListTag<FloatTag>("Rotation")
+                        .add(new FloatTag("", (float) yaw))
+                        .add(new FloatTag("", (float) pitch)));
+        double f = 1.1;
+        EntityFishingHook fishingHook = new EntityFishingHook(chunk, nbt, this);
+        fishingHook.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
                 Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
-		ProjectileLaunchEvent ev = new ProjectileLaunchEvent(fishingHook);
-		this.getServer().getPluginManager().callEvent(ev);
-		if (ev.isCancelled()) {
-			fishingHook.close();
-		} else {
-			fishingHook.spawnToAll();
+        ProjectileLaunchEvent ev = new ProjectileLaunchEvent(fishingHook);
+        this.getServer().getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            fishingHook.close();
+        } else {
+            fishingHook.spawnToAll();
             this.fishing = fishingHook;
             fishingHook.rod = fishingRod;
-		}
+        }
     }
 
     /**
