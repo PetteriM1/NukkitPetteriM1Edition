@@ -260,7 +260,10 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
             source.setCancelled(true);
         }
 
-        super.attack(source);
+        boolean hasUpdate = super.attack(source);
+        if (!hasUpdate){
+            return false;
+        }
 
         if (!source.isCancelled()) {
             this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
@@ -268,30 +271,27 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
             this.vibrateTimer = 20;
 
             if (source instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) source;
-                Entity damager = entityDamageByEntityEvent.getDamager();
-                if (damager instanceof Player) {
-                    Player damagerPlayer = (Player) damager;
-                    if (damagerPlayer.isCreative()) {
+                EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) source;
+                if (event.getDamager() instanceof Player){
+                    Player player = (Player) event.getDamager();
+                    if (player.isCreative()) {
                         this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
                         this.close();
                         return true;
-                    } else {
-                        if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-                            this.level.dropItem(this, new ItemArmorStand());
-                            this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-                            this.equipmentInventory.clearAll();
-                            this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-                            this.armorInventory.clearAll();
-                        }
+                    }
+
+                    if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                        this.level.dropItem(this, new ItemArmorStand());
+                        this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                        this.equipmentInventory.clearAll();
+                        this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                        this.armorInventory.clearAll();
                     }
                 }
             }
-
             this.close();
         }
-
-        return false;
+        return true;
     }
 
     @Override
