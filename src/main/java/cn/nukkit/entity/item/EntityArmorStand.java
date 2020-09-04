@@ -45,26 +45,26 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 	}
 
 	@Override
-    protected float getGravity() {
-        return 0.04f;
-    }
+	protected float getGravity() {
+		return 0.04f;
+	}
 
 	@Override
-    public float getHeight() {
-        return 1.975f;
-    }
+	public float getHeight() {
+		return 1.975f;
+	}
 
-    @Override
-    public float getWidth() {
-        return 0.5f;
-    }
+	@Override
+	public float getWidth() {
+		return 0.5f;
+	}
 
 	public EntityArmorStand(FullChunk chunk, CompoundTag nbt) {
 		super(chunk, nbt);
 
 		if (nbt.contains(TAG_POSE_INDEX)) {
-            this.setPose(nbt.getInt(TAG_POSE_INDEX));
-        }
+			this.setPose(nbt.getInt(TAG_POSE_INDEX));
+		}
 	}
 
 	@Override
@@ -244,27 +244,6 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 	@Override
 	public boolean attack(EntityDamageEvent source) {
-		if (source instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) source;
-			Entity damager = entityDamageByEntityEvent.getDamager();
-			if (damager instanceof Player) {
-				Player damagerPlayer = (Player) damager;
-				if (damagerPlayer.isCreative()) {
-					this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
-					this.close();
-					return true;
-				} else {
-					if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-						this.level.dropItem(this, new ItemArmorStand());
-						this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-						this.equipmentInventory.clearAll();
-						this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-						this.armorInventory.clearAll();
-					}
-				}
-			}
-		}
-
 		if (source.getCause() == EntityDamageEvent.DamageCause.CONTACT) {
 			source.setCancelled(true);
 		}
@@ -275,6 +254,28 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 			this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
 			this.setGenericFlag(Entity.DATA_FLAG_VIBRATING, true);
 			this.vibrateTimer = 20;
+
+			if (source instanceof EntityDamageByEntityEvent) {
+				EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) source;
+				Entity damager = entityDamageByEntityEvent.getDamager();
+				if (damager instanceof Player) {
+					Player damagerPlayer = (Player) damager;
+					if (damagerPlayer.isCreative()) {
+						this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
+						this.close();
+						return true;
+					} else {
+						if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+							this.level.dropItem(this, new ItemArmorStand());
+							this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+							this.equipmentInventory.clearAll();
+							this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+							this.armorInventory.clearAll();
+						}
+					}
+				}
+			}
+
 			this.close();
 		}
 
