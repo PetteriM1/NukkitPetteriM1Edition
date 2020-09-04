@@ -12,7 +12,10 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
+import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTotem;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Location;
@@ -859,7 +862,7 @@ public abstract class Entity extends Location implements Metadatable {
         shortNames.put(clazz.getSimpleName(), name);
         return true;
     }
-    
+
     public static CompoundTag getDefaultNBT(Vector3 pos) {
         return getDefaultNBT(pos, null);
     }
@@ -1112,7 +1115,34 @@ public abstract class Entity extends Location implements Metadatable {
             this.setAbsorption(Math.max(0, this.absorption + source.getDamage(EntityDamageEvent.DamageModifier.ABSORPTION)));
         }
         setLastDamageCause(source);
-        setHealth(health - source.getFinalDamage());
+        float newHealth = health - source.getFinalDamage();
+        if (newHealth < 1 && this.isPlayer) {
+            if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.SUICIDE) {
+                Player p = (Player) this;
+                Inventory inventory = p.getOffhandInventory();
+                Item totem = Item.get(Item.TOTEM, 0, 1);
+                if (inventory.contains(totem) || ((PlayerInventory) (inventory = p.getInventory())).getItemInHand() instanceof ItemTotem) {
+                    inventory.removeItem(totem);
+                    this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
+                    this.extinguish();
+                    this.removeAllEffects();
+                    this.setHealth(1);
+
+                    this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(1));
+                    this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800).setAmplifier(1));
+                    this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(1));
+
+                    EntityEventPacket pk = new EntityEventPacket();
+                    pk.eid = this.getId();
+                    pk.event = EntityEventPacket.CONSUME_TOTEM;
+                    p.dataPacket(pk);
+
+                    source.setCancelled(true);
+                    return false;
+                }
+            }
+        }
+        setHealth(newHealth);
         return true;
     }
 
@@ -1139,7 +1169,7 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean isAlive() {
         return this.health > 0;
     }
-    
+
     public boolean isClosed() {
         return closed;
     }
