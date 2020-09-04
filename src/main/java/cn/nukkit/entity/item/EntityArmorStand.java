@@ -244,40 +244,41 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
 
 	@Override
 	public boolean attack(EntityDamageEvent source) {
-		if (source instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent entityDamageByEntityEvent = (EntityDamageByEntityEvent) source;
-			Entity damager = entityDamageByEntityEvent.getDamager();
-			if (damager instanceof Player) {
-				Player damagerPlayer = (Player) damager;
-				if (damagerPlayer.isCreative()) {
-					this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
-					this.close();
-					return true;
-				} else {
-					if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-						this.level.dropItem(this, new ItemArmorStand());
-						this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-						this.equipmentInventory.clearAll();
-						this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-						this.armorInventory.clearAll();
-					}
-				}
-			}
-		}
-
 		if (source.getCause() == EntityDamageEvent.DamageCause.CONTACT) {
 			source.setCancelled(true);
 		}
 
 		super.attack(source);
+		if (source.isCancelled()) {
+			return false;
+		}
+		
+		if (source instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) source;
+			if (!(event.getDamager() instanceof Player)) {
+				return false;
+			}
 
-		if (!source.isCancelled()) {
+			Player player = (Player) event.getDamager();
+			if (player.isCreative()) {
+				this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
+				this.close();
+				return true;
+			} else {
+				if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+					this.level.dropItem(this, new ItemArmorStand());
+					this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+					this.equipmentInventory.clearAll();
+					this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+					this.armorInventory.clearAll();
+				}
+			}
+		}else {
 			this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
 			this.setGenericFlag(Entity.DATA_FLAG_VIBRATING, true);
 			this.vibrateTimer = 20;
 			this.close();
 		}
-
 		return false;
 	}
 
