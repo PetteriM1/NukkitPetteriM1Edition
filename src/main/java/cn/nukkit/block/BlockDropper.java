@@ -197,8 +197,8 @@ public class BlockDropper extends BlockSolidMeta implements Faceable {
     public int getComparatorInputOverride() {
         BlockEntity blockEntity = this.level.getBlockEntity(this);
 
-        if (blockEntity instanceof BlockEntityDispenser) {
-            return ContainerInventory.calculateRedstone(((BlockEntityDispenser) blockEntity).getInventory());
+        if (blockEntity instanceof BlockEntityDropper) {
+            return ContainerInventory.calculateRedstone(((BlockEntityDropper) blockEntity).getInventory());
         }
 
         return 0;
