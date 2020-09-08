@@ -1765,7 +1765,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.failedTransactions = 0;
 
         if (this.fishing != null && this.server.getTick() % 20 == 0) {
-            if (this.distance(fishing) > 33) {
+            if (this.distanceSquared(fishing) > 1089) { // 33 blocks
                 this.stopFishing(false);
             }
         }

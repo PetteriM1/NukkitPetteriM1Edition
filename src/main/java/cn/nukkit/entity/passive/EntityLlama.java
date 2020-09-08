@@ -69,7 +69,7 @@ public class EntityLlama extends EntityHorseBase {
 
                 this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
                     if (this.isAlive()) {
-                        if (this.distance(damager) < 10) {
+                        if (this.distanceSquared(damager) < 100) {
                             this.moveTime = 0;
                             this.stayTime = 100;
 

@@ -77,7 +77,7 @@ public class End extends Generator {
                 chunk.setBiomeId(x, z, EnumBiome.END.biome.getId());
 
                 for (int y = 12; y < 64; ++y) {
-                    double noiseValue = (Math.abs(64 - y) >> 6) - noise[x][z][y];
+                    double noiseValue = 0 - noise[x][z][y];
                     noiseValue -= 0.5;
 
                     double distance = new Vector3(0, 64, 0).distance(new Vector3((chunkX << 4) + x, y / 1.3, (chunkZ << 4) + z));
