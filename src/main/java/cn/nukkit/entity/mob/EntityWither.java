@@ -165,6 +165,10 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     @Override
     public void kill() {
+        if (!this.isAlive()) {
+            return;
+        }
+
         if (this.lastDamageCause != null && EntityDamageEvent.DamageCause.SUICIDE != this.lastDamageCause.getCause()) {
             this.explode();
         }

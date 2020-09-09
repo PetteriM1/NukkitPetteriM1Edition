@@ -256,6 +256,10 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
 
     @Override
     public void kill() {
+        if (!this.isAlive()) {
+            return;
+        }
+
         super.kill();
 
         if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {

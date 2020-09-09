@@ -406,6 +406,10 @@ public class EntityBoat extends EntityVehicle {
 
     @Override
     public void kill() {
+        if (!this.isAlive()) {
+            return;
+        }
+
         super.kill();
 
         if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
