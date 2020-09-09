@@ -28,9 +28,9 @@ public class DebugCommand extends VanillaCommand {
         }
 
         Nukkit.DEBUG = args[0].equals("off")? 1 : args[0].equals("censored")?  2 : 3;
-        if (Nukkit.DEBUG > 1){
+        if (Nukkit.DEBUG > 1) {
             sender.sendMessage("§eDebug was enabled!");
-        }else {
+        } else {
             sender.sendMessage("§eDebug was disabled!");
         }
 
