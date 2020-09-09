@@ -92,7 +92,6 @@ public class SpawnerTask implements Runnable {
             EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
             this.mobSpawners.put(clazz, spawner);
         }catch (Exception e){
-            System.out.println("Woopsie!");
             return false;
         }
         return true;
