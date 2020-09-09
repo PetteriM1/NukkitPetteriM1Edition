@@ -22,7 +22,7 @@ public class SpawnerTask implements Runnable {
     private final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
     private final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
 
-    public SpawnerTask(){
+    public SpawnerTask() {
         this.registerAnimalSpawner(ChickenSpawner.class);
         this.registerAnimalSpawner(CowSpawner.class);
         this.registerAnimalSpawner(DolphinSpawner.class);
@@ -61,47 +61,49 @@ public class SpawnerTask implements Runnable {
         this.registerMobSpawner(DrownedSpawner.class);
     }
 
-    public boolean registerAnimalSpawner(Class<?> clazz){
-        if (this.animalSpawners.containsKey(clazz)){
+    public boolean registerAnimalSpawner(Class<?> clazz) {
+        if (this.animalSpawners.containsKey(clazz)) {
             return false;
         }
 
         try {
             EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
             this.animalSpawners.put(clazz, spawner);
-        }catch (Exception e){
+        }catch (Exception e) {
+            Server.getInstance().getLogger().error("Can not create spawn task for class "+clazz.getSimpleName()+"!", e);
             return false;
         }
         return true;
     }
 
-    public EntitySpawner getAnimalSpawner(Class<?> clazz){
+    public EntitySpawner getAnimalSpawner(Class<?> clazz) {
         return this.animalSpawners.get(clazz);
     }
 
-    public boolean unregisterAnimalSpawner(Class<?> clazz){
+    public boolean unregisterAnimalSpawner(Class<?> clazz) {
         return this.animalSpawners.remove(clazz) != null;
     }
 
-    public boolean registerMobSpawner(Class<?> clazz){
-        if (this.mobSpawners.containsKey(clazz)){
+    public boolean registerMobSpawner(Class<?> clazz) {
+        if (this.mobSpawners.containsKey(clazz)) {
             return false;
         }
 
         try {
             EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
             this.mobSpawners.put(clazz, spawner);
-        }catch (Exception e){
+        }catch (Exception e) {
+            Server.getInstance().getLogger().error("Can not create spawn task for class "+clazz.getSimpleName()+"!", e);
             return false;
         }
         return true;
     }
 
-    public EntitySpawner getMobSpawner(Class<?> clazz){
+    public EntitySpawner getMobSpawner(Class<?> clazz) {
         return this.mobSpawners.get(clazz);
     }
 
-    public boolean unregisterMobSpawner(Class<?> clazz){
+    public boolean unregisterMobSpawner(Class<?> clazz) {
         return this.mobSpawners.remove(clazz) != null;
     }
 
