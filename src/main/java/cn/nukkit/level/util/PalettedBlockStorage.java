@@ -18,7 +18,7 @@ public class PalettedBlockStorage {
     }
 
     public PalettedBlockStorage(BitArrayVersion version) {
-        this.bitArray = version.createPalette(SIZE);
+        this.bitArray = version.createPalette();
         this.palette = new IntArrayList(16);
         this.palette.add(0); // Air is at the start of every palette.
     }
@@ -26,6 +26,10 @@ public class PalettedBlockStorage {
     private PalettedBlockStorage(BitArray bitArray, IntList palette) {
         this.palette = palette;
         this.bitArray = bitArray;
+    }
+
+    private int getPaletteHeader(BitArrayVersion version) {
+        return (version.getId() << 1) | 1;
     }
 
     private int getPaletteHeader(BitArrayVersion version, boolean runtime) {
@@ -42,7 +46,7 @@ public class PalettedBlockStorage {
     }
 
     public void writeTo(int protocol, BinaryStream stream) {
-        stream.putByte((byte) getPaletteHeader(bitArray.getVersion(), true));
+        stream.putByte((byte) getPaletteHeader(bitArray.getVersion()));
 
         for (int word : bitArray.getWords()) {
             stream.putLInt(word);
@@ -53,7 +57,7 @@ public class PalettedBlockStorage {
     }
 
     private void onResize(BitArrayVersion version) {
-        BitArray newBitArray = version.createPalette(SIZE);
+        BitArray newBitArray = version.createPalette();
 
         for (int i = 0; i < SIZE; i++) {
             newBitArray.set(i, this.bitArray.get(i));

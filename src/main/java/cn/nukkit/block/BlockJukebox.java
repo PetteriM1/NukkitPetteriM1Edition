@@ -81,7 +81,7 @@ public class BlockJukebox extends BlockSolid {
         return false;
     }
 
-    @Override
+    /*@Override // Replaced with BlockEntityJukebox#onBreak
     public boolean onBreak(Item item) {
         if (super.onBreak(item)) {
             BlockEntity blockEntity = this.level.getBlockEntity(this);
@@ -93,7 +93,7 @@ public class BlockJukebox extends BlockSolid {
         }
 
         return false;
-    }
+    }*/
 
     private BlockEntity createBlockEntity() {
         CompoundTag nbt = new CompoundTag()
