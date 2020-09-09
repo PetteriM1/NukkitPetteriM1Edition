@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntitySpider;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class SpiderSpawner extends AbstractEntitySpawner {
 
-    public SpiderSpawner(Spawner spawnTask) {
+    public SpiderSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

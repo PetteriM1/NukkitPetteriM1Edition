@@ -206,6 +206,8 @@ public class Server {
     private PlayerDataSerializer playerDataSerializer = new DefaultPlayerDataSerializer(this);
     public static List<String> noTickingWorlds = new ArrayList<>();
 
+    private SpawnerTask spawnerTask;
+
     /* Some settings */
     private String motd;
     private String ip;
@@ -505,7 +507,8 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            this.scheduler.scheduleDelayedRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            this.spawnerTask = new SpawnerTask();
+            this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
 
         // Check for updates
@@ -2374,6 +2377,10 @@ public class Server {
      */
     public boolean suomiCraftPEMode() {
         return suomicraftMode;
+    }
+
+    public SpawnerTask getSpawnerTask() {
+        return this.spawnerTask;
     }
 
     /**

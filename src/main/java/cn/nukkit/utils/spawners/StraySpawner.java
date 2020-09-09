@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntityStray;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class StraySpawner extends AbstractEntitySpawner {
 
-    public StraySpawner(Spawner spawnTask) {
+    public StraySpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

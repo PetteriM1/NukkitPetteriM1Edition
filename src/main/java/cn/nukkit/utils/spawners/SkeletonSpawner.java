@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntitySkeleton;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class SkeletonSpawner extends AbstractEntitySpawner {
 
-    public SkeletonSpawner(Spawner spawnTask) {
+    public SkeletonSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

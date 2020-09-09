@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntitySlime;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class SlimeSpawner extends AbstractEntitySpawner {
 
-    public SlimeSpawner(Spawner spawnTask) {
+    public SlimeSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

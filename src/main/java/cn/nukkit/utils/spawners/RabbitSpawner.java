@@ -6,12 +6,12 @@ import cn.nukkit.entity.passive.EntityRabbit;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 import cn.nukkit.utils.Utils;
 
 public class RabbitSpawner extends AbstractEntitySpawner {
 
-    public RabbitSpawner(Spawner spawnTask) {
+    public RabbitSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

@@ -7,11 +7,11 @@ import cn.nukkit.entity.passive.EntityDolphin;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class DolphinSpawner extends AbstractEntitySpawner {
 
-    public DolphinSpawner(Spawner spawnTask) {
+    public DolphinSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 
