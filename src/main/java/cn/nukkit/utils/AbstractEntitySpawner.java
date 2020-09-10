@@ -8,9 +8,9 @@ import cn.nukkit.level.Position;
 
 public abstract class AbstractEntitySpawner implements EntitySpawner {
 
-    protected Spawner spawnTask;
+    protected SpawnerTask spawnTask;
 
-    public AbstractEntitySpawner(Spawner spawnTask) {
+    public AbstractEntitySpawner(SpawnerTask spawnTask) {
         this.spawnTask = spawnTask;
     }
 
@@ -28,18 +28,18 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     private void spawnTo(Player player) {
         Level level = player.getLevel();
 
-        if (Spawner.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
+        if (SpawnerTask.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
             Position pos = player.getPosition();
 
             if (pos != null) {
-                pos.x += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
-                pos.z += Spawner.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
+                pos.x += SpawnerTask.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
+                pos.z += SpawnerTask.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
 
                 if (!level.isChunkLoaded((int) pos.x >> 4, (int) pos.z >> 4) || !level.isChunkGenerated((int) pos.x >> 4, (int) pos.z >> 4)) {
                     return;
                 }
 
-                pos.y = Spawner.getSafeYCoord(level, pos);
+                pos.y = SpawnerTask.getSafeYCoord(level, pos);
 
                 if (!level.isInSpawnRadius(pos)) { // Do not spawn mobs in the world spawn area
                     try {

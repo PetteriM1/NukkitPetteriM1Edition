@@ -78,7 +78,7 @@ public class EntityElderGuardian extends EntitySwimmingMob {
 
     @Override
     public String getName() {
-        return "Elder Guardian";
+        return this.hasCustomName() ? this.getNameTag() : "Elder Guardian";
     }
 
     @Override

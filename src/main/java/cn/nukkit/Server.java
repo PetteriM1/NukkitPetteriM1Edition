@@ -206,6 +206,8 @@ public class Server {
     private PlayerDataSerializer playerDataSerializer = new DefaultPlayerDataSerializer(this);
     public static List<String> noTickingWorlds = new ArrayList<>();
 
+    private SpawnerTask spawnerTask;
+
     /* Some settings */
     private String motd;
     private String ip;
@@ -506,7 +508,8 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
-            this.scheduler.scheduleDelayedRepeatingTask(new Spawner(), this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            this.spawnerTask = new SpawnerTask();
+            this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
         }
 
         // Check for updates
@@ -2381,6 +2384,10 @@ public class Server {
         return suomicraftMode;
     }
 
+    public SpawnerTask getSpawnerTask() {
+        return this.spawnerTask;
+    }
+
     /**
      * Load some settings from server.properties
      */
@@ -2391,7 +2398,7 @@ public class Server {
         this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
         this.mobAI = this.getPropertyBoolean("mob-ai", true);
         this.netherEnabled = this.getPropertyBoolean("nether", true);
-        this.endEnabled = this.getPropertyBoolean("end", true);
+        this.endEnabled = this.getPropertyBoolean("end", false);
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
         this.achievements = this.getPropertyBoolean("achievements", true);
@@ -2526,7 +2533,7 @@ public class Server {
             put("thread-watchdog", true);
             put("thread-watchdog-tick", 50000);
             put("nether", true);
-            put("end", true);
+            put("end", false);
             put("suomicraft-mode", false);
             put("do-not-tick-worlds", "");
             put("load-all-worlds", true);

@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntityMagmaCube;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class MagmaCubeSpawner extends AbstractEntitySpawner {
 
-    public MagmaCubeSpawner(Spawner spawnTask) {
+    public MagmaCubeSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

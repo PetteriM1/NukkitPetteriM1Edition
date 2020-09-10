@@ -7,11 +7,11 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Utils;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class EndermanSpawner extends AbstractEntitySpawner {
 
-    public EndermanSpawner(Spawner spawnTask) {
+    public EndermanSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 
@@ -20,7 +20,9 @@ public class EndermanSpawner extends AbstractEntitySpawner {
             return;
         }
 
-        if ((pos.y > 255 || (level.isNether && pos.y > 127)) || pos.y < 1) {
+        final int biomeId = level.getBiomeId((int) pos.x, (int) pos.z);
+
+        if ((pos.y > 255 || (level.isNether && pos.y > 127)) || pos.y < 1 || biomeId == 14 || biomeId == 15) {
         } else if (Block.transparent[level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z)]) {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7 && !level.isNether && !level.isEnd) {
         } else if (level.isMobSpawningAllowedByTime() || level.isNether || level.isEnd) {

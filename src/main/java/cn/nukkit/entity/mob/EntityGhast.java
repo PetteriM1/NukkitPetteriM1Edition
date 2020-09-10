@@ -65,7 +65,7 @@ public class EntityGhast extends EntityFlyingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 60 && Utils.rand(1, 32) < 4 && this.distance(player) <= 100) {
+        if (this.attackDelay > 60 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 10000) {
             this.attackDelay = 0;
 
             double f = 1;

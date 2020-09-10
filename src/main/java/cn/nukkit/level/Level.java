@@ -1936,7 +1936,7 @@ public class Level implements ChunkManager, Metadatable {
             if (motion == null) {
                 if (dropAround) {
                     float f = ThreadLocalRandom.current().nextFloat() * 0.5f;
-                    float f1 = ThreadLocalRandom.current().nextFloat() * (6.2831855f);
+                    float f1 = ThreadLocalRandom.current().nextFloat() * 6.2831855f;
 
                     motion = new Vector3(-MathHelper.sin(f1) * f, 0.20000000298023224, MathHelper.cos(f1) * f);
                 } else {
@@ -1965,6 +1965,59 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
+    public EntityItem dropAndGetItem(Vector3 source, Item item) {
+        return this.dropAndGetItem(source, item, null);
+    }
+
+    public EntityItem dropAndGetItem(Vector3 source, Item item, Vector3 motion) {
+        return this.dropAndGetItem(source, item, motion, 10);
+    }
+
+    public EntityItem dropAndGetItem(Vector3 source, Item item, Vector3 motion, int delay) {
+        return this.dropAndGetItem(source, item, motion, false, delay);
+    }
+
+    public EntityItem dropAndGetItem(Vector3 source, Item item, Vector3 motion, boolean dropAround, int delay) {
+        EntityItem itemEntity = null;
+
+        if (motion == null) {
+            if (dropAround) {
+                float f = ThreadLocalRandom.current().nextFloat() * 0.5f;
+                float f1 = ThreadLocalRandom.current().nextFloat() * 6.2831855f;
+
+                motion = new Vector3(-MathHelper.sin(f1) * f, 0.20000000298023224, MathHelper.cos(f1) * f);
+            } else {
+                motion = new Vector3(Utils.random.nextDouble() * 0.2 - 0.1, 0.2,
+                        Utils.random.nextDouble() * 0.2 - 0.1);
+            }
+        }
+
+        CompoundTag itemTag = NBTIO.putItemHelper(item);
+        itemTag.setName("Item");
+
+        if (item.getId() > 0 && item.getCount() > 0) {
+            itemEntity = (EntityItem) Entity.createEntity("Item",
+                    this.getChunk((int) source.getX() >> 4, (int) source.getZ() >> 4, true),
+                    new CompoundTag().putList(new ListTag<DoubleTag>("Pos").add(new DoubleTag("", source.getX()))
+                            .add(new DoubleTag("", source.getY())).add(new DoubleTag("", source.getZ())))
+
+                            .putList(new ListTag<DoubleTag>("Motion").add(new DoubleTag("", motion.x))
+                                    .add(new DoubleTag("", motion.y)).add(new DoubleTag("", motion.z)))
+
+                            .putList(new ListTag<FloatTag>("Rotation")
+                                    .add(new FloatTag("", ThreadLocalRandom.current().nextFloat() * 360))
+                                    .add(new FloatTag("", 0)))
+
+                            .putShort("Health", 5).putCompound("Item", itemTag).putShort("PickupDelay", delay));
+
+            if (itemEntity != null) {
+                itemEntity.spawnToAll();
+            }
+        }
+
+        return itemEntity;
+    }
+
     public Item useBreakOn(Vector3 vector) {
         return this.useBreakOn(vector, null);
     }
@@ -1981,7 +2034,6 @@ public class Level implements ChunkManager, Metadatable {
         return useBreakOn(vector, null, item, player, createParticles);
     }
 
-    @SuppressWarnings("unchecked")
     public Item useBreakOn(Vector3 vector, BlockFace face, Item item, Player player, boolean createParticles) {
         if (player != null && player.getGamemode() > Player.ADVENTURE) {
             return null;
@@ -2001,7 +2053,7 @@ public class Level implements ChunkManager, Metadatable {
                 Tag tag = item.getNamedTagEntry("CanDestroy");
                 boolean canBreak = false;
                 if (tag instanceof ListTag) {
-                    for (Tag v : ((ListTag<Tag>) tag).getAll()) {
+                    for (Tag v : ((ListTag<? extends Tag>) tag).getAll()) {
                         if (v instanceof StringTag) {
                             Item entry = Item.fromString(((StringTag) v).data);
                             if (entry.getId() > 0 && entry.getBlock() != null && entry.getBlock().getId() == target.getId()) {

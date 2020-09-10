@@ -158,22 +158,18 @@ public class CraftingDataPacket extends DataPacket {
             }
 
             if (protocol >= 388) {
-                if (protocol >= 407) { //TODO
-                    this.putUnsignedVarInt(0);
-                } else {
-                    this.putUnsignedVarInt(this.brewingEntries.size());
-                    for (BrewingRecipe recipe : brewingEntries) {
-                        if (protocol >= 407) {
-                            this.putVarInt(0/*recipe.getInputPotionId()*/);
-                        }
-                        this.putVarInt(recipe.getInput().getDamage());
-                        this.putVarInt(recipe.getIngredient().getId());
-                        if (protocol >= 407) {
-                            this.putVarInt(0/*recipe.getIngredientItemType()*/);
-                            this.putVarInt(0/*recipe.getOutputPotionId()*/);
-                        }
-                        this.putVarInt(recipe.getResult().getDamage());
+                this.putUnsignedVarInt(this.brewingEntries.size());
+                for (BrewingRecipe recipe : brewingEntries) {
+                    if (protocol >= 407) {
+                        this.putVarInt(recipe.getInput().getId());
                     }
+                    this.putVarInt(recipe.getInput().getDamage());
+                    this.putVarInt(recipe.getIngredient().getId());
+                    if (protocol >= 407) {
+                        this.putVarInt(recipe.getIngredient().getDamage());
+                        this.putVarInt(recipe.getResult().getId());
+                    }
+                    this.putVarInt(recipe.getResult().getDamage());
                 }
 
                 this.putUnsignedVarInt(this.containerEntries.size());

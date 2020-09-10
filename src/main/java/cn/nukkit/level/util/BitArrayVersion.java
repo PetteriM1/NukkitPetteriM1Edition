@@ -15,12 +15,14 @@ public enum BitArrayVersion {
     final byte entriesPerWord;
     final int maxEntryValue;
     final BitArrayVersion next;
+    final int wordsForSize;
 
     BitArrayVersion(int bits, int entriesPerWord, BitArrayVersion next) {
         this.bits = (byte) bits;
         this.entriesPerWord = (byte) entriesPerWord;
         this.maxEntryValue = (1 << this.bits) - 1;
         this.next = next;
+        this.wordsForSize = getWordsForSize(4096);
     }
 
     public static BitArrayVersion get(int version, boolean read) {
@@ -30,6 +32,10 @@ public enum BitArrayVersion {
             }
         }
         throw new IllegalArgumentException("Invalid palette version: " + version);
+    }
+
+    public BitArray createPalette() {
+        return this.createPalette(4096, new int[wordsForSize]);
     }
 
     public BitArray createPalette(int size) {

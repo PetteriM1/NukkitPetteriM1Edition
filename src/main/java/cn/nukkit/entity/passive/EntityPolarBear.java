@@ -139,7 +139,7 @@ public class EntityPolarBear extends EntityWalkingMob {
 
     @Override
     public String getName() {
-        return "Polar Bear";
+        return this.hasCustomName() ? this.getNameTag() : "Polar Bear";
     }
 
     @Override

@@ -40,6 +40,6 @@ public class EntityWanderingTrader extends EntityWalkingAnimal {
 
     @Override
     public String getName() {
-        return "Wandering Trader";
+        return this.hasCustomName() ? this.getNameTag() : "Wandering Trader";
     }
 }

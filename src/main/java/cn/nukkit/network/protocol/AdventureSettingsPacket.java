@@ -42,7 +42,7 @@ public class AdventureSettingsPacket extends DataPacket {
 
     public long commandPermission = PERMISSION_NORMAL;
 
-    public long flags2 = -1;
+    public long flags2 = 0;
 
     public long playerPermission = Player.PERMISSION_MEMBER;
 

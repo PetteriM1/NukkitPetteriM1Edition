@@ -99,7 +99,7 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
 
     @Override
     public String getName() {
-        return "Cave Spider";
+        return this.hasCustomName() ? this.getNameTag() : "Cave Spider";
     }
 
     @Override

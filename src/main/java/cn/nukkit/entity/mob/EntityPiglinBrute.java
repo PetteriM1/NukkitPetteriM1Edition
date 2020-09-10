@@ -73,4 +73,9 @@ public class EntityPiglinBrute extends EntityWalkingMob {
 
         return super.entityBaseTick(tickDiff);
     }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Piglin Brute";
+    }
 }
