@@ -14,63 +14,107 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.spawners.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Spawner implements Runnable {
+public class SpawnerTask implements Runnable {
 
-    private final List<EntitySpawner> animalSpawners = Arrays.asList(
-            new ChickenSpawner(this),
-            new CodSpawner(this),
-            new CowSpawner(this),
-            new DolphinSpawner(this),
-            new DonkeySpawner(this),
-            new HorseSpawner(this),
-            new MooshroomSpawner(this),
-            new OcelotSpawner(this),
-            new ParrotSpawner(this),
-            new PigSpawner(this),
-            new PolarBearSpawner(this),
-            new PufferfishSpawner(this),
-            new RabbitSpawner(this),
-            new SalmonSpawner(this),
-            new SheepSpawner(this),
-            new SquidSpawner(this),
-            new TropicalFishSpawner(this),
-            new TurtleSpawner(this),
-            new WolfSpawner(this),
-            new PandaSpawner(this),
-            new FoxSpawner(this)
-    );
+    private final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
+    private final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
 
-    private final List<EntitySpawner> mobSpawners = Arrays.asList(
-            new BlazeSpawner(this),
-            new CreeperSpawner(this),
-            new EndermanSpawner(this),
-            new GhastSpawner(this),
-            new HuskSpawner(this),
-            new MagmaCubeSpawner(this),
-            new SkeletonSpawner(this),
-            new SlimeSpawner(this),
-            new SpiderSpawner(this),
-            new StraySpawner(this),
-            new ZombieSpawner(this),
-            new ZombiePigmanSpawner(this),
-            new WitchSpawner(this),
-            new WitherSkeletonSpawner(this),
-            new DrownedSpawner(this)
-    );
+    public SpawnerTask() {
+        this.registerAnimalSpawner(ChickenSpawner.class);
+        this.registerAnimalSpawner(CowSpawner.class);
+        this.registerAnimalSpawner(DolphinSpawner.class);
+        this.registerAnimalSpawner(DonkeySpawner.class);
+        this.registerAnimalSpawner(HorseSpawner.class);
+        this.registerAnimalSpawner(MooshroomSpawner.class);
+        this.registerAnimalSpawner(OcelotSpawner.class);
+        this.registerAnimalSpawner(ParrotSpawner.class);
+        this.registerAnimalSpawner(PigSpawner.class);
+        this.registerAnimalSpawner(PolarBearSpawner.class);
+        this.registerAnimalSpawner(PufferfishSpawner.class);
+        this.registerAnimalSpawner(RabbitSpawner.class);
+        this.registerAnimalSpawner(SalmonSpawner.class);
+        this.registerAnimalSpawner(SheepSpawner.class);
+        this.registerAnimalSpawner(SquidSpawner.class);
+        this.registerAnimalSpawner(TropicalFishSpawner.class);
+        this.registerAnimalSpawner(TurtleSpawner.class);
+        this.registerAnimalSpawner(WolfSpawner.class);
+        this.registerAnimalSpawner(PandaSpawner.class);
+        this.registerAnimalSpawner(FoxSpawner.class);
+
+        this.registerMobSpawner(BlazeSpawner.class);
+        this.registerMobSpawner(CreeperSpawner.class);
+        this.registerMobSpawner(EndermanSpawner.class);
+        this.registerMobSpawner(GhastSpawner.class);
+        this.registerMobSpawner(HuskSpawner.class);
+        this.registerMobSpawner(MagmaCubeSpawner.class);
+        this.registerMobSpawner(SkeletonSpawner.class);
+        this.registerMobSpawner(SlimeSpawner.class);
+        this.registerMobSpawner(SpiderSpawner.class);
+        this.registerMobSpawner(StraySpawner.class);
+        this.registerMobSpawner(ZombieSpawner.class);
+        this.registerMobSpawner(ZombiePigmanSpawner.class);
+        this.registerMobSpawner(WitchSpawner.class);
+        this.registerMobSpawner(WitherSkeletonSpawner.class);
+        this.registerMobSpawner(DrownedSpawner.class);
+    }
+
+    public boolean registerAnimalSpawner(Class<?> clazz) {
+        if (this.animalSpawners.containsKey(clazz)) {
+            return false;
+        }
+
+        try {
+            EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
+            this.animalSpawners.put(clazz, spawner);
+        }catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public EntitySpawner getAnimalSpawner(Class<?> clazz) {
+        return this.animalSpawners.get(clazz);
+    }
+
+    public boolean unregisterAnimalSpawner(Class<?> clazz) {
+        return this.animalSpawners.remove(clazz) != null;
+    }
+
+    public boolean registerMobSpawner(Class<?> clazz) {
+        if (this.mobSpawners.containsKey(clazz)) {
+            return false;
+        }
+
+        try {
+            EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
+            this.mobSpawners.put(clazz, spawner);
+        }catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public EntitySpawner getMobSpawner(Class<?> clazz) {
+        return this.mobSpawners.get(clazz);
+    }
+
+    public boolean unregisterMobSpawner(Class<?> clazz) {
+        return this.mobSpawners.remove(clazz) != null;
+    }
 
     @Override
     public void run() {
         if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
             if (Server.getInstance().spawnAnimals) {
-                for (EntitySpawner spawner : animalSpawners) {
+                for (EntitySpawner spawner : animalSpawners.values()) {
                     spawner.spawn();
                 }
             }
             if (Server.getInstance().spawnMobs) {
-                for (EntitySpawner spawner : mobSpawners) {
+                for (EntitySpawner spawner : mobSpawners.values()) {
                     spawner.spawn();
                 }
             }

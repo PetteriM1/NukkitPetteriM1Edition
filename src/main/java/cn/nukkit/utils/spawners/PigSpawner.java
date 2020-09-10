@@ -8,11 +8,11 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Utils;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class PigSpawner extends AbstractEntitySpawner {
 
-    public PigSpawner(Spawner spawnTask) {
+    public PigSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

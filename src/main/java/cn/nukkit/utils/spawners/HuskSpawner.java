@@ -8,11 +8,11 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
 import cn.nukkit.utils.Utils;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class HuskSpawner extends AbstractEntitySpawner {
 
-    public HuskSpawner(Spawner spawnTask) {
+    public HuskSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

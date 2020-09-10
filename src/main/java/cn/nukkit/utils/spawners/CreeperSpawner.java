@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntityCreeper;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class CreeperSpawner extends AbstractEntitySpawner {
 
-    public CreeperSpawner(Spawner spawnTask) {
+    public CreeperSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

@@ -6,11 +6,11 @@ import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 
 public class DrownedSpawner extends AbstractEntitySpawner {
 
-    public DrownedSpawner(Spawner spawnTask) {
+    public DrownedSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 

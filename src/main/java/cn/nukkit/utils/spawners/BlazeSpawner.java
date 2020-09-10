@@ -5,12 +5,12 @@ import cn.nukkit.entity.mob.EntityBlaze;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.AbstractEntitySpawner;
-import cn.nukkit.utils.Spawner;
+import cn.nukkit.utils.SpawnerTask;
 import cn.nukkit.utils.Utils;
 
 public class BlazeSpawner extends AbstractEntitySpawner {
 
-    public BlazeSpawner(Spawner spawnTask) {
+    public BlazeSpawner(SpawnerTask spawnTask) {
         super(spawnTask);
     }
 
