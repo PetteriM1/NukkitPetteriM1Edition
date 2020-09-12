@@ -3,6 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.projectile.EntityLlamaSpit;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -63,9 +64,9 @@ public class EntityLlama extends EntityHorseBase {
         if (ev instanceof EntityDamageByEntityEvent) {
             Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
             if (damager instanceof Player) {
-                if (delay.get()) return true;
-                delay.set(true);
-                server.getScheduler().scheduleDelayedTask(() -> delay.compareAndSet(true, false), 40);
+                if (this.delay.get()) return true;
+                this.delay.set(true);
+                this.server.getScheduler().scheduleDelayedTask(() -> this.delay.compareAndSet(true, false), 40);
 
                 this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
                     if (this.isAlive()) {
@@ -109,7 +110,9 @@ public class EntityLlama extends EntityHorseBase {
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
-        if (creature instanceof Player) {
+        boolean canTarget = super.targetOption(creature, distance);
+
+        if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
             return player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.WHEAT && distance <= 40;
         }
