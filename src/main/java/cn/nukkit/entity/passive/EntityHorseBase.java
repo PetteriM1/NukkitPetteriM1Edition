@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.item.Item;
@@ -42,19 +43,19 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
         Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
 
         if (entity.riding != null) {
-            dismountEntity(entity);
+            this.dismountEntity(entity);
             entity.resetFallDistance();
         } else {
-            if (isPassenger(entity)) {
+            if (this.isPassenger(entity)) {
                 return false;
             }
 
-            broadcastLinkPacket(entity, TYPE_RIDE);
+            this.broadcastLinkPacket(entity, TYPE_RIDE);
 
             entity.riding = this;
             entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
             entity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, this instanceof EntityDonkey ? 2.1f : 2.3f, 0)));
-            passengers.add(entity);
+            this.passengers.add(entity);
         }
 
         return true;
@@ -62,12 +63,12 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
     @Override
     public boolean dismountEntity(Entity entity) {
-        broadcastLinkPacket(entity, TYPE_REMOVE);
+        this.broadcastLinkPacket(entity, TYPE_REMOVE);
         entity.riding = null;
         entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-        passengers.remove(entity);
+        this.passengers.remove(entity);
         entity.setSeatPosition(new Vector3f());
-        updatePassengerPosition(entity);
+        this.updatePassengerPosition(entity);
         return true;
     }
 
@@ -132,6 +133,11 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return this.passengers.isEmpty();
+    }
+
+    @Override
     public boolean canDespawn() {
         if (!this.getPassengers().isEmpty()) {
             return false;
@@ -148,11 +154,10 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
         for (Entity passenger : new ArrayList<>(this.passengers)) {
             if (!passenger.isAlive() || this.isInsideOfWater()) {
-                dismountEntity(passenger);
+                this.dismountEntity(passenger);
                 continue;
             }
-
-            updatePassengerPosition(passenger);
+            this.updatePassengerPosition(passenger);
         }
     }
 }
