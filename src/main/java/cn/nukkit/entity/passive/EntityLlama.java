@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EntityLlama extends EntityHorseBase {
 
     public static final int NETWORK_ID = 29;
+    public int variant;
 
     private AtomicBoolean delay = new AtomicBoolean();
 
@@ -51,10 +52,27 @@ public class EntityLlama extends EntityHorseBase {
     }
 
     @Override
+    public boolean canBeSaddled() {
+        return false;
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
-
         this.setMaxHealth(15);
+
+        if (this.namedTag.contains("Variant")) {
+            this.variant = this.namedTag.getInt("Variant");
+        } else {
+            this.variant = getRandomVariant();
+        }
+        this.setDataProperty(new IntEntityData(DATA_VARIANT, this.variant));
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putInt("Variant", this.variant);
     }
 
     @Override
@@ -114,9 +132,18 @@ public class EntityLlama extends EntityHorseBase {
 
         if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
-            return player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.WHEAT && distance <= 40;
+            return player.isAlive() && !player.closed && this.isFeedItem(player.getInventory().getItemInHand()) && distance <= 40;
         }
-
         return false;
+    }
+
+    @Override
+    public boolean isFeedItem(Item item) {
+        return item.getId() == Item.WHEAT;
+    }
+
+    private static int getRandomVariant() {
+        int[] variantList = {0, 1, 2, 3};
+        return variantList[Utils.rand(0, variantList.length - 1)];
     }
 }

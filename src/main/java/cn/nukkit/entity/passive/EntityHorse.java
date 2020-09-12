@@ -5,6 +5,8 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
@@ -14,8 +16,7 @@ import java.util.List;
 public class EntityHorse extends EntityHorseBase {
 
     public static final int NETWORK_ID = 23;
-
-    public int variant = getRandomVariant();
+    public int variant;
 
     public EntityHorse(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -50,6 +51,8 @@ public class EntityHorse extends EntityHorseBase {
 
         if (this.namedTag.contains("Variant")) {
             this.variant = this.namedTag.getInt("Variant");
+        } else {
+            this.variant = getRandomVariant();
         }
 
         this.setDataProperty(new IntEntityData(DATA_VARIANT, this.variant));
@@ -58,7 +61,6 @@ public class EntityHorse extends EntityHorseBase {
     @Override
     public void saveNBT() {
         super.saveNBT();
-
         this.namedTag.putInt("Variant", this.variant);
     }
 
@@ -68,15 +70,8 @@ public class EntityHorse extends EntityHorseBase {
 
         if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed
-                    && (player.getInventory().getItemInHand().getId() == Item.WHEAT
-                            || player.getInventory().getItemInHand().getId() == Item.APPLE
-                            || player.getInventory().getItemInHand().getId() == Item.HAY_BALE
-                            || player.getInventory().getItemInHand().getId() == Item.GOLDEN_APPLE
-                            || player.getInventory().getItemInHand().getId() == Item.SUGAR
-                            || player.getInventory().getItemInHand().getId() == Item.BREAD
-                            || player.getInventory().getItemInHand().getId() == Item.GOLDEN_CARROT)
-                    && distance <= 40;
+            return player.spawned && player.isAlive() && !player.closed &&
+                    this.isFeedItem(player.getInventory().getItemInHand()) && distance <= 40;
         }
         return false;
     }
@@ -84,13 +79,11 @@ public class EntityHorse extends EntityHorseBase {
     @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
-
         if (!this.isBaby()) {
             for (int i = 0; i < Utils.rand(0, 2); i++) {
                 drops.add(Item.get(Item.LEATHER, 0, 1));
             }
         }
-
         return drops.toArray(new Item[0]);
     }
 

@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -10,6 +11,7 @@ import cn.nukkit.utils.Utils;
 public class EntityParrot extends EntityFlyingAnimal {
 
     public static final int NETWORK_ID = 30;
+    public int variant;
 
     public EntityParrot(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -33,8 +35,20 @@ public class EntityParrot extends EntityFlyingAnimal {
     @Override
     public void initEntity() {
         super.initEntity();
-
         this.setMaxHealth(6);
+
+        if (this.namedTag.contains("Variant")) {
+            this.variant = this.namedTag.getInt("Variant");
+        } else {
+            this.variant = getRandomVariant();
+        }
+        this.setDataProperty(new IntEntityData(DATA_VARIANT, this.variant));
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putInt("Variant", this.variant);
     }
 
     @Override
@@ -59,5 +73,10 @@ public class EntityParrot extends EntityFlyingAnimal {
                     && distance <= 40;
         }
         return false;
+    }
+
+    private static int getRandomVariant() {
+        int[] variantList = {0, 1, 2, 3, 4};
+        return variantList[Utils.rand(0, variantList.length - 1)];
     }
 }
