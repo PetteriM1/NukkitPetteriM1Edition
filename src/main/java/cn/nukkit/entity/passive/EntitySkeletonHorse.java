@@ -46,6 +46,11 @@ public class EntitySkeletonHorse extends EntityHorseBase implements EntitySmite 
     }
 
     @Override
+    public boolean isFeedItem(Item item) {
+        return false;
+    }
+
+    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 

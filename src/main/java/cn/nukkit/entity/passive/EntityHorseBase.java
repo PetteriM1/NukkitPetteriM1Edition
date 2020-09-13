@@ -7,9 +7,11 @@ import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -36,6 +38,21 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
+    }
+
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+
+        if (this.namedTag.contains("Saddle")) {
+            this.setSaddled(this.namedTag.getBoolean("Saddle"));
+        }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putBoolean("Saddle", this.isSaddled());
     }
 
     @Override
@@ -74,13 +91,45 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (this.passengers.isEmpty() && !this.isBaby() && !player.isSneaking()) {
+        if (this.isFeedItem(item)) {
+            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(), 0), Item.get(item.getId(), 0, 1)));
+            this.setInLove();
+            return true;
+        } else if (this.canBeSaddled() && !this.isSaddled() && item.equals(Item.get(Item.SADDLE))) {
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SADDLE);
+            this.setSaddled(true);
+        } else if (this.passengers.isEmpty() && !this.isBaby() && !player.isSneaking() && (!this.canBeSaddled() || this.isSaddled())) {
             if (player.riding == null) {
                 this.mountEntity(player);
             }
         }
 
         return super.onInteract(player, item, clickedPos);
+    }
+
+    public boolean canBeSaddled() {
+        return !this.isBaby();
+    }
+
+    public boolean isSaddled() {
+        return this.canBeSaddled() && this.getDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED);
+    }
+
+    public void setSaddled(boolean saddled) {
+        if (this.canBeSaddled()) {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED, saddled);
+        }
+    }
+
+    public boolean isFeedItem(Item item) {
+        return item.getId() == Item.WHEAT ||
+                item.getId() == Item.APPLE ||
+                item.getId() == Item.HAY_BALE ||
+                item.getId() == Item.GOLDEN_APPLE ||
+                item.getId() == Item.SUGAR ||
+                item.getId() == Item.BREAD ||
+                item.getId() == Item.GOLDEN_CARROT;
     }
 
     @Override
