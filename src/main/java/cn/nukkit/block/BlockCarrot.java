@@ -31,7 +31,7 @@ public class BlockCarrot extends BlockCrops {
     public Item[] getDrops(Item item) {
         if (getDamage() >= 0x07) {
             return new Item[]{
-                    new ItemCarrot(0, Utils.random.nextInt(3) + 1)
+                    new ItemCarrot(0, Utils.rand(1, 5))
             };
         }
         return new Item[]{
