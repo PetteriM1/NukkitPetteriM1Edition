@@ -256,6 +256,7 @@ public class Server {
     public boolean strongIPBans;
     public boolean spawnAnimals;
     public boolean spawnMobs;
+    public boolean anvilsEnabled;
     public boolean savePlayerDataByUuid;
     public boolean vanillaPortals;
     public boolean personaSkins;
@@ -2429,6 +2430,7 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
+        this.anvilsEnabled = this.getPropertyBoolean("anvils-enabled", true);
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
@@ -2550,6 +2552,7 @@ public class Server {
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
             put("automatic-bug-report", true);
+            put("anvils-enabled", true);
             put("save-player-data-by-uuid", true);
             put("vanilla-portals", true);
             put("persona-skins", true);
