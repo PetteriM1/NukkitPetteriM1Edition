@@ -107,7 +107,11 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            player.addWindow(new AnvilInventory(player.getUIInventory(), this), Player.ANVIL_WINDOW_ID);
+            if (player.getServer().anvilsEnabled) {
+                player.addWindow(new AnvilInventory(player.getUIInventory(), this), Player.ANVIL_WINDOW_ID);
+            } else {
+                player.sendMessage("\u00A7cAnvils are disabled on this server");
+            }
         }
         return true;
     }

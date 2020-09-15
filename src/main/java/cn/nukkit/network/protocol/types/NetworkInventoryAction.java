@@ -89,6 +89,10 @@ public class NetworkInventoryAction {
                 switch (this.windowId) {
                     case SOURCE_TYPE_CRAFTING_RESULT:
                     case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
+                    case SOURCE_TYPE_ANVIL_INPUT:
+                    case SOURCE_TYPE_ANVIL_MATERIAL:
+                    case SOURCE_TYPE_ANVIL_OUTPUT:
+                    case SOURCE_TYPE_ANVIL_RESULT:
                         packet.isCraftingPart = true;
                         break;
                     case SOURCE_TYPE_ENCHANT_INPUT:
@@ -227,22 +231,17 @@ public class NetworkInventoryAction {
                     switch (this.windowId) {
                         case SOURCE_TYPE_ANVIL_INPUT:
                             this.inventorySlot = 0;
-                            return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
+                            return new CraftingTransferMaterialAction(this.oldItem, this.newItem, this.inventorySlot);
                         case SOURCE_TYPE_ANVIL_MATERIAL:
                             this.inventorySlot = 1;
-                            return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
+                            return new CraftingTransferMaterialAction(this.oldItem, this.newItem, this.inventorySlot);
                         case SOURCE_TYPE_ANVIL_OUTPUT:
                             break;
                         case SOURCE_TYPE_ANVIL_RESULT:
                             this.inventorySlot = 2;
-                            anvil.clear(0);
-                            Item material = anvil.getItem(1);
-                            if (!material.isNull()) {
-                                material.setCount(material.getCount() - 1);
-                                anvil.setItem(1, material);
-                            }
-                            anvil.setItem(2, this.oldItem);
-                            return new SlotChangeAction(anvil, this.inventorySlot, this.oldItem, this.newItem);
+                            anvil.setNewItemName(this.oldItem.getCustomName());
+                            anvil.updateResult();
+                            return new CraftingTakeResultAction(this.oldItem, this.newItem);
                     }
                 }
 
