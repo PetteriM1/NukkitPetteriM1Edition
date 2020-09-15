@@ -249,6 +249,8 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_ADMIRING = 93;
     public static final int DATA_FLAG_CELEBRATING_SPECIAL = 94;
 
+    public static final double STEP_CLIP_MULTIPLIER = 0.4;
+
     public static long entityCount = 1;
 
     private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();
@@ -747,7 +749,14 @@ public abstract class Entity extends Location implements Metadatable {
     public void recalculateBoundingBox(boolean send) {
         float height = this.getHeight() * this.scale;
         double radius = (this.getWidth() * this.scale) / 2d;
-        this.boundingBox.setBounds(x - radius, y, z - radius, x + radius, y + height, z + radius);
+        this.boundingBox.setBounds(
+                this.x - radius,
+                this.y + this.ySize,
+                z - radius,
+                x + radius,
+                y + height + this.ySize,
+                z + radius
+        );
 
         FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
         FloatEntityData bbW = new FloatEntityData(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
@@ -1915,7 +1924,7 @@ public abstract class Entity extends Location implements Metadatable {
         } else {
             if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.startTiming();
 
-            this.ySize *= 0.4;
+            this.ySize *= STEP_CLIP_MULTIPLIER;
 
             double movX = dx;
             double movY = dy;
@@ -1945,7 +1954,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             this.boundingBox.offset(0, 0, dz);
 
-            if (this.getStepHeight() > 0 && fallingFlag && this.ySize < 0.05 && (movX != dx || movZ != dz)) {
+            if (this.getStepHeight() > 0 && fallingFlag && (movX != dx || movZ != dz)) {
                 double cx = dx;
                 double cy = dy;
                 double cz = dz;
@@ -1977,7 +1986,12 @@ public abstract class Entity extends Location implements Metadatable {
 
                 this.boundingBox.offset(0, 0, dz);
 
-                this.boundingBox.offset(0, 0, dz);
+                double reverseDY = -dy;
+                for (AxisAlignedBB bb : list) {
+                    reverseDY = bb.calculateYOffset(this.boundingBox, reverseDY);
+                }
+                dy += reverseDY;
+                this.boundingBox.offset(0, reverseDY, 0);
 
                 if ((cx * cx + cz * cz) >= (dx * dx + dz * dz)) {
                     dx = cx;
@@ -1985,7 +1999,7 @@ public abstract class Entity extends Location implements Metadatable {
                     dz = cz;
                     this.boundingBox.setBB(axisalignedbb1);
                 } else {
-                    this.ySize += 0.5;
+                    this.ySize += dy;
                 }
             }
 

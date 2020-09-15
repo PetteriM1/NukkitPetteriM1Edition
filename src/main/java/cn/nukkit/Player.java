@@ -1506,18 +1506,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         boolean revert = false;
         if ((distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
             revert = true;
-        } else {
-            if (this.chunk == null || !this.chunk.isGenerated()) {
-                BaseFullChunk chunk = this.level.getChunk((int) newPos.x >> 4, (int) newPos.z >> 4, false);
-                if (chunk == null || !chunk.isGenerated()) {
-                    revert = true;
-                    this.nextChunkOrderRun = 0;
-                } else {
-                    if (this.chunk != null) {
-                        this.chunk.removeEntity(this);
-                    }
-                    this.chunk = chunk;
+        } else if (this.chunk == null || !this.chunk.isGenerated()) {
+            BaseFullChunk chunk = this.level.getChunk((int) newPos.x >> 4, (int) newPos.z >> 4, false);
+            if (chunk == null || !chunk.isGenerated()) {
+                revert = true;
+                this.nextChunkOrderRun = 0;
+            } else {
+                if (this.chunk != null) {
+                    this.chunk.removeEntity(this);
                 }
+                this.chunk = chunk;
             }
         }
 
@@ -1529,6 +1527,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             double dx = newPos.x - this.x;
             double dy = newPos.y - this.y;
             double dz = newPos.z - this.z;
+
+            //the client likes to clip into blocks like stairs, but we do full server-side prediction of that without
+            //help from the client's position changes, so we deduct the expected clip height from the moved distance.
+            double expectedClipDistance = this.ySize * (1 - STEP_CLIP_MULTIPLIER);
+            dy -= expectedClipDistance;
 
             this.fastMove(dx, dy, dz);
             if (this.newPosition == null) {
@@ -4523,6 +4526,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.mode = mode;
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
+        this.ySize = 0;
+
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
         } else {
@@ -4541,6 +4546,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
+
+        this.ySize = 0;
+
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
         Server.broadcastPacket(targets, pk);
     }
