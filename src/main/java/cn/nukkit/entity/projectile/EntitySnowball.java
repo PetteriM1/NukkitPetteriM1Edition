@@ -1,7 +1,9 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.item.ItemSnowball;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 /**
@@ -61,5 +63,13 @@ public class EntitySnowball extends EntityProjectile {
         }
 
         return super.onUpdate(currentTick);
+    }
+
+    @Override
+    public void onHit() {
+        ItemSnowball egg = new ItemSnowball();
+        for (int i = 0; i < 5; i++) {
+            level.addParticle(new ItemBreakParticle(this, egg));
+        }
     }
 }

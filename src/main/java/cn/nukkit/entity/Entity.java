@@ -1045,7 +1045,8 @@ public abstract class Entity extends Location implements Metadatable {
             pk.metadata = data == null ? this.dataProperties : data;
         }
 
-        player.dataPacket(pk);
+        //player.dataPacket(pk);
+        player.batchDataPacket(pk);
     }
 
     private EntityMetadata mvReplace(EntityMetadata data) {
@@ -1078,7 +1079,8 @@ public abstract class Entity extends Location implements Metadatable {
             } else {
                 pk.metadata = data == null ? this.dataProperties : data;
             }
-            player.dataPacket(pk/*.clone()*/);
+            //player.dataPacket(pk/*.clone()*/);
+            player.batchDataPacket(pk);
         }
         if (this.isPlayer) {
             if (((Player) this).protocol < 274) {
@@ -1086,7 +1088,8 @@ public abstract class Entity extends Location implements Metadatable {
             } else {
                 pk.metadata = data == null ? this.dataProperties : data;
             }
-            ((Player) this).dataPacket(pk);
+            //((Player) this).dataPacket(pk);
+            ((Player) this).batchDataPacket(pk);
         }
     }
 
@@ -2344,7 +2347,8 @@ public abstract class Entity extends Location implements Metadatable {
                 } else {
                     pk.metadata = d == null ? this.dataProperties : d;
                 }
-                ((Player) this).dataPacket(pk);
+                //((Player) this).dataPacket(pk);
+                ((Player) this).batchDataPacket(pk);
             }
             return true;
         }

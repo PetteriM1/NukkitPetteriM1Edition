@@ -2457,6 +2457,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
+
+                    if (server.suomiCraftPEMode() && Math.abs(movePlayerPacket.pitch) > 90) {
+                        this.kick(PlayerKickEvent.Reason.UNKNOWN, "Invalid MovePlayerPacket!");
+                        break;
+                    }
+
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
                     double dis = newPos.distanceSquared(this);
 

@@ -110,10 +110,6 @@ public class EntityArrow extends EntityProjectile {
 
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
-            if (this.firstTickOnGround) {
-                this.firstTickOnGround = false;
-                this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW_HIT);
-            }
         }
 
         if (this.age > 1200) {
@@ -138,5 +134,10 @@ public class EntityArrow extends EntityProjectile {
 
     public void setPickupMode(int pickupMode) {
         this.pickupMode = pickupMode;
+    }
+
+    @Override
+    public void onHit() {
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW_HIT);
     }
 }
