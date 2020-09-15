@@ -10,8 +10,8 @@ import io.netty.util.internal.StringUtil;
 import lombok.NonNull;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -63,7 +63,7 @@ public class AnvilInventory extends FakeBlockUIComponent {
         int repairMaterial = getRepairMaterial(target);
         Item result = target.clone();
         int levelCost = getRepairCost(result) + (sacrifice.isNull() ? 0 : getRepairCost(sacrifice));
-        Map<Integer, Enchantment> enchantmentMap = new HashMap<>();
+        Map<Integer, Enchantment> enchantmentMap = new LinkedHashMap<>();
         for (Enchantment enchantment : target.getEnchantments()) {
             enchantmentMap.put(enchantment.getId(), enchantment);
         }
@@ -144,7 +144,7 @@ public class AnvilInventory extends FakeBlockUIComponent {
 
                     while(targetEnchIter.hasNext()) {
                         Enchantment targetEnchantment = targetEnchIter.next();
-                        if (targetEnchantment != sacrificeEnchantment && (!sacrificeEnchantment.isCompatibleWith(targetEnchantment) || !targetEnchantment.isCompatibleWith(sacrificeEnchantment))) {
+                        if (targetEnchantment.id != sacrificeEnchantment.id && (!sacrificeEnchantment.isCompatibleWith(targetEnchantment) || !targetEnchantment.isCompatibleWith(sacrificeEnchantment))) {
                             compatible = false;
                             ++extraCost;
                         }
@@ -175,7 +175,7 @@ public class AnvilInventory extends FakeBlockUIComponent {
                             rarity = Math.max(1, rarity / 2);
                         }
 
-                        extraCost += rarity * resultLevel;
+                        extraCost += rarity * Math.max(0, resultLevel - targetLevel);
                         if (target.getCount() > 1) {
                             extraCost = 40;
                         }
