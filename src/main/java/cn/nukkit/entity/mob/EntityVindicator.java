@@ -2,11 +2,13 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.MobEquipmentPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.HashMap;
@@ -14,6 +16,8 @@ import java.util.HashMap;
 public class EntityVindicator extends EntityWalkingMob {
 
     public static final int NETWORK_ID = 57;
+
+    private boolean angry;
 
     public EntityVindicator(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -86,6 +90,35 @@ public class EntityVindicator extends EntityWalkingMob {
             return true;
         }
 
+        if (this.followTarget != null) {
+            if (!this.angry) {
+                this.angry = true;
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, true); // show the axe
+            }
+            if (this.getDataPropertyLong(DATA_TARGET_EID) != this.followTarget.getId()) {
+                this.setDataProperty(new LongEntityData(DATA_TARGET_EID, this.followTarget.getId())); // raise the axe
+            }
+        } else {
+            if (this.angry) {
+                this.angry = false;
+                this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, false);
+            }
+            if (this.getDataPropertyLong(DATA_TARGET_EID) != 0) {
+                this.setDataProperty(new LongEntityData(DATA_TARGET_EID, 0));
+            }
+        }
+
         return super.entityBaseTick(tickDiff);
+    }
+
+    @Override
+    public void spawnTo(Player player) {
+        super.spawnTo(player);
+
+        MobEquipmentPacket pk = new MobEquipmentPacket();
+        pk.eid = this.getId();
+        pk.item = Item.get(Item.IRON_AXE);
+        pk.hotbarSlot = 0;
+        player.dataPacket(pk);
     }
 }
