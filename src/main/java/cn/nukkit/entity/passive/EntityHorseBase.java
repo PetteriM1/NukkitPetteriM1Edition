@@ -2,13 +2,16 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.Vector3fEntityData;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -38,23 +41,38 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     @Override
+    protected void initEntity() {
+        super.initEntity();
+
+        if (this.namedTag.contains("Saddle")) {
+            this.setSaddled(this.namedTag.getBoolean("Saddle"));
+        }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putBoolean("Saddle", this.isSaddled());
+    }
+
+    @Override
     public boolean mountEntity(Entity entity) {
         Objects.requireNonNull(entity, "The target of the mounting entity can't be null");
 
         if (entity.riding != null) {
-            dismountEntity(entity);
+            this.dismountEntity(entity);
             entity.resetFallDistance();
         } else {
-            if (isPassenger(entity)) {
+            if (this.isPassenger(entity)) {
                 return false;
             }
 
-            broadcastLinkPacket(entity, TYPE_RIDE);
+            this.broadcastLinkPacket(entity, TYPE_RIDE);
 
             entity.riding = this;
             entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, true);
             entity.setDataProperty(new Vector3fEntityData(DATA_RIDER_SEAT_POSITION, new Vector3f(0, this instanceof EntityDonkey ? 2.1f : 2.3f, 0)));
-            passengers.add(entity);
+            this.passengers.add(entity);
         }
 
         return true;
@@ -62,24 +80,56 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
     @Override
     public boolean dismountEntity(Entity entity) {
-        broadcastLinkPacket(entity, TYPE_REMOVE);
+        this.broadcastLinkPacket(entity, TYPE_REMOVE);
         entity.riding = null;
         entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-        passengers.remove(entity);
+        this.passengers.remove(entity);
         entity.setSeatPosition(new Vector3f());
-        updatePassengerPosition(entity);
+        this.updatePassengerPosition(entity);
         return true;
     }
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (this.passengers.isEmpty() && !this.isBaby() && !player.isSneaking()) {
+        if (this.isFeedItem(item)) {
+            this.level.addParticle(new ItemBreakParticle(this.add(0,this.getMountedYOffset(), 0), Item.get(item.getId(), 0, 1)));
+            this.setInLove();
+            return true;
+        } else if (this.canBeSaddled() && !this.isSaddled() && item.equals(Item.get(Item.SADDLE))) {
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SADDLE);
+            this.setSaddled(true);
+        } else if (this.passengers.isEmpty() && !this.isBaby() && !player.isSneaking() && (!this.canBeSaddled() || this.isSaddled())) {
             if (player.riding == null) {
                 this.mountEntity(player);
             }
         }
 
         return super.onInteract(player, item, clickedPos);
+    }
+
+    public boolean canBeSaddled() {
+        return !this.isBaby();
+    }
+
+    public boolean isSaddled() {
+        return this.canBeSaddled() && this.getDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED);
+    }
+
+    public void setSaddled(boolean saddled) {
+        if (this.canBeSaddled()) {
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED, saddled);
+        }
+    }
+
+    public boolean isFeedItem(Item item) {
+        return item.getId() == Item.WHEAT ||
+                item.getId() == Item.APPLE ||
+                item.getId() == Item.HAY_BALE ||
+                item.getId() == Item.GOLDEN_APPLE ||
+                item.getId() == Item.SUGAR ||
+                item.getId() == Item.BREAD ||
+                item.getId() == Item.GOLDEN_CARROT;
     }
 
     @Override
@@ -132,6 +182,11 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return this.passengers.isEmpty();
+    }
+
+    @Override
     public boolean canDespawn() {
         if (!this.getPassengers().isEmpty()) {
             return false;
@@ -148,11 +203,10 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
         for (Entity passenger : new ArrayList<>(this.passengers)) {
             if (!passenger.isAlive() || this.isInsideOfWater()) {
-                dismountEntity(passenger);
+                this.dismountEntity(passenger);
                 continue;
             }
-
-            updatePassengerPosition(passenger);
+            this.updatePassengerPosition(passenger);
         }
     }
 }

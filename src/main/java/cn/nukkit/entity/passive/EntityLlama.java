@@ -3,6 +3,7 @@ package cn.nukkit.entity.passive;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.projectile.EntityLlamaSpit;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -22,7 +23,11 @@ public class EntityLlama extends EntityHorseBase {
 
     public static final int NETWORK_ID = 29;
 
-    private AtomicBoolean delay = new AtomicBoolean();
+    public int variant;
+
+    private static final int[] VARIANTS = {0, 1, 2, 3};
+
+    private final AtomicBoolean delay = new AtomicBoolean();
 
     public EntityLlama(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -50,10 +55,29 @@ public class EntityLlama extends EntityHorseBase {
     }
 
     @Override
+    public boolean canBeSaddled() {
+        return false;
+    }
+
+    @Override
     public void initEntity() {
         super.initEntity();
 
         this.setMaxHealth(15);
+
+        if (this.namedTag.contains("Variant")) {
+            this.variant = this.namedTag.getInt("Variant");
+        } else {
+            this.variant = getRandomVariant();
+        }
+
+        this.setDataProperty(new IntEntityData(DATA_VARIANT, this.variant));
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putInt("Variant", this.variant);
     }
 
     @Override
@@ -63,9 +87,9 @@ public class EntityLlama extends EntityHorseBase {
         if (ev instanceof EntityDamageByEntityEvent) {
             Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
             if (damager instanceof Player) {
-                if (delay.get()) return true;
-                delay.set(true);
-                server.getScheduler().scheduleDelayedTask(() -> delay.compareAndSet(true, false), 40);
+                if (this.delay.get()) return true;
+                this.delay.set(true);
+                this.server.getScheduler().scheduleDelayedTask(() -> this.delay.compareAndSet(true, false), 40);
 
                 this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
                     if (this.isAlive()) {
@@ -109,11 +133,22 @@ public class EntityLlama extends EntityHorseBase {
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
-        if (creature instanceof Player) {
+        boolean canTarget = super.targetOption(creature, distance);
+
+        if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
-            return player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.WHEAT && distance <= 40;
+            return player.isAlive() && !player.closed && this.isFeedItem(player.getInventory().getItemInHand()) && distance <= 40;
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isFeedItem(Item item) {
+        return item.getId() == Item.WHEAT;
+    }
+
+    private static int getRandomVariant() {
+        return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
     }
 }

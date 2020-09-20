@@ -5,11 +5,11 @@ import cn.nukkit.plugin.Plugin;
 import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.ServerException;
 import co.aikar.timings.Timings;
+import io.netty.util.internal.ConcurrentSet;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author MagicDroidX
@@ -21,9 +21,9 @@ public class PermissibleBase implements Permissible {
 
     private Permissible parent = null;
 
-    private final Set<PermissionAttachment> attachments = new HashSet<>();
+    private final ConcurrentSet<PermissionAttachment> attachments = new ConcurrentSet<>();
 
-    private final Map<String, PermissionAttachmentInfo> permissions = new HashMap<>();
+    private final ConcurrentMap<String, PermissionAttachmentInfo> permissions = new ConcurrentHashMap<>();
 
     public PermissibleBase(ServerOperator opable) {
         this.opable = opable;

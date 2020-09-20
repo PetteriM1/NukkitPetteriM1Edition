@@ -256,6 +256,7 @@ public class Server {
     public boolean strongIPBans;
     public boolean spawnAnimals;
     public boolean spawnMobs;
+    public boolean anvilsEnabled;
     public boolean savePlayerDataByUuid;
     public int requiredProtocol;
     public boolean vanillaPortals;
@@ -980,30 +981,28 @@ public class Server {
                 try {
                     this.tick();
 
-                    if (doLevelGC) {
-                        long next = this.nextTick;
-                        long current = System.currentTimeMillis();
+                    long next = this.nextTick;
+                    long current = System.currentTimeMillis();
 
-                        if (next - 0.1 > current) {
-                            long allocated = next - current - 1;
+                    if (next - 0.1 > current) {
+                        long allocated = next - current - 1;
 
-                            { // Instead of wasting time, do something potentially useful
-                                int offset = 0;
-                                for (int i = 0; i < levelArray.length; i++) {
-                                    offset = (i + lastLevelGC) % levelArray.length;
-                                    levelArray[offset].doGarbageCollection(allocated - 1);
-                                    allocated = next - System.currentTimeMillis();
-                                    if (allocated <= 0) break;
-                                }
-                                lastLevelGC = offset + 1;
+                        if (doLevelGC) { // Instead of wasting time, do something potentially useful
+                            int offset = 0;
+                            for (int i = 0; i < levelArray.length; i++) {
+                                offset = (i + lastLevelGC) % levelArray.length;
+                                levelArray[offset].doGarbageCollection(allocated - 1);
+                                allocated = next - System.currentTimeMillis();
+                                if (allocated <= 0) break;
                             }
+                            lastLevelGC = offset + 1;
+                        }
 
-                            if (allocated > 0) {
-                                try {
-                                    Thread.sleep(allocated, 900000);
-                                } catch (Exception e) {
-                                    this.getLogger().logException(e);
-                                }
+                        if (allocated > 0 || !doLevelGC) {
+                            try {
+                                Thread.sleep(allocated, 900000);
+                            } catch (Exception e) {
+                                this.getLogger().logException(e);
                             }
                         }
                     }
@@ -2436,6 +2435,7 @@ public class Server {
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
+        this.anvilsEnabled = this.getPropertyBoolean("anvils-enabled", true);
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
@@ -2558,6 +2558,7 @@ public class Server {
             put("do-not-limit-interactions", false);
             put("do-not-limit-skin-geometry", true);
             put("automatic-bug-report", true);
+            put("anvils-enabled", true);
             put("save-player-data-by-uuid", true);
             put("vanilla-portals", true);
             put("persona-skins", true);

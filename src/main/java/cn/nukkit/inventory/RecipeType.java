@@ -10,6 +10,7 @@ public enum RecipeType {
     SHULKER_BOX,
     SHAPELESS_CHEMISTRY,
     SHAPED_CHEMISTRY,
+    REPAIR,
     CAMPFIRE,
     CAMPFIRE_DATA
 }

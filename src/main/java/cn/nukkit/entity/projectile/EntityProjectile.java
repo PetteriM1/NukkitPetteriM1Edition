@@ -26,8 +26,6 @@ public abstract class EntityProjectile extends Entity {
 
     public Entity shootingEntity;
 
-    public boolean firstTickOnGround = true;
-
     protected double getDamage() {
         return namedTag.contains("damage") ? namedTag.getDouble("damage") : getBaseDamage();
     }
@@ -71,6 +69,8 @@ public abstract class EntityProjectile extends Entity {
 
         if (entity.attack(ev)) {
             this.hadCollision = true;
+
+            this.onHit();
 
             if (this.fireTicks > 0) {
                 EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this, entity, 5);
@@ -121,7 +121,6 @@ public abstract class EntityProjectile extends Entity {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-
             MovingObjectPosition movingObjectPosition = null;
 
             if (!this.isCollided) {
@@ -182,6 +181,7 @@ public abstract class EntityProjectile extends Entity {
                 this.motionZ = 0;
 
                 this.server.getPluginManager().callEvent(new ProjectileHitEvent(this, MovingObjectPosition.fromBlock(this.getFloorX(), this.getFloorY(), this.getFloorZ(), -1, this)));
+                this.onHit();
                 return false;
             } else if (!this.isCollided && this.hadCollision) {
                 this.hadCollision = false;
@@ -210,5 +210,9 @@ public abstract class EntityProjectile extends Entity {
         this.motionX += rand.nextGaussian() * 0.007499999832361937 * modifier;
         this.motionY += rand.nextGaussian() * 0.007499999832361937 * modifier;
         this.motionZ += rand.nextGaussian() * 0.007499999832361937 * modifier;
+    }
+
+    protected void onHit() {
+
     }
 }

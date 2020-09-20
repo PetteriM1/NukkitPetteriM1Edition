@@ -2471,6 +2471,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
+
+                    if (server.suomiCraftPEMode() && Math.abs(movePlayerPacket.pitch) > 90) {
+                        this.kick(PlayerKickEvent.Reason.UNKNOWN, "Invalid MovePlayerPacket!");
+                        break;
+                    }
+
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
                     double dis = newPos.distanceSquared(this);
 
@@ -2687,7 +2693,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
                             if (this.checkMovement && (this.inAirTicks > 30 || this.isSwimming() || this.isGliding()) && !server.getAllowFlight()) {
-                                this.setMotion(new Vector3(0, 0, 0));
+                                this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
                                 break;
                             }
                             this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
@@ -2732,14 +2738,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
                             break;
                         case PlayerActionPacket.ACTION_START_GLIDE:
-                            PlayerToggleGlideEvent playerToggleGlideEvent = new PlayerToggleGlideEvent(this, true);
                             if (!server.getAllowFlight() && this.checkMovement) {
                                 Item chestplate = this.getInventory().getChestplateFast();
-                                if ((chestplate == null || chestplate.getId() != ItemID.ELYTRA)) {
-                                    playerToggleGlideEvent.setCancelled(true);
-                                    this.setMotion(new Vector3(0, 0, 0));
+                                if ((chestplate == null || chestplate.getId() != ItemID.ELYTRA) && !server.getAllowFlight()) {
+                                    this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
+                                    break;
                                 }
                             }
+                            PlayerToggleGlideEvent playerToggleGlideEvent = new PlayerToggleGlideEvent(this, true);
                             this.server.getPluginManager().callEvent(playerToggleGlideEvent);
                             if (playerToggleGlideEvent.isCancelled()) {
                                 this.sendData(this);

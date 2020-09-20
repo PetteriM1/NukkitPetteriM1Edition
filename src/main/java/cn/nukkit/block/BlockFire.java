@@ -91,6 +91,8 @@ public class BlockFire extends BlockFlowable {
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_RANDOM) {
             if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
                 this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
+            } else if (!Server.getInstance().suomiCraftPEMode() && this.level.gameRules.getBoolean(GameRule.DO_FIRE_TICK) && !level.isUpdateScheduled(this, this)) {
+                level.scheduleUpdate(this, tickRate());
             }
 
             return Level.BLOCK_UPDATE_NORMAL;

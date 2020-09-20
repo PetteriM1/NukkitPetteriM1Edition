@@ -36,7 +36,7 @@ public class BlockPotato extends BlockCrops {
     public Item[] getDrops(Item item) {
         if (getDamage() >= 0x07) {
             return new Item[]{
-                    new ItemPotato(0, Utils.random.nextInt(3) + 1)
+                    new ItemPotato(0, Utils.random.nextInt(3) + 2)
             };
         } else {
             return new Item[]{

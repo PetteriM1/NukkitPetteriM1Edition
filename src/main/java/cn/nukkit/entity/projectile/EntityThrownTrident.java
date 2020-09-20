@@ -93,20 +93,9 @@ public class EntityThrownTrident extends EntityProjectile {
             return false;
         }
 
-        if (this.timing != null) this.timing.startTiming();
-
-        if (this.onGround || this.hadCollision) {
-            if (this.firstTickOnGround) {
-                this.firstTickOnGround = false;
-                this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
-            }
-        }
-
         if (this.age > 1200) {
             this.close();
         }
-
-        if (this.timing != null) this.timing.stopTiming();
 
         return super.onUpdate(currentTick);
     }
@@ -123,11 +112,16 @@ public class EntityThrownTrident extends EntityProjectile {
             ev = new EntityDamageByChildEntityEvent(this.shootingEntity, this, entity, DamageCause.PROJECTILE, damage);
         }
         entity.attack(ev);
-        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT);
         this.hadCollision = true;
+        this.onHit();
         this.close();
         EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
         newTrident.setItem(trident);
         newTrident.spawnToAll();
+    }
+
+    @Override
+    public void onHit() {
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
     }
 }

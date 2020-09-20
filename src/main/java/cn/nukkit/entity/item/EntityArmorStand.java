@@ -209,7 +209,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
         SetEntityDataPacket setEntityDataPacket = new SetEntityDataPacket();
         setEntityDataPacket.eid = this.getId();
         setEntityDataPacket.metadata = this.getDataProperties();
-        Server.getInstance().getOnlinePlayers().values().forEach(all -> all.dataPacket(setEntityDataPacket));
+        getViewers().values().forEach(all -> all.dataPacket(setEntityDataPacket));
     }
 
     @Override

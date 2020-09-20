@@ -48,17 +48,12 @@ public class EntityMule extends EntityHorseBase {
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
-        if (creature instanceof Player) {
+        boolean canTarget = super.targetOption(creature, distance);
+
+        if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed
-                    && (player.getInventory().getItemInHand().getId() == Item.WHEAT
-                    || player.getInventory().getItemInHand().getId() == Item.APPLE
-                    || player.getInventory().getItemInHand().getId() == Item.HAY_BALE
-                    || player.getInventory().getItemInHand().getId() == Item.GOLDEN_APPLE
-                    || player.getInventory().getItemInHand().getId() == Item.SUGAR
-                    || player.getInventory().getItemInHand().getId() == Item.BREAD
-                    || player.getInventory().getItemInHand().getId() == Item.GOLDEN_CARROT)
-                    && distance <= 40;
+            return player.spawned && player.isAlive() && !player.closed &&
+                    this.isFeedItem(player.getInventory().getItemInHand()) && distance <= 40;
         }
         return false;
     }

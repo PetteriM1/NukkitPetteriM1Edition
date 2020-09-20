@@ -4,7 +4,9 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.passive.EntityChicken;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
+import cn.nukkit.item.ItemEgg;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
@@ -84,5 +86,13 @@ public class EntityEgg extends EntityProjectile {
         }
 
         return super.onUpdate(currentTick);
+    }
+
+    @Override
+    public void onHit() {
+        ItemEgg egg = new ItemEgg();
+        for (int i = 0; i < 5; i++) {
+            level.addParticle(new ItemBreakParticle(this, egg));
+        }
     }
 }

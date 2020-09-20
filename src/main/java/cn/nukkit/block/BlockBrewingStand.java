@@ -69,31 +69,28 @@ public class BlockBrewingStand extends BlockSolidMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!block.down().isTransparent()) {
-            getLevel().setBlock(block, this, true, true);
+        getLevel().setBlock(block, this, true, true);
 
-            CompoundTag nbt = new CompoundTag()
-                    .putList(new ListTag<>("Items"))
-                    .putString("id", BlockEntity.BREWING_STAND)
-                    .putInt("x", (int) this.x)
-                    .putInt("y", (int) this.y)
-                    .putInt("z", (int) this.z);
+        CompoundTag nbt = new CompoundTag()
+                .putList(new ListTag<>("Items"))
+                .putString("id", BlockEntity.BREWING_STAND)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
 
-            if (item.hasCustomName()) {
-                nbt.putString("CustomName", item.getCustomName());
-            }
-
-            if (item.hasCustomBlockData()) {
-                Map<String, Tag> customData = item.getCustomBlockData().getTags();
-                for (Map.Entry<String, Tag> tag : customData.entrySet()) {
-                    nbt.put(tag.getKey(), tag.getValue());
-                }
-            }
-
-            BlockEntity.createBlockEntity(BlockEntity.BREWING_STAND, this.getChunk(), nbt);
-            return true;
+        if (item.hasCustomName()) {
+            nbt.putString("CustomName", item.getCustomName());
         }
-        return false;
+
+        if (item.hasCustomBlockData()) {
+            Map<String, Tag> customData = item.getCustomBlockData().getTags();
+            for (Map.Entry<String, Tag> tag : customData.entrySet()) {
+                nbt.put(tag.getKey(), tag.getValue());
+            }
+        }
+
+        BlockEntityBrewingStand brewing = (BlockEntityBrewingStand) BlockEntity.createBlockEntity(BlockEntity.BREWING_STAND, getLevel().getChunk((int) this.x >> 4, (int) this.z >> 4), nbt);
+        return brewing != null;
     }
 
     @Override
@@ -110,7 +107,10 @@ public class BlockBrewingStand extends BlockSolidMeta {
                         .putInt("x", (int) this.x)
                         .putInt("y", (int) this.y)
                         .putInt("z", (int) this.z);
-                brewing = (BlockEntityBrewingStand) BlockEntity.createBlockEntity(BlockEntity.BREWING_STAND, this.getChunk(), nbt);
+                brewing = (BlockEntityBrewingStand) BlockEntity.createBlockEntity(BlockEntity.BREWING_STAND, this.getLevel().getChunk((int) (this.x) >> 4, (int) (this.z) >> 4), nbt);
+                if (brewing == null) {
+                    return false;
+                }
             }
 
             if (brewing.namedTag.contains("Lock") && brewing.namedTag.get("Lock") instanceof StringTag) {
@@ -132,7 +132,7 @@ public class BlockBrewingStand extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
+        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
             return new Item[]{
                     toItem()
             };

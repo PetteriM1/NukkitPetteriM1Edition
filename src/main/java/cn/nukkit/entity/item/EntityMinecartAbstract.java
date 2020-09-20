@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockRail;
 import cn.nukkit.block.BlockRailActivator;
 import cn.nukkit.block.BlockRailPowered;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
@@ -26,6 +27,7 @@ import cn.nukkit.utils.Rail;
 import cn.nukkit.utils.Rail.Orientation;
 import org.apache.commons.math3.util.FastMath;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -127,12 +129,9 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
 
         if (!this.isAlive()) {
-            ++this.deadTicks;
-            if (this.deadTicks >= 10) {
-                this.despawnFromAll();
-                this.close();
-            }
-            return this.deadTicks < 10;
+            this.despawnFromAll();
+            this.close();
+            return false;
         }
 
         int tickDiff = currentTick - this.lastUpdate;
@@ -271,10 +270,8 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
     public void close() {
         super.close();
 
-        for (cn.nukkit.entity.Entity entity : passengers) {
-            if (entity instanceof Player) {
-                entity.riding = null;
-            }
+        for (Entity passenger : new ArrayList<>(this.passengers)) {
+            dismountEntity(passenger);
         }
 
         SmokeParticle particle = new SmokeParticle(this);
