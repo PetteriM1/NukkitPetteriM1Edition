@@ -22,6 +22,8 @@ public class EntityThrownTrident extends EntityProjectile {
 
     protected Item trident;
 
+    private boolean alreadyCollided;
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -122,6 +124,9 @@ public class EntityThrownTrident extends EntityProjectile {
 
     @Override
     public void onHit() {
-        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
+        if (!this.alreadyCollided) {
+            this.alreadyCollided = true;
+            this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
+        }
     }
 }

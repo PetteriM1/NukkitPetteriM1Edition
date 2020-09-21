@@ -58,7 +58,7 @@ public class BlockMagma extends BlockSolid {
         if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
             if (entity instanceof Player) {
                 Player p = (Player) entity;
-                if (p.getInventory().getBoots().getEnchantment(Enchantment.ID_FROST_WALKER) != null) {
+                if (p.getInventory().getBootsFast().getEnchantment(Enchantment.ID_FROST_WALKER) != null) {
                     return;
                 }
                 if (!p.isCreative() && !p.isSpectator() && !p.isSneaking()) {

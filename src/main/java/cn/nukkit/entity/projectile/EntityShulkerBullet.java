@@ -69,7 +69,7 @@ public class EntityShulkerBullet extends EntityProjectile {
 
     @Override
     public boolean attack(EntityDamageEvent source) {
-        this.level.addSound(this, Sound.MOB_SHULKER_BULLET_HIT);
+        this.level.addSoundToViewers(this, Sound.MOB_SHULKER_BULLET_HIT);
         this.close();
         return true;
     }
@@ -77,7 +77,7 @@ public class EntityShulkerBullet extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         super.onCollideWithEntity(entity);
-        this.level.addSound(this, Sound.MOB_SHULKER_BULLET_HIT);
+        this.level.addSoundToViewers(this, Sound.MOB_SHULKER_BULLET_HIT);
         entity.addEffect(Effect.getEffect(Effect.LEVITATION).setDuration(200));
     }
 }

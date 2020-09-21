@@ -3102,7 +3102,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.dropItem(vector3, itemDrop);
                                 itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
                                 itemFrame.setItemRotation(0);
-                                this.getLevel().addSound(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
+                                this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
                             }
                         } else {
                             itemFrame.spawnTo(this);

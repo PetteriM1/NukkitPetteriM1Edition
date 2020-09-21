@@ -62,7 +62,7 @@ public class BlockGrass extends BlockDirt {
                 item.useOn(this);
                 this.getLevel().setBlock(this, Block.get(FARMLAND));
                 if (player != null) {
-                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
                 }
                 return true;
             }
@@ -72,7 +72,7 @@ public class BlockGrass extends BlockDirt {
                 item.useOn(this);
                 this.getLevel().setBlock(this, Block.get(GRASS_PATH));
                 if (player != null) {
-                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
                 }
                 return true;
             }
