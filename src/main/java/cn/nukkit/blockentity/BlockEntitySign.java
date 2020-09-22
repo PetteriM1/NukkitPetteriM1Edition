@@ -140,7 +140,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         for (int i = 0; i < lines.length; i++) {
             // Don't allow excessive text per line
             if (lines[i] != null) {
-                lines[i] = lines[i].substring(0, Math.min(255, lines[i].length()));
+                lines[i] = lines[i].substring(0, Math.min(200, lines[i].length()));
             }
         }
     }
