@@ -72,6 +72,10 @@ public class BlockIceFrosted extends BlockTransparentMeta {
             if (countNeighbors() < 2) {
                 level.setBlock(this, get(WATER), true);
             }
+        } else if (type == Level.BLOCK_UPDATE_RANDOM) {
+            if ((this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) >= 12 || (level.getTime() % Level.TIME_FULL < 13184 || level.getTime() % Level.TIME_FULL > 22800)) && (Utils.random.nextInt(3) == 0 || countNeighbors() < 4)) {
+                slightlyMelt(true);
+            }
         }
         return super.onUpdate(type);
     }
