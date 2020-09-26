@@ -106,8 +106,8 @@ public class TeleportCommand extends VanillaCommand {
 
             if (x < -30000000) x = -30000000;
             if (x > 30000000) x = 30000000;
-            if (y < 0) y = 0;
-            if (y > 256) y = 256;
+            if (y < -30000000) y = -30000000;
+            if (y > 30000000) y = 30000000;
             if (z < -30000000) z = -30000000;
             if (z > 30000000) z = 30000000;
 

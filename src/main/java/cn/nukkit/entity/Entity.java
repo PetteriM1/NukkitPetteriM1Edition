@@ -1910,12 +1910,12 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean move(double dx, double dy, double dz) {
-        if (!this.isPlayer) {
-            this.blocksAround = null;
-        }
-
         if (dx == 0 && dz == 0 && dy == 0) {
             return true;
+        }
+
+        if (!this.isPlayer) {
+            this.blocksAround = null;
         }
 
         if (this.keepMovement) {
@@ -2527,7 +2527,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public boolean isOnLadder() {
         int b = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-        return b == Block.LADDER || b == Block.VINES;
+        return b == Block.LADDER || b == Block.VINES || b == Block.COBWEB;
     }
 
     public float getMountedYOffset() {

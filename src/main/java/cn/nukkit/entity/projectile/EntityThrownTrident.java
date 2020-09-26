@@ -22,7 +22,7 @@ public class EntityThrownTrident extends EntityProjectile {
 
     protected Item trident;
 
-    private boolean alreadyCollided;
+    public boolean alreadyCollided;
 
     @Override
     public int getNetworkId() {
@@ -104,6 +104,11 @@ public class EntityThrownTrident extends EntityProjectile {
 
     @Override
     public void onCollideWithEntity(Entity entity) {
+        if (this.alreadyCollided) {
+            this.move(this.motionX, this.motionY, this.motionZ);
+            return;
+        }
+
         this.server.getPluginManager().callEvent(new ProjectileHitEvent(this, MovingObjectPosition.fromEntity(entity)));
         float damage = this.getResultDamage();
 
@@ -118,15 +123,13 @@ public class EntityThrownTrident extends EntityProjectile {
         this.onHit();
         this.close();
         EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
+        newTrident.alreadyCollided = true;
         newTrident.setItem(trident);
         newTrident.spawnToAll();
     }
 
     @Override
     public void onHit() {
-        if (!this.alreadyCollided) {
-            this.alreadyCollided = true;
-            this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
-        }
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
     }
 }

@@ -1823,8 +1823,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
-                        int block = level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-                        if (block == Block.LADDER || block == Block.VINES || block == Block.COBWEB) {
+                        if (this.isOnLadder()) {
                             this.resetFallDistance();
                         } else {
                             if (diff > 1 && expectedVelocity < this.speed.y && (speed.y < -0.2 || speed.y > 4)) {
@@ -4422,7 +4421,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         } else if (source.getCause() == DamageCause.FALL) {
             Position pos = this.getPosition().floor().add(0.5, -1, 0.5);
-            if (this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.SLIME_BLOCK) {
+            int block = this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+            if (block == Block.SLIME_BLOCK || block == Block.COBWEB) {
                 if (!this.isSneaking()) {
                     source.setCancelled();
                     this.resetFallDistance();
