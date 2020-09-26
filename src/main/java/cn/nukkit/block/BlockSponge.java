@@ -8,6 +8,7 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
@@ -63,31 +64,32 @@ public class BlockSponge extends BlockSolidMeta {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Level level = block.getLevel();
-        boolean blockSet = level.setBlock(block, this);
-        if (blockSet) {
-            if (this.getDamage() == WET && level.getDimension() == Level.DIMENSION_NETHER) {
-                level.setBlock(block, Block.get(BlockID.SPONGE, DRY));
-                this.getLevel().addSoundToViewers(block.getLocation(), Sound.RANDOM_FIZZ);
+        if (this.getDamage() == WET && level.getDimension() == Level.DIMENSION_NETHER) {
+            level.setBlock(block, Block.get(BlockID.SPONGE, DRY), true, true);
+            level.addSoundToViewers(block.getLocation(), Sound.RANDOM_FIZZ);
 
-                for (int i = 0; i < 8; ++i) {
-                    this.getLevel().addParticle(new SmokeParticle(block.getLocation().add(Utils.random.nextDouble(), 1, Utils.random.nextDouble())));
-                }
-            } else if (this.getDamage() == DRY && performWaterAbsorb(block)) {
-                level.setBlock(block, Block.get(BlockID.SPONGE, WET));
-
-                for (int i = 0; i < 4; i++) {
-                    LevelEventPacket packet = new LevelEventPacket();
-                    packet.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
-                    packet.x = (float) block.getX() + 0.5f;
-                    packet.y = (float) block.getY() + 1f;
-                    packet.z = (float) block.getZ() + 0.5f;
-                    packet.data = GlobalBlockPalette.getOrCreateRuntimeId(0, BlockID.WATER, 0);
-                    level.addChunkPacket(getChunkX(), getChunkZ(), packet);
-                }
+            for (int i = 0; i < 8; ++i) {
+                level.addParticle(new SmokeParticle(block.getLocation().add(Utils.random.nextDouble(), 1, Utils.random.nextDouble())));
             }
+
+            return true;
+        } else if (this.getDamage() == DRY && block instanceof BlockWater && performWaterAbsorb(block)) {
+            level.setBlock(block, Block.get(BlockID.SPONGE, WET), true, true);
+
+            for (int i = 0; i < 4; i++) {
+                LevelEventPacket packet = new LevelEventPacket();
+                packet.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
+                packet.x = (float) block.getX() + 0.5f;
+                packet.y = (float) block.getY() + 1f;
+                packet.z = (float) block.getZ() + 0.5f;
+                packet.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, BlockID.WATER, 0);
+                level.addChunkPacket(getChunkX(), getChunkZ(), packet);
+            }
+
+            return true;
         }
-        return blockSet;
+
+        return super.place(item, block, target, face, fx, fy, fz, player);
     }
 
     private boolean performWaterAbsorb(Block block) {
