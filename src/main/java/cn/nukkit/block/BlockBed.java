@@ -157,7 +157,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
 
             if (!player.isCreative()) {
                 BlockFace secondPart = this.getBlockFace().getOpposite();
-                AxisAlignedBB checkArea = new AxisAlignedBB(b.x - 8, b.y - 6.5, b.z - 8, b.x + 9, b.y + 5.5, b.z + 9).addCoord(secondPart.getXOffset(), 0, secondPart.getZOffset());
+                AxisAlignedBB checkArea = new SimpleAxisAlignedBB(b.x - 8, b.y - 6.5, b.z - 8, b.x + 9, b.y + 5.5, b.z + 9).addCoord(secondPart.getXOffset(), 0, secondPart.getZOffset());
 
                 for (Entity entity : this.getLevel().getCollidingEntities(checkArea)) {
                     if (!entity.isClosed() && monsters.contains(entity.getNetworkId())) {
