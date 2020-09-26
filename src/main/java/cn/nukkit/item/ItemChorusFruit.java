@@ -24,6 +24,7 @@ public class ItemChorusFruit extends ItemEdible {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
+        if (ticksUsed < 10) return false;
         boolean successful = super.onUse(player, ticksUsed);
         if (successful) {
             player.onChorusFruitTeleport();

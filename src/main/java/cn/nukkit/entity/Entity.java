@@ -13,14 +13,9 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
-import cn.nukkit.inventory.Inventory;
-import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemTotem;
-import cn.nukkit.level.GameRule;
-import cn.nukkit.level.Level;
-import cn.nukkit.level.Location;
-import cn.nukkit.level.Position;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
@@ -249,6 +244,8 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_CELEBRATING = 92;
     public static final int DATA_FLAG_ADMIRING = 93;
     public static final int DATA_FLAG_CELEBRATING_SPECIAL = 94;
+
+    public static final double STEP_CLIP_MULTIPLIER = 0.4;
 
     public static long entityCount = 1;
 
@@ -749,7 +746,14 @@ public abstract class Entity extends Location implements Metadatable {
     public void recalculateBoundingBox(boolean send) {
         float height = this.getHeight() * this.scale;
         double radius = (this.getWidth() * this.scale) / 2d;
-        this.boundingBox.setBounds(x - radius, y, z - radius, x + radius, y + height, z + radius);
+        this.boundingBox.setBounds(
+                this.x - radius,
+                this.y + this.ySize,
+                z - radius,
+                x + radius,
+                y + height + this.ySize,
+                z + radius
+        );
 
         FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
         FloatEntityData bbW = new FloatEntityData(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
@@ -1124,11 +1128,18 @@ public abstract class Entity extends Location implements Metadatable {
         if (newHealth < 1 && this.isPlayer) {
             if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.SUICIDE) {
                 Player p = (Player) this;
-                Inventory inventory = p.getOffhandInventory();
-                Item totem = Item.get(Item.TOTEM, 0, 1);
-                if (inventory.contains(totem) || ((PlayerInventory) (inventory = p.getInventory())).getItemInHand() instanceof ItemTotem) {
-                    inventory.removeItem(totem);
+                boolean totem = false;
+                if (p.getOffhandInventory().getItemFast(0).getId() == ItemID.TOTEM) {
+                    p.getOffhandInventory().clear(0);
+                    totem = true;
+                } else if (p.getInventory().getItemInHandFast().getId() == ItemID.TOTEM) {
+                    p.getInventory().clear(p.getInventory().getHeldItemIndex());
+                    totem = true;
+                }
+                if (totem) {
                     this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_TOTEM);
+                    this.getLevel().addParticleEffect(this, ParticleEffect.TOTEM);
+
                     this.extinguish();
                     this.removeAllEffects();
                     this.setHealth(1);
@@ -1917,12 +1928,12 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean move(double dx, double dy, double dz) {
-        if (!this.isPlayer) {
-            this.blocksAround = null;
-        }
-
         if (dx == 0 && dz == 0 && dy == 0) {
             return true;
+        }
+
+        if (!this.isPlayer) {
+            this.blocksAround = null;
         }
 
         if (this.keepMovement) {
@@ -1933,7 +1944,7 @@ public abstract class Entity extends Location implements Metadatable {
         } else {
             if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.startTiming();
 
-            this.ySize *= 0.4;
+            this.ySize *= STEP_CLIP_MULTIPLIER;
 
             double movX = dx;
             double movY = dy;
@@ -1963,7 +1974,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             this.boundingBox.offset(0, 0, dz);
 
-            if (this.getStepHeight() > 0 && fallingFlag && this.ySize < 0.05 && (movX != dx || movZ != dz)) {
+            if (this.getStepHeight() > 0 && fallingFlag && (movX != dx || movZ != dz)) {
                 double cx = dx;
                 double cy = dy;
                 double cz = dz;
@@ -1995,7 +2006,12 @@ public abstract class Entity extends Location implements Metadatable {
 
                 this.boundingBox.offset(0, 0, dz);
 
-                this.boundingBox.offset(0, 0, dz);
+                double reverseDY = -dy;
+                for (AxisAlignedBB bb : list) {
+                    reverseDY = bb.calculateYOffset(this.boundingBox, reverseDY);
+                }
+                dy += reverseDY;
+                this.boundingBox.offset(0, reverseDY, 0);
 
                 if ((cx * cx + cz * cz) >= (dx * dx + dz * dz)) {
                     dx = cx;
@@ -2003,7 +2019,7 @@ public abstract class Entity extends Location implements Metadatable {
                     dz = cz;
                     this.boundingBox.setBB(axisalignedbb1);
                 } else {
-                    this.ySize += 0.5;
+                    this.ySize += dy;
                 }
             }
 
@@ -2530,7 +2546,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public boolean isOnLadder() {
         int b = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-        return b == Block.LADDER || b == Block.VINES;
+        return b == Block.LADDER || b == Block.VINES || b == Block.COBWEB;
     }
 
     public float getMountedYOffset() {

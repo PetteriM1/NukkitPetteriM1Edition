@@ -128,6 +128,7 @@ public class Level implements ChunkManager, Metadatable {
         if (!Server.getInstance().suomiCraftPEMode()) randomTickBlocks[Block.FIRE] = true;
         randomTickBlocks[Block.GLOWING_REDSTONE_ORE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
+        randomTickBlocks[Block.ICE_FROSTED] = true;
 
         if (Server.getInstance().requiredProtocol >= 388){
             randomTickBlocks[Block.BAMBOO] = true;
@@ -459,6 +460,28 @@ public class Level implements ChunkManager, Metadatable {
         } else {
             Server.broadcastPacket(players, packet);
         }
+    }
+
+    public void addSoundToViewers(Vector3 pos, cn.nukkit.level.Sound sound) {
+        PlaySoundPacket packet = new PlaySoundPacket();
+        packet.name = sound.getSound();
+        packet.volume = 1f;
+        packet.pitch = 1f;
+        packet.x = pos.getFloorX();
+        packet.y = pos.getFloorY();
+        packet.z = pos.getFloorZ();
+        addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, packet);
+    }
+
+    public void addSoundToViewers(Entity entity, cn.nukkit.level.Sound sound) {
+        PlaySoundPacket packet = new PlaySoundPacket();
+        packet.name = sound.getSound();
+        packet.volume = 1f;
+        packet.pitch = 1f;
+        packet.x = entity.getFloorX();
+        packet.y = entity.getFloorY();
+        packet.z = entity.getFloorZ();
+        Server.broadcastPacket(entity.getViewers().values(), packet);
     }
 
     public void addSound(Vector3 pos, cn.nukkit.level.Sound sound) {
@@ -2455,7 +2478,7 @@ public class Level implements ChunkManager, Metadatable {
                         EntityWither wither = (EntityWither) Entity.createEntity("Wither", block.add(0.5, -1, 0.5));
                         wither.stayTime = 220;
                         wither.spawnToAll();
-                        this.addSound(block, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
+                        this.addSoundToViewers(wither, cn.nukkit.level.Sound.MOB_WITHER_SPAWN);
                         return null;
                     }
                 }
@@ -4227,7 +4250,7 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (fireCharge) {
-                this.addSound(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
+                this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
             } else {
                 this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
             }
@@ -4313,7 +4336,7 @@ public class Level implements ChunkManager, Metadatable {
             }
 
             if (fireCharge) {
-                this.addSound(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
+                this.addSoundToViewers(target, cn.nukkit.level.Sound.MOB_GHAST_FIREBALL);
             } else {
                 this.addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_IGNITE);
             }
@@ -4335,8 +4358,8 @@ public class Level implements ChunkManager, Metadatable {
             x = Math.floor(portal.getFloorX() << 3);
             z = Math.floor(portal.getFloorZ() << 3);
         } else {
-            x = Math.floor(portal.getFloorX() / 8);
-            z = Math.floor(portal.getFloorZ() / 8);
+            x = Math.floor(portal.getFloorX() >> 3);
+            z = Math.floor(portal.getFloorZ() >> 3);
         }
         return new Position(x, portal.getFloorY(), z, this == nether? Server.getInstance().getDefaultLevel() : nether);
     }

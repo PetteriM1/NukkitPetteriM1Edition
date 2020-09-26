@@ -97,7 +97,7 @@ public class BlockCauldron extends BlockSolidMeta {
                         this.setDamage(0);//empty
                         this.level.setBlock(this, this, true);
                         cauldron.clearCustomColor();
-                        this.getLevel().addSound(this, Sound.CAULDRON_TAKEWATER);
+                        this.getLevel().addSoundToViewers(this, Sound.CAULDRON_TAKEWATER);
                     }
                 } else if (item.getDamage() == 8) {//water bucket
 
@@ -119,12 +119,12 @@ public class BlockCauldron extends BlockSolidMeta {
                             cauldron.setSplashPotion(false);
                             cauldron.clearCustomColor();
                             this.level.setBlock(this, this, true);
-                            this.level.addSound(this, Sound.CAULDRON_EXPLODE);
+                            this.level.addSoundToViewers(this, Sound.CAULDRON_EXPLODE);
                         } else {
                             this.setDamage(6);//fill
                             cauldron.clearCustomColor();
                             this.level.setBlock(this, this, true);
-                            this.getLevel().addSound(this, Sound.CAULDRON_FILLWATER);
+                            this.getLevel().addSoundToViewers(this, Sound.CAULDRON_FILLWATER);
                         }
                         //this.update();
                     }
@@ -159,7 +159,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     }
                 }
 
-                this.getLevel().addSound(this, Sound.CAULDRON_FILLPOTION);
+                this.getLevel().addSoundToViewers(this, Sound.CAULDRON_FILLPOTION);
                 break;
             case Item.GLASS_BOTTLE:
                 if (isEmpty()) {
@@ -184,7 +184,7 @@ public class BlockCauldron extends BlockSolidMeta {
                     }
                 }
 
-                this.getLevel().addSound(this, Sound.CAULDRON_TAKEPOTION);
+                this.getLevel().addSoundToViewers(this, Sound.CAULDRON_TAKEPOTION);
                 break;
             default:
                 return true;

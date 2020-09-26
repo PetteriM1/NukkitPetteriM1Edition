@@ -97,7 +97,7 @@ public class EntityWitch extends EntityWalkingMob {
                         thrownPotion.close();
                     } else {
                         thrownPotion.spawnToAll();
-                        this.level.addSound(this, Sound.MOB_WITCH_THROW);
+                        this.level.addSoundToViewers(this, Sound.MOB_WITCH_THROW);
                     }
                 }
             }

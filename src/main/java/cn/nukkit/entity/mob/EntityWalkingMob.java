@@ -23,7 +23,6 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
 
     @Override
     public void setTarget(Entity target) {
-        if (this instanceof EntityCaveSpider && !(target instanceof Player)) return; // A temporary fix
         this.setTarget(target, true);
     }
 

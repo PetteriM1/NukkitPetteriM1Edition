@@ -113,7 +113,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
                 skull.close();
             } else {
                 skull.spawnToAll();
-                this.level.addSound(this, Sound.MOB_WITHER_SHOOT);
+                this.level.addSoundToViewers(this, Sound.MOB_WITHER_SHOOT);
             }
         }
     }

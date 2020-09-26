@@ -46,7 +46,7 @@ public class BlockGrassPath extends BlockGrass {
                 item.useOn(this);
                 this.getLevel().setBlock(this, get(FARMLAND), true);
                 if (player != null) {
-                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
                 }
                 return true;
             }

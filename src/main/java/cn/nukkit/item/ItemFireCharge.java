@@ -58,7 +58,7 @@ public class ItemFireCharge extends Item {
                     player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                 }
 
-                level.addSound(block, Sound.MOB_GHAST_FIREBALL);
+                level.addSoundToViewers(block, Sound.MOB_GHAST_FIREBALL);
                 return true;
             }
         }

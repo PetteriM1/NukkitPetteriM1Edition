@@ -86,7 +86,7 @@ abstract public class ItemArmor extends Item implements ItemDurable {
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ARMOR_EQUIP_LEATHER);
                     break;
                 case TIER_NETHERITE:
-                    player.getLevel().addSound(player, Sound.ARMOR_EQUIP_NETHERITE);
+                    player.getLevel().addSoundToViewers(player, Sound.ARMOR_EQUIP_NETHERITE);
                 case TIER_OTHER:
                 default:
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ARMOR_EQUIP_GENERIC);

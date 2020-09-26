@@ -40,6 +40,7 @@ public abstract class ItemEdible extends Item {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
+        if (ticksUsed < 10) return false;
         PlayerItemConsumeEvent consumeEvent = new PlayerItemConsumeEvent(player, this);
 
         player.getServer().getPluginManager().callEvent(consumeEvent);

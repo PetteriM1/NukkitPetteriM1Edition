@@ -1120,7 +1120,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.getServer().bedSpawnpoints) {
             if (!this.getSpawn().equals(pos)) {
                 this.setSpawn(pos);
-                this.sendTranslation("tile.bed.respawnSet");
+                this.sendTranslation("§7%tile.bed.respawnSet");
             }
         }
 
@@ -1520,18 +1520,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         boolean revert = false;
         if ((distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
             revert = true;
-        } else {
-            if (this.chunk == null || !this.chunk.isGenerated()) {
-                BaseFullChunk chunk = this.level.getChunk((int) newPos.x >> 4, (int) newPos.z >> 4, false);
-                if (chunk == null || !chunk.isGenerated()) {
-                    revert = true;
-                    this.nextChunkOrderRun = 0;
-                } else {
-                    if (this.chunk != null) {
-                        this.chunk.removeEntity(this);
-                    }
-                    this.chunk = chunk;
+        } else if (this.chunk == null || !this.chunk.isGenerated()) {
+            BaseFullChunk chunk = this.level.getChunk((int) newPos.x >> 4, (int) newPos.z >> 4, false);
+            if (chunk == null || !chunk.isGenerated()) {
+                revert = true;
+                this.nextChunkOrderRun = 0;
+            } else {
+                if (this.chunk != null) {
+                    this.chunk.removeEntity(this);
                 }
+                this.chunk = chunk;
             }
         }
 
@@ -1543,6 +1541,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             double dx = newPos.x - this.x;
             double dy = newPos.y - this.y;
             double dz = newPos.z - this.z;
+
+            //the client likes to clip into blocks like stairs, but we do full server-side prediction of that without
+            //help from the client's position changes, so we deduct the expected clip height from the moved distance.
+            double expectedClipDistance = this.ySize * (1 - STEP_CLIP_MULTIPLIER);
+            dy -= expectedClipDistance;
 
             this.fastMove(dx, dy, dz);
             if (this.newPosition == null) {
@@ -1834,8 +1837,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
-                        int block = level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-                        if (block == Block.LADDER || block == Block.VINES || block == Block.COBWEB) {
+                        if (this.isOnLadder()) {
                             this.resetFallDistance();
                         } else {
                             if (diff > 1 && expectedVelocity < this.speed.y && (speed.y < -0.2 || speed.y > 4)) {
@@ -3116,7 +3118,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.level.dropItem(vector3, itemDrop);
                                 itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
                                 itemFrame.setItemRotation(0);
-                                this.getLevel().addSound(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
+                                this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
                             }
                         } else {
                             itemFrame.spawnTo(this);
@@ -3845,7 +3847,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.message = this.server.getLanguage().translateString(message, parameters, "nukkit.");
             for (int i = 0; i < parameters.length; i++) {
                 parameters[i] = this.server.getLanguage().translateString(parameters[i], parameters, "nukkit.");
-
             }
             pk.parameters = parameters;
         } else {
@@ -4435,7 +4436,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         } else if (source.getCause() == DamageCause.FALL) {
             Position pos = this.getPosition().floor().add(0.5, -1, 0.5);
-            if (this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.SLIME_BLOCK) {
+            int block = this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+            if (block == Block.SLIME_BLOCK || block == Block.COBWEB) {
                 if (!this.isSneaking()) {
                     source.setCancelled();
                     this.resetFallDistance();
@@ -4538,6 +4540,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.mode = mode;
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
+        this.ySize = 0;
+
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
         } else {
@@ -4556,6 +4560,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
+
+        this.ySize = 0;
+
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
         Server.broadcastPacket(targets, pk);
     }

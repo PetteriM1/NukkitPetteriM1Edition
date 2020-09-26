@@ -6,9 +6,9 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBed;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityPrimedTNT;
+import cn.nukkit.entity.mob.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBed;
-import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -22,11 +22,16 @@ import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockBed extends BlockTransparentMeta implements Faceable {
+
+    private static final List<Integer> monsters = Arrays.asList(EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityPhantom.NETWORK_ID, EntityRavager.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombieVillager.NETWORK_ID, EntityZombieVillagerV2.NETWORK_ID);
 
     public BlockBed() {
         this(0);
@@ -90,7 +95,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean onActivate(Item item, Player player) {
-        if (this.level.getDimension() == Level.DIMENSION_NETHER || this.level.getDimension() == Level.DIMENSION_THE_END) {
+        if (this.level.getDimension() != Level.DIMENSION_OVERWORLD) {
             this.level.useBreakOn(this);
             CompoundTag nbt = new CompoundTag()
                     .putList(new ListTag<DoubleTag>("Pos")
@@ -114,7 +119,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
         boolean isNight = (time >= Level.TIME_NIGHT && time < Level.TIME_SUNRISE);
 
         if (player != null && !isNight) {
-            player.sendMessage(new TranslationContainer("tile.bed.noSleep"));
+            player.sendTranslation("§7%tile.bed.noSleep");
             return true;
         }
 
@@ -137,15 +142,34 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
                 b = blockWest;
             } else {
                 if (player != null) {
-                    player.sendMessage(new TranslationContainer("tile.bed.notValid"));
+                    player.sendTranslation("§7%tile.bed.notValid");
                 }
 
                 return true;
             }
         }
 
-        if (player != null && !player.sleepOn(b)) {
-            player.sendMessage(new TranslationContainer("tile.bed.occupied"));
+        if (player != null) {
+            if (player.distanceSquared(this) > 36) {
+                player.sendTranslation("§7%tile.bed.tooFar");
+                return true;
+            }
+
+            if (!player.isCreative()) {
+                BlockFace secondPart = this.getBlockFace().getOpposite();
+                AxisAlignedBB checkArea = new AxisAlignedBB(b.x - 8, b.y - 6.5, b.z - 8, b.x + 9, b.y + 5.5, b.z + 9).addCoord(secondPart.getXOffset(), 0, secondPart.getZOffset());
+
+                for (Entity entity : this.getLevel().getCollidingEntities(checkArea)) {
+                    if (!entity.isClosed() && monsters.contains(entity.getNetworkId())) {
+                        player.sendTranslation("§7%tile.bed.notSafe");
+                        return true;
+                    }
+                }
+            }
+
+            if (!player.sleepOn(b)) {
+                player.sendTranslation("§7%tile.bed.occupied");
+            }
         }
 
         return true;

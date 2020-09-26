@@ -191,7 +191,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected void onBlock(Entity entity, boolean animate) {
         if (animate) {
-            getLevel().addSound(this, Sound.ITEM_SHIELD_BLOCK);
+            getLevel().addSoundToViewers(this, Sound.ITEM_SHIELD_BLOCK);
         }
     }
 

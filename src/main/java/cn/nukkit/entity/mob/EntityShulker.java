@@ -83,7 +83,7 @@ public class EntityShulker extends EntityWalkingMob {
                 bullet.close();
             } else {
                 bullet.spawnToAll();
-                this.level.addSound(this, Sound.MOB_SHULKER_SHOOT);
+                this.level.addSoundToViewers(this, Sound.MOB_SHULKER_SHOOT);
             }
         }
     }

@@ -53,6 +53,11 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
+    protected double getStepHeight() {
+        return 0.6f;
+    }
+
+    @Override
     public float getEyeHeight() {
         return isSwimming() || isGliding() ? 0.58f : 1.62f;
     }

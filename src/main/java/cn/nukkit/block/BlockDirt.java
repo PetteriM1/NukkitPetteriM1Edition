@@ -60,7 +60,7 @@ public class BlockDirt extends BlockSolidMeta {
                 item.useOn(this);
                 this.getLevel().setBlock(this, this.getDamage() == 0 ? get(FARMLAND) : get(DIRT), true);
                 if (player != null) {
-                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
                 }
                 return true;
             }

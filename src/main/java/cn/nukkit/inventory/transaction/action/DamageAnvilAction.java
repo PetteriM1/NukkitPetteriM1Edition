@@ -48,13 +48,13 @@ public class DamageAnvilAction extends InventoryAction {
         ev.setCancelled(!shouldDamage);
         source.getServer().getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
-            levelBlock.getLevel().addSound(levelBlock, Sound.RANDOM_ANVIL_USE);
+            levelBlock.getLevel().addSoundToViewers(levelBlock, Sound.RANDOM_ANVIL_USE);
             return true;
         } else {
             if (newState.getId() == BlockID.AIR) {
-                levelBlock.getLevel().addSound(levelBlock, Sound.RANDOM_ANVIL_BREAK);
+                levelBlock.getLevel().addSoundToViewers(levelBlock, Sound.RANDOM_ANVIL_BREAK);
             } else {
-                levelBlock.getLevel().addSound(levelBlock, Sound.RANDOM_ANVIL_USE);
+                levelBlock.getLevel().addSoundToViewers(levelBlock, Sound.RANDOM_ANVIL_USE);
             }
             return levelBlock.getLevel().setBlock(levelBlock, newState, true, true);
         }
