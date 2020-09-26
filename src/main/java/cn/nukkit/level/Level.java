@@ -4231,8 +4231,8 @@ public class Level implements ChunkManager, Metadatable {
             x = Math.floor(portal.getFloorX() << 3);
             z = Math.floor(portal.getFloorZ() << 3);
         } else {
-            x = Math.floor(portal.getFloorX() / 8);
-            z = Math.floor(portal.getFloorZ() / 8);
+            x = Math.floor(portal.getFloorX() >> 3);
+            z = Math.floor(portal.getFloorZ() >> 3);
         }
         return new Position(x, portal.getFloorY(), z, this == nether? Server.getInstance().getDefaultLevel() : nether);
     }

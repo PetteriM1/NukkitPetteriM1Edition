@@ -1120,7 +1120,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.getServer().bedSpawnpoints) {
             if (!this.getSpawn().equals(pos)) {
                 this.setSpawn(pos);
-                this.sendTranslation("tile.bed.respawnSet");
+                this.sendTranslation("§7%tile.bed.respawnSet");
             }
         }
 
@@ -3833,7 +3833,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.message = this.server.getLanguage().translateString(message, parameters, "nukkit.");
             for (int i = 0; i < parameters.length; i++) {
                 parameters[i] = this.server.getLanguage().translateString(parameters[i], parameters, "nukkit.");
-
             }
             pk.parameters = parameters;
         } else {
