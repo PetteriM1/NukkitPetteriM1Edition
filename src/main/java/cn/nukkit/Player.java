@@ -5229,7 +5229,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.port = port;
         this.dataPacket(pk);
         String message = "Transferred to " + hostName + ':' + port;
-        this.close("", message, false);
+        //this.close("", message, false);
+        server.getLogger().info(server.getLanguage().translateString("nukkit.player.logOut",
+                TextFormat.AQUA + (this.username == null ? "" : this.username) + TextFormat.WHITE,
+                this.getAddress(), String.valueOf(this.getPort()), message));
     }
 
     /**
