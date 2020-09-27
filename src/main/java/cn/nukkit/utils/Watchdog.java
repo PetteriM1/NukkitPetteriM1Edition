@@ -9,7 +9,7 @@ public class Watchdog extends Thread {
 
     private final Server server;
     private final long time;
-    public boolean running;
+    public volatile boolean running;
     private boolean responding = true;
 
     public Watchdog(Server server, long time) {
@@ -17,13 +17,12 @@ public class Watchdog extends Thread {
         this.time = time;
         this.running = true;
         this.setName("Watchdog");
+        this.setDaemon(true);
     }
 
     public void kill() {
         running = false;
-        synchronized (this) {
-            this.notifyAll();
-        }
+        interrupt();
     }
 
     @Override
@@ -35,35 +34,37 @@ public class Watchdog extends Thread {
                 if (!responding && diff > time << 1) {
                     System.exit(1); // Kill the server if it gets stuck on shutdown
                 }
-                if (server.isRunning() && diff > time) {
-                    if (responding) {
-                        MainLogger logger = this.server.getLogger();
-                        logger.emergency("--------- Server stopped responding ---------");
-                        logger.emergency(Math.round(diff / 1000d) + "s");
-                        logger.emergency("---------------- Main thread ----------------");
 
-                        dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger);
-
-                        logger.emergency("---------------- All threads ----------------");
-                        ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
-                        for (int i = 0; i < threads.length; i++) {
-                            if (i != 0) logger.emergency("------------------------------");
-                            dumpThread(threads[i], logger);
-                        }
-                        logger.emergency("---------------------------------------------");
-                        responding = false;
-                        this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
-                    }
-                } else {
+                if (diff <= time) {
                     responding = true;
+                } else if (responding) {
+                    MainLogger logger = this.server.getLogger();
+                    logger.emergency("--------- Server stopped responding ---------");
+                    logger.emergency(Math.round(diff / 1000d) + " s");
+                    logger.emergency("---------------- Main thread ----------------");
+
+                    dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger);
+
+                    logger.emergency("---------------- All threads ----------------");
+                    ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
+                    for (int i = 0; i < threads.length; i++) {
+                        if (i != 0) logger.emergency("------------------------------");
+                        dumpThread(threads[i], logger);
+                    }
+                    logger.emergency("---------------------------------------------");
+                    responding = false;
+                    this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
                 }
             }
             try {
-                synchronized (this) {
-                    this.wait(Math.max(time >> 2, 1000));
-                }
-            } catch (InterruptedException ignore) {}
+                sleep(Math.max(time / 4, 1000));
+            } catch (InterruptedException ignore) {
+                server.getLogger().emergency("The Watchdog thread has been interrupted and is no longer monitoring the server state");
+                running = false;
+                return;
+            }
         }
+        server.getLogger().warning("Watchdog has been stopped");
     }
 
     private static void dumpThread(ThreadInfo thread, Logger logger) {

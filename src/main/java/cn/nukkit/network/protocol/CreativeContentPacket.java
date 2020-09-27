@@ -18,7 +18,7 @@ public class CreativeContentPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt(entries.length);
+        this.putUnsignedVarInt(entries.length);
         int i = 1; //HACK around since 0 is not indexed by client
         for (Item entry : entries) {
             this.putUnsignedVarInt(i++);

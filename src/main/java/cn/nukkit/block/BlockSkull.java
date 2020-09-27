@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSkull;
@@ -103,7 +104,11 @@ public class BlockSkull extends BlockTransparentMeta {
                 nbt.put(aTag.getName(), aTag);
             }
         }
-        BlockEntity.createBlockEntity(BlockEntity.SKULL, this.getLevel().getChunk(block.getChunkX(), block.getChunkZ()), nbt);
+
+        // HACK
+        Server.getInstance().getScheduler().scheduleDelayedTask(() -> {
+            BlockEntity.createBlockEntity(BlockEntity.SKULL, this.getLevel().getChunk(block.getChunkX(), block.getChunkZ()), nbt);
+        }, 2);
 
         // TODO: 2016/2/3 SPAWN WITHER
 

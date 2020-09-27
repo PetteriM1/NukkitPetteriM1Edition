@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockNetherWartBlock extends BlockSolid {
@@ -17,7 +18,7 @@ public class BlockNetherWartBlock extends BlockSolid {
 
     @Override
     public double getResistance() {
-        return 5;
+        return 1;
     }
 
     @Override
@@ -35,5 +36,10 @@ public class BlockNetherWartBlock extends BlockSolid {
     @Override
     public BlockColor getColor() {
         return BlockColor.RED_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 }
