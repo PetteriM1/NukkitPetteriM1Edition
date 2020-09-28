@@ -5358,7 +5358,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     itemsWithMending.add(inventory.getHeldItemIndex());
                 }
                 if (!itemsWithMending.isEmpty()) {
-                    Integer itemToRepair = itemsWithMending.get(Utils.random.nextInt(itemsWithMending.size()));
+                    int itemToRepair = itemsWithMending.get(Utils.random.nextInt(itemsWithMending.size()));
                     Item toRepair = inventory.getItem(itemToRepair);
                     if (toRepair instanceof ItemTool || toRepair instanceof ItemArmor) {
                         if (toRepair.getDamage() > 0) {
