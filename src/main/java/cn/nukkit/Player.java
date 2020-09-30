@@ -252,6 +252,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean locallyInitialized;
     private boolean foodEnabled = true;
     private int failedTransactions;
+    public int ticksSinceLastRest;
 
     private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET, ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET);
 
@@ -1125,6 +1126,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.level.sleepTicks = 60;
+        this.ticksSinceLastRest = 0;
 
         return true;
     }
@@ -1868,6 +1870,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         updateBlockingFlag();
+
+        if (!this.isSleeping()) {
+            this.ticksSinceLastRest++;
+        }
 
         return true;
     }
@@ -5130,7 +5136,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean switchLevel(Level level) {
         Level oldLevel = this.level;
         if (super.switchLevel(level)) {
-            this.setImmobile(true);
+            //this.setImmobile(true);
 
             SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
             spawnPosition.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
@@ -5164,7 +5170,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.setDimension(level.getDimension());
             }
 
-            this.setImmobile(false);
+            this.ticksSinceLastRest = 0;
+
+            //this.setImmobile(false);
             return true;
         }
 

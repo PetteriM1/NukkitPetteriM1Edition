@@ -2,6 +2,7 @@ package cn.nukkit.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.entity.mob.EntityPhantom;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
@@ -17,10 +18,8 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
     @Override
     public void spawn() {
         for (Player player : Server.getInstance().getOnlinePlayers().values()) {
-            if (player.getLevel().isSpawningAllowed()) {
-                if (isSpawnAllowedByDifficulty()) {
-                    spawnTo(player);
-                }
+            if (isSpawningAllowed(player)) {
+                spawnTo(player);
             }
         }
     }
@@ -31,7 +30,14 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         if (SpawnerTask.entitySpawnAllowed(level, getEntityNetworkId(), player)) {
             Position pos = player.getPosition();
 
-            if (pos != null) {
+            if (getEntityNetworkId() == EntityPhantom.NETWORK_ID) {
+                if (!level.isInSpawnRadius(pos)) { // Do not spawn mobs in the world spawn area
+                    pos.x = pos.x + Utils.rand(-2, 2);
+                    pos.y = pos.y + Utils.rand(20, 34);
+                    pos.z = pos.z + Utils.rand(-2, 2);
+                    spawn(player, pos, level);
+                }
+            } else if (pos != null) {
                 pos.x += SpawnerTask.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
                 pos.z += SpawnerTask.getRandomSafeXZCoord(Utils.rand(48, 52), Utils.rand(24, 28), Utils.rand(4, 8));
 
@@ -50,18 +56,13 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         }
     }
 
-    private static boolean isSpawnAllowedByDifficulty() {
-        int randomNumber = Utils.rand(0, 3);
-
-        switch (Server.getInstance().getDifficulty()) {
-            case 0:
-                return randomNumber == 0;
-            case 1:
-                return randomNumber <= 1;
-            case 2:
-                return randomNumber <= 2;
-            default:
-                return true;
+    private boolean isSpawningAllowed(Player player) {
+        if (!player.getLevel().isMobSpawningAllowed() || Utils.rand(1, 4) == 1) {
+            return false;
         }
+        if (Server.getInstance().getDifficulty() == 0) {
+            return !Utils.monstersList.contains(getEntityNetworkId());
+        }
+        return true;
     }
 }

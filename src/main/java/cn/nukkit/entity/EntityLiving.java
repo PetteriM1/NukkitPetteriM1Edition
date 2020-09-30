@@ -240,12 +240,20 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                     if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
                         this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
+
+                        if (!this.dropsOnNaturalDeath()) {
+                            for (cn.nukkit.item.Item item : ev.getDrops()) {
+                                this.getLevel().dropItem(this, item);
+                            }
+                        }
                     }
                 }
             }
 
-            for (cn.nukkit.item.Item item : ev.getDrops()) {
-                this.getLevel().dropItem(this, item);
+            if (this.dropsOnNaturalDeath()) {
+                for (cn.nukkit.item.Item item : ev.getDrops()) {
+                    this.getLevel().dropItem(this, item);
+                }
             }
         }
     }
@@ -475,5 +483,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     public void setBlocking(boolean value) {
         this.blocking = value;
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_BLOCKING, value);
+    }
+
+    public boolean dropsOnNaturalDeath() {
+        return true;
     }
 }

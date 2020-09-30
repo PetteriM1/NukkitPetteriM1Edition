@@ -9,6 +9,7 @@ import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.EntityCod;
 import cn.nukkit.entity.passive.EntitySalmon;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
@@ -59,6 +60,7 @@ public class SpawnerTask implements Runnable {
         this.registerMobSpawner(WitchSpawner.class);
         this.registerMobSpawner(WitherSkeletonSpawner.class);
         this.registerMobSpawner(DrownedSpawner.class);
+        this.registerMobSpawner(PhantomSpawner.class);
     }
 
     public boolean registerAnimalSpawner(Class<?> clazz) {
@@ -69,7 +71,7 @@ public class SpawnerTask implements Runnable {
         try {
             EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
             this.animalSpawners.put(clazz, spawner);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
         return true;
@@ -91,7 +93,7 @@ public class SpawnerTask implements Runnable {
         try {
             EntitySpawner spawner = (EntitySpawner) clazz.getConstructor(SpawnerTask.class).newInstance(this);
             this.mobSpawners.put(clazz, spawner);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
         return true;
@@ -121,12 +123,15 @@ public class SpawnerTask implements Runnable {
         }
     }
 
-    static boolean entitySpawnAllowed(Level level, int networkId, Vector3 pos) {
+    static boolean entitySpawnAllowed(Level level, int networkId, Player player) {
+        if (networkId == EntityPhantom.NETWORK_ID && (player.ticksSinceLastRest < 72000 || player.isSleeping() || player.isSpectator() || !level.getGameRules().getBoolean(GameRule.DO_INSOMNIA))) {
+            return false;
+        }
         int max = getMaxSpawns(networkId, level.getDimension() == Level.DIMENSION_NETHER, level.getDimension() == Level.DIMENSION_THE_END);
         if (max == 0) return false;
         int count = 0;
         for (Entity entity : level.entities.values()) {
-            if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(pos.x, entity.y, pos.z).distanceSquared(entity) < 10000) { // 100 blocks
+            if (entity.isAlive() && entity.getNetworkId() == networkId && new Vector3(player.x, entity.y, player.z).distanceSquared(entity) < 10000) { // 100 blocks
                 count++;
                 if (count > max) {
                     return false;
@@ -256,6 +261,9 @@ public class SpawnerTask implements Runnable {
                 return end || nether ? 0 : 4;
             case EntityWitch.NETWORK_ID:
                 return end || nether ? 0 : 1;
+            case EntityPhantom.NETWORK_ID:
+                int difficulty = Server.getInstance().getDifficulty();
+                return end || nether ? 0 : difficulty == 1 ? 2 : difficulty == 2 ? 3 : 4;
             default:
                 return end || nether ? 0 : 2;
         }

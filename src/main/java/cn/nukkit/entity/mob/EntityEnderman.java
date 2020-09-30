@@ -176,9 +176,9 @@ public class EntityEnderman extends EntityWalkingMob {
         if (!isAngry()) return false;
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 144;
+            return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 200;
         }
-        return creature.isAlive() && !creature.closed && distance <= 144;
+        return creature.isAlive() && !creature.closed && distance <= 200;
     }
 
     public void stareToAngry() {
