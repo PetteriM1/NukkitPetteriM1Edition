@@ -61,10 +61,12 @@ public class ShulkerBoxInventory extends ContainerInventory {
 
     @Override
     public boolean canAddItem(Item item) {
-        if (item.getId() == BlockID.SHULKER_BOX || item.getId() == BlockID.UNDYED_SHULKER_BOX) {
-            // Do not allow nested shulker boxes
-            return false;
-        }
-        return super.canAddItem(item);
+        return allowedToAdd(item) && super.canAddItem(item);
+    }
+
+    @Override
+    public boolean allowedToAdd(Item item) {
+        // Do not allow nested shulker boxes
+        return item.getId() != BlockID.SHULKER_BOX && item.getId() != BlockID.UNDYED_SHULKER_BOX;
     }
 }

@@ -19,12 +19,12 @@ public class BlockNetherReactor extends BlockSolid {
 
     @Override
     public double getHardness() {
-        return 30;
+        return 3;
     }
 
     @Override
     public double getResistance() {
-        return 30;
+        return 15;
     }
 
     @Override
@@ -34,9 +34,9 @@ public class BlockNetherReactor extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_IRON) {
+        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
             return new Item[]{new ItemDiamond(0, 3), new ItemIngotIron(0, 6)};
-        } else return new Item[]{};
+        } else return new Item[0];
     }
 
     @Override
