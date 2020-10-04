@@ -4119,7 +4119,7 @@ public class Level implements ChunkManager, Metadatable {
         return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
     }
 
-    public boolean isSpawningAllowed() {
+    public boolean isMobSpawningAllowed() {
         return !Server.disabledSpawnWorlds.contains(getName()) && gameRules.getBoolean(GameRule.DO_MOB_SPAWNING);
     }
 

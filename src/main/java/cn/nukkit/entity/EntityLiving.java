@@ -57,6 +57,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     private boolean blocking = false;
 
+    private int airTicks;
+
     protected final boolean isDrowned = this instanceof EntityDrowned;
 
     @Override
@@ -240,12 +242,20 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 if (baseEntity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                     if (((EntityDamageByEntityEvent) baseEntity.getLastDamageCause()).getDamager() instanceof Player) {
                         this.getLevel().dropExpOrb(this, baseEntity.getKillExperience());
+
+                        if (!this.dropsOnNaturalDeath()) {
+                            for (cn.nukkit.item.Item item : ev.getDrops()) {
+                                this.getLevel().dropItem(this, item);
+                            }
+                        }
                     }
                 }
             }
 
-            for (cn.nukkit.item.Item item : ev.getDrops()) {
-                this.getLevel().dropItem(this, item);
+            if (this.dropsOnNaturalDeath()) {
+                for (cn.nukkit.item.Item item : ev.getDrops()) {
+                    this.getLevel().dropItem(this, item);
+                }
             }
         }
     }
@@ -265,7 +275,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         if (this instanceof Player) {
-            if (!isBreathing && ((Player) this).getInventory().getHelmet() instanceof ItemTurtleShell) {
+            if (!isBreathing && ((Player) this).getInventory().getHelmetFast() instanceof ItemTurtleShell) {
                 if (turtleTicks > 0) {
                     isBreathing = true;
                     turtleTicks--;
@@ -461,10 +471,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
     
     public int getAirTicks() {
-        return this.getDataPropertyShort(DATA_AIR);
+        return this.airTicks;
     }
 
     public void setAirTicks(int ticks) {
+        this.airTicks = ticks;
         this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
     }
 
@@ -475,5 +486,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     public void setBlocking(boolean value) {
         this.blocking = value;
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_BLOCKING, value);
+    }
+
+    public boolean dropsOnNaturalDeath() {
+        return true;
     }
 }

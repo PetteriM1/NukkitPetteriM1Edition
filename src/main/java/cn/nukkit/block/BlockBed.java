@@ -6,7 +6,6 @@ import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBed;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityPrimedTNT;
-import cn.nukkit.entity.mob.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBed;
 import cn.nukkit.level.Level;
@@ -21,17 +20,13 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.Faceable;
-
-import java.util.Arrays;
-import java.util.List;
+import cn.nukkit.utils.Utils;
 
 /**
  * @author MagicDroidX
  * Nukkit Project
  */
 public class BlockBed extends BlockTransparentMeta implements Faceable {
-
-    private static final List<Integer> monsters = Arrays.asList(EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityPhantom.NETWORK_ID, EntityRavager.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombieVillager.NETWORK_ID, EntityZombieVillagerV2.NETWORK_ID);
 
     public BlockBed() {
         this(0);
@@ -160,7 +155,7 @@ public class BlockBed extends BlockTransparentMeta implements Faceable {
                 AxisAlignedBB checkArea = new SimpleAxisAlignedBB(b.x - 8, b.y - 6.5, b.z - 8, b.x + 9, b.y + 5.5, b.z + 9).addCoord(secondPart.getXOffset(), 0, secondPart.getZOffset());
 
                 for (Entity entity : this.getLevel().getCollidingEntities(checkArea)) {
-                    if (!entity.isClosed() && monsters.contains(entity.getNetworkId())) {
+                    if (!entity.isClosed() && Utils.monstersList.contains(entity.getNetworkId())) {
                         player.sendTranslation("§7%tile.bed.notSafe");
                         return true;
                     }

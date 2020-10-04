@@ -37,6 +37,8 @@ public interface Inventory {
 
     boolean canAddItem(Item item);
 
+    boolean allowedToAdd(Item item);
+
     Item[] removeItem(Item... slots);
 
     Map<Integer, Item> getContents();

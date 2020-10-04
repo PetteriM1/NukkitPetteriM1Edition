@@ -3,6 +3,7 @@ package cn.nukkit.entity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.mob.EntityEnderDragon;
+import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.entity.mob.EntityRavager;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -208,7 +209,9 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     @Override
     public boolean move(double dx, double dy, double dz) {
         if (dy < -10 || dy > 10) {
-            this.kill();
+            if (!(this instanceof EntityFlyingMob)) {
+                this.kill();
+            }
             return false;
         }
 

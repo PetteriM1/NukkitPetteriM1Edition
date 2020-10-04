@@ -207,6 +207,10 @@ public class PlayerInventory extends BaseInventory {
         return this.getItem(this.getSize());
     }
 
+    public Item getHelmetFast() {
+        return this.getItemFast(36);
+    }
+
     public Item getChestplate() {
         return this.getItem(this.getSize() + 1);
     }
@@ -217,6 +221,10 @@ public class PlayerInventory extends BaseInventory {
 
     public Item getLeggings() {
         return this.getItem(this.getSize() + 2);
+    }
+
+    public Item getLeggingsFast() {
+        return this.getItemFast(38);
     }
 
     public Item getBoots() {
