@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityMovingBlock;
 import cn.nukkit.blockentity.BlockEntityPistonArm;
+import cn.nukkit.event.block.BlockPistonEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
@@ -175,6 +176,12 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
 
         boolean canMove = calculator.canMove();
         if (!canMove && extending) {
+            return false;
+        }
+
+        BlockPistonEvent event = new BlockPistonEvent(this, direction, calculator.getBlocksToMove(), calculator.getBlocksToDestroy(), extending);
+        this.level.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
             return false;
         }
 
