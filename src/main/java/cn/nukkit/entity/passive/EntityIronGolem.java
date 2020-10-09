@@ -75,7 +75,7 @@ public class EntityIronGolem extends EntityWalkingMob {
     }
 
     public boolean targetOption(EntityCreature creature, double distance) {
-        return !(creature instanceof Player) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 60;
+        return !(creature instanceof Player) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 100;
     }
 
     @Override

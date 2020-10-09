@@ -161,7 +161,7 @@ public class SpawnerTask implements Runnable {
 
     private static boolean tooNearOfPlayer(Position pos) {
         for (Player p : pos.getLevel().getPlayers().values()) {
-            if (p.distanceSquared(pos) < 144) { // 12 blocks
+            if (p.distanceSquared(pos) < 196) { // 14 blocks
                 return true;
             }
         }

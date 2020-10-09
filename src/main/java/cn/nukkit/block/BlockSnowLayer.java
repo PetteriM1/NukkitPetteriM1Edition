@@ -5,8 +5,8 @@ import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSnowball;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
-import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
@@ -25,8 +25,13 @@ public class BlockSnowLayer extends BlockFallableMeta {
     }
 
     @Override
+    public final int getFullId() {
+        return 1248 + this.getDamage();
+    }
+
+    @Override
     public String getName() {
-        return "Snow Layer";
+        return "Top Snow";
     }
 
     @Override
@@ -51,13 +56,12 @@ public class BlockSnowLayer extends BlockFallableMeta {
 
     @Override
     public boolean canBeReplaced() {
-        return true;
+        return (this.getDamage() & 0x7) != 0x7;
     }
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        if (down.isSolid() || down instanceof BlockSnowLayer) {
+        if (this.canSurvive()) {
             this.getLevel().setBlock(block, this, true);
 
             return true;
@@ -65,12 +69,27 @@ public class BlockSnowLayer extends BlockFallableMeta {
         return false;
     }
 
+    private boolean canSurvive() {
+        Block below = this.down();
+        return below.getId() != ICE && below.getId() != PACKED_ICE && below.getId() != ICE_FROSTED && (below.isSolid() || (this.getDamage() & 0x7) == 0x7);
+    }
+
     @Override
     public int onUpdate(int type) {
-        super.onUpdate(type);
-        if (type == Level.BLOCK_UPDATE_RANDOM) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if ((this.getDamage() & 0x7) != 0x7 || this.up().getId() != SNOW_LAYER) {
+                super.onUpdate(type);
+            }
+
+            if (this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ()) == SNOW_LAYER && !this.canSurvive()) {
+                this.level.useBreakOn(this, null, null, true);
+                if (this.level.getGameRules().getBoolean(GameRule.DO_TILE_DROPS)) {
+                    this.level.dropItem(this, this.toItem());
+                }
+            }
+        } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) >= 10) {
-                BlockFadeEvent event = new BlockFadeEvent(this, get(AIR));
+                BlockFadeEvent event = new BlockFadeEvent(this, (this.getDamage() & 0x7) > 0 ? get(SNOW_LAYER, this.getDamage() - 1) : get(AIR));
                 level.getServer().getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
                     level.setBlock(this, event.getNewState(), true);
@@ -89,9 +108,10 @@ public class BlockSnowLayer extends BlockFallableMeta {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShovel() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new Item[]{
-                    this.toItem()
-            };
+            Item drop = this.toItem();
+            int height = this.getDamage() & 0x7;
+            drop.setCount(height < 3 ? 1 : height < 5 ? 2 : height == 7 ? 4 : 3);
+            return new Item[]{drop};
         } else {
             return new Item[0];
         }
@@ -109,7 +129,7 @@ public class BlockSnowLayer extends BlockFallableMeta {
 
     @Override
     public boolean isTransparent() {
-        return true;
+        return (this.getDamage() & 0x7) != 0x7;
     }
 
     @Override
@@ -118,17 +138,40 @@ public class BlockSnowLayer extends BlockFallableMeta {
     }
 
     @Override
-    public boolean canPassThrough() {
+    public boolean isSolid() {
+        return (this.getDamage() & 0x7) == 0x7;
+    }
+
+    @Override
+    public double getMaxY() {
+        int height = this.getDamage() & 0x7;
+        return height < 3 ? this.y : height == 7 ? this.y + 1 : this.y + 0.5;
+    }
+
+    @Override
+    public boolean canBeActivated() {
         return true;
     }
 
     @Override
-    public boolean isSolid() {
-        return false;
-    }
+    public boolean onActivate(Item item, Player player) {
+        if (item.isShovel()) {
+            item.useOn(this);
+            this.level.useBreakOn(this, item.clone().clearNamedTag(), null, true);
+            return true;
+        } else if (item.getId() == SNOW_LAYER) {
+            if ((this.getDamage() & 0x7) != 0x7) {
+                this.setDamage(this.getDamage() + 1);
+                this.level.setBlock(this ,this, true);
 
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return null;
+                if (player != null && (player.gamemode & 0x1) == 0) {
+                    item.count--;
+                }
+                return true;
+            } else {
+                this.level.setBlock(this ,this, true);
+            }
+        }
+        return false;
     }
 }

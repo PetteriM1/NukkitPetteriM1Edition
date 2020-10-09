@@ -133,9 +133,9 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this instanceof EntityMob) {
             if (creature instanceof Player) {
                 Player player = (Player) creature;
-                return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 80;
+                return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 100;
             }
-            return creature.isAlive() && !creature.closed && distance <= 80;
+            return creature.isAlive() && !creature.closed && distance <= 100;
         }
         return false;
     }
