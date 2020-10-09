@@ -4220,7 +4220,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Position calculatePortalMirror(Vector3 portal) {
-        Level nether = Server.getInstance().getLevelByName("nether");
+        Level nether = Server.getInstance().getNetherWorld(this.getName());
         if (nether == null) {
             return null;
         }

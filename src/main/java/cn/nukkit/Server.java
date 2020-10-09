@@ -174,7 +174,8 @@ public class Server {
     final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
-    private static final List<String> nonAutoSaveWorlds = new ArrayList<>();
+    public static final List<String> nonAutoSaveWorlds = new ArrayList<>();
+    public static final List<String> multiNetherWorlds = new ArrayList<>();
 
     private static final Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
 
@@ -469,9 +470,24 @@ public class Server {
                         this.loadLevel(fs.getName());
                     }
                 }
-                if (this.getLevelByName("nether") == null && netherEnabled) {
-                    this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
-                    this.loadLevel("nether");
+                if (netherEnabled) {
+                    if (this.getLevelByName("nether") == null) {
+                        this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
+                        this.loadLevel("nether");
+                    }
+                    String list = this.getPropertyString("multi-nether-worlds");
+                    if (!list.trim().isEmpty()) {
+                        StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+                        while (tokenizer.hasMoreTokens()) {
+                            String world = tokenizer.nextToken();
+                            multiNetherWorlds.add(world);
+                            String nether = world + "-nether";
+                            if (this.getLevelByName(nether) == null) {
+                                this.generateLevel(nether, System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
+                                this.loadLevel(nether);
+                            }
+                        }
+                    }
                 }
                 if (this.getLevelByName("the_end") == null && endEnabled) {
                     this.generateLevel("the_end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
@@ -2192,6 +2208,10 @@ public class Server {
         return skinChangeCooldown;
     }
 
+    public Level getNetherWorld(String world) {
+        return multiNetherWorlds.contains(world) ? this.getLevelByName(world + "-nether") : this.getLevelByName("nether");
+    }
+
     /**
      * Checks the current thread against the expected primary thread for the server.
      *
@@ -2551,6 +2571,7 @@ public class Server {
             put("save-player-data-by-uuid", true);
             put("vanilla-portals", true);
             put("persona-skins", true);
+            put("multi-nether-worlds", "");
         }
     }
 

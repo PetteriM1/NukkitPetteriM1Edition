@@ -1473,10 +1473,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.portalPos = null;
                 } else {
-                    if (this.getLevel().isNether) {
+                    if (this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
                         this.teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                     } else {
-                        Level nether = this.getServer().getLevelByName("nether");
+                        Level nether = this.getServer().getNetherWorld(this.level.getName());
                         if (nether != null) {
                             this.teleport(nether.getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                         }
