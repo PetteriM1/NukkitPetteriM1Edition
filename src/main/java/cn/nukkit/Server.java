@@ -458,8 +458,14 @@ public class Server {
         if (this.defaultLevel == null) {
             this.getLogger().emergency(this.baseLang.translateString("nukkit.level.defaultError"));
             this.forceShutdown();
-
             return;
+        }
+
+        for (Map.Entry<Integer, Level> entry : this.getLevels().entrySet()) {
+            Level level = entry.getValue();
+            this.getLogger().debug("Preparing spawn region for level " + level.getName());
+            Position spawn = level.getSpawnLocation();
+            level.populateChunk(spawn.getChunkX(), spawn.getChunkZ(), true);
         }
 
         // Load levels
