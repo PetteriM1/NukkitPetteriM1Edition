@@ -137,11 +137,11 @@ public class CraftingTransaction extends InventoryTransaction {
     protected void sendInventories() {
         super.sendInventories();
 
-        Optional<Inventory> topWindow = source.getTopWindow();
+        /*Optional<Inventory> topWindow = source.getTopWindow();
         if (topWindow.isPresent()) {
-            //source.removeWindow(topWindow.get());
+            source.removeWindow(topWindow.get());
             return;
-        }
+        }*/
 
         /*
          * TODO: HACK!
