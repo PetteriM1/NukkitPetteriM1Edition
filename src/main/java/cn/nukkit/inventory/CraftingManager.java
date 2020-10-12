@@ -35,7 +35,9 @@ public class CraftingManager {
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, BrewingRecipe> brewingRecipesOld = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, ContainerRecipe> containerRecipesOld = new Int2ObjectOpenHashMap<>();
 
     private static int RECIPE_COUNT = 0;
     protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
@@ -216,31 +218,45 @@ public class CraftingManager {
             }
         }
 
-        this.rebuildPacket();
-
-        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
-
-        Config config = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json"));
-        // Load brewing recipes
-        List<Map> potionMixes = config.getMapList("potionMixes");
-
+        Config extras = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json"));
+        List<Map> potionMixes = extras.getMapList("potionMixes");
         for (Map potionMix : potionMixes) {
-            int fromPotionId = ((Number) potionMix.get("fromPotionId")).intValue(); // gson returns doubles...
+            int fromPotionId = ((Number) potionMix.get("fromPotionId")).intValue();
             int ingredient = ((Number) potionMix.get("ingredient")).intValue();
             int toPotionId = ((Number) potionMix.get("toPotionId")).intValue();
-
-            registerBrewingRecipe(new BrewingRecipe(Item.get(ItemID.POTION, fromPotionId), Item.get(ingredient), Item.get(ItemID.POTION, toPotionId)));
+            registerBrewingRecipeOld(new BrewingRecipe(Item.get(ItemID.POTION, fromPotionId), Item.get(ingredient), Item.get(ItemID.POTION, toPotionId)));
         }
 
-        List<Map> containerMixes = config.getMapList("containerMixes");
-
+        List<Map> containerMixes = extras.getMapList("containerMixes");
         for (Map containerMix : containerMixes) {
             int fromItemId = ((Number) containerMix.get("fromItemId")).intValue();
             int ingredient = ((Number) containerMix.get("ingredient")).intValue();
             int toItemId = ((Number) containerMix.get("toItemId")).intValue();
+            registerContainerRecipeOld(new ContainerRecipe(Item.get(fromItemId), Item.get(ingredient), Item.get(toItemId)));
+        }
 
+        Config extras407 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("extras_407.json"));
+        List<Map> potionMixes407 = extras407.getMapList("potionMixes");
+        for (Map potionMix : potionMixes407) {
+            int fromPotionId = ((Number) potionMix.get("inputId")).intValue();
+            int fromPotionMeta = ((Number) potionMix.get("inputMeta")).intValue();
+            int ingredient = ((Number) potionMix.get("reagentId")).intValue();
+            int ingredientMeta = ((Number) potionMix.get("reagentMeta")).intValue();
+            int toPotionId = ((Number) potionMix.get("outputId")).intValue();
+            int toPotionMeta = ((Number) potionMix.get("outputMeta")).intValue();
+            registerBrewingRecipe(new BrewingRecipe(Item.get(fromPotionId, fromPotionMeta), Item.get(ingredient, ingredientMeta), Item.get(toPotionId, toPotionMeta)));
+        }
+
+        List<Map> containerMixes407 = extras407.getMapList("containerMixes");
+        for (Map containerMix : containerMixes407) {
+            int fromItemId = ((Number) containerMix.get("inputId")).intValue();
+            int ingredient = ((Number) containerMix.get("reagentId")).intValue();
+            int toItemId = ((Number) containerMix.get("outputId")).intValue();
             registerContainerRecipe(new ContainerRecipe(Item.get(fromItemId), Item.get(ingredient), Item.get(toItemId)));
         }
+
+        this.rebuildPacket();
+        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
     }
 
     public void rebuildPacket() {
@@ -279,10 +295,10 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk388.addFurnaceRecipe(recipe);
         }
-        for (BrewingRecipe recipe : brewingRecipes.values()) {
+        for (BrewingRecipe recipe : brewingRecipesOld.values()) {
             pk388.addBrewingRecipe(recipe);
         }
-        for (ContainerRecipe recipe : containerRecipes.values()) {
+        for (ContainerRecipe recipe : containerRecipesOld.values()) {
             pk388.addContainerRecipe(recipe);
         }
         pk388.encode();
@@ -432,15 +448,25 @@ public class CraftingManager {
     public void registerBrewingRecipe(BrewingRecipe recipe) {
         Item input = recipe.getIngredient();
         Item potion = recipe.getInput();
-
         this.brewingRecipes.put(getPotionHash(input.getId(), potion.getDamage()), recipe);
+    }
+
+    public void registerBrewingRecipeOld(BrewingRecipe recipe) {
+        Item input = recipe.getIngredient();
+        Item potion = recipe.getInput();
+        this.brewingRecipesOld.put(getPotionHash(input.getId(), potion.getDamage()), recipe);
     }
 
     public void registerContainerRecipe(ContainerRecipe recipe) {
         Item input = recipe.getIngredient();
         Item potion = recipe.getInput();
-
         this.containerRecipes.put(getContainerHash(input.getId(), potion.getId()), recipe);
+    }
+
+    public void registerContainerRecipeOld(ContainerRecipe recipe) {
+        Item input = recipe.getIngredient();
+        Item potion = recipe.getInput();
+        this.containerRecipesOld.put(getContainerHash(input.getId(), potion.getId()), recipe);
     }
 
     public BrewingRecipe matchBrewingRecipe(Item input, Item potion) {
@@ -448,7 +474,6 @@ public class CraftingManager {
         if (id == Item.POTION || id == Item.SPLASH_POTION || id == Item.LINGERING_POTION) {
             return this.brewingRecipes.get(getPotionHash(input.getId(), potion.getDamage()));
         }
-
         return null;
     }
 
