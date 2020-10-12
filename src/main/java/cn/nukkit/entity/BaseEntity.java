@@ -27,7 +27,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     private int airTicks = 0;
 
-    protected float moveMultifier = 1.0f;
+    protected float moveMultiplier = 1.0f;
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
@@ -219,9 +219,9 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         this.blocksAround = null;
 
-        double movX = dx * moveMultifier;
+        double movX = dx * moveMultiplier;
         double movY = dy;
-        double movZ = dz * moveMultifier;
+        double movZ = dz * moveMultiplier;
 
         AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
 
