@@ -128,8 +128,7 @@ public class ItemBucket extends Item {
             }
         } else if (targetBlock instanceof BlockLiquid) {
             Item result = Item.get(BUCKET, 0, 1);
-            PlayerBucketEmptyEvent ev;
-            player.getServer().getPluginManager().callEvent(ev = new PlayerBucketEmptyEvent(player, block, face, this, result));
+            PlayerBucketEmptyEvent ev = new PlayerBucketEmptyEvent(player, block, face, this, result);
             if (!block.canBeFlowedInto()) {
                 ev.setCancelled(true);
             }
@@ -137,6 +136,8 @@ public class ItemBucket extends Item {
             if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
+
+            player.getServer().getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
                 player.getLevel().setBlock(block, targetBlock, true, true);
