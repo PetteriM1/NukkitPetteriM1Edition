@@ -2083,6 +2083,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setLevel(level);
         }
 
+        this.ticksSinceLastRest = nbt.getInt("ticksSinceLastRest");
+
         for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
             if (!(achievement instanceof ByteTag)) {
                 continue;
@@ -4103,6 +4105,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.namedTag.putInt("foodLevel", this.foodData.getLevel());
             this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
+
+            this.namedTag.putInt("ticksSinceLastRest", this.ticksSinceLastRest);
 
             if (!this.username.isEmpty() && this.namedTag != null) {
                 if (this.server.savePlayerDataByUuid) {
