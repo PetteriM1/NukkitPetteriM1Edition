@@ -208,6 +208,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private final List<DataPacket> batchedPackets = new ArrayList<>();
 
     private PermissibleBase perm;
+    private boolean showAdmin = true;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -499,6 +500,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.recalculatePermissions();
         this.adventureSettings.update();
         this.sendCommandData();
+    }
+
+    public void setShowAdmin(boolean showAdmin) {
+        this.showAdmin = showAdmin;
+    }
+
+    public boolean showAdmin() {
+        return this.showAdmin;
     }
 
     @Override
