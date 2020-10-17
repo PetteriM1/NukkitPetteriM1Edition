@@ -1,8 +1,11 @@
 package cn.nukkit.blockentity;
 
+import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -96,8 +99,25 @@ public class BlockEntityCauldron extends BlockEntitySpawnable {
     public void setCustomColor(int r, int g, int b) {
         int color = (r << 16 | g << 8 | b) & 0xffffff;
 
-        namedTag.putInt("CustomColor", color);
-        spawnToAll();
+        if (color != namedTag.getInt("CustomColor")) {
+            namedTag.putInt("CustomColor", color);
+            Block block = getBlock();
+            Player[] pl = level.getChunkPlayers(getChunkX(), getChunkZ()).values().toArray(new Player[0]);
+            for (Player p : pl) {
+                UpdateBlockPacket air = new UpdateBlockPacket();
+                air.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, 0);
+                air.flags = UpdateBlockPacket.FLAG_ALL_PRIORITY;
+                air.x = (int) x;
+                air.y = (int) y;
+                air.z = (int) z;
+                UpdateBlockPacket self = (UpdateBlockPacket) air.clone();
+                self.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, block.getId(), block.getDamage());
+                p.dataPacket(air);
+                p.dataPacket(self);
+            }
+
+            spawnToAll();
+        }
     }
 
     public void clearCustomColor() {

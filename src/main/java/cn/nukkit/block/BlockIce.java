@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.event.block.BlockFadeEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.utils.BlockColor;
 
@@ -44,11 +45,10 @@ public class BlockIce extends BlockTransparent {
 
     @Override
     public boolean onBreak(Item item) {
-        if (this.getLevel().getDimension() != Level.DIMENSION_NETHER) {
-            return this.getLevel().setBlock(this, Block.get(BlockID.WATER), true);
-        } else {
+        if (this.getLevel().getDimension() == Level.DIMENSION_NETHER || item.hasEnchantment(Enchantment.ID_SILK_TOUCH) || down().getId() == BlockID.AIR) {
             return super.onBreak(item);
         }
+        return this.getLevel().setBlock(this, Block.get(BlockID.WATER), true);
     }
 
     @Override

@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -162,7 +163,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected boolean blockedByShield(EntityDamageEvent source) {
         Entity damager = source instanceof EntityDamageByEntityEvent? ((EntityDamageByEntityEvent) source).getDamager() : null;
-        if (damager == null || !this.isBlocking()) {
+        if (damager == null || !this.isBlocking() || damager instanceof EntityWeather) {
             return false;
         }
 

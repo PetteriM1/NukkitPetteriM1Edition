@@ -1,5 +1,6 @@
 package cn.nukkit.entity.projectile;
 
+import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.LongEntityData;
@@ -141,7 +142,7 @@ public abstract class EntityProjectile extends Entity {
             Entity nearEntity = null;
 
             for (Entity entity : list) {
-                if (/*!entity.canCollideWith(this) || */(entity == this.shootingEntity && this.age < 5)) {
+                if (/*!entity.canCollideWith(this) || */(entity == this.shootingEntity && this.age < 5) || (entity.isPlayer && ((Player) entity).getGamemode() == Player.SPECTATOR)) {
                     continue;
                 }
 

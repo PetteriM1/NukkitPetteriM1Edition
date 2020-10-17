@@ -119,6 +119,9 @@ public class CraftingTransaction extends InventoryTransaction {
                     }
                 }
             }
+            if (recipe == null) {
+                source.sendExperienceLevel();
+            }
             source.getUIInventory().setItem(AnvilInventory.RESULT, Item.get(0), false);
         } else {
             recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);

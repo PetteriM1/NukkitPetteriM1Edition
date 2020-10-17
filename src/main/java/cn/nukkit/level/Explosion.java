@@ -100,10 +100,8 @@ public class Explosion {
                             if (block.getId() != 0 && block.getId() != 7) {
                                 blastForce -= (block.getResistance() / 5 + 0.3d) * stepLen;
                                 if (blastForce > 0) {
-                                    if (level.getServer().explosionBreakBlocks) {
-                                        if (!this.affectedBlocks.contains(block)) {
-                                            this.affectedBlocks.add(block);
-                                        }
+                                    if (!this.affectedBlocks.contains(block)) {
+                                        this.affectedBlocks.add(block);
                                     }
                                 }
                             }

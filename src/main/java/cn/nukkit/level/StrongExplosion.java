@@ -85,10 +85,8 @@ public class StrongExplosion extends Explosion {
                                     blastForce -= (block.getResistance() / 5 + 0.3d) * 0.3d;
                                 }
                                 if (blastForce > 0) {
-                                    if (level.getServer().explosionBreakBlocks) {
-                                        if (!this.affectedBlocks.contains(block)) {
-                                            this.affectedBlocks.add(block);
-                                        }
+                                    if (!this.affectedBlocks.contains(block)) {
+                                        this.affectedBlocks.add(block);
                                     }
                                 }
                             }

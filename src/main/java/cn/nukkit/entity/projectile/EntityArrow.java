@@ -110,12 +110,17 @@ public class EntityArrow extends EntityProjectile {
 
         if (this.timing != null) this.timing.startTiming();
 
+        if (this.age > 1200) {
+            this.close();
+            return false;
+        }
+
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
         }
 
-        if (this.age > 1200) {
-            this.close();
+        if (this.fireTicks > 0 && this.level.isRaining() && this.level.canBlockSeeSky(this)) {
+            this.extinguish();
         }
 
         if (this.timing != null) this.timing.stopTiming();

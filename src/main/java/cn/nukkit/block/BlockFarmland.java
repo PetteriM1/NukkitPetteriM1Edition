@@ -54,7 +54,7 @@ public class BlockFarmland extends BlockTransparentMeta {
                 this.y,
                 this.z,
                 this.x + 1,
-                this.y + 0.9375,
+                this.y + 1, // the actual bounding box is a normal cube
                 this.z + 1
         );
     }
