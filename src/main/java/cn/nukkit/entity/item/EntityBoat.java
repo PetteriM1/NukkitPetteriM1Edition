@@ -12,7 +12,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.vehicle.VehicleMoveEvent;
 import cn.nukkit.event.vehicle.VehicleUpdateEvent;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemBoat;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
@@ -49,6 +49,7 @@ public class EntityBoat extends EntityVehicle {
     public static final double SINKING_SPEED = 0.0005;
     public static final double SINKING_MAX_SPEED = 0.005;
 
+    protected int variant;
     protected boolean sinking = true;
 
     public EntityBoat(FullChunk chunk, CompoundTag nbt) {
@@ -62,7 +63,10 @@ public class EntityBoat extends EntityVehicle {
     protected void initEntity() {
         super.initEntity();
 
-        this.dataProperties.putByte(DATA_WOOD_ID, this.namedTag.getByte("woodID"));
+        if (this.namedTag.contains("Variant")) {
+            this.variant = this.namedTag.getInt("Variant");
+        }
+        this.dataProperties.putInt(DATA_VARIANT, this.variant);
     }
 
     @Override
@@ -413,7 +417,22 @@ public class EntityBoat extends EntityVehicle {
         super.kill();
 
         if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-            this.level.dropItem(this, new ItemBoat());
+            this.level.dropItem(this, Item.get(ItemID.BOAT, this.variant));
         }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putInt("Variant", this.variant);
+    }
+
+    public int getVariant() {
+        return this.variant;
+    }
+
+    public void setVariant(int variant) {
+        this.variant = variant;
+        this.dataProperties.putInt(DATA_VARIANT, variant);
     }
 }

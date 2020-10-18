@@ -49,6 +49,7 @@ public class ItemBoat extends Item {
                 .putList(new ListTag<FloatTag>("Rotation")
                         .add(new FloatTag("", (float) ((player.yaw + 90f) % 360)))
                         .add(new FloatTag("", 0)))
+                .putInt("Variant", this.getDamage())
         );
 
         if (!player.isCreative()) {

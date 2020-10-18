@@ -357,7 +357,7 @@ public class Server {
         if (this.isHardcore && this.difficulty < 3) {
             this.setDifficulty(3);
         } else {
-            this.setDifficulty(this.getPropertyInt("difficulty", 2));
+            this.setDifficulty(getDifficultyFromString(this.getPropertyString("difficulty", "2")));
         }
 
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
