@@ -208,6 +208,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private final List<DataPacket> batchedPackets = new ArrayList<>();
 
     private PermissibleBase perm;
+    /**
+     * Option to hide admin permissions from player list tab in client.
+     * Admin player shown in server list will look same as normal player.
+     */
     private boolean showAdmin = true;
 
     private int exp = 0;
