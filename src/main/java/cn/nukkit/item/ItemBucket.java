@@ -154,8 +154,7 @@ public class ItemBucket extends Item {
                 placementBlock = block;
             }
 
-            PlayerBucketEmptyEvent ev = new PlayerBucketEmptyEvent(player, placementBlock, face, this, result);
-            player.getServer().getPluginManager().callEvent(ev);
+            PlayerBucketEmptyEvent ev = new PlayerBucketEmptyEvent(player, block, face, this, result);
             boolean canBeFlowedInto = placementBlock.canBeFlowedInto() || placementBlock.getId() == BlockID.BAMBOO;
             if (usesWaterlogging) {
                 ev.setCancelled(placementBlock.getWaterloggingLevel() <= 0 && !canBeFlowedInto);
@@ -163,9 +162,15 @@ public class ItemBucket extends Item {
                 ev.setCancelled(!canBeFlowedInto);
             }
 
+            if (!block.canBeFlowedInto()) {
+                ev.setCancelled(true);
+            }
+
             if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
+
+            player.getServer().getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
                 player.getLevel().setBlock(placementBlock, placementBlock.layer, targetBlock, true, true);

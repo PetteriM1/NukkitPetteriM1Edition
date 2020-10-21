@@ -58,7 +58,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
-        return !(creature instanceof Player) && creature.isAlive() && distance <= 60;
+        return !(creature instanceof Player) && creature.isAlive() && distance <= 100;
     }
 
     @Override

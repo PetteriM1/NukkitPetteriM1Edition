@@ -2,6 +2,7 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLava;
+import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityBlockChangeEvent;
@@ -9,8 +10,8 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GameRule;
-import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.sound.AnvilFallSound;
 import cn.nukkit.math.Vector3;
@@ -134,7 +135,7 @@ public class EntityFallingBlock extends Entity {
             motionY *= 1 - this.getDrag();
             motionZ *= friction;
 
-            Vector3 pos = (new Vector3(x - 0.5, y, z - 0.5)).round();
+            Vector3 pos = new Vector3(x - 0.5, y, z - 0.5).round();
             if (breakOnLava && level.getBlock(pos.subtract(0, 1, 0)) instanceof BlockLava) {
                 this.close();
                 if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
@@ -147,8 +148,34 @@ public class EntityFallingBlock extends Entity {
             if (this.onGround) {
                 this.close();
                 Block block = this.level.getBlock(pos);
-                if (block.isTransparent() && !block.canBeReplaced()) {
-                    if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                Block floorBlock = this.level.getBlock(pos);
+                if (this.getBlock() == Block.SNOW_LAYER && floorBlock.getId() == Block.SNOW_LAYER && (floorBlock.getDamage() & 0x7) != 0x7) {
+                    int mergedHeight = (floorBlock.getDamage() & 0x7) + 1 + (this.getDamage() & 0x7) + 1;
+                    if (mergedHeight > 8) {
+                        EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, floorBlock, Block.get(Block.SNOW_LAYER, 0x7));
+                        this.server.getPluginManager().callEvent(event);
+                        if (!event.isCancelled()) {
+                            this.level.setBlock(pos, event.getTo(), true);
+
+                            Vector3 abovePos = pos.up();
+                            Block aboveBlock = this.level.getBlock(abovePos);
+                            if (aboveBlock.getId() == Block.AIR) {
+                                EntityBlockChangeEvent event2 = new EntityBlockChangeEvent(this, aboveBlock, Block.get(Block.SNOW_LAYER, mergedHeight - 9)); // -8-1
+                                this.server.getPluginManager().callEvent(event2);
+                                if (!event2.isCancelled()) {
+                                    this.level.setBlock(abovePos, event2.getTo(), true);
+                                }
+                            }
+                        }
+                    } else {
+                        EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, floorBlock, Block.get(Block.SNOW_LAYER, mergedHeight - 1));
+                        this.server.getPluginManager().callEvent(event);
+                        if (!event.isCancelled()) {
+                            this.level.setBlock(pos, event.getTo(), true);
+                        }
+                    }
+                } else if ((block.isTransparent() && !block.canBeReplaced() || this.getBlock() == Block.SNOW_LAYER && block instanceof BlockLiquid)) {
+                    if (this.getBlock() != Block.SNOW_LAYER ? this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS) : this.level.getGameRules().getBoolean(GameRule.DO_TILE_DROPS)) {
                         this.level.dropItem(this, Block.get(this.getBlock(), this.getDamage()).toItem());
                     }
                 } else {

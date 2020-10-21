@@ -129,6 +129,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.GLOWING_REDSTONE_ORE] = true;
         randomTickBlocks[Block.COCOA_BLOCK] = true;
         randomTickBlocks[Block.ICE_FROSTED] = true;
+        randomTickBlocks[Block.VINE] = true;
 
         if (Server.getInstance().requiredProtocol >= 388){
             randomTickBlocks[Block.BAMBOO] = true;
@@ -3533,7 +3534,7 @@ public class Level implements ChunkManager, Metadatable {
             FullChunk chunk = this.getChunk((int) v.x >> 4, (int) v.z >> 4, false);
             int x = (int) v.x & 0x0f;
             int z = (int) v.z & 0x0f;
-            if (chunk != null) {
+            if (chunk != null && chunk.isGenerated()) {
                 int y = (int) NukkitMath.clamp(v.y, 0, 254);
                 boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
                 for (; y > 0; --y) {
@@ -4347,7 +4348,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Position calculatePortalMirror(Vector3 portal) {
-        Level nether = Server.getInstance().getLevelByName("nether");
+        Level nether = Server.getInstance().getNetherWorld(this.getName());
         if (nether == null) {
             return null;
         }

@@ -97,6 +97,22 @@ public class ItemMap extends Item {
         p.dataPacket(pk);
     }
 
+    public boolean trySendImage(Player p) {
+        BufferedImage image = this.image != null ? this.image : loadImageFromNBT();
+        if (image == null) return false;
+        ClientboundMapItemDataPacket pk = new ClientboundMapItemDataPacket();
+        pk.mapId = getMapId();
+        pk.update = 2;
+        pk.scale = 0;
+        pk.width = 128;
+        pk.height = 128;
+        pk.offsetX = 0;
+        pk.offsetZ = 0;
+        pk.image = image;
+        p.dataPacket(pk);
+        return true;
+    }
+
     @Override
     public boolean canBeActivated() {
         return true;

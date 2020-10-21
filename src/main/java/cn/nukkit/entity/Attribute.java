@@ -30,6 +30,7 @@ public class Attribute implements Cloneable {
     public static final int FALL_DAMAGE = 13;
     public static final int HORSE_JUMP_STRENGTH = 14;
     public static final int ZOMBIE_SPAWN_REINFORCEMENTS = 15;
+    public static final int LAVA_MOVEMENT = 16;
 
     protected static Map<Integer, Attribute> attributes = new HashMap<>();
 
@@ -68,6 +69,7 @@ public class Attribute implements Cloneable {
         addAttribute(FALL_DAMAGE, "minecraft:fall_damage", 0.0f, 340282346638528859811704183484516925440.0f, 1.0f);
         addAttribute(HORSE_JUMP_STRENGTH, "minecraft:horse.jump_strength", 0.0f, 2.0f, 0.7f);
         addAttribute(ZOMBIE_SPAWN_REINFORCEMENTS, "minecraft:zombie.spawn_reinforcements", 0.0f, 1.0f, 0.0f);
+        addAttribute(LAVA_MOVEMENT, "minecraft:lava_movement", 0.00f, 340282346638528859811704183484516925440.00f, 0.02f);
     }
 
     public static Attribute addAttribute(int id, String name, float minValue, float maxValue, float defaultValue) {

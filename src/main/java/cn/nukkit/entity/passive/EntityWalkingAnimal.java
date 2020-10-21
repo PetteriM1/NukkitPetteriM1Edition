@@ -61,9 +61,9 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
             this.panicTicks = time;
             this.stayTime = 0;
             this.moveTime = time;
-            this.moveMultifier = 1.8f;
+            this.moveMultiplier = 1.8f;
         } else {
-            this.moveMultifier = 1.0f;
+            this.moveMultiplier = 1.0f;
         }
     }
 

@@ -234,6 +234,7 @@ public interface BlockID {
     int PRISMARINE = 168;
     int SEA_LANTERN = 169;
     int HAY_BALE = 170;
+    int HAY_BLOCK = 170;
     int CARPET = 171;
     int TERRACOTTA = 172;
     int COAL_BLOCK = 173;

@@ -1,6 +1,5 @@
 package cn.nukkit.command.defaults;
 
-import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.plugin.Plugin;
@@ -17,9 +16,7 @@ public class PluginsCommand extends VanillaCommand {
     public PluginsCommand(String name) {
         super(name, "%nukkit.command.plugins.description", "%nukkit.command.plugins.usage");
         this.setPermission("nukkit.command.plugins");
-        if (!Server.getInstance().suomiCraftPEMode()) {
-            this.setAliases(new String[]{"pl"});
-        }
+        this.setAliases(new String[]{"pl"});
         this.commandParameters.clear();
     }
 

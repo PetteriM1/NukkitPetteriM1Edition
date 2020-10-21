@@ -64,9 +64,8 @@ public class Explosion {
      * @return bool
      */
     public boolean explodeA() {
-        if (this.size < 0.1) {
-            return false;
-        }
+        if (this.size < 0.1) return false;
+        if (!level.getServer().explosionBreakBlocks) return true;
 
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
@@ -98,10 +97,8 @@ public class Explosion {
                             if (block.getId() != 0 && block.getId() != 7) {
                                 blastForce -= (block.getResistance() / 5 + 0.3d) * stepLen;
                                 if (blastForce > 0) {
-                                    if (level.getServer().explosionBreakBlocks) {
-                                        if (!this.affectedBlocks.contains(block)) {
-                                            this.affectedBlocks.add(block);
-                                        }
+                                    if (!this.affectedBlocks.contains(block)) {
+                                        this.affectedBlocks.add(block);
                                     }
                                 }
                             }

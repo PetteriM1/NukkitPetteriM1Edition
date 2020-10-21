@@ -119,6 +119,9 @@ public class CraftingTransaction extends InventoryTransaction {
                     }
                 }
             }
+            if (recipe == null) {
+                source.sendExperienceLevel();
+            }
             source.getUIInventory().setItem(AnvilInventory.RESULT, Item.get(0), false);
         } else {
             recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);
@@ -137,11 +140,11 @@ public class CraftingTransaction extends InventoryTransaction {
     protected void sendInventories() {
         super.sendInventories();
 
-        Optional<Inventory> topWindow = source.getTopWindow();
+        /*Optional<Inventory> topWindow = source.getTopWindow();
         if (topWindow.isPresent()) {
-            //source.removeWindow(topWindow.get());
+            source.removeWindow(topWindow.get());
             return;
-        }
+        }*/
 
         /*
          * TODO: HACK!

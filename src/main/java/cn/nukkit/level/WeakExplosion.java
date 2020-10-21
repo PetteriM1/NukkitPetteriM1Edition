@@ -49,7 +49,7 @@ public class WeakExplosion extends Explosion {
     @Override
     public boolean explodeA() {
         if (this.size < 0.1) return false;
-        if (!level.getServer().explosionBreakBlocks) return false;
+        if (!level.getServer().explosionBreakBlocks) return true;
         Vector3 vector = new Vector3(0, 0, 0);
         Vector3 vBlock = new Vector3(0, 0, 0);
         for (int i = 0; i < 16; ++i) {

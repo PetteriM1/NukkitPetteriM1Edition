@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -162,7 +163,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected boolean blockedByShield(EntityDamageEvent source) {
         Entity damager = source instanceof EntityDamageByEntityEvent? ((EntityDamageByEntityEvent) source).getDamager() : null;
-        if (damager == null || !this.isBlocking()) {
+        if (damager == null || !this.isBlocking() || damager instanceof EntityWeather) {
             return false;
         }
 
@@ -349,14 +350,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             if (this instanceof Player) {
                 if (this.age % 5 == 0) {
                     int block = this.level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
-                    if (block == Block.MAGMA || block == Block.CACTUS) {
+                    if (block == Block.CACTUS) {
+                        Block.get(Block.CACTUS).onEntityCollide(this);
+                    } else if (block == Block.MAGMA) {
                         Block.get(Block.MAGMA).onEntityCollide(this);
-                    }
-                    if (block == Block.MAGMA && this.isInsideOfWater()) {
-                        this.level.addParticle(new BubbleParticle(this));
-                        this.setMotion(this.getMotion().add(0, -0.3, 0));
-                    }
-                    if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
+                        if (this.isInsideOfWater()) {
+                            this.level.addParticle(new BubbleParticle(this));
+                            this.setMotion(this.getMotion().add(0, -0.3, 0));
+                        }
+                    } else if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
                         this.level.addParticle(new BubbleParticle(this));
                         this.setMotion(this.getMotion().add(0, 0.3, 0));
                     }

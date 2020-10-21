@@ -208,6 +208,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private final List<DataPacket> batchedPackets = new ArrayList<>();
 
     private PermissibleBase perm;
+    /**
+     * Option to hide admin permissions from player list tab in client.
+     * Admin player shown in server list will look same as normal player.
+     */
+    private boolean showAdmin = true;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -499,6 +504,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.recalculatePermissions();
         this.adventureSettings.update();
         this.sendCommandData();
+    }
+
+    public void setShowAdmin(boolean showAdmin) {
+        this.showAdmin = showAdmin;
+    }
+
+    public boolean showAdmin() {
+        return this.showAdmin;
     }
 
     @Override
@@ -1487,10 +1500,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.portalPos = null;
                 } else {
-                    if (this.getLevel().isNether) {
+                    if (this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
                         this.teleport(this.getServer().getDefaultLevel().getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                     } else {
-                        Level nether = this.getServer().getLevelByName("nether");
+                        Level nether = this.getServer().getNetherWorld(this.level.getName());
                         if (nether != null) {
                             this.teleport(nether.getSafeSpawn(), TeleportCause.NETHER_PORTAL);
                         }
@@ -2097,6 +2110,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setLevel(level);
         }
 
+        this.ticksSinceLastRest = nbt.getInt("ticksSinceLastRest");
+
         for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
             if (!(achievement instanceof ByteTag)) {
                 continue;
@@ -2479,12 +2494,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     MovePlayerPacket movePlayerPacket = (MovePlayerPacket) packet;
-
-                    if (server.suomiCraftPEMode() && Math.abs(movePlayerPacket.pitch) > 90) {
-                        this.kick(PlayerKickEvent.Reason.UNKNOWN, "Invalid MovePlayerPacket!");
-                        break;
-                    }
-
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
                     double dis = newPos.distanceSquared(this);
 
@@ -3152,13 +3161,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 }
                             }
                         }
-                    }
-
-                    if (mapItem != null) {
+                    } else {
                         PlayerMapInfoRequestEvent event;
                         getServer().getPluginManager().callEvent(event = new PlayerMapInfoRequestEvent(this, mapItem));
 
                         if (!event.isCancelled()) {
+                            ItemMap map = (ItemMap) mapItem;
+                            if (map.trySendImage(this)) {
+                                return;
+                            }
                             try {
                                 BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
                                 Graphics2D graphics = image.createGraphics();
@@ -3170,8 +3181,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     }
                                 }
 
-                                ((ItemMap) mapItem).setImage(image);
-                                ((ItemMap) mapItem).sendImage(this);
+                                map.setImage(image);
+                                map.sendImage(this);
                             } catch (Exception ex) {
                                 this.getServer().getLogger().debug("There was an error while generating map image", ex);
                             }
@@ -4117,6 +4128,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putInt("foodLevel", this.foodData.getLevel());
             this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
 
+            this.namedTag.putInt("ticksSinceLastRest", this.ticksSinceLastRest);
+
             if (!this.username.isEmpty() && this.namedTag != null) {
                 if (this.server.savePlayerDataByUuid) {
                     this.server.saveOfflinePlayerData(this.uuid, this.namedTag, async);
@@ -4274,7 +4287,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (!ev.getKeepInventory() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
                 for (Item item : ev.getDrops()) {
-                    this.level.dropItem(this, item, null, true, 40);
+                    if (!item.hasEnchantment(Enchantment.ID_VANISHING_CURSE)) {
+                        this.level.dropItem(this, item, null, true, 40);
+                    }
                 }
 
                 if (this.inventory != null) {

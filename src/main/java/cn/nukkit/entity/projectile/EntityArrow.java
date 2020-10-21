@@ -4,6 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -21,6 +22,7 @@ public class EntityArrow extends EntityProjectile {
     public static final int PICKUP_CREATIVE = 2;
 
     protected int pickupMode;
+    public boolean isFromStray;
 
     @Override
     public int getNetworkId() {
@@ -108,12 +110,17 @@ public class EntityArrow extends EntityProjectile {
 
         if (this.timing != null) this.timing.startTiming();
 
+        if (this.age > 1200) {
+            this.close();
+            return false;
+        }
+
         if (this.onGround || this.hadCollision) {
             this.setCritical(false);
         }
 
-        if (this.age > 1200) {
-            this.close();
+        if (this.fireTicks > 0 && this.level.isRaining() && this.level.canBlockSeeSky(this)) {
+            this.extinguish();
         }
 
         if (this.timing != null) this.timing.stopTiming();
@@ -139,5 +146,13 @@ public class EntityArrow extends EntityProjectile {
     @Override
     public void onHit() {
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_BOW_HIT);
+    }
+
+    public void onCollideWithEntity(Entity entity) {
+        super.onCollideWithEntity(entity);
+
+        if (this.isFromStray) {
+            entity.addEffect(Effect.getEffect(Effect.SLOWNESS).setDuration(600));
+        }
     }
 }

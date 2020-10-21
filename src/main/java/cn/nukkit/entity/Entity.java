@@ -1410,10 +1410,10 @@ public abstract class Entity extends Location implements Metadatable {
             this.server.getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
-                if (this.getLevel().isNether) {
+                if (this.getLevel().getDimension() == Level.DIMENSION_NETHER) {
                     this.switchLevel(server.getDefaultLevel());
                 } else {
-                    this.switchLevel(server.getLevelByName("nether"));
+                    this.switchLevel(server.getNetherWorld(this.level.getName()));
                 }
             }
         }

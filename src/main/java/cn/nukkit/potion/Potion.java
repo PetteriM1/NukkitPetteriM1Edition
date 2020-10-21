@@ -58,6 +58,7 @@ public class Potion implements Cloneable {
     public static final int SLOW_FALLING = 40;
     public static final int SLOW_FALLING_LONG = 41;
     public static final int SLOWNESS_LONG_II = 42;
+    public static final int SLOWNESS_IV = 43;
 
     protected static Potion[] potions;
 
@@ -107,6 +108,7 @@ public class Potion implements Cloneable {
         potions[Potion.SLOW_FALLING] = new Potion(Potion.SLOW_FALLING);
         potions[Potion.SLOW_FALLING_LONG] = new Potion(Potion.SLOW_FALLING_LONG);
         potions[Potion.SLOWNESS_LONG_II] = new Potion(Potion.SLOWNESS_LONG_II, 2);
+        potions[Potion.SLOWNESS_IV] = new Potion(Potion.SLOWNESS, 4);
     }
 
     public static Potion getPotion(int id) {
@@ -256,6 +258,8 @@ public class Potion implements Cloneable {
                 break;
             case SLOWNESS:
             case SLOWNESS_LONG:
+            case SLOWNESS_LONG_II:
+            case SLOWNESS_IV:
                 effect = Effect.getEffect(Effect.SLOWNESS);
                 break;
             case WATER_BREATHING:
@@ -307,6 +311,8 @@ public class Potion implements Cloneable {
 
     public static int getLevel(int potionType) {
         switch (potionType) {
+            case SLOWNESS_IV:
+                return 4;
             case MUNDANE_II:
             case LEAPING_II:
             case SPEED_II:
@@ -317,6 +323,7 @@ public class Potion implements Cloneable {
             case STRENGTH_II:
             case WITHER_II:
             case TURTLE_MASTER_II:
+            case SLOWNESS_LONG_II:
                 return 2;
             default:
                 return 1;
@@ -412,6 +419,8 @@ public class Potion implements Cloneable {
                     return 180;
                 case WITHER_II:
                     return 30;
+                case SLOWNESS_IV:
+                    return 15;
                 default:
                     return 0;
             }
@@ -491,6 +500,8 @@ public class Potion implements Cloneable {
                     return 240;
                 case WITHER_II:
                     return 30;
+                case SLOWNESS_IV:
+                    return 20;
                 default:
                     return 0;
             }

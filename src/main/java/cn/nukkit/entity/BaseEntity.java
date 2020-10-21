@@ -27,7 +27,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     private int airTicks = 0;
 
-    protected float moveMultifier = 1.0f;
+    protected float moveMultiplier = 1.0f;
 
     protected Vector3 target = null;
     protected Entity followTarget = null;
@@ -133,9 +133,9 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         if (this instanceof EntityMob) {
             if (creature instanceof Player) {
                 Player player = (Player) creature;
-                return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 80;
+                return !player.closed && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 100;
             }
-            return creature.isAlive() && !creature.closed && distance <= 80;
+            return creature.isAlive() && !creature.closed && distance <= 100;
         }
         return false;
     }
@@ -219,9 +219,9 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         this.blocksAround = null;
 
-        double movX = dx * moveMultifier;
+        double movX = dx * moveMultiplier;
         double movY = dy;
-        double movZ = dz * moveMultifier;
+        double movZ = dz * moveMultiplier;
 
         AxisAlignedBB[] list = this.level.getCollisionCubes(this, this.boundingBox.addCoord(dx, dy, dz), false);
 

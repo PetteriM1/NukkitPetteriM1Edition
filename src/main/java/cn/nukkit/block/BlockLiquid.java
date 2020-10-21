@@ -327,7 +327,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
             level.getServer().getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
                 if (block.layer == 0 && block.getId() > 0) {
-                    this.level.useBreakOn(block);
+                    this.level.useBreakOn(block, block.getId() == COBWEB ? Item.get(Item.WOODEN_SWORD) : null);
                 }
                 this.level.setBlock(block, block.layer, getBlock(newFlowDecay), true, true);
                 this.level.scheduleUpdate(block, this.tickRate());
