@@ -11,11 +11,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DefaultPlayerDataSerializer implements PlayerDataSerializer {
 
-    private final Server server;
+    private String dataPath;
+
+    public DefaultPlayerDataSerializer(Server server) {
+        this(server.getDataPath());
+    }
+
+    public DefaultPlayerDataSerializer(String dataPath) {
+        this.dataPath = dataPath;
+    }
 
     @Override
     public Optional<InputStream> read(String name, UUID uuid) throws IOException {
-        File file = new File(server.getDataPath() + "players/" + name + ".dat");
+        File file = new File(dataPath  + "players/" + name + ".dat");
         if (!file.exists()) {
             return Optional.empty();
         }
@@ -26,7 +34,7 @@ public class DefaultPlayerDataSerializer implements PlayerDataSerializer {
     @Override
     public OutputStream write(String name, UUID uuid) throws IOException {
         Preconditions.checkNotNull(name, "name");
-        File file = new File(server.getDataPath() + "players/" + name + ".dat");
+        File file = new File(dataPath  + "players/" + name + ".dat");
         return new FileOutputStream(file);
     }
 }
