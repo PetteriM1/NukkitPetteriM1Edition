@@ -204,7 +204,7 @@ public class Server {
     private final Thread currentThread;
     private Watchdog watchdog;
     private DB nameLookup;
-    private PlayerDataSerializer playerDataSerializer = new DefaultPlayerDataSerializer(this);
+    private PlayerDataSerializer playerDataSerializer;
     public static List<String> noTickingWorlds = new ArrayList<>();
 
     private SpawnerTask spawnerTask;
@@ -278,6 +278,8 @@ public class Server {
 
         this.dataPath = new File(dataPath).getAbsolutePath() + '/';
         this.pluginPath = new File(pluginPath).getAbsolutePath() + '/';
+
+        this.playerDataSerializer = new DefaultPlayerDataSerializer(this);
 
         this.console = new NukkitConsole();
         this.consoleThread = new ConsoleThread();
