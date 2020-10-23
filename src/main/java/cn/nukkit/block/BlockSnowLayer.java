@@ -25,11 +25,6 @@ public class BlockSnowLayer extends BlockFallableMeta {
     }
 
     @Override
-    public final int getFullId() {
-        return 1248 + this.getDamage();
-    }
-
-    @Override
     public String getName() {
         return "Top Snow";
     }
