@@ -56,7 +56,7 @@ public class EntityPufferfish extends EntityFish {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (ev instanceof EntityDamageByEntityEvent) {
+        if (ev instanceof EntityDamageByEntityEvent && ev.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
             if (damager instanceof Player) {
                 if (this.puffed > 0) return true;

@@ -13,11 +13,11 @@ import cn.nukkit.level.generator.populator.impl.PopulatorWell;
 public class BeachBiome extends SandyBiome {
     public BeachBiome() {
         PopulatorSugarcane sugarcane = new PopulatorSugarcane();
-        sugarcane.setBaseAmount(2);
+        //sugarcane.setBaseAmount(2);
         sugarcane.setRandomAmount(2);
         this.addPopulator(sugarcane);
         PopulatorTallSugarcane tallSugarcane = new PopulatorTallSugarcane();
-        tallSugarcane.setBaseAmount(1);
+        //tallSugarcane.setBaseAmount(1);
         tallSugarcane.setRandomAmount(1);
         this.addPopulator(tallSugarcane);
         PopulatorCactus cactus = new PopulatorCactus();

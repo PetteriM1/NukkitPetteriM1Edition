@@ -10,6 +10,7 @@ import cn.nukkit.inventory.ShulkerBoxInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 
 import java.util.*;
 
@@ -222,6 +223,17 @@ public class InventoryTransaction {
             if (!action.onPreExecute(this.source)) {
                 this.sendInventories();
                 return true;
+            }
+            if (action instanceof SlotChangeAction) {
+                if (!source.isCreative()) {
+                    int slot = ((SlotChangeAction) action).getSlot();
+                    if (slot == 36 || slot == 37 || slot == 38 || slot == 39) {
+                        if (action.getSourceItem().hasEnchantment(Enchantment.ID_BINDING_CURSE)) {
+                            this.sendInventories();
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
