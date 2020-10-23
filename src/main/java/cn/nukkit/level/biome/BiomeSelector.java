@@ -118,7 +118,7 @@ public class BiomeSelector {
                         }
                     }
                 } else {
-                    if (rainfall < -0.2f)   {
+                    if (rainfall < -0.2f) {
                         if (noiseOcean < 0f)    {
                             biome = EnumBiome.SWAMPLAND_M;
                         } else {
@@ -127,7 +127,9 @@ public class BiomeSelector {
                     } else if (rainfall > 0.1f) {
                         if (noiseOcean < 0.155f)  {
                             biome = EnumBiome.JUNGLE_M;
-                        } else {
+                        } if (rainfall > 0.2f){
+                            biome = EnumBiome.JUNGLE_BAMBOO;
+                        }else {
                             biome = EnumBiome.JUNGLE;
                         }
                     } else {

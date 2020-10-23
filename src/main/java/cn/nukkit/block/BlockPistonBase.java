@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityMovingBlock;
 import cn.nukkit.blockentity.BlockEntityPistonArm;
@@ -191,6 +192,10 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             for (int i = destroyBlocks.size() - 1; i >= 0; --i) {
                 Block block = destroyBlocks.get(i);
                 this.level.useBreakOn(block, null, null, false);
+
+                if (Server.getInstance().dropSpawners && block instanceof BlockMobSpawner){
+                    this.level.dropItem(block.add(0.5, 0.5, 0.5), Item.get(Item.MONSTER_SPAWNER, 0, 1));
+                }
             }
 
             List<Block> newBlocks = calculator.getBlocksToMove();

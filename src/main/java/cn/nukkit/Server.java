@@ -255,6 +255,7 @@ public class Server {
     public boolean queryPlugins;
     public boolean despawnEntities;
     public boolean strongIPBans;
+    public boolean dropSpawners;
     public boolean spawnAnimals;
     public boolean spawnMobs;
     public boolean anvilsEnabled;
@@ -2452,6 +2453,7 @@ public class Server {
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
+        this.dropSpawners = this.getPropertyBoolean("drop-spawners", true);
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
         this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
@@ -2493,6 +2495,7 @@ public class Server {
             put("announce-player-achievements", false);
             put("spawn-protection", 10);
             put("max-players", 50);
+            put("drop-spawners", true);
             put("spawn-animals", true);
             put("spawn-mobs", true);
             put("gamemode", 0);

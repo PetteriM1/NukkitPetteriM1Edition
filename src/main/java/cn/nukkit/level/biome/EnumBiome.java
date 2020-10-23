@@ -63,7 +63,12 @@ public enum EnumBiome {
     FOREST_HILLS(18, new ForestHillsBiome()),
     TAIGA_HILLS(19, new TaigaHillsBiome()),
     EXTREME_HILLS_EDGE(20, new ExtremeHillsEdgeBiome()),
+
+    //TODO: figure out why ID 168 does not work, until than 21
+    JUNGLE_BAMBOO(21, new JungleBambooBiome()),
+    //Overwrite it with right biome, but BAMBOO will be registered
     JUNGLE(21, new JungleBiome()),
+
     JUNGLE_HILLS(22, new JungleHillsBiome()),
     JUNGLE_EDGE(23, new JungleEdgeBiome()),
     DEEP_OCEAN(24, new DeepOceanBiome()),
