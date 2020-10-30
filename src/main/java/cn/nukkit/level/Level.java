@@ -130,7 +130,6 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.COCOA_BLOCK] = true;
         randomTickBlocks[Block.ICE_FROSTED] = true;
         randomTickBlocks[Block.VINE] = true;
-        randomTickBlocks[Block.VINE] = true;
 
         if (Server.getInstance().requiredProtocol >= 388){
             randomTickBlocks[Block.BAMBOO] = true;
@@ -138,6 +137,7 @@ public class Level implements ChunkManager, Metadatable {
             randomTickBlocks[Block.CORAL_FAN] = true;
             randomTickBlocks[Block.CORAL_FAN_DEAD] = true;
             randomTickBlocks[Block.BLOCK_KELP] = true;
+            randomTickBlocks[Block.SWEET_BERRY_BUSH] = true;
         }
     }
 
