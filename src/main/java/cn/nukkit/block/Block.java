@@ -343,6 +343,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[DRIED_KELP_BLOCK] = BlockDriedKelpBlock.class; //394
                 list[BLOCK_KELP] = BlockKelp.class; //393
 
+                list[CARVED_PUMPKIN] = BlockCarvedPumpkin.class; //410
                 list[SEA_PICKLE] = BlockSeaPickle.class; //411
                 list[BARRIER] = BlockBarrier.class; //416
                 list[STONE_SLAB3] = BlockSlabStone3.class ; //417
@@ -361,6 +362,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[LANTERN] = BlockLantern.class; //463
                 list[CAMPFIRE_BLOCK] = BlockCampfire.class; //464
                 list[WOOD_BARK] = BlockWoodBark.class; //467
+                list[COMPOSTER] = BlockComposter.class; //468
 
                 //PISTON_HEAD_STICKY will work with more-blocks only
                 //For this reason register piston blocks with more-block support only

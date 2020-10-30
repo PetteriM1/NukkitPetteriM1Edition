@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
@@ -53,8 +54,27 @@ public class BlockPumpkin extends BlockSolidMeta implements Faceable {
     }
 
     @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (!item.isShears()) {
+            return false;
+        }
+
+        BlockCarvedPumpkin carvedPumpkin = new BlockCarvedPumpkin();
+        carvedPumpkin.setBlockFace(this.getBlockFace());
+        item.useOn(this);
+        this.level.setBlock(this, carvedPumpkin, true, true);
+        this.getLevel().dropItem(add(0.5, 0.5, 0.5), Item.get(ItemID.PUMPKIN_SEEDS));
+        return true;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
+        this.setBlockFace(player != null ? player.getDirection().getOpposite() : BlockFace.SOUTH);
         this.getLevel().setBlock(block, this, true, true);
         return true;
     }
@@ -67,6 +87,10 @@ public class BlockPumpkin extends BlockSolidMeta implements Faceable {
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    public void setBlockFace(BlockFace blockFace) {
+        this.setDamage(blockFace.getHorizontalIndex());
     }
 
     @Override

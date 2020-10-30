@@ -346,6 +346,7 @@ public interface BlockID {
     int BLOCK_KELP = 393;
     int DRIED_KELP_BLOCK = 394;
 
+    int CARVED_PUMPKIN = 410;
     int SEA_PICKLE = 411;
     int BARRIER = 416;
     int STONE_SLAB3 = 417;
@@ -363,5 +364,6 @@ public interface BlockID {
     int LANTERN = 463;
     int CAMPFIRE_BLOCK = 464;
     int WOOD_BARK = 467;
+    int COMPOSTER = 468;
     int PISTON_HEAD_STICKY = 472;
 }
