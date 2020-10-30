@@ -155,6 +155,11 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public Item toItem() {
         return new ItemBlock(new BlockLantern());
     }

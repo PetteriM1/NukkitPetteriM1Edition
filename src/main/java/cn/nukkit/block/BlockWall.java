@@ -43,6 +43,11 @@ public class BlockWall extends BlockTransparentMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         if (this.getDamage() == 0x01) {
             return "Mossy Cobblestone Wall";

@@ -109,7 +109,7 @@ public class EntityZombieVillager extends EntityWalkingMob implements EntitySmit
             }
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

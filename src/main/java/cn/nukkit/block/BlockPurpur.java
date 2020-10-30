@@ -62,6 +62,11 @@ public class BlockPurpur extends BlockSolidMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (this.getDamage() != PURPUR_NORMAL) {
             this.setDamage(((this.getDamage() & 0x03) | faces[face.getIndex()]));
@@ -69,17 +74,6 @@ public class BlockPurpur extends BlockSolidMeta {
         this.getLevel().setBlock(block, this, true, true);
 
         return true;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
     }
 
     @Override

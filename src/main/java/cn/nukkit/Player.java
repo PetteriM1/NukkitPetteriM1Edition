@@ -1291,7 +1291,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.protocol < 407) {
                 InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
                 inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
+                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(Item.EMPTY_ARRAY);
                 this.dataPacket(inventoryContentPacket);
             }
         }
@@ -1335,12 +1335,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 List<Item> drops = new ArrayList<>(this.inventory.getContents().values());
                 drops.addAll(this.offhandInventory.getContents().values());
                 drops.addAll(this.playerUIInventory.getContents().values());
-                return drops.toArray(new Item[0]);
+                return drops.toArray(Item.EMPTY_ARRAY);
             }
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
 
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     @Override
@@ -2619,7 +2619,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
                             if (!this.isCreative()) {
-                                double breakTime = Math.ceil(target.getBreakTime(this.inventory.getItemInHand(), this) * 20);
+                                double breakTime = Math.ceil(target.calculateBreakTime(this.inventory.getItemInHand(), this) * 20);
                                 if (breakTime > 0) {
                                     LevelEventPacket pk = new LevelEventPacket();
                                     pk.evid = LevelEventPacket.EVENT_BLOCK_START_BREAK;
@@ -4984,7 +4984,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void resetCraftingGridType() {
         if (this.craftingGrid != null) {
-            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(new Item[0]));
+            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(Item.EMPTY_ARRAY));
 
             if (drops.length > 0) {
                 for (Item drop : drops) {

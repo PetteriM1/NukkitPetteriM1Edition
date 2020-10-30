@@ -51,6 +51,11 @@ public class BlockBricks extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public BlockColor getColor() {
         return BlockColor.RED_BLOCK_COLOR;
     }

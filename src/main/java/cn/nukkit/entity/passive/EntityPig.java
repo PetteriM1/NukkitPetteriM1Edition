@@ -121,7 +121,7 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable {
             }
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     public int getKillExperience() {

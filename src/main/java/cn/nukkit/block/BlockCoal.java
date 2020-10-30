@@ -31,6 +31,11 @@ public class BlockCoal extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public int getBurnChance() {
         return 5;
     }
@@ -52,7 +57,7 @@ public class BlockCoal extends BlockSolid {
                     toItem()
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

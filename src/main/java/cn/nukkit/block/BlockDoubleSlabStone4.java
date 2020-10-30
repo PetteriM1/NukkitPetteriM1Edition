@@ -42,6 +42,11 @@ public class BlockDoubleSlabStone4 extends BlockDoubleSlabStone {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         String[] names = new String[]{
                 "Mossy Stone Brick",

@@ -66,7 +66,7 @@ public class BlockDoubleSlab extends BlockSolidMeta {
                     Item.get(Item.SLAB, this.getDamage() & 0x07, 2)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

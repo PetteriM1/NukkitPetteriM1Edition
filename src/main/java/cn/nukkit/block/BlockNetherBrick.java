@@ -26,6 +26,11 @@ public class BlockNetherBrick extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public double getHardness() {
         return 2;
     }
@@ -33,17 +38,6 @@ public class BlockNetherBrick extends BlockSolid {
     @Override
     public double getResistance() {
         return 10;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
     }
 
     @Override

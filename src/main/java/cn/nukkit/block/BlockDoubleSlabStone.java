@@ -49,6 +49,11 @@ public class BlockDoubleSlabStone extends BlockSolidMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         String[] names = new String[]{
                 "Stone",
@@ -75,7 +80,7 @@ public class BlockDoubleSlabStone extends BlockSolidMeta {
                     Item.get(Item.SLAB, this.getDamage() & 0x07, 2)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

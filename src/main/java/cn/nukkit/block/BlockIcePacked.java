@@ -31,7 +31,7 @@ public class BlockIcePacked extends BlockIce {
                     this.toItem()
             };
         }
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     @Override

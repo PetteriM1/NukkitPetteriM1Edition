@@ -24,6 +24,11 @@ public class BlockFenceNetherBrick extends BlockFence {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         return "Nether Brick Fence";
     }
@@ -45,7 +50,7 @@ public class BlockFenceNetherBrick extends BlockFence {
                     toItem()
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

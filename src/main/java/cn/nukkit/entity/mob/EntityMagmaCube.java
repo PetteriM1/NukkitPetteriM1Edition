@@ -114,7 +114,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
             level.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
-                return new Item[0];
+                return Item.EMPTY_ARRAY;
             }
 
             EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
@@ -122,13 +122,13 @@ public class EntityMagmaCube extends EntityJumpingMob {
             entity.setScale(0.51f + entity.size * 0.51f);
             entity.spawnToAll();
 
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         } else if (this.size == SIZE_MEDIUM) {
             CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, this, CreatureSpawnEvent.SpawnReason.SLIME_SPLIT);
             level.getServer().getPluginManager().callEvent(ev);
 
             if (ev.isCancelled()) {
-                return new Item[0];
+                return Item.EMPTY_ARRAY;
             }
 
             EntityMagmaCube entity = (EntityMagmaCube) Entity.createEntity("MagmaCube", this);
@@ -136,7 +136,7 @@ public class EntityMagmaCube extends EntityJumpingMob {
             entity.setScale(0.51f + entity.size * 0.51f);
             entity.spawnToAll();
 
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         } else {
             return new Item[]{Item.get(Item.MAGMA_CREAM, 0, Utils.rand(0, 1))};
         }

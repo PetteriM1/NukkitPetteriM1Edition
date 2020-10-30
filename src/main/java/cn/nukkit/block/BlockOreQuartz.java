@@ -38,8 +38,13 @@ public class BlockOreQuartz extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
+        if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
             int count = 1;
             Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
             if (fortune != null && fortune.getLevel() >= 1) {
@@ -56,7 +61,7 @@ public class BlockOreQuartz extends BlockSolid {
                     new ItemQuartz(0, count)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

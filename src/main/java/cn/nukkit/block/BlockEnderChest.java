@@ -74,6 +74,11 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public AxisAlignedBB recalculateBoundingBox() {
         return new SimpleAxisAlignedBB(
                 this.x + 0.0625,
@@ -147,12 +152,12 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
+        if (item.isPickaxe() && item.getTier() >= getToolTier()) {
             return new Item[]{
                     Item.get(Item.OBSIDIAN, 0, 8)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

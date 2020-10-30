@@ -37,6 +37,11 @@ public class BlockEnchantingTable extends BlockTransparent {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public double getHardness() {
         return 5;
     }
@@ -63,7 +68,7 @@ public class BlockEnchantingTable extends BlockTransparent {
                     toItem()
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

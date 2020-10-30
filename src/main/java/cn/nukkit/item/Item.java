@@ -32,8 +32,10 @@ import java.util.regex.Pattern;
  */
 public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
+    public static final Item[] EMPTY_ARRAY = new Item[0];
+
     protected static final String UNKNOWN_STR = "Unknown";
-    public static Class[] list = null;
+    public static Class<?>[] list = null;
 
     protected Block block = null;
     protected final int id;

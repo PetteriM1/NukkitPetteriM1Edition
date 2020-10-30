@@ -2093,7 +2093,7 @@ public class Level implements ChunkManager, Metadatable {
                 }
             }
 
-            double breakTime = target.getBreakTime(item, player);
+            double breakTime = target.calculateBreakTime(item, player);
 
             if (player.isCreative() && breakTime > 0.15) {
                 breakTime = 0.15;

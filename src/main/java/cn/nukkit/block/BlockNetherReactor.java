@@ -33,10 +33,15 @@ public class BlockNetherReactor extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
             return new Item[]{new ItemDiamond(0, 3), new ItemIngotIron(0, 6)};
-        } else return new Item[0];
+        } else return Item.EMPTY_ARRAY;
     }
 
     @Override

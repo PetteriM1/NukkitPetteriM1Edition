@@ -108,7 +108,7 @@ public class BlockSnowLayer extends BlockFallableMeta {
             drop.setCount(height < 3 ? 1 : height < 5 ? 2 : height == 7 ? 4 : 3);
             return new Item[]{drop};
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

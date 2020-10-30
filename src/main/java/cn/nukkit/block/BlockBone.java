@@ -53,7 +53,11 @@ public class BlockBone extends BlockSolid implements Faceable {
             return new Item[]{new ItemBlock(this)};
         }
 
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
+    }
+
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
     }
 
     @Override

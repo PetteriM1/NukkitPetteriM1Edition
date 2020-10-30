@@ -80,6 +80,6 @@ public class BlockChorusPlant extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
-        return Utils.rand() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : new Item[0];
+        return Utils.rand() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : Item.EMPTY_ARRAY;
     }
 }

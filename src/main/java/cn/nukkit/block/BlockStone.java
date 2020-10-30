@@ -46,6 +46,11 @@ public class BlockStone extends BlockSolidMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         String[] names = new String[]{
                 "Stone",
@@ -62,12 +67,12 @@ public class BlockStone extends BlockSolidMeta {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
+        if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
             return new Item[]{
                     Item.get(this.getDamage() == 0 ? Item.COBBLESTONE : Item.STONE, this.getDamage(), 1)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

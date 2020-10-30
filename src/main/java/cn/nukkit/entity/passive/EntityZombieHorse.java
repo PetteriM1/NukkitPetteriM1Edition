@@ -64,7 +64,7 @@ public class EntityZombieHorse extends EntityHorseBase implements EntitySmite {
             }
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

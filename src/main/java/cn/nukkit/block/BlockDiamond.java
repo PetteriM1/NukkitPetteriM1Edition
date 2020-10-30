@@ -25,6 +25,11 @@ public class BlockDiamond extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
+    }
+
+    @Override
     public int getId() {
         return DIAMOND_BLOCK;
     }

@@ -30,6 +30,11 @@ public class BlockDoubleSlabStone3 extends BlockDoubleSlabStone {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public double getResistance() {
         return this.getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
     }
