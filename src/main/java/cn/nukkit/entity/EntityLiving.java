@@ -288,14 +288,16 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         }
 
         // HACK!
-        if (this instanceof Player && ((Player) this).protocol <= 282) {
-            if (((Player) this).protocol <= 201) {
-                this.setDataFlagSelfOnly(DATA_FLAGS, 33, isBreathing);
+        if (this instanceof Player) {
+            if (((Player) this).protocol <= 282) {
+                if (((Player) this).protocol <= 201) {
+                    this.setDataFlagSelfOnly(DATA_FLAGS, 33, isBreathing);
+                } else {
+                    this.setDataFlagSelfOnly(DATA_FLAGS, 34, isBreathing);
+                }
             } else {
-                this.setDataFlagSelfOnly(DATA_FLAGS, 34, isBreathing);
+                this.setDataFlagSelfOnly(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
             }
-        } else {
-            this.setDataFlagSelfOnly(DATA_FLAGS, DATA_FLAG_BREATHING, isBreathing);
         }
 
         boolean hasUpdate = super.entityBaseTick(tickDiff);
@@ -365,18 +367,18 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                     }
                 }
             }
-        }
 
-        if (this.attackTime > 0) {
-            this.attackTime -= tickDiff;
-            hasUpdate = true;
-        }
+            if (this.attackTime > 0) {
+                this.attackTime -= tickDiff;
+                hasUpdate = true;
+            }
 
-        if (this.riding == null) {
-            Entity[] e = level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
-            for (Entity entity : e) {
-                if (entity instanceof EntityRideable) {
-                    this.collidingWith(entity);
+            if (this.riding == null) {
+                Entity[] e = level.getNearbyEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
+                for (Entity entity : e) {
+                    if (entity instanceof EntityRideable) {
+                        this.collidingWith(entity);
+                    }
                 }
             }
         }
