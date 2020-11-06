@@ -8,8 +8,8 @@ import co.aikar.timings.Timings;
 import io.netty.util.internal.ConcurrentSet;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author MagicDroidX
@@ -21,9 +21,9 @@ public class PermissibleBase implements Permissible {
 
     private Permissible parent = null;
 
-    private final ConcurrentSet<PermissionAttachment> attachments = new ConcurrentSet<>();
+    private final Set<PermissionAttachment> attachments = new ConcurrentSet<>();
 
-    private final ConcurrentMap<String, PermissionAttachmentInfo> permissions = new ConcurrentHashMap<>();
+    private final Map<String, PermissionAttachmentInfo> permissions = new ConcurrentHashMap<>();
 
     public PermissibleBase(ServerOperator opable) {
         this.opable = opable;

@@ -18,7 +18,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
 /**
@@ -32,17 +31,17 @@ public class PluginManager {
 
     protected final Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-    protected final ConcurrentMap<String, Permission> permissions = new ConcurrentHashMap<>();
+    protected final Map<String, Permission> permissions = new ConcurrentHashMap<>();
 
-    protected final ConcurrentMap<String, Permission> defaultPerms = new ConcurrentHashMap<>();
+    protected final Map<String, Permission> defaultPerms = new ConcurrentHashMap<>();
 
-    protected final ConcurrentMap<String, Permission> defaultPermsOp = new ConcurrentHashMap<>();
+    protected final Map<String, Permission> defaultPermsOp = new ConcurrentHashMap<>();
 
-    protected final ConcurrentMap<String, ConcurrentSet<Permissible>> permSubs = new ConcurrentHashMap<>();
+    protected final Map<String, Set<Permissible>> permSubs = new ConcurrentHashMap<>();
 
-    protected final ConcurrentSet<Permissible> defSubs = new ConcurrentSet<>();
+    protected final Set<Permissible> defSubs = new ConcurrentSet<>();
 
-    protected final ConcurrentSet<Permissible> defSubsOp = new ConcurrentSet<>();
+    protected final Set<Permissible> defSubsOp = new ConcurrentSet<>();
 
     protected final Map<String, PluginLoader> fileAssociations = new HashMap<>();
 
