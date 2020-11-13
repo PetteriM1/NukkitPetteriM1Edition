@@ -270,6 +270,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             // 212 Border in Education Edition
             list[MAGMA] = BlockMagma.class; //213
             list[BLOCK_NETHER_WART_BLOCK] = BlockNetherWartBlock.class; //214
+            list[RED_NETHER_BRICK] = BlockBricksRedNether.class; //215
             list[BONE_BLOCK] = BlockBone.class; //216
             // 217 not yet in Minecraft
             list[SHULKER_BOX] = BlockShulkerBox.class; //218
