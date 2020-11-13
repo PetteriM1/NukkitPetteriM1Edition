@@ -777,7 +777,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
         //this.batchDataPacket(pk);
-        this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
+        if (this.protocol < ProtocolInfo.v1_12_0) {
+            this.dataPacket(pk); // Multiversion for batchPackets is broken?
+        } else {
+            this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
+        }
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
