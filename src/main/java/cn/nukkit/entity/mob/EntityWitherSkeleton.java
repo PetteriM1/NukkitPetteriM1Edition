@@ -14,6 +14,7 @@ import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmite {
@@ -52,8 +53,19 @@ public class EntityWitherSkeleton extends EntityWalkingMob implements EntitySmit
     public void attackEntity(Entity player) {
         if (this.attackDelay > 23 && player.distanceSquared(this) <= 1) {
             this.attackDelay = 0;
-            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, getDamage()));
-            player.addEffect(Effect.getEffect(Effect.WITHER).setDuration(200));
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+            if (player instanceof Player) {
+                HashMap<Integer, Float> armorValues = new ArmorPoints();
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += armorValues.getOrDefault(i.getId(), 0f);
+                }
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR, (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            if (player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage))) {
+                player.addEffect(Effect.getEffect(Effect.WITHER).setDuration(200));
+            }
         }
     }
 

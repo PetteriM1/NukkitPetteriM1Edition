@@ -95,7 +95,7 @@ public class EntityThrownTrident extends EntityProjectile {
             return false;
         }
 
-        if (this.age > 1200) {
+        if (this.age > 6000) {
             this.close();
         }
 
