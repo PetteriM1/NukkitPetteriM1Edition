@@ -702,7 +702,7 @@ public class Server {
         if (!forceSync && this.networkCompressionAsync) {
             CompletableFuture.runAsync(() -> {
                 byte[][] payload = new byte[(packets.length << 1)][];
-                int size = 0;
+                //int size = 0;
                 for (int i = 0; i < packets.length; i++) {
                     DataPacket p = packets[i];
                     if (!p.isEncoded) {
@@ -713,8 +713,8 @@ public class Server {
                     payload[i2] = Binary.writeUnsignedVarInt(buf.length);
                     payload[i2 + 1] = buf;
                     packets[i] = null;
-                    size += payload[i2].length;
-                    size += payload[i2 + 1].length;
+                    //size += payload[i2].length;
+                    //size += payload[i2 + 1].length;
                 }
 
                 List<InetSocketAddress> targetsOld = new ArrayList<>();
@@ -744,7 +744,7 @@ public class Server {
         } else {
             if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.startTiming();
             byte[][] payload = new byte[(packets.length << 1)][];
-            int size = 0;
+            //int size = 0;
             for (int i = 0; i < packets.length; i++) {
                 DataPacket p = packets[i];
                 if (!p.isEncoded) {
@@ -755,8 +755,8 @@ public class Server {
                 payload[i2] = Binary.writeUnsignedVarInt(buf.length);
                 payload[i2 + 1] = buf;
                 packets[i] = null;
-                size += payload[i2].length;
-                size += payload[i2 + 1].length;
+                //size += payload[i2].length;
+                //size += payload[i2 + 1].length;
             }
 
             List<InetSocketAddress> targetsOld = new ArrayList<>();
@@ -795,7 +795,7 @@ public class Server {
 
         for (InetSocketAddress i : targets) {
             if (this.players.containsKey(i)) {
-                this.players.get(i).dataPacket(pk);
+                this.players.get(i).directDataPacket(pk);
             }
         }
     }
@@ -1035,7 +1035,7 @@ public class Server {
     }
 
     public void onPlayerCompleteLoginSequence(Player player) {
-        this.sendFullPlayerListData(player);
+        //this.sendFullPlayerListData(player);
     }
 
     public void addPlayer(InetSocketAddress socketAddress, Player player) {
@@ -1114,7 +1114,9 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol >= ProtocolInfo.v1_16_0) {
+        if (player.protocol >= ProtocolInfo.v1_16_100) {
+            //player.dataPacket(CraftingManager.packet419); //TODO 1.16.100
+        } else if (player.protocol >= ProtocolInfo.v1_16_0) {
             player.dataPacket(CraftingManager.packet407);
         } else if (player.protocol > ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet338);

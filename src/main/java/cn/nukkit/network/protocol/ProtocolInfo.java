@@ -33,21 +33,23 @@ public interface ProtocolInfo {
     int v1_14_60 = 390;
     int v1_16_0 = 407;
     int v1_16_20 = 408;
-    int v1_16_100 = 409;
+    int v1_16_100_0 = 409;
     int v1_16_100_51 = 410;
     int v1_16_100_52 = 411;
+    int v1_16_100 = 419;
 
-    int CURRENT_PROTOCOL = 408;
+    int CURRENT_PROTOCOL = v1_16_100;
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
             v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0,
-            v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0, v1_14_60, v1_16_0, v1_16_20, v1_16_100, v1_16_100_51,
-            v1_16_100_52
+            v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0, v1_14_60, v1_16_0, v1_16_20, v1_16_100_0, v1_16_100_51,
+            v1_16_100_52, v1_16_100
     );
 
-    String MINECRAFT_VERSION = "v1.16.40";
-    String MINECRAFT_VERSION_NETWORK = "1.16.40";
+    String MINECRAFT_VERSION = "v1.16.100";
+    String MINECRAFT_VERSION_NETWORK = "1.16.100";
 
+    byte BATCH_PACKET = (byte) 0xff;
     byte LOGIN_PACKET = 0x01;
     byte PLAY_STATUS_PACKET = 0x02;
     byte SERVER_TO_CLIENT_HANDSHAKE_PACKET = 0x03;
@@ -188,7 +190,6 @@ public interface ProtocolInfo {
     byte COMPLETED_USING_ITEM_PACKET = (byte) 0x8e;
     byte NETWORK_SETTINGS_PACKET = (byte) 0x8f;
     byte PLAYER_AUTH_INPUT_PACKET = (byte) 0x90;
-    byte BATCH_PACKET = (byte) 0xff;
     byte CREATIVE_CONTENT_PACKET = (byte) 0x91;
     byte PLAYER_ENCHANT_OPTIONS_PACKET = (byte) 0x92;
     byte ITEM_STACK_REQUEST_PACKET = (byte) 0x93;
@@ -201,4 +202,10 @@ public interface ProtocolInfo {
     byte POS_TRACKING_CLIENT_REQUEST_PACKET = (byte) 0x9a;
     byte DEBUG_INFO_PACKET = (byte) 0x9b;
     byte PACKET_VIOLATION_WARNING_PACKET = (byte) 0x9c;
+    byte MOTION_PREDICTION_HINTS_PACKET = (byte) 0x9d;
+    byte ANIMATE_ENTITY_PACKET = (byte) 0x9e;
+    byte CAMERA_SHAKE_PACKET = (byte) 0x9f;
+    byte PLAYER_FOG_PACKET = (byte) 0xa0;
+    byte CORRECT_PLAYER_MOVE_PREDICTION_PACKET = (byte) 0xa1;
+    byte ITEM_COMPONENT_PACKET = (byte) 0xa2;
 }

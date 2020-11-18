@@ -95,6 +95,7 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -204,9 +205,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected boolean checkMovement = true;
 
-    //private final Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
-
-    private final List<DataPacket> batchedPackets = new ArrayList<>();
+    private final Queue<DataPacket> packetQueue = new ConcurrentLinkedDeque<>();
 
     private PermissibleBase perm;
     /**
@@ -859,7 +858,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.noDamageTicks = 60;
         this.setAirTicks(400);
-        this.sendAttributes();
 
         if (this.hasPermission(Server.BROADCAST_CHANNEL_USERS)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_USERS, this);
@@ -1007,6 +1005,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean batchDataPacket(DataPacket packet) {
+        if (packet instanceof BatchPacket) {
+            return this.directDataPacket(packet); // We don't want to batch a batched packet
+        }
+
         if (!this.connected) {
             return false;
         }
@@ -1022,12 +1024,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
-            /*if (!this.batchedPackets.containsKey(packet.getChannel())) {
-                this.batchedPackets.put(packet.getChannel(), new ArrayList<>());
-            }
-
-            this.batchedPackets.get(packet.getChannel()).add(packet.clone());*/
-            batchedPackets.add(packet.clone());
+            this.packetQueue.offer(packet);
         }
         return true;
     }
@@ -1972,17 +1969,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (!this.batchedPackets.isEmpty()) {
+        if (!this.packetQueue.isEmpty()) {
             Player[] pArr = new Player[]{this};
-            /*for (Entry<Integer, List<DataPacket>> entry : this.batchedPackets.entrySet()) {
-                List<DataPacket> packets = entry.getValue();
-                DataPacket[] arr = packets.toArray(new DataPacket[0]);
-                packets.clear();
-                this.server.batchPackets(pArr, arr, false);
-            }*/
-            this.server.batchPackets(pArr, batchedPackets.toArray(new DataPacket[0]), false);
-            this.batchedPackets.clear();
+            List<DataPacket> toBatch = new ArrayList<>();
+            DataPacket packet;
+            while ((packet = this.packetQueue.poll()) != null) {
+                toBatch.add(packet);
+            }
+            DataPacket[] arr = toBatch.toArray(new DataPacket[0]);
+            this.server.batchPackets(pArr, arr, false);
         }
+
+        /*if (!this.isOnline()) {
+            return;
+        }*/
 
         if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
             this.orderChunks();
@@ -2188,6 +2188,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.getAddress(),
                 String.valueOf(this.getPort())));
 
+        final Map<UUID, Player> tempOnlinePlayers = getServer().getOnlinePlayers();
+
         CompletableFuture.runAsync(() -> {
             try {
                 if (!this.connected) return;
@@ -2199,26 +2201,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 this.setImmobile(true);
-                this.setCanClimb(true);
-                this.setNameTagVisible(true);
-                this.setNameTagAlwaysVisible(true);
-                this.sendAttributes();
+                this.setEnableClientCommand(true);
                 this.adventureSettings.update();
-                this.sendPotionEffects(this);
-                this.sendData(this);
-                this.sendAllInventories();
-
-                if (this.protocol < 407) {
-                    if (this.gamemode == Player.SPECTATOR) {
-                        InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                        inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-                        this.dataPacket(inventoryContentPacket);
-                    } else {
-                        this.inventory.sendCreativeContents();
-                    }
+                if (this.protocol < 407 && this.gamemode == Player.SPECTATOR) {
+                    InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                    inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
+                    this.dataPacket(inventoryContentPacket);
                 } else {
                     this.inventory.sendCreativeContents();
                 }
+                this.sendAttributes();
+                this.sendPotionEffects(this);
+                this.sendData(this);
+                this.setCanClimb(true);
+                this.setNameTagVisible(true);
+                this.setNameTagAlwaysVisible(true);
+                this.sendAllInventories();
 
                 this.inventory.sendHeldItem(this);
                 this.server.sendRecipeList(this);
@@ -2232,16 +2230,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (op || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
                     this.setRemoveFormat(false);
                 }
+
+                sendFullPlayerListInternal(this, tempOnlinePlayers);
             } catch (Exception e) {
                 this.close("", "Internal Server Error");
                 getServer().getLogger().logException(e);
             }
         });
 
-        this.setEnableClientCommand(true);
-
-        this.server.addOnlinePlayer(this);
+        this.server.playerList.put(this.getUniqueId(), this);
+        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin(), this.getLoginChainData().getXUID());
         this.server.onPlayerCompleteLoginSequence(this);
+    }
+
+    private void sendFullPlayerListInternal(Player player, Map<UUID, Player> playerList) {
+        PlayerListPacket pk = new PlayerListPacket();
+        pk.type = PlayerListPacket.TYPE_ADD;
+        pk.entries = playerList.values().stream()
+                .map(p -> new PlayerListPacket.Entry(
+                        p.getUniqueId(),
+                        p.getId(),
+                        p.getDisplayName(),
+                        p.getSkin(),
+                        p.getLoginChainData().getXUID()))
+                .toArray(PlayerListPacket.Entry[]::new);
+        player.dataPacket(pk);
     }
 
     public void handleDataPacket(DataPacket packet) {
@@ -3056,6 +3069,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (protocol >= 407) {
                             ContainerClosePacket pk = new ContainerClosePacket();
                             pk.windowId = -1;
+                            pk.wasServerInitiated = false;
                             this.dataPacket(pk);
                         }
                     }
@@ -5143,13 +5157,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk1.y = (float) this.y;
         pk1.z = (float) this.z;
         pk1.respawn = !this.isAlive();
-        this.directDataPacket(pk1);
+        this.dataPacket(pk1);
 
         if (this.protocol >= 313) {
             NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
             pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
             pk0.radius = viewDistance << 4;
-            this.directDataPacket(pk0);
+            this.dataPacket(pk0);
         }
     }
 

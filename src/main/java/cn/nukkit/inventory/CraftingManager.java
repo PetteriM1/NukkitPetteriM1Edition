@@ -31,6 +31,7 @@ public class CraftingManager {
     public static BatchPacket packet354 = null;
     public static BatchPacket packet338 = null;
     public static BatchPacket packet407 = null;
+    public static BatchPacket packet419 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -260,6 +261,27 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
+        CraftingDataPacket pk419 = new CraftingDataPacket();
+        pk419.cleanRecipes = true;
+        pk419.protocol = 419; //TODO 1.16.100
+        /*for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk419.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk419.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk419.addFurnaceRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk419.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk419.addContainerRecipe(recipe);
+        }*/
+        pk419.encode();
+        packet419 = pk419.compress(Deflater.BEST_COMPRESSION);
         CraftingDataPacket pk407 = new CraftingDataPacket();
         pk407.cleanRecipes = true;
         pk407.protocol = 407;
