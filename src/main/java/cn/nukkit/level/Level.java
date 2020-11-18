@@ -181,19 +181,6 @@ public class Level implements ChunkManager, Metadatable {
     //private final List<BlockUpdateEntry> nextTickUpdates = Lists.newArrayList();
     //private final Map<BlockVector3, Integer> updateQueueIndex = new HashMap<>();
 
-    //TODO: This is a bad way to handle multiversion chunks while the new format requires the correct block palette for every version
-    /*private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue0 = new ConcurrentHashMap<>(); // < 1.12
-    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue361 = new ConcurrentHashMap<>(); // 1.12
-    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue388 = new ConcurrentHashMap<>(); // 1.13
-    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue389 = new ConcurrentHashMap<>(); // 1.14
-    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue407 = new ConcurrentHashMap<>(); // 1.16
-    private final ConcurrentMap<Long, Int2ObjectMap<Player>> chunkSendQueue419 = new ConcurrentHashMap<>(); // 1.16.100*/
-    /*private final LongSet chunkSendTasks0 = new LongOpenHashSet(); // < 1.12
-    private final LongSet chunkSendTasks361 = new LongOpenHashSet(); // 1.12
-    private final LongSet chunkSendTasks388 = new LongOpenHashSet(); // 1.13
-    private final LongSet chunkSendTasks389 = new LongOpenHashSet(); // 1.14
-    private final LongSet chunkSendTasks407 = new LongOpenHashSet(); // 1.16
-    private final LongSet chunkSendTasks419 = new LongOpenHashSet(); // 1.16.100*/
     private final Int2ObjectMap<ConcurrentMap<Long, Int2ObjectMap<Player>>> chunkSendQueues = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<LongSet> chunkSendTasks = new Int2ObjectOpenHashMap<>();
 
@@ -2951,12 +2938,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private void sendChunk(int x, int z, long index, DataPacket packet) {
-        this.sendChunkInternal(x, z, index, packet, 0);
-        this.sendChunkInternal(x, z, index, packet, ProtocolInfo.v1_12_0);
-        this.sendChunkInternal(x, z, index, packet, ProtocolInfo.v1_13_0);
-        this.sendChunkInternal(x, z, index, packet, ProtocolInfo.v1_14_0);
-        this.sendChunkInternal(x, z, index, packet, ProtocolInfo.v1_16_0);
-        this.sendChunkInternal(x, z, index, packet, ProtocolInfo.v1_16_100);
+        for (int protocolId : chunkSendTasks.keySet()){
+            this.sendChunkInternal(x, z, index, packet, protocolId);
+        }
     }
 
     private void sendChunkInternal(int x, int z, long index, DataPacket packet, int protocol) {
