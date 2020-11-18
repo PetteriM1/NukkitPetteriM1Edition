@@ -15,6 +15,7 @@ import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.ThreadCache;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.io.File;
@@ -105,7 +106,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public AsyncTask requestChunkTask(int protocol, int x, int z) throws ChunkException {
+    public AsyncTask requestChunkTask(IntSet protocols, int x, int z) throws ChunkException {
         Chunk chunk = (Chunk) this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
@@ -144,7 +145,6 @@ public class Anvil extends BaseLevelProvider {
             extraData = null;
         }
 
-        BinaryStream stream = ThreadCache.binaryStream.get().reset();
         int subChunkCount = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
         for (int i = sections.length - 1; i >= 0; i--) {
@@ -153,34 +153,37 @@ public class Anvil extends BaseLevelProvider {
                 break;
             }
         }
-        if (protocol < ProtocolInfo.v1_12_0) {
-            stream.putByte((byte) subChunkCount);
-        }
-        for (int i = 0; i < subChunkCount; i++) {
-            if (protocol < ProtocolInfo.v1_13_0) {
-                stream.putByte((byte) 0);
-                stream.put(sections[i].getBytes());
+
+        for (int protocolId : protocols) {
+            BinaryStream stream = ThreadCache.binaryStream.get().reset();
+            if (protocolId < ProtocolInfo.v1_12_0) {
+                stream.putByte((byte) subChunkCount);
+            }
+
+            for (int i = 0; i < subChunkCount; i++) {
+                if (protocolId < ProtocolInfo.v1_13_0) {
+                    stream.putByte((byte) 0);
+                    stream.put(sections[i].getBytes());
+                } else {
+                    sections[i].writeTo(protocolId, stream);
+                }
+            }
+            if (protocolId < ProtocolInfo.v1_12_0) {
+                for (byte height : chunk.getHeightMapArray()) {
+                    stream.putByte(height);
+                }
+                stream.put(PAD_256);
+            }
+            stream.put(chunk.getBiomeIdArray());
+            stream.putByte((byte) 0);
+            if (extraData != null) {
+                stream.put(extraData.getBuffer());
             } else {
-                sections[i].writeTo(protocol, stream);
+                stream.putVarInt(0);
             }
+            stream.put(blockEntities);
+            this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, subChunkCount, stream.getBuffer());
         }
-        if (protocol < ProtocolInfo.v1_12_0) {
-            for (byte height : chunk.getHeightMapArray()) {
-                stream.putByte(height);
-            }
-            stream.put(PAD_256);
-        }
-        stream.put(chunk.getBiomeIdArray());
-        stream.putByte((byte) 0);
-        if (extraData != null) {
-            stream.put(extraData.getBuffer());
-        } else {
-            stream.putVarInt(0);
-        }
-        stream.put(blockEntities);
-
-        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, subChunkCount, stream.getBuffer());
-
         return null;
     }
 
