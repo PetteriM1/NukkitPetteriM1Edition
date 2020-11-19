@@ -48,10 +48,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.BatchPacket;
-import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.PlayerListPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.network.rcon.RCON;
 import cn.nukkit.permission.BanEntry;
@@ -730,13 +727,10 @@ public class Server {
 
             for (int i = 0; i < packetList.size(); i++) {
                 DataPacket p = packetList.get(i);
+                int idx = i * 2;
                 byte[] buf = p.getBuffer();
-                int i2 = i << 1;
-                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-                payload[i2 + 1] = buf;
-                packets[i] = null;
-                //size += payload[i2].length;
-                //size += payload[i2 + 1].length;
+                payload[idx] = Binary.writeUnsignedVarInt(buf.length);
+                payload[idx + 1] = buf;
             }
 
             try {
