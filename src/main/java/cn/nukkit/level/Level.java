@@ -61,7 +61,9 @@ import co.aikar.timings.TimingsHistory;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import java.lang.ref.SoftReference;
 import java.util.*;
@@ -1108,6 +1110,8 @@ public class Level implements ChunkManager, Metadatable {
         if (optimizeRebuilds) {
             chunks = new LongOpenHashSet();
         }
+
+        Int2ObjectMap<ObjectList<Player>> targets = Server.shortPlayers(target);
         for (Vector3 b : blocks) {
             if (b == null) {
                 continue;
@@ -1128,20 +1132,22 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
             //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
-            for (Player p : target) {
+            for (int protocolId : targets.keySet()) {
+                ObjectList<Player> players = targets.get(protocolId);
+                UpdateBlockPacket packet = (UpdateBlockPacket) updateBlockPacket.clone();
                 try {
                     if (b instanceof Block) {
-                        updateBlockPacket.blockId = ((Block) b).getId();
-                        updateBlockPacket.blockData = ((Block) b).getDamage();
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, ((Block) b).getFullId());
+                        packet.blockId = ((Block) b).getId();
+                        packet.blockData = ((Block) b).getDamage();
+                        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getFullId());
                     } else {
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(p.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, getFullBlock((int) b.x, (int) b.y, (int) b.z));
                     }
                 } catch (NoSuchElementException e) {
-                    throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for player " + p.getName() + " with protocol " + p.protocol);
+                    throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for players with protocol " +protocolId);
                 }
 
-                p.batchDataPacket(updateBlockPacket);
+                this.server.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
             }
         }
     }
