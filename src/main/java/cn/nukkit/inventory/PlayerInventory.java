@@ -23,15 +23,9 @@ import java.util.Collection;
 public class PlayerInventory extends BaseInventory {
 
     protected int itemInHandIndex = 0;
-    private int[] hotbar;
 
     public PlayerInventory(EntityHumanType player) {
         super(player, InventoryType.PLAYER);
-        this.hotbar = new int[this.getHotbarSize()];
-
-        for (int i = 0; i < this.hotbar.length; i++) {
-            this.hotbar[i] = i;
-        }
     }
 
     @Override
