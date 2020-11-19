@@ -4,6 +4,8 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 
+import java.lang.reflect.Field;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
@@ -108,4 +110,23 @@ public abstract class Particle extends Vector3 {
     }
 
     public abstract DataPacket mvEncode(int protocol);
+
+    public static Integer getParticleIdByName(String name) {
+        name = name.toUpperCase();
+
+        try {
+            Field field = Particle.class.getField((name.startsWith("TYPE_") ? name : ("TYPE_" + name)));
+
+            Class<?> type = field.getType();
+
+            if (type == int.class) {
+                return field.getInt(null);
+            }
+        } catch(NoSuchFieldException | IllegalAccessException ignored) {}
+        return null;
+    }
+
+    public static boolean particleExists(String name) {
+        return getParticleIdByName(name) != null;
+    }
 }

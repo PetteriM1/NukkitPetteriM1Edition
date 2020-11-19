@@ -25,6 +25,7 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
 import cn.nukkit.event.inventory.InventoryCloseEvent;
 import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
 import cn.nukkit.event.inventory.InventoryPickupItemEvent;
+import cn.nukkit.event.inventory.InventoryPickupTridentEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.event.player.PlayerAsyncPreLoginEvent.LoginResult;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
@@ -777,7 +778,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
         //this.batchDataPacket(pk);
-        this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
+        if (this.protocol < ProtocolInfo.v1_12_0) {
+            this.dataPacket(pk); // Multiversion for batchPackets is broken?
+        } else {
+            this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
+        }
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
@@ -2110,7 +2115,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setLevel(level);
         }
 
-        this.ticksSinceLastRest = nbt.getInt("ticksSinceLastRest");
+        this.ticksSinceLastRest = nbt.getInt("TimeSinceRest");
 
         for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
             if (!(achievement instanceof ByteTag)) {
@@ -2382,7 +2387,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         @Override
                         public void onRun() {
-                            e = new PlayerAsyncPreLoginEvent(username, uuid, Player.this.getAddress(), Player.this.getPort());
+                            e = new PlayerAsyncPreLoginEvent(username, uuid, loginChainData.getXUID(), Player.this.getAddress(), Player.this.getPort());
                             server.getPluginManager().callEvent(e);
                         }
 
@@ -4128,7 +4133,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putInt("foodLevel", this.foodData.getLevel());
             this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
 
-            this.namedTag.putInt("ticksSinceLastRest", this.ticksSinceLastRest);
+            this.namedTag.putInt("TimeSinceRest", this.ticksSinceLastRest);
 
             if (!this.username.isEmpty() && this.namedTag != null) {
                 if (this.server.savePlayerDataByUuid) {
@@ -5324,6 +5329,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     return false;
                 }
 
+                InventoryPickupTridentEvent ev = new InventoryPickupTridentEvent(this.inventory, (EntityThrownTrident) entity);
+                this.server.getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    return false;
+                }
+
                 TakeItemEntityPacket pk = new TakeItemEntityPacket();
                 pk.entityId = this.getId();
                 pk.target = entity.getId();
@@ -5509,6 +5520,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             });
         }
+    }
+
+    public int getTimeSinceRest() {
+        return ticksSinceLastRest;
+    }
+
+    public void setTimeSinceRest(int timeSinceRest) {
+        this.ticksSinceLastRest = timeSinceRest;
     }
 
     @Override

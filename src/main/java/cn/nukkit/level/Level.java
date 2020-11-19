@@ -3530,48 +3530,44 @@ public class Level implements ChunkManager, Metadatable {
             spawn.y = 1.01;
         }
 
-        if (spawn != null) {
-            Vector3 v = spawn.floor();
-            FullChunk chunk = this.getChunk((int) v.x >> 4, (int) v.z >> 4, false);
-            int x = (int) v.x & 0x0f;
-            int z = (int) v.z & 0x0f;
-            if (chunk != null && chunk.isGenerated()) {
-                int y = (int) NukkitMath.clamp(v.y, 0, 254);
-                boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
-                for (; y > 0; --y) {
-                    int[] b = chunk.getBlockState(x, y, z);
-                    Block block = Block.get(b[0], b[1]);
-                    if (this.isFullBlock(block)) {
-                        if (wasAir) {
-                            y++;
-                            break;
-                        }
-                    } else {
-                        wasAir = true;
+        Vector3 v = spawn.floor();
+        FullChunk chunk = this.getChunk((int) v.x >> 4, (int) v.z >> 4, false);
+        int x = (int) v.x & 0x0f;
+        int z = (int) v.z & 0x0f;
+        if (chunk != null && chunk.isGenerated()) {
+            int y = (int) NukkitMath.clamp(v.y, 1, 254);
+            boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
+            for (; y > 0; --y) {
+                int[] b = chunk.getBlockState(x, y, z);
+                Block block = Block.get(b[0], b[1]);
+                if (this.isFullBlock(block)) {
+                    if (wasAir) {
+                        y++;
+                        break;
                     }
+                } else {
+                    wasAir = true;
                 }
-
-                for (; y >= 0 && y < 255; y++) {
-                    int[] b = chunk.getBlockState(x, y + 1, z);
-                    Block block = Block.get(b[0], b[1]);
-                    if (!this.isFullBlock(block)) {
-                        b = chunk.getBlockState(x, y, z);
-                        block = Block.get(b[0], b[1]);
-                        if (!this.isFullBlock(block)) {
-                            return new Position(spawn.x, y == (int) spawn.y ? spawn.y : y, spawn.z, this);
-                        }
-                    } else {
-                        ++y;
-                    }
-                }
-
-                v.y = y;
             }
 
-            return new Position(spawn.x, v.y, spawn.z, this);
+            for (; y >= 0 && y < 255; y++) {
+                int[] b = chunk.getBlockState(x, y + 1, z);
+                Block block = Block.get(b[0], b[1]);
+                if (!this.isFullBlock(block)) {
+                    b = chunk.getBlockState(x, y, z);
+                    block = Block.get(b[0], b[1]);
+                    if (!this.isFullBlock(block)) {
+                        return new Position(spawn.x, y == (int) spawn.y ? spawn.y : y, spawn.z, this);
+                    }
+                } else {
+                    ++y;
+                }
+            }
+
+            v.y = y;
         }
 
-        return null;
+        return new Position(spawn.x, v.y, spawn.z, this);
     }
 
     public int getTime() {
