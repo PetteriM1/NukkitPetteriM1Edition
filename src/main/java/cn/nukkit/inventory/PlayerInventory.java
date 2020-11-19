@@ -539,6 +539,7 @@ public class PlayerInventory extends BaseInventory {
         Player p = (Player) holder;
         ContainerClosePacket pk = new ContainerClosePacket();
         pk.windowId = p.getWindowId(this);
+        pk.wasServerInitiated = false;
         p.directDataPacket(pk);
     }
 }

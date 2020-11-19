@@ -162,7 +162,7 @@ public class EntityHuman extends EntityHumanType {
                 }
                 if (skinTag.contains("AnimatedImageData")) {
                     for (CompoundTag animationTag : skinTag.getList("AnimatedImageData", CompoundTag.class).getAll()) {
-                        newSkin.getAnimations().add(new SkinAnimation(new SerializedImage(animationTag.getInt("ImageWidth"), animationTag.getInt("ImageHeight"), animationTag.getByteArray("Image")), animationTag.getInt("Type"), animationTag.getFloat("Frames")));
+                        newSkin.getAnimations().add(new SkinAnimation(new SerializedImage(animationTag.getInt("ImageWidth"), animationTag.getInt("ImageHeight"), animationTag.getByteArray("Image")), animationTag.getInt("Type"), animationTag.getFloat("Frames"), animationTag.getInt("AnimationExpression")));
                     }
                 }
                 if (skinTag.contains("ArmSize")) {
@@ -246,6 +246,7 @@ public class EntityHuman extends EntityHumanType {
                             .putInt("Type", animation.type)
                             .putInt("ImageWidth", animation.image.width)
                             .putInt("ImageHeight", animation.image.height)
+                            .putInt("AnimationExpression", animation.expression)
                             .putByteArray("Image", animation.image.data));
                 }
 
