@@ -155,7 +155,8 @@ public class RakNetServer extends RakNet {
         RakNetServerSession session = this.sessionsByAddress.get(packet.sender());
 
         if (session != null) {
-            this.sendAlreadyConnected(ctx, packet.sender());
+            //this.sendAlreadyConnected(ctx, packet.sender());
+            Server.getInstance().getLogger().debug("The client was already connected. Trying to ignore that and continue.");
         /*} else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());*/
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
