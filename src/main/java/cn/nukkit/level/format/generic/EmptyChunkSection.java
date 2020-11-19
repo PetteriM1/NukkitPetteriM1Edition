@@ -4,6 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.util.BitArrayVersion;
 import cn.nukkit.level.util.PalettedBlockStorage;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 
@@ -16,7 +17,8 @@ import java.util.Arrays;
 public class EmptyChunkSection implements ChunkSection {
 
     public static final EmptyChunkSection[] EMPTY = new EmptyChunkSection[16];
-    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage(BitArrayVersion.V1);
+    private static final PalettedBlockStorage EMPTY_STORAGE_PRE419 = new PalettedBlockStorage(BitArrayVersion.V1, 0);
+    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage(BitArrayVersion.V1, ProtocolInfo.v1_16_100);
 
     static {
         for (int y = 0; y < EMPTY.length; y++) {
@@ -143,8 +145,13 @@ public class EmptyChunkSection implements ChunkSection {
     public void writeTo(int protocol, BinaryStream stream) {
         stream.putByte((byte) 8);
         stream.putByte((byte) 2);
-        EMPTY_STORAGE.writeTo(protocol, stream);
-        EMPTY_STORAGE.writeTo(protocol, stream);
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            EMPTY_STORAGE.writeTo(protocol, stream);
+            EMPTY_STORAGE.writeTo(protocol, stream);
+        } else {
+            EMPTY_STORAGE_PRE419.writeTo(protocol, stream);
+            EMPTY_STORAGE_PRE419.writeTo(protocol, stream);
+        }
     }
 
     @Override
