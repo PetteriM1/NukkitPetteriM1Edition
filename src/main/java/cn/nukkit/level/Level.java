@@ -54,7 +54,6 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
-import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
@@ -2938,7 +2937,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private void sendChunk(int x, int z, long index, DataPacket packet) {
-        for (int protocolId : chunkSendTasks.keySet()){
+        for (int protocolId : chunkSendTasks.keySet()) {
             this.sendChunkInternal(x, z, index, packet, protocolId);
         }
     }
@@ -2966,10 +2965,10 @@ public class Level implements ChunkManager, Metadatable {
 
         // Map shorted by index => requested protocols
         Long2ObjectMap<IntSet> chunkRequests = new Long2ObjectOpenHashMap<>();
-        for (int protocolId : this.chunkSendQueues.keySet()){
+        for (int protocolId : this.chunkSendQueues.keySet()) {
             Set<Long> indexes = this.getChunkSendQueue(protocolId).keySet();
             LongSet tasks = this.getChunkSendTasks(protocolId);
-            for (long index : indexes){
+            for (long index : indexes) {
                 if (!tasks.contains(index)) {
                     chunkRequests.computeIfAbsent(index, l -> new IntOpenHashSet()).add(protocolId);
                     tasks.add(index);
@@ -2985,7 +2984,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private void chunkRequestInternal(Long2ObjectMap<IntSet> chunkRequests) {
-        for (long index : chunkRequests.keySet()){
+        for (long index : chunkRequests.keySet()) {
             IntSet protocols = new IntOpenHashSet(chunkRequests.get(index));
             int x = getHashX(index);
             int z = getHashZ(index);
@@ -3009,10 +3008,7 @@ public class Level implements ChunkManager, Metadatable {
                 this.timings.syncChunkSendPrepareTimer.startTiming();
             }
 
-            AsyncTask task = this.provider.requestChunkTask(protocols, x, z);
-            if (task != null) {
-                this.server.getScheduler().scheduleAsyncTask(task);
-            }
+            this.provider.requestChunkTask(protocols, x, z);
 
             if (this.timings.syncChunkSendPrepareTimer != null) {
                 this.timings.syncChunkSendPrepareTimer.stopTiming();
@@ -4121,7 +4117,7 @@ public class Level implements ChunkManager, Metadatable {
         return this.chunkSendTasks.computeIfAbsent(protocolId, i -> new LongOpenHashSet());
     }
 
-    private int getChunkProtocol(int protocolId){
+    private int getChunkProtocol(int protocolId) {
         if (protocolId >= ProtocolInfo.v1_16_100) {
             return ProtocolInfo.v1_16_100;
         } else if (protocolId >= ProtocolInfo.v1_16_0 && protocolId <= ProtocolInfo.v1_16_100_52) {
