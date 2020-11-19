@@ -81,7 +81,7 @@ public class AnvilInventory extends FakeBlockUIComponent {
                     return;
                 }
 
-                for(repair2 = 0; repair > 0 && repair2 < sacrifice.getCount(); ++repair2) {
+                for (repair2 = 0; repair > 0 && repair2 < sacrifice.getCount(); ++repair2) {
                     repair3 = result.getDamage() - repair;
                     result.setDamage(repair3);
                     ++extraCost;

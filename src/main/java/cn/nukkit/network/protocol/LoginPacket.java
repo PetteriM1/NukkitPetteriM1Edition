@@ -180,9 +180,8 @@ public class LoginPacket extends DataPacket {
         byte[] data = Base64.getDecoder().decode(element.get("Image").getAsString());
         int width = element.get("ImageWidth").getAsInt();
         int height = element.get("ImageHeight").getAsInt();
-        JsonElement exp = element.get("AnimationExpression");
-        int expression = exp == null ? exp.getAsInt() : 0;
-        return new SkinAnimation(new SerializedImage(width, height, data), type, frames, expression);
+        //int expression = element.get("AnimationExpression").getAsInt(); //TODO: Make this work with multiversion
+        return new SkinAnimation(new SerializedImage(width, height, data), type, frames, 0);
     }
 
     private static SerializedImage getImage(JsonObject token, String name) {
