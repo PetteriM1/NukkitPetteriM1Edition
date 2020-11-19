@@ -1038,6 +1038,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return packet successfully sent
      */
     public boolean dataPacket(DataPacket packet) {
+        if (this.protocol >= ProtocolInfo.v1_16_100){
+            return batchDataPacket(packet);
+        }
+
         if (!this.connected) {
             return false;
         }
@@ -1063,7 +1067,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.interfaz.putPacket(this, packet, false, false);
         }
-
         return true;
     }
 
@@ -1966,7 +1969,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void checkNetwork() {
-        if (!this.isOnline()) {
+        if (this.protocol < ProtocolInfo.v1_16_100 && !this.isOnline()){
             return;
         }
 
@@ -1981,9 +1984,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.batchPackets(pArr, arr, false);
         }
 
-        /*if (!this.isOnline()) {
+        if (this.protocol >= ProtocolInfo.v1_16_100 && !this.isOnline()) {
             return;
-        }*/
+        }
 
         if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
             this.orderChunks();
@@ -4581,7 +4584,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             Server.broadcastPacket(targets, pk);
         } else {
             pk.eid = this.id;
-            this.directDataPacket(pk);
+            this.dataPacket(pk);
         }
     }
 

@@ -48,10 +48,7 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.BatchPacket;
-import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.PlayerListPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.network.rcon.RCON;
 import cn.nukkit.permission.BanEntry;
@@ -77,6 +74,13 @@ import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import lombok.extern.log4j.Log4j2;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
@@ -638,22 +642,7 @@ public class Server {
             }
             return;
         }
-        boolean mvplayers = false;
-        for (Player player : players) {
-            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
-                mvplayers = true;
-                break;
-            }
-        }
-        if (!mvplayers) { // We can send same packet for everyone and save some resources
-            packet.encode();
-            packet.isEncoded = true;
-            instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false); // forceSync should be true?
-        } else { // Need to force multiversion
-            for (Player player : players) {
-                player.dataPacket(packet);
-            }
-        }
+        instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false);
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
@@ -663,22 +652,7 @@ public class Server {
             }
             return;
         }
-        boolean mvplayers = false;
-        for (Player player : players) {
-            if (player.protocol <= ProtocolInfo.v1_5_0) { // 1.5 or lower
-                mvplayers = true;
-                break;
-            }
-        }
-        if (!mvplayers) { // We can send same packet for everyone and save some resources
-            packet.encode();
-            packet.isEncoded = true;
-            instance.batchPackets(players, new DataPacket[]{packet}, false); // forceSync should be true?
-        } else { // Need to force multiversion
-            for (Player player : players) {
-                player.dataPacket(packet);
-            }
-        }
+        instance.batchPackets(players, new DataPacket[]{packet}, false);
     }
 
     public void batchPackets(Player[] players, DataPacket[] packets) {
@@ -700,92 +674,80 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            CompletableFuture.runAsync(() -> {
-                byte[][] payload = new byte[(packets.length << 1)][];
-                //int size = 0;
-                for (int i = 0; i < packets.length; i++) {
-                    DataPacket p = packets[i];
-                    if (!p.isEncoded) {
-                        p.encode();
-                    }
-                    byte[] buf = p.getBuffer();
-                    int i2 = i << 1;
-                    payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-                    payload[i2 + 1] = buf;
-                    packets[i] = null;
-                    //size += payload[i2].length;
-                    //size += payload[i2 + 1].length;
-                }
+            CompletableFuture.runAsync(() -> this.processBatches(players, packets));
+        }else  {
+            this.processBatches(players, packets);
+        }
+    }
 
-                List<InetSocketAddress> targetsOld = new ArrayList<>();
-                List<InetSocketAddress> targets = new ArrayList<>();
-                for (Player p : players) {
-                    if (p.isConnected()) {
-                        if (p.protocol >= ProtocolInfo.v1_16_0) {
-                            targets.add(p.getSocketAddress());
-                        } else {
-                            targetsOld.add(p.getSocketAddress());
-                        }
-                    }
-                }
+    private void processBatches(Player[] players, DataPacket[] packets){
+        Int2ObjectMap<ObjectList<InetSocketAddress>> targets = new Int2ObjectOpenHashMap<>();
+        for (Player player : players) {
+            targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player.getSocketAddress());
+        }
 
-                try {
-                    byte[] bytes = Binary.appendBytes(payload);
-                    if (!targets.isEmpty()) {
-                        this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
+        // Encoded packets by encoding protocol
+        Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = new Int2ObjectOpenHashMap<>();
+        if (Timings.playerNetworkSendTimer != null) {
+            Timings.playerNetworkSendTimer.startTiming();
+        }
+
+        for (DataPacket packet : packets) {
+            Int2IntMap encodingProtocols = new Int2IntOpenHashMap();
+            for (int protocolId : targets.keySet()) {
+                // TODO: encode only by encoding protocols
+                // No need to have all versions here
+                encodingProtocols.put(protocolId, protocolId);
+            }
+
+            Int2ObjectMap<DataPacket> encodedPacket = new Int2ObjectOpenHashMap<>();
+            for (int encodingProtocol : encodingProtocols.values()) {
+                if (!encodedPacket.containsKey(encodingProtocol)) {
+                    DataPacket pk = packet.clone();
+                    pk.protocol = encodingProtocol;
+                    if (!pk.isEncoded) {
+                        pk.encode();
                     }
-                    if (!targetsOld.isEmpty()) {
-                        this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    encodedPacket.put(encodingProtocol, pk);
                 }
-            });
-        } else {
-            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.startTiming();
+            }
+
+            for (int protocolId : encodingProtocols.values()) {
+                int encodingProtocol = encodingProtocols.get(protocolId);
+                encodedPackets.computeIfAbsent(protocolId, i-> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
+            }
+        }
+
+        for (int protocolId : targets.keySet()) {
+            ObjectList<DataPacket> packetList = encodedPackets.get(protocolId);
+            ObjectList<InetSocketAddress> finalTargets = targets.get(protocolId);
+
             byte[][] payload = new byte[(packets.length << 1)][];
             //int size = 0;
-            for (int i = 0; i < packets.length; i++) {
-                DataPacket p = packets[i];
-                if (!p.isEncoded) {
-                    p.encode();
-                }
+
+            for (int i = 0; i < packetList.size(); i++) {
+                DataPacket p = packetList.get(i);
+                int idx = i * 2;
                 byte[] buf = p.getBuffer();
-                int i2 = i << 1;
-                payload[i2] = Binary.writeUnsignedVarInt(buf.length);
-                payload[i2 + 1] = buf;
-                packets[i] = null;
-                //size += payload[i2].length;
-                //size += payload[i2 + 1].length;
+                payload[idx] = Binary.writeUnsignedVarInt(buf.length);
+                payload[idx + 1] = buf;
             }
 
-            List<InetSocketAddress> targetsOld = new ArrayList<>();
-            List<InetSocketAddress> targets = new ArrayList<>();
-            for (Player p : players) {
-                if (p.isConnected()) {
-                    if (p.protocol >= ProtocolInfo.v1_16_0) {
-                        targets.add(p.getSocketAddress());
-                    } else {
-                        targetsOld.add(p.getSocketAddress());
-                    }
-                }
-            }
-
-            //if (!forceSync && this.networkCompressionAsync) {
-            //    this.scheduler.scheduleAsyncTask(new CompressBatchedTask(payload, targets, this.networkCompressionLevel));
-            //} else {
             try {
                 byte[] bytes = Binary.appendBytes(payload);
-                if (!targets.isEmpty()) {
-                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), targets);
-                }
-                if (!targetsOld.isEmpty()) {
-                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), targetsOld);
+                if (protocolId >= ProtocolInfo.v1_16_0){
+                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), finalTargets);
+                }else {
+                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), finalTargets);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            if (Timings.playerNetworkSendTimer != null) Timings.playerNetworkSendTimer.stopTiming();
+
+        }
+
+        if (Timings.playerNetworkSendTimer != null) {
+            Timings.playerNetworkSendTimer.stopTiming();
         }
     }
 
