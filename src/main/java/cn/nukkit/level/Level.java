@@ -66,7 +66,6 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import java.lang.ref.SoftReference;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -1133,7 +1132,7 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
             //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
-            for (int protocolId : targets.keySet()){
+            for (int protocolId : targets.keySet()) {
                 ObjectList<Player> players = targets.get(protocolId);
                 UpdateBlockPacket packet = (UpdateBlockPacket) updateBlockPacket.clone();
                 try {
