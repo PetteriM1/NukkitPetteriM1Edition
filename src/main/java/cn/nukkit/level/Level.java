@@ -2262,7 +2262,7 @@ public class Level implements ChunkManager, Metadatable {
             Entity[] entities = this.getCollidingEntities(hand.getBoundingBox());
             int realCount = 0;
             for (Entity e : entities) {
-                if (e instanceof EntityArrow || e instanceof EntityItem || (e instanceof Player && ((Player) e).isSpectator() || !e.canCollide())) {
+                if (e == player || e instanceof EntityArrow || e instanceof EntityItem || (e instanceof Player && ((Player) e).isSpectator() || !e.canCollide())) {
                     continue;
                 }
                 ++realCount;
@@ -2270,11 +2270,11 @@ public class Level implements ChunkManager, Metadatable {
 
             if (player != null) {
                 Vector3 diff = player.getNextPosition().subtract(player.getPosition());
-                if (diff.lengthSquared() > 0.00001) {
+                //if (diff.lengthSquared() > 0.00001) {
                     if (hand.getBoundingBox().intersectsWith(player.getBoundingBox().getOffsetBoundingBox(diff.x, diff.y, diff.z))) {
                         ++realCount;
                     }
-                }
+                //}
             }
 
             if (realCount > 0) {
