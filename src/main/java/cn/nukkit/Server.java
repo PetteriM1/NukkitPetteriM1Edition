@@ -675,12 +675,12 @@ public class Server {
 
         if (!forceSync && this.networkCompressionAsync) {
             CompletableFuture.runAsync(() -> this.processBatches(players, packets));
-        }else  {
+        } else {
             this.processBatches(players, packets);
         }
     }
 
-    private void processBatches(Player[] players, DataPacket[] packets){
+    private void processBatches(Player[] players, DataPacket[] packets) {
         Int2ObjectMap<ObjectList<InetSocketAddress>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player.getSocketAddress());
@@ -723,7 +723,6 @@ public class Server {
             ObjectList<InetSocketAddress> finalTargets = targets.get(protocolId);
 
             byte[][] payload = new byte[(packets.length << 1)][];
-            //int size = 0;
 
             for (int i = 0; i < packetList.size(); i++) {
                 DataPacket p = packetList.get(i);
@@ -735,9 +734,9 @@ public class Server {
 
             try {
                 byte[] bytes = Binary.appendBytes(payload);
-                if (protocolId >= ProtocolInfo.v1_16_0){
+                if (protocolId >= ProtocolInfo.v1_16_0) {
                     this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), finalTargets);
-                }else {
+                } else {
                     this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), finalTargets);
                 }
             } catch (Exception e) {

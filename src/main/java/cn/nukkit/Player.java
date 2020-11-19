@@ -1038,7 +1038,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return packet successfully sent
      */
     public boolean dataPacket(DataPacket packet) {
-        if (this.protocol >= ProtocolInfo.v1_16_100){
+        if (this.protocol >= ProtocolInfo.v1_16_100) {
             return batchDataPacket(packet);
         }
 
@@ -1969,7 +1969,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void checkNetwork() {
-        if (this.protocol < ProtocolInfo.v1_16_100 && !this.isOnline()){
+        if (this.protocol < ProtocolInfo.v1_16_100 && !this.isOnline()) {
             return;
         }
 
