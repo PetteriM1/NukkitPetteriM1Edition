@@ -14,14 +14,25 @@ public class PalettedBlockStorage {
     private BitArray bitArray;
 
     public PalettedBlockStorage() {
-        this(BitArrayVersion.V2);
+        this(0);
+    }
+
+    public PalettedBlockStorage(int protocolId) {
+        this(BitArrayVersion.V2, protocolId);
     }
 
     public PalettedBlockStorage(BitArrayVersion version) {
+        this(version, 0);
+    }
+
+    public PalettedBlockStorage(BitArrayVersion version, int protocolId) {
         this.bitArray = version.createPalette();
         this.palette = new IntArrayList(16);
         this.palette.add(0); // Air is at the start of every palette.
-        //this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0));
+
+        if (protocolId >= ProtocolInfo.v1_16_100){
+            this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(protocolId, 0));
+        }
     }
 
     private PalettedBlockStorage(BitArray bitArray, IntList palette) {
