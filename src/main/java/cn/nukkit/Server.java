@@ -2183,6 +2183,14 @@ public class Server {
         return multiNetherWorlds.contains(world) ? this.getLevelByName(world + "-nether") : this.getLevelByName("nether");
     }
 
+    public static Int2ObjectMap<ObjectList<Player>> shortPlayers(Player[] players){
+        Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
+        for (Player player : players){
+            targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
+        }
+        return targets;
+    }
+
     /**
      * Checks the current thread against the expected primary thread for the server.
      *
