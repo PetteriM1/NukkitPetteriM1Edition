@@ -1038,33 +1038,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return packet successfully sent
      */
     public boolean dataPacket(DataPacket packet) {
-        if (!this.connected) {
-            return false;
-        }
-
-        packet.protocol = this.protocol;
-
-        if (packet instanceof StartGamePacket) {
-            ((StartGamePacket) packet).version = this.version;
-        }
-
-        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
-                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-                this.server.getPluginManager().callEvent(ev);
-                if (ev.isCancelled()) {
-                    return false;
-                }
-            }
-
-            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
-                log.trace("Outbound {}: {}", this.getName(), packet);
-            }
-
-            this.interfaz.putPacket(this, packet, false, false);
-        }
-
-        return true;
+        return batchDataPacket(packet);
     }
 
     public int dataPacket(DataPacket packet, boolean needACK) {
@@ -1966,10 +1940,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void checkNetwork() {
-        if (!this.isOnline()) {
-            return;
-        }
-
         if (!this.packetQueue.isEmpty()) {
             Player[] pArr = new Player[]{this};
             List<DataPacket> toBatch = new ArrayList<>();
@@ -1981,9 +1951,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.batchPackets(pArr, arr, false);
         }
 
-        /*if (!this.isOnline()) {
+        if (!this.isOnline()) {
             return;
-        }*/
+        }
 
         if (this.nextChunkOrderRun-- <= 0 || this.chunk == null) {
             this.orderChunks();
@@ -4581,7 +4551,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             Server.broadcastPacket(targets, pk);
         } else {
             pk.eid = this.id;
-            this.directDataPacket(pk);
+            this.dataPacket(pk);
         }
     }
 
