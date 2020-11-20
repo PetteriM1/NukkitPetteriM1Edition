@@ -72,7 +72,7 @@ public class PlayerOffhandInventory extends BaseInventory {
         pk.inventorySlot = 1;
         pk.windowId = ContainerIds.OFFHAND;
         pk.encode();
-        pk.isEncoded = true;
+        pk.isEncoded = true; //TODO: figure out does this break multiversion
         return pk;
     }
 
