@@ -1460,10 +1460,10 @@ public abstract class Entity extends Location implements Metadatable {
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
-        //Server.broadcastPacket(this.hasSpawned.values(), pk);
-        for (Player p : this.hasSpawned.values()) {
+        Server.broadcastPacket(this.hasSpawned.values(), pk);
+        /*for (Player p : this.hasSpawned.values()) {
             p.batchDataPacket(pk);
-        }
+        }*/
     }
 
     public Vector3 getDirectionVector() {

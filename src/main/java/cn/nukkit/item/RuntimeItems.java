@@ -23,13 +23,13 @@ public class RuntimeItems {
     private static final Gson GSON = new Gson();
     private static final Type ENTRY_TYPE = new TypeToken<ArrayList<Entry>>(){}.getType();
 
-    public static final byte[] ITEM_DATA_PALETTE;
-    public static final byte[] ITEM_DATA_PALETTE_361;
+    public static byte[] ITEM_DATA_PALETTE;
+    public static byte[] ITEM_DATA_PALETTE_361;
 
     private static final Int2IntMap LEGACY_NETWORK_MAP = new Int2IntOpenHashMap();
     private static final Int2IntMap NETWORK_LEGACY_MAP = new Int2IntOpenHashMap();
 
-    static {
+    public static void init() {
         Server.getInstance().getLogger().debug("Loading runtime items...");
         // 361 - 1.12+
         InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtime_item_ids_361.json");

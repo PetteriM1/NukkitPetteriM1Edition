@@ -347,7 +347,7 @@ public class CraftingManager {
         }
 
         this.rebuildPacket();
-        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
+        MainLogger.getLogger().debug("Loaded " + this.recipes.size() + " recipes");
     }
 
     public void rebuildPacket() {
