@@ -777,12 +777,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.data = payload;
         //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
-        //this.batchDataPacket(pk);
-        if (this.protocol < ProtocolInfo.v1_12_0) {
+        this.batchDataPacket(pk);
+        /*if (this.protocol < ProtocolInfo.v1_12_0) {
             this.dataPacket(pk); // Multiversion for batchPackets is broken?
         } else {
             this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
-        }
+        }*/
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
@@ -2242,8 +2242,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         });
 
-        this.server.playerList.put(this.getUniqueId(), this);
         this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin(), this.getLoginChainData().getXUID());
+        this.server.playerList.put(this.getUniqueId(), this);
         this.server.onPlayerCompleteLoginSequence(this);
     }
 
@@ -3741,7 +3741,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     return false;
                                 }
                             }).map(Field::getName).findFirst();
-                    this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse("UNKNOWN") + " from " + this.username + ": " + PVWpk.toString());
+                    this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse(" UNKNOWN") + " from " + this.username + ": " + PVWpk.toString());
                     break;
                 case ProtocolInfo.EMOTE_PACKET:
                     EmotePacket emotePacket = (EmotePacket) packet;
