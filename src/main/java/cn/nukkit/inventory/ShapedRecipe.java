@@ -24,7 +24,7 @@ public class ShapedRecipe implements CraftingRecipe {
 
     private final CharObjectHashMap<Item> ingredients = new CharObjectHashMap<>();
 
-    private int networkId;
+    private final int networkId;
 
     public ShapedRecipe(Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
         this(null, 1, primaryResult, shape, ingredients, extraResults);
@@ -51,6 +51,10 @@ public class ShapedRecipe implements CraftingRecipe {
      *                         Note: Recipes **do not** need to be square. Do NOT add padding for empty rows/columns.
      */
     public ShapedRecipe(String recipeId, int priority, Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults, Integer networkId) {
+        this(recipeId, priority, primaryResult, shape, ingredients, extraResults, networkId, false);
+    }
+
+    public ShapedRecipe(String recipeId, int priority, Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults, Integer networkId, boolean protocol419) {
         this.recipeId = recipeId;
         this.priority = priority;
         int rowCount = shape.length;
@@ -103,7 +107,7 @@ public class ShapedRecipe implements CraftingRecipe {
                 this.ingredientsAggregate.add(ingredient);
         }
         this.ingredientsAggregate.sort(CraftingManager.recipeComparator);
-        this.networkId = networkId != null ? networkId : ++CraftingManager.nextNetworkId;
+        this.networkId = networkId != null ? networkId : (protocol419 ? ++CraftingManager.nextNetworkId419 : ++CraftingManager.nextNetworkId388);
     }
 
     public int getWidth() {

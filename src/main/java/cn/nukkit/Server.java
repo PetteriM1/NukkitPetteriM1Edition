@@ -1076,7 +1076,7 @@ public class Server {
 
     public void sendRecipeList(Player player) {
         if (player.protocol >= ProtocolInfo.v1_16_100) {
-            //player.dataPacket(CraftingManager.packet419); //TODO 1.16.100
+            player.dataPacket(CraftingManager.packet419);
         } else if (player.protocol >= ProtocolInfo.v1_16_0) {
             player.dataPacket(CraftingManager.packet407);
         } else if (player.protocol > ProtocolInfo.v1_12_0) {
@@ -1562,6 +1562,7 @@ public class Server {
 
     public void addRecipe(Recipe recipe) {
         this.craftingManager.registerRecipe(recipe);
+        this.craftingManager.registerRecipe388(recipe);
     }
 
     public Optional<Player> getPlayer(UUID uuid) {
