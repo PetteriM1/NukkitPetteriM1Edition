@@ -640,7 +640,7 @@ public class Server {
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
         if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
-                player.dataPacket(packet);
+                player.directDataPacket(packet);
             }
             return;
         }
@@ -650,7 +650,7 @@ public class Server {
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
-                player.dataPacket(packet);
+                player.directDataPacket(packet);
             }
             return;
         }
@@ -676,13 +676,17 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            CompletableFuture.runAsync(() -> this.processBatches(players, packets));
+            CompletableFuture.runAsync(() -> this.processBatches(false, players, packets));
         } else {
-            this.processBatches(players, packets);
+            this.processBatches(true, players, packets);
         }
     }
 
-    private void processBatches(Player[] players, DataPacket[] packets) {
+    private void processBatches(boolean noAsync, Player[] players, DataPacket[] packets) {
+        if (noAsync && Timings.playerNetworkSendTimer != null) {
+            Timings.playerNetworkSendTimer.startTiming();
+        }
+
         Int2ObjectMap<ObjectList<InetSocketAddress>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player.getSocketAddress());
@@ -690,9 +694,6 @@ public class Server {
 
         // Encoded packets by encoding protocol
         Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = new Int2ObjectOpenHashMap<>();
-        if (Timings.playerNetworkSendTimer != null) {
-            Timings.playerNetworkSendTimer.startTiming();
-        }
 
         for (DataPacket packet : packets) {
             Int2IntMap encodingProtocols = new Int2IntOpenHashMap();
@@ -716,7 +717,7 @@ public class Server {
 
             for (int protocolId : encodingProtocols.values()) {
                 int encodingProtocol = encodingProtocols.get(protocolId);
-                encodedPackets.computeIfAbsent(protocolId, i-> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
+                encodedPackets.computeIfAbsent(protocolId, i -> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
             }
         }
 
@@ -744,10 +745,9 @@ public class Server {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         }
 
-        if (Timings.playerNetworkSendTimer != null) {
+        if (noAsync && Timings.playerNetworkSendTimer != null) {
             Timings.playerNetworkSendTimer.stopTiming();
         }
     }
