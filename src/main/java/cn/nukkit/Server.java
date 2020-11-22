@@ -1563,7 +1563,6 @@ public class Server {
 
     public void addRecipe(Recipe recipe) {
         this.craftingManager.registerRecipe(recipe);
-        this.craftingManager.registerRecipe388(recipe);
     }
 
     public Optional<Player> getPlayer(UUID uuid) {
