@@ -290,7 +290,7 @@ public class EntityHuman extends EntityHumanType {
                 throw new IllegalStateException(this.getClass().getSimpleName() + " must have a valid skin set");
             }
 
-            if (this instanceof Player)
+            if (this.isPlayer)
                 this.server.sendFullPlayerListData(player);
             else
                 this.server.updatePlayerListData(this.uuid, this.getId(), this.getName(), this.skin, new Player[]{player});
@@ -312,7 +312,11 @@ public class EntityHuman extends EntityHumanType {
             pk.metadata = this.dataProperties;
             player.dataPacket(pk);
 
-            this.inventory.sendArmorContents(player);
+            if (this.isPlayer) {
+                this.inventory.sendArmorContents(player);
+            } else {
+                this.inventory.sendArmorContentsIfNotAr(player);
+            }
             this.offhandInventory.sendContents(player);
 
             if (this.riding != null) {

@@ -21,7 +21,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     private final int priority;
 
-    private int networkId;
+    private final int networkId;
 
     public ShapelessRecipe(Item result, Collection<Item> ingredients) {
         this(null, 10, result, ingredients);
@@ -60,7 +60,7 @@ public class ShapelessRecipe implements CraftingRecipe {
         }
 
         this.ingredientsAggregate.sort(CraftingManager.recipeComparator);
-        this.networkId = networkId != null ? networkId : ++CraftingManager.nextNetworkId;
+        this.networkId = networkId != null ? networkId : ++CraftingManager.NEXT_NETWORK_ID;
     }
 
     @Override

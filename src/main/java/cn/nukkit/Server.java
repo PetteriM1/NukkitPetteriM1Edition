@@ -24,6 +24,7 @@ import cn.nukkit.event.server.ServerStopEvent;
 import cn.nukkit.inventory.CraftingManager;
 import cn.nukkit.inventory.Recipe;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
@@ -80,7 +81,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
 import lombok.extern.log4j.Log4j2;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
@@ -391,6 +391,7 @@ public class Server {
         Attribute.init();
         DispenseBehaviorRegister.init();
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
+        RuntimeItems.init();
 
         // Convert legacy data before plugins get the chance to mess with it
         try {
@@ -638,7 +639,7 @@ public class Server {
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
         if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
-                player.dataPacket(packet);
+                player.directDataPacket(packet);
             }
             return;
         }
@@ -648,7 +649,7 @@ public class Server {
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             for (Player player : players) {
-                player.dataPacket(packet);
+                player.directDataPacket(packet);
             }
             return;
         }
@@ -674,13 +675,17 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            CompletableFuture.runAsync(() -> this.processBatches(players, packets));
+            CompletableFuture.runAsync(() -> this.processBatches(false, players, packets));
         } else {
-            this.processBatches(players, packets);
+            this.processBatches(true, players, packets);
         }
     }
 
-    private void processBatches(Player[] players, DataPacket[] packets) {
+    private void processBatches(boolean noAsync, Player[] players, DataPacket[] packets) {
+        if (noAsync && Timings.playerNetworkSendTimer != null) {
+            Timings.playerNetworkSendTimer.startTiming();
+        }
+
         Int2ObjectMap<ObjectList<InetSocketAddress>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player.getSocketAddress());
@@ -688,9 +693,6 @@ public class Server {
 
         // Encoded packets by encoding protocol
         Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = new Int2ObjectOpenHashMap<>();
-        if (Timings.playerNetworkSendTimer != null) {
-            Timings.playerNetworkSendTimer.startTiming();
-        }
 
         for (DataPacket packet : packets) {
             Int2IntMap encodingProtocols = new Int2IntOpenHashMap();
@@ -714,7 +716,7 @@ public class Server {
 
             for (int protocolId : encodingProtocols.values()) {
                 int encodingProtocol = encodingProtocols.get(protocolId);
-                encodedPackets.computeIfAbsent(protocolId, i-> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
+                encodedPackets.computeIfAbsent(protocolId, i -> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
             }
         }
 
@@ -742,10 +744,9 @@ public class Server {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         }
 
-        if (Timings.playerNetworkSendTimer != null) {
+        if (noAsync && Timings.playerNetworkSendTimer != null) {
             Timings.playerNetworkSendTimer.stopTiming();
         }
     }
@@ -1076,7 +1077,7 @@ public class Server {
 
     public void sendRecipeList(Player player) {
         if (player.protocol >= ProtocolInfo.v1_16_100) {
-            //player.dataPacket(CraftingManager.packet419); //TODO 1.16.100
+            player.dataPacket(CraftingManager.packet419);
         } else if (player.protocol >= ProtocolInfo.v1_16_0) {
             player.dataPacket(CraftingManager.packet407);
         } else if (player.protocol > ProtocolInfo.v1_12_0) {

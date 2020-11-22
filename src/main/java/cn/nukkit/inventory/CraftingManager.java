@@ -21,9 +21,9 @@ import java.util.zip.Deflater;
  */
 public class CraftingManager {
 
-    public final Collection<Recipe> recipes = new ArrayDeque<>();
     private final Collection<Recipe> recipes313 = new ArrayDeque<>();
     private final Collection<Recipe> recipes340 = new ArrayDeque<>();
+    public final Collection<Recipe> recipes = new ArrayDeque<>();
 
     public static BatchPacket packet313 = null;
     public static BatchPacket packet340 = null;
@@ -39,10 +39,10 @@ public class CraftingManager {
     public final Map<Integer, BrewingRecipe> brewingRecipesOld = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, ContainerRecipe> containerRecipesOld = new Int2ObjectOpenHashMap<>();
+    protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
 
     private static int RECIPE_COUNT = 0;
-    protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
-    public static int nextNetworkId = 0;
+    public static int NEXT_NETWORK_ID = 0;
 
     public static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {
@@ -59,10 +59,11 @@ public class CraftingManager {
     @SuppressWarnings("unchecked")
     public CraftingManager() {
         MainLogger.getLogger().debug("Loading recipes...");
-        List<Map> recipes = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json")).getRootSection().getMapList("recipes");
+        List<Map> recipes_388 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes388.json")).getRootSection().getMapList("recipes");
+        List<Map> recipes_332 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes332.json")).getMapList("recipes");
         List<Map> recipes_313 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes313.json")).getMapList("recipes");
-        List<Map> recipes_340 = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes340.json")).getMapList("recipes");
-        for (Map<String, Object> recipe : recipes) {
+
+        for (Map<String, Object> recipe : recipes_388) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
                     case 0:
@@ -141,7 +142,7 @@ public class CraftingManager {
                         break;
                 }
             } catch (Exception e) {
-                MainLogger.getLogger().error("Exception during registering recipe", e);
+                MainLogger.getLogger().error("Exception during registering (protocol 388) recipe", e);
             }
         }
 
@@ -182,7 +183,7 @@ public class CraftingManager {
             }
         }
 
-        for (Map<String, Object> recipe : recipes_340) {
+        for (Map<String, Object> recipe : recipes_332) {
             try {
                 switch (Utils.toInt(recipe.get("type"))) {
                     case 0:
@@ -215,11 +216,11 @@ public class CraftingManager {
                         break;
                 }
             } catch (Exception e) {
-                MainLogger.getLogger().error("Exception during registering (protocol 340) recipe", e);
+                MainLogger.getLogger().error("Exception during registering (protocol 332) recipe", e);
             }
         }
 
-        Config extras = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes.json"));
+        Config extras = new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("recipes388.json"));
         List<Map> potionMixes = extras.getMapList("potionMixes");
         for (Map potionMix : potionMixes) {
             int fromPotionId = ((Number) potionMix.get("fromPotionId")).intValue();
@@ -257,7 +258,7 @@ public class CraftingManager {
         }
 
         this.rebuildPacket();
-        MainLogger.getLogger().info("Loaded " + this.recipes.size() + " recipes");
+        MainLogger.getLogger().debug("Loaded " + this.recipes.size() + " recipes");
     }
 
     public void rebuildPacket() {
@@ -384,7 +385,7 @@ public class CraftingManager {
                 pk313.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
-        //TODO furnace recipes?
+        //TODO: furnace recipes?
         /*for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk313.addFurnaceRecipe(recipe);
         }*/
@@ -440,11 +441,9 @@ public class CraftingManager {
     public void registerRecipe(Recipe recipe) {
         if (recipe instanceof CraftingRecipe) {
             UUID id = Utils.dataToUUID(String.valueOf(++RECIPE_COUNT), String.valueOf(recipe.getResult().getId()), String.valueOf(recipe.getResult().getDamage()), String.valueOf(recipe.getResult().getCount()), Arrays.toString(recipe.getResult().getCompoundTag()));
-
             ((CraftingRecipe) recipe).setId(id);
             this.recipes.add(recipe);
         }
-
         recipe.registerToCraftingManager(this);
     }
 

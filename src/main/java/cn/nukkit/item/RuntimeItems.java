@@ -4,8 +4,6 @@ import cn.nukkit.Server;
 import cn.nukkit.utils.BinaryStream;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.UtilityClass;
@@ -23,13 +21,10 @@ public class RuntimeItems {
     private static final Gson GSON = new Gson();
     private static final Type ENTRY_TYPE = new TypeToken<ArrayList<Entry>>(){}.getType();
 
-    public static final byte[] ITEM_DATA_PALETTE;
-    public static final byte[] ITEM_DATA_PALETTE_361;
+    public static byte[] ITEM_DATA_PALETTE;
+    public static byte[] ITEM_DATA_PALETTE_361;
 
-    private static final Int2IntMap LEGACY_NETWORK_MAP = new Int2IntOpenHashMap();
-    private static final Int2IntMap NETWORK_LEGACY_MAP = new Int2IntOpenHashMap();
-
-    static {
+    public static void init() {
         Server.getInstance().getLogger().debug("Loading runtime items...");
         // 361 - 1.12+
         InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtime_item_ids_361.json");
@@ -48,8 +43,6 @@ public class RuntimeItems {
         Collection<Entry> entries419 = GSON.fromJson(new InputStreamReader(stream419, StandardCharsets.UTF_8), ENTRY_TYPE);
         BinaryStream paletteBuffer419 = new BinaryStream();
         paletteBuffer419.putUnsignedVarInt(entries419.size());
-        LEGACY_NETWORK_MAP.defaultReturnValue(-1);
-        NETWORK_LEGACY_MAP.defaultReturnValue(-1);
         for (Entry entry : entries419) {
             paletteBuffer419.putString(entry.name);
             paletteBuffer419.putLShort(entry.id);

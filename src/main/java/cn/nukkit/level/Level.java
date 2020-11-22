@@ -1136,12 +1136,16 @@ public class Level implements ChunkManager, Metadatable {
                 ObjectList<Player> players = targets.get(protocolId);
                 UpdateBlockPacket packet = (UpdateBlockPacket) updateBlockPacket.clone();
                 try {
-                    if (b instanceof Block) {
-                        packet.blockId = ((Block) b).getId();
-                        packet.blockData = ((Block) b).getDamage();
-                        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getFullId());
+                    if (protocolId > 201) {
+                        if (b instanceof Block) {
+                            packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getFullId());
+                        } else {
+                            packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                        }
                     } else {
-                        packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                        Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
+                        updateBlockPacket.blockId = bl.getId();
+                        updateBlockPacket.blockData = bl.getDamage();
                     }
                 } catch (NoSuchElementException e) {
                     throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for players with protocol " +protocolId);
@@ -1166,12 +1170,16 @@ public class Level implements ChunkManager, Metadatable {
             //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
-                if (b instanceof Block) {
-                    updateBlockPacket.blockId = ((Block) b).getId();
-                    updateBlockPacket.blockData = ((Block) b).getDamage();
-                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getFullId());
+                if (target.protocol > 201) {
+                    if (b instanceof Block) {
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getFullId());
+                    } else {
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                    }
                 } else {
-                    updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                    Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
+                    updateBlockPacket.blockId = bl.getId();
+                    updateBlockPacket.blockData = bl.getDamage();
                 }
             } catch (NoSuchElementException e) {
                 throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for player " + target.getName() + " with protocol " + target.protocol);
