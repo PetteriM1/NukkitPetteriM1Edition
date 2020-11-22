@@ -1143,8 +1143,8 @@ public class Level implements ChunkManager, Metadatable {
                         }
                     } else {
                         Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
-                        updateBlockPacket.blockId = bl.getId();
-                        updateBlockPacket.blockData = bl.getDamage();
+                        packet.blockId = bl.getId();
+                        packet.blockData = bl.getDamage();
                     }
                 } catch (NoSuchElementException e) {
                     throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for players with protocol " +protocolId);
