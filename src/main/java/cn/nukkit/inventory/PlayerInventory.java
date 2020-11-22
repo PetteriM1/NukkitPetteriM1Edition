@@ -162,6 +162,18 @@ public class PlayerInventory extends BaseInventory {
         }
     }
 
+    public void sendHeldItemIfNotAir(Player player) {
+        Item item = this.getItemInHand();
+        if (item.getId() != 0) {
+            MobEquipmentPacket pk = new MobEquipmentPacket();
+            pk.item = item;
+            pk.inventorySlot = pk.hotbarSlot = this.itemInHandIndex;
+            pk.eid = player.getId();
+            this.sendSlot(this.itemInHandIndex, player);
+            player.dataPacket(pk);
+        }
+    }
+
     public void sendHeldItem(Collection<Player> players) {
         this.sendHeldItem(players.toArray(new Player[0]));
     }
@@ -362,6 +374,16 @@ public class PlayerInventory extends BaseInventory {
             } else {
                 player.dataPacket(pk);
             }
+        }
+    }
+
+    public void sendArmorContentsIfNotAr(Player player) {
+        Item[] armor = this.getArmorContents();
+        if (armor[0].getId() != 0 || armor[1].getId() != 0 || armor[2].getId() != 0 || armor[3].getId() != 0) {
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getHolder().getId();
+            pk.slots = armor;
+            player.dataPacket(pk);
         }
     }
 

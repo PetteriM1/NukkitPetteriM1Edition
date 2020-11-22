@@ -2256,7 +2256,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inventory.sendCreativeContents();
                 }
                 this.sendAllInventories();
-                this.inventory.sendHeldItem(this);
+                this.inventory.sendHeldItemIfNotAir(this);
                 this.server.sendRecipeList(this);
 
                 this.sendPotionEffects(this);
