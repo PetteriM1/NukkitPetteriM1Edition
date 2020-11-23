@@ -586,59 +586,18 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addParticle(Particle particle, Player[] players) {
-        if (!(particle instanceof FloatingTextParticle)) {
-            // Check for multiversion players and send correct particles for them
-            int x = 0;
-            boolean mv = false;
-            if (players == null) {
-                /*Collection<Player> pl = getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values();
-                for (Player p : pl) {
-                    if (x == 0) {
-                        x = p.protocol;
-                    } else if (x != p.protocol) {
-                        mv = true;
-                        break;
-                    }
-                }
-                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
-                    for (Player mvPlayer : pl) {
-                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
-                    }
-                    return;
-                }*/
-            } else {
-                for (Player p : players) {
-                    if (x == 0) {
-                        x = p.protocol;
-                    } else if (x != p.protocol) {
-                        mv = true;
-                        break;
-                    }
-                }
-                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
-                    for (Player mvPlayer : players) {
-                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
-                    }
-                    return;
-                }
-            }
+        Int2ObjectMap<ObjectList<Player>> targets;
+        if (players == null) {
+            targets = Server.shortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
+        }else {
+            targets = Server.shortPlayers(players);
         }
 
-        DataPacket[] packets = particle.encode();
-
-        if (players == null) {
-            if (packets != null) {
-                for (DataPacket packet : packets) {
-                    this.addChunkPacket((int) particle.x >> 4, (int) particle.z >> 4, packet);
-                }
-            }
-        } else {
-            if (packets != null) {
-                if (packets.length == 1) {
-                    Server.broadcastPacket(players, packets[0]);
-                } else {
-                    this.server.batchPackets(players, packets, false);
-                }
+        for (int protocolId : targets.keySet()) {
+            ObjectList<Player> protocolPlayers = targets.get(protocolId);
+            DataPacket packet = particle.mvEncode(protocolId);
+            if (packet != null) {
+                Server.broadcastPacket(protocolPlayers, packet);
             }
         }
     }
