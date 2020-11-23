@@ -2206,9 +2206,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (!this.connected) return;
                 if (this.protocol >= 313) {
                     if (this.protocol >= 361) {
-                        /*if (this.protocol >= 419) {
+                        if (this.protocol >= 419) {
                             this.dataPacket(new ItemComponentPacket());
-                        }*/
+                        }
                         this.dataPacket(new BiomeDefinitionListPacket());
                     }
                     this.dataPacket(new AvailableEntityIdentifiersPacket());
@@ -2227,7 +2227,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 enableCommandsPK.enabled = this.isEnableClientCommand();
                 this.dataPacket(enableCommandsPK);
 
-                if (!op && this.isEnableClientCommand()) { // OPs get updated command list when they get their permissions so no point sending it again here
+                if (this.isEnableClientCommand()) {
                     this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
                         if (this.isOnline()) {
                             this.sendCommandData();
