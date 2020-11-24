@@ -16,6 +16,7 @@ import lombok.experimental.UtilityClass;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -39,7 +40,7 @@ public class RuntimeItems {
             throw new AssertionError("Unable to load "+fileName);
         }
 
-        InputStreamReader reader = new InputStreamReader(stream);
+        InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
         Collection<Entry> entries = GSON.fromJson(reader, ENTRY_TYPE);
 
         BinaryStream paletteBuffer = new BinaryStream();
