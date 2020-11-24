@@ -91,8 +91,6 @@ public class EntityEgg extends EntityProjectile {
     @Override
     public void onHit() {
         ItemEgg egg = new ItemEgg();
-        for (int i = 0; i < 5; i++) {
-            level.addParticle(new ItemBreakParticle(this, egg));
-        }
+        level.addParticle(new ItemBreakParticle(this, egg), null, 5);
     }
 }
