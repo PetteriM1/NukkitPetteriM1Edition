@@ -19,7 +19,7 @@ public class ResourcePackChunkDataPacket extends DataPacket {
         this.progress = this.getLLong();
         if (protocol < 388) {
             this.data = this.get(this.getLInt());
-        } else  {
+        } else {
             this.data = this.getByteArray();
         }
     }

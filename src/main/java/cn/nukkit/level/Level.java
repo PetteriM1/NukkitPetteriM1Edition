@@ -41,7 +41,6 @@ import cn.nukkit.level.generator.task.GenerationTask;
 import cn.nukkit.level.generator.task.LightPopulationTask;
 import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
-import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
@@ -61,6 +60,7 @@ import co.aikar.timings.TimingsHistory;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
@@ -585,58 +585,29 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addParticle(Particle particle, Player[] players) {
-        if (!(particle instanceof FloatingTextParticle)) {
-            // Check for multiversion players and send correct particles for them
-            int x = 0;
-            boolean mv = false;
-            if (players == null) {
-                /*Collection<Player> pl = getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values();
-                for (Player p : pl) {
-                    if (x == 0) {
-                        x = p.protocol;
-                    } else if (x != p.protocol) {
-                        mv = true;
-                        break;
-                    }
-                }
-                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
-                    for (Player mvPlayer : pl) {
-                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
-                    }
-                    return;
-                }*/
-            } else {
-                for (Player p : players) {
-                    if (x == 0) {
-                        x = p.protocol;
-                    } else if (x != p.protocol) {
-                        mv = true;
-                        break;
-                    }
-                }
-                if (mv || x != ProtocolInfo.CURRENT_PROTOCOL) {
-                    for (Player mvPlayer : players) {
-                        mvPlayer.dataPacket(particle.mvEncode(mvPlayer.protocol));
-                    }
-                    return;
-                }
-            }
+        addParticle(particle, players, 1);
+    }
+
+    public void addParticle(Particle particle, Player[] players, int count) {
+        Int2ObjectMap<ObjectList<Player>> targets;
+        if (players == null) {
+            targets = Server.shortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
+        } else {
+            targets = Server.shortPlayers(players);
         }
 
-        DataPacket[] packets = particle.encode();
-
-        if (players == null) {
-            if (packets != null) {
-                for (DataPacket packet : packets) {
-                    this.addChunkPacket((int) particle.x >> 4, (int) particle.z >> 4, packet);
-                }
-            }
-        } else {
-            if (packets != null) {
-                if (packets.length == 1) {
-                    Server.broadcastPacket(players, packets[0]);
+        for (int protocolId : targets.keySet()) {
+            ObjectList<Player> protocolPlayers = targets.get(protocolId);
+            DataPacket packet = particle.mvEncode(protocolId);
+            if (packet != null) {
+                if (count == 1) {
+                    Server.broadcastPacket(protocolPlayers, packet);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    List<DataPacket> packets = new ArrayList<>(count);
+                    for (int i = 0; i < count; i++) {
+                        packets.add(packet.clone());
+                    }
+                    Server.broadcastPackets(protocolPlayers.toArray(new Player[0]), packets.toArray(new DataPacket[0]));
                 }
             }
         }

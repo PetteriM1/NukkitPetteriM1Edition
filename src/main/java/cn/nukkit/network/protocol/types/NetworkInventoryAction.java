@@ -105,8 +105,8 @@ public class NetworkInventoryAction {
         }
 
         this.inventorySlot = (int) packet.getUnsignedVarInt();
-        this.oldItem = packet.getSlot();
-        this.newItem = packet.getSlot();
+        this.oldItem = packet.getSlot(packet.protocol);
+        this.newItem = packet.getSlot(packet.protocol);
 
         if (packet.hasNetworkIds && packet.protocol >= 407) {
             this.stackNetworkId = packet.getVarInt();

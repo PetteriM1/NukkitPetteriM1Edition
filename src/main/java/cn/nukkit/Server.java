@@ -656,6 +656,10 @@ public class Server {
         instance.batchPackets(players, new DataPacket[]{packet}, false);
     }
 
+    public static void broadcastPackets(Player[] players, DataPacket[] packets) {
+        instance.batchPackets(players, packets, false);
+    }
+
     public void batchPackets(Player[] players, DataPacket[] packets) {
         this.batchPackets(players, packets, false);
     }
@@ -2185,6 +2189,14 @@ public class Server {
     }
 
     public static Int2ObjectMap<ObjectList<Player>> shortPlayers(Player[] players) {
+        Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
+        for (Player player : players) {
+            targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
+        }
+        return targets;
+    }
+
+    public static Int2ObjectMap<ObjectList<Player>> shortPlayers(Collection<Player> players) {
         Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);

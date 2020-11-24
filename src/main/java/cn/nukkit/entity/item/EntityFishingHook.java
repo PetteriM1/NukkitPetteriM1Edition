@@ -193,13 +193,11 @@ public class EntityFishingHook extends EntityProjectile {
 		teasePk.event = EntityEventPacket.FISH_HOOK_TEASE;
 		Server.broadcastPacket(this.getViewers().values(), teasePk);
 
-		for (int i = 0; i < 5; i++) {
-			this.level.addParticle(new BubbleParticle(this.setComponents(
-					this.x + Utils.random.nextDouble() * 0.5 - 0.25,
-					this.getWaterHeight(),
-					this.z + Utils.random.nextDouble() * 0.5 - 0.25
-			)));
-		}
+		this.level.addParticle(new BubbleParticle(this.setComponents(
+				this.x + Utils.random.nextDouble() * 0.5 - 0.25,
+				this.getWaterHeight(),
+				this.z + Utils.random.nextDouble() * 0.5 - 0.25
+		)), null, 5);
 	}
 
 	public void spawnFish() {
