@@ -24,7 +24,8 @@ import java.util.Collection;
 public class RuntimeItems {
 
     private static final Gson GSON = new Gson();
-    private static final Type ENTRY_TYPE = new TypeToken<ArrayList<Entry>>(){}.getType();
+    private static final Type ENTRY_TYPE = new TypeToken<ArrayList<Entry>>() {
+    }.getType();
 
     private static final Int2ObjectMap<RuntimeItemMapping> itemPalettes = new Int2ObjectOpenHashMap<>();
 
@@ -37,7 +38,7 @@ public class RuntimeItems {
     private static void registerMapping(int protocolId, String fileName) {
         InputStream stream = Server.class.getClassLoader().getResourceAsStream(fileName);
         if (stream == null) {
-            throw new AssertionError("Unable to load "+fileName);
+            throw new AssertionError("Unable to load " + fileName);
         }
 
         InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
