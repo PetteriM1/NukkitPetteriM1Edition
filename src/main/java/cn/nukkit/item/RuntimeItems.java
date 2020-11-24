@@ -29,7 +29,7 @@ public class RuntimeItems {
 
     public static void init() {
         Server.getInstance().getLogger().debug("Loading runtime items...");
-        registerMapping(ProtocolInfo.v1_12_0, "runtime_item_ids_419.json");
+        registerMapping(ProtocolInfo.v1_12_0, "runtime_item_ids_361.json");
         registerMapping(ProtocolInfo.v1_16_100, "runtime_item_ids_419.json");
     }
 
