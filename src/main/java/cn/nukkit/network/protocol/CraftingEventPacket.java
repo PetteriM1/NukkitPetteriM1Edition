@@ -35,13 +35,13 @@ public class CraftingEventPacket extends DataPacket {
         int inputSize = (int) this.getUnsignedVarInt();
         this.input = new Item[Math.min(inputSize, 128)];
         for (int i = 0; i < this.input.length; ++i) {
-            this.input[i] = this.getSlot();
+            this.input[i] = this.getSlot(this.protocol);
         }
 
         int outputSize = (int) this.getUnsignedVarInt();
         this.output = new Item[Math.min(outputSize, 128)];
         for (int i = 0; i < this.output.length; ++i) {
-            this.output[i] = getSlot();
+            this.output[i] = this.getSlot(this.protocol);
         }
     }
 

@@ -90,7 +90,7 @@ public class CraftingDataPacket extends DataPacket {
                             if (protocol < 361) {
                                 this.putSlot(protocol, ingredient);
                             } else {
-                                this.putRecipeIngredient(ingredient);
+                                this.putRecipeIngredient(this.protocol, ingredient);
                             }
                         }
                         this.putUnsignedVarInt(1);
@@ -119,7 +119,7 @@ public class CraftingDataPacket extends DataPacket {
                                 if (protocol < 361) {
                                     this.putSlot(protocol, shaped.getIngredient(x, z));
                                 } else {
-                                    this.putRecipeIngredient(shaped.getIngredient(x, z));
+                                    this.putRecipeIngredient(this.protocol, shaped.getIngredient(x, z));
                                 }
                             }
                         }
