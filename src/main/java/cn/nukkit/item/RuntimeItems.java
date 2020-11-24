@@ -51,10 +51,10 @@ public class RuntimeItems {
             paletteBuffer.putString(entry.name);
             paletteBuffer.putLShort(entry.id);
 
-            if (protocolId < ProtocolInfo.v1_16_100){
+            if (protocolId < ProtocolInfo.v1_16_100) {
                 legacyNetworkMap.put(entry.id, entry.id);
                 networkLegacyMap.put(entry.id, entry.id);
-            }else {
+            } else {
                 paletteBuffer.putBoolean(false); // Component item
                 if (entry.oldId != null) {
                     boolean hasData = entry.oldData != null;
@@ -69,8 +69,8 @@ public class RuntimeItems {
         itemPalettes.put(protocolId, new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap));
     }
 
-    public static RuntimeItemMapping getRuntimeMapping(int protocolId){
-        if (protocolId < ProtocolInfo.v1_16_100){
+    public static RuntimeItemMapping getRuntimeMapping(int protocolId) {
+        if (protocolId < ProtocolInfo.v1_16_100) {
             return itemPalettes.get(ProtocolInfo.v1_12_0);
         }
         return itemPalettes.get(protocolId);

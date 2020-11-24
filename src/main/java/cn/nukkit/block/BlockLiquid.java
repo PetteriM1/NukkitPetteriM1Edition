@@ -404,10 +404,7 @@ public abstract class BlockLiquid extends BlockTransparentMeta {
 
     protected void triggerLavaMixEffects(Vector3 pos) {
         this.getLevel().addSound(new FizzSound(pos.add(0.5, 0.5, 0.5), 2.6F + (ThreadLocalRandom.current().nextFloat() - ThreadLocalRandom.current().nextFloat()) * 0.8F));
-
-        for (int i = 0; i < 8; ++i) {
-            this.getLevel().addParticle(new SmokeParticle(pos.add(Math.random(), 1.2, Math.random())));
-        }
+        this.getLevel().addParticle(new SmokeParticle(pos.add(Math.random(), 1.2, Math.random())), null, 8);
     }
 
     public abstract BlockLiquid getBlock(int meta);

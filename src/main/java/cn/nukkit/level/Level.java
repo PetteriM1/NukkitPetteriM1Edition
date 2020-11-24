@@ -41,7 +41,6 @@ import cn.nukkit.level.generator.task.GenerationTask;
 import cn.nukkit.level.generator.task.LightPopulationTask;
 import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
-import cn.nukkit.level.particle.FloatingTextParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
@@ -586,10 +585,14 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addParticle(Particle particle, Player[] players) {
+        addParticle(particle, players, 1);
+    }
+
+    public void addParticle(Particle particle, Player[] players, int count) {
         Int2ObjectMap<ObjectList<Player>> targets;
         if (players == null) {
             targets = Server.shortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
-        }else {
+        } else {
             targets = Server.shortPlayers(players);
         }
 
@@ -597,7 +600,15 @@ public class Level implements ChunkManager, Metadatable {
             ObjectList<Player> protocolPlayers = targets.get(protocolId);
             DataPacket packet = particle.mvEncode(protocolId);
             if (packet != null) {
-                Server.broadcastPacket(protocolPlayers, packet);
+                if (count == 1) {
+                    Server.broadcastPacket(protocolPlayers, packet);
+                } else {
+                    List<DataPacket> packets = new ArrayList<>(count);
+                    for (int i = 0; i < count; i++) {
+                        packets.add(packet.clone());
+                    }
+                    Server.broadcastPackets(protocolPlayers.toArray(new Player[0]), packets.toArray(new DataPacket[0]));
+                }
             }
         }
     }

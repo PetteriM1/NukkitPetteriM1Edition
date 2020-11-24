@@ -410,7 +410,7 @@ public class BinaryStream {
 
         boolean hasData = false;
         int fullId = -1;
-        if (protocolId >= ProtocolInfo.v1_16_100){
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
             hasData = RuntimeItems.hasData(fullId);
             id = RuntimeItems.getId(fullId);
@@ -515,7 +515,7 @@ public class BinaryStream {
 
         int networkId = item.getId();
         boolean clearData = false;
-        if (protocolId >= ProtocolInfo.v1_16_100){
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
             clearData = RuntimeItems.hasData(networkFullId);
             networkId = RuntimeItems.getNetworkId(networkFullId);
@@ -529,9 +529,9 @@ public class BinaryStream {
             auxValue = item.getCount();
             if (!isDurable) {
                 int meta;
-                if (protocolId < ProtocolInfo.v1_16_100){
+                if (protocolId < ProtocolInfo.v1_16_100) {
                     meta = item.hasMeta() ? item.getDamage() : -1;
-                }else {
+                } else {
                     meta = clearData ? 0 : item.hasMeta() ? item.getDamage() : -1;
                 }
                 auxValue |= ((meta & 0x7fff) << 8);
@@ -597,13 +597,13 @@ public class BinaryStream {
         }
 
         int damage = this.getVarInt();
-        if (protocolId >= ProtocolInfo.v1_16_100){
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             int fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
             id = RuntimeItems.getId(fullId);
-            if (RuntimeItems.hasData(fullId)){
+            if (RuntimeItems.hasData(fullId)) {
                 damage = RuntimeItems.getData(fullId);
             }
-        }else
+        } else
 
 
         if (damage == 0x7fff) {
@@ -621,15 +621,15 @@ public class BinaryStream {
 
         int networkId = ingredient.getId();
         int damage;
-        if (protocolId >= ProtocolInfo.v1_16_100){
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(ingredient);
-            if (RuntimeItems.hasData(networkFullId)){
+            if (RuntimeItems.hasData(networkFullId)) {
                 damage = 0;
-            }else {
+            } else {
                 damage = ingredient.hasMeta() ? ingredient.getDamage() : -1;
             }
             networkId = RuntimeItems.getNetworkId(networkFullId);
-        }else {
+        } else {
             if (ingredient.hasMeta()) {
                 damage = ingredient.getDamage();
             } else {

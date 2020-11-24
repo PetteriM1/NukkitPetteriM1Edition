@@ -11,7 +11,7 @@ public class RuntimeItemMapping {
 
     private final byte[] itemDataPalette;
 
-    public RuntimeItemMapping(int protocolId, byte[] itemDataPalette, Int2IntMap legacyNetworkMap, Int2IntMap networkLegacyMap){
+    public RuntimeItemMapping(int protocolId, byte[] itemDataPalette, Int2IntMap legacyNetworkMap, Int2IntMap networkLegacyMap) {
         this.protocolId = protocolId;
         this.itemDataPalette = itemDataPalette;
         this.legacyNetworkMap = legacyNetworkMap;

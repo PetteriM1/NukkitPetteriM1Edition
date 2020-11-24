@@ -24,8 +24,8 @@ public class CraftingDataPacket extends DataPacket {
     public static final String CRAFTING_TAG_SMOKER = "smoker";
 
     private List<Recipe> entries = new ArrayList<>();
-    private List<BrewingRecipe> brewingEntries = new ArrayList<>();
-    private List<ContainerRecipe> containerEntries = new ArrayList<>();
+    private final List<BrewingRecipe> brewingEntries = new ArrayList<>();
+    private final List<ContainerRecipe> containerEntries = new ArrayList<>();
     public boolean cleanRecipes;
 
     public void addShapelessRecipe(ShapelessRecipe... recipe) {
