@@ -325,12 +325,11 @@ public class EntityHuman extends EntityHumanType {
                 pkk.riderUniqueId = this.getId();
                 pkk.type = 1;
                 pkk.immediate = 1;
-
                 player.dataPacket(pkk);
             }
 
-            if (!(this instanceof Player)) {
-                this.server.removePlayerListData(this.uuid, new Player[]{player});
+            if (!this.isPlayer) {
+                this.server.removePlayerListData(this.uuid, player);
             }
         }
     }
