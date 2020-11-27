@@ -596,13 +596,19 @@ public class BinaryStream {
             return Item.get(0, 0, 0);
         }
 
+        int id = networkId;
+        if (protocolId >= ProtocolInfo.v1_16_100) {
+            int legacyFullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
+            id = RuntimeItems.getId(legacyFullId);
+        }
+
         int damage = this.getVarInt();
         if (damage == 0x7fff) {
             damage = -1;
         }
 
         int count = this.getVarInt();
-        return Item.get(networkId, damage, count);
+        return Item.get(id, damage, count);
     }
 
     public void putRecipeIngredient(int protocolId, Item ingredient) {
@@ -610,8 +616,14 @@ public class BinaryStream {
             this.putVarInt(0);
             return;
         }
+
         int networkId = ingredient.getId();
         int damage = ingredient.hasMeta() ? ingredient.getDamage() : 0x7fff;
+
+        if (protocolId >= ProtocolInfo.v1_16_100) {
+            int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(ingredient);
+            networkId = RuntimeItems.getNetworkId(networkFullId);
+        }
 
         this.putVarInt(networkId);
         this.putVarInt(damage);
