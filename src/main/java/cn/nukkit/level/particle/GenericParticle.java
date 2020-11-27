@@ -25,26 +25,13 @@ public class GenericParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
-        LevelEventPacket pk = new LevelEventPacket();
-        pk.evid = (short) (LevelEventPacket.EVENT_ADD_PARTICLE_MASK | this.id);
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.data = this.data;
-
-        return new DataPacket[]{pk};
-    }
-
-    @Override
-    public DataPacket mvEncode(int protocol) {
-        LevelEventPacket pk = new LevelEventPacket();
-        pk.evid = (short) (LevelEventPacket.EVENT_ADD_PARTICLE_MASK | getMultiversionId(protocol, this.id));
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.data = this.data;
-
-        return pk;
+    public DataPacket[] mvEncode(int protocol) {
+        LevelEventPacket packet = new LevelEventPacket();
+        packet.evid = (short) (LevelEventPacket.EVENT_ADD_PARTICLE_MASK | getMultiversionId(protocol, this.id));
+        packet.x = (float) this.x;
+        packet.y = (float) this.y;
+        packet.z = (float) this.z;
+        packet.data = this.data;
+        return new DataPacket[]{packet};
     }
 }

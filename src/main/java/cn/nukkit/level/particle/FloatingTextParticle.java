@@ -121,9 +121,8 @@ public class FloatingTextParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
+    public DataPacket[] mvEncode(int protocol) {
         ArrayList<DataPacket> packets = new ArrayList<>();
-
         if (this.entityId == -1) {
             this.entityId = 1095216660480L + Utils.random.nextLong(0, 0x7fffffffL);
         } else {
@@ -163,12 +162,6 @@ public class FloatingTextParticle extends Particle {
             playerRemove.type = PlayerListPacket.TYPE_REMOVE;
             packets.add(playerRemove);
         }
-
         return packets.toArray(new DataPacket[0]);
-    }
-
-    @Override
-    public DataPacket mvEncode(int protocol) {
-        throw new UnsupportedOperationException("Unable to perform mvEncode for a FloatingTextParticle");
     }
 }

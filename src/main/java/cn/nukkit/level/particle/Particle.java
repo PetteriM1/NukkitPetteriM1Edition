@@ -95,7 +95,9 @@ public abstract class Particle extends Vector3 {
         super(x, y, z);
     }
 
-    abstract public DataPacket[] encode();
+    public DataPacket[] encode(){
+        return this.mvEncode(ProtocolInfo.CURRENT_PROTOCOL);
+    }
 
     public static int getMultiversionId(int protocol, int particle) {
         if (protocol == ProtocolInfo.v1_13_0) {
@@ -109,7 +111,7 @@ public abstract class Particle extends Vector3 {
         }
     }
 
-    public abstract DataPacket mvEncode(int protocol);
+    public abstract DataPacket[] mvEncode(int protocol);
 
     public static Integer getParticleIdByName(String name) {
         name = name.toUpperCase();

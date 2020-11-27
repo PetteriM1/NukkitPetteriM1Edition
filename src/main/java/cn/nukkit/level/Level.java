@@ -598,17 +598,19 @@ public class Level implements ChunkManager, Metadatable {
 
         for (int protocolId : targets.keySet()) {
             ObjectList<Player> protocolPlayers = targets.get(protocolId);
-            DataPacket packet = particle.mvEncode(protocolId);
-            if (packet != null) {
+            DataPacket[] packets = particle.mvEncode(protocolId);
+            if (packets != null) {
                 if (count == 1) {
-                    Server.broadcastPacket(protocolPlayers, packet);
-                } else {
-                    List<DataPacket> packets = new ArrayList<>(count);
-                    for (int i = 0; i < count; i++) {
-                        packets.add(packet.clone());
-                    }
-                    Server.broadcastPackets(protocolPlayers.toArray(new Player[0]), packets.toArray(new DataPacket[0]));
+                    Server.broadcastPackets(protocolPlayers.toArray(new Player[0]), packets);
+                    continue;
                 }
+
+                List<DataPacket> packetList = Arrays.asList(packets);
+                List<DataPacket> sendList = new ObjectArrayList<>();
+                for (int i = 0; i < count; i++) {
+                    sendList.addAll(packetList);
+                }
+                Server.broadcastPackets(protocolPlayers.toArray(new Player[0]), sendList.toArray(new DataPacket[0]));
             }
         }
     }

@@ -26,26 +26,13 @@ public class PunchBlockParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
-        LevelEventPacket pk = new LevelEventPacket();
-        pk.evid = LevelEventPacket.EVENT_PARTICLE_PUNCH_BLOCK;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, blockId, blockDamage) | index;
-
-        return new DataPacket[]{pk};
-    }
-
-    @Override
-    public DataPacket mvEncode(int protocol) {
-        LevelEventPacket pk = new LevelEventPacket();
-        pk.evid = LevelEventPacket.EVENT_PARTICLE_PUNCH_BLOCK;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
-
-        return pk;
+    public DataPacket[] mvEncode(int protocol) {
+        LevelEventPacket packet = new LevelEventPacket();
+        packet.evid = LevelEventPacket.EVENT_PARTICLE_PUNCH_BLOCK;
+        packet.x = (float) this.x;
+        packet.y = (float) this.y;
+        packet.z = (float) this.z;
+        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
+        return new DataPacket[]{packet};
     }
 }
