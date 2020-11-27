@@ -27,7 +27,7 @@ public class RuntimeItemMapping {
             networkId = this.legacyNetworkMap.get(RuntimeItems.getFullId(item.getId(), 0));
         }
         if (networkId == -1) {
-            throw new IllegalArgumentException("Unknown item mapping " + item.getId() + ":" + item.getDamage());
+            throw new IllegalArgumentException("Unknown item mapping " + item);
         }
 
         return networkId;

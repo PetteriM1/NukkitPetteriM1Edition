@@ -53,10 +53,7 @@ public class RuntimeItems {
             paletteBuffer.putString(entry.name);
             paletteBuffer.putLShort(entry.id);
 
-            if (protocolId < ProtocolInfo.v1_16_100) {
-                legacyNetworkMap.put(entry.id, entry.id);
-                networkLegacyMap.put(entry.id, entry.id);
-            } else {
+            if (protocolId >= ProtocolInfo.v1_16_100) {
                 paletteBuffer.putBoolean(false); // Component item
                 if (entry.oldId != null) {
                     boolean hasData = entry.oldData != null;
