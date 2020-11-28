@@ -530,26 +530,51 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType) {
-        addLevelSoundEvent(pos, type, data, entityType, false, false);
+        this.addLevelSoundEvent(pos, type, data, entityType, null);
+    }
+
+    public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType, Player[] players) {
+        this.addLevelSoundEvent(pos, type, data, entityType, false, false, players);
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType, boolean isBaby, boolean isGlobal) {
-        String identifier = AddEntityPacket.LEGACY_IDS.getOrDefault(entityType, ":");
-        addLevelSoundEvent(pos, type, data, identifier, isBaby, isGlobal);
+        this.addLevelSoundEvent(pos, type, data, entityType, isBaby, isGlobal, null);
     }
-     public void addLevelSoundEvent(Vector3 pos, int type) {
-        this.addLevelSoundEvent(pos, type, -1);
+
+    public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType, boolean isBaby, boolean isGlobal, Player[] players) {
+        String identifier = AddEntityPacket.LEGACY_IDS.getOrDefault(entityType, ":");
+        this.addLevelSoundEvent(pos, type, data, identifier, isBaby, isGlobal, players);
+    }
+
+    public void addLevelSoundEvent(Vector3 pos, int type) {
+        this.addLevelSoundEvent(pos, type, null);
+    }
+
+    public void addLevelSoundEvent(Vector3 pos, int type, Player[] players) {
+        this.addLevelSoundEvent(pos, type, -1, players);
     }
 
     public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos) {
-        this.addLevelSoundEvent(pos, type, data, ":", false, false);
+        this.addLevelSoundEvent(type, pitch, data, pos, null);
+    }
+
+    public void addLevelSoundEvent(int type, int pitch, int data, Vector3 pos, Player[] players) {
+        this.addLevelSoundEvent(pos, type, data, ":", false, false, players);
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int data) {
-        this.addLevelSoundEvent(pos, type, data, ":", false, false);
+        this.addLevelSoundEvent(pos, type, data, null);
+    }
+
+    public void addLevelSoundEvent(Vector3 pos, int type, int data, Player[] players) {
+        this.addLevelSoundEvent(pos, type, data, ":", false, false, players);
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int data, String identifier, boolean isBaby, boolean isGlobal) {
+        this.addLevelSoundEvent(pos, type, data, identifier, isBaby, isGlobal, null);
+    }
+
+    public void addLevelSoundEvent(Vector3 pos, int type, int data, String identifier, boolean isBaby, boolean isGlobal, Player[] players) {
         LevelSoundEventPacket pk = new LevelSoundEventPacket();
         pk.sound = type;
         pk.extraData = data;
@@ -560,7 +585,11 @@ public class Level implements ChunkManager, Metadatable {
         pk.isGlobal = isGlobal;
         pk.isBabyMob = isBaby;
 
-        this.addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
+        if (players == null) {
+            this.addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
+        } else {
+            this.server.batchPackets(players, new DataPacket[]{pk}, false);
+        }
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int pitch, int data, boolean isGlobal) {
@@ -2058,17 +2087,13 @@ public class Level implements ChunkManager, Metadatable {
         }
 
         Vector3 above = new Vector3(target.x, target.y + 1, target.z);
-        if (above != null) {
-            if (this.getBlockIdAt((int) above.x, (int) above.y, (int) above.z) == Item.FIRE) {
-                this.setBlock(above, Block.get(BlockID.AIR), true);
-            }
+        if (this.getBlockIdAt((int) above.x, (int) above.y, (int) above.z) == Item.FIRE) {
+            this.setBlock(above, Block.get(BlockID.AIR), true);
         }
 
         if (createParticles) {
             Map<Integer, Player> players = this.getChunkPlayers((int) target.x >> 4, (int) target.z >> 4);
-
             this.addParticle(new DestroyBlockParticle(target.add(0.5), target), players.values());
-
             if (player != null) {
                 players.remove(player.getLoaderId());
             }
@@ -2392,7 +2417,12 @@ public class Level implements ChunkManager, Metadatable {
 
 
         if (playSound) {
-            this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, hand.getId(), hand.getDamage()));
+            Int2ObjectMap<ObjectList<Player>> players = Server.shortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
+            for (int protocolId : players.keySet()){
+                ObjectList<Player> targets = players.get(protocolId);
+                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, hand.getId(), hand.getDamage());
+                this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, soundData, targets.toArray(new Player[0]));
+            }
         }
 
         if (item.getCount() <= 0) {
