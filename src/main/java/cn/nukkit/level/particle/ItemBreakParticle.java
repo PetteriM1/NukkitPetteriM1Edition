@@ -23,7 +23,7 @@ public class ItemBreakParticle extends Particle {
     @Override
     public DataPacket[] mvEncode(int protocol) {
         int networkId = this.item.getId();
-        if (protocol >= ProtocolInfo.v1_16_100){
+        if (protocol >= ProtocolInfo.v1_16_100) {
             int networkFullId = RuntimeItems.getRuntimeMapping(protocol).getNetworkFullId(this.item);
             networkId = RuntimeItems.getNetworkId(networkFullId);
         }

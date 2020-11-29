@@ -95,7 +95,7 @@ public abstract class Particle extends Vector3 {
         super(x, y, z);
     }
 
-    public DataPacket[] encode(){
+    public DataPacket[] encode() {
         return this.mvEncode(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
