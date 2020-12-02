@@ -80,14 +80,4 @@ public class EntityVex extends EntityFlyingMob {
         pk.hotbarSlot = 10;
         player.dataPacket(pk);
     }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
 }

@@ -22,10 +22,7 @@ import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
-import cn.nukkit.event.inventory.InventoryCloseEvent;
-import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
-import cn.nukkit.event.inventory.InventoryPickupItemEvent;
-import cn.nukkit.event.inventory.InventoryPickupTridentEvent;
+import cn.nukkit.event.inventory.*;
 import cn.nukkit.event.player.*;
 import cn.nukkit.event.player.PlayerAsyncPreLoginEvent.LoginResult;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
@@ -2903,7 +2900,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     switch (interactPacket.action) {
                         case InteractPacket.ACTION_OPEN_INVENTORY:
                             if (this.protocol >= 407 && this.spawned) {
-                                this.inventory.sendInventory();
+                                InventoryOpenEvent inventoryOpenEvent = new InventoryOpenEvent(this.inventory, this);
+                                server.getPluginManager().callEvent(inventoryOpenEvent);
+                                if (!inventoryOpenEvent.isCancelled()) {
+                                    this.inventory.sendInventory();
+                                }
                             }
                             break;
                         case InteractPacket.ACTION_MOUSEOVER:
