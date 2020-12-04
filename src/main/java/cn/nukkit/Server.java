@@ -664,7 +664,6 @@ public class Server {
         this.batchPackets(players, packets, false);
     }
 
-    @SuppressWarnings("unused")
     public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync) {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
@@ -732,7 +731,7 @@ public class Server {
 
             for (int i = 0; i < packetList.size(); i++) {
                 DataPacket p = packetList.get(i);
-                int idx = i * 2;
+                int idx = i << 1;
                 byte[] buf = p.getBuffer();
                 payload[idx] = Binary.writeUnsignedVarInt(buf.length);
                 payload[idx + 1] = buf;
