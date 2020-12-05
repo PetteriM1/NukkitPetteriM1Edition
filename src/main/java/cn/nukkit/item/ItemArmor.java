@@ -50,19 +50,19 @@ abstract public class ItemArmor extends Item implements ItemDurable {
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         boolean equip = false;
-        if (this.isHelmet() && player.getInventory().getHelmet().isNull()) {
+        if (this.isHelmet() && player.getInventory().getHelmetFast().isNull()) {
             if (player.getInventory().setHelmet(this)) {
                 equip = true;
             }
-        } else if (this.isChestplate() && player.getInventory().getChestplate().isNull()) {
+        } else if (this.isChestplate() && player.getInventory().getChestplateFast().isNull()) {
             if (player.getInventory().setChestplate(this)) {
                 equip = true;
             }
-        } else if (this.isLeggings() && player.getInventory().getLeggings().isNull()) {
+        } else if (this.isLeggings() && player.getInventory().getLeggingsFast().isNull()) {
             if (player.getInventory().setLeggings(this)) {
                 equip = true;
             }
-        } else if (this.isBoots() && player.getInventory().getBoots().isNull()) {
+        } else if (this.isBoots() && player.getInventory().getBootsFast().isNull()) {
             if (player.getInventory().setBoots(this)) {
                 equip = true;
             }

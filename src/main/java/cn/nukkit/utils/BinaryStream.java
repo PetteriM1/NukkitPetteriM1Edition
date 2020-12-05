@@ -623,7 +623,7 @@ public class BinaryStream {
         if (protocolId >= ProtocolInfo.v1_16_100) {
             int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(ingredient);
             networkId = RuntimeItems.getNetworkId(networkFullId);
-            if (RuntimeItems.hasData(networkFullId)){
+            if (RuntimeItems.hasData(networkFullId)) {
                 damage = 0;
             }
         }

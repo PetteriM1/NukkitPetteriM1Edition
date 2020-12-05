@@ -154,14 +154,4 @@ public class EntityMagmaCube extends EntityJumpingMob {
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Magma Cube";
     }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
 }

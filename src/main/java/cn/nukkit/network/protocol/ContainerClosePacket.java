@@ -20,6 +20,9 @@ public class ContainerClosePacket extends DataPacket {
     @Override
     public void decode() {
         this.windowId = (byte) this.getByte();
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.wasServerInitiated = this.getBoolean();
+        }
     }
 
     @Override

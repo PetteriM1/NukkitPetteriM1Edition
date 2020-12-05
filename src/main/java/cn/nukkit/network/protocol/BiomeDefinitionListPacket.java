@@ -4,7 +4,7 @@ import cn.nukkit.Nukkit;
 import com.google.common.io.ByteStreams;
 import lombok.ToString;
 
-@ToString(exclude = "tag")
+@ToString()
 public class BiomeDefinitionListPacket extends DataPacket {
 
     private static final byte[] TAG361;
