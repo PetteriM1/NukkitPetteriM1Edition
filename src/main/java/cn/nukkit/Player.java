@@ -179,7 +179,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected Vector3 sleeping = null;
 
-    private int loaderId;
+    private final int loaderId;
 
     public final Map<Long, Boolean> usedChunks = new Long2ObjectOpenHashMap<>();
 
