@@ -14,7 +14,7 @@ public class ItemFrameDropItemPacket extends DataPacket {
     public int z;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         BlockVector3 v = this.getBlockVector3();
         this.z = v.z;
         this.y = v.y;
@@ -22,7 +22,7 @@ public class ItemFrameDropItemPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 
     @Override

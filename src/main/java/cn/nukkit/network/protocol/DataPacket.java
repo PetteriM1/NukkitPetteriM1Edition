@@ -12,9 +12,6 @@ import com.nukkitx.network.raknet.RakNetReliability;
  * Nukkit Project
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
-
-    public int protocol = 999;
-
     public boolean isEncoded = false;
     private int channel = Network.CHANNEL_NONE;
 
@@ -22,14 +19,22 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public abstract byte pid();
 
-    public abstract void decode();
+    public abstract void decode(int protocolId);
 
-    public abstract void encode();
+    public void decodePacket(int protocolId) {
+        this.decode(protocolId);
+    }
 
-    @Override
-    public DataPacket reset() {
-        super.reset();
-        if (protocol <= 274) {
+    public abstract void encode(int protocolId);
+
+    public void encodePacket(int protocolId) {
+        this.reset(protocolId);
+        this.encode(protocolId);
+    }
+
+    public DataPacket reset(int protocolId) {
+        this.reset();
+        if (protocolId <= ProtocolInfo.v1_5_0) {
             this.putByte(this.pid());
             this.putShort(0);
         } else {
@@ -63,10 +68,10 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     }
 
     public BatchPacket compress() {
-        return compress(Server.getInstance().networkCompressionLevel);
+        return compress(Server.getInstance().networkCompressionLevel, ProtocolInfo.CURRENT_PROTOCOL);
     }
 
-    public BatchPacket compress(int level) {
+    public BatchPacket compress(int level, int protocolId) {
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
         byte[] buf = getBuffer();
@@ -74,7 +79,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         batchPayload[1] = buf;
         byte[] data = Binary.appendBytes(batchPayload);
         try {
-            if (protocol >= ProtocolInfo.v1_16_0) {
+            if (protocolId >= ProtocolInfo.v1_16_0) {
                 batch.payload = Zlib.deflateRaw(data, level);
             } else {
                 batch.payload = Zlib.deflate(data, level);

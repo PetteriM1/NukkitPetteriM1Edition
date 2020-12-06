@@ -22,12 +22,11 @@ public class PlayStatusPacket extends DataPacket {
     public int status;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putInt(this.status);
     }
 }

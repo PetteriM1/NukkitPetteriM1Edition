@@ -70,7 +70,7 @@ public class NetworkInventoryAction {
     public Item newItem;
     public int stackNetworkId;
 
-    public NetworkInventoryAction read(InventoryTransactionPacket packet) {
+    public NetworkInventoryAction read(InventoryTransactionPacket packet, int protocolId) {
         this.sourceType = (int) packet.getUnsignedVarInt();
 
         switch (this.sourceType) {
@@ -105,17 +105,17 @@ public class NetworkInventoryAction {
         }
 
         this.inventorySlot = (int) packet.getUnsignedVarInt();
-        this.oldItem = packet.getSlot(packet.protocol);
-        this.newItem = packet.getSlot(packet.protocol);
+        this.oldItem = packet.getSlot(protocolId);
+        this.newItem = packet.getSlot(protocolId);
 
-        if (packet.hasNetworkIds && packet.protocol >= 407) {
+        if (packet.hasNetworkIds && protocolId >= 407) {
             this.stackNetworkId = packet.getVarInt();
         }
 
         return this;
     }
 
-    public void write(InventoryTransactionPacket packet) {
+    public void write(InventoryTransactionPacket packet, int protocolId) {
         packet.putUnsignedVarInt(this.sourceType);
 
         switch (this.sourceType) {
@@ -134,10 +134,10 @@ public class NetworkInventoryAction {
         }
 
         packet.putUnsignedVarInt(this.inventorySlot);
-        packet.putSlot(packet.protocol, this.oldItem);
-        packet.putSlot(packet.protocol, this.newItem);
+        packet.putSlot(protocolId, this.oldItem);
+        packet.putSlot(protocolId, this.newItem);
 
-        if (packet.hasNetworkIds && packet.protocol >= 407) {
+        if (packet.hasNetworkIds && protocolId >= 407) {
             packet.putVarInt(this.stackNetworkId);
         }
     }

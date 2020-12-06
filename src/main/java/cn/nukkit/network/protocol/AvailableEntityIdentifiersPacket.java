@@ -28,15 +28,14 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
-        if (protocol >= ProtocolInfo.v1_16_100) {
+    public void encode(int protocolId) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.put(TAG419);
-        } else if (protocol >= ProtocolInfo.v1_10_0) {
+        } else if (protocolId >= ProtocolInfo.v1_10_0) {
             this.put(Base64.getDecoder().decode(NBT340));
         } else {
             this.put(Base64.getDecoder().decode(NBT313));

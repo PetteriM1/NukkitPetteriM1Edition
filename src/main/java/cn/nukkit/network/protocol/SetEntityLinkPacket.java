@@ -16,17 +16,16 @@ public class SetEntityLinkPacket extends DataPacket {
     public boolean riderInitiated = false;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityUniqueId(this.vehicleUniqueId);
         this.putEntityUniqueId(this.riderUniqueId);
         this.putByte(this.type);
         this.putByte(this.immediate);
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.putBoolean(this.riderInitiated);
         }
     }

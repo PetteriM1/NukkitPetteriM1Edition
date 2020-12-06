@@ -25,7 +25,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.isBlock = this.getBoolean();
         if (this.isBlock) {
             BlockVector3 v = this.getBlockVector3();
@@ -45,8 +45,7 @@ public class CommandBlockUpdatePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putBoolean(this.isBlock);
         if (this.isBlock) {
             this.putBlockVector3(this.x, this.y, this.z);

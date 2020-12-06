@@ -20,12 +20,11 @@ public class SetEntityMotionPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityRuntimeId(this.eid);
         this.putVector3f(this.motionX, this.motionY, this.motionZ);
     }

@@ -11,12 +11,11 @@ public class SpawnExperienceOrbPacket extends DataPacket {
     public int amount;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVector3f(this.x, this.y, this.z);
         this.putUnsignedVarInt(this.amount);
     }

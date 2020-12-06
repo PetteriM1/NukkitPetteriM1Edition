@@ -18,7 +18,7 @@ public class BlockPickRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         BlockVector3 v = this.getSignedBlockPosition();
         this.x = v.x;
         this.y = v.y;
@@ -28,6 +28,6 @@ public class BlockPickRequestPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 }

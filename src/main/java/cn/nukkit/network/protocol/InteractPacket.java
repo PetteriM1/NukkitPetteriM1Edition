@@ -14,14 +14,13 @@ public class InteractPacket extends DataPacket {
     public long target;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.action = this.getByte();
         this.target = this.getEntityRuntimeId();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putByte((byte) this.action);
         this.putEntityRuntimeId(this.target);
     }

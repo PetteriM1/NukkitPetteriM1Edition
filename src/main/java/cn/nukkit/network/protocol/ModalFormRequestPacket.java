@@ -14,12 +14,11 @@ public class ModalFormRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarInt(this.formId);
         this.putString(this.data);
     }

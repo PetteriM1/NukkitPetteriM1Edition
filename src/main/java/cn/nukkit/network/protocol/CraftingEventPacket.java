@@ -27,7 +27,7 @@ public class CraftingEventPacket extends DataPacket {
     public Item[] output;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.windowId = this.getByte();
         this.type = (int) this.getUnsignedVarInt();
         this.id = this.getUUID();
@@ -35,18 +35,18 @@ public class CraftingEventPacket extends DataPacket {
         int inputSize = (int) this.getUnsignedVarInt();
         this.input = new Item[Math.min(inputSize, 128)];
         for (int i = 0; i < this.input.length; ++i) {
-            this.input[i] = this.getSlot(this.protocol);
+            this.input[i] = this.getSlot(protocolId);
         }
 
         int outputSize = (int) this.getUnsignedVarInt();
         this.output = new Item[Math.min(outputSize, 128)];
         for (int i = 0; i < this.output.length; ++i) {
-            this.output[i] = this.getSlot(this.protocol);
+            this.output[i] = this.getSlot(protocolId);
         }
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 
     @Override

@@ -22,19 +22,18 @@ public class MobEquipmentPacket extends DataPacket {
     public int windowId;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.eid = this.getEntityRuntimeId();
-        this.item = this.getSlot(this.protocol);
+        this.item = this.getSlot(protocolId);
         this.inventorySlot = this.getByte();
         this.hotbarSlot = this.getByte();
         this.windowId = this.getByte();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityRuntimeId(this.eid);
-        this.putSlot(protocol, this.item);
+        this.putSlot(protocolId, this.item);
         this.putByte((byte) this.inventorySlot);
         this.putByte((byte) this.hotbarSlot);
         this.putByte((byte) this.windowId);

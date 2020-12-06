@@ -16,11 +16,11 @@ public class MapInfoRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         mapId = this.getEntityUniqueId();
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 }

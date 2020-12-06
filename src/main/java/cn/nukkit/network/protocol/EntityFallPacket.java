@@ -10,14 +10,14 @@ public class EntityFallPacket extends DataPacket {
     public boolean isInVoid;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.eid = this.getEntityRuntimeId();
         this.fallDistance = this.getLFloat();
         this.isInVoid = this.getBoolean();
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 
     @Override

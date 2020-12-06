@@ -170,15 +170,10 @@ public class Network {
                 DataPacket pk = this.getPacketFromBuffer(player.protocol, buf);
 
                 if (pk != null) {
-                    pk.protocol = player.protocol;
-
-                    if (player.raknetProtocol > 8) {
-                        pk.decode();
-                    } else { // version < 1.6
+                    if (player.raknetProtocol <= 8) { // version < 1.6
                         pk.setBuffer(buf, 3);
-                        pk.decode();
                     }
-
+                    pk.decodePacket(player.protocol);
                     packets.add(pk);
                 }
             }

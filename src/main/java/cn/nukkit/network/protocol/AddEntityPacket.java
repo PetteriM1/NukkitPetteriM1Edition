@@ -155,15 +155,15 @@ public class AddEntityPacket extends DataPacket {
     public EntityLink[] links = new EntityLink[0];
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
+
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (this.protocol < 313) {
+        if (protocolId < 313) {
             this.putUnsignedVarInt(this.type);
         } else {
             if (id == null) {
@@ -175,14 +175,14 @@ public class AddEntityPacket extends DataPacket {
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
-        if (protocol >= 274) {
+        if (protocolId >= 274) {
             this.putLFloat(this.headYaw);
         }
         this.putAttributeList(this.attributes);
-        this.put(Binary.writeMetadata(protocol, this.metadata));
+        this.put(Binary.writeMetadata(protocolId, this.metadata));
         this.putUnsignedVarInt(this.links.length);
         for (EntityLink link : links) {
-            putEntityLink(protocol, link);
+            putEntityLink(protocolId, link);
         }
     }
 }

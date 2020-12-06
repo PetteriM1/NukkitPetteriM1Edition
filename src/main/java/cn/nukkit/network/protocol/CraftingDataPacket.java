@@ -55,15 +55,14 @@ public class CraftingDataPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putUnsignedVarInt(entries.size());
 
-        if (protocol < 354) {
+        if (protocolId < 354) {
             BinaryStream writer = new BinaryStream();
             for (Object entry : entries) {
                 int entryType = writeEntryLegacy(entry, writer);
@@ -81,26 +80,26 @@ public class CraftingDataPacket extends DataPacket {
                 switch (recipe.getType()) {
                     case SHAPELESS:
                         ShapelessRecipe shapeless = (ShapelessRecipe) recipe;
-                        if (protocol >= 361) {
+                        if (protocolId >= 361) {
                             this.putString(shapeless.getRecipeId());
                         }
                         List<Item> ingredients = shapeless.getIngredientList();
                         this.putUnsignedVarInt(ingredients.size());
                         for (Item ingredient : ingredients) {
-                            if (protocol < 361) {
-                                this.putSlot(protocol, ingredient);
+                            if (protocolId < 361) {
+                                this.putSlot(protocolId, ingredient);
                             } else {
-                                this.putRecipeIngredient(this.protocol, ingredient);
+                                this.putRecipeIngredient(protocolId, ingredient);
                             }
                         }
                         this.putUnsignedVarInt(1);
-                        this.putSlot(protocol, shapeless.getResult());
+                        this.putSlot(protocolId, shapeless.getResult());
                         this.putUUID(shapeless.getId());
-                        if (protocol >= 354) {
+                        if (protocolId >= 354) {
                             this.putString(CRAFTING_TAG_CRAFTING_TABLE);
-                            if (protocol >= 361) {
+                            if (protocolId >= 361) {
                                 this.putVarInt(shapeless.getPriority());
-                                if (protocol >= 407) {
+                                if (protocolId >= 407) {
                                     this.putUnsignedVarInt(shapeless.getNetworkId());
                                 }
                             }
@@ -108,7 +107,7 @@ public class CraftingDataPacket extends DataPacket {
                         break;
                     case SHAPED:
                         ShapedRecipe shaped = (ShapedRecipe) recipe;
-                        if (protocol >= 361) {
+                        if (protocolId >= 361) {
                             this.putString(shaped.getRecipeId());
                         }
                         this.putVarInt(shaped.getWidth());
@@ -116,10 +115,10 @@ public class CraftingDataPacket extends DataPacket {
 
                         for (int z = 0; z < shaped.getHeight(); ++z) {
                             for (int x = 0; x < shaped.getWidth(); ++x) {
-                                if (protocol < 361) {
-                                    this.putSlot(protocol, shaped.getIngredient(x, z));
+                                if (protocolId < 361) {
+                                    this.putSlot(protocolId, shaped.getIngredient(x, z));
                                 } else {
-                                    this.putRecipeIngredient(this.protocol, shaped.getIngredient(x, z));
+                                    this.putRecipeIngredient(protocolId, shaped.getIngredient(x, z));
                                 }
                             }
                         }
@@ -128,14 +127,14 @@ public class CraftingDataPacket extends DataPacket {
                         outputs.addAll(shaped.getExtraResults());
                         this.putUnsignedVarInt(outputs.size());
                         for (Item output : outputs) {
-                            this.putSlot(protocol, output);
+                            this.putSlot(protocolId, output);
                         }
                         this.putUUID(shaped.getId());
-                        if (protocol >= 354) {
+                        if (protocolId >= 354) {
                             this.putString(CRAFTING_TAG_CRAFTING_TABLE);
-                            if (protocol >= 361) {
+                            if (protocolId >= 361) {
                                 this.putVarInt(shaped.getPriority());
-                                if (protocol >= 407) {
+                                if (protocolId >= 407) {
                                     this.putUnsignedVarInt(shaped.getNetworkId());
                                 }
                             }
@@ -149,23 +148,23 @@ public class CraftingDataPacket extends DataPacket {
                         if (recipe.getType() == RecipeType.FURNACE_DATA) {
                             this.putVarInt(input.getDamage());
                         }
-                        this.putSlot(protocol, furnace.getResult());
-                        if (protocol >= 354) {
+                        this.putSlot(protocolId, furnace.getResult());
+                        if (protocolId >= 354) {
                             this.putString(CRAFTING_TAG_FURNACE);
                         }
                         break;
                 }
             }
 
-            if (protocol >= 388) {
+            if (protocolId >= 388) {
                 this.putUnsignedVarInt(this.brewingEntries.size());
                 for (BrewingRecipe recipe : brewingEntries) {
-                    if (protocol >= 407) {
+                    if (protocolId >= 407) {
                         this.putVarInt(recipe.getInput().getId());
                     }
                     this.putVarInt(recipe.getInput().getDamage());
                     this.putVarInt(recipe.getIngredient().getId());
-                    if (protocol >= 407) {
+                    if (protocolId >= 407) {
                         this.putVarInt(recipe.getIngredient().getDamage());
                         this.putVarInt(recipe.getResult().getId());
                     }

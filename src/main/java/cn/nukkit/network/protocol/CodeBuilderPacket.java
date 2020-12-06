@@ -11,14 +11,13 @@ public class CodeBuilderPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.url = this.getString();
         this.isOpening = this.getBoolean();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putString(url);
         this.putBoolean(isOpening);
     }

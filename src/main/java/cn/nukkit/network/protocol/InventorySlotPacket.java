@@ -21,20 +21,19 @@ public class InventorySlotPacket extends DataPacket {
     public Item item;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.inventoryId = (int) this.getUnsignedVarInt();
         this.slot = (int) this.getUnsignedVarInt();
-        this.item = this.getSlot(this.protocol);
+        this.item = this.getSlot(protocolId);
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putUnsignedVarInt(this.inventoryId);
         this.putUnsignedVarInt(this.slot);
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.putVarInt(networkId);
         }
-        this.putSlot(protocol, this.item);
+        this.putSlot(protocolId, this.item);
     }
 }

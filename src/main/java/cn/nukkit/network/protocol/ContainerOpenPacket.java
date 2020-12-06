@@ -23,7 +23,7 @@ public class ContainerOpenPacket extends DataPacket {
     public long entityId = -1;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.windowId = this.getByte();
         this.type = this.getByte();
         BlockVector3 v = this.getBlockVector3();
@@ -34,8 +34,7 @@ public class ContainerOpenPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putByte((byte) this.windowId);
         this.putByte((byte) this.type);
         this.putBlockVector3(this.x, this.y, this.z);

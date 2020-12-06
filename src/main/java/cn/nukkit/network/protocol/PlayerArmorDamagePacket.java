@@ -14,7 +14,7 @@ public class PlayerArmorDamagePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         int flagsval = this.getByte();
         for (int i = 0; i < 4; i++) {
             if ((flagsval & (1 << i)) != 0) {
@@ -25,8 +25,7 @@ public class PlayerArmorDamagePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         int outflags = 0;
         for (PlayerArmorDamageFlag flag : this.flags) {
             outflags |= 1 << flag.ordinal();

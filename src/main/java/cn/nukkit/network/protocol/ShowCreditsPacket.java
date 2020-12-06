@@ -17,14 +17,13 @@ public class ShowCreditsPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.eid = this.getEntityRuntimeId();
         this.status = this.getVarInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityRuntimeId(this.eid);
         this.putVarInt(this.status);
     }

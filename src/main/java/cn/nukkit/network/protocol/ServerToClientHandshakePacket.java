@@ -15,10 +15,10 @@ public class ServerToClientHandshakePacket extends DataPacket {
     public String privateKey;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 }

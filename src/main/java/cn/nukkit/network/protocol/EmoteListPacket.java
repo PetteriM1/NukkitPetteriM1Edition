@@ -16,7 +16,7 @@ public class EmoteListPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.runtimeId = this.getEntityUniqueId();
         int size = (int) this.getUnsignedVarInt();
         if (size > 1000) {
@@ -29,8 +29,7 @@ public class EmoteListPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityUniqueId(runtimeId);
         this.putUnsignedVarInt(pieceIds.size());
         for (UUID id : pieceIds) {

@@ -31,7 +31,7 @@ public class TextPacket extends DataPacket {
     public String platformChatId = "";
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.type = (byte) getByte();
         this.isLocalized = this.getBoolean() || type == TYPE_TRANSLATION;
         switch (type) {
@@ -39,7 +39,7 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.source = this.getString();
-                if (protocol > 201 && protocol <= 282) {
+                if (protocolId > 201 && protocolId <= 282) {
                     this.getString();
                     this.getVarInt();
                 }
@@ -61,8 +61,8 @@ public class TextPacket extends DataPacket {
                     this.parameters[i] = this.getString();
                 }
         }
-        if (protocol >= 223) {
-            if (protocol >= 361) {
+        if (protocolId >= 223) {
+            if (protocolId >= 361) {
                 this.xboxUserId = this.getString();
             }
             this.platformChatId = this.getString();
@@ -70,8 +70,7 @@ public class TextPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putByte(this.type);
         this.putBoolean(this.isLocalized || type == TYPE_TRANSLATION);
         switch (this.type) {
@@ -79,7 +78,7 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
-                if (protocol > 201 && protocol <= 282) {
+                if (protocolId > 201 && protocolId <= 282) {
                     this.putString("");
                     this.putVarInt(0);
                 }
@@ -100,8 +99,8 @@ public class TextPacket extends DataPacket {
                     this.putString(parameter);
                 }
         }
-        if (protocol >= 223) {
-            if (protocol >= 361) {
+        if (protocolId >= 223) {
+            if (protocolId >= 361) {
                 this.putString(this.xboxUserId);
             }
             this.putString(this.platformChatId);

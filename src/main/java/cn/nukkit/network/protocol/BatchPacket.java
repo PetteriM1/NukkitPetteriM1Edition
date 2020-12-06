@@ -14,12 +14,12 @@ public class BatchPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.payload = this.get();
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
     }
 
     public void trim() {

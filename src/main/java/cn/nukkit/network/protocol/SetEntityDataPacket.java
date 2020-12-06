@@ -21,15 +21,14 @@ public class SetEntityDataPacket extends DataPacket {
     public long frame;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityRuntimeId(this.eid);
-        this.put(Binary.writeMetadata(protocol, this.metadata));
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        this.put(Binary.writeMetadata(protocolId, this.metadata));
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.putUnsignedVarLong(this.frame);
         }
     }

@@ -57,7 +57,7 @@ public class AvailableCommandsPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         /*commands = new HashMap<>();
 
         List<String> enumValues = new ArrayList<>();
@@ -171,9 +171,7 @@ public class AvailableCommandsPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
-
+    public void encode(int protocolId) {
         LinkedHashSet<String> enumValuesSet = new LinkedHashSet<>();
         LinkedHashSet<String> postFixesSet = new LinkedHashSet<>();
         LinkedHashSet<CommandEnum> enumsSet = new LinkedHashSet<>();
@@ -272,7 +270,7 @@ public class AvailableCommandsPacket extends DataPacket {
                             type |= ARG_FLAG_ENUM | enums.indexOf(parameter.enumData);
                         } else {
                             int id = parameter.type.getId();
-                            if (protocol < 388) {
+                            if (protocolId < 388) {
                                 switch (parameter.type) {
                                     case STRING:
                                         id = ARG_TYPE_STRING_PRE388;
@@ -300,14 +298,14 @@ public class AvailableCommandsPacket extends DataPacket {
 
                     putLInt(type);
                     putBoolean(parameter.optional);
-                    if (protocol >= 340) {
+                    if (protocolId >= 340) {
                         putByte(parameter.options);
                     }
                 }
             }
         });
 
-        if (protocol > 274) {
+        if (protocolId > 274) {
             this.putUnsignedVarInt(softEnums.size());
 
             softEnums.forEach((name, values) -> {
@@ -317,7 +315,7 @@ public class AvailableCommandsPacket extends DataPacket {
             });
         }
 
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.putUnsignedVarInt(0);
         }
     }

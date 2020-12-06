@@ -13,12 +13,12 @@ public class SetLocalPlayerAsInitializedPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.eid = this.getUnsignedVarLong();
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
         this.putUnsignedVarLong(eid);
     }
 }

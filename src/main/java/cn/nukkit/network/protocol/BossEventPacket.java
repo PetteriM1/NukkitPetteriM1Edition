@@ -42,7 +42,7 @@ public class BossEventPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.bossEid = this.getEntityUniqueId();
         this.type = (int) this.getUnsignedVarInt();
         switch (this.type) {
@@ -69,8 +69,7 @@ public class BossEventPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityUniqueId(this.bossEid);
         this.putUnsignedVarInt(this.type);
         switch (this.type) {

@@ -15,7 +15,7 @@ public class AnimatePacket extends DataPacket {
     public float rowingTime;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.action = Action.fromId(this.getVarInt());
         this.eid = getEntityRuntimeId();
         if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
@@ -24,8 +24,7 @@ public class AnimatePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarInt(this.action.getId());
         this.putEntityRuntimeId(this.eid);
         if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {

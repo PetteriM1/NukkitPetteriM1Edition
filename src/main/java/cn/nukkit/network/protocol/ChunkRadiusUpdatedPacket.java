@@ -12,13 +12,12 @@ public class ChunkRadiusUpdatedPacket extends DataPacket {
     public int radius;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.radius = this.getVarInt();
     }
 
     @Override
-    public void encode() {
-        super.reset();
+    public void encode(int protocolId) {
         this.putVarInt(this.radius);
     }
 

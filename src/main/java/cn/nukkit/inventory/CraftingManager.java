@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -264,7 +265,6 @@ public class CraftingManager {
     public void rebuildPacket() {
         CraftingDataPacket pk419 = new CraftingDataPacket();
         pk419.cleanRecipes = true;
-        pk419.protocol = 419;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk419.addShapedRecipe((ShapedRecipe) recipe);
@@ -281,11 +281,10 @@ public class CraftingManager {
         for (ContainerRecipe recipe : containerRecipes.values()) {
             pk419.addContainerRecipe(recipe);
         }
-        pk419.encode();
-        packet419 = pk419.compress(Deflater.BEST_COMPRESSION);
+        pk419.encodePacket(ProtocolInfo.v1_16_100);
+        packet419 = pk419.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_16_100_0);
         CraftingDataPacket pk407 = new CraftingDataPacket();
         pk407.cleanRecipes = true;
-        pk407.protocol = 407;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk407.addShapedRecipe((ShapedRecipe) recipe);
@@ -302,12 +301,11 @@ public class CraftingManager {
         for (ContainerRecipe recipe : containerRecipes.values()) {
             pk407.addContainerRecipe(recipe);
         }
-        pk407.encode();
-        packet407 = pk407.compress(Deflater.BEST_COMPRESSION);
+        pk407.encodePacket(ProtocolInfo.v1_16_0);
+        packet407 = pk407.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_16_0);
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
         pk388.cleanRecipes = true;
-        pk388.protocol = 388;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk388.addShapedRecipe((ShapedRecipe) recipe);
@@ -324,12 +322,11 @@ public class CraftingManager {
         for (ContainerRecipe recipe : containerRecipesOld.values()) {
             pk388.addContainerRecipe(recipe);
         }
-        pk388.encode();
-        packet338 = pk388.compress(Deflater.BEST_COMPRESSION);
+        pk388.encodePacket(ProtocolInfo.v1_13_0);
+        packet338 = pk388.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_13_0);
         // 361
         CraftingDataPacket pk361 = new CraftingDataPacket();
         pk361.cleanRecipes = true;
-        pk361.protocol = 361;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk361.addShapedRecipe((ShapedRecipe) recipe);
@@ -340,12 +337,11 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk361.addFurnaceRecipe(recipe);
         }
-        pk361.encode();
-        packet361 = pk361.compress(Deflater.BEST_COMPRESSION);
+        pk361.encodePacket(ProtocolInfo.v1_12_0);
+        packet361 = pk361.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_12_0);
         // 354
         CraftingDataPacket pk354 = new CraftingDataPacket();
         pk354.cleanRecipes = true;
-        pk354.protocol = 354;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
                 pk354.addShapedRecipe((ShapedRecipe) recipe);
@@ -356,12 +352,11 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk354.addFurnaceRecipe(recipe);
         }
-        pk354.encode();
-        packet354 = pk354.compress(Deflater.BEST_COMPRESSION);
+        pk354.encodePacket(ProtocolInfo.v1_11_0);
+        packet354 = pk354.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_11_0);
         // 340
         CraftingDataPacket pk340 = new CraftingDataPacket();
         pk340.cleanRecipes = true;
-        pk340.protocol = 340;
         for (Recipe recipe : this.recipes340) {
             if (recipe instanceof ShapedRecipe) {
                 pk340.addShapedRecipe((ShapedRecipe) recipe);
@@ -372,12 +367,11 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk340.addFurnaceRecipe(recipe);
         }
-        pk340.encode();
-        packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
+        pk340.encodePacket(ProtocolInfo.v1_10_0);
+        packet340 = pk340.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_10_0);
         // 313
         CraftingDataPacket pk313 = new CraftingDataPacket();
         pk313.cleanRecipes = true;
-        pk313.protocol = 313;
         for (Recipe recipe : this.recipes313) {
             if (recipe instanceof ShapedRecipe) {
                 pk313.addShapedRecipe((ShapedRecipe) recipe);
@@ -389,8 +383,8 @@ public class CraftingManager {
         /*for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk313.addFurnaceRecipe(recipe);
         }*/
-        pk313.encode();
-        packet313 = pk313.compress(Deflater.BEST_COMPRESSION);
+        pk313.encodePacket(ProtocolInfo.v1_8_0);
+        packet313 = pk313.compress(Deflater.BEST_COMPRESSION, ProtocolInfo.v1_8_0);
     }
 
     public Collection<Recipe> getRecipes() {

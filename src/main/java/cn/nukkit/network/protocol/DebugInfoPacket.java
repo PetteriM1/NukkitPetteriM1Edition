@@ -11,14 +11,13 @@ public class DebugInfoPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.entityId = this.getLong();
         this.data = this.getString();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putLong(this.entityId);
         this.putString(this.data);
     }

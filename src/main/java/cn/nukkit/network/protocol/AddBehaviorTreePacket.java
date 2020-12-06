@@ -13,13 +13,12 @@ public class AddBehaviorTreePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.behaviorTreeJson = this.getString();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putString(behaviorTreeJson);
     }
 }

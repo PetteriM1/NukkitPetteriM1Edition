@@ -33,21 +33,20 @@ public class UpdateBlockPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putBlockVector3(x, y, z);
-        if (protocol > 201) {
+        if (protocolId > 201) {
             this.putUnsignedVarInt(blockRuntimeId);
             this.putUnsignedVarInt(flags);
         } else {
             this.putUnsignedVarInt(blockId);
             this.putUnsignedVarInt((176) | blockData & 0xf);
         }
-        if (protocol > 224) {
+        if (protocolId > 224) {
             this.putUnsignedVarInt(dataLayer);
         }
     }

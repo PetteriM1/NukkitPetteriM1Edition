@@ -12,15 +12,14 @@ public class EmotePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.runtimeId = this.getEntityUniqueId();
         this.emoteID = this.getString();
         this.flags = (byte) this.getByte();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityUniqueId(this.runtimeId);
         this.putString(this.emoteID);
         this.putByte(flags);

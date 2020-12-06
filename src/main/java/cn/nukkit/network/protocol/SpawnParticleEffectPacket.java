@@ -17,14 +17,13 @@ public class SpawnParticleEffectPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putByte((byte) this.dimensionId);
-        if (protocol >= 332) {
+        if (protocolId >= 332) {
             this.putEntityUniqueId(uniqueEntityId);
         }
         this.putVector3f(this.position);

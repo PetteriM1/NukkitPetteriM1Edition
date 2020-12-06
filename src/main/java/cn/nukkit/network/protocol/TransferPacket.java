@@ -9,14 +9,13 @@ public class TransferPacket extends DataPacket {
     public int port = 19132;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.address = this.getString();
         this.port = (short) this.getLShort();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putString(address);
         this.putLShort(port);
     }

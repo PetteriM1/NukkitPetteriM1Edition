@@ -16,7 +16,7 @@ public class PacketViolationWarningPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.type = PacketViolationType.values()[this.getVarInt() + 1];
         this.severity = PacketViolationSeverity.values()[this.getVarInt()];
         this.packetId = this.getVarInt();
@@ -24,8 +24,7 @@ public class PacketViolationWarningPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarInt(this.type.ordinal() - 1);
         this.putVarInt(this.severity.ordinal());
         this.putVarInt(this.packetId);

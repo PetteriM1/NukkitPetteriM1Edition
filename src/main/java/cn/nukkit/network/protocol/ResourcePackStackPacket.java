@@ -13,18 +13,17 @@ public class ResourcePackStackPacket extends DataPacket {
     public boolean isExperimental = false;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putBoolean(this.mustAccept);
         this.putUnsignedVarInt(this.behaviourPackStack.length);
         for (ResourcePack entry : this.behaviourPackStack) {
             this.putString(entry.getPackId().toString());
             this.putString(entry.getPackVersion());
-            if (this.protocol >= 313) {
+            if (protocolId >= 313) {
                 this.putString("");
             }
         }
@@ -32,18 +31,18 @@ public class ResourcePackStackPacket extends DataPacket {
         for (ResourcePack entry : this.resourcePackStack) {
             this.putString(entry.getPackId().toString());
             this.putString(entry.getPackVersion());
-            if (this.protocol >= 313) {
+            if (protocolId >= 313) {
                 this.putString("");
             }
         }
-        if (this.protocol >= 313) {
-            if (protocol < ProtocolInfo.v1_16_100) {
+        if (protocolId >= 313) {
+            if (protocolId < ProtocolInfo.v1_16_100) {
                 this.putBoolean(isExperimental);
             }
-            if (protocol >= 388) {
-                this.putString(Utils.getVersionByProtocol(protocol));
+            if (protocolId >= 388) {
+                this.putString(Utils.getVersionByProtocol(protocolId));
             }
-            if (protocol >= ProtocolInfo.v1_16_100) {
+            if (protocolId >= ProtocolInfo.v1_16_100) {
                 this.putLInt(0); // Experiments length
                 this.putBoolean(false); // Were experiments previously toggled
             }

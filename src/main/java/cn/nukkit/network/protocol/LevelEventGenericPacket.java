@@ -17,12 +17,11 @@ public class LevelEventGenericPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarInt(eventId);
         try {
             this.put(NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN, true));

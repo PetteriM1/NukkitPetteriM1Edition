@@ -52,24 +52,22 @@ public class InventoryTransactionPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
-
-        if (protocol >= 407) {
+    public void encode(int protocolId) {
+        if (protocolId >= 407) {
             this.putVarInt(this.legacyRequestId);
-            if (this.legacyRequestId > 0 && protocol >= 407) {
+            if (this.legacyRequestId > 0 && protocolId >= 407) {
                 //TODO
             }
         }
 
         this.putUnsignedVarInt(this.transactionType);
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.putBoolean(this.hasNetworkIds);
         }
         this.putUnsignedVarInt(this.actions.length);
 
         for (NetworkInventoryAction action : this.actions) {
-            action.write(this);
+            action.write(this, protocolId);
         }
 
         switch (this.transactionType) {
@@ -83,10 +81,10 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putBlockVector3(useItemData.blockPos);
                 this.putBlockFace(useItemData.face);
                 this.putVarInt(useItemData.hotbarSlot);
-                this.putSlot(protocol, useItemData.itemInHand);
+                this.putSlot(protocolId, useItemData.itemInHand);
                 this.putVector3f(useItemData.playerPos.asVector3f());
                 this.putVector3f(useItemData.clickPos);
-                if (protocol >= 354) { // Idk in which version this added
+                if (protocolId >= 354) { // Idk in which version this added
                     this.putUnsignedVarInt(useItemData.blockRuntimeId);
                 }
                 break;
@@ -96,7 +94,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 this.putEntityRuntimeId(useItemOnEntityData.entityRuntimeId);
                 this.putUnsignedVarInt(useItemOnEntityData.actionType);
                 this.putVarInt(useItemOnEntityData.hotbarSlot);
-                this.putSlot(protocol, useItemOnEntityData.itemInHand);
+                this.putSlot(protocolId, useItemOnEntityData.itemInHand);
                 this.putVector3f(useItemOnEntityData.playerPos.asVector3f());
                 this.putVector3f(useItemOnEntityData.clickPos.asVector3f());
                 break;
@@ -105,7 +103,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
                 this.putUnsignedVarInt(releaseItemData.actionType);
                 this.putVarInt(releaseItemData.hotbarSlot);
-                this.putSlot(protocol, releaseItemData.itemInHand);
+                this.putSlot(protocolId, releaseItemData.itemInHand);
                 this.putVector3f(releaseItemData.headRot.asVector3f());
                 break;
             default:
@@ -114,8 +112,8 @@ public class InventoryTransactionPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
-        if (protocol >= 407) {
+    public void decode(int protocolId) {
+        if (protocolId >= 407) {
             this.legacyRequestId = this.getVarInt();
             if (legacyRequestId < -1 && (legacyRequestId & 1) == 0) {
                 int length = (int) this.getUnsignedVarInt();
@@ -130,13 +128,13 @@ public class InventoryTransactionPacket extends DataPacket {
 
         this.transactionType = (int) this.getUnsignedVarInt();
 
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.hasNetworkIds = this.getBoolean();
         }
 
         this.actions = new NetworkInventoryAction[Math.min((int) this.getUnsignedVarInt(), 4096)];
         for (int i = 0; i < this.actions.length; i++) {
-            this.actions[i] = new NetworkInventoryAction().read(this);
+            this.actions[i] = new NetworkInventoryAction().read(this, protocolId);
         }
 
         switch (this.transactionType) {
@@ -151,7 +149,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 itemData.blockPos = this.getBlockVector3();
                 itemData.face = this.getBlockFace();
                 itemData.hotbarSlot = this.getVarInt();
-                itemData.itemInHand = this.getSlot(this.protocol);
+                itemData.itemInHand = this.getSlot(protocolId);
                 itemData.playerPos = this.getVector3f().asVector3();
                 itemData.clickPos = this.getVector3f();
                 try { itemData.blockRuntimeId = (int) this.getUnsignedVarInt(); } catch (Exception ignore) {}
@@ -164,7 +162,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 useItemOnEntityData.entityRuntimeId = this.getEntityRuntimeId();
                 useItemOnEntityData.actionType = (int) this.getUnsignedVarInt();
                 useItemOnEntityData.hotbarSlot = this.getVarInt();
-                useItemOnEntityData.itemInHand = this.getSlot(this.protocol);
+                useItemOnEntityData.itemInHand = this.getSlot(protocolId);
                 useItemOnEntityData.playerPos = this.getVector3f().asVector3();
                 useItemOnEntityData.clickPos = this.getVector3f().asVector3();
 
@@ -175,7 +173,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
                 releaseItemData.actionType = (int) getUnsignedVarInt();
                 releaseItemData.hotbarSlot = getVarInt();
-                releaseItemData.itemInHand = this.getSlot(this.protocol);
+                releaseItemData.itemInHand = this.getSlot(protocolId);
                 releaseItemData.headRot = this.getVector3f().asVector3();
 
                 this.transactionData = releaseItemData;

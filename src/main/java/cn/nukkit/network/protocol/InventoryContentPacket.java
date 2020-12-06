@@ -33,7 +33,7 @@ public class InventoryContentPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         /*this.inventoryId = (int) this.getUnsignedVarInt();
         int count = (int) this.getUnsignedVarInt();
         this.slots = new Item[count];
@@ -44,15 +44,14 @@ public class InventoryContentPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putUnsignedVarInt(this.inventoryId);
         this.putUnsignedVarInt(this.slots.length);
         for (Item slot : this.slots) {
-            if (protocol >= 407) {
+            if (protocolId >= 407) {
                 this.putVarInt(networkId);
             }
-            this.putSlot(protocol, slot);
+            this.putSlot(protocolId, slot);
         }
     }
 

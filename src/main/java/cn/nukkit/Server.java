@@ -709,9 +709,8 @@ public class Server {
             for (int encodingProtocol : encodingProtocols.values()) {
                 if (!encodedPacket.containsKey(encodingProtocol)) {
                     DataPacket pk = packet.clone();
-                    pk.protocol = encodingProtocol;
                     if (!pk.isEncoded) {
-                        pk.encode();
+                        pk.encodePacket(encodingProtocol);
                     }
                     encodedPacket.put(encodingProtocol, pk);
                 }

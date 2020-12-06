@@ -11,14 +11,13 @@ public class MapCreateLockedCopyPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.originalMapId = this.getVarLong();
         this.newMapId = this.getVarLong();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarLong(this.originalMapId);
         this.putVarLong(this.newMapId);
     }

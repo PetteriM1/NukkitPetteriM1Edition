@@ -16,7 +16,7 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     public Entry[] packEntries;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.responseStatus = (byte) this.getByte();
         this.packEntries = new Entry[this.getLShort()];
         for (int i = 0; i < this.packEntries.length; i++) {
@@ -26,8 +26,7 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putByte(this.responseStatus);
         this.putLShort(this.packEntries.length);
         for (Entry entry : this.packEntries) {

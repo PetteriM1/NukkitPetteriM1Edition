@@ -26,9 +26,9 @@ public class MoveEntityAbsolutePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.eid = this.getEntityRuntimeId();
-        if (protocol >= 274) {
+        if (protocolId >= 274) {
             int flags = this.getByte();
             teleport = (flags & 0x01) != 0;
             onGround = (flags & 0x02) != 0;
@@ -43,10 +43,9 @@ public class MoveEntityAbsolutePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityRuntimeId(this.eid);
-        if (protocol >= 274) {
+        if (protocolId >= 274) {
             byte flags = 0;
             if (onGround) {
                 flags |= 0x01;
@@ -60,7 +59,7 @@ public class MoveEntityAbsolutePacket extends DataPacket {
         this.putByte((byte) (this.pitch / 1.40625));
         this.putByte((byte) (this.headYaw / 1.40625));
         this.putByte((byte) (this.yaw / 1.40625));
-        if (protocol <= 261) {
+        if (protocolId <= 261) {
             this.putBoolean(this.onGround);
             this.putBoolean(this.teleport);
         }

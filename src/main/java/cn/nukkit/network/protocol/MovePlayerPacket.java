@@ -26,7 +26,7 @@ public class MovePlayerPacket extends DataPacket {
     public long frame;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.eid = this.getEntityRuntimeId();
         Vector3f v = this.getVector3f();
         this.x = v.x;
@@ -42,14 +42,13 @@ public class MovePlayerPacket extends DataPacket {
             this.teleportCause = this.getLInt();
             this.teleportItem = this.getLInt();
         }
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.frame = this.getUnsignedVarLong();
         }
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityRuntimeId(this.eid);
         this.putVector3f(this.x, this.y, this.z);
         this.putLFloat(this.pitch);
@@ -62,7 +61,7 @@ public class MovePlayerPacket extends DataPacket {
             this.putLInt(this.teleportCause);
             this.putLInt(this.teleportItem);
         }
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.putUnsignedVarLong(this.frame);
         }
     }

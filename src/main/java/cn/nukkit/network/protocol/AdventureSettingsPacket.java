@@ -50,7 +50,7 @@ public class AdventureSettingsPacket extends DataPacket {
 
     public long entityUniqueId; //This is a little-endian long, NOT a var-long. (WTF Mojang)
 
-    public void decode() {
+    public void decode(int protocolId) {
         this.flags = getUnsignedVarInt();
         this.commandPermission = getUnsignedVarInt();
         this.flags2 = getUnsignedVarInt();
@@ -59,8 +59,7 @@ public class AdventureSettingsPacket extends DataPacket {
         this.entityUniqueId = getLLong();
     }
 
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putUnsignedVarInt(this.flags);
         this.putUnsignedVarInt(this.commandPermission);
         this.putUnsignedVarInt(this.flags2);

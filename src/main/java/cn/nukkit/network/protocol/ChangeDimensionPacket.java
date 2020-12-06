@@ -18,7 +18,7 @@ public class ChangeDimensionPacket extends DataPacket {
     public boolean respawn;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.dimension = this.getVarInt();
         this.x = this.getVector3f().x;
         this.y = this.getVector3f().y;
@@ -27,8 +27,7 @@ public class ChangeDimensionPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarInt(this.dimension);
         this.putVector3f(this.x, this.y, this.z);
         this.putBoolean(this.respawn);

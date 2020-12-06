@@ -34,12 +34,11 @@ public class EventPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarLong(this.eid);
         this.putVarInt(this.unknown1);
         this.putByte(this.unknown2);

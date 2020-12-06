@@ -17,13 +17,12 @@ public class SetPlayerGameTypePacket extends DataPacket {
     public int gamemode;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.gamemode = this.getVarInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putVarInt(this.gamemode);
     }
 }

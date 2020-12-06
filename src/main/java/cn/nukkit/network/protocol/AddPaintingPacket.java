@@ -17,15 +17,14 @@ public class AddPaintingPacket extends DataPacket {
     public String title;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (protocol < 361) {
+        if (protocolId < 361) {
             this.putBlockVector3((int) this.x, (int) this.y, (int) this.z);
         } else {
             this.putVector3f(this.x, this.y, this.z);

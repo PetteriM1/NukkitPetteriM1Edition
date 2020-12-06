@@ -249,8 +249,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                 byte[] packetBuffer = new byte[buffer.readableBytes()];
                 buffer.readBytes(packetBuffer);
                 batchPacket.setBuffer(packetBuffer);
-                batchPacket.decode();
-
+                batchPacket.decodePacket(this.player.protocol);
                 packets.offer(batchPacket);
             }
         }

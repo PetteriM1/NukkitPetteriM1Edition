@@ -23,7 +23,7 @@ public class BookEditPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.action = Action.values()[this.getByte()];
         this.inventorySlot = this.getByte();
 
@@ -50,7 +50,7 @@ public class BookEditPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encode(int protocolId) {
 
     }
 

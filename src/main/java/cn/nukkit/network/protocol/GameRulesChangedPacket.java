@@ -18,12 +18,11 @@ public class GameRulesChangedPacket extends DataPacket {
     public GameRules gameRules;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         putGameRules(gameRules);
     }
 }

@@ -16,12 +16,11 @@ public class SimpleEventPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putShort(this.eventType);
     }
 }

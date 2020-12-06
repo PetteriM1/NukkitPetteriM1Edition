@@ -11,14 +11,13 @@ public class ResourcePackChunkRequestPacket extends DataPacket {
     public int chunkIndex;
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
         this.packId = UUID.fromString(this.getString());
         this.chunkIndex = this.getLInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putString(this.packId.toString());
         this.putLInt(this.chunkIndex);
     }

@@ -18,12 +18,11 @@ public class PlaySoundPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decode(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encode(int protocolId) {
         this.putString(this.name);
         this.putBlockVector3(this.x << 3, this.y << 3, this.z << 3);
         this.putLFloat(this.volume);
