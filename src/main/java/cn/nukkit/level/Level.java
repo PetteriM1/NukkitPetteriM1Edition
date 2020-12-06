@@ -140,8 +140,6 @@ public class Level implements ChunkManager, Metadatable {
 
     private final ConcurrentLinkedQueue<BlockEntity> updateBlockEntities = new ConcurrentLinkedQueue<>();
 
-    private boolean cacheChunks;
-
     private final Server server;
 
     private final int levelId;
@@ -166,7 +164,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public float skyLightSubtracted;
 
-    private String folderName;
+    private final String folderName;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
     private final Long2ObjectOpenHashMap<SoftReference<Map<Character, Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
@@ -187,23 +185,23 @@ public class Level implements ChunkManager, Metadatable {
     private final Long2ObjectOpenHashMap<Boolean> chunkPopulationQueue = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Boolean> chunkPopulationLock = new Long2ObjectOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Boolean> chunkGenerationQueue = new Long2ObjectOpenHashMap<>();
-    private int chunkGenerationQueueSize;
-    private int chunkPopulationQueueSize;
+    private final int chunkGenerationQueueSize;
+    private final int chunkPopulationQueueSize;
 
     private boolean autoSave;
 
     private BlockMetadataStore blockMetadata;
 
-    private boolean useSections;
+    private final boolean useSections;
 
-    private Vector3 temporalVector;
+    private final Vector3 temporalVector;
 
     public int sleepTicks = 0;
 
-    private int chunkTickRadius;
+    private final int chunkTickRadius;
     private final Long2IntMap chunkTickList = new Long2IntOpenHashMap();
-    private int chunksPerTicks;
-    private boolean clearChunksOnTick;
+    private final int chunksPerTicks;
+    private final boolean clearChunksOnTick;
 
     private int updateLCG = ThreadLocalRandom.current().nextInt();
 
@@ -251,10 +249,9 @@ public class Level implements ChunkManager, Metadatable {
 
     public GameRules gameRules;
 
-    private boolean randomTickingEnabled;
+    private final boolean randomTickingEnabled;
 
     public Level(Server server, String name, String path, Class<? extends LevelProvider> provider) {
-
         this.levelId = levelIdCounter++;
         this.blockMetadata = new BlockMetadataStore(this);
         this.server = server;
@@ -305,7 +302,6 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkPopulationQueueSize = this.server.getPropertyInt("chunk-generation-population-queue-size", 8);
         this.chunkTickList.clear();
         this.clearChunksOnTick = this.server.getPropertyBoolean("clear-chunk-tick-list", true);
-        this.cacheChunks = this.server.getPropertyBoolean("cache-chunks", false);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
 
@@ -3036,7 +3032,7 @@ public class Level implements ChunkManager, Metadatable {
         if (this.timings.syncChunkSendTimer != null) this.timings.syncChunkSendTimer.startTiming();
         long index = Level.chunkHash(x, z);
 
-        if (this.cacheChunks) {
+        if (server.cacheChunks) {
             BatchPacket data = Player.getChunkCacheFromData(protocol, x, z, subChunkCount, payload);
             BaseFullChunk chunk = getChunk(x, z, false);
             if (chunk != null && chunk.getChanges() <= timestamp) {
@@ -4125,7 +4121,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private ConcurrentMap<Long, Int2ObjectMap<Player>> getChunkSendQueue(int protocol) {
         int protocolId = this.getChunkProtocol(protocol);
-        return this.chunkSendQueues.computeIfAbsent(protocolId, i -> new ConcurrentHashMap());
+        return this.chunkSendQueues.computeIfAbsent(protocolId, i -> new ConcurrentHashMap<>());
     }
 
     private LongSet getChunkSendTasks(int protocol) {
@@ -4133,27 +4129,29 @@ public class Level implements ChunkManager, Metadatable {
         return this.chunkSendTasks.computeIfAbsent(protocolId, i -> new LongOpenHashSet());
     }
 
-    private int getChunkProtocol(int protocolId) {
-        if (protocolId >= ProtocolInfo.v1_16_100) {
+    private int getChunkProtocol(int protocol) {
+        if (protocol >= ProtocolInfo.v1_16_100) {
             return ProtocolInfo.v1_16_100;
-        } else if (protocolId >= ProtocolInfo.v1_16_0 && protocolId <= ProtocolInfo.v1_16_100_52) {
+        } else if (protocol >= ProtocolInfo.v1_16_20 && protocol <= ProtocolInfo.v1_16_100_52) {
+            return ProtocolInfo.v1_16_20;
+        } else if (protocol == ProtocolInfo.v1_16_0) {
             return ProtocolInfo.v1_16_0;
-        } else if (protocolId == ProtocolInfo.v1_14_0 || protocolId == ProtocolInfo.v1_14_60) {
+        } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return ProtocolInfo.v1_14_0;
-        } else if (protocolId == ProtocolInfo.v1_13_0) {
+        } else if (protocol == ProtocolInfo.v1_13_0) {
             return ProtocolInfo.v1_13_0;
-        } else if (protocolId == ProtocolInfo.v1_12_0) {
+        } else if (protocol == ProtocolInfo.v1_12_0) {
             return ProtocolInfo.v1_12_0;
-        } else if (protocolId < ProtocolInfo.v1_12_0) {
+        } else if (protocol < ProtocolInfo.v1_12_0) {
             return 0;
         }
-        throw new IllegalArgumentException("Unsuitable protocol used protocol='" + protocolId + "'");
+        throw new IllegalArgumentException("Invalid chunk protocol: " + protocol);
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
         return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) ||
-                (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) ||
-                ((chunk >= ProtocolInfo.v1_16_0 && player >= ProtocolInfo.v1_16_0) && (chunk <= ProtocolInfo.v1_16_100_52 && player <= ProtocolInfo.v1_16_100_52)) ||
+                (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) ||
+                ((chunk >= ProtocolInfo.v1_16_20 && player >= ProtocolInfo.v1_16_20) && (chunk <= ProtocolInfo.v1_16_100_52 && player <= ProtocolInfo.v1_16_100_52)) ||
                 (chunk == ProtocolInfo.v1_16_100 && player == ProtocolInfo.v1_16_100);
     }
 
