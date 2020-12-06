@@ -22,6 +22,7 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FastThreadLocal;
 import io.netty.util.concurrent.ScheduledFuture;
 import io.netty.util.internal.PlatformDependent;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -270,37 +271,36 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         }
 
         private void sendOutbound() {
-            List<DataPacket> toBatch = new ArrayList<>();
+            List<DataPacket> toBatch = new ObjectArrayList<>();
             DataPacket packet;
             while ((packet = this.outbound.poll()) != null) {
-                if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-                    if (!toBatch.isEmpty()) {
-                        this.sendPackets(toBatch.toArray(new DataPacket[0]));
+                if (packet instanceof BatchPacket) {
+                    if (!toBatch.isEmpty()){
+                        this.sendPackets(toBatch);
                         toBatch.clear();
                     }
                     this.sendPacket(((BatchPacket) packet).payload);
+                } else {
+                    toBatch.add(packet);
                 }
-
-                toBatch.add(packet);
             }
 
             if (!toBatch.isEmpty()) {
-                this.sendPackets(toBatch.toArray(new DataPacket[0]));
+                this.sendPackets(toBatch);
             }
         }
 
-        private void sendPackets(DataPacket[] packets) {
-            byte[][] payload = new byte[packets.length * 2][];
-            for (int i = 0; i < packets.length; i++) {
-                DataPacket packet = packets[i];
-                int idx = i * 2;
+        private void sendPackets(List<DataPacket> packets) {
+            byte[][] payload = new byte[(packets.size() << 1)][];
+            for (int i = 0; i < packets.size(); i++) {
+                DataPacket packet = packets.get(i);
                 if (!packet.isEncoded){
                     packet.encodePacket(this.player.protocol);
                 }
+                int idx = i << 1;
                 byte[] buf = packet.getBuffer();
                 payload[idx] = Binary.writeUnsignedVarInt(buf.length);
                 payload[idx + 1] = buf;
-                packets[i] = null;
             }
 
             try {
@@ -310,7 +310,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                     this.sendPacket(Zlib.deflate(payload, server.networkCompressionLevel));
                 }
             } catch (IOException e) {
-                log.info("Unable to deflate batched packets", e);
+                log.error("Unable to deflate batched packets!", e);
             }
         }
 
