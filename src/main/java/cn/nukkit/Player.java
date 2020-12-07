@@ -774,7 +774,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.data = payload;
         //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
-        this.dataPacket(pk);
+        this.batchDataPacket(pk);
+        /*if (this.protocol < ProtocolInfo.v1_12_0) {
+            this.dataPacket(pk); // Multiversion for batchPackets is broken?
+        } else {
+            this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
+        }*/
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
@@ -998,7 +1003,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean batchDataPacket(DataPacket packet) {
-        return this.dataPacket(packet);
+        if (!this.connected) {
+            return false;
+        }
+
+        DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
+        this.server.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
+        }
+        this.packetQueue.add(packet);
+        return true;
     }
 
     /**
@@ -1013,20 +1028,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        try (Timing ignored = Timings.getSendDataPacketTiming(packet)) {
-            DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-            this.server.getPluginManager().callEvent(ev);
-            if (ev.isCancelled()) {
-                return false;
+        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
+            if (server.callDataPkEv) {
+                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
+                this.server.getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    return false;
+                }
             }
-
             this.interfaz.putPacket(this, packet, false, true);
         }
         return true;
     }
 
     public int dataPacket(DataPacket packet, boolean needACK) {
-        return this.dataPacket(packet) ? 1 : 0;
+        return this.dataPacket(packet) ? 0 : -1;
     }
 
     /**
@@ -1037,11 +1053,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return packet successfully sent
      */
     public boolean directDataPacket(DataPacket packet) {
-        return this.dataPacket(packet);
+        if (!this.connected) {
+            return false;
+        }
+
+        // TODO: wtf is this and why it works?
+        if (!loggedIn && packet.pid() == ProtocolInfo.SET_ENTITY_DATA_PACKET) {
+            return false; //HACK
+        }
+
+        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
+            if (server.callDataPkEv) {
+                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
+                this.server.getPluginManager().callEvent(ev);
+                if (ev.isCancelled()) {
+                    return false;
+                }
+            }
+
+            this.interfaz.putPacket(this, packet, false, true);
+        }
+        return true;
     }
 
     public int directDataPacket(DataPacket packet, boolean needACK) {
-        return this.dataPacket(packet) ? 1 : 0;
+        return this.directDataPacket(packet) ? 0 : -1;
     }
 
     public int getPing() {
@@ -2126,7 +2162,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.gameRules = this.getLevel().getGameRules();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.version = this.getLoginChainData().getGameVersion();
-        this.dataPacket(startGamePacket);
+        this.directDataPacket(startGamePacket);
 
         this.loggedIn = true;
 
@@ -3998,7 +4034,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (notify && !reason.isEmpty()) {
                 DisconnectPacket pk = new DisconnectPacket();
                 pk.message = reason;
-                this.dataPacket(pk);
+                this.directDataPacket(pk);
             }
 
             this.connected = false;
@@ -4649,7 +4685,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void sendPlayStatus(int status, boolean immediate) {
         PlayStatusPacket pk = new PlayStatusPacket();
         pk.status = status;
-        this.dataPacket(pk);
+
+        if (immediate) {
+            this.directDataPacket(pk);
+        } else {
+            this.dataPacket(pk);
+        }
     }
 
     @Override

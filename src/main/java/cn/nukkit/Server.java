@@ -750,7 +750,7 @@ public class Server {
 
         for (InetSocketAddress i : targets) {
             if (this.players.containsKey(i)) {
-                this.players.get(i).dataPacket(pk);
+                this.players.get(i).directDataPacket(pk);
             }
         }
     }
