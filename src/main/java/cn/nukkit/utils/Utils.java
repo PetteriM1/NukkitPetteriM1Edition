@@ -339,8 +339,11 @@ public class Utils {
             case ProtocolInfo.v1_16_100_52:
             case ProtocolInfo.v1_16_100:
                 return "1.16.100";
+            case ProtocolInfo.v1_16_200_51:
             case ProtocolInfo.v1_16_200:
                 return "1.16.200";
+            case ProtocolInfo.v1_16_210_50:
+                return "1.16.210";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
         }
