@@ -4152,7 +4152,7 @@ public class Level implements ChunkManager, Metadatable {
         return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) ||
                 (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) ||
                 ((chunk >= ProtocolInfo.v1_16_20 && player >= ProtocolInfo.v1_16_20) && (chunk <= ProtocolInfo.v1_16_100_52 && player <= ProtocolInfo.v1_16_100_52)) ||
-                (chunk == ProtocolInfo.v1_16_100 && player == ProtocolInfo.v1_16_100);
+                (chunk >= ProtocolInfo.v1_16_100 && player >= ProtocolInfo.v1_16_100); // remember to change >= from 1.16.100 on next palette change
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {

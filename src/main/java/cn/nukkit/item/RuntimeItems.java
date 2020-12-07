@@ -72,7 +72,7 @@ public class RuntimeItems {
         if (protocolId < ProtocolInfo.v1_16_100) {
             return itemPalettes.get(ProtocolInfo.v1_12_0);
         }
-        return itemPalettes.get(protocolId);
+        return itemPalettes.get(/*protocolId*/ProtocolInfo.v1_16_100);
     }
 
     public static int getId(int fullId) {
