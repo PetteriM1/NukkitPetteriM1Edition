@@ -37,13 +37,14 @@ public interface ProtocolInfo {
     int v1_16_100_51 = 410;
     int v1_16_100_52 = 411;
     int v1_16_100 = 419;
+    int v1_16_200 = 422;
 
     int CURRENT_PROTOCOL = v1_16_100;
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
             v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0,
             v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0, v1_14_60, v1_16_0, v1_16_20, v1_16_100_0, v1_16_100_51,
-            v1_16_100_52, v1_16_100
+            v1_16_100_52, v1_16_100, v1_16_200
     );
 
     String MINECRAFT_VERSION = "v1.16.100";
