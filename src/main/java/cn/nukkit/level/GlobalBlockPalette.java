@@ -390,6 +390,9 @@ public class GlobalBlockPalette {
                 }
                 return id408;
             case 419:
+            case 420:
+            case 422:
+            case 423:
                 int id419 = legacyToRuntimeId419.get(legacyId);
                 if (id419 == -1) {
                     id419 = legacyToRuntimeId419.get(id << 6);
