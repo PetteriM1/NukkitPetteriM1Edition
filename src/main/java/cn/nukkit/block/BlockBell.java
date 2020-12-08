@@ -245,30 +245,19 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
             return true;
         }
 
-        if (support instanceof BlockGlass || support.getId() == BEACON) {
-            return true;
-        } else if (support instanceof BlockSlab) {
-            if (attachmentFace == BlockFace.UP) {
-                return (support.getDamage() & 0x8) == 0x8;
-            } else if (attachmentFace == BlockFace.DOWN) {
-                return (support.getDamage() & 0x8) == 0x0;
-            } else {
-                return false;
+        if (attachmentFace == BlockFace.DOWN) {
+            switch (support.getId()) {
+                case HOPPER_BLOCK:
+                case IRON_BARS:
+                    return true;
+                default:
+                    return support instanceof BlockFence;
             }
-        } else if (support instanceof BlockStairs) {
-            if (attachmentFace == BlockFace.UP) {
-                return (support.getDamage() & 0x4) == 0x4;
-            } else if (attachmentFace == BlockFace.DOWN) {
-                return (support.getDamage() & 0x4) == 0x0;
-            } else {
-                return false;
-            }
-        } else if (support.getId() == SCAFFOLDING || support instanceof BlockCauldron || support.getId() == HOPPER_BLOCK) {
-            return attachmentFace == BlockFace.UP;
-        } else if (support instanceof BlockFence || support instanceof BlockWall) {
-            return attachmentFace == BlockFace.UP || attachmentFace == BlockFace.DOWN;
         }
 
+        if (support instanceof BlockCauldron) {
+            return attachmentFace == BlockFace.UP;
+        }
         return false;
     }
 
@@ -299,7 +288,6 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (block.canBeReplaced() && block.getId() != AIR && !(block instanceof BlockLiquid)) {
             face = BlockFace.UP;
-            //target = block.down();
         }
         switch (face) {
             case UP:
@@ -312,7 +300,7 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
                 break;
             default:
                 this.setBlockFace(face);
-                if (block.getSide(face).isSolid()) {
+                if (this.checkSupport(block.getSide(face), face.getOpposite())) {
                     this.setAttachmentType(TYPE_ATTACHMENT_MULTIPLE);
                 } else {
                     this.setAttachmentType(TYPE_ATTACHMENT_SIDE);
@@ -371,6 +359,11 @@ public class BlockBell extends BlockTransparentMeta implements Faceable {
     @Override
     public Item toItem() {
         return new ItemBlock(new BlockBell());
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
     }
 
     @Override

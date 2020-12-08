@@ -29,19 +29,22 @@ public class BlockLantern extends BlockFlowable {
     }
 
     private boolean isBlockAboveValid() {
-        Block up = up();
-        if (up instanceof BlockLeaves) {
-            return false;
-        } else if (up instanceof BlockFence || up instanceof BlockWall) {
-            return true;
-        } else if (up instanceof BlockSlab) {
-            return (up.getDamage() & 0x08) == 0x00;
-        } else if (up instanceof BlockStairs) {
-            return (up.getDamage() & 0x04) == 0x00;
-        } else if (up.isSolid()) {
-            return true;
-        } else {
-            return false;
+        Block support = this.up();
+        switch (support.getId()) {
+            case IRON_BARS:
+            case HOPPER_BLOCK:
+                return true;
+            default:
+                if (support instanceof BlockFence) {
+                    return true;
+                }
+                if (support instanceof BlockSlab && (support.getDamage() & 0x08) == 0x00) {
+                    return true;
+                }
+                if (support instanceof BlockStairs && (support.getDamage() & 0x04) == 0x00) {
+                    return true;
+                }
+                return !support.isTransparent() && support.isSolid() && !support.isPowerSource();
         }
     }
 
