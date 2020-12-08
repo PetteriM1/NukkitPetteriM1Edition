@@ -130,6 +130,10 @@ public class EntityStray extends EntityWalkingMob implements EntitySmite {
             drops.add(Item.get(Item.ARROW, 0, 1));
         }
 
+        if (Utils.rand()) {
+            drops.add(Item.get(Item.ARROW, 18, 1));
+        }
+
         return drops.toArray(new Item[0]);
     }
 
