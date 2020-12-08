@@ -2545,8 +2545,8 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isOnLadder() {
-        int b = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-        return b == Block.LADDER || b == Block.VINES || b == Block.COBWEB;
+        int blockId = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+        return blockId == Block.LADDER || blockId == Block.VINES || blockId == Block.COBWEB || blockId == Block.SCAFFOLDING;
     }
 
     public float getMountedYOffset() {

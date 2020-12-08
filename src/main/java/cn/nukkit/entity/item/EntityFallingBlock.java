@@ -73,23 +73,23 @@ public class EntityFallingBlock extends Entity {
     protected void initEntity() {
         super.initEntity();
 
-        if (namedTag != null) {
-            if (namedTag.contains("TileID")) {
-                blockId = namedTag.getInt("TileID");
-            } else if (namedTag.contains("Tile")) {
-                blockId = namedTag.getInt("Tile");
-                namedTag.putInt("TileID", blockId);
+        if (this.namedTag != null) {
+            if (this.namedTag.contains("TileID")) {
+                this.blockId = this.namedTag.getInt("TileID");
+            } else if (this.namedTag.contains("Tile")) {
+                this.blockId = this.namedTag.getInt("Tile");
+                this.namedTag.putInt("TileID", blockId);
             }
 
-            if (namedTag.contains("Data")) {
-                damage = namedTag.getByte("Data");
+            if (this.namedTag.contains("Data")) {
+                damage = this.namedTag.getByte("Data");
             }
 
-            breakOnLava = namedTag.getBoolean("BreakOnLava");
+            this.breakOnLava = this.namedTag.getBoolean("BreakOnLava");
         }
 
-        if (blockId == 0) {
-            close();
+        if (this.blockId == 0) {
+            this.close();
             return;
         }
 

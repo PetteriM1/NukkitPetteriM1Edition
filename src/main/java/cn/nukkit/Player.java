@@ -1408,7 +1408,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         boolean portal = false;
         boolean endPortal = false;
         boolean scaffolding = false;
-        boolean overScaffolding = false;
 
         for (Block block : this.getCollisionBlocks()) {
             switch (block.getId()){
@@ -1423,16 +1422,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
             }
 
-            if (block.getFloorY() == getFloorY() && block.down().getId() == BlockID.SCAFFOLDING) {
-                overScaffolding = true;
-            }
-
             block.onEntityCollide(this);
             block.getLevelBlockAtLayer(1).onEntityCollide(this);
         }
 
         this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_IN_SCAFFOLDING, scaffolding);
-        this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_OVER_SCAFFOLDING, overScaffolding);
+
+        AxisAlignedBB scanBoundingBox = this.boundingBox.getOffsetBoundingBox(0, -0.125, 0);
+        scanBoundingBox.setMaxY(this.boundingBox.getMinY());
+        Block[] scaffoldingUnder = this.level.getCollisionBlocks(scanBoundingBox, true, true, b-> b.getId() == BlockID.SCAFFOLDING);
+        this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_OVER_SCAFFOLDING, scaffoldingUnder.length > 0);
 
         if (endPortal) {
             inEndPortalTicks++;

@@ -69,6 +69,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Predicate;
 
 
 /**
@@ -1470,6 +1471,14 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst) {
+        return getCollisionBlocks(bb, targetFirst, false);
+    }
+
+    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck) {
+        return getCollisionBlocks(bb, targetFirst, ignoreCollidesCheck, block -> block.getId() != 0);
+    }
+
+    public Block[] getCollisionBlocks(AxisAlignedBB bb, boolean targetFirst, boolean ignoreCollidesCheck, Predicate<Block> condition) {
         int minX = NukkitMath.floorDouble(bb.getMinX());
         int minY = NukkitMath.floorDouble(bb.getMinY());
         int minZ = NukkitMath.floorDouble(bb.getMinZ());
@@ -1484,7 +1493,7 @@ public class Level implements ChunkManager, Metadatable {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
                         Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
-                        if (block != null && block.getId() != 0 && block.collidesWithBB(bb)) {
+                        if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
                             return new Block[]{block};
                         }
                     }
@@ -1495,14 +1504,13 @@ public class Level implements ChunkManager, Metadatable {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
                         Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
-                        if (block != null && block.getId() != 0 && block.collidesWithBB(bb)) {
+                        if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
                             collides.add(block);
                         }
                     }
                 }
             }
         }
-
         return collides.toArray(new Block[0]);
     }
 

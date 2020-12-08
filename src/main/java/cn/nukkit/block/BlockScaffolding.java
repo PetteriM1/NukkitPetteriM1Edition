@@ -146,7 +146,7 @@ public class BlockScaffolding extends BlockFallable {
 
     @Override
     public boolean canPassThrough() {
-        return true;
+        return false;
     }
 
     @Override
