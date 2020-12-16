@@ -53,17 +53,16 @@ public class WhitelistCommand extends VanillaCommand {
                 case "reload":
                     sender.getServer().reloadWhitelist();
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.reloaded"));
-
                     return true;
                 case "on":
                     sender.getServer().setPropertyBoolean("white-list", true);
+                    sender.getServer().whitelistEnabled = true;
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.enabled"));
-
                     return true;
                 case "off":
                     sender.getServer().setPropertyBoolean("white-list", false);
+                    sender.getServer().whitelistEnabled = false;
                     Command.broadcastCommandMessage(sender, new TranslationContainer("commands.whitelist.disabled"));
-
                     return true;
                 case "list":
                     StringBuilder result = new StringBuilder();
