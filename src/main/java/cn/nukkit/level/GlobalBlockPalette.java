@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -392,7 +393,8 @@ public class GlobalBlockPalette {
             case 419:
             case 420:
             case 422:
-            case 423:
+            case ProtocolInfo.v1_16_210_50:
+            case ProtocolInfo.v1_16_210_53:
                 int id419 = legacyToRuntimeId419.get(legacyId);
                 if (id419 == -1) {
                     id419 = legacyToRuntimeId419.get(id << 6);
