@@ -211,6 +211,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * Admin player shown in server list will look same as normal player.
      */
     private boolean showAdmin = true;
+    /**
+     * Option not to spawn the player for others.
+     */
+    public boolean showToOthers = true;
 
     private int exp = 0;
     private int expLevel = 0;
@@ -415,7 +419,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     @Override
     public void spawnTo(Player player) {
-        if (this.spawned && player.spawned && this.isAlive() && player.isAlive() && player.getLevel() == this.level && player.canSee(this) && !this.isSpectator()) {
+        if (this.spawned && player.spawned && this.isAlive() && player.isAlive() && player.getLevel() == this.level && player.canSee(this) && !this.isSpectator() && this.showToOthers) {
             super.spawnTo(player);
         }
     }
