@@ -1003,16 +1003,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean batchDataPacket(DataPacket packet) {
+        if (packet instanceof BatchPacket) {
+            return this.directDataPacket(packet); // We don't want to batch a batched packet
+        }
+
         if (!this.connected) {
             return false;
         }
 
-        DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
-        this.server.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
+        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
+            if (server.callDataPkEv) {
+                DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
+                this.server.getPluginManager().callEvent(event);
+                if (event.isCancelled()) {
+                    return false;
+                }
+            }
+            this.packetQueue.offer(packet.clone());
         }
-        this.packetQueue.add(packet);
         return true;
     }
 
@@ -1036,6 +1044,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     return false;
                 }
             }
+
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
+                log.trace("Outbound {}: {}", this.getName(), packet);
+            }
+
             this.interfaz.putPacket(this, packet, false, true);
         }
         return true;

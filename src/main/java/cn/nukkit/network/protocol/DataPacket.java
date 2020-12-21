@@ -66,11 +66,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             return null;
         }
     }
-
-    public BatchPacket compress() {
-        return compress(Server.getInstance().networkCompressionLevel, ProtocolInfo.CURRENT_PROTOCOL);
-    }
-
+    
     public BatchPacket compress(int level, int protocolId) {
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
