@@ -24,7 +24,7 @@ public class BlockFlowerPot extends BlockFlowable {
         super(meta);
     }
 
-    protected static boolean canPlaceIntoFlowerPot(int id) {
+    protected static boolean canPlaceIntoFlowerPot(int id, int dmg) {
         switch (id) {
             case SAPLING:
             case DEAD_BUSH:
@@ -34,6 +34,10 @@ public class BlockFlowerPot extends BlockFlowable {
             case BROWN_MUSHROOM:
             case CACTUS:
                 return true;
+            case TALL_GRASS:
+                if (dmg == 2 || dmg == 3) {
+                    return true;
+                }
             default:
                 return false;
         }
@@ -100,7 +104,7 @@ public class BlockFlowerPot extends BlockFlowable {
         BlockEntity blockEntity = getLevel().getBlockEntity(this);
         if (!(blockEntity instanceof BlockEntityFlowerPot)) return false;
         if (blockEntity.namedTag.getShort("item") != AIR || blockEntity.namedTag.getInt("mData") != AIR) {
-            if (!canPlaceIntoFlowerPot(item.getId())) {
+            if (!canPlaceIntoFlowerPot(item.getId(), item.getDamage())) {
                 int id = blockEntity.namedTag.getShort("item");
                 if (id == AIR) id = blockEntity.namedTag.getInt("mData");
                 for (Item drop : player.getInventory().addItem(Item.get(id, blockEntity.namedTag.getInt("data")))) {
@@ -117,19 +121,17 @@ public class BlockFlowerPot extends BlockFlowable {
             return false;
         }
         int itemID;
-        int itemMeta;
-        if (!canPlaceIntoFlowerPot(item.getId())) {
-            if (!canPlaceIntoFlowerPot(item.getBlock().getId())) {
+        if (!canPlaceIntoFlowerPot(item.getId(), item.getDamage())) {
+            Block b = item.getBlock();
+            if (!canPlaceIntoFlowerPot(b.getId(), b.getDamage())) {
                 return true;
             }
-            itemID = item.getBlock().getId();
-            itemMeta = item.getDamage();
+            itemID = b.getId();
         } else {
             itemID = item.getId();
-            itemMeta = item.getDamage();
         }
         blockEntity.namedTag.putShort("item", itemID);
-        blockEntity.namedTag.putInt("data", itemMeta);
+        blockEntity.namedTag.putInt("data", item.getDamage());
 
         this.setDamage(1);
         this.getLevel().setBlock(this, this, true);

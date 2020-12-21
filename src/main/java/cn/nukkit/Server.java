@@ -228,7 +228,7 @@ public class Server {
     private boolean isHardcore;
     private boolean callBatchPkEv;
     private boolean forceResources;
-    private boolean whitelistEnabled;
+    public boolean whitelistEnabled;
     private boolean forceGamemode;
     private boolean netherEnabled;
     public boolean xboxAuth;
