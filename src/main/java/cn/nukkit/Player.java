@@ -1990,7 +1990,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.server.batchPackets(pArr, arr, false);
         }
 
-        if (this.protocol >= ProtocolInfo.v1_16_100 && !this.isOnline()) {
+        if (!this.isOnline()) {
             return;
         }
 
