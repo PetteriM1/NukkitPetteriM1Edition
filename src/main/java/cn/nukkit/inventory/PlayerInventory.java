@@ -532,30 +532,28 @@ public class PlayerInventory extends BaseInventory {
         return (EntityHuman) super.getHolder();
     }
 
-    public void sendInventory() {
-        if (!(holder instanceof Player)) {
-            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
-        }
-
-        Player p = (Player) holder;
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
         ContainerOpenPacket pk = new ContainerOpenPacket();
-        pk.x = p.getFloorX();
-        pk.y = p.getFloorY();
-        pk.z = p.getFloorZ();
-        pk.windowId = p.getWindowId(this);
-        pk.type = InventoryType.PLAYER.getNetworkType();
-        p.directDataPacket(pk);
+        pk.windowId = who.getWindowId(this);
+        pk.type = this.getType().getNetworkType();
+        pk.x = who.getFloorX();
+        pk.y = who.getFloorY();
+        pk.z = who.getFloorZ();
+        pk.entityId = who.getId();
+        who.dataPacket(pk);
     }
 
-    public void closeInventory() {
-        if (!(holder instanceof Player)) {
-            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
-        }
-
-        Player p = (Player) holder;
+    @Override
+    public void onClose(Player who) {
         ContainerClosePacket pk = new ContainerClosePacket();
-        pk.windowId = p.getWindowId(this);
-        pk.wasServerInitiated = false;
-        p.directDataPacket(pk);
+        pk.windowId = who.getWindowId(this);
+        pk.wasServerInitiated = who.getClosingWindowId() != pk.windowId;
+        who.dataPacket(pk);
+        // Player can never stop viewing their own inventory
+        if (who != holder) {
+            super.onClose(who);
+        }
     }
 }

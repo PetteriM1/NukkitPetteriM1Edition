@@ -37,6 +37,8 @@ public abstract class BaseInventory implements Inventory {
 
     protected InventoryHolder holder;
 
+    public boolean destroyed = false;
+
     Item air;
 
     public BaseInventory(InventoryHolder holder, InventoryType type) {
