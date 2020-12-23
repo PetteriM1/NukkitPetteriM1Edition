@@ -49,7 +49,10 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.*;
+import cn.nukkit.network.protocol.BatchPacket;
+import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.PlayerListPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.network.rcon.RCON;
 import cn.nukkit.permission.BanEntry;
@@ -75,8 +78,6 @@ import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -94,6 +95,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
@@ -146,9 +148,6 @@ public class Server {
     private final LevelMetadataStore levelMetadata;
     private final Network network;
 
-    private boolean networkCompressionAsync;
-    public int networkCompressionLevel;
-
     private boolean autoTickRate;
     private int autoTickRateLimit;
     private boolean alwaysTickPlayers;
@@ -174,7 +173,7 @@ public class Server {
 
     public SentryClient sentry;
 
-    private final Map<InetSocketAddress, Player> players = new HashMap<>();
+    private final Map<InetSocketAddress, Player> players = new ConcurrentHashMap<>();
     final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
@@ -248,6 +247,7 @@ public class Server {
     int chunksPerTick;
     int spawnThreshold;
     int c_s_spawnThreshold;
+    public int networkCompressionLevel;
     public boolean doNotLimitSkinGeometry;
     public boolean blockListener;
     public boolean explosionBreakBlocks;
@@ -265,6 +265,7 @@ public class Server {
     public boolean vanillaPortals;
     public boolean personaSkins;
     public boolean cacheChunks;
+    public boolean callEntityMotionEv;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -328,6 +329,8 @@ public class Server {
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
         this.scheduler = new ServerScheduler();
+
+        new BatchingThread().start();
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
             try {
@@ -634,7 +637,7 @@ public class Server {
             }
             return;
         }
-        instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet}, false);
+        instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
@@ -644,7 +647,7 @@ public class Server {
             }
             return;
         }
-        instance.batchPackets(players, new DataPacket[]{packet}, false);
+        instance.batchPackets(players, new DataPacket[]{packet});
     }
 
     public static void broadcastPackets(Player[] players, DataPacket[] packets) {
@@ -668,81 +671,7 @@ public class Server {
             }
         }
 
-        if (!forceSync && this.networkCompressionAsync) {
-            CompletableFuture.runAsync(() -> this.processBatches(false, players, packets));
-        } else {
-            this.processBatches(true, players, packets);
-        }
-    }
-
-    private void processBatches(boolean noAsync, Player[] players, DataPacket[] packets) {
-        if (noAsync && Timings.playerNetworkSendTimer != null) {
-            Timings.playerNetworkSendTimer.startTiming();
-        }
-
-        Int2ObjectMap<ObjectList<InetSocketAddress>> targets = new Int2ObjectOpenHashMap<>();
-        for (Player player : players) {
-            targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player.getSocketAddress());
-        }
-
-        // Encoded packets by encoding protocol
-        Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = new Int2ObjectOpenHashMap<>();
-
-        for (DataPacket packet : packets) {
-            Int2IntMap encodingProtocols = new Int2IntOpenHashMap();
-            for (int protocolId : targets.keySet()) {
-                // TODO: encode only by encoding protocols
-                // No need to have all versions here
-                encodingProtocols.put(protocolId, protocolId);
-            }
-
-            Int2ObjectMap<DataPacket> encodedPacket = new Int2ObjectOpenHashMap<>();
-            for (int encodingProtocol : encodingProtocols.values()) {
-                if (!encodedPacket.containsKey(encodingProtocol)) {
-                    DataPacket pk = packet.clone();
-                    pk.protocol = encodingProtocol;
-                    if (!pk.isEncoded) {
-                        pk.encode();
-                    }
-                    encodedPacket.put(encodingProtocol, pk);
-                }
-            }
-
-            for (int protocolId : encodingProtocols.values()) {
-                int encodingProtocol = encodingProtocols.get(protocolId);
-                encodedPackets.computeIfAbsent(protocolId, i -> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
-            }
-        }
-
-        for (int protocolId : targets.keySet()) {
-            ObjectList<DataPacket> packetList = encodedPackets.get(protocolId);
-            ObjectList<InetSocketAddress> finalTargets = targets.get(protocolId);
-
-            byte[][] payload = new byte[(packets.length << 1)][];
-
-            for (int i = 0; i < packetList.size(); i++) {
-                DataPacket p = packetList.get(i);
-                int idx = i << 1;
-                byte[] buf = p.getBuffer();
-                payload[idx] = Binary.writeUnsignedVarInt(buf.length);
-                payload[idx + 1] = buf;
-            }
-
-            try {
-                byte[] bytes = Binary.appendBytes(payload);
-                if (protocolId >= ProtocolInfo.v1_16_0) {
-                    this.broadcastPacketsCallback(Zlib.deflateRaw(bytes, this.networkCompressionLevel), finalTargets);
-                } else {
-                    this.broadcastPacketsCallback(Zlib.deflate(bytes, this.networkCompressionLevel), finalTargets);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (noAsync && Timings.playerNetworkSendTimer != null) {
-            Timings.playerNetworkSendTimer.stopTiming();
-        }
+        BatchingThread.queue.add(new BatchEntry(players, packets));
     }
 
     public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
@@ -2392,7 +2321,6 @@ public class Server {
     private void loadSettings() {
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
         this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
-        this.networkCompressionAsync = this.getPropertyBoolean("async-compression", true);
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
         this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);
@@ -2448,6 +2376,7 @@ public class Server {
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
+        this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2569,6 +2498,7 @@ public class Server {
             put("vanilla-portals", true);
             put("persona-skins", true);
             put("multi-nether-worlds", "");
+            put("call-entity-motion-event", true);
         }
     }
 
