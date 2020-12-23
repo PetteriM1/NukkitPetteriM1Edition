@@ -1,10 +1,7 @@
 package cn.nukkit.network.protocol.types;
 
 import cn.nukkit.Player;
-import cn.nukkit.inventory.AnvilInventory;
-import cn.nukkit.inventory.BeaconInventory;
-import cn.nukkit.inventory.EnchantInventory;
-import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
@@ -172,6 +169,12 @@ public class NetworkInventoryAction {
 
                 Inventory window = player.getWindowById(this.windowId);
                 if (window != null) {
+                    if (window instanceof BaseInventory) {
+                        if (((BaseInventory) window).destroyed) {
+                            player.getServer().getLogger().debug("Player " + player.getName() + " has an invalid open container with window ID " + this.windowId);
+                            return null;
+                        }
+                    }
                     return new SlotChangeAction(window, this.inventorySlot, this.oldItem, this.newItem);
                 }
 
