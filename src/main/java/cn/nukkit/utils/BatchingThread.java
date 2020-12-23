@@ -2,6 +2,7 @@ package cn.nukkit.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -11,7 +12,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
-import java.net.InetSocketAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -31,9 +31,9 @@ public class BatchingThread extends Thread {
         while (running) {
             BatchEntry entry = queue.poll();
             if (entry != null) {
-                Int2ObjectMap<ObjectList<InetSocketAddress>> targets = new Int2ObjectOpenHashMap<>();
+                Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
                 for (Player player : entry.players) {
-                    targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player.getSocketAddress());
+                    targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
                 }
 
                 // Encoded packets by encoding protocol
@@ -67,7 +67,7 @@ public class BatchingThread extends Thread {
 
                 for (int protocolId : targets.keySet()) {
                     ObjectList<DataPacket> packetList = encodedPackets.get(protocolId);
-                    ObjectList<InetSocketAddress> finalTargets = targets.get(protocolId);
+                    ObjectList<Player> finalTargets = targets.get(protocolId);
 
                     byte[][] payload = new byte[(entry.packets.length << 1)][];
 
@@ -81,10 +81,14 @@ public class BatchingThread extends Thread {
 
                     try {
                         byte[] bytes = Binary.appendBytes(payload);
+                        BatchPacket pk = new BatchPacket();
                         if (protocolId >= ProtocolInfo.v1_16_0) {
-                            Server.getInstance().broadcastPacketsCallback(Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel), finalTargets);
+                            pk.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
                         } else {
-                            Server.getInstance().broadcastPacketsCallback(Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel), finalTargets);
+                            pk.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+                        }
+                        for (Player pl : finalTargets) {
+                            pl.directDataPacket(pk);
                         }
                     } catch (Exception e) {
                         throw new RuntimeException(e);

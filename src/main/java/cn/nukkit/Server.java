@@ -49,7 +49,6 @@ import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
-import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -95,7 +94,6 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
@@ -173,7 +171,7 @@ public class Server {
 
     public SentryClient sentry;
 
-    private final Map<InetSocketAddress, Player> players = new ConcurrentHashMap<>();
+    private final Map<InetSocketAddress, Player> players = new HashMap<>();
     final Map<UUID, Player> playerList = new HashMap<>();
 
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
@@ -672,17 +670,6 @@ public class Server {
         }
 
         BatchingThread.queue.add(new BatchEntry(players, packets));
-    }
-
-    public void broadcastPacketsCallback(byte[] data, List<InetSocketAddress> targets) {
-        BatchPacket pk = new BatchPacket();
-        pk.payload = data;
-
-        for (InetSocketAddress i : targets) {
-            if (this.players.containsKey(i)) {
-                this.players.get(i).directDataPacket(pk);
-            }
-        }
     }
 
     public void enablePlugins(PluginLoadOrder type) {
