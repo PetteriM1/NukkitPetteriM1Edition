@@ -2191,8 +2191,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.gameRules = this.getLevel().getGameRules();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.version = this.getLoginChainData().getGameVersion();
-        startGamePacket.rainLevel = this.getLevel().getRainTime();
-        startGamePacket.lightningLevel = this.getLevel().getThunderTime();
+        if (this.getLevel().isRaining()) {
+            startGamePacket.rainLevel = this.getLevel().getRainTime();
+            if (this.getLevel().isThundering()) {
+                startGamePacket.lightningLevel = this.getLevel().getThunderTime();
+            }
+        }
         this.directDataPacket(startGamePacket);
 
         this.loggedIn = true;
