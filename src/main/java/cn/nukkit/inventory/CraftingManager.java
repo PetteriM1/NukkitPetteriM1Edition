@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
+import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -31,7 +32,7 @@ public class CraftingManager {
     public static BatchPacket packet354 = null;
     public static BatchPacket packet338 = null;
     public static BatchPacket packet407 = null;
-    public static BatchPacket packet419 = null;
+    public static DataPacket packet419 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -282,7 +283,7 @@ public class CraftingManager {
             pk419.addContainerRecipe(recipe);
         }
         pk419.encode();
-        packet419 = pk419.compress(Deflater.BEST_COMPRESSION);
+        packet419 = pk419;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk407 = new CraftingDataPacket();
         pk407.cleanRecipes = true;
         pk407.protocol = 407;
