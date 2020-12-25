@@ -1982,14 +1982,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (!this.packetQueue.isEmpty()) {
-            Player[] pArr = new Player[]{this};
             List<DataPacket> toBatch = new ArrayList<>();
             DataPacket packet;
             while ((packet = this.packetQueue.poll()) != null) {
                 toBatch.add(packet);
             }
             DataPacket[] arr = toBatch.toArray(new DataPacket[0]);
-            this.server.batchPackets(pArr, arr, false);
+            this.server.batchPackets(new Player[]{this}, arr, false);
         }
 
         if (!this.isOnline()) {
@@ -2192,6 +2191,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.gameRules = this.getLevel().getGameRules();
         startGamePacket.worldName = this.getServer().getNetwork().getName();
         startGamePacket.version = this.getLoginChainData().getGameVersion();
+        startGamePacket.rainLevel = this.getLevel().getRainTime();
+        startGamePacket.lightningLevel = this.getLevel().getThunderTime();
         this.directDataPacket(startGamePacket);
 
         this.loggedIn = true;

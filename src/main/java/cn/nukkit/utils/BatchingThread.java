@@ -69,18 +69,19 @@ public class BatchingThread extends Thread {
                     ObjectList<DataPacket> packetList = encodedPackets.get(protocolId);
                     ObjectList<Player> finalTargets = targets.get(protocolId);
 
-                    byte[][] payload = new byte[(entry.packets.length << 1)][];
-
-                    for (int i = 0; i < packetList.size(); i++) {
-                        DataPacket p = packetList.get(i);
-                        int idx = i << 1;
-                        byte[] buf = p.getBuffer();
-                        payload[idx] = Binary.writeUnsignedVarInt(buf.length);
-                        payload[idx + 1] = buf;
+                    BinaryStream batched = new BinaryStream();
+                    for (DataPacket packet : packetList) {
+                        if (packet instanceof BatchPacket) {
+                            throw new RuntimeException("Cannot batch BatchPacket");
+                        }
+                        if (!packet.isEncoded) packet.encode();
+                        byte[] buf = packet.getBuffer();
+                        batched.putUnsignedVarInt(buf.length);
+                        batched.put(buf);
                     }
 
                     try {
-                        byte[] bytes = Binary.appendBytes(payload);
+                        byte[] bytes = Binary.appendBytes(batched.getBuffer());
                         BatchPacket pk = new BatchPacket();
                         if (protocolId >= ProtocolInfo.v1_16_0) {
                             pk.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
