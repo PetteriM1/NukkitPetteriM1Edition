@@ -6,6 +6,7 @@ import cn.nukkit.level.format.anvil.util.NibbleArray;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
@@ -20,7 +21,8 @@ import java.util.Arrays;
  */
 public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
-    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage();
+    private static final PalettedBlockStorage EMPTY_STORAGE_PRE419 = new PalettedBlockStorage(0);
+    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage(ProtocolInfo.v1_16_100);
 
     private final int y;
 
@@ -325,7 +327,11 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
             stream.putByte((byte) 8); // Paletted chunk because Mojang messed up the old one
             stream.putByte((byte) 2);
             this.storage.writeTo(protocol, stream);
-            EMPTY_STORAGE.writeTo(protocol, stream);
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                EMPTY_STORAGE.writeTo(protocol, stream);
+            } else {
+                EMPTY_STORAGE_PRE419.writeTo(protocol, stream);
+            }
         }
     }
 

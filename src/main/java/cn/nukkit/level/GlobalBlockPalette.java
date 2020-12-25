@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
@@ -39,6 +40,8 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator388 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator389 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator407 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator408 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator419 = new AtomicInteger(0);
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -52,6 +55,8 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId388 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId389 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId408 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
     private static byte[] compiledTable274;
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
@@ -63,6 +68,7 @@ public class GlobalBlockPalette {
     private static byte[] compiledTable388;
     private static byte[] compiledTable389;
     private static byte[] compiledTable407;
+    private static byte[] compiledTable408;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -78,6 +84,8 @@ public class GlobalBlockPalette {
         legacyToRuntimeId388.defaultReturnValue(-1);
         legacyToRuntimeId389.defaultReturnValue(-1);
         legacyToRuntimeId407.defaultReturnValue(-1);
+        legacyToRuntimeId408.defaultReturnValue(-1);
+        legacyToRuntimeId419.defaultReturnValue(-1);
 
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
@@ -269,6 +277,52 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError("Unable to write block palette 407", e);
         }
+        // 408
+        ListTag<CompoundTag> tag408;
+        try (InputStream stream408 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_408.dat")) {
+            if (stream408 == null) {
+                throw new AssertionError("Unable to locate block state nbt 408");
+            }
+            //noinspection unchecked
+            tag408 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream408)), ByteOrder.LITTLE_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 408", e);
+        }
+        for (CompoundTag state : tag408.getAll()) {
+            int runtimeId = runtimeIdAllocator408.getAndIncrement();
+            if (!state.contains("LegacyStates")) continue;
+            List<CompoundTag> legacyStates = state.getList("LegacyStates", CompoundTag.class).getAll();
+            for (CompoundTag legacyState : legacyStates) {
+                int legacyId = legacyState.getInt("id") << 6 | legacyState.getShort("val");
+                legacyToRuntimeId408.put(legacyId, runtimeId);
+            }
+            state.remove("meta");
+        }
+        try {
+            compiledTable408 = NBTIO.write(tag408, ByteOrder.LITTLE_ENDIAN, true);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to write block palette 408", e);
+        }
+        // 419
+        ListTag<CompoundTag> tag419;
+        try (InputStream stream419 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_419.dat")) {
+            if (stream419 == null) {
+                throw new AssertionError("Unable to locate block state nbt 419");
+            }
+            //noinspection unchecked
+            tag419 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream419)), ByteOrder.LITTLE_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 419", e);
+        }
+        for (CompoundTag state : tag419.getAll()) {
+            int runtimeId = runtimeIdAllocator419.getAndIncrement();
+            if (!state.contains("LegacyStates")) continue;
+            List<CompoundTag> legacyStates = state.getList("LegacyStates", CompoundTag.class).getAll();
+            for (CompoundTag legacyState : legacyStates) {
+                int legacyId = legacyState.getInt("id") << 6 | legacyState.getShort("val");
+                legacyToRuntimeId419.put(legacyId, runtimeId);
+            }
+        }
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
@@ -305,25 +359,52 @@ public class GlobalBlockPalette {
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
                     if (id389 == -1) {
-                        throw new NoSuchElementException("Unmapped block registered id:" + id + " meta:" + meta);
+                        log.info("(389) Creating new runtime ID for unknown block {}", id);
+                        id389 = runtimeIdAllocator389.getAndIncrement();
+                        legacyToRuntimeId389.put(id << 6, id389);
                     }
                 }
                 return id389;
             case 407:
-            case 408:
-            case 409:
-            case 410:
-            case 411:
                 int id407 = legacyToRuntimeId407.get(legacyId);
                 if (id407 == -1) {
                     id407 = legacyToRuntimeId407.get(id << 6);
                     if (id407 == -1) {
-                        log.info("Creating new runtime ID for unknown block {}", id);
+                        log.info("(407) Creating new runtime ID for unknown block {}", id);
                         id407 = runtimeIdAllocator407.getAndIncrement();
                         legacyToRuntimeId407.put(id << 6, id407);
                     }
                 }
-            return id407;
+                return id407;
+            case 408:
+            case 409:
+            case 410:
+            case 411:
+                int id408 = legacyToRuntimeId408.get(legacyId);
+                if (id408 == -1) {
+                    id408 = legacyToRuntimeId408.get(id << 6);
+                    if (id408 == -1) {
+                        log.info("(408) Creating new runtime ID for unknown block {}", id);
+                        id408 = runtimeIdAllocator408.getAndIncrement();
+                        legacyToRuntimeId408.put(id << 6, id408);
+                    }
+                }
+                return id408;
+            case 419:
+            case 420:
+            case 422:
+            case ProtocolInfo.v1_16_210_50:
+            case ProtocolInfo.v1_16_210_53:
+                int id419 = legacyToRuntimeId419.get(legacyId);
+                if (id419 == -1) {
+                    id419 = legacyToRuntimeId419.get(id << 6);
+                    if (id419 == -1) {
+                        log.info("(419) Creating new runtime ID for unknown block {}", id);
+                        id419 = runtimeIdAllocator419.getAndIncrement();
+                        legacyToRuntimeId419.put(id << 6, id419);
+                    }
+                }
+                return id419;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }
@@ -389,12 +470,13 @@ public class GlobalBlockPalette {
             case 390:
                 return compiledTable389;
             case 407:
+                return compiledTable407;
             case 408:
             case 409:
             case 410:
             case 411:
-                return compiledTable407;
-            default:
+                return compiledTable408;
+            default: // Unused since 1.16.100 (419)
                 throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
         }
     }

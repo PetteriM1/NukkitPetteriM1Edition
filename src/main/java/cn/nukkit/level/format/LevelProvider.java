@@ -4,7 +4,7 @@ import cn.nukkit.level.GameRules;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.scheduler.AsyncTask;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public interface LevelProvider {
     byte ORDER_YZX = 0;
     byte ORDER_ZXY = 1;
 
-    AsyncTask requestChunkTask(int protocol, int X, int Z);
+    void requestChunkTask(IntSet protocols, int X, int Z);
 
     String getPath();
 

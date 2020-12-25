@@ -80,14 +80,4 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Elder Guardian";
     }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
 }

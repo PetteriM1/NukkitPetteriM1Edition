@@ -75,7 +75,7 @@ public class PlayerUIInventory extends BaseInventory {
 
     @Override
     public void sendContents(Player... target) {
-        sendSlot(0, target); //update cursor slot
+        //sendSlot(0, target); //update cursor slot
 
         InventoryContentPacket pk = new InventoryContentPacket();
         pk.slots = new Item[this.getSize()];
@@ -101,9 +101,10 @@ public class PlayerUIInventory extends BaseInventory {
                     p.dataPacket(pk);
                 }
             }
-            if (p.protocol >= ProtocolInfo.v1_16_0) {
+            /*if (p.protocol >= ProtocolInfo.v1_16_0) {
                 p.dataPacket(pk);
-            }
+            }*/
+            //https://github.com/CloudburstMC/Nukkit/commit/f96ce6eb90d47ab99ced368dd7129601f14c0b2b
         }
     }
 

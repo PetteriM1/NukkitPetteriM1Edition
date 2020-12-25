@@ -1,5 +1,7 @@
 package cn.nukkit.level.util;
 
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -14,13 +16,27 @@ public class PalettedBlockStorage {
     private BitArray bitArray;
 
     public PalettedBlockStorage() {
-        this(BitArrayVersion.V2);
+        this(0);
+    }
+
+    public PalettedBlockStorage(int protocol) {
+        this(BitArrayVersion.V2, protocol);
     }
 
     public PalettedBlockStorage(BitArrayVersion version) {
+        this(version, 0);
+    }
+
+    public PalettedBlockStorage(BitArrayVersion version, int protocol) {
         this.bitArray = version.createPalette();
         this.palette = new IntArrayList(16);
-        this.palette.add(0); // Air is at the start of every palette.
+
+        // Air is at the start of every palette.
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0));
+        } else {
+            this.palette.add(0);
+        }
     }
 
     private PalettedBlockStorage(BitArray bitArray, IntList palette) {

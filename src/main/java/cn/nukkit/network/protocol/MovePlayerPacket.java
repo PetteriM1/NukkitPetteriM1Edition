@@ -23,6 +23,7 @@ public class MovePlayerPacket extends DataPacket {
     public long ridingEid;
     public int teleportCause = 0;
     public int teleportItem = 0;
+    public long frame;
 
     @Override
     public void decode() {
@@ -41,6 +42,9 @@ public class MovePlayerPacket extends DataPacket {
             this.teleportCause = this.getLInt();
             this.teleportItem = this.getLInt();
         }
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.frame = this.getUnsignedVarLong();
+        }
     }
 
     @Override
@@ -57,6 +61,9 @@ public class MovePlayerPacket extends DataPacket {
         if (this.mode == MODE_TELEPORT) {
             this.putLInt(this.teleportCause);
             this.putLInt(this.teleportItem);
+        }
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.putUnsignedVarLong(this.frame);
         }
     }
 

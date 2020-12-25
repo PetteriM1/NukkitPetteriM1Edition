@@ -28,7 +28,7 @@ public class EntityStrider extends EntityWalkingAnimal {
     @Override
     protected void initEntity() {
         super.initEntity();
-        this.setMaxHealth(15);
+        this.setMaxHealth(20);
     }
 
     @Override

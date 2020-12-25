@@ -71,8 +71,8 @@ public class PlayerOffhandInventory extends BaseInventory {
         pk.item = item;
         pk.inventorySlot = 1;
         pk.windowId = ContainerIds.OFFHAND;
-        pk.encode();
-        pk.isEncoded = true;
+        //pk.encode();
+        //pk.isEncoded = true;
         return pk;
     }
 

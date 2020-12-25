@@ -1143,7 +1143,7 @@ public abstract class Entity extends Location implements Metadatable {
                     this.setHealth(1);
 
                     this.addEffect(Effect.getEffect(Effect.REGENERATION).setDuration(800).setAmplifier(1));
-                    this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800).setAmplifier(1));
+                    this.addEffect(Effect.getEffect(Effect.FIRE_RESISTANCE).setDuration(800));
                     this.addEffect(Effect.getEffect(Effect.ABSORPTION).setDuration(100).setAmplifier(1));
 
                     EntityEventPacket pk = new EntityEventPacket();
@@ -1700,6 +1700,12 @@ public abstract class Entity extends Location implements Metadatable {
     public void fall(float fallDistance) {
         if (!this.hasEffect(Effect.SLOW_FALLING)) {
             float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
+
+            Block down = this.level.getBlock(this.floor().down());
+            if (down.getId() == BlockID.HAY_BALE) {
+                damage -= (damage * 0.8f);
+            }
+
             if (damage > 0) {
                 if (!this.isPlayer || level.getGameRules().getBoolean(GameRule.FALL_DAMAGE)) {
                     this.attack(new EntityDamageEvent(this, DamageCause.FALL, damage));
@@ -1707,9 +1713,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             if (fallDistance > 0.75) {
-                Block down = this.level.getBlock(this.floor().down());
-
-                if (down.getId() == Item.FARMLAND) {
+                if (down.getId() == BlockID.FARMLAND) {
                     Event ev;
 
                     if (this.isPlayer) {
@@ -2207,7 +2211,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean setMotion(Vector3 motion) {
-        if (!this.justCreated) {
+        if (server.callEntityMotionEv && !this.justCreated) {
             EntityMotionEvent ev = new EntityMotionEvent(this, motion);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {

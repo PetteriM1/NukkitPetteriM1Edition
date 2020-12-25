@@ -1,6 +1,7 @@
 package cn.nukkit.inventory.transaction;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.event.inventory.InventoryClickEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
@@ -11,6 +12,7 @@ import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.*;
 
@@ -19,7 +21,7 @@ import java.util.*;
  */
 public class InventoryTransaction {
 
-    private long creationTime;
+    private boolean invalid;
     protected boolean hasExecuted;
 
     protected Player source;
@@ -52,7 +54,7 @@ public class InventoryTransaction {
     }
 
     public long getCreationTime() {
-        return creationTime;
+        return 0; // unused
     }
 
     public Set<Inventory> getInventories() {
@@ -68,20 +70,31 @@ public class InventoryTransaction {
     }
 
     public void addAction(InventoryAction action) {
+        if (invalid) {
+            Server.getInstance().getLogger().error("Failed to add InventoryAction for " + source.getName() + ": previous run was marked as invalid");
+            return;
+        }
+
         if (action instanceof SlotChangeAction) {
             SlotChangeAction slotChangeAction = (SlotChangeAction)action;
+
+            Item targetItem = slotChangeAction.getTargetItem();
+            Item sourceItem = slotChangeAction.getSourceItem();
+            if (targetItem.getCount() > targetItem.getMaxStackSize() || sourceItem.getCount() > sourceItem.getMaxStackSize()) {
+                invalid = true;
+                return;
+            }
 
             ListIterator<InventoryAction> iterator = this.actions.listIterator();
 
             while (iterator.hasNext()) {
                 InventoryAction existingAction = iterator.next();
                 if (existingAction instanceof SlotChangeAction) {
-                    Item targetItem = slotChangeAction.getTargetItem();
-                    Item sourceItem = slotChangeAction.getSourceItem();
-                    if (targetItem.getCount() > targetItem.getMaxStackSize() || sourceItem.getCount() > sourceItem.getMaxStackSize()) return;
-                    if (slotChangeAction.getInventory() instanceof ShulkerBoxInventory && (targetItem.getId() == BlockID.SHULKER_BOX || targetItem.getId() == BlockID.UNDYED_SHULKER_BOX)) return;
-
-                    SlotChangeAction existingSlotChangeAction = (SlotChangeAction)existingAction;
+                    if (slotChangeAction.getInventory() instanceof ShulkerBoxInventory && (targetItem.getId() == BlockID.SHULKER_BOX || targetItem.getId() == BlockID.UNDYED_SHULKER_BOX)) {
+                        invalid = true;
+                        return;
+                    }
+                    SlotChangeAction existingSlotChangeAction = (SlotChangeAction) existingAction;
                     if (!existingSlotChangeAction.getInventory().equals(slotChangeAction.getInventory()))
                         continue;
                     Item existingSource = existingSlotChangeAction.getSourceItem();
@@ -152,10 +165,19 @@ public class InventoryTransaction {
     }
 
     protected void sendInventories() {
-        for (Inventory inventory : this.inventories) {
-            inventory.sendContents(this.source);
-            if (inventory instanceof PlayerInventory) {
-                ((PlayerInventory) inventory).sendArmorContents(this.source);
+        if (this.getSource().protocol >= ProtocolInfo.v1_16_0) {
+            for (InventoryAction action : this.actions) {
+                if (action instanceof SlotChangeAction) {
+                    SlotChangeAction sca = (SlotChangeAction) action;
+                    sca.getInventory().sendSlot(sca.getSlot(), this.source);
+                }
+            }
+        } else {
+            for (Inventory inventory : this.inventories) {
+                inventory.sendContents(this.source);
+                if (inventory instanceof PlayerInventory) {
+                    ((PlayerInventory) inventory).sendArmorContents(this.source);
+                }
             }
         }
     }

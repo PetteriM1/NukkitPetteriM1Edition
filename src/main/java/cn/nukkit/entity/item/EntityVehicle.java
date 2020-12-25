@@ -18,32 +18,39 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public abstract class EntityVehicle extends Entity implements EntityRideable, EntityInteractable {
 
+    private int hurtTime;
+    private int hurtDirection;
+    private int damage;
+
     public EntityVehicle(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
 
     public int getRollingAmplitude() {
-        return this.getDataPropertyInt(DATA_HURT_TIME);
+        return hurtTime;
     }
 
     public void setRollingAmplitude(int time) {
+        this.hurtTime = time;
         this.setDataProperty(new IntEntityData(DATA_HURT_TIME, time));
     }
 
     public int getRollingDirection() {
-        return this.getDataPropertyInt(DATA_HURT_DIRECTION);
+        return hurtDirection;
     }
 
     public void setRollingDirection(int direction) {
+        this.hurtDirection = direction;
         this.setDataProperty(new IntEntityData(DATA_HURT_DIRECTION, direction));
     }
 
     public int getDamage() {
-        return this.getDataPropertyInt(DATA_HEALTH); // false data name (should be DATA_DAMAGE_TAKEN)
+        return damage;
     }
 
     public void setDamage(int damage) {
-        this.setDataProperty(new IntEntityData(DATA_HEALTH, damage));
+        this.damage = damage;
+        this.setDataProperty(new IntEntityData(DATA_HEALTH, damage)); // false data name (should be DATA_DAMAGE_TAKEN)
     }
 
     @Override

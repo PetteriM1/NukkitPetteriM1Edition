@@ -154,8 +154,9 @@ public class RakNetServer extends RakNet {
 
         RakNetServerSession session = this.sessionsByAddress.get(packet.sender());
 
-        if (session != null) {
-            this.sendAlreadyConnected(ctx, packet.sender());
+        if (session != null /*&& session.getState() == RakNetState.CONNECTED*/) {
+            //this.sendAlreadyConnected(ctx, packet.sender());
+            Server.getInstance().getLogger().debug("The client was already connected. Trying to ignore that and continue.");
         /*} else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());*/
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
@@ -163,7 +164,7 @@ public class RakNetServer extends RakNet {
         } else if (Server.getInstance().strongIPBans && Server.getInstance().getIPBans().isBanned(packet.sender().getHostName())) {
             this.sendConnectionBanned(ctx, packet.sender());
             Server.getInstance().getLogger().info("\u00A7c" + packet.sender().getHostName() + " disconnected due to IP banned");
-        } else {
+        } else if (session == null) {
             // Passed all checks. Now create the session and send the first reply.
             session = new RakNetServerSession(this, packet.sender(), ctx.channel(), mtu,
                     this.eventLoopGroup.next(), protocol);
@@ -176,6 +177,8 @@ public class RakNetServer extends RakNet {
                     Server.getInstance().getLogger().warning("Unable to create session for " + packet.sender().getHostName() + ": listener is null");
                 }
             }
+        //} else {
+        //    session.sendOpenConnectionReply1(); // Probably a packet loss occurred, send the reply again
         }
     }
 

@@ -23,6 +23,7 @@ public class EntityArrow extends EntityProjectile {
 
     protected int pickupMode;
     public boolean isFromStray;
+    protected boolean critical;
 
     @Override
     public int getNetworkId() {
@@ -79,11 +80,13 @@ public class EntityArrow extends EntityProjectile {
     }
 
     public void setCritical(boolean value) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL, value);
+        //this.setDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL, value);
+        this.critical = value;
     }
 
     public boolean isCritical() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL);
+        //return this.getDataFlag(DATA_FLAGS, DATA_FLAG_CRITICAL);
+        return this.critical;
     }
 
     @Override

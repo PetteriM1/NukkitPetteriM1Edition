@@ -22,7 +22,7 @@ public abstract class EntityFlying extends BaseEntity {
         Vector3 target = this.target;
         if (!(target instanceof EntityCreature) || !this.targetOption((EntityCreature) target, this.distanceSquared(target)) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
-            for (Entity entity : this.level.entities.values()) {
+            for (Entity entity : this.getViewers().values()) {
                 if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal || !entity.canBeFollowed()) {
                     continue;
                 }

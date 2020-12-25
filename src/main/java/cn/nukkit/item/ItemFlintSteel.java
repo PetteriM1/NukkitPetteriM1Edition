@@ -59,11 +59,10 @@ public class ItemFlintSteel extends ItemTool {
                 return true;
             }
 
-            if (player != null && !player.isCreative() && this.useOn(block)) {
+            if (player != null && !player.isCreative()) {
+                this.useOn(block);
                 if (this.getDamage() >= DURABILITY_FLINT_STEEL) {
                     this.count = 0;
-                } else {
-                    this.meta++;
                 }
             }
             return true;

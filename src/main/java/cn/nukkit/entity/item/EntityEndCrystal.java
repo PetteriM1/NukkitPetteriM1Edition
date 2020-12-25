@@ -20,7 +20,7 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
 
     @Override
     public float getLength() {
-        return 1.5f;
+        return 1.0f;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
 
     @Override
     public float getWidth() {
-        return 1.5f;
+        return 1.0f;
     }
 
     @Override

@@ -14,9 +14,9 @@ public class MoveEntityDeltaPacket extends DataPacket {
 
     public long eid;
     public int flags = 0;
-    public int xDelta = 0;
-    public int yDelta = 0;
-    public int zDelta = 0;
+    public float x = 0;
+    public float y = 0;
+    public float z = 0;
     public double yawDelta = 0;
     public double headYawDelta = 0;
     public double pitchDelta = 0;
@@ -30,9 +30,9 @@ public class MoveEntityDeltaPacket extends DataPacket {
     public void decode() {
         this.getEntityRuntimeId();
         this.flags = this.getByte();
-        this.xDelta = getCoordinate(FLAG_HAS_X);
-        this.yDelta = getCoordinate(FLAG_HAS_Y);
-        this.zDelta = getCoordinate(FLAG_HAS_Z);
+        this.x = getCoordinate(FLAG_HAS_X);
+        this.y = getCoordinate(FLAG_HAS_Y);
+        this.z = getCoordinate(FLAG_HAS_Z);
         this.yawDelta = getRotation(FLAG_HAS_YAW);
         this.headYawDelta = getRotation(FLAG_HAS_HEAD_YAW);
         this.pitchDelta = getRotation(FLAG_HAS_PITCH);
@@ -43,17 +43,20 @@ public class MoveEntityDeltaPacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.eid);
         this.putByte((byte) flags);
-        putCoordinate(FLAG_HAS_X, this.xDelta);
-        putCoordinate(FLAG_HAS_Y, this.yDelta);
-        putCoordinate(FLAG_HAS_Z, this.zDelta);
+        putCoordinate(FLAG_HAS_X, this.x);
+        putCoordinate(FLAG_HAS_Y, this.y);
+        putCoordinate(FLAG_HAS_Z, this.z);
         putRotation(FLAG_HAS_YAW, this.yawDelta);
         putRotation(FLAG_HAS_HEAD_YAW, this.headYawDelta);
         putRotation(FLAG_HAS_PITCH, this.pitchDelta);
     }
 
-    private int getCoordinate(int flag) {
+    private float getCoordinate(int flag) {
         if ((flags & flag) != 0) {
-            return this.getVarInt();
+            if (protocol < ProtocolInfo.v1_16_100) {
+                return (float) this.getVarInt();
+            }
+            return this.getLFloat();
         }
         return 0;
     }
@@ -65,9 +68,13 @@ public class MoveEntityDeltaPacket extends DataPacket {
         return 0d;
     }
 
-    private void putCoordinate(int flag, int value) {
+    private void putCoordinate(int flag, float value) {
         if ((flags & flag) != 0) {
-            this.putVarInt(value);
+            if (protocol < ProtocolInfo.v1_16_100) {
+                this.putVarInt((int) value);
+            } else {
+                this.putLFloat(value);
+            }
         }
     }
 

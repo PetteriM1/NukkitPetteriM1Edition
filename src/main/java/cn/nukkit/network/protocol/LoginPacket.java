@@ -142,7 +142,7 @@ public class LoginPacket extends DataPacket {
 
             if (skinToken.has("AnimatedImageData")) {
                 for (JsonElement element : skinToken.get("AnimatedImageData").getAsJsonArray()) {
-                    skin.getAnimations().add(getAnimation(element.getAsJsonObject()));
+                    skin.getAnimations().add(getAnimation(protocol_, element.getAsJsonObject()));
                 }
             }
 
@@ -174,13 +174,14 @@ public class LoginPacket extends DataPacket {
         return GSON.fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
     }
 
-    private static SkinAnimation getAnimation(JsonObject element) {
+    private static SkinAnimation getAnimation(int protocol, JsonObject element) {
         float frames = element.get("Frames").getAsFloat();
         int type = element.get("Type").getAsInt();
         byte[] data = Base64.getDecoder().decode(element.get("Image").getAsString());
         int width = element.get("ImageWidth").getAsInt();
         int height = element.get("ImageHeight").getAsInt();
-        return new SkinAnimation(new SerializedImage(width, height, data), type, frames);
+        int expression = protocol >= ProtocolInfo.v1_16_100 ? element.get("AnimationExpression").getAsInt() : 0;
+        return new SkinAnimation(new SerializedImage(width, height, data), type, frames, expression);
     }
 
     private static SerializedImage getImage(JsonObject token, String name) {
