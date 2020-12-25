@@ -19,7 +19,7 @@ public class AdventureSettings implements Cloneable {
     public static final int PERMISSION_AUTOMATION = 3;
     public static final int PERMISSION_ADMIN = 4;
 
-    private Map<Type, Boolean> values = new EnumMap<>(Type.class);
+    private final Map<Type, Boolean> values = new EnumMap<>(Type.class);
 
     private Player player;
 
@@ -57,7 +57,7 @@ public class AdventureSettings implements Cloneable {
         pk.playerPermission = (player.isOp() && player.showAdmin() && !player.isSpectator() ? Player.PERMISSION_OPERATOR : Player.PERMISSION_MEMBER);
         pk.entityUniqueId = player.getId();
 
-        Server.broadcastPacket(player.getViewers().values(), pk);
+        //Server.broadcastPacket(player.getViewers().values(), pk);
         player.dataPacket(pk);
 
         player.resetInAirTicks();

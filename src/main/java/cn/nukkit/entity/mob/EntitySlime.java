@@ -161,14 +161,4 @@ public class EntitySlime extends EntityJumpingMob {
         if (this.size == SIZE_SMALL) return 1;
         return 0;
     }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
 }

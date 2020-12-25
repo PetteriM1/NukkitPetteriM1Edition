@@ -363,8 +363,6 @@ public class BlockCauldron extends BlockSolidMeta {
         cauldron.clearCustomColor();
         this.level.setBlock(this, new BlockCauldron(0), true);
         this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
-        for (int i = 0; i < 8; ++i) {
-            this.getLevel().addParticle(new SmokeParticle(add(Math.random(), 1.2, Math.random())));
-        }
+        this.getLevel().addParticle(new SmokeParticle(add(Math.random(), 1.2, Math.random())), null, 8);
     }
 }

@@ -11,10 +11,10 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.ThreadCache;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.io.File;
@@ -106,7 +106,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public AsyncTask requestChunkTask(int protocol, int x, int z) throws ChunkException {
+    public void requestChunkTask(IntSet protocols, int x, int z) throws ChunkException {
         Chunk chunk = (Chunk) this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
@@ -132,20 +132,6 @@ public class Anvil extends BaseLevelProvider {
             }
         }
 
-        Map<Integer, Integer> extra = chunk.getBlockExtraDataArray();
-        BinaryStream extraData;
-        if (!extra.isEmpty()) {
-            extraData = new BinaryStream();
-            extraData.putVarInt(extra.size());
-            for (Map.Entry<Integer, Integer> entry : extra.entrySet()) {
-                extraData.putVarInt(entry.getKey());
-                extraData.putLShort(entry.getValue());
-            }
-        } else {
-            extraData = null;
-        }
-
-        BinaryStream stream = ThreadCache.binaryStream.get().reset();
         int subChunkCount = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
         for (int i = sections.length - 1; i >= 0; i--) {
@@ -154,38 +140,38 @@ public class Anvil extends BaseLevelProvider {
                 break;
             }
         }
-        if (protocol < ProtocolInfo.v1_12_0) {
-            stream.putByte((byte) subChunkCount);
-        }
-        for (int i = 0; i < subChunkCount; i++) {
-            stream.put(sections[i].getBytes(protocol));
+
+        for (int protocolId : protocols) {
+            BinaryStream stream = ThreadCache.binaryStream.get().reset();
+            if (protocolId < ProtocolInfo.v1_12_0) {
+                stream.putByte((byte) subChunkCount);
+            }
+
+            for (int i = 0; i < subChunkCount; i++) {
+                stream.put(sections[i].getBytes(protocol));
 
             //TODO: support older chunks
-            /*if (protocol < ProtocolInfo.v1_13_0) {
-                stream.putByte((byte) 0);
-                stream.put(sections[i].getBytes());
-            } else {
-                sections[i].writeTo(protocol, stream);
-            }*/
-        }
-        if (protocol < ProtocolInfo.v1_12_0) {
-            for (byte height : chunk.getHeightMapArray()) {
-                stream.putByte(height);
+            /*if (protocolId < ProtocolInfo.v1_13_0) {
+                    stream.putByte((byte) 0);
+                    stream.put(sections[i].getBytes());
+                } else {
+                    sections[i].writeTo(protocolId, stream);
+                }*/
             }
-            stream.put(PAD_256);
+            if (protocolId < ProtocolInfo.v1_12_0) {
+                for (byte height : chunk.getHeightMapArray()) {
+                    stream.putByte(height);
+                }
+                stream.put(PAD_256);
+            }
+            stream.put(chunk.getBiomeIdArray());
+            stream.putByte((byte) 0); // Border blocks
+            if (protocolId < ProtocolInfo.v1_16_100) {
+                stream.putVarInt(0); // There is no extra data anymore but idk when it was removed
+            }
+            stream.put(blockEntities);
+            this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, subChunkCount, stream.getBuffer());
         }
-        stream.put(chunk.getBiomeIdArray());
-        stream.putByte((byte) 0);
-        if (extraData != null) {
-            stream.put(extraData.getBuffer());
-        } else {
-            stream.putVarInt(0);
-        }
-        stream.put(blockEntities);
-
-        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, subChunkCount, stream.getBuffer());
-
-        return null;
     }
 
     private int lastPosition = 0;
@@ -295,7 +281,7 @@ public class Anvil extends BaseLevelProvider {
             return region;
         }
     }
-    
+
     @Override
     public int getMaximumLayer() {
         return 1;

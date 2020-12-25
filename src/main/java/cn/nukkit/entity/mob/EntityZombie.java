@@ -170,15 +170,17 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
     public void spawnTo(Player player) {
         super.spawnTo(player);
 
-        MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
-        pk.eid = this.getId();
-        pk.slots = this.armor;
+        if (this.armor[0].getId() != 0 || this.armor[1].getId() != 0 || this.armor[2].getId() != 0 || this.armor[3].getId() != 0) {
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getId();
+            pk.slots = this.armor;
 
         /*if (java.time.LocalDate.now().toString().contains("-10-31")) {
             pk.slots[0] = new ItemBlock(Block.get(Block.JACK_O_LANTERN));
         }*/
 
-        player.dataPacket(pk);
+            player.dataPacket(pk);
+        }
 
         if (this.tool != null) {
             MobEquipmentPacket pk2 = new MobEquipmentPacket();

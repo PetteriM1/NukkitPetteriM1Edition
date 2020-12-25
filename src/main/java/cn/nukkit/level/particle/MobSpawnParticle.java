@@ -20,26 +20,13 @@ public class MobSpawnParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
+    public DataPacket[] mvEncode(int protocol) {
         LevelEventPacket packet = new LevelEventPacket();
         packet.evid = LevelEventPacket.EVENT_PARTICLE_SPAWN;
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
         packet.data = (this.width & 0xff) + ((this.height & 0xff) << 8);
-
         return new DataPacket[]{packet};
-    }
-
-    @Override
-    public DataPacket mvEncode(int protocol) {
-        LevelEventPacket packet = new LevelEventPacket();
-        packet.evid = LevelEventPacket.EVENT_PARTICLE_SPAWN;
-        packet.x = (float) this.x;
-        packet.y = (float) this.y;
-        packet.z = (float) this.z;
-        packet.data = (this.width & 0xff) + ((this.height & 0xff) << 8);
-
-        return packet;
     }
 }

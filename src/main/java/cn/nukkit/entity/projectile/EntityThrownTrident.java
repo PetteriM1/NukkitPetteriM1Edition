@@ -125,6 +125,9 @@ public class EntityThrownTrident extends EntityProjectile {
         EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
         newTrident.alreadyCollided = true;
         newTrident.setItem(trident);
+        if (this.getServer().suomiCraftPEMode()) {
+            newTrident.namedTag = this.namedTag.clone();
+        }
         newTrident.spawnToAll();
     }
 

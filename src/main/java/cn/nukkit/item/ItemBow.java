@@ -112,7 +112,7 @@ public class ItemBow extends ItemTool {
                 ((EntityArrow) projectile).setPickupMode(EntityArrow.PICKUP_CREATIVE);
             }
             if (!player.isCreative()) {
-                if (!infinity) {
+                if (!infinity || itemArrow.getDamage() != 0) {
                     inventory.removeItem(itemArrow);
                 }
 

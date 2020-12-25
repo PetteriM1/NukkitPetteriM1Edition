@@ -42,11 +42,11 @@ public class AdventureSettingsPacket extends DataPacket {
 
     public long commandPermission = PERMISSION_NORMAL;
 
-    public long flags2 = 0;
+    public long flags2 = -1; // This may be incorrect but DON'T TOUCH IT!
 
     public long playerPermission = Player.PERMISSION_MEMBER;
 
-    public long customFlags; //...
+    public long customFlags;
 
     public long entityUniqueId; //This is a little-endian long, NOT a var-long. (WTF Mojang)
 

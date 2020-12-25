@@ -23,15 +23,9 @@ import java.util.Collection;
 public class PlayerInventory extends BaseInventory {
 
     protected int itemInHandIndex = 0;
-    private int[] hotbar;
 
     public PlayerInventory(EntityHumanType player) {
         super(player, InventoryType.PLAYER);
-        this.hotbar = new int[this.getHotbarSize()];
-
-        for (int i = 0; i < this.hotbar.length; i++) {
-            this.hotbar[i] = i;
-        }
     }
 
     @Override
@@ -164,6 +158,18 @@ public class PlayerInventory extends BaseInventory {
                 this.sendSlot(this.itemInHandIndex, player);
             }
 
+            player.dataPacket(pk);
+        }
+    }
+
+    public void sendHeldItemIfNotAir(Player player) {
+        Item item = this.getItemInHand();
+        if (item.getId() != 0) {
+            MobEquipmentPacket pk = new MobEquipmentPacket();
+            pk.item = item;
+            pk.inventorySlot = pk.hotbarSlot = this.itemInHandIndex;
+            pk.eid = player.getId();
+            this.sendSlot(this.itemInHandIndex, player);
             player.dataPacket(pk);
         }
     }
@@ -371,6 +377,16 @@ public class PlayerInventory extends BaseInventory {
         }
     }
 
+    public void sendArmorContentsIfNotAr(Player player) {
+        Item[] armor = this.getArmorContents();
+        if (armor[0].getId() != 0 || armor[1].getId() != 0 || armor[2].getId() != 0 || armor[3].getId() != 0) {
+            MobArmorEquipmentPacket pk = new MobArmorEquipmentPacket();
+            pk.eid = this.getHolder().getId();
+            pk.slots = armor;
+            player.dataPacket(pk);
+        }
+    }
+
     public void setArmorContents(Item[] items) {
         if (items.length < 4) {
             Item[] newItems = new Item[4];
@@ -516,29 +532,28 @@ public class PlayerInventory extends BaseInventory {
         return (EntityHuman) super.getHolder();
     }
 
-    public void sendInventory() {
-        if (!(holder instanceof Player)) {
-            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
-        }
-
-        Player p = (Player) holder;
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
         ContainerOpenPacket pk = new ContainerOpenPacket();
-        pk.x = p.getFloorX();
-        pk.y = p.getFloorY();
-        pk.z = p.getFloorZ();
-        pk.windowId = p.getWindowId(this);
-        pk.type = InventoryType.PLAYER.getNetworkType();
-        p.directDataPacket(pk);
+        pk.windowId = who.getWindowId(this);
+        pk.type = this.getType().getNetworkType();
+        pk.x = who.getFloorX();
+        pk.y = who.getFloorY();
+        pk.z = who.getFloorZ();
+        pk.entityId = who.getId();
+        who.dataPacket(pk);
     }
 
-    public void closeInventory() {
-        if (!(holder instanceof Player)) {
-            throw new RuntimeException("Cannot send inventory to non-player inventory holder");
-        }
-
-        Player p = (Player) holder;
+    @Override
+    public void onClose(Player who) {
         ContainerClosePacket pk = new ContainerClosePacket();
-        pk.windowId = p.getWindowId(this);
-        p.directDataPacket(pk);
+        pk.windowId = who.getWindowId(this);
+        pk.wasServerInitiated = who.getClosingWindowId() != pk.windowId;
+        who.dataPacket(pk);
+        // Player can never stop viewing their own inventory
+        if (who != holder) {
+            super.onClose(who);
+        }
     }
 }

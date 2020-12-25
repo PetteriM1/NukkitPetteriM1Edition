@@ -5,7 +5,6 @@ import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * Created on 2015/11/21 by xtypr.
@@ -21,26 +20,13 @@ public class DestroyBlockParticle extends Particle {
     }
 
     @Override
-    public DataPacket[] encode() {
-        LevelEventPacket pk = new LevelEventPacket();
-        pk.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, block.getId(), block.getDamage());
-
-        return new DataPacket[]{pk};
-    }
-
-    @Override
-    public DataPacket mvEncode(int protocol) {
-        LevelEventPacket pk = new LevelEventPacket();
-        pk.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
-        pk.x = (float) this.x;
-        pk.y = (float) this.y;
-        pk.z = (float) this.z;
-        pk.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
-
-        return pk;
+    public DataPacket[] mvEncode(int protocol) {
+        LevelEventPacket packet = new LevelEventPacket();
+        packet.evid = LevelEventPacket.EVENT_PARTICLE_DESTROY;
+        packet.x = (float) this.x;
+        packet.y = (float) this.y;
+        packet.z = (float) this.z;
+        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
+        return new DataPacket[]{packet};
     }
 }

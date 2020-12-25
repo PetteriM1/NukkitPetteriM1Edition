@@ -65,9 +65,7 @@ public class ItemCrossbow extends ItemBow {
                         player.getInventory().setItemInHand(this);
                     }
                 }
-            }
 
-            if (!player.isCreative()) {
                 inventory.removeItem(itemArrow);
             }
 

@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockBedrock;
 import cn.nukkit.block.BlockObsidian;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityEndCrystal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
@@ -46,7 +47,7 @@ public class ItemEndCrystal extends Item {
         }
 
         for (Entity e : level.getCollidingEntities(new SimpleAxisAlignedBB(block.x, block.y, block.z, block.x + 1, block.y + 1, block.z + 1))) {
-            if (e.isPlayer && !((Player) e).isSpectator()) {
+            if (e.getNetworkId() == EntityEndCrystal.NETWORK_ID || (e.isPlayer && !((Player) e).isSpectator())) {
                 return false;
             }
         }
