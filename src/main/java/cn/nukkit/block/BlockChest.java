@@ -140,8 +140,8 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            Block top = up();
-            if (!top.isTransparent()) {
+            Block top = this.up();
+            if (!top.isTransparent() && !(top instanceof BlockSlab && (top.getDamage() & 0x07) <= 0)) { // avoid issues with the slab hack
                 return true;
             }
 
