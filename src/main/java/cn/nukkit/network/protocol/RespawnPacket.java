@@ -20,22 +20,21 @@ public class RespawnPacket extends DataPacket {
     public long runtimeEntityId;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         Vector3f v = this.getVector3f();
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        if (protocol >= 388) {
+        if (protocolId >= 388) {
             this.respawnState = this.getByte();
             this.runtimeEntityId  = this.getEntityRuntimeId();
         }
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putVector3f(this.x, this.y, this.z);
-        if (protocol >= 388) {
+        if (protocolId >= 388) {
             this.putByte((byte) respawnState);
             this.putEntityRuntimeId(runtimeEntityId);
         }

@@ -30,19 +30,18 @@ public class AddItemEntityPacket extends DataPacket {
     public boolean isFromFishing = false;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        this.putSlot(protocol, this.item);
+        this.putSlot(protocolId, this.item);
         this.putVector3f(this.x, this.y, this.z);
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
-        this.put(Binary.writeMetadata(protocol, metadata));
-        if (protocol >= 223) {
+        this.put(Binary.writeMetadata(protocolId, metadata));
+        if (protocolId >= 223) {
             this.putBoolean(this.isFromFishing);
         }
     }

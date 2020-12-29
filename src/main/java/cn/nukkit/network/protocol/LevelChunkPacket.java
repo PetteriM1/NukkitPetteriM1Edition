@@ -22,15 +22,14 @@ public class LevelChunkPacket extends DataPacket {
     public byte[] data;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putVarInt(this.chunkX);
         this.putVarInt(this.chunkZ);
-        if (protocol >= 361) {
+        if (protocolId >= 361) {
             this.putUnsignedVarInt(this.subChunkCount);
             this.putBoolean(cacheEnabled);
             if (this.cacheEnabled) {

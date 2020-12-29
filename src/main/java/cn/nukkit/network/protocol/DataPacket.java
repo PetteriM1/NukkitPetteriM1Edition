@@ -12,9 +12,6 @@ import com.nukkitx.network.raknet.RakNetReliability;
  * Nukkit Project
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
-
-    public int protocol = 999;
-
     public boolean isEncoded = false;
     private int channel = Network.CHANNEL_NONE;
 
@@ -22,14 +19,34 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public abstract byte pid();
 
-    public abstract void decode();
+    public void decode() {
+        this.decode(ProtocolInfo.CURRENT_PROTOCOL);
+    }
 
-    public abstract void encode();
+    public void decode(int protocolId) {
+        this.decodePayload(protocolId);
+    }
 
-    @Override
-    public DataPacket reset() {
-        super.reset();
-        if (protocol <= 274) {
+    public void encode() {
+        this.encode(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public void encode(int protocolId) {
+        this.reset(protocolId);
+        this.encodePayload(protocolId);
+    }
+
+    public void decodePayload(int protocolId) {
+        // TODO: consider making this abstract
+    }
+
+    public void encodePayload(int protocolId) {
+        // TODO: consider making this abstract
+    }
+
+    public DataPacket reset(int protocolId) {
+        this.reset();
+        if (protocolId <= ProtocolInfo.v1_5_0) {
             this.putByte(this.pid());
             this.putShort(0);
         } else {
@@ -61,12 +78,8 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             return null;
         }
     }
-
-    public BatchPacket compress() {
-        return compress(Server.getInstance().networkCompressionLevel);
-    }
-
-    public BatchPacket compress(int level) {
+    
+    public BatchPacket compress(int level, int protocolId) {
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
         byte[] buf = getBuffer();
@@ -74,7 +87,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         batchPayload[1] = buf;
         byte[] data = Binary.appendBytes(batchPayload);
         try {
-            if (protocol >= ProtocolInfo.v1_16_0) {
+            if (protocolId >= ProtocolInfo.v1_16_0) {
                 batch.payload = Zlib.deflateRaw(data, level);
             } else {
                 batch.payload = Zlib.deflate(data, level);

@@ -27,33 +27,32 @@ public class MoveEntityDeltaPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.getEntityRuntimeId();
         this.flags = this.getByte();
-        this.x = getCoordinate(FLAG_HAS_X);
-        this.y = getCoordinate(FLAG_HAS_Y);
-        this.z = getCoordinate(FLAG_HAS_Z);
+        this.x = getCoordinate(FLAG_HAS_X, protocolId);
+        this.y = getCoordinate(FLAG_HAS_Y, protocolId);
+        this.z = getCoordinate(FLAG_HAS_Z, protocolId);
         this.yawDelta = getRotation(FLAG_HAS_YAW);
         this.headYawDelta = getRotation(FLAG_HAS_HEAD_YAW);
         this.pitchDelta = getRotation(FLAG_HAS_PITCH);
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putEntityRuntimeId(this.eid);
         this.putByte((byte) flags);
-        putCoordinate(FLAG_HAS_X, this.x);
-        putCoordinate(FLAG_HAS_Y, this.y);
-        putCoordinate(FLAG_HAS_Z, this.z);
+        putCoordinate(FLAG_HAS_X, this.x, protocolId);
+        putCoordinate(FLAG_HAS_Y, this.y, protocolId);
+        putCoordinate(FLAG_HAS_Z, this.z, protocolId);
         putRotation(FLAG_HAS_YAW, this.yawDelta);
         putRotation(FLAG_HAS_HEAD_YAW, this.headYawDelta);
         putRotation(FLAG_HAS_PITCH, this.pitchDelta);
     }
 
-    private float getCoordinate(int flag) {
+    private float getCoordinate(int flag, int protocolId) {
         if ((flags & flag) != 0) {
-            if (protocol < ProtocolInfo.v1_16_100) {
+            if (protocolId < ProtocolInfo.v1_16_100) {
                 return (float) this.getVarInt();
             }
             return this.getLFloat();
@@ -68,9 +67,9 @@ public class MoveEntityDeltaPacket extends DataPacket {
         return 0d;
     }
 
-    private void putCoordinate(int flag, float value) {
+    private void putCoordinate(int flag, float value, int protocolId) {
         if ((flags & flag) != 0) {
-            if (protocol < ProtocolInfo.v1_16_100) {
+            if (protocolId < ProtocolInfo.v1_16_100) {
                 this.putVarInt((int) value);
             } else {
                 this.putLFloat(value);

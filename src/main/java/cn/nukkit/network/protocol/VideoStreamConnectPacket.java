@@ -18,12 +18,11 @@ public class VideoStreamConnectPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putString(address);
         this.putLFloat(screenshotFrequency);
         this.putByte(action);

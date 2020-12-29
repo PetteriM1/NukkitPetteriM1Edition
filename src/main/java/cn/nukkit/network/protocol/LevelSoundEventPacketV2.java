@@ -16,7 +16,7 @@ public class LevelSoundEventPacketV2 extends LevelSoundEventPacket {
     public boolean isGlobal;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.sound = this.getByte();
         Vector3f v = this.getVector3f();
         this.x = v.x;
@@ -29,8 +29,7 @@ public class LevelSoundEventPacketV2 extends LevelSoundEventPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putByte((byte) this.sound);
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.extraData);

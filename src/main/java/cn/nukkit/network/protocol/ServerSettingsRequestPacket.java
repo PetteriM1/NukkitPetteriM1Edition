@@ -11,10 +11,10 @@ public class ServerSettingsRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload(int protocolId) {
     }
 }

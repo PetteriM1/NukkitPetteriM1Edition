@@ -80,12 +80,11 @@ public class StartGamePacket extends DataPacket {
     public boolean isOnlySpawningV1Villagers = false;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
         this.putVarInt(this.playerGamemode);
@@ -93,9 +92,9 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.yaw);
         this.putLFloat(this.pitch);
         this.putVarInt(this.seed);
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.putLShort(0x00); // SpawnBiomeType - Default
-            this.putString(protocol >= ProtocolInfo.v1_16_100 ? "plains" : ""); // UserDefinedBiomeName
+            this.putString(protocolId >= ProtocolInfo.v1_16_100 ? "plains" : ""); // UserDefinedBiomeName
         }
         this.putVarInt(this.dimension);
         this.putVarInt(this.generator);
@@ -104,25 +103,25 @@ public class StartGamePacket extends DataPacket {
         this.putBlockVector3(this.spawnX, this.spawnY, this.spawnZ);
         this.putBoolean(this.hasAchievementsDisabled);
         this.putVarInt(this.dayCycleStopTime);
-        if (protocol >= 388) {
+        if (protocolId >= 388) {
             this.putVarInt(this.eduEditionOffer);
         } else {
             this.putBoolean(this.eduMode);
         }
-        if (protocol > 224) {
+        if (protocolId > 224) {
             this.putBoolean(this.hasEduFeaturesEnabled);
-            if (protocol >= 407) {
+            if (protocolId >= 407) {
                 this.putString(""); // Education Edition Product ID
             }
         }
         this.putLFloat(this.rainLevel);
         this.putLFloat(this.lightningLevel);
-        if (protocol >= 332) {
+        if (protocolId >= 332) {
             this.putBoolean(this.hasConfirmedPlatformLockedContent);
         }
         this.putBoolean(this.multiplayerGame);
         this.putBoolean(this.broadcastToLAN);
-        if (protocol >= 332) {
+        if (protocolId >= 332) {
             this.putVarInt(this.xblBroadcastIntent);
             this.putVarInt(this.platformBroadcastIntent);
         } else {
@@ -131,49 +130,49 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(gameRules);
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.putLInt(0); // Experiment count
             this.putBoolean(false); // Were experiments previously toggled
         }
         this.putBoolean(this.bonusChest);
-        if (protocol > 201) {
+        if (protocolId > 201) {
             this.putBoolean(this.hasStartWithMapEnabled);
         }
-        if (protocol < 332) {
+        if (protocolId < 332) {
             this.putBoolean(this.trustPlayers);
         }
         this.putVarInt(this.permissionLevel);
-        if (protocol < 332) {
+        if (protocolId < 332) {
             this.putVarInt(this.gamePublish);
         }
-        if (protocol >= 201) {
+        if (protocolId >= 201) {
             this.putLInt(this.serverChunkTickRange);
         }
-        if (protocol >= 223 && protocol < 332) {
+        if (protocolId >= 223 && protocolId < 332) {
             this.putBoolean(this.broadcastToPlatform);
             this.putVarInt(this.platformBroadcastMode);
             this.putBoolean(this.xblBroadcastIntentOld);
         }
-        if (protocol > 224) {
+        if (protocolId > 224) {
             this.putBoolean(this.hasLockedBehaviorPack);
             this.putBoolean(this.hasLockedResourcePack);
             this.putBoolean(this.isFromLockedWorldTemplate);
         }
-        if (protocol >= 291) {
+        if (protocolId >= 291) {
             this.putBoolean(this.isUsingMsaGamertagsOnly);
-            if (protocol >= 313) {
+            if (protocolId >= 313) {
                 this.putBoolean(this.isFromWorldTemplate);
                 this.putBoolean(this.isWorldTemplateOptionLocked);
-                if (protocol >= 361) {
+                if (protocolId >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
-                    if (protocol >= 388) {
-                        this.putString(Utils.getVersionByProtocol(protocol));
+                    if (protocolId >= 388) {
+                        this.putString(Utils.getVersionByProtocol(protocolId));
                     }
                 }
             }
-            if (protocol >= 407) {
-                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world width
-                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world height
+            if (protocolId >= 407) {
+                this.putLInt(protocolId >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world width
+                this.putLInt(protocolId >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world height
                 this.putBoolean(false); // Nether type
                 this.putBoolean(false); // Experimental Gameplay
             }
@@ -182,8 +181,8 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.worldName);
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
-        if (protocol >= 388) {
-            if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= 388) {
+            if (protocolId >= ProtocolInfo.v1_16_100) {
                 this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
             } else {
                 this.putBoolean(this.isMovementServerAuthoritative);
@@ -191,19 +190,19 @@ public class StartGamePacket extends DataPacket {
         }
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
-        if (protocol > 274) {
-            if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId > 274) {
+            if (protocolId >= ProtocolInfo.v1_16_100) {
                 this.putUnsignedVarInt(0); // Custom blocks
             } else {
-                this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+                this.put(GlobalBlockPalette.getCompiledTable(protocolId));
             }
-            if (protocol >= 361) {
-                this.put(RuntimeItems.getRuntimeMapping(protocol).getItemDataPalette());
+            if (protocolId >= 361) {
+                this.put(RuntimeItems.getRuntimeMapping(protocolId).getItemDataPalette());
             }
             this.putString(this.multiplayerCorrelationId);
-            if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
+            if (protocolId == 354 && version != null && version.startsWith("1.11.4")) {
                 this.putBoolean(this.isOnlySpawningV1Villagers);
-            } else if (protocol >= 407) {
+            } else if (protocolId >= 407) {
                 this.putBoolean(false);
             }
         }

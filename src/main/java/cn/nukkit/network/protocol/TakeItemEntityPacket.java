@@ -9,14 +9,13 @@ public class TakeItemEntityPacket extends DataPacket {
     public long target;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.target = this.getEntityRuntimeId();
         this.entityId = this.getEntityRuntimeId();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putEntityRuntimeId(this.target);
         this.putEntityRuntimeId(this.entityId);
     }

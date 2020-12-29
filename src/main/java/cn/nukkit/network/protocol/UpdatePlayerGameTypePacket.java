@@ -11,14 +11,13 @@ public class UpdatePlayerGameTypePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.gameType = GameType.from(this.getVarInt());
         this.entityId = this.getVarLong();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putVarInt(this.gameType.ordinal());
         this.putVarLong(entityId);
     }

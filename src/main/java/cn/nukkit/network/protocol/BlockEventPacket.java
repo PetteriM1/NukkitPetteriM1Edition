@@ -21,12 +21,11 @@ public class BlockEventPacket extends DataPacket {
     public int case2;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putBlockVector3(this.x, this.y, this.z);
         this.putVarInt(this.case1);
         this.putVarInt(this.case2);

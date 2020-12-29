@@ -13,11 +13,11 @@ public class ResourcePackChunkDataPacket extends DataPacket {
     public byte[] data;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.packId = UUID.fromString(this.getString());
         this.chunkIndex = this.getLInt();
         this.progress = this.getLLong();
-        if (protocol < 388) {
+        if (protocolId < 388) {
             this.data = this.get(this.getLInt());
         } else {
             this.data = this.getByteArray();
@@ -25,12 +25,11 @@ public class ResourcePackChunkDataPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putString(this.packId.toString());
         this.putLInt(this.chunkIndex);
         this.putLLong(this.progress);
-        if (protocol < 388) {
+        if (protocolId < 388) {
             this.putLInt(this.data.length);
             this.put(this.data);
         } else {

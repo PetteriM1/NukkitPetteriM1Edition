@@ -16,7 +16,7 @@ public class PlayerEnchantOptionsPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         int size = (int) this.getUnsignedVarInt();
         if (size > 1000) {
             throw new RuntimeException("EnchantOptions too big: " + size);
@@ -62,8 +62,7 @@ public class PlayerEnchantOptionsPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putUnsignedVarInt(this.options.size());
         for (EnchantOptionData option : this.options) {
             this.putVarInt(option.getMinLevel());

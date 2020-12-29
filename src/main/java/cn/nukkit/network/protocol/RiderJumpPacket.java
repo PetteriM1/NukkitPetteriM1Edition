@@ -13,13 +13,12 @@ public class RiderJumpPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.jumpStrength = this.getVarInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putVarInt(this.jumpStrength);
     }
 }

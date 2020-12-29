@@ -18,18 +18,17 @@ public class ContainerClosePacket extends DataPacket {
     public boolean wasServerInitiated;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.windowId = (byte) this.getByte();
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.wasServerInitiated = this.getBoolean();
         }
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putByte((byte) this.windowId);
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.putBoolean(this.wasServerInitiated);
         }
     }

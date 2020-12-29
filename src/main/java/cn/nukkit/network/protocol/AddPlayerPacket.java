@@ -38,21 +38,20 @@ public class AddPlayerPacket extends DataPacket {
     public int buildPlatform = -1;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putUUID(this.uuid);
         this.putString(this.username);
-        if (protocol >= 223 && protocol <= 282) {
+        if (protocolId >= 223 && protocolId <= 282) {
             this.putString("");
             this.putVarInt(0);
         }
         this.putEntityUniqueId(this.entityUniqueId);
         this.putEntityRuntimeId(this.entityRuntimeId);
-        if (protocol >= 223) {
+        if (protocolId >= 223) {
             this.putString(this.platformChatId);
         }
         this.putVector3f(this.x, this.y, this.z);
@@ -60,9 +59,9 @@ public class AddPlayerPacket extends DataPacket {
         this.putLFloat(this.pitch);
         this.putLFloat(this.yaw);
         this.putLFloat(this.yaw);
-        this.putSlot(protocol, this.item);
-        this.put(Binary.writeMetadata(protocol, this.metadata));
-        if (protocol > 274) {
+        this.putSlot(protocolId, this.item);
+        this.put(Binary.writeMetadata(protocolId, this.metadata));
+        if (protocolId > 274) {
             this.putUnsignedVarInt(0);
             this.putUnsignedVarInt(0);
             this.putUnsignedVarInt(0);
@@ -71,7 +70,7 @@ public class AddPlayerPacket extends DataPacket {
             this.putLLong(entityUniqueId);
             this.putUnsignedVarInt(0);
             this.putString(deviceId);
-            if (protocol >= 388) {
+            if (protocolId >= 388) {
                 this.putLInt(buildPlatform);
             }
         }

@@ -40,13 +40,12 @@ public class ClientboundMapItemDataPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
 
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putEntityUniqueId(mapId);
 
         int update = 0;
@@ -63,7 +62,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
 
         this.putUnsignedVarInt(update);
         this.putByte(this.dimensionId);
-        if (protocol >= 354) {
+        if (protocolId >= 354) {
             this.putBoolean(this.isLocked);
         }
 

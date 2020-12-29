@@ -24,10 +24,10 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     public long compressedPackSize;
     public byte[] sha256;
     public boolean premium;
-    public int type = protocol < 388 ? 1 : TYPE_RESOURCE;
+    public int type = -1;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.packId = UUID.fromString(this.getString());
         this.maxChunkSize = this.getLInt();
         this.chunkCount = this.getLInt();
@@ -40,16 +40,15 @@ public class ResourcePackDataInfoPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putString(this.packId.toString());
         this.putLInt(this.maxChunkSize);
         this.putLInt(this.chunkCount);
         this.putLLong(this.compressedPackSize);
         this.putByteArray(this.sha256);
-        if (protocol >= 361) {
+        if (protocolId >= 361) {
             this.putBoolean(this.premium);
-            this.putByte((byte) this.type);
+            this.putByte((byte) (this.type == -1? (protocolId < ProtocolInfo.v1_13_0? 1 : TYPE_RESOURCE) : type));
         }
     }
 

@@ -17,8 +17,8 @@ public class LecternUpdatePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
-        if (protocol < 354) {
+    public void decodePayload(int protocolId) {
+        if (protocolId < 354) {
             this.page = this.getByte();
             this.blockPosition = this.getBlockVector3();
             this.dropBook = this.getBoolean();
@@ -31,6 +31,6 @@ public class LecternUpdatePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload(int protocolId) {
     }
 }

@@ -24,18 +24,17 @@ public class UpdateTradePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putByte(windowId);
         this.putByte(windowType);
         this.putVarInt(unknownVarInt1);
-        if (protocol < 354) {
+        if (protocolId < 354) {
             this.putVarInt(unknownVarInt2);
-            if (this.protocol >= 313) {
+            if (protocolId >= 313) {
                 this.putVarInt(unknownVarInt3);
             }
             this.putBoolean(isWilling);
@@ -45,7 +44,7 @@ public class UpdateTradePacket extends DataPacket {
         this.putEntityUniqueId(player);
         this.putEntityUniqueId(trader);
         this.putString(displayName);
-        if (protocol >= 354) {
+        if (protocolId >= 354) {
             this.putBoolean(screen2);
             this.putBoolean(isWilling);
         }

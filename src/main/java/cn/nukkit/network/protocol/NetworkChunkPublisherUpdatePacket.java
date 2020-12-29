@@ -15,14 +15,13 @@ public class NetworkChunkPublisherUpdatePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.position = this.getSignedBlockPosition();
         this.radius = (int) this.getUnsignedVarInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putSignedBlockPosition(position);
         this.putUnsignedVarInt(radius);
     }

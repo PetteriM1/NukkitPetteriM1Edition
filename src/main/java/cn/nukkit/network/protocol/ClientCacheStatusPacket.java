@@ -10,13 +10,12 @@ public class ClientCacheStatusPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.supported = this.getBoolean();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putBoolean(this.supported);
     }
 }

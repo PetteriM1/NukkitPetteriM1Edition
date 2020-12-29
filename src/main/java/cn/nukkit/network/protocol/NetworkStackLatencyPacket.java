@@ -14,15 +14,14 @@ public class NetworkStackLatencyPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         timestamp = this.getLLong();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putLLong(timestamp);
-        if (protocol >= 332) {
+        if (protocolId >= 332) {
             this.putBoolean(unknownBool);
         }
     }

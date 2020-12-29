@@ -15,7 +15,7 @@ public class PlayerInputPacket extends DataPacket {
     public boolean sneaking;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.motionX = this.getLFloat();
         this.motionY = this.getLFloat();
         this.jumping = this.getBoolean();
@@ -23,7 +23,7 @@ public class PlayerInputPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload(int protocolId) {
     }
 
     @Override

@@ -18,15 +18,14 @@ public class SetSpawnPositionPacket extends DataPacket {
     public int dimension = 0;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putVarInt(this.spawnType);
         this.putBlockVector3(this.x, this.y, this.z);
-        if (protocol >= 407) {
+        if (protocolId >= 407) {
             this.putVarInt(this.dimension);
             this.putBlockVector3(this.x, this.y, this.z);
         } else {

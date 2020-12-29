@@ -1017,8 +1017,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        packet.protocol = this.protocol;
-
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
             if (server.callDataPkEv) {
                 DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
@@ -1048,8 +1046,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (!this.connected) {
             return false;
         }
-
-        packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
             if (server.callDataPkEv) {
@@ -1089,8 +1085,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false; //HACK
         }
 
-        packet.protocol = this.protocol;
-
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
             if (server.callDataPkEv) {
                 DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
@@ -1102,7 +1096,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.interfaz.putPacket(this, packet, false, true);
         }
-
         return true;
     }
 
@@ -2314,8 +2307,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + " due to player not logged in yet");
             return;
         }
-
-        packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getReceiveDataPacketTiming(packet)) {
             DataPacketReceiveEvent ev = new DataPacketReceiveEvent(this, packet);
@@ -5182,9 +5173,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.chunkZ = chunkZ;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
-        pk.protocol = protocol;
         //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
-        pk.encode();
+        pk.encode(protocol);
 
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];

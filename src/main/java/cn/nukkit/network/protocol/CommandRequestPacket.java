@@ -33,7 +33,7 @@ public class CommandRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.command = this.getString();
 
         CommandOriginData.Origin type = CommandOriginData.Origin.values()[this.getVarInt()];
@@ -47,6 +47,6 @@ public class CommandRequestPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload(int protocolId) {
     }
 }

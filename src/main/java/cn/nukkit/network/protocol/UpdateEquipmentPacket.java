@@ -18,12 +18,11 @@ public class UpdateEquipmentPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putByte((byte) this.windowId);
         this.putByte((byte) this.windowType);
         this.putEntityUniqueId(this.eid);

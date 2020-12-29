@@ -25,12 +25,11 @@ public class BiomeDefinitionListPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
-        this.put(protocol >= ProtocolInfo.v1_16_100 ? TAG419 : TAG361);
+    public void encodePayload(int protocolId) {
+        this.put(protocolId >= ProtocolInfo.v1_16_100 ? TAG419 : TAG361);
     }
 }

@@ -31,7 +31,7 @@ public class LoginPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.protocol_ = this.getInt();
         if (protocol_ == 0) {
             setOffset(getOffset() + 2);
@@ -43,7 +43,7 @@ public class LoginPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload(int protocolId) {
     }
 
     public int getProtocol() {

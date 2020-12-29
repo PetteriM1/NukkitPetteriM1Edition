@@ -27,7 +27,7 @@ public class SetTitlePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.type = this.getVarInt();
         this.text = this.getString();
         this.fadeInTime = this.getVarInt();
@@ -36,8 +36,7 @@ public class SetTitlePacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putVarInt(type);
         this.putString(text);
         this.putVarInt(fadeInTime);

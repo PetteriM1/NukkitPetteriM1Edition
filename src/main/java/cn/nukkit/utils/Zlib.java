@@ -34,23 +34,23 @@ public abstract class Zlib {
         provider = providers[providerIndex];
     }
 
-    public static byte[] deflate(byte[] data) throws Exception {
+    public static byte[] deflate(byte[] data) throws IOException {
         return deflate(data, Deflater.DEFAULT_COMPRESSION);
     }
 
-    public static byte[] deflate(byte[] data, int level) throws Exception {
+    public static byte[] deflate(byte[] data, int level) throws IOException {
         return provider.deflate(data, level);
     }
 
-    public static byte[] deflate(byte[][] data, int level) throws Exception {
+    public static byte[] deflate(byte[][] data, int level) throws IOException {
         return provider.deflate(data, level);
     }
 
-    public static byte[] deflateRaw(byte[] data, int level) throws Exception {
+    public static byte[] deflateRaw(byte[] data, int level) throws IOException {
         return provider.deflateRaw(data, level);
     }
 
-    public static byte[] deflateRaw(byte[][] data, int level) throws Exception {
+    public static byte[] deflateRaw(byte[][] data, int level) throws IOException {
         return provider.deflateRaw(data, level);
     }
 

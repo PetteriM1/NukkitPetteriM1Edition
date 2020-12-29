@@ -18,12 +18,10 @@ public class UpdateAttributesPacket extends DataPacket {
         return ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;
     }
 
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
-    public void encode() {
-        this.reset();
-
+    public void encodePayload(int protocolId) {
         this.putEntityRuntimeId(this.entityId);
 
         if (this.entries == null) {
@@ -39,7 +37,7 @@ public class UpdateAttributesPacket extends DataPacket {
             }
         }
 
-        if (protocol >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
             this.putUnsignedVarInt(this.frame);
         }
     }

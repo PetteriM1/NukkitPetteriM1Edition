@@ -12,13 +12,12 @@ public class HurtArmorPacket extends DataPacket {
     public int damage;
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
     }
 
     @Override
-    public void encode() {
-        this.reset();
-        if (protocol >= 407) {
+    public void encodePayload(int protocolId) {
+        if (protocolId >= 407) {
             this.putVarInt(this.cause);
         }
         this.putVarInt(this.damage);

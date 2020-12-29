@@ -10,13 +10,12 @@ public class OnScreenTextureAnimationPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.effectId = this.getLInt();
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putLInt(this.effectId);
     }
 }

@@ -13,13 +13,12 @@ public class GUIDataPickItemPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
-        this.reset();
+    public void encodePayload(int protocolId) {
         this.putLInt(this.hotbarSlot);
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.hotbarSlot = this.getLInt();
     }
 }

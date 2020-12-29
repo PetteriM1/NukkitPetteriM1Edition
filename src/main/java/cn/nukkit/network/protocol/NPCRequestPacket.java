@@ -28,7 +28,7 @@ public class NPCRequestPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
+    public void decodePayload(int protocolId) {
         this.entityRuntimeId = this.getEntityRuntimeId();
         this.requestType = RequestType.values()[this.getByte()];
         this.commandString = this.getString();
@@ -36,7 +36,7 @@ public class NPCRequestPacket extends DataPacket {
     }
 
     @Override
-    public void encode() {
+    public void encodePayload(int protocolId) {
         this.putEntityRuntimeId(this.entityRuntimeId);
         this.putByte((byte) requestType.ordinal());
         this.putString(this.commandString);
