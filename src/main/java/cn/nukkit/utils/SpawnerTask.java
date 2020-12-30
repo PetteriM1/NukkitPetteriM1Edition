@@ -23,6 +23,8 @@ public class SpawnerTask implements Runnable {
     private final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
     private final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
 
+    private boolean mobsNext; // Split monster and animal spawning to different ticks to avoid lag spikes
+
     public SpawnerTask() {
         this.registerAnimalSpawner(ChickenSpawner.class);
         this.registerAnimalSpawner(CowSpawner.class);
@@ -110,15 +112,20 @@ public class SpawnerTask implements Runnable {
 
     @Override
     public void run() {
-        if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
-            if (Server.getInstance().spawnAnimals) {
-                for (EntitySpawner spawner : animalSpawners.values()) {
-                    spawner.spawn();
+        if (Server.getInstance().getOnlinePlayersCount() != 0) {
+            if (mobsNext) {
+                mobsNext = false;
+                if (Server.getInstance().spawnMobs) {
+                    for (EntitySpawner spawner : mobSpawners.values()) {
+                        spawner.spawn();
+                    }
                 }
-            }
-            if (Server.getInstance().spawnMobs) {
-                for (EntitySpawner spawner : mobSpawners.values()) {
-                    spawner.spawn();
+            } else {
+                mobsNext = true;
+                if (Server.getInstance().spawnAnimals) {
+                    for (EntitySpawner spawner : animalSpawners.values()) {
+                        spawner.spawn();
+                    }
                 }
             }
         }
