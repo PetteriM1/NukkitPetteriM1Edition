@@ -26,6 +26,7 @@ public class HuskSpawner extends AbstractEntitySpawner {
         } else if (level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) > 7) {
         } else if (level.isMobSpawningAllowedByTime()) {
             BaseEntity entity = this.spawnTask.createEntity("Husk", pos.add(0, 1, 0));
+            if (entity == null) return;
             if (Utils.rand(1, 20) == 1) {
                 entity.setBaby(true);
             }

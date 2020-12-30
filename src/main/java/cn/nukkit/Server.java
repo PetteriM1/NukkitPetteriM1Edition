@@ -788,6 +788,10 @@ public class Server {
             this.getLogger().debug("Disabling all plugins...");
             this.disablePlugins();
 
+            if (this.watchdog != null) {
+                this.watchdog.running = false; // TODO: fix
+            }
+
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
                 this.unloadLevel(level, true);

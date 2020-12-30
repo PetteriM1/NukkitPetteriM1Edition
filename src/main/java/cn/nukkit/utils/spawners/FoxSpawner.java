@@ -31,6 +31,7 @@ public class FoxSpawner extends AbstractEntitySpawner {
             int count = Utils.rand(2, 4); // They spawn in groups of 2-4
             for (int i = 0; i < count; i++) {
                 BaseEntity entity = this.spawnTask.createEntity("Fox", pos.add(0, 1, 0));
+                if (entity == null) return;
                 if (Utils.rand(1, 20) == 1) {
                     entity.setBaby(true);
                 }

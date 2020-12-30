@@ -61,6 +61,7 @@ public class SpawnerTask implements Runnable {
         this.registerMobSpawner(WitherSkeletonSpawner.class);
         this.registerMobSpawner(DrownedSpawner.class);
         this.registerMobSpawner(PhantomSpawner.class);
+        this.registerMobSpawner(PiglinSpawner.class);
     }
 
     public boolean registerAnimalSpawner(Class<?> clazz) {
@@ -151,9 +152,11 @@ public class SpawnerTask implements Runnable {
                     entity.spawnToAll();
                 } else {
                     entity.close();
+                    entity = null;
                 }
             } else {
                 entity.close();
+                entity = null;
             }
         }
         return entity;
@@ -248,6 +251,7 @@ public class SpawnerTask implements Runnable {
     private static int getMaxSpawns(int id, boolean nether, boolean end) {
         switch (id) {
             case EntityZombiePigman.NETWORK_ID:
+            case EntityPiglin.NETWORK_ID:
                 return nether ? 4 : 0;
             case EntityGhast.NETWORK_ID:
             case EntityBlaze.NETWORK_ID:
