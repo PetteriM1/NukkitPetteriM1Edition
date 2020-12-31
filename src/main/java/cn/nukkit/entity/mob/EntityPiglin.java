@@ -40,7 +40,7 @@ public class EntityPiglin extends EntityWalkingMob {
     protected void initEntity() {
         super.initEntity();
         this.setMaxHealth(16);
-        this.setDamage(new int[]{0, 5, 9, 13});
+        this.setDamage(new int[]{0, 3, 5, 7});
     }
 
     @Override
