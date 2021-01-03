@@ -4072,9 +4072,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void close(TextContainer message, String reason, boolean notify) {
         if (this.connected && !this.closed) {
             if (notify && !reason.isEmpty()) {
-                DisconnectPacket pk = new DisconnectPacket();
+                DisconnectPacket pk = new DisconnectPacket(); // Batch the packet here to make sure it gets thru before the connection is closed
                 pk.message = reason;
-                this.directDataPacket(pk);
+                pk.protocol = this.protocol;
+                pk.encode();
+                BinaryStream stream = new BinaryStream();
+                byte[] buf = pk.getBuffer();
+                stream.putUnsignedVarInt(buf.length);
+                stream.put(buf);
+                try {
+                    byte[] bytes = Binary.appendBytes(stream.getBuffer());
+                    BatchPacket batched = new BatchPacket();
+                    if (this.protocol >= ProtocolInfo.v1_16_0) {
+                        batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
+                    } else {
+                        batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+                    }
+                    this.directDataPacket(batched);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             this.connected = false;
