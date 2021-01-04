@@ -2312,7 +2312,7 @@ public class Server {
      */
     private void loadSettings() {
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
+        this.networkCompressionLevel = Math.max(Math.min(this.getPropertyInt("compression-level", 4), 9), 0);
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
         this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);
