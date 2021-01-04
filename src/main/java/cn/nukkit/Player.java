@@ -841,7 +841,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= server.spawnThreshold) {
             if (this.protocol < 274) {
-                this.locallyInitialized = true;
                 this.doFirstSpawn();
             }
 
@@ -856,6 +855,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void doFirstSpawn() {
+        this.locallyInitialized = true;
+
         if (this.spawned) {
             return;
         }
@@ -2541,7 +2542,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
-                    if (this.teleportPosition != null) {
+                    if (this.teleportPosition != null || !this.locallyInitialized) {
                         break;
                     }
 
@@ -3722,7 +3723,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         return;
                     }
 
-                    this.locallyInitialized = true;
                     this.doFirstSpawn();
                     break;
                 case ProtocolInfo.RESPAWN_PACKET:
