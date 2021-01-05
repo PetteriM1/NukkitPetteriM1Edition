@@ -4065,8 +4065,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (notify && !reason.isEmpty()) {
                 DisconnectPacket pk = new DisconnectPacket(); // Batch the packet here to make sure it gets thru before the connection is closed
                 pk.message = reason;
-                pk.protocol = this.protocol;
-                pk.encode();
+                pk.encode(this.protocol);
                 BinaryStream stream = new BinaryStream();
                 byte[] buf = pk.getBuffer();
                 stream.putUnsignedVarInt(buf.length);
