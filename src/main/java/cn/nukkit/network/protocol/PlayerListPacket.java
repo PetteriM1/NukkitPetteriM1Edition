@@ -56,7 +56,7 @@ public class PlayerListPacket extends DataPacket {
                 }
                 if (protocolId >= ProtocolInfo.v1_14_60) {
                     for (Entry entry : this.entries) { // WTF Mojang
-                        this.putBoolean(entry.skin.isTrusted());
+                        this.putBoolean(true);
                     }
                 }
                 break;

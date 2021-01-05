@@ -2,9 +2,12 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -16,6 +19,8 @@ import java.util.HashMap;
 public class EntityPiglin extends EntityWalkingMob {
 
     public final static int NETWORK_ID = 123;
+
+    private int angry = 0;
 
     @Override
     public int getNetworkId() {
@@ -35,7 +40,7 @@ public class EntityPiglin extends EntityWalkingMob {
     protected void initEntity() {
         super.initEntity();
         this.setMaxHealth(16);
-        this.setDamage(new int[]{0, 5, 9, 13});
+        this.setDamage(new int[]{0, 3, 5, 7});
     }
 
     @Override
@@ -67,5 +72,40 @@ public class EntityPiglin extends EntityWalkingMob {
             }
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
         }
+    }
+
+    public boolean isAngry() {
+        return this.angry > 0;
+    }
+
+    public void setAngry(int val) {
+        this.angry = val;
+    }
+
+    private static boolean isWearingGold(Player p) {
+        PlayerInventory i = p.getInventory();
+        return i.getHelmetFast().getId() == ItemID.GOLD_HELMET || i.getChestplateFast().getId() == ItemID.GOLD_CHESTPLATE || i.getLeggingsFast().getId() == ItemID.GOLD_LEGGINGS || i.getBootsFast().getId() == ItemID.GOLD_BOOTS;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        super.attack(ev);
+
+        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
+            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.setAngry(600);
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (!creature.isPlayer) return false;
+        if (distance <= 100 && this.isAngry() && creature instanceof EntityPiglin && !((EntityPiglin) creature).isAngry()) {
+            ((EntityPiglin) creature).setAngry(600);
+        }
+        return (this.isAngry() || !isWearingGold((Player) creature)) && super.targetOption(creature, distance);
     }
 }

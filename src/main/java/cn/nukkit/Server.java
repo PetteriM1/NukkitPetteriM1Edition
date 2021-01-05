@@ -531,7 +531,8 @@ public class Server {
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
             this.spawnerTask = new SpawnerTask();
-            this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            int spawnerTicks = Math.max(this.getPropertyInt("ticks-per-entity-spawns", 200), 2) >> 1; // Run the spawner on 2x speed but spawn only either monsters or animals
+            this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, spawnerTicks, spawnerTicks);
         }
 
         // Check for updates
@@ -788,6 +789,10 @@ public class Server {
             this.getLogger().debug("Disabling all plugins...");
             this.disablePlugins();
 
+            if (this.watchdog != null) {
+                this.watchdog.running = false; // TODO: fix
+            }
+
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
                 this.unloadLevel(level, true);
@@ -949,9 +954,7 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
-        for (Player player : players) {
-            player.dataPacket(pk);
-        }
+        Server.broadcastPacket(players, pk);
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
@@ -966,7 +969,9 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_REMOVE;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid)};
-        Server.broadcastPacket(players, pk);
+        for (Player player : players) {
+            player.dataPacket(pk);
+        }
     }
 
     public void removePlayerListData(UUID uuid, Collection<Player> players) {
@@ -2309,7 +2314,7 @@ public class Server {
      */
     private void loadSettings() {
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
+        this.networkCompressionLevel = Math.max(Math.min(this.getPropertyInt("compression-level", 4), 9), 0);
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
         this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);

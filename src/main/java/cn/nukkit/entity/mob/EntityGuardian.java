@@ -72,7 +72,6 @@ public class EntityGuardian extends EntitySwimmingMob {
         damage.put(EntityDamageEvent.DamageModifier.ARMOR,
                 (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
         player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
-
     }
 
     @Override
@@ -90,7 +89,7 @@ public class EntityGuardian extends EntitySwimmingMob {
             }
             if (targetOption((EntityCreature) followTarget,this.distanceSquared(followTarget))) {
                 if (--laserChargeTick < 0) {
-                    attackEntity(followTarget);
+                    if (this.getServer().getMobAiEnabled()) attackEntity(followTarget);
                     this.setDataProperty(new LongEntityData(Entity.DATA_TARGET_EID, laserTargetEid = -1));
                     laserChargeTick = 60;
                 }

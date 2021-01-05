@@ -13,6 +13,6 @@ public class ItemComponentPacket extends DataPacket {
 
     @Override
     public void encodePayload(int protocolId) {
-        this.putVarInt(0); // Send empty array for now
+        this.putUnsignedVarInt(0); // Send an empty array for now
     }
 }

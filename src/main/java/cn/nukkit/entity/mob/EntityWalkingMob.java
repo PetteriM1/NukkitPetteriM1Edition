@@ -153,7 +153,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
         this.entityBaseTick(tickDiff);
 
         Vector3 target = this.updateMove(tickDiff);
-        if ((!this.isFriendly() || !(target instanceof Player)) && target instanceof Entity) {
+        if (this.getServer().getMobAiEnabled() && (!this.isFriendly() || !(target instanceof Player)) && target instanceof Entity) {
             if (target != this.followTarget || this.canAttack) {
                 this.attackEntity((Entity) target);
             }

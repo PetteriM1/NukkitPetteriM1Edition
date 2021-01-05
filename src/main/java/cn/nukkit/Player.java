@@ -840,8 +840,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= server.spawnThreshold) {
-            if (this.protocol < 274) {
-                this.locallyInitialized = true;
+            if (this.protocol <= 274) {
                 this.doFirstSpawn();
             }
 
@@ -856,6 +855,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void doFirstSpawn() {
+        this.locallyInitialized = true;
+
         if (this.spawned) {
             return;
         }
@@ -2532,7 +2533,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
-                    if (this.teleportPosition != null) {
+                    if (this.teleportPosition != null || !this.locallyInitialized) {
                         break;
                     }
 
@@ -3709,11 +3710,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET:
-                    if (this.locallyInitialized || this.protocol < 274) {
+                    if (this.locallyInitialized || this.protocol <= 274) {
                         return;
                     }
 
-                    this.locallyInitialized = true;
                     this.doFirstSpawn();
                     break;
                 case ProtocolInfo.RESPAWN_PACKET:
@@ -4063,9 +4063,26 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void close(TextContainer message, String reason, boolean notify) {
         if (this.connected && !this.closed) {
             if (notify && !reason.isEmpty()) {
-                DisconnectPacket pk = new DisconnectPacket();
+                DisconnectPacket pk = new DisconnectPacket(); // Batch the packet here to make sure it gets thru before the connection is closed
                 pk.message = reason;
-                this.directDataPacket(pk);
+                pk.protocol = this.protocol;
+                pk.encode();
+                BinaryStream stream = new BinaryStream();
+                byte[] buf = pk.getBuffer();
+                stream.putUnsignedVarInt(buf.length);
+                stream.put(buf);
+                try {
+                    byte[] bytes = Binary.appendBytes(stream.getBuffer());
+                    BatchPacket batched = new BatchPacket();
+                    if (this.protocol >= ProtocolInfo.v1_16_0) {
+                        batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
+                    } else {
+                        batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+                    }
+                    this.directDataPacket(batched);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             this.connected = false;
