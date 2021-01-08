@@ -508,7 +508,7 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("thread-watchdog", true)) {
-            this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 50000));
+            this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 60000));
             this.watchdog.start();
         }
 
@@ -788,10 +788,6 @@ public class Server {
 
             this.getLogger().debug("Disabling all plugins...");
             this.disablePlugins();
-
-            if (this.watchdog != null) {
-                this.watchdog.running = false; // TODO: fix
-            }
 
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
@@ -2458,7 +2454,7 @@ public class Server {
             put("ticks-per-entity-spawns", 200);
             put("ticks-per-entity-despawns", 12000);
             put("thread-watchdog", true);
-            put("thread-watchdog-tick", 50000);
+            put("thread-watchdog-tick", 60000);
             put("nether", true);
             put("end", false);
             put("suomicraft-mode", false);
