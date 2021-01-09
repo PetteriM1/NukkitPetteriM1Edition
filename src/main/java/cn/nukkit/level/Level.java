@@ -1828,11 +1828,11 @@ public class Level implements ChunkManager, Metadatable {
         block.level = this;
         int cx = x >> 4;
         int cz = z >> 4;
-        long index = Level.chunkHash(cx, cz);
+
         if (direct) {
             this.sendBlocks(this.getChunkPlayers(cx, cz).values().toArray(new Player[0]), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
         } else {
-            addBlockChange(index, x, y, z);
+            addBlockChange(Level.chunkHash(cx, cz), x, y, z);
         }
 
         for (ChunkLoader loader : this.getChunkLoaders(cx, cz)) {
