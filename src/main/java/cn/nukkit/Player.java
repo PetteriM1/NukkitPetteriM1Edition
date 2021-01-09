@@ -2913,12 +2913,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case InteractPacket.ACTION_OPEN_INVENTORY:
                             if (this.protocol >= 407) {
                                 if (!this.inventoryOpen) {
-                                    InventoryOpenEvent inventoryOpenEvent = new InventoryOpenEvent(this.inventory, this);
-                                    server.getPluginManager().callEvent(inventoryOpenEvent);
-                                    if (!inventoryOpenEvent.isCancelled()) {
-                                        this.inventory.open(this);
-                                        this.inventoryOpen = true;
-                                    }
+                                    this.inventoryOpen = this.inventory.open(this);
                                 }
                             }
                             break;
