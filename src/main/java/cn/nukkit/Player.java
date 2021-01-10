@@ -2198,7 +2198,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 startGamePacket.lightningLevel = this.getLevel().getThunderTime();
             }
         }
-        this.directDataPacket(startGamePacket);
+        this.quickBatch(startGamePacket);
 
         this.loggedIn = true;
 
@@ -4067,26 +4067,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void close(TextContainer message, String reason, boolean notify) {
         if (this.connected && !this.closed) {
             if (notify && !reason.isEmpty()) {
-                DisconnectPacket pk = new DisconnectPacket(); // Batch the packet here to make sure it gets thru before the connection is closed
+                DisconnectPacket pk = new DisconnectPacket();
                 pk.message = reason;
-                pk.protocol = this.protocol;
-                pk.encode();
-                BinaryStream stream = new BinaryStream();
-                byte[] buf = pk.getBuffer();
-                stream.putUnsignedVarInt(buf.length);
-                stream.put(buf);
-                try {
-                    byte[] bytes = Binary.appendBytes(stream.getBuffer());
-                    BatchPacket batched = new BatchPacket();
-                    if (this.protocol >= ProtocolInfo.v1_16_0) {
-                        batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
-                    } else {
-                        batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
-                    }
-                    this.directDataPacket(batched);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                this.quickBatch(pk); // Batch the packet here to make sure it gets thru before the connection is closed
             }
 
             this.connected = false;
@@ -5594,6 +5577,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.fishing = null;
+    }
+
+    /**
+     * Batch packet and send it immediately
+     * @param pk data packet
+     */
+    protected void quickBatch(DataPacket pk) {
+        pk.protocol = this.protocol;
+        pk.encode();
+        BinaryStream stream = new BinaryStream();
+        byte[] buf = pk.getBuffer();
+        stream.putUnsignedVarInt(buf.length);
+        stream.put(buf);
+        try {
+            byte[] bytes = Binary.appendBytes(stream.getBuffer());
+            BatchPacket batched = new BatchPacket();
+            if (this.protocol >= ProtocolInfo.v1_16_0) {
+                batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
+            } else {
+                batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+            }
+            this.directDataPacket(batched);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
