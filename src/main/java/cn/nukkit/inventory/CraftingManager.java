@@ -30,7 +30,7 @@ public class CraftingManager {
     public static BatchPacket packet340 = null;
     public static BatchPacket packet361 = null;
     public static BatchPacket packet354 = null;
-    public static BatchPacket packet338 = null;
+    public static BatchPacket packet388 = null;
     public static BatchPacket packet407 = null;
     public static DataPacket packet419 = null;
 
@@ -282,7 +282,7 @@ public class CraftingManager {
         for (ContainerRecipe recipe : containerRecipes.values()) {
             pk419.addContainerRecipe(recipe);
         }
-        pk419.encode();
+        pk419.tryEncode();
         packet419 = pk419;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk407 = new CraftingDataPacket();
         pk407.cleanRecipes = true;
@@ -303,7 +303,7 @@ public class CraftingManager {
         for (ContainerRecipe recipe : containerRecipes.values()) {
             pk407.addContainerRecipe(recipe);
         }
-        pk407.encode();
+        pk407.tryEncode();
         packet407 = pk407.compress(Deflater.BEST_COMPRESSION);
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
@@ -325,8 +325,8 @@ public class CraftingManager {
         for (ContainerRecipe recipe : containerRecipesOld.values()) {
             pk388.addContainerRecipe(recipe);
         }
-        pk388.encode();
-        packet338 = pk388.compress(Deflater.BEST_COMPRESSION);
+        pk388.tryEncode();
+        packet388 = pk388.compress(Deflater.BEST_COMPRESSION);
         // 361
         CraftingDataPacket pk361 = new CraftingDataPacket();
         pk361.cleanRecipes = true;
@@ -341,7 +341,7 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk361.addFurnaceRecipe(recipe);
         }
-        pk361.encode();
+        pk361.tryEncode();
         packet361 = pk361.compress(Deflater.BEST_COMPRESSION);
         // 354
         CraftingDataPacket pk354 = new CraftingDataPacket();
@@ -357,7 +357,7 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk354.addFurnaceRecipe(recipe);
         }
-        pk354.encode();
+        pk354.tryEncode();
         packet354 = pk354.compress(Deflater.BEST_COMPRESSION);
         // 340
         CraftingDataPacket pk340 = new CraftingDataPacket();
@@ -373,7 +373,7 @@ public class CraftingManager {
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk340.addFurnaceRecipe(recipe);
         }
-        pk340.encode();
+        pk340.tryEncode();
         packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
         // 313
         CraftingDataPacket pk313 = new CraftingDataPacket();
@@ -390,7 +390,7 @@ public class CraftingManager {
         /*for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk313.addFurnaceRecipe(recipe);
         }*/
-        pk313.encode();
+        pk313.tryEncode();
         packet313 = pk313.compress(Deflater.BEST_COMPRESSION);
     }
 

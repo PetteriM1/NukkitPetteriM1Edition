@@ -999,7 +999,7 @@ public class Server {
         } else if (player.protocol >= ProtocolInfo.v1_16_0) {
             player.dataPacket(CraftingManager.packet407);
         } else if (player.protocol > ProtocolInfo.v1_12_0) {
-            player.dataPacket(CraftingManager.packet338);
+            player.dataPacket(CraftingManager.packet388);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
         } else if (player.protocol == ProtocolInfo.v1_11_0) {

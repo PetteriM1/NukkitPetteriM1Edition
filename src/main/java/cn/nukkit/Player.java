@@ -5178,8 +5178,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
         pk.protocol = protocol;
-        //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
-        pk.encode();
+        pk.tryEncode();
 
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
@@ -5585,7 +5584,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     protected void quickBatch(DataPacket pk) {
         pk.protocol = this.protocol;
-        pk.encode();
+        pk.tryEncode();
         BinaryStream stream = new BinaryStream();
         byte[] buf = pk.getBuffer();
         stream.putUnsignedVarInt(buf.length);

@@ -52,9 +52,7 @@ public class BatchingThread extends Thread {
                         if (!encodedPacket.containsKey(encodingProtocol)) {
                             DataPacket pk = packet.clone();
                             pk.protocol = encodingProtocol;
-                            if (!pk.isEncoded) {
-                                pk.encode();
-                            }
+                            packet.tryEncode();
                             encodedPacket.put(encodingProtocol, pk);
                         }
                     }
@@ -74,7 +72,7 @@ public class BatchingThread extends Thread {
                         if (packet instanceof BatchPacket) {
                             throw new RuntimeException("Cannot batch BatchPacket");
                         }
-                        if (!packet.isEncoded) packet.encode();
+                        packet.tryEncode();
                         byte[] buf = packet.getBuffer();
                         batched.putUnsignedVarInt(buf.length);
                         batched.put(buf);

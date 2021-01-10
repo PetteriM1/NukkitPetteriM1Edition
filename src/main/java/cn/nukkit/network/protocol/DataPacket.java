@@ -15,7 +15,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
 
     public int protocol = 999;
 
-    public boolean isEncoded = false;
+    public volatile boolean isEncoded = false;
     private int channel = Network.CHANNEL_NONE;
 
     public RakNetReliability reliability = RakNetReliability.RELIABLE_ORDERED;
@@ -83,5 +83,12 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
             throw new RuntimeException(e);
         }
         return batch;
+    }
+
+    public final void tryEncode() {
+        if (!this.isEncoded) {
+            this.isEncoded = true;
+            this.encode();
+        }
     }
 }
