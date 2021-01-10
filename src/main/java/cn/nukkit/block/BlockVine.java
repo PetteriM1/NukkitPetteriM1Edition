@@ -251,7 +251,7 @@ public class BlockVine extends BlockTransparentMeta {
         for (int x = blockX - 4; x <= blockX + 4; x++) {
             for (int z = blockZ - 4; z <= blockZ + 4; z++) {
                 for (int y = blockY - 1; y <= blockY + 1; y++) {
-                    if (this.level.getBlock(x, y, z).getId() == VINE) {
+                    if (this.level.getBlockIdAt(x, y, z) == VINE) {
                         if (++count >= 5) return false;
                     }
                 }
