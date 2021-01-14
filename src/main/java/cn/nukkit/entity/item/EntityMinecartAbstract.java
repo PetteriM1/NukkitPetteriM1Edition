@@ -17,7 +17,6 @@ import cn.nukkit.item.ItemMinecart;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.MathHelper;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.Vector3;
@@ -273,9 +272,6 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         for (Entity passenger : new ArrayList<>(this.passengers)) {
             dismountEntity(passenger);
         }
-
-        SmokeParticle particle = new SmokeParticle(this);
-        level.addParticle(particle);
     }
 
     @Override
