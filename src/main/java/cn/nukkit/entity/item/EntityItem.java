@@ -141,7 +141,7 @@ public class EntityItem extends Entity {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-            Entity[] e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
+            Entity[] e = null;
 
             if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
@@ -149,6 +149,7 @@ public class EntityItem extends Entity {
                     this.pickupDelay = 0;
                 }
             } else {
+                e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
                 for (Entity entity : e) {
                     if (entity.isPlayer) {
                         if (((Player) entity).pickupEntity(this, true)) {
@@ -173,6 +174,10 @@ public class EntityItem extends Entity {
 
             if (this.age % 200 == 0 && this.onGround && this.item != null) {
                 if (this.item.getCount() < this.item.getMaxStackSize()) {
+                    if (e == null) {
+                        e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
+                    }
+
                     for (Entity entity : e) {
                         if (entity instanceof EntityItem) {
                             if (!entity.isAlive()) {

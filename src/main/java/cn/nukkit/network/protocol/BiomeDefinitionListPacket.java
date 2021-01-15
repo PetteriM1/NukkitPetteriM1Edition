@@ -7,13 +7,12 @@ import lombok.ToString;
 @ToString()
 public class BiomeDefinitionListPacket extends DataPacket {
 
-    private static final byte[] TAG361;
-    private static final byte[] TAG419;
+    // Call the latest version "TAG"
+    private static final byte[] TAG; // 361
 
     static {
         try {
-            TAG361 = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat"));
-            TAG419 = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_419.dat"));
+            TAG = ByteStreams.toByteArray(Nukkit.class.getClassLoader().getResourceAsStream("biome_definitions_361.dat"));
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading biome definitions", e);
         }
@@ -30,6 +29,6 @@ public class BiomeDefinitionListPacket extends DataPacket {
 
     @Override
     public void encodePayload(int protocolId) {
-        this.put(protocolId >= ProtocolInfo.v1_16_100 ? TAG419 : TAG361);
+        this.put(TAG);
     }
 }

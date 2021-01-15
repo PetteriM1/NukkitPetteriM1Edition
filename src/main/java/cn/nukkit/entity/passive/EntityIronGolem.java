@@ -37,12 +37,12 @@ public class EntityIronGolem extends EntityWalkingMob {
 
     @Override
     public float getHeight() {
-        return 2.7f;
+        return 2.9f;
     }
 
     @Override
     public double getSpeed() {
-        return 0.8;
+        return 0.7;
     }
 
     @Override

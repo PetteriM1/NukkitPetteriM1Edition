@@ -1766,8 +1766,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.entityId = this.getId();
         pk.entries = new Attribute[]{
                 Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
-                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getLevel()),
-                Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()),
+                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getLevel()).setDefaultValue(this.foodData.getMaxLevel()),
+                Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()).setDefaultValue(this.getMovementSpeed()),
                 Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(this.expLevel),
                 Attribute.getAttribute(Attribute.EXPERIENCE).setValue(((float) this.exp) / calculateRequireExperience(this.expLevel))
         };
@@ -2191,7 +2191,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 startGamePacket.lightningLevel = this.getLevel().getThunderTime();
             }
         }
-        this.directDataPacket(startGamePacket);
+        this.quickBatch(startGamePacket);
 
         this.loggedIn = true;
 
@@ -2904,12 +2904,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case InteractPacket.ACTION_OPEN_INVENTORY:
                             if (this.protocol >= 407) {
                                 if (!this.inventoryOpen) {
-                                    InventoryOpenEvent inventoryOpenEvent = new InventoryOpenEvent(this.inventory, this);
-                                    server.getPluginManager().callEvent(inventoryOpenEvent);
-                                    if (!inventoryOpenEvent.isCancelled()) {
-                                        this.inventory.open(this);
-                                        this.inventoryOpen = true;
-                                    }
+                                    this.inventoryOpen = this.inventory.open(this);
                                 }
                             }
                             break;
@@ -4063,25 +4058,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void close(TextContainer message, String reason, boolean notify) {
         if (this.connected && !this.closed) {
             if (notify && !reason.isEmpty()) {
-                DisconnectPacket pk = new DisconnectPacket(); // Batch the packet here to make sure it gets thru before the connection is closed
+                DisconnectPacket pk = new DisconnectPacket();
                 pk.message = reason;
-                pk.encode(this.protocol);
-                BinaryStream stream = new BinaryStream();
-                byte[] buf = pk.getBuffer();
-                stream.putUnsignedVarInt(buf.length);
-                stream.put(buf);
-                try {
-                    byte[] bytes = Binary.appendBytes(stream.getBuffer());
-                    BatchPacket batched = new BatchPacket();
-                    if (this.protocol >= ProtocolInfo.v1_16_0) {
-                        batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
-                    } else {
-                        batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
-                    }
-                    this.directDataPacket(batched);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                this.quickBatch(pk); // Batch the packet here to make sure it gets thru before the connection is closed
             }
 
             this.connected = false;
@@ -4510,7 +4489,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setMovementSpeed(float speed, boolean send) {
         super.setMovementSpeed(speed);
         if (this.spawned && send) {
-            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed));
+            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed).setDefaultValue(speed));
         }
     }
 
@@ -5189,8 +5168,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.chunkZ = chunkZ;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
-        //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
-        pk.encode(protocol);
+        pk.tryEncode(protocol);
 
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
@@ -5588,6 +5566,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.fishing = null;
+    }
+
+    /**
+     * Batch packet and send it immediately
+     * @param pk data packet
+     */
+    protected void quickBatch(DataPacket pk) {
+        pk.tryEncode(this.protocol);
+        BinaryStream stream = new BinaryStream();
+        byte[] buf = pk.getBuffer();
+        stream.putUnsignedVarInt(buf.length);
+        stream.put(buf);
+        try {
+            byte[] bytes = Binary.appendBytes(stream.getBuffer());
+            BatchPacket batched = new BatchPacket();
+            if (this.protocol >= ProtocolInfo.v1_16_0) {
+                batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
+            } else {
+                batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+            }
+            this.directDataPacket(batched);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

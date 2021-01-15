@@ -58,7 +58,7 @@ public class BatchingHelper {
                 if (!encodedPacket.containsKey(encodingProtocol)) {
                     DataPacket pk = packet.clone();
                     if (!pk.isEncoded) {
-                        pk.encode(encodingProtocol);
+                        pk.tryEncode(encodingProtocol);
                     }
                     encodedPacket.put(encodingProtocol, pk);
                 }
@@ -80,7 +80,7 @@ public class BatchingHelper {
                     throw new RuntimeException("Cannot batch BatchPacket");
                 }
                 if (!packet.isEncoded) {
-                    packet.encode(protocolId);
+                    packet.tryEncode(protocolId);
                 }
                 byte[] buf = packet.getBuffer();
                 batched.putUnsignedVarInt(buf.length);
