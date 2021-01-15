@@ -6,6 +6,7 @@ import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.projectile.EntitySnowball;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityShootBowEvent;
 import cn.nukkit.event.entity.ProjectileLaunchEvent;
@@ -58,7 +59,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
     @Override
     public boolean targetOption(EntityCreature creature, double distance) {
-        return !(creature instanceof Player) && creature.isAlive() && distance <= 100;
+        return (!(creature instanceof Player) || creature.getId() == this.isAngryTo) && creature.isAlive() && distance <= 100;
     }
 
     @Override
@@ -147,5 +148,17 @@ public class EntitySnowGolem extends EntityWalkingMob {
         super.saveNBT();
 
         this.namedTag.putBoolean("Sheared", this.sheared);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (super.attack(ev)) {
+            if (ev instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.isAngryTo = ((EntityDamageByEntityEvent) ev).getDamager().getId();
+            }
+            return true;
+        }
+
+        return false;
     }
 }
