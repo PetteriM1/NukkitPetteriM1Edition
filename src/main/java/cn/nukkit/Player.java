@@ -1558,8 +1558,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             double dy = newPos.y - this.y;
             double dz = newPos.z - this.z;
 
-            //the client likes to clip into blocks like stairs, but we do full server-side prediction of that without
-            //help from the client's position changes, so we deduct the expected clip height from the moved distance.
+            // The client likes to clip into blocks like stairs, but we do full server-side prediction of that without
+            // Help from the client's position changes, so we deduct the expected clip height from the moved distance.
             double expectedClipDistance = this.ySize * (1 - STEP_CLIP_MULTIPLIER);
             dy -= expectedClipDistance;
 
@@ -4627,8 +4627,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.ySize = 0;
 
         if (targets != null) {
+            if (Arrays.stream(targets).anyMatch(target -> target == this)) {
+                this.ySize = 0;
+            }
             Server.broadcastPacket(targets, pk);
         } else {
+            this.ySize = 0;
             pk.eid = this.id;
             this.dataPacket(pk);
         }
@@ -4645,7 +4649,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.yaw = (float) yaw;
         pk.mode = mode;
 
-        this.ySize = 0;
+        if (targets.stream().anyMatch(target -> target == this)) {
+            this.ySize = 0;
+        }
 
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
         Server.broadcastPacket(targets, pk);

@@ -1863,9 +1863,8 @@ public abstract class Entity extends Location implements Metadatable {
                         NukkitMath.floorDouble(this.z))
         );
 
-        AxisAlignedBB bb = block.getBoundingBox();
-
-        return bb != null && block.isSolid() && !block.isTransparent() && bb.intersectsWith(this.boundingBox) && !(block instanceof BlockSlab); // The instanceof BlockSlab check is a hack to fix issues with the solid slab hack
+        // TODO: maybe add !(block instanceof BlockSlab) - The instanceof BlockSlab check is a hack to fix issues with the solid slab hack
+        return block.isSolid() && !block.isTransparent() && block.collidesWithBB(this.getBoundingBox());
     }
 
     public boolean isInsideOfFire() {
@@ -1889,8 +1888,9 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.startTiming();
 
-        AxisAlignedBB newBB = this.boundingBox.getOffsetBoundingBox(dx, dy, dz);
+        this.ySize *= STEP_CLIP_MULTIPLIER;
 
+        AxisAlignedBB newBB = this.boundingBox.getOffsetBoundingBox(dx, dy, dz);
         if (server.getAllowFlight() || !this.level.hasCollision(this, newBB, false)) {
             this.boundingBox = newBB;
         }
@@ -2047,9 +2047,9 @@ public abstract class Entity extends Location implements Metadatable {
             int minX = NukkitMath.floorDouble(this.boundingBox.minX);
             int minY = NukkitMath.floorDouble(this.boundingBox.minY);
             int minZ = NukkitMath.floorDouble(this.boundingBox.minZ);
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.maxX);
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.maxY);
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.maxZ);
+            int maxX = NukkitMath.floorDouble(this.boundingBox.maxX);
+            int maxY = NukkitMath.floorDouble(this.boundingBox.maxY);
+            int maxZ = NukkitMath.floorDouble(this.boundingBox.maxZ);
 
             this.blocksAround = new ArrayList<>();
 

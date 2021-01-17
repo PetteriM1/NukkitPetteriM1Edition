@@ -56,6 +56,11 @@ public class BlockAir extends BlockTransparent {
     }
 
     @Override
+    public AxisAlignedBB[] getCollisionBoundingBoxes() {
+        return new AxisAlignedBB[0];
+    }
+
+    @Override
     public double getHardness() {
         return 0;
     }

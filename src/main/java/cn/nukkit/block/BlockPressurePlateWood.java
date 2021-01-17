@@ -60,14 +60,14 @@ public class BlockPressurePlateWood extends BlockPressurePlateBase {
 
     @Override
     protected int computeRedstoneStrength() {
-        AxisAlignedBB bb = getCollisionBoundingBox();
-
-        for (Entity entity : this.level.getCollidingEntities(bb)) {
-            if (entity.doesTriggerPressurePlate()) {
-                return 15;
+        AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
+        for (AxisAlignedBB bb : bbs) {
+            for (Entity entity : this.level.getCollidingEntities(bb)) {
+                if (entity.doesTriggerPressurePlate()) {
+                    return 15;
+                }
             }
         }
-
         return 0;
     }
 }

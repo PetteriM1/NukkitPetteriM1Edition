@@ -19,26 +19,51 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        if ((this.getDamage() & 0x04) > 0) {
-            return new AxisAlignedBB(
-                    this.x,
-                    this.y + 0.5,
-                    this.z,
-                    this.x + 1,
-                    this.y + 1,
-                    this.z + 1
-            );
-        } else {
-            return new AxisAlignedBB(
-                    this.x,
-                    this.y,
-                    this.z,
-                    this.x + 1,
-                    this.y + 0.5,
-                    this.z + 1
-            );
+    protected AxisAlignedBB[] recalculateCollisionBoxes() {
+        double minYSlab = (this.getDamage() & 0x04) == 0? 0 : 0.5;
+        double maxYSlab = minYSlab + 0.5;
+
+        AxisAlignedBB bb1 = new AxisAlignedBB(
+                this.x,
+                this.y + minYSlab,
+                this.z,
+                this.x + 1,
+                this.y + maxYSlab,
+                this.z + 1
+        );
+
+        int rotationMeta  = this.getDamage() & 0x03;
+        double minY = (this.getDamage() & 0x04) == 0? 0.5 : 0;
+        double maxY = minY + 0.5;
+        double minX = 0;
+        double maxX = 1;
+        double minZ = 0;
+        double maxZ = 1;
+
+        switch (rotationMeta) {
+            case 0:
+                minX = 0.5;
+                break;
+            case 1:
+                maxX = 0.5;
+                break;
+            case 2:
+                minZ = 0.5;
+                break;
+            case 3:
+                maxZ = 0.5;
+                break;
         }
+
+        AxisAlignedBB bb2 = new AxisAlignedBB(
+                this.x + minX,
+                this.y + minY,
+                this.z + minZ,
+                this.x + maxX,
+                this.y + maxY,
+                this.z + maxZ
+        );
+        return new AxisAlignedBB[]{bb1, bb2};
     }
 
     @Override
@@ -68,74 +93,6 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
         Item item = super.toItem();
         item.setDamage(0);
         return item;
-    }
-
-    @Override
-    public boolean collidesWithBB(AxisAlignedBB bb) {
-        int damage = this.getDamage();
-        int side = damage & 0x03;
-        double f = 0;
-        double f1 = 0.5;
-        double f2 = 0.5;
-        double f3 = 1;
-        if ((damage & 0x04) > 0) {
-            f = 0.5;
-            f1 = 1;
-            f2 = 0;
-            f3 = 0.5;
-        }
-
-        if (bb.intersectsWith(new AxisAlignedBB(
-                this.x,
-                this.y + f,
-                this.z,
-                this.x + 1,
-                this.y + f1,
-                this.z + 1
-        ))) {
-            return true;
-        }
-
-
-        if (side == 0) {
-            return bb.intersectsWith(new AxisAlignedBB(
-                    this.x + 0.5,
-                    this.y + f2,
-                    this.z,
-                    this.x + 1,
-                    this.y + f3,
-                    this.z + 1
-            ));
-        } else if (side == 1) {
-            return bb.intersectsWith(new AxisAlignedBB(
-                    this.x,
-                    this.y + f2,
-                    this.z,
-                    this.x + 0.5,
-                    this.y + f3,
-                    this.z + 1
-            ));
-        } else if (side == 2) {
-            return bb.intersectsWith(new AxisAlignedBB(
-                    this.x,
-                    this.y + f2,
-                    this.z + 0.5,
-                    this.x + 1,
-                    this.y + f3,
-                    this.z + 1
-            ));
-        } else if (side == 3) {
-            return bb.intersectsWith(new AxisAlignedBB(
-                    this.x,
-                    this.y + f2,
-                    this.z,
-                    this.x + 1,
-                    this.y + f3,
-                    this.z + 0.5
-            ));
-        }
-
-        return false;
     }
 
     @Override

@@ -39,7 +39,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     public static double[] hardness = null;
     public static boolean[] transparent = null;
     public AxisAlignedBB boundingBox = null;
-    public AxisAlignedBB collisionBoundingBox = null;
+    protected AxisAlignedBB[] collisionBoxes = null;
     public static boolean[] hasMeta = null;
 
     protected Block() {}
@@ -774,8 +774,13 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
     }
 
     public boolean collidesWithBB(AxisAlignedBB bb, boolean collisionBB) {
-        AxisAlignedBB bb1 = collisionBB ? this.getCollisionBoundingBox() : this.getBoundingBox();
-        return bb1 != null && bb.intersectsWith(bb1);
+        AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
+        for (AxisAlignedBB bb1 : bbs) {
+            if (bb1 != null && bb.intersectsWith(bb1)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void onEntityCollide(Entity entity) {
@@ -788,11 +793,11 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         return this.boundingBox;
     }
 
-    public AxisAlignedBB getCollisionBoundingBox() {
-        if (this.collisionBoundingBox == null) {
-            this.collisionBoundingBox = this.recalculateCollisionBoundingBox();
+    public AxisAlignedBB[] getCollisionBoundingBoxes() {
+        if (this.collisionBoxes == null) {
+            this.collisionBoxes = this.recalculateCollisionBoxes();
         }
-        return this.collisionBoundingBox;
+        return this.collisionBoxes;
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
@@ -806,90 +811,36 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         );
     }
 
+    protected AxisAlignedBB[] recalculateCollisionBoxes() {
+        return new AxisAlignedBB[]{this.recalculateCollisionBoundingBox()};
+    }
+
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return getBoundingBox();
+        return this.getBoundingBox();
     }
 
     public MovingObjectPosition calculateIntercept(Vector3 pos1, Vector3 pos2) {
-        AxisAlignedBB bb = this.getBoundingBox();
-        if (bb == null) {
+        AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
+        if (bbs == null || bbs.length < 1) {
             return null;
         }
 
-        Vector3 v1 = pos1.getIntermediateWithXValue(pos2, bb.minX);
-        Vector3 v2 = pos1.getIntermediateWithXValue(pos2, bb.maxX);
-        Vector3 v3 = pos1.getIntermediateWithYValue(pos2, bb.minY);
-        Vector3 v4 = pos1.getIntermediateWithYValue(pos2, bb.maxY);
-        Vector3 v5 = pos1.getIntermediateWithZValue(pos2, bb.minZ);
-        Vector3 v6 = pos1.getIntermediateWithZValue(pos2, bb.maxZ);
+        MovingObjectPosition currentHit = null;
+        double currentDistance = Float.MAX_VALUE;
 
-        if (v1 != null && !bb.isVectorInYZ(v1)) {
-            v1 = null;
+        for (AxisAlignedBB bb : bbs) {
+            MovingObjectPosition nextHit = bb.calculateIntercept(pos1, pos2);
+            if (nextHit == null) {
+                continue;
+            }
+
+            double nextDistance = nextHit.hitVector.distanceSquared(pos1);
+            if (nextDistance < currentDistance) {
+                currentHit = nextHit;
+                currentDistance = nextDistance;
+            }
         }
-
-        if (v2 != null && !bb.isVectorInYZ(v2)) {
-            v2 = null;
-        }
-
-        if (v3 != null && !bb.isVectorInXZ(v3)) {
-            v3 = null;
-        }
-
-        if (v4 != null && !bb.isVectorInXZ(v4)) {
-            v4 = null;
-        }
-
-        if (v5 != null && !bb.isVectorInXY(v5)) {
-            v5 = null;
-        }
-
-        if (v6 != null && !bb.isVectorInXY(v6)) {
-            v6 = null;
-        }
-
-        Vector3 vector = v1;
-
-        if (v2 != null && (vector == null || pos1.distanceSquared(v2) < pos1.distanceSquared(vector))) {
-            vector = v2;
-        }
-
-        if (v3 != null && (vector == null || pos1.distanceSquared(v3) < pos1.distanceSquared(vector))) {
-            vector = v3;
-        }
-
-        if (v4 != null && (vector == null || pos1.distanceSquared(v4) < pos1.distanceSquared(vector))) {
-            vector = v4;
-        }
-
-        if (v5 != null && (vector == null || pos1.distanceSquared(v5) < pos1.distanceSquared(vector))) {
-            vector = v5;
-        }
-
-        if (v6 != null && (vector == null || pos1.distanceSquared(v6) < pos1.distanceSquared(vector))) {
-            vector = v6;
-        }
-
-        if (vector == null) {
-            return null;
-        }
-
-        int f = -1;
-
-        if (vector == v1) {
-            f = 4;
-        } else if (vector == v2) {
-            f = 5;
-        } else if (vector == v3) {
-            f = 0;
-        } else if (vector == v4) {
-            f = 1;
-        } else if (vector == v5) {
-            f = 2;
-        } else if (vector == v6) {
-            f = 3;
-        }
-
-        return MovingObjectPosition.fromBlock((int) this.x, (int) this.y, (int) this.z, f, vector.add(this.x, this.y, this.z));
+        return currentHit;
     }
 
     public String getSaveId() {

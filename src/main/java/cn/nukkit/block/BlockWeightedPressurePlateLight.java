@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.utils.BlockColor;
 
@@ -69,7 +70,13 @@ public class BlockWeightedPressurePlateLight extends BlockPressurePlateBase {
 
     @Override
     protected int computeRedstoneStrength() {
-        int count = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
+        AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
+        int count = 0;
+        for (AxisAlignedBB bb : bbs) {
+            if ((count = Math.min(this.level.getCollidingEntities(bb).length, this.getMaxWeight())) > 0) {
+                break;
+            }
+        }
 
         if (count > 0) {
             float f = (float) Math.min(this.getMaxWeight(), count) / (float) this.getMaxWeight();

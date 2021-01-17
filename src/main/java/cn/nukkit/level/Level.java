@@ -1451,9 +1451,9 @@ public class Level implements ChunkManager, Metadatable {
         int minX = NukkitMath.floorDouble(bb.minX);
         int minY = NukkitMath.floorDouble(bb.minY);
         int minZ = NukkitMath.floorDouble(bb.minZ);
-        int maxX = NukkitMath.ceilDouble(bb.maxX);
-        int maxY = NukkitMath.ceilDouble(bb.maxY);
-        int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+        int maxX = NukkitMath.floorDouble(bb.maxX);
+        int maxY = NukkitMath.floorDouble(bb.maxY);
+        int maxZ = NukkitMath.floorDouble(bb.maxZ);
 
         List<Block> collides = new ArrayList<>();
 
@@ -1510,9 +1510,9 @@ public class Level implements ChunkManager, Metadatable {
         int minX = NukkitMath.floorDouble(bb.minX);
         int minY = NukkitMath.floorDouble(bb.minY);
         int minZ = NukkitMath.floorDouble(bb.minZ);
-        int maxX = NukkitMath.ceilDouble(bb.maxX);
-        int maxY = NukkitMath.ceilDouble(bb.maxY);
-        int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+        int maxX = NukkitMath.floorDouble(bb.maxX);
+        int maxY = NukkitMath.floorDouble(bb.maxY);
+        int maxZ = NukkitMath.floorDouble(bb.maxZ);
 
         List<AxisAlignedBB> collides = new ArrayList<>();
 
@@ -1520,8 +1520,12 @@ public class Level implements ChunkManager, Metadatable {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
                     Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
-                    if (!block.canPassThrough() && block.collidesWithBB(bb)) {
-                        collides.add(block.getBoundingBox());
+                    if (!block.canPassThrough()) {
+                        for (AxisAlignedBB blockBB : block.getCollisionBoundingBoxes()) {
+                            if (blockBB.intersectsWith(bb)) {
+                                collides.add(blockBB);
+                            }
+                        }
                     }
                 }
             }
@@ -2248,27 +2252,20 @@ public class Level implements ChunkManager, Metadatable {
             hand.position(block);
         }
 
-        if (!hand.canPassThrough() && hand.getBoundingBox() != null) {
-            Entity[] entities = this.getCollidingEntities(hand.getBoundingBox());
-            int realCount = 0;
-            for (Entity e : entities) {
-                if (e == player || e instanceof EntityArrow || e instanceof EntityItem || (e instanceof Player && ((Player) e).isSpectator() || !e.canCollide())) {
-                    continue;
-                }
-                ++realCount;
-            }
-
-            if (player != null) {
-                Vector3 diff = player.getNextPosition().subtract(player.getPosition());
-                //if (diff.lengthSquared() > 0.00001) {
-                    if (hand.getBoundingBox().intersectsWith(player.getBoundingBox().getOffsetBoundingBox(diff.x, diff.y, diff.z))) {
-                        ++realCount;
+        if (!hand.canPassThrough() || hand.isSolid()) {
+            for (AxisAlignedBB collisionBox : hand.getCollisionBoundingBoxes()) {
+                Entity[] entities = this.getCollidingEntities(collisionBox);
+                int realCount = 0;
+                for (Entity e : entities) {
+                    if (e == player || e instanceof EntityArrow || e instanceof EntityItem || (e instanceof Player && ((Player) e).isSpectator() || !e.canCollide())) {
+                        continue;
                     }
-                //}
-            }
+                    ++realCount;
+                }
 
-            if (realCount > 0) {
-                return null;
+                if (realCount > 0) {
+                    return null; // Entity in block
+                }
             }
         }
 
