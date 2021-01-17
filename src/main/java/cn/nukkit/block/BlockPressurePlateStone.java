@@ -67,9 +67,11 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
     protected int computeRedstoneStrength() {
         AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
         for (AxisAlignedBB bb : bbs) {
-            for (Entity entity : this.level.getCollidingEntities(bb)) {
-                if (entity instanceof EntityLiving && entity.doesTriggerPressurePlate()) {
-                    return 15;
+            if (bb != null) {
+                for (Entity entity : this.level.getCollidingEntities(bb)) {
+                    if (entity instanceof EntityLiving && entity.doesTriggerPressurePlate()) {
+                        return 15;
+                    }
                 }
             }
         }

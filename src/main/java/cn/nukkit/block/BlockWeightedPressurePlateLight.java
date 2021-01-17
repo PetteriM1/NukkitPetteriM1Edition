@@ -73,7 +73,7 @@ public class BlockWeightedPressurePlateLight extends BlockPressurePlateBase {
         AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
         int count = 0;
         for (AxisAlignedBB bb : bbs) {
-            if ((count = Math.min(this.level.getCollidingEntities(bb).length, this.getMaxWeight())) > 0) {
+            if (bb != null && (count = Math.min(this.level.getCollidingEntities(bb).length, this.getMaxWeight())) > 0) {
                 break;
             }
         }

@@ -1522,7 +1522,7 @@ public class Level implements ChunkManager, Metadatable {
                     Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
                     if (!block.canPassThrough()) {
                         for (AxisAlignedBB blockBB : block.getCollisionBoundingBoxes()) {
-                            if (blockBB.intersectsWith(bb)) {
+                            if (blockBB != null && blockBB.intersectsWith(bb)) {
                                 collides.add(blockBB);
                             }
                         }
@@ -2254,6 +2254,9 @@ public class Level implements ChunkManager, Metadatable {
 
         if (!hand.canPassThrough() || hand.isSolid()) {
             for (AxisAlignedBB collisionBox : hand.getCollisionBoundingBoxes()) {
+                if (collisionBox == null) {
+                    continue;
+                }
                 Entity[] entities = this.getCollidingEntities(collisionBox);
                 int realCount = 0;
                 for (Entity e : entities) {

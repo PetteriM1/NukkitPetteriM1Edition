@@ -123,10 +123,12 @@ public class BlockTripWire extends BlockFlowable {
             boolean found = false;
             AxisAlignedBB[] bbs = this.getCollisionBoundingBoxes();
             for (AxisAlignedBB bb : bbs) {
-                Entity[] e = this.level.getCollidingEntities(bb);
-                for (Entity entity : e) {
-                    if (entity.doesTriggerPressurePlate()) {
-                        found = true;
+                if (bb != null) {
+                    Entity[] e = this.level.getCollidingEntities(bb);
+                    for (Entity entity : e) {
+                        if (entity.doesTriggerPressurePlate()) {
+                            found = true;
+                        }
                     }
                 }
             }

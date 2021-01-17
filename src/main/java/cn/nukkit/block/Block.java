@@ -829,6 +829,9 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
         double currentDistance = Float.MAX_VALUE;
 
         for (AxisAlignedBB bb : bbs) {
+            if (bb == null) {
+                continue;
+            }
             MovingObjectPosition nextHit = bb.calculateIntercept(pos1, pos2);
             if (nextHit == null) {
                 continue;
