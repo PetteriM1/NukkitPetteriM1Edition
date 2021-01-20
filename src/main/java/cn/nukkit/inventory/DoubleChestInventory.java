@@ -115,28 +115,24 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
         this.right.viewers.add(who);
 
         if (this.getViewers().size() == 1) {
-            BlockEventPacket pk1 = new BlockEventPacket();
-            pk1.x = (int) this.left.getHolder().getX();
-            pk1.y = (int) this.left.getHolder().getY();
-            pk1.z = (int) this.left.getHolder().getZ();
-            pk1.case1 = 1;
-            pk1.case2 = 2;
             Level level = this.left.getHolder().getLevel();
             if (level != null) {
-                level.addLevelSoundEvent(this.left.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
+                BlockEventPacket pk1 = new BlockEventPacket();
+                pk1.x = (int) this.left.getHolder().getX();
+                pk1.y = (int) this.left.getHolder().getY();
+                pk1.z = (int) this.left.getHolder().getZ();
+                pk1.case1 = 1;
+                pk1.case2 = 2;
+
+                BlockEventPacket pk2 = new BlockEventPacket();
+                pk2.x = (int) this.right.getHolder().getX();
+                pk2.y = (int) this.right.getHolder().getY();
+                pk2.z = (int) this.right.getHolder().getZ();
+                pk2.case1 = 1;
+                pk2.case2 = 2;
+
+                level.addLevelSoundEvent(this.left.getHolder(), LevelSoundEventPacket.SOUND_CHEST_OPEN);
                 level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk1);
-            }
-
-            BlockEventPacket pk2 = new BlockEventPacket();
-            pk2.x = (int) this.right.getHolder().getX();
-            pk2.y = (int) this.right.getHolder().getY();
-            pk2.z = (int) this.right.getHolder().getZ();
-            pk2.case1 = 1;
-            pk2.case2 = 2;
-
-            level = this.right.getHolder().getLevel();
-            if (level != null) {
-                level.addLevelSoundEvent(this.left.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
                 level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk2);
             }
         }
