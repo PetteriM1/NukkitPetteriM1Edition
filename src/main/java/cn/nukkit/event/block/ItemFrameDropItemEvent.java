@@ -20,10 +20,10 @@ public class ItemFrameDropItemEvent extends BlockEvent implements Cancellable {
 
     /**
      * Event for when an item frame drops an item that it is containing.
-     * @param player Player related to the event. Contains player data.
-     * @param block Block (Item frame) affected by change. Contains block data
-     * @param itemFrame ItemFrame that has been affected.
-     * @param item Item that is dropped/contained in the item
+     * @param player Player related to the event.
+     * @param block Block (item frame) affected by change.
+     * @param itemFrame Item frame that has been affected.
+     * @param item Item that is dropped/contained in the item frame.
      */
     public ItemFrameDropItemEvent(Player player, Block block, BlockEntityItemFrame itemFrame, Item item) {
         super(block);

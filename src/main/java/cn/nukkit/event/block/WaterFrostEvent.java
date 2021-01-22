@@ -16,8 +16,8 @@ public class WaterFrostEvent extends BlockEvent implements Cancellable {
     }
 
     /**
-     * Event called on water frozen.
-     * @param block Block affected. Contains Block data.
+     * Event called on water freezing.
+     * @param block Block affected.
      */
     public WaterFrostEvent(Block block) {
         super(block);

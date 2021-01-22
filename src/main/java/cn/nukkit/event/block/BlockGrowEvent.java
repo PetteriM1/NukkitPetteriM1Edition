@@ -20,7 +20,7 @@ public class BlockGrowEvent extends BlockEvent implements Cancellable {
 
     /**
      * Called on block grow.
-     * @param block Block affected by event. Contains Block data.
+     * @param block Block affected by event E.g Vine.
      * @param newState New state of the affected block.
      */
     public BlockGrowEvent(Block block, Block newState) {

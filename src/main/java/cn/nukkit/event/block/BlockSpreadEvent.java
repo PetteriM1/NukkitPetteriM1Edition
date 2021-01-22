@@ -20,7 +20,7 @@ public class BlockSpreadEvent extends BlockFormEvent implements Cancellable {
 
     /**
      * Event for block spread, such as flowing water or lava.
-     * @param block Block that is being spread. Contains Block data.
+     * @param block Block that is being spread.
      * @param source Source of flow.
      * @param newState New state of spread block.
      */

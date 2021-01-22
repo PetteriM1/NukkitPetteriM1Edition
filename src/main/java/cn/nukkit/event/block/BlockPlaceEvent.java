@@ -27,11 +27,11 @@ public class BlockPlaceEvent extends BlockEvent implements Cancellable {
 
     /**
      * This event is called when a block is placed.
-     * @param player Player that placed block. Contains player data.
+     * @param player Player that placed block.
      * @param blockPlace Block place.
      * @param blockReplace Block replace.
      * @param blockAgainst Block against.
-     * @param item Item block place. Contains item data.
+     * @param item Item block place.
      */
     public BlockPlaceEvent(Player player, Block blockPlace, Block blockReplace, Block blockAgainst, Item item) {
         super(blockPlace);

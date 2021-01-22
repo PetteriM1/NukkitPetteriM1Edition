@@ -22,7 +22,7 @@ public class BlockFadeEvent extends BlockEvent implements Cancellable {
      * - Snow melts because of block light.
      * - Ice melts because of block light.
      * - Glowing redstone ore turns to normal redstone ore.
-     * @param block Block that has faded/melted. Contains Block data.
+     * @param block Block that has faded/melted.
      * @param newState New state of Block.
      */
     public BlockFadeEvent(Block block, Block newState) {

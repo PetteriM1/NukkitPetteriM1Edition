@@ -21,10 +21,10 @@ public class SignChangeEvent extends BlockEvent implements Cancellable {
     private String[] lines;
 
     /**
-     * Event called when a sign changes state. Contains data for it's set text.
-     * @param block Sign block affected. Contains Block data.
-     * @param player Player that caused event. Contains player data.
-     * @param lines Lines (String) changed/added to the sign.
+     * Event called when a sign changes state. Returns data for it's set text.
+     * @param block Sign block affected.
+     * @param player Player that caused event.
+     * @param lines Lines (string) changed/added to the sign.
      */
     public SignChangeEvent(Block block, Player player, String[] lines) {
         super(block);

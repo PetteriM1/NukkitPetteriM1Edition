@@ -31,9 +31,9 @@ public class BlockBreakEvent extends BlockEvent implements Cancellable {
     protected boolean fastBreak;
 
     /**
-     * This event is called when a block is broken.
-     * @param player Player who broke the block. Contains player data.
-     * @param block Block that was broken. Contains block data.
+     * This event is called when a block is broken. It contains the following parameters:
+     * @param player Player who broke the block.
+     * @param block Block that was broken.
      * @param item Item used to break block.
      * @param drops Items dropped by block.
      */

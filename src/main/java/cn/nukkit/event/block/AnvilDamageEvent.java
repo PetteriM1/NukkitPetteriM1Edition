@@ -22,10 +22,10 @@ public class AnvilDamageEvent extends BlockFadeEvent implements Cancellable {
     private final CraftingTransaction transaction;
     private final Cause cause;
     /**
-     * This event is called when an anvil is damaged.
-     * @param block The block (anvil) that has been damaged. Contains block data.
+     * This event is called when an anvil is damaged due to player interaction or a 'crafting' transaction.
+     * @param block The block (anvil) that has been damaged.
      * @param newState The new state of the anvil when broken
-     * @param player The player who broke the block. Contains player data.
+     * @param player The player who broke the block.
      * @param transaction Crafting transaction.
      * @param cause Cause of block break.
      */

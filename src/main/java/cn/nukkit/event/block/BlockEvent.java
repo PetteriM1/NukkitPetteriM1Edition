@@ -13,7 +13,7 @@ public abstract class BlockEvent extends Event {
 
     /**
      * Standard block Event.
-     * @param block Block. Contains Block data.
+     * @param block Block.
      */
     public BlockEvent(Block block) {
         this.block = block;

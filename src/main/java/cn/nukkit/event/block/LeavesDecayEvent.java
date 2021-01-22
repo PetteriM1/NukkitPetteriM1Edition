@@ -17,8 +17,8 @@ public class LeavesDecayEvent extends BlockEvent implements Cancellable {
     }
 
     /**
-     * Event for leaves decaying.
-     * @param block Leaves block. Contains Block data.
+     * Event for leaves decaying / disappearing.
+     * @param block Leaves block.
      */
     public LeavesDecayEvent(Block block) {
         super(block);

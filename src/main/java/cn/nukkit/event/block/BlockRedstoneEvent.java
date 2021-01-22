@@ -19,7 +19,7 @@ public class BlockRedstoneEvent extends BlockEvent {
     private int newPower;
 
     /**
-     * Event called on redstone change. I.e Redstone power.
+     * Event called on redstone change. E.g Redstone power.
      * @param block Block that is affected.
      * @param oldPower Old power of the block.
      * @param newPower New power of the block.

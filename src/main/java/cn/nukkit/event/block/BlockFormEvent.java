@@ -18,7 +18,7 @@ public class BlockFormEvent extends BlockGrowEvent implements Cancellable {
 
     /**
      * Block Form Event is called on block form state.
-     * @param block Block affected by event. Contains Block data.
+     * @param block Block affected by event.
      * @param newState New state of block.
      */
     public BlockFormEvent(Block block, Block newState) {

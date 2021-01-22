@@ -19,7 +19,7 @@ public class BlockFromToEvent extends BlockEvent implements Cancellable {
 
     /**
      * Event called on block changed from one type  to another. E.g Redstone.
-     * @param block Block affected by event. Contains Block data.
+     * @param block Block affected by event.
      * @param to Block type that block is being changed to.
      */
     public BlockFromToEvent(Block block, Block to) {

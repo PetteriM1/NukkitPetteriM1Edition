@@ -22,7 +22,7 @@ public class BlockIgniteEvent extends BlockEvent implements Cancellable {
 
     /**
      * Block ignite event is called when a block is ignited (lit on fire).
-     * @param block Block that has been affected (ignited). Contains Block data.
+     * @param block Block that has been affected (ignited).
      * @param source Block source of ignition.
      * @param entity Block ignite entity.
      * @param cause Cause of block ignition.

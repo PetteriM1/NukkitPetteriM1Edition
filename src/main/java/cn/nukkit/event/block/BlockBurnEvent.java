@@ -14,7 +14,7 @@ public class BlockBurnEvent extends BlockEvent implements Cancellable {
 
     /**
      * This event is called when a block is burned.
-     * @param block Block that is burned. Contains block data.
+     * @param block Block that is burned.
      */
     public BlockBurnEvent(Block block) {
         super(block);

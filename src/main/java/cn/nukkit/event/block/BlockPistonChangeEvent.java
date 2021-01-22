@@ -20,7 +20,7 @@ public class BlockPistonChangeEvent extends BlockEvent {
 
     /**
      * This event is called on piston activation/deactivation/change.
-     * @param block Block (Piston) that is affected. Contains block data.
+     * @param block Block (Piston) that is affected.
      * @param oldPower Old power (charge) of piston.
      * @param newPower New charge (updated) of piston.
      */

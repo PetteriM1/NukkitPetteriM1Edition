@@ -21,10 +21,10 @@ public class LiquidFlowEvent extends BlockEvent implements Cancellable {
     private final int newFlowDecay;
 
     /**
-     * Event called on Liquid Flowing.
+     * Event for liquid flowing.
      * @param to Flowing from one place to another.
-     * @param source
-     * @param newFlowDecay
+     * @param source Source of  liquid flow.
+     * @param newFlowDecay Number for when water stops  flowing.
      */
     public LiquidFlowEvent(Block to, BlockLiquid source, int newFlowDecay) {
         super(to);
