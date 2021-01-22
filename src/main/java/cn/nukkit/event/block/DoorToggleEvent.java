@@ -6,8 +6,8 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Created by Snake1999 on 2016/1/22.
- * Package cn.nukkit.event.block in project nukkit.
+ * Event for door Interactions.
+ * @author Snake1999 on 2016/1/22.
  */
 public class DoorToggleEvent extends BlockUpdateEvent implements Cancellable {
 
@@ -19,6 +19,11 @@ public class DoorToggleEvent extends BlockUpdateEvent implements Cancellable {
 
     private Player player;
 
+    /**
+     * Event for when a player interacts with a door.
+     * @param block Door Block that has been affected by the player. Contains block data.
+     * @param player Player that is affecting the door.
+     */
     public DoorToggleEvent(Block block, Player player) {
         super(block);
         this.player = player;

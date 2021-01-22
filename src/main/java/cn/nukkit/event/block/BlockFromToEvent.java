@@ -4,6 +4,9 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
+/**
+ * Event for Block Change "From To"
+ */
 public class BlockFromToEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -14,6 +17,11 @@ public class BlockFromToEvent extends BlockEvent implements Cancellable {
 
     private Block to;
 
+    /**
+     * Event called on block changed from one type  to another. E.g Redstone.
+     * @param block Block affected by event. Contains Block data.
+     * @param to Block type that block is being changed to.
+     */
     public BlockFromToEvent(Block block, Block to) {
         super(block);
         this.to = to;

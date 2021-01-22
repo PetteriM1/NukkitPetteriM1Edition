@@ -7,7 +7,8 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.inventory.transaction.CraftingTransaction;
 
 /**
- * Credits: GameModsBR
+ * Event for Anvils being Damaged.
+ * @author GameModsBR
  */
 public class AnvilDamageEvent extends BlockFadeEvent implements Cancellable {
 
@@ -20,7 +21,14 @@ public class AnvilDamageEvent extends BlockFadeEvent implements Cancellable {
     private final Player player;
     private final CraftingTransaction transaction;
     private final Cause cause;
-
+    /**
+     * This event is called when an anvil is damaged.
+     * @param block The block (anvil) that has been damaged. Contains block data.
+     * @param newState The new state of the anvil when broken
+     * @param player The player who broke the block. Contains player data.
+     * @param transaction Crafting transaction.
+     * @param cause Cause of block break.
+     */
     public AnvilDamageEvent(Block block, Block newState, Player player, CraftingTransaction transaction, Cause cause) {
         super(block, newState);
         this.player = player;

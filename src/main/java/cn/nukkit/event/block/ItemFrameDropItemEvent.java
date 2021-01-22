@@ -8,7 +8,8 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.item.Item;
 
 /**
- * Created by Pub4Game on 03.07.2016.
+ * Event for Item Frame Drops.
+ * @author Pub4Game on 03.07.2016.
  */
 public class ItemFrameDropItemEvent extends BlockEvent implements Cancellable {
 
@@ -17,6 +18,13 @@ public class ItemFrameDropItemEvent extends BlockEvent implements Cancellable {
     private final Item item;
     private final BlockEntityItemFrame itemFrame;
 
+    /**
+     * Event for when an item frame drops an item that it is containing.
+     * @param player Player related to the event. Contains player data.
+     * @param block Block (Item frame) affected by change. Contains block data
+     * @param itemFrame ItemFrame that has been affected.
+     * @param item Item that is dropped/contained in the item
+     */
     public ItemFrameDropItemEvent(Player player, Block block, BlockEntityItemFrame itemFrame, Item item) {
         super(block);
         this.player = player;

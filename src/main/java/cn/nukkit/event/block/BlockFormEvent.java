@@ -5,8 +5,8 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
+ * Event for Block form State.
  * @author MagicDroidX
- * Nukkit Project
  */
 public class BlockFormEvent extends BlockGrowEvent implements Cancellable {
 
@@ -16,6 +16,11 @@ public class BlockFormEvent extends BlockGrowEvent implements Cancellable {
         return handlers;
     }
 
+    /**
+     * Block Form Event is called on block form state.
+     * @param block Block affected by event. Contains Block data.
+     * @param newState New state of block.
+     */
     public BlockFormEvent(Block block, Block newState) {
         super(block, newState);
     }

@@ -4,13 +4,17 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.Event;
 
 /**
+ * Generic Block event
  * @author MagicDroidX
- * Nukkit Project
  */
 public abstract class BlockEvent extends Event {
 
     protected final Block block;
 
+    /**
+     * Standard block Event.
+     * @param block Block. Contains Block data.
+     */
     public BlockEvent(Block block) {
         this.block = block;
     }

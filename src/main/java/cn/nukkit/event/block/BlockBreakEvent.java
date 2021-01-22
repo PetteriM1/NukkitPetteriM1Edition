@@ -8,8 +8,8 @@ import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 
 /**
+ * Event for block being broken.
  * @author MagicDroidX
- * Nukkit Project
  */
 public class BlockBreakEvent extends BlockEvent implements Cancellable {
 
@@ -30,6 +30,13 @@ public class BlockBreakEvent extends BlockEvent implements Cancellable {
 
     protected boolean fastBreak;
 
+    /**
+     * This event is called when a block is broken.
+     * @param player Player who broke the block. Contains player data.
+     * @param block Block that was broken. Contains block data.
+     * @param item Item used to break block.
+     * @param drops Items dropped by block.
+     */
     public BlockBreakEvent(Player player, Block block, Item item, Item[] drops) {
         this(player, block, item, drops, false, false);
     }
