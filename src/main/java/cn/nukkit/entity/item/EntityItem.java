@@ -1,6 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -141,14 +140,14 @@ public class EntityItem extends Entity {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-            Entity[] e = null;
+            //Entity[] e = null;
 
             if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
-            } else {
+            }/* else {
                 e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
                 for (Entity entity : e) {
                     if (entity.isPlayer) {
@@ -158,7 +157,7 @@ public class EntityItem extends Entity {
                         }
                     }
                 }
-            }
+            }*/
 
             if (this.age > 6000) {
                 ItemDespawnEvent ev = new ItemDespawnEvent(this);
@@ -174,9 +173,9 @@ public class EntityItem extends Entity {
 
             if (this.age % 200 == 0 && this.onGround && this.item != null) {
                 if (this.item.getCount() < this.item.getMaxStackSize()) {
-                    if (e == null) {
-                        e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
-                    }
+                    //if (e == null) {
+                    Entity[] e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
+                    //}
 
                     for (Entity entity : e) {
                         if (entity instanceof EntityItem) {
