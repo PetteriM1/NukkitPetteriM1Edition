@@ -5,8 +5,8 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
+ * Event for Block Update
  * @author MagicDroidX
- * Nukkit Project
  */
 public class BlockUpdateEvent extends BlockEvent implements Cancellable {
 
@@ -16,6 +16,10 @@ public class BlockUpdateEvent extends BlockEvent implements Cancellable {
         return handlers;
     }
 
+    /**
+     * Event called on a block being updated.
+     * @param block Block updated.
+     */
     public BlockUpdateEvent(Block block) {
         super(block);
     }
