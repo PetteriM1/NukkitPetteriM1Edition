@@ -88,16 +88,16 @@ public class EntityMooshroom extends EntityWalkingAnimal {
     
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.equals(Item.get(Item.BOWL, 0), true)) {
+        if (item.getId() == Item.BOWL) {
+            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             player.getInventory().addItem(Item.get(Item.MUSHROOM_STEW, 0, 1));
-            player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             return true;
-        } else if (item.equals(Item.get(Item.BUCKET, 0), true)) {
-            player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
+        } else if (item.getId() == Item.BUCKET) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
             return true;
-        } else if (item.equals(Item.get(Item.WHEAT, 0)) && !this.isBaby()) {
+        } else if (item.getId() == Item.WHEAT && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
             this.setInLove();

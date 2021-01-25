@@ -84,13 +84,13 @@ public class EntitySheep extends EntityWalkingAnimal {
         if (item.getId() == Item.DYE) {
             this.setColor(((ItemDye) item).getDyeColor().getWoolData());
             return true;
-        } else if (item.equals(Item.get(Item.WHEAT,0,1)) && !this.isBaby()) {
+        } else if (item.getId() == Item.WHEAT && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_EAT);
             this.level.addParticle(new ItemBreakParticle(this.add(0, this.getMountedYOffset(), 0), Item.get(Item.WHEAT)));
             this.setInLove();
             return true;
-        } else if (item.equals(Item.get(Item.SHEARS, 0, 1), false) && !this.isBaby() && !this.sheared) {
+        } else if (item.getId() == Item.SHEARS && !this.isBaby() && !this.sheared) {
             this.shear(true);
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SHEAR);
             player.getInventory().getItemInHand().setDamage(item.getDamage() + 1);
