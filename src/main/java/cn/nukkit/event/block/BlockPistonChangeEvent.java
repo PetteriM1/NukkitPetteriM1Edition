@@ -4,7 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Block Piston Change.
+ * Event for Block piston change.
  * @author CreeperFace on 2.8.2017.
  */
 public class BlockPistonChangeEvent extends BlockEvent {

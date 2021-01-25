@@ -5,7 +5,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Block Fading
+ * Event for Block fading.
  */
 public class BlockFadeEvent extends BlockEvent implements Cancellable {
 

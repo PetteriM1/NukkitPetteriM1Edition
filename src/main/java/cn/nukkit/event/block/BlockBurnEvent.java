@@ -5,7 +5,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Block being Burned
+ * Event for Block being burned.
  * @author MagicDroidX
  */
 public class BlockBurnEvent extends BlockEvent implements Cancellable {

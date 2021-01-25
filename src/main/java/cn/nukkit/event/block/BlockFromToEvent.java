@@ -5,7 +5,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Block Change "From To"
+ * Event for Block Change "From To".
  */
 public class BlockFromToEvent extends BlockEvent implements Cancellable {
 

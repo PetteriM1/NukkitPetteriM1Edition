@@ -6,7 +6,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Sign Text Change
+ * Event for Sign Text change.
  * @author MagicDroidX
  */
 public class SignChangeEvent extends BlockEvent implements Cancellable {
@@ -23,8 +23,8 @@ public class SignChangeEvent extends BlockEvent implements Cancellable {
     /**
      * Event called when a sign changes state. Returns data for it's set text.
      * @param block Sign block affected.
-     * @param player Player that caused event.
-     * @param lines Lines (string) changed/added to the sign.
+     * @param player Player that edited the sign.
+     * @param lines Lines (String[4]) changed after edit.
      */
     public SignChangeEvent(Block block, Player player, String[] lines) {
         super(block);

@@ -8,7 +8,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
 
 /**
- * Event for block being broken.
+ * Event for Block being broken.
  * @author MagicDroidX
  */
 public class BlockBreakEvent extends BlockEvent implements Cancellable {

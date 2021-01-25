@@ -5,7 +5,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for block spread.
+ * Event for Block spread.
  * @author MagicDroidX
  */
 public class BlockSpreadEvent extends BlockFormEvent implements Cancellable {
@@ -19,7 +19,7 @@ public class BlockSpreadEvent extends BlockFormEvent implements Cancellable {
     private final Block source;
 
     /**
-     * Event for block spread, such as flowing water or lava.
+     * Event for block spread, such as grass or mycelium.
      * @param block Block that is being spread.
      * @param source Source of flow.
      * @param newState New state of spread block.

@@ -6,7 +6,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Block fire (Ignite)
+ * Event for Block fire (ignite).
  */
 public class BlockIgniteEvent extends BlockEvent implements Cancellable {
 

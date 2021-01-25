@@ -5,7 +5,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for water freezing
+ * Event for Water freezing.
  */
 public class WaterFrostEvent extends BlockEvent implements Cancellable {
 
@@ -16,8 +16,8 @@ public class WaterFrostEvent extends BlockEvent implements Cancellable {
     }
 
     /**
-     * Event called on water freezing.
-     * @param block Block affected.
+     * Event called on water freezing (currently used for frost walker).
+     * @param block Block frozen.
      */
     public WaterFrostEvent(Block block) {
         super(block);

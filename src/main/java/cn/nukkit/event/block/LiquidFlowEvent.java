@@ -6,7 +6,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Liquid Flow
+ * Event for Liquid flow.
  */
 public class LiquidFlowEvent extends BlockEvent implements Cancellable {
 
@@ -19,11 +19,10 @@ public class LiquidFlowEvent extends BlockEvent implements Cancellable {
     private final Block to;
     private final BlockLiquid source;
     private final int newFlowDecay;
-
     /**
      * Event for liquid flowing.
      * @param to Flowing from one place to another.
-     * @param source Source of  liquid flow.
+     * @param source Source of liquid flow.
      * @param newFlowDecay Number for when water stops  flowing.
      */
     public LiquidFlowEvent(Block to, BlockLiquid source, int newFlowDecay) {

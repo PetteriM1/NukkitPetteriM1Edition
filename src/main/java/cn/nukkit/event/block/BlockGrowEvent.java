@@ -5,7 +5,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 
 /**
- * Event for Block Growth.
+ * Event for Block growth.
  * @author MagicDroidX
  */
 public class BlockGrowEvent extends BlockEvent implements Cancellable {

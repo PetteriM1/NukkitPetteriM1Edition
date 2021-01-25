@@ -8,7 +8,7 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.item.Item;
 
 /**
- * Event for Item Frame Drops.
+ * Event for Item Frame drops.
  * @author Pub4Game on 03.07.2016.
  */
 public class ItemFrameDropItemEvent extends BlockEvent implements Cancellable {
