@@ -54,6 +54,8 @@ public class NBTIO {
             item.setCount(tag.getByte("Count"));
         }
 
+        if (item.count > item.getMaxStackSize()) item.count = item.getMaxStackSize();
+
         Tag tagTag = tag.get("tag");
         if (tagTag instanceof CompoundTag) {
             item.setNamedTag((CompoundTag) tagTag);
