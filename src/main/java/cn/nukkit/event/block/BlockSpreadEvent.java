@@ -21,7 +21,7 @@ public class BlockSpreadEvent extends BlockFormEvent implements Cancellable {
     /**
      * Event for block spread, such as grass or mycelium.
      * @param block Block that is being spread.
-     * @param source Source of flow.
+     * @param source The source block.
      * @param newState New state of spread block.
      */
     public BlockSpreadEvent(Block block, Block source, Block newState) {

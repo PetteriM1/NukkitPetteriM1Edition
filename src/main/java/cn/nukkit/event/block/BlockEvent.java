@@ -4,7 +4,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.event.Event;
 
 /**
- * Generic Block event.
+ * Generic block event.
  * @author MagicDroidX
  */
 public abstract class BlockEvent extends Event {
@@ -12,7 +12,8 @@ public abstract class BlockEvent extends Event {
     protected final Block block;
 
     /**
-     * Standard block Event.
+     * Generic block event.
+     * NOTICE: This event isn't meant to be called.
      * @param block Block.
      */
     public BlockEvent(Block block) {

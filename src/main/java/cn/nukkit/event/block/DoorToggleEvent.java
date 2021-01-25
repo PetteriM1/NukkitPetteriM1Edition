@@ -20,9 +20,9 @@ public class DoorToggleEvent extends BlockUpdateEvent implements Cancellable {
     private Player player;
 
     /**
-     * Event for when a player interacts with a door.
+     * Event for player door interactions.
      * @param block Door block that has been affected by the player.
-     * @param player Player that is affecting the door.
+     * @param player Player that is interacting with the door.
      */
     public DoorToggleEvent(Block block, Player player) {
         super(block);
