@@ -128,6 +128,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.COCOA_BLOCK] = true;
         randomTickBlocks[Block.ICE_FROSTED] = true;
         randomTickBlocks[Block.VINE] = true;
+        randomTickBlocks[Block.WATER] = true;
     }
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
@@ -3758,6 +3759,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean canBlockSeeSky(Vector3 pos) {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
+    }
+
+    public boolean canBlockSeeSky(Block block) {
+        return this.getHighestBlockAt((int) block.getX(), (int) block.getZ()) < block.getY();
     }
 
     public int getStrongPower(Vector3 pos, BlockFace direction) {

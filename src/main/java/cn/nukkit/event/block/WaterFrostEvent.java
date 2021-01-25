@@ -16,7 +16,7 @@ public class WaterFrostEvent extends BlockEvent implements Cancellable {
     }
 
     /**
-     * Event called on water freezing (currently used with frost walker enchantment).
+     * Event called on water freezing.
      * @param block Block frozen.
      */
     public WaterFrostEvent(Block block) {
