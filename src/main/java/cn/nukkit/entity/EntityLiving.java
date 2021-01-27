@@ -58,8 +58,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     private boolean blocking = false;
 
-    private int airTicks;
-
     protected final boolean isDrowned = this instanceof EntityDrowned;
 
     @Override
@@ -481,7 +479,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public void setAirTicks(int ticks) {
         this.airTicks = ticks;
-        this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+        if (this.isPlayer) {
+            this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+        }
     }
 
     public boolean isBlocking() {

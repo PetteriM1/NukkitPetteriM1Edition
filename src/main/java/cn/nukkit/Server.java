@@ -1976,12 +1976,12 @@ public class Server {
         this.properties.save();
     }
 
-    public String getPropertyString(String variable) {
-        return this.getPropertyString(variable, null);
+    public String getPropertyString(String key) {
+        return this.getPropertyString(key, null);
     }
 
-    public String getPropertyString(String variable, String defaultValue) {
-        return this.properties.exists(variable) ? (String) this.properties.get(variable) : defaultValue;
+    public String getPropertyString(String key, String defaultValue) {
+        return this.properties.exists(key) ? this.properties.get(key).toString() : defaultValue;
     }
 
     public int getPropertyInt(String variable) {
