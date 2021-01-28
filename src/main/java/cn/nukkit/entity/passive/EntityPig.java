@@ -28,6 +28,8 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable {
 
     public static final int NETWORK_ID = 12;
 
+    private boolean saddled;
+
     public EntityPig(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -178,10 +180,11 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable {
     }
 
     public boolean isSaddled() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED);
+        return this.saddled;
     }
 
     public void setSaddled(boolean saddled) {
+        this.saddled = saddled;
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED, saddled);
     }
 
@@ -226,7 +229,7 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable {
 
     @Override
     public boolean canDespawn() {
-        if (this.isSaddled() || !this.passengers.isEmpty()) {
+        if (this.isSaddled()) {
             return false;
         }
 
