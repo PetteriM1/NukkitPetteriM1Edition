@@ -3474,13 +3474,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_AIR:
                                     Vector3 directionVector = this.getDirectionVector();
 
-                                    if (this.isCreative()) {
-                                        item = this.inventory.getItemInHand();
-                                    } else if (!this.inventory.getItemInHand().equals(useItemData.itemInHand)) {
+                                    item = this.inventory.getItemInHand();
+
+                                    if (item instanceof ItemCrossbow) {
+                                        if (!item.onClickAir(this, directionVector)) {
+                                            return; // Shoot
+                                        }
+                                    }
+
+                                    if (!item.equals(useItemData.itemInHand)) {
                                         this.inventory.sendHeldItem(this);
                                         break packetswitch;
-                                    } else {
-                                        item = this.inventory.getItemInHand();
                                     }
 
                                     PlayerInteractEvent interactEvent = new PlayerInteractEvent(this, item, directionVector, face, Action.RIGHT_CLICK_AIR);
