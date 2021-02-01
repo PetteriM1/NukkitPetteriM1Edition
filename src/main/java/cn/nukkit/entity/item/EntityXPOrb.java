@@ -159,7 +159,7 @@ public class EntityXPOrb extends Entity {
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
-            } else {
+            }/* else {
                 Entity[] e = this.level.getCollidingEntities(this.boundingBox, this);
                 for (Entity entity : e) {
                     if (entity instanceof Player) {
@@ -168,7 +168,7 @@ public class EntityXPOrb extends Entity {
                         }
                     }
                 }
-            }
+            }*/
 
             if (!this.isOnGround()) {
                 this.motionY -= this.getGravity();

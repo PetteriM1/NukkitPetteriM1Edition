@@ -1013,6 +1013,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
     }
 
+    public int getBlockId() {
+        return block == null ? 0 : block.getId();
+    }
+
     public int getId() {
         return id;
     }

@@ -128,6 +128,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.COCOA_BLOCK] = true;
         randomTickBlocks[Block.ICE_FROSTED] = true;
         randomTickBlocks[Block.VINE] = true;
+        randomTickBlocks[Block.WATER] = true;
     }
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
@@ -968,8 +969,9 @@ public class Level implements ChunkManager, Metadatable {
             for (long index : this.chunkPackets.keySet()) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
-                Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().toArray(new Player[0]);
-                if (chunkPlayers.length > 0) {
+                Map<Integer, Player> map = this.getChunkPlayers(chunkX, chunkZ);
+                if (!map.isEmpty()) {
+                    Player[] chunkPlayers = map.values().toArray(new Player[0]);
                     for (DataPacket pk : this.chunkPackets.get(index)) {
                         Server.broadcastPacket(chunkPlayers, pk);
                     }
@@ -1461,7 +1463,7 @@ public class Level implements ChunkManager, Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.getBlock(x, y, z, false);
                         if (block != null && block.getId() != 0 && block.collidesWithBB(bb)) {
                             return new Block[]{block};
                         }
@@ -1472,7 +1474,7 @@ public class Level implements ChunkManager, Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.getBlock(x, y, z, false);
                         if (block != null && block.getId() != 0 && block.collidesWithBB(bb)) {
                             collides.add(block);
                         }
@@ -1519,7 +1521,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                    Block block = this.getBlock(x, y, z, false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         collides.add(block.getBoundingBox());
                     }
@@ -1549,7 +1551,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                    Block block = this.getBlock(x, y, z, false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         return true;
                     }
@@ -2065,12 +2067,12 @@ public class Level implements ChunkManager, Metadatable {
                 ev.setCancelled();
             }
 
+            player.lastBreak = System.currentTimeMillis();
+
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
                 return null;
             }
-
-            player.lastBreak = System.currentTimeMillis();
 
             drops = ev.getDrops();
             dropExp = ev.getDropExp();
@@ -3757,6 +3759,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean canBlockSeeSky(Vector3 pos) {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
+    }
+
+    public boolean canBlockSeeSky(Block block) {
+        return this.getHighestBlockAt((int) block.getX(), (int) block.getZ()) < block.getY();
     }
 
     public int getStrongPower(Vector3 pos, BlockFace direction) {

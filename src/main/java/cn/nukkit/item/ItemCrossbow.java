@@ -9,16 +9,11 @@ import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.inventory.Inventory;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.DoubleTag;
-import cn.nukkit.nbt.tag.FloatTag;
-import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Utils;
 
 public class ItemCrossbow extends ItemBow {
-
-    private boolean loaded; // TODO: Remove when fixed
 
     public ItemCrossbow() {
         this(0, 1);
@@ -38,9 +33,9 @@ public class ItemCrossbow extends ItemBow {
     }
 
     @Override
-    public boolean onRelease(Player player, int ticksUsed) {
-        if (player.getServer().getTick() - player.getStartActionTick() < 20 && player.getStartActionTick() != -1) {
-            return false;
+    public boolean onUse(Player player, int ticksUsed) {
+        if (ticksUsed < 20) {
+            return true;
         }
 
         Item itemArrow = Item.get(Item.ARROW, 0, 1);
@@ -50,10 +45,10 @@ public class ItemCrossbow extends ItemBow {
         if (!inventory.contains(itemArrow) && !(inventory = player.getInventory()).contains(itemArrow) && player.isSurvival()) {
             player.getOffhandInventory().sendContents(player);
             inventory.sendContents(player);
-            return false;
+            return true;
         }
 
-        if (!this.loaded) {
+        if (!this.isLoaded()) {
             if (!player.isCreative()) {
                 if (!this.isUnbreakable()) {
                     Enchantment durability = this.getEnchantment(Enchantment.ID_DURABILITY);
@@ -73,34 +68,49 @@ public class ItemCrossbow extends ItemBow {
             player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_LOADING_END);
         }
 
-        return false; //HACK
+        return true;
     }
 
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
-        this.launchArrow(player);
+        return !this.launchArrow(player);
+    }
+
+    @Override
+    public boolean onRelease(Player player, int ticksUsed) {
         return true;
     }
 
     public void loadArrow(Player player, Item arrow) {
-        //this.getNamedTag().putCompound("chargedItem", new CompoundTag("chargedItem").putByte("Count", arrow.getCount()).putShort("Damage", arrow.getDamage()).putString("Name", "minecraft:arrow"));
-        this.loaded = true;
+        if (arrow == null) return;
+        //CompoundTag oldTag = this.getNamedTag();
+        //this.setCompoundTag(oldTag == null ? new CompoundTag("") : oldTag
+        this.setCompoundTag(new CompoundTag("") //FIXME: don't clear the old tag
+                .putBoolean("Charged", true)
+                .putCompound("chargedItem", new CompoundTag("chargedItem")
+                        .putByte("Count", arrow.getCount())
+                        .putShort("Damage", arrow.getDamage())
+                        .putString("Name", "minecraft:arrow")));
+        player.getInventory().setItemInHand(this);
+    }
+
+    public void useArrow(Player player) {
+        this.setCompoundTag(this.getNamedTag().putBoolean("Charged", false).remove("chargedItem"));
         player.getInventory().setItemInHand(this);
     }
 
     public boolean isLoaded() {
-        /*if (this.getNamedTagEntry("chargedItem") != null) {
-            if (this.getNamedTag().getByte("Count") > 0 && this.getNamedTag().getString("Name") != null) {
-                return true;
-            }
+        Tag itemInfo = this.getNamedTagEntry("chargedItem");
+        if (itemInfo != null) {
+            CompoundTag tag = (CompoundTag) itemInfo;
+            return tag.getByte("Count") > 0 && tag.getString("Name") != null;
         }
 
-        return false;*/
-        return this.loaded;
+        return false;
     }
 
-    public void launchArrow(Player player) {
-        if (this.loaded) {
+    public boolean launchArrow(Player player) {
+        if (this.isLoaded()) {
             CompoundTag nbt = new CompoundTag()
                     .putList(new ListTag<DoubleTag>("Pos")
                             .add(new DoubleTag("", player.x))
@@ -131,11 +141,12 @@ public class ItemCrossbow extends ItemBow {
                     } else {
                         proj.spawnToAll();
                         player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_CROSSBOW_SHOOT);
-                        this.loaded = false;
-                        //this.getNamedTag().remove("chargedItem");
+                        this.useArrow(player);
                     }
                 }
             }
+            return true;
         }
+        return false;
     }
 }

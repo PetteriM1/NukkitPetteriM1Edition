@@ -1390,7 +1390,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.level.getBlock(x, y, z, false);
 
                         if (!block.canPassThrough() && block.collidesWithBB(realBB)) {
                             onGround = true;
@@ -1808,11 +1808,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.processMovement(tickDiff);
             this.motionX = this.motionY = this.motionZ = 0; // HACK: fix player knockback being messed up
 
-            if (currentTick % 2 == 0) {
+            //if (currentTick % 2 == 0) {
                 if (!this.isSpectator()) {
                     this.checkNearEntities();
                 }
-            }
+            //}
 
             this.entityBaseTick(tickDiff);
 
@@ -3365,7 +3365,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
                                     // Hack: Fix client spamming right clicks
-                                    if (!server.doNotLimitInteractions && (lastRightClickPos != null && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
+                                    if (!server.doNotLimitInteractions && (lastRightClickPos != null && this.getInventory().getItemInHandFast().getBlockId() == BlockID.AIR && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
                                         return;
                                     }
 
@@ -3465,13 +3465,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_AIR:
                                     Vector3 directionVector = this.getDirectionVector();
 
-                                    if (this.isCreative()) {
-                                        item = this.inventory.getItemInHand();
-                                    } else if (!this.inventory.getItemInHand().equals(useItemData.itemInHand)) {
+                                    item = this.inventory.getItemInHand();
+
+                                    if (item instanceof ItemCrossbow) {
+                                        if (!item.onClickAir(this, directionVector)) {
+                                            return; // Shoot
+                                        }
+                                    }
+
+                                    if (!item.equals(useItemData.itemInHand)) {
                                         this.inventory.sendHeldItem(this);
                                         break packetswitch;
-                                    } else {
-                                        item = this.inventory.getItemInHand();
                                     }
 
                                     PlayerInteractEvent interactEvent = new PlayerInteractEvent(this, item, directionVector, face, Action.RIGHT_CLICK_AIR);

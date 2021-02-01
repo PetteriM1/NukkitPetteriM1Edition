@@ -193,7 +193,7 @@ public class EntityBoat extends EntityVehicle {
             //TODO: Lily pad collision
             this.updateMovement();
 
-            if (this.passengers.size() < 2) {
+            if (this.age % 5 == 0 && this.passengers.size() < 2) {
                 Entity[] e = this.level.getCollidingEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
                 for (Entity entity : e) {
                     if (entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || isPassenger(entity)) {

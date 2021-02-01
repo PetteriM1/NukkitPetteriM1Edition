@@ -300,6 +300,7 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean onGround;
     public int deadTicks = 0;
     public int age = 0;
+    protected int airTicks = 0;
 
     protected float health = 20;
     protected int maxHealth = 20;
@@ -929,7 +930,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.namedTag.putFloat("FallDistance", this.fallDistance);
         this.namedTag.putShort("Fire", this.fireTicks);
-        this.namedTag.putShort("Air", this.getDataPropertyShort(DATA_AIR));
+        this.namedTag.putShort("Air", this.airTicks);
         this.namedTag.putBoolean("OnGround", this.onGround);
         this.namedTag.putBoolean("Invulnerable", this.invulnerable);
         this.namedTag.putFloat("Scale", this.scale);
@@ -1084,7 +1085,7 @@ public abstract class Entity extends Location implements Metadatable {
                 pk.metadata = data == null ? this.dataProperties : data;
             }
             //player.dataPacket(pk/*.clone()*/);
-            player.batchDataPacket(pk);
+            player.batchDataPacket(pk.clone());
         }
         if (this.isPlayer) {
             if (((Player) this).protocol < 274) {
@@ -1203,7 +1204,7 @@ public abstract class Entity extends Location implements Metadatable {
             this.health = this.getMaxHealth();
         }
 
-        setDataProperty(new IntEntityData(DATA_HEALTH, (int) this.health));
+        setDataProperty(new IntEntityData(DATA_HEALTH, (int) this.health), this.isPlayer || this instanceof EntityRideable);
     }
 
     public void setLastDamageCause(EntityDamageEvent type) {
@@ -2056,7 +2057,7 @@ public abstract class Entity extends Location implements Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.level.getBlock(x, y, z, false);
                         this.blocksAround.add(block);
                     }
                 }
