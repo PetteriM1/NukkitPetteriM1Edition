@@ -15,6 +15,8 @@ import cn.nukkit.utils.Utils;
 
 public class ItemCrossbow extends ItemBow {
 
+    private int loadTick = 0; //TODO Improve this
+
     public ItemCrossbow() {
         this(0, 1);
     }
@@ -83,14 +85,14 @@ public class ItemCrossbow extends ItemBow {
 
     public void loadArrow(Player player, Item arrow) {
         if (arrow == null) return;
-        //CompoundTag oldTag = this.getNamedTag();
-        //this.setCompoundTag(oldTag == null ? new CompoundTag("") : oldTag
-        this.setCompoundTag(new CompoundTag("") //FIXME: don't clear the old tag
-                .putBoolean("Charged", true)
+        CompoundTag tag = this.getNamedTag() == null ? new CompoundTag() : this.getNamedTag();
+        tag.putBoolean("Charged", true)
                 .putCompound("chargedItem", new CompoundTag("chargedItem")
                         .putByte("Count", arrow.getCount())
                         .putShort("Damage", arrow.getDamage())
-                        .putString("Name", "minecraft:arrow")));
+                        .putString("Name", "minecraft:arrow"));
+        this.setCompoundTag(tag);
+        this.loadTick = Server.getInstance().getTick();
         player.getInventory().setItemInHand(this);
     }
 
@@ -110,7 +112,7 @@ public class ItemCrossbow extends ItemBow {
     }
 
     public boolean launchArrow(Player player) {
-        if (this.isLoaded()) {
+        if (this.isLoaded() && Server.getInstance().getTick() - this.loadTick > 20) {
             CompoundTag nbt = new CompoundTag()
                     .putList(new ListTag<DoubleTag>("Pos")
                             .add(new DoubleTag("", player.x))
