@@ -52,7 +52,7 @@ public class BatchingThread extends Thread {
                         if (!encodedPacket.containsKey(encodingProtocol)) {
                             DataPacket pk = packet.clone();
                             pk.protocol = encodingProtocol;
-                            packet.tryEncode();
+                            pk.tryEncode();
                             encodedPacket.put(encodingProtocol, pk);
                         }
                     }

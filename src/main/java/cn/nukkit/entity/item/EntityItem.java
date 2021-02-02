@@ -207,7 +207,7 @@ public class EntityItem extends Entity {
             }
 
             if (this.level.getBlockIdAt((int) this.x, (int) this.boundingBox.maxY, (int) this.z) == 8 || this.level.getBlockIdAt((int) this.x, (int) this.boundingBox.maxY, (int) this.z) == 9) {
-                if (!this.isImmobile()) this.setImmobile(true); // Hack: fix weird glitching
+                //if (!this.isImmobile()) this.setImmobile(true); // Hack: fix weird glitching
                 this.motionY -= this.getGravity() * -0.015;
             } else if (this.isInsideOfWater()) {
                 this.motionY = this.getGravity() - 0.06;
@@ -219,7 +219,7 @@ public class EntityItem extends Entity {
                 hasUpdate = true;
             }
 
-            this.move(this.motionX, this.motionY, this.motionZ);
+            //this.move(this.motionX, this.motionY, this.motionZ);
 
             double friction = 1 - this.getDrag();
 
@@ -235,7 +235,7 @@ public class EntityItem extends Entity {
                 this.motionY *= -0.5;
             }
 
-            this.updateMovement();
+            if (this.move(this.motionX, this.motionY, this.motionZ)) this.updateMovement();
         }
 
         if (this.timing != null) this.timing.stopTiming();

@@ -1916,7 +1916,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public boolean move(double dx, double dy, double dz) {
         if (dx == 0 && dz == 0 && dy == 0) {
-            return true;
+            return false;
         }
 
         if (!this.isPlayer) {
