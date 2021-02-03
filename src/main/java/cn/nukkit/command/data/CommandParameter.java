@@ -71,6 +71,54 @@ public class CommandParameter {
         this(name, false, enumValues);
     }
 
+    private CommandParameter(String name, boolean optional, CommandParamType type, CommandEnum enumData, String postFix) {
+        this.name = name;
+        this.optional = optional;
+        this.type = type;
+        this.enumData = enumData;
+        this.postFix = postFix;
+    }
+
+    public static CommandParameter newType(String name, CommandParamType type) {
+        return newType(name, false, type);
+    }
+
+    public static CommandParameter newType(String name, boolean optional, CommandParamType type) {
+        return new CommandParameter(name, optional, type, null, null);
+    }
+
+    public static CommandParameter newEnum(String name, String[] values) {
+        return newEnum(name, false, values);
+    }
+
+    public static CommandParameter newEnum(String name, boolean optional, String[] values) {
+        return newEnum(name, optional, new CommandEnum(name + "Enums", values));
+    }
+
+    public static CommandParameter newEnum(String name, String type) {
+        return newEnum(name, false, type);
+    }
+
+    public static CommandParameter newEnum(String name, boolean optional, String type) {
+        return newEnum(name, optional, new CommandEnum(type, new ArrayList<>()));
+    }
+
+    public static CommandParameter newEnum(String name, CommandEnum data) {
+        return newEnum(name, false, data);
+    }
+
+    public static CommandParameter newEnum(String name, boolean optional, CommandEnum data) {
+        return new CommandParameter(name, optional, CommandParamType.RAWTEXT, data, null);
+    }
+
+    public static CommandParameter newPostfix(String name, String postfix) {
+        return newPostfix(name, false, postfix);
+    }
+
+    public static CommandParameter newPostfix(String name, boolean optional, String postfix) {
+        return new CommandParameter(name, optional, CommandParamType.RAWTEXT, null, postfix);
+    }
+
     protected static CommandParamType fromString(String param) {
         switch (param) {
             case "string":

@@ -300,6 +300,7 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean onGround;
     public int deadTicks = 0;
     public int age = 0;
+    public int ticksLived = 0;
     protected int airTicks = 0;
 
     protected float health = 20;
@@ -1418,6 +1419,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         this.age += tickDiff;
+        this.ticksLived += tickDiff;
         TimingsHistory.activatedEntityTicks++;
 
         if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
