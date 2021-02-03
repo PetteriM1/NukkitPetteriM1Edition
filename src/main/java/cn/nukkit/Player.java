@@ -2841,6 +2841,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case PlayerActionPacket.ACTION_START_SWIMMING:
                             PlayerToggleSwimEvent ptse = new PlayerToggleSwimEvent(this, true);
                             this.server.getPluginManager().callEvent(ptse);
+                            if (!this.isInsideOfWater()) {
+                                ptse.setCancelled(true);
+                            }
                             if (ptse.isCancelled()) {
                                 this.sendData(this);
                             } else {

@@ -206,10 +206,7 @@ public class EntityItem extends Entity {
                 }
             }
 
-            if (this.level.getBlockIdAt((int) this.x, (int) this.boundingBox.maxY, (int) this.z) == 8 || this.level.getBlockIdAt((int) this.x, (int) this.boundingBox.maxY, (int) this.z) == 9) {
-                //if (!this.isImmobile()) this.setImmobile(true); // Hack: fix weird glitching
-                this.motionY -= this.getGravity() * -0.015;
-            } else if (this.isInsideOfWater()) {
+            if (this.isInsideOfWater()) {
                 this.motionY = this.getGravity() - 0.06;
             } else if (!this.isOnGround()) {
                 this.motionY -= this.getGravity();
