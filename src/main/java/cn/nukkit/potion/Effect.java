@@ -2,6 +2,7 @@ package cn.nukkit.potion;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityRegainHealthEvent;
@@ -179,6 +180,7 @@ public class Effect implements Cloneable {
         int interval;
         switch (this.id) {
             case Effect.POISON:
+            case Effect.FATAL_POISON:
                 if ((interval = (25 >> this.amplifier)) > 0) {
                     return (this.duration % interval) == 0;
                 }
@@ -198,9 +200,11 @@ public class Effect implements Cloneable {
     }
 
     public void applyEffect(Entity entity) {
+        if (entity instanceof EntityBoss) return; // Boss mobs are immune to poison, wither and regeneration
         switch (this.id) {
             case Effect.POISON:
-                if (entity.getHealth() > 1) {
+            case Effect.FATAL_POISON:
+                if (entity.getHealth() > 1 || this.id == FATAL_POISON) {
                     entity.attack(new EntityDamageEvent(entity, DamageCause.MAGIC, 1));
                 }
                 break;
