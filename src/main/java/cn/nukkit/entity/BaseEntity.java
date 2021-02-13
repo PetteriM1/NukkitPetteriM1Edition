@@ -217,6 +217,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             return false;
         }
 
+        if (dx == 0 && dz == 0 && dy == 0) {
+            return false;
+        }
+
         if (Timings.entityMoveTimer != null) Timings.entityMoveTimer.startTiming();
 
         this.blocksAround = null;

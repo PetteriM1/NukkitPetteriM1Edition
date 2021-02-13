@@ -300,6 +300,7 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean onGround;
     public int deadTicks = 0;
     public int age = 0;
+    public int ticksLived = 0;
     protected int airTicks = 0;
 
     protected float health = 20;
@@ -1418,6 +1419,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         this.age += tickDiff;
+        this.ticksLived += tickDiff;
         TimingsHistory.activatedEntityTicks++;
 
         if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
@@ -1846,13 +1848,15 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isInsideOfWater() {
-        Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
+        /*Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
             return this.y < (block.y + 0.9);
         }
 
-        return false;
+        return false;*/
+        int bid = level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+        return bid == BlockID.WATER || bid == BlockID.STILL_WATER;
     }
 
     public boolean isInsideOfSolid() {
@@ -1916,7 +1920,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public boolean move(double dx, double dy, double dz) {
         if (dx == 0 && dz == 0 && dy == 0) {
-            return true;
+            return false;
         }
 
         if (!this.isPlayer) {

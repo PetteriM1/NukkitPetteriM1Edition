@@ -2831,6 +2831,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_START_SWIMMING:
                             PlayerToggleSwimEvent ptse = new PlayerToggleSwimEvent(this, true);
+                            if (!this.isInsideOfWater()) {
+                                ptse.setCancelled(true);
+                            }
                             this.server.getPluginManager().callEvent(ptse);
                             if (ptse.isCancelled()) {
                                 this.sendData(this);
@@ -3221,9 +3224,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
                                 Graphics2D graphics = image.createGraphics();
 
+                                int worldX = (this.getFloorX () / 128) << 7;
+                                int worldZ = (this.getFloorZ () / 128) << 7;
                                 for (int x = 0; x < 128; x++) {
                                     for (int y = 0; y < 128; y++) {
-                                        graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
+                                        graphics.setColor(new Color(this.getLevel().getMapColorAt(worldX + x, worldZ + y).getRGB()));
                                         graphics.fillRect(x, y, x, y);
                                     }
                                 }
