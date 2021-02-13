@@ -57,6 +57,11 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
     }
 
     @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    @Override
     public boolean onBreak(Item item) {
         boolean result = super.onBreak(item);
         for (BlockFace face : BlockFace.values()) {

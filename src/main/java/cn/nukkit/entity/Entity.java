@@ -300,6 +300,8 @@ public abstract class Entity extends Location implements Metadatable {
     public boolean onGround;
     public int deadTicks = 0;
     public int age = 0;
+    public int ticksLived = 0;
+    protected int airTicks = 0;
 
     protected float health = 20;
     protected int maxHealth = 20;
@@ -411,7 +413,7 @@ public abstract class Entity extends Location implements Metadatable {
                     continue;
                 }
 
-                effect.setAmplifier(e.getByte("Amplifier")).setDuration(e.getInt("Duration")).setVisible(e.getBoolean("showParticles"));
+                effect.setAmplifier(e.getByte("Amplifier")).setDuration(e.getInt("Duration")).setVisible(e.getBoolean("ShowParticles"));
 
                 this.addEffect(effect);
             }
@@ -929,7 +931,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.namedTag.putFloat("FallDistance", this.fallDistance);
         this.namedTag.putShort("Fire", this.fireTicks);
-        this.namedTag.putShort("Air", this.getDataPropertyShort(DATA_AIR));
+        this.namedTag.putShort("Air", this.airTicks);
         this.namedTag.putBoolean("OnGround", this.onGround);
         this.namedTag.putBoolean("Invulnerable", this.invulnerable);
         this.namedTag.putFloat("Scale", this.scale);
@@ -1084,7 +1086,7 @@ public abstract class Entity extends Location implements Metadatable {
                 pk.metadata = data == null ? this.dataProperties : data;
             }
             //player.dataPacket(pk/*.clone()*/);
-            player.batchDataPacket(pk);
+            player.batchDataPacket(pk.clone());
         }
         if (this.isPlayer) {
             if (((Player) this).protocol < 274) {
@@ -1203,7 +1205,7 @@ public abstract class Entity extends Location implements Metadatable {
             this.health = this.getMaxHealth();
         }
 
-        setDataProperty(new IntEntityData(DATA_HEALTH, (int) this.health));
+        setDataProperty(new IntEntityData(DATA_HEALTH, (int) this.health), this.isPlayer || this instanceof EntityRideable);
     }
 
     public void setLastDamageCause(EntityDamageEvent type) {
@@ -1417,6 +1419,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         this.age += tickDiff;
+        this.ticksLived += tickDiff;
         TimingsHistory.activatedEntityTicks++;
 
         if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
@@ -1845,13 +1848,15 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isInsideOfWater() {
-        Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
+        /*Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(this.y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
             return this.y < (block.y + 0.9);
         }
 
-        return false;
+        return false;*/
+        int bid = level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+        return bid == BlockID.WATER || bid == BlockID.STILL_WATER;
     }
 
     public boolean isInsideOfSolid() {
@@ -1915,7 +1920,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public boolean move(double dx, double dy, double dz) {
         if (dx == 0 && dz == 0 && dy == 0) {
-            return true;
+            return false;
         }
 
         if (!this.isPlayer) {
@@ -2056,7 +2061,7 @@ public abstract class Entity extends Location implements Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.level.getBlock(x, y, z, false);
                         this.blocksAround.add(block);
                     }
                 }

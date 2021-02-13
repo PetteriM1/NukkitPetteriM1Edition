@@ -2,6 +2,7 @@ package cn.nukkit.potion;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityBoss;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityRegainHealthEvent;
@@ -41,7 +42,7 @@ public class Effect implements Cloneable {
     public static final int SATURATION = 23;
     public static final int LEVITATION = 24;
     public static final int FATAL_POISON = 25;
-    public static final int COUNDIT_POWER = 26;
+    public static final int CONDUIT_POWER = 26;
     public static final int SLOW_FALLING = 27;
     public static final int BAD_OMEN = 28;
     public static final int VILLAGE_HERO = 29;
@@ -76,7 +77,7 @@ public class Effect implements Cloneable {
         effects[Effect.SATURATION] = new Effect(Effect.SATURATION, "%potion.saturation", 255, 0, 255);
         effects[Effect.LEVITATION] = new Effect(Effect.LEVITATION, "%potion.levitation", 206, 255, 255);
         effects[Effect.FATAL_POISON] = new Effect(Effect.FATAL_POISON, "%potion.poison", 78, 147, 49, true);
-        effects[Effect.COUNDIT_POWER] = new Effect(Effect.COUNDIT_POWER, "%potion.conduitPower", 29, 194, 209);
+        effects[Effect.CONDUIT_POWER] = new Effect(Effect.CONDUIT_POWER, "%potion.conduitPower", 29, 194, 209);
         effects[Effect.SLOW_FALLING] = new Effect(Effect.SLOW_FALLING, "%potion.slowFalling", 206, 255, 255);
         effects[Effect.BAD_OMEN] = new Effect(Effect.BAD_OMEN, "%potion.badOmen", 0, 0, 0);
         effects[Effect.VILLAGE_HERO] = new Effect(Effect.VILLAGE_HERO, "%potion.villageHero", 0, 0, 0);
@@ -179,6 +180,7 @@ public class Effect implements Cloneable {
         int interval;
         switch (this.id) {
             case Effect.POISON:
+            case Effect.FATAL_POISON:
                 if ((interval = (25 >> this.amplifier)) > 0) {
                     return (this.duration % interval) == 0;
                 }
@@ -198,9 +200,11 @@ public class Effect implements Cloneable {
     }
 
     public void applyEffect(Entity entity) {
+        if (entity instanceof EntityBoss) return; // Boss mobs are immune to poison, wither and regeneration
         switch (this.id) {
             case Effect.POISON:
-                if (entity.getHealth() > 1) {
+            case Effect.FATAL_POISON:
+                if (entity.getHealth() > 1 || this.id == FATAL_POISON) {
                     entity.attack(new EntityDamageEvent(entity, DamageCause.MAGIC, 1));
                 }
                 break;

@@ -163,12 +163,21 @@ public class BlockVine extends BlockTransparentMeta {
     @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!this.getSide(getFace()).isSolid()) {
-                Block up = this.up();
-                if (up.getId() != VINE || up.getDamage() != this.getDamage()) {
-                    this.getLevel().useBreakOn(this, null, null, true);
-                    return Level.BLOCK_UPDATE_NORMAL;
+            int meta = this.getDamage();
+            Block up = this.up();
+            for (BlockFace face : BlockFace.Plane.HORIZONTAL) {
+                int faceMeta = getMetaFromFace(face);
+                if (!this.getSide(face).isSolid() && (up.getId() != VINE || (up.getDamage() & faceMeta) != faceMeta)) {
+                    meta &= ~faceMeta;
                 }
+            }
+            if (meta == 0 && !up.isSolid()) {
+                this.getLevel().useBreakOn(this, null, null, true);
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+            if (meta != this.getDamage()) {
+                this.level.setBlock(this, Block.get(VINE, meta), true);
+                return Level.BLOCK_UPDATE_NORMAL;
             }
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             Random random = ThreadLocalRandom.current();
@@ -242,7 +251,7 @@ public class BlockVine extends BlockTransparentMeta {
         for (int x = blockX - 4; x <= blockX + 4; x++) {
             for (int z = blockZ - 4; z <= blockZ + 4; z++) {
                 for (int y = blockY - 1; y <= blockY + 1; y++) {
-                    if (this.level.getBlock(x, y, z).getId() == VINE) {
+                    if (this.level.getBlockIdAt(x, y, z) == VINE) {
                         if (++count >= 5) return false;
                     }
                 }
@@ -279,21 +288,6 @@ public class BlockVine extends BlockTransparentMeta {
         if (isOnHorizontalFace) {
             putVine(block, meta, source);
         }
-    }
-
-    private BlockFace getFace() {
-        int meta = this.getDamage();
-        if ((meta & 1) > 0) {
-            return BlockFace.SOUTH;
-        } else if ((meta & 2) > 0) {
-            return BlockFace.WEST;
-        } else if ((meta & 4) > 0) {
-            return BlockFace.NORTH;
-        } else if ((meta & 8) > 0) {
-            return BlockFace.EAST;
-        }
-
-        return BlockFace.UP;
     }
 
     private static int getMetaFromFace(BlockFace face) {

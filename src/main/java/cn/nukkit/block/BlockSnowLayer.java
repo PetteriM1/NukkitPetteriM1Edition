@@ -7,6 +7,7 @@ import cn.nukkit.item.ItemSnowball;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
+import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 
@@ -168,5 +169,17 @@ public class BlockSnowLayer extends BlockFallableMeta {
             }
         }
         return false;
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return new AxisAlignedBB(
+                this.x,
+                this.y,
+                this.z,
+                this.x + 1,
+                getMaxY(),
+                this.z + 1
+        );
     }
 }

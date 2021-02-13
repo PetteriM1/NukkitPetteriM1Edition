@@ -21,8 +21,8 @@ public class PlayerSkinPacket extends DataPacket {
 
     @Override
     public void decode() {
+        uuid = getUUID();
         if (protocol < 388) {
-            uuid = getUUID();
             skin = new Skin();
             skin.setSkinId(getString());
             newSkinName = getString();
@@ -31,9 +31,10 @@ public class PlayerSkinPacket extends DataPacket {
             skin.setCapeData(getByteArray());
             skin.setGeometryName(getString());
             skin.setGeometryData(getString());
-            premium = getBoolean();
+            if (protocol > 274) {
+                premium = getBoolean();
+            }
         } else {
-            uuid = getUUID();
             skin = getSkin(protocol);
             newSkinName = getString();
             oldSkinName = getString();

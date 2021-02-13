@@ -17,6 +17,11 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
 
     private boolean canAttack = true;
 
+    /**
+     * For golems: entity id of the target
+     */
+    public long isAngryTo;
+
     public EntityWalkingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -153,7 +158,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
         this.entityBaseTick(tickDiff);
 
         Vector3 target = this.updateMove(tickDiff);
-        if ((!this.isFriendly() || !(target instanceof Player)) && target instanceof Entity) {
+        if (this.getServer().getMobAiEnabled() && target instanceof Entity && (!this.isFriendly() || !(target instanceof Player) || ((Entity) target).getId() == this.isAngryTo)) {
             if (target != this.followTarget || this.canAttack) {
                 this.attackEntity((Entity) target);
             }

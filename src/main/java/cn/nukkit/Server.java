@@ -508,7 +508,7 @@ public class Server {
         }
 
         if (this.getPropertyBoolean("thread-watchdog", true)) {
-            this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 50000));
+            this.watchdog = new Watchdog(this, this.getPropertyInt("thread-watchdog-tick", 60000));
             this.watchdog.start();
         }
 
@@ -530,7 +530,8 @@ public class Server {
 
         if (this.getPropertyBoolean("entity-auto-spawn-task", true)) {
             this.spawnerTask = new SpawnerTask();
-            this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, this.getPropertyInt("ticks-per-entity-spawns", 200), this.getPropertyInt("ticks-per-entity-spawns", 200));
+            int spawnerTicks = Math.max(this.getPropertyInt("ticks-per-entity-spawns", 200), 2) >> 1; // Run the spawner on 2x speed but spawn only either monsters or animals
+            this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, spawnerTicks, spawnerTicks);
         }
 
         // Check for updates
@@ -947,9 +948,7 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
-        for (Player player : players) {
-            player.dataPacket(pk);
-        }
+        Server.broadcastPacket(players, pk);
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
@@ -964,7 +963,9 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_REMOVE;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid)};
-        Server.broadcastPacket(players, pk);
+        for (Player player : players) {
+            player.dataPacket(pk);
+        }
     }
 
     public void removePlayerListData(UUID uuid, Collection<Player> players) {
@@ -998,7 +999,7 @@ public class Server {
         } else if (player.protocol >= ProtocolInfo.v1_16_0) {
             player.dataPacket(CraftingManager.packet407);
         } else if (player.protocol > ProtocolInfo.v1_12_0) {
-            player.dataPacket(CraftingManager.packet338);
+            player.dataPacket(CraftingManager.packet388);
         } else if (player.protocol == ProtocolInfo.v1_12_0) {
             player.dataPacket(CraftingManager.packet361);
         } else if (player.protocol == ProtocolInfo.v1_11_0) {
@@ -1975,12 +1976,12 @@ public class Server {
         this.properties.save();
     }
 
-    public String getPropertyString(String variable) {
-        return this.getPropertyString(variable, null);
+    public String getPropertyString(String key) {
+        return this.getPropertyString(key, null);
     }
 
-    public String getPropertyString(String variable, String defaultValue) {
-        return this.properties.exists(variable) ? (String) this.properties.get(variable) : defaultValue;
+    public String getPropertyString(String key, String defaultValue) {
+        return this.properties.exists(key) ? this.properties.get(key).toString() : defaultValue;
     }
 
     public int getPropertyInt(String variable) {
@@ -2307,7 +2308,7 @@ public class Server {
      */
     private void loadSettings() {
         this.forceLanguage = this.getPropertyBoolean("force-language", false);
-        this.networkCompressionLevel = this.getPropertyInt("compression-level", 4);
+        this.networkCompressionLevel = Math.max(Math.min(this.getPropertyInt("compression-level", 4), 9), 0);
         this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
         this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
         this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);
@@ -2453,7 +2454,7 @@ public class Server {
             put("ticks-per-entity-spawns", 200);
             put("ticks-per-entity-despawns", 12000);
             put("thread-watchdog", true);
-            put("thread-watchdog-tick", 50000);
+            put("thread-watchdog-tick", 60000);
             put("nether", true);
             put("end", false);
             put("suomicraft-mode", false);

@@ -57,18 +57,18 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId408 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
-    private static byte[] compiledTable274;
-    private static byte[] compiledTable282;
-    private static byte[] compiledTable291;
-    private static byte[] compiledTable313;
-    private static byte[] compiledTable332;
-    private static byte[] compiledTable340;
-    private static byte[] compiledTable354;
-    private static byte[] compiledTable361;
-    private static byte[] compiledTable388;
-    private static byte[] compiledTable389;
-    private static byte[] compiledTable407;
-    private static byte[] compiledTable408;
+    private static final byte[] compiledTable274;
+    private static final byte[] compiledTable282;
+    private static final byte[] compiledTable291;
+    private static final byte[] compiledTable313;
+    private static final byte[] compiledTable332;
+    private static final byte[] compiledTable340;
+    private static final byte[] compiledTable354;
+    private static final byte[] compiledTable361;
+    private static final byte[] compiledTable388;
+    private static final byte[] compiledTable389;
+    private static final byte[] compiledTable407;
+    private static final byte[] compiledTable408;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);

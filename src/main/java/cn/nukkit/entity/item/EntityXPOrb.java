@@ -23,7 +23,6 @@ public class EntityXPOrb extends Entity {
      */
     public static final int[] ORB_SPLIT_SIZES = {2477, 1237, 617, 307, 149, 73, 37, 17, 7, 3, 1}; // This is indexed biggest to smallest so that we can return as soon as we found the biggest value
     public Player closestPlayer = null;
-    private int age;
     private int pickupDelay;
     private int exp;
 
@@ -159,7 +158,7 @@ public class EntityXPOrb extends Entity {
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
-            } else {
+            }/* else {
                 Entity[] e = this.level.getCollidingEntities(this.boundingBox, this);
                 for (Entity entity : e) {
                     if (entity instanceof Player) {
@@ -168,7 +167,7 @@ public class EntityXPOrb extends Entity {
                         }
                     }
                 }
-            }
+            }*/
 
             if (!this.isOnGround()) {
                 this.motionY -= this.getGravity();

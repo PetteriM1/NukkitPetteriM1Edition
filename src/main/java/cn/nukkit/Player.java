@@ -840,8 +840,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= server.spawnThreshold) {
-            if (this.protocol < 274) {
-                this.locallyInitialized = true;
+            if (this.protocol <= 274) {
                 this.doFirstSpawn();
             }
 
@@ -856,6 +855,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void doFirstSpawn() {
+        this.locallyInitialized = true;
+
         if (this.spawned) {
             return;
         }
@@ -1396,7 +1397,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.level.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.level.getBlock(x, y, z, false);
 
                         if (!block.canPassThrough() && block.collidesWithBB(realBB)) {
                             onGround = true;
@@ -1772,8 +1773,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.entityId = this.getId();
         pk.entries = new Attribute[]{
                 Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(this.getMaxHealth()).setValue(health > 0 ? (health < getMaxHealth() ? health : getMaxHealth()) : 0),
-                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getLevel()),
-                Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()),
+                Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(this.foodData.getLevel()).setDefaultValue(this.foodData.getMaxLevel()),
+                Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(this.getMovementSpeed()).setDefaultValue(this.getMovementSpeed()),
                 Attribute.getAttribute(Attribute.EXPERIENCE_LEVEL).setValue(this.expLevel),
                 Attribute.getAttribute(Attribute.EXPERIENCE).setValue(((float) this.exp) / calculateRequireExperience(this.expLevel))
         };
@@ -1814,11 +1815,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.processMovement(tickDiff);
             this.motionX = this.motionY = this.motionZ = 0; // HACK: fix player knockback being messed up
 
-            if (currentTick % 2 == 0) {
+            //if (currentTick % 2 == 0) {
                 if (!this.isSpectator()) {
                     this.checkNearEntities();
                 }
-            }
+            //}
 
             this.entityBaseTick(tickDiff);
 
@@ -2197,7 +2198,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 startGamePacket.lightningLevel = this.getLevel().getThunderTime();
             }
         }
-        this.directDataPacket(startGamePacket);
+        this.quickBatch(startGamePacket);
 
         this.loggedIn = true;
 
@@ -2540,7 +2541,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
-                    if (this.teleportPosition != null) {
+                    if (this.teleportPosition != null || !this.locallyInitialized) {
                         break;
                     }
 
@@ -2838,6 +2839,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_START_SWIMMING:
                             PlayerToggleSwimEvent ptse = new PlayerToggleSwimEvent(this, true);
+                            if (!this.isInsideOfWater()) {
+                                ptse.setCancelled(true);
+                            }
                             this.server.getPluginManager().callEvent(ptse);
                             if (ptse.isCancelled()) {
                                 this.sendData(this);
@@ -2911,12 +2915,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         case InteractPacket.ACTION_OPEN_INVENTORY:
                             if (this.protocol >= 407) {
                                 if (!this.inventoryOpen) {
-                                    InventoryOpenEvent inventoryOpenEvent = new InventoryOpenEvent(this.inventory, this);
-                                    server.getPluginManager().callEvent(inventoryOpenEvent);
-                                    if (!inventoryOpenEvent.isCancelled()) {
-                                        this.inventory.open(this);
-                                        this.inventoryOpen = true;
-                                    }
+                                    this.inventoryOpen = this.inventory.open(this);
                                 }
                             }
                             break;
@@ -3233,9 +3232,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 BufferedImage image = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
                                 Graphics2D graphics = image.createGraphics();
 
+                                int worldX = (this.getFloorX () / 128) << 7;
+                                int worldZ = (this.getFloorZ () / 128) << 7;
                                 for (int x = 0; x < 128; x++) {
                                     for (int y = 0; y < 128; y++) {
-                                        graphics.setColor(new Color(this.getLevel().getMapColorAt(this.getFloorX() - 64 + x, this.getFloorZ() - 64 + y).getRGB()));
+                                        graphics.setColor(new Color(this.getLevel().getMapColorAt(worldX + x, worldZ + y).getRGB()));
                                         graphics.fillRect(x, y, x, y);
                                     }
                                 }
@@ -3377,7 +3378,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
                                     // Hack: Fix client spamming right clicks
-                                    if (!server.doNotLimitInteractions && (lastRightClickPos != null && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
+                                    if (!server.doNotLimitInteractions && (lastRightClickPos != null && this.getInventory().getItemInHandFast().getBlockId() == BlockID.AIR && System.currentTimeMillis() - lastRightClickTime < 200.0 && blockVector.distanceSquared(lastRightClickPos) < 0.00001)) {
                                         return;
                                     }
 
@@ -3477,13 +3478,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_AIR:
                                     Vector3 directionVector = this.getDirectionVector();
 
-                                    if (this.isCreative()) {
-                                        item = this.inventory.getItemInHand();
-                                    } else if (!this.inventory.getItemInHand().equals(useItemData.itemInHand)) {
+                                    item = this.inventory.getItemInHand();
+
+                                    if (item instanceof ItemCrossbow) {
+                                        if (!item.onClickAir(this, directionVector)) {
+                                            return; // Shoot
+                                        }
+                                    }
+
+                                    if (!item.equals(useItemData.itemInHand)) {
                                         this.inventory.sendHeldItem(this);
                                         break packetswitch;
-                                    } else {
-                                        item = this.inventory.getItemInHand();
                                     }
 
                                     PlayerInteractEvent interactEvent = new PlayerInteractEvent(this, item, directionVector, face, Action.RIGHT_CLICK_AIR);
@@ -3717,11 +3722,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     break;
                 case ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET:
-                    if (this.locallyInitialized || this.protocol < 274) {
+                    if (this.locallyInitialized || this.protocol <= 274) {
                         return;
                     }
 
-                    this.locallyInitialized = true;
                     this.doFirstSpawn();
                     break;
                 case ProtocolInfo.RESPAWN_PACKET:
@@ -4073,7 +4077,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (notify && !reason.isEmpty()) {
                 DisconnectPacket pk = new DisconnectPacket();
                 pk.message = reason;
-                this.directDataPacket(pk);
+                this.quickBatch(pk); // Batch the packet here to make sure it gets thru before the connection is closed
             }
 
             this.connected = false;
@@ -4502,7 +4506,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public void setMovementSpeed(float speed, boolean send) {
         super.setMovementSpeed(speed);
         if (this.spawned && send) {
-            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed));
+            this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed).setDefaultValue(speed));
         }
     }
 
@@ -5182,8 +5186,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
         pk.protocol = protocol;
-        //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
-        pk.encode();
+        pk.tryEncode();
 
         BatchPacket batch = new BatchPacket();
         byte[][] batchPayload = new byte[2][];
@@ -5581,6 +5584,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.fishing = null;
+    }
+
+    /**
+     * Batch packet and send it immediately
+     * @param pk data packet
+     */
+    protected void quickBatch(DataPacket pk) {
+        pk.protocol = this.protocol;
+        pk.tryEncode();
+        BinaryStream stream = new BinaryStream();
+        byte[] buf = pk.getBuffer();
+        stream.putUnsignedVarInt(buf.length);
+        stream.put(buf);
+        try {
+            byte[] bytes = Binary.appendBytes(stream.getBuffer());
+            BatchPacket batched = new BatchPacket();
+            if (this.protocol >= ProtocolInfo.v1_16_0) {
+                batched.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
+            } else {
+                batched.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+            }
+            this.directDataPacket(batched);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

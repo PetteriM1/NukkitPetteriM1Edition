@@ -1,6 +1,7 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.mob.EntityWalkingMob;
@@ -10,6 +11,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -37,12 +39,12 @@ public class EntityIronGolem extends EntityWalkingMob {
 
     @Override
     public float getHeight() {
-        return 2.7f;
+        return 2.9f;
     }
 
     @Override
     public double getSpeed() {
-        return 0.8;
+        return 0.7;
     }
 
     @Override
@@ -50,12 +52,12 @@ public class EntityIronGolem extends EntityWalkingMob {
         super.initEntity();
 
         this.setMaxHealth(100);
-        this.setDamage(new int[] { 0, 21, 21, 21 });
-        this.setMinDamage(new int[] { 0, 7, 7, 7 });
+        this.setDamage(new int[] { 0, 11, 21, 31 });
+        this.setMinDamage(new int[] { 0, 4, 7, 11 });
     }
 
     public void attackEntity(Entity player) {
-        if (this.attackDelay > 23 && this.distanceSquared(player) < 4) {
+        if (this.attackDelay > 40 && this.distanceSquared(player) < 4) {
             this.attackDelay = 0;
             HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
             damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
@@ -71,11 +73,15 @@ public class EntityIronGolem extends EntityWalkingMob {
                         (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
             }
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+            EntityEventPacket pk = new EntityEventPacket();
+            pk.eid = this.getId();
+            pk.event = EntityEventPacket.ARM_SWING;
+            Server.broadcastPacket(this.getViewers().values(), pk);
         }
     }
 
     public boolean targetOption(EntityCreature creature, double distance) {
-        return !(creature instanceof Player) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 100;
+        return (!(creature instanceof Player) || creature.getId() == this.isAngryTo) && !(creature instanceof EntityWolf) && creature.isAlive() && distance <= 100;
     }
 
     @Override
@@ -105,6 +111,18 @@ public class EntityIronGolem extends EntityWalkingMob {
 
     @Override
     public boolean canDespawn() {
+        return false;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent ev) {
+        if (super.attack(ev)) {
+            if (ev instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+                this.isAngryTo = ((EntityDamageByEntityEvent) ev).getDamager().getId();
+            }
+            return true;
+        }
+
         return false;
     }
 }
