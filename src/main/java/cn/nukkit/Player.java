@@ -4624,8 +4624,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.mode = mode;
         //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
-        this.ySize = 0;
-
         if (targets != null) {
             if (Arrays.stream(targets).anyMatch(target -> target == this)) {
                 this.ySize = 0;
