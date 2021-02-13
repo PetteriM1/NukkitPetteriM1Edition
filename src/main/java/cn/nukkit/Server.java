@@ -46,10 +46,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.BatchingHelper;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
+import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -78,6 +78,8 @@ import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -209,7 +211,6 @@ public class Server {
     public static List<String> noTickingWorlds = new ArrayList<>();
 
     private SpawnerTask spawnerTask;
-    private final BatchingHelper batchingHelper;
 
     /* Some settings */
     private String motd;
@@ -329,7 +330,6 @@ public class Server {
         Zlib.setProvider(this.getPropertyInt("zlib-provider", 2));
 
         this.scheduler = new ServerScheduler();
-        this.batchingHelper = new BatchingHelper(this);
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
             try {
@@ -631,33 +631,64 @@ public class Server {
 
 
     public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-            for (Player player : players) {
-                player.directDataPacket(packet);
-            }
-            return;
-        }
-        instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
+        broadcastPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
-        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
-            for (Player player : players) {
-                player.directDataPacket(packet);
-            }
-            return;
-        }
-        instance.batchPackets(players, new DataPacket[]{packet});
+        broadcastPackets(players, new DataPacket[]{packet});
     }
 
     public static void broadcastPackets(Player[] players, DataPacket[] packets) {
-        instance.batchPackets(players, packets, false);
+        Int2ObjectMap<ObjectList<Player>> targets = shortPlayers(players);
+        Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = shortAndEncode(targets, packets);
+
+        for (int protocolId : targets.keySet()) {
+            ObjectList<DataPacket> packetList = encodedPackets.get(protocolId);
+            ObjectList<Player> finalTargets = targets.get(protocolId);
+
+            for (Player player : finalTargets) {
+                for (DataPacket packet : packetList) {
+                    player.dataPacket(packet);
+                }
+            }
+        }
     }
 
+    public static Int2ObjectMap<ObjectList<DataPacket>> shortAndEncode(Int2ObjectMap<ObjectList<Player>> targets, DataPacket[] packets) {
+        // Encoded packets by encoding protocol
+        Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = new Int2ObjectOpenHashMap<>();
+
+        for (DataPacket packet : packets) {
+            Int2IntMap encodingProtocols = new Int2IntOpenHashMap();
+            for (int protocolId : targets.keySet()) {
+                // TODO: encode only by encoding protocols
+                // No need to have all versions here
+                encodingProtocols.put(protocolId, protocolId);
+            }
+
+            Int2ObjectMap<DataPacket> encodedPacket = new Int2ObjectOpenHashMap<>();
+            for (int encodingProtocol : encodingProtocols.values()) {
+                if (!encodedPacket.containsKey(encodingProtocol)) {
+                    DataPacket pk = packet.clone();
+                    pk.tryEncode(encodingProtocol);
+                    encodedPacket.put(encodingProtocol, pk);
+                }
+            }
+
+            for (int protocolId : encodingProtocols.values()) {
+                int encodingProtocol = encodingProtocols.get(protocolId);
+                encodedPackets.computeIfAbsent(protocolId, i -> new ObjectArrayList<>()).add(encodedPacket.get(encodingProtocol));
+            }
+        }
+        return encodedPackets;
+    }
+
+    @Deprecated
     public void batchPackets(Player[] players, DataPacket[] packets) {
         this.batchPackets(players, packets, false);
     }
 
+    @Deprecated
     public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync) {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
@@ -670,7 +701,40 @@ public class Server {
                 return;
             }
         }
-        this.batchingHelper.batchPackets(players, packets);
+
+        Int2ObjectMap<ObjectList<Player>> targets = shortPlayers(players);
+        Int2ObjectMap<ObjectList<DataPacket>> encodedPackets = shortAndEncode(targets, packets);
+
+        for (int protocolId : targets.keySet()) {
+            ObjectList<DataPacket> packetList = encodedPackets.get(protocolId);
+            ObjectList<Player> finalTargets = targets.get(protocolId);
+
+            BinaryStream batched = new BinaryStream();
+            for (DataPacket packet : packetList) {
+                if (packet instanceof BatchPacket) {
+                    throw new RuntimeException("Cannot batch BatchPacket");
+                }
+                packet.tryEncode(protocolId);
+                byte[] buf = packet.getBuffer();
+                batched.putUnsignedVarInt(buf.length);
+                batched.put(buf);
+            }
+
+            try {
+                byte[] bytes = Binary.appendBytes(batched.getBuffer());
+                BatchPacket pk = new BatchPacket();
+                if (protocolId >= ProtocolInfo.v1_16_0) {
+                    pk.payload = Zlib.deflateRaw(bytes, Server.getInstance().networkCompressionLevel);
+                } else {
+                    pk.payload = Zlib.deflate(bytes, Server.getInstance().networkCompressionLevel);
+                }
+                for (Player pl : finalTargets) {
+                    pl.directDataPacket(pk);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void enablePlugins(PluginLoadOrder type) {
@@ -809,8 +873,6 @@ public class Server {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
             }
-
-            this.batchingHelper.shutdown();
 
             if (nameLookup != null) {
                 this.getLogger().debug("Closing name lookup DB...");

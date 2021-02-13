@@ -1010,26 +1010,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean batchDataPacket(DataPacket packet) {
-        if (packet instanceof BatchPacket) {
-            return this.directDataPacket(packet); // We don't want to batch a batched packet
-        }
-
-        if (!this.connected) {
-            return false;
-        }
-
-        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
-                DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
-                this.server.getPluginManager().callEvent(event);
-                if (event.isCancelled()) {
-                    return false;
-                }
-            }
-
-            this.packetQueue.offer(packet);
-        }
-        return true;
+        return this.dataPacket(packet);
     }
 
     /**
@@ -1040,34 +1021,28 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return packet successfully sent
      */
     public boolean dataPacket(DataPacket packet) {
-        if (this.protocol >= ProtocolInfo.v1_16_100) {
-            return batchDataPacket(packet);
-        }
-
         if (!this.connected) {
             return false;
         }
 
-        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
-                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-                this.server.getPluginManager().callEvent(ev);
-                if (ev.isCancelled()) {
-                    return false;
-                }
+        try (Timing ignored = Timings.getSendDataPacketTiming(packet)) {
+            DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
+            this.server.getPluginManager().callEvent(ev);
+            if (ev.isCancelled()) {
+                return false;
             }
 
             if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
                 log.trace("Outbound {}: {}", this.getName(), packet);
             }
 
-            this.interfaz.putPacket(this, packet, false, false);
+            this.interfaz.putPacket(this, packet, false, true);
         }
         return true;
     }
 
     public int dataPacket(DataPacket packet, boolean needACK) {
-        return this.dataPacket(packet) ? 0 : -1;
+        return this.dataPacket(packet) ? 1 : 0;
     }
 
     /**
@@ -1078,30 +1053,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @return packet successfully sent
      */
     public boolean directDataPacket(DataPacket packet) {
-        if (!this.connected) {
-            return false;
-        }
-
-        if (!loggedIn && packet.pid() == ProtocolInfo.SET_ENTITY_DATA_PACKET) {
-            return false; //HACK
-        }
-
-        try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
-                DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
-                this.server.getPluginManager().callEvent(ev);
-                if (ev.isCancelled()) {
-                    return false;
-                }
-            }
-
-            this.interfaz.putPacket(this, packet, false, true);
-        }
-        return true;
+        return this.dataPacket(packet);
     }
 
     public int directDataPacket(DataPacket packet, boolean needACK) {
-        return this.directDataPacket(packet) ? 0 : -1;
+        return this.dataPacket(packet) ? 1 : 0;
     }
 
     public int getPing() {
@@ -1971,20 +1927,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void checkNetwork() {
-        if (this.protocol < ProtocolInfo.v1_16_100 && !this.isOnline()) {
-            return;
-        }
-
-        if (!this.packetQueue.isEmpty()) {
-            List<DataPacket> toBatch = new ArrayList<>();
-            DataPacket packet;
-            while ((packet = this.packetQueue.poll()) != null) {
-                toBatch.add(packet);
-            }
-            DataPacket[] arr = toBatch.toArray(new DataPacket[0]);
-            this.server.batchPackets(new Player[]{this}, arr, false);
-        }
-
         if (!this.isOnline()) {
             return;
         }
