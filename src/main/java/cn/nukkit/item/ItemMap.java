@@ -58,7 +58,7 @@ public class ItemMap extends Item {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(this.image, "png", baos);
 
-            this.setNamedTag(this.getNamedTag().putByteArray("Colors", baos.toByteArray()));
+            this.setNamedTag(this.getNamedTag().putLong("map_uuid", mapCount++).putByteArray("Colors", baos.toByteArray()));
             baos.close();
         } catch (IOException e) {
             MainLogger.getLogger().logException(e);
