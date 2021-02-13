@@ -129,7 +129,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.equals(Item.get(Item.SHEARS, 0, 1), false) && !this.sheared) {
+        if (item.getId() == Item.SHEARS && !this.sheared) {
             this.shear(true);
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_SHEAR);
             player.getInventory().getItemInHand().setDamage(item.getDamage() + 1);

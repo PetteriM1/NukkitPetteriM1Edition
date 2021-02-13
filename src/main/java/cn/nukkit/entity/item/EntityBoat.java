@@ -48,8 +48,8 @@ public class EntityBoat extends EntityVehicle {
     public static final double SINKING_SPEED = 0.0005;
     public static final double SINKING_MAX_SPEED = 0.005;
 
-    protected int variant;
     protected boolean sinking = true;
+    public int woodID;
 
     public EntityBoat(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -63,9 +63,9 @@ public class EntityBoat extends EntityVehicle {
         super.initEntity();
 
         if (this.namedTag.contains("Variant")) {
-            this.variant = this.namedTag.getInt("Variant");
+            this.woodID = this.namedTag.getInt("Variant");
         }
-        this.dataProperties.putInt(DATA_VARIANT, this.variant);
+        this.dataProperties.putInt(DATA_VARIANT, this.woodID);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class EntityBoat extends EntityVehicle {
             //TODO: Lily pad collision
             this.updateMovement();
 
-            if (this.passengers.size() < 2) {
+            if (this.age % 5 == 0 && this.passengers.size() < 2) {
                 Entity[] e = this.level.getCollidingEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
                 for (Entity entity : e) {
                     if (entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || isPassenger(entity)) {
@@ -413,22 +413,22 @@ public class EntityBoat extends EntityVehicle {
         super.kill();
 
         if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-            this.level.dropItem(this, Item.get(ItemID.BOAT, this.variant));
+            this.level.dropItem(this, Item.get(ItemID.BOAT, this.woodID));
         }
     }
 
     @Override
     public void saveNBT() {
         super.saveNBT();
-        this.namedTag.putInt("Variant", this.variant);
+        this.namedTag.putInt("Variant", this.woodID);
     }
 
     public int getVariant() {
-        return this.variant;
+        return this.woodID;
     }
 
     public void setVariant(int variant) {
-        this.variant = variant;
+        this.woodID = variant;
         this.dataProperties.putInt(DATA_VARIANT, variant);
     }
 }
