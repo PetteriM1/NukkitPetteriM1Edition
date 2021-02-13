@@ -277,18 +277,29 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         public void onEncapsulated(EncapsulatedPacket packet) {
             ByteBuf buffer = packet.getBuffer();
             short packetId = buffer.readUnsignedByte();
-            if (packetId == 0xfe) {
-                byte[] packetBuffer = new byte[buffer.readableBytes()];
-                buffer.readBytes(packetBuffer);
+            if (packetId != 0xfe) {
+                return;
+            }
 
-                try {
-                    int raknetVer = this.raknet.getRakNet().getProtocolVersion();
-                    int protocol = this.player == null? ProtocolInfo.CURRENT_PROTOCOL : this.player.protocol;
-                    RakNetInterface.this.network.processBatch(packetBuffer, this.inbound, raknetVer, protocol);
-                } catch (ProtocolException e) {
-                    this.disconnect("Sent malformed packet");
-                    log.error("Unable to process batch packet", e);
-                }
+            byte[] packetBuffer = new byte[buffer.readableBytes()];
+            buffer.readBytes(packetBuffer);
+
+            if (this.player == null) {
+                // In this case player wasn't created yet. We queue batch to inbound
+                log.debug("Received packets too early from "+this.raknet.getAddress());
+                BatchPacket batchPacket = new BatchPacket();
+                batchPacket.setBuffer(packetBuffer);
+                batchPacket.decode(ProtocolInfo.CURRENT_PROTOCOL); // Shouldn't matter
+                this.inbound.offer(batchPacket);
+                return;
+            }
+            
+            try {
+                int raknetVer = this.raknet.getRakNet().getProtocolVersion();
+                RakNetInterface.this.network.processBatch(packetBuffer, this.inbound, raknetVer, this.player.protocol);
+            } catch (ProtocolException e) {
+                this.disconnect("Sent malformed packet");
+                log.error("Unable to process batch packet", e);
             }
         }
 

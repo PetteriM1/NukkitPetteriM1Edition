@@ -208,7 +208,6 @@ public class Network {
 
                 if ((pk instanceof LoginPacket) && ((LoginPacket) pk).getProtocol() != protocolVersion) {
                     protocolVersion = ((LoginPacket) pk).getProtocol();
-                    log.warn("Protocol version changed due to LoginPacket to protocol="+protocolVersion);
                 }
                 packets.add(pk);
             }
