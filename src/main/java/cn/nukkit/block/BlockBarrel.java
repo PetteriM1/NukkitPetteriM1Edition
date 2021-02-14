@@ -177,4 +177,24 @@ public class BlockBarrel extends BlockSolidMeta implements Faceable {
 
         return super.getComparatorInputOverride();
     }
+
+    @Override
+    public boolean canBePushed() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (!(blockEntity instanceof BlockEntityBarrel)) {
+            return super.canBePushed();
+        }
+        BlockEntityBarrel chest = (BlockEntityBarrel) blockEntity;
+        return chest.getInventory().getViewers().size() < 1;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (!(blockEntity instanceof BlockEntityBarrel)) {
+            return super.canBePulled();
+        }
+        BlockEntityBarrel chest = (BlockEntityBarrel) blockEntity;
+        return chest.getInventory().getViewers().size() < 1;
+    }
 }

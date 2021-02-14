@@ -198,4 +198,24 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
+
+    @Override
+    public boolean canBePushed() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (!(blockEntity instanceof BlockEntityChest)) {
+            return super.canBePushed();
+        }
+        BlockEntityChest chest = (BlockEntityChest) blockEntity;
+        return chest.getInventory().getViewers().size() < 1;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (!(blockEntity instanceof BlockEntityChest)) {
+            return super.canBePulled();
+        }
+        BlockEntityChest chest = (BlockEntityChest) blockEntity;
+        return chest.getInventory().getViewers().size() < 1;
+    }
 }
