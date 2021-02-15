@@ -330,7 +330,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for oldest versions
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems137.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_2_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_2_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -339,7 +339,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 274
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems274.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_5_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_5_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -348,7 +348,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 291
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems291.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_7_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_7_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -357,7 +357,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 313
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems313.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_8_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_8_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -366,7 +366,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 332
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems332.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_9_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_9_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -375,7 +375,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 340
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems340.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_10_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_10_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -384,7 +384,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 354, 361, 388
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems354.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_11_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_11_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -393,7 +393,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 389, 390
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems389.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_14_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                addCreativeItem(v1_14_0, fromJson(map));
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -402,7 +402,11 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 407+
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems407.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_16_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                Item item = fromJson(map);
+                byte[] nbtBytes = item.getCompoundTag();
+                item = new Item(item.getId(), item.getDamage(), item.getCount());
+                item.setCompoundTag(nbtBytes);
+                addCreativeItem(v1_16_0, item);
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
@@ -473,7 +477,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public static void addCreativeItem(Item item) {
-        addCreativeItem(389, item);
+        addCreativeItem(CURRENT_PROTOCOL, item);
     }
 
     public static void addCreativeItem(int protocol, Item item) {
