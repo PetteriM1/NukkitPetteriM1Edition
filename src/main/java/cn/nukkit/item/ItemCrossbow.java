@@ -151,4 +151,9 @@ public class ItemCrossbow extends ItemBow {
         }
         return false;
     }
+
+    @Override
+    public int getEnchantAbility() {
+        return 1;
+    }
 }

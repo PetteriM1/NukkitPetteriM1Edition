@@ -5,6 +5,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.sound.TNTPrimeSound;
@@ -103,11 +104,13 @@ public class BlockTNT extends BlockSolid {
             item.useOn(this);
             this.prime(80, player);
             return true;
-        }
-
-        if (item.getId() == Item.FIRE_CHARGE) {
-            if (!player.isCreative()) player.getInventory().removeItem(Item.get(Item.FIRE_CHARGE, 0, 1));
+        } else if (item.getId() == Item.FIRE_CHARGE) {
+            if (!player.isCreative()) item.count--;
             this.level.addSoundToViewers(this, Sound.MOB_GHAST_FIREBALL);
+            this.prime(80, player);
+            return true;
+        } else if (item.hasEnchantment(Enchantment.ID_FIRE_ASPECT)) {
+            item.useOn(this);
             this.prime(80, player);
             return true;
         }

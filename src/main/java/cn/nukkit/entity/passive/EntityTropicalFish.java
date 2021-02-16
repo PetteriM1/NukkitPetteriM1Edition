@@ -35,11 +35,6 @@ public class EntityTropicalFish extends EntityFish {
     }
 
     @Override
-    public int getKillExperience() {
-        return 0;
-    }
-
-    @Override
     public Item[] getDrops() {
         return new Item[]{Item.get(Item.CLOWNFISH, 0, 1)};
     }

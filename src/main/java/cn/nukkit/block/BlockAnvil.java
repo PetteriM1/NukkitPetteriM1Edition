@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.inventory.AnvilInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -54,7 +55,7 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
 
     @Override
     public boolean canBeActivated() {
-        return true;
+        return Server.getInstance().anvilsEnabled;
     }
 
     @Override
@@ -107,11 +108,7 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (player != null) {
-            if (player.getServer().anvilsEnabled) {
-                player.addWindow(new AnvilInventory(player.getUIInventory(), this), Player.ANVIL_WINDOW_ID);
-            } else {
-                player.sendMessage("\u00A7cAnvils are disabled on this server");
-            }
+            player.addWindow(new AnvilInventory(player.getUIInventory(), this), Player.ANVIL_WINDOW_ID);
         }
         return true;
     }

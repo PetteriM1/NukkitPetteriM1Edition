@@ -23,11 +23,15 @@ public class Effect implements Cloneable {
     public static final int MINING_FATIGUE = 4;
     public static final int STRENGTH = 5;
     public static final int HEALING = 6;
+    public static final int INSTANT_HEALTH = 6;
     public static final int HARMING = 7;
+    public static final int INSTANT_DAMAGE = 7;
     public static final int JUMP = 8;
+    public static final int JUMP_BOOST = 8;
     public static final int NAUSEA = 9;
     public static final int REGENERATION = 10;
     public static final int DAMAGE_RESISTANCE = 11;
+    public static final int RESISTANCE = 11;
     public static final int FIRE_RESISTANCE = 12;
     public static final int WATER_BREATHING = 13;
     public static final int INVISIBILITY = 14;
@@ -75,12 +79,12 @@ public class Effect implements Cloneable {
         effects[Effect.HEALTH_BOOST] = new Effect(Effect.HEALTH_BOOST, "%potion.healthBoost", 248, 125, 35);
         effects[Effect.ABSORPTION] = new Effect(Effect.ABSORPTION, "%potion.absorption", 36, 107, 251);
         effects[Effect.SATURATION] = new Effect(Effect.SATURATION, "%potion.saturation", 255, 0, 255);
-        effects[Effect.LEVITATION] = new Effect(Effect.LEVITATION, "%potion.levitation", 206, 255, 255);
+        effects[Effect.LEVITATION] = new Effect(Effect.LEVITATION, "%potion.levitation", 206, 255, 255, true);
         effects[Effect.FATAL_POISON] = new Effect(Effect.FATAL_POISON, "%potion.poison", 78, 147, 49, true);
         effects[Effect.CONDUIT_POWER] = new Effect(Effect.CONDUIT_POWER, "%potion.conduitPower", 29, 194, 209);
         effects[Effect.SLOW_FALLING] = new Effect(Effect.SLOW_FALLING, "%potion.slowFalling", 206, 255, 255);
-        effects[Effect.BAD_OMEN] = new Effect(Effect.BAD_OMEN, "%potion.badOmen", 0, 0, 0);
-        effects[Effect.VILLAGE_HERO] = new Effect(Effect.VILLAGE_HERO, "%potion.villageHero", 0, 0, 0);
+        effects[Effect.BAD_OMEN] = new Effect(Effect.BAD_OMEN, "%effect.badOmen", 11, 97, 56, true);
+        effects[Effect.VILLAGE_HERO] = new Effect(Effect.VILLAGE_HERO, "%effect.villageHero", 68, 255, 68);
     }
 
     public static Effect getEffect(int id) {
