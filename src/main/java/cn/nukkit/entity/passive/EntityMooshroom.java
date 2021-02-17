@@ -94,7 +94,16 @@ public class EntityMooshroom extends EntityWalkingAnimal {
             return true;
         } else if (item.getId() == Item.BUCKET) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
+            Item newBucket = Item.get(Item.BUCKET, 1, 1);
+            if (player.getInventory().getItemFast(player.getInventory().getHeldItemIndex()).count > 0) {
+                if (player.getInventory().canAddItem(newBucket)) {
+                    player.getInventory().addItem(newBucket);
+                } else {
+                    player.dropItem(newBucket);
+                }
+            } else {
+                player.getInventory().setItemInHand(newBucket);
+            }
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
             return true;
         } else if (item.getId() == Item.WHEAT && !this.isBaby()) {
