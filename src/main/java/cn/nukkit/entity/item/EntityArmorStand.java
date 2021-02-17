@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityInteractable;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.inventory.EntityArmorInventory;
@@ -25,7 +26,7 @@ import cn.nukkit.scheduler.Task;
 
 import java.util.Collection;
 
-public class EntityArmorStand extends Entity implements InventoryHolder {
+public class EntityArmorStand extends Entity implements InventoryHolder, EntityInteractable {
 
     public static final int NETWORK_ID = 61;
 
@@ -118,7 +119,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
             } else {
                 this.setPose(this.getPose() + 1);
             }
-            return true;
+            return false; // do not consume item
         }
 
         if (this.isValid() && !player.isSpectator()) {
@@ -342,6 +343,16 @@ public class EntityArmorStand extends Entity implements InventoryHolder {
         if (this.timing != null) this.timing.stopTiming();
 
         return hasUpdate;
+    }
+
+    @Override
+    public String getInteractButtonText() {
+        return "action.interact.armorstand.equip";
+    }
+
+    @Override
+    public boolean canDoInteraction() {
+        return true;
     }
 
     private static class Hack extends Task {

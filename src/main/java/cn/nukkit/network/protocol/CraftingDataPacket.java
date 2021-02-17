@@ -44,6 +44,10 @@ public class CraftingDataPacket extends DataPacket {
         Collections.addAll(brewingEntries, recipe);
     }
 
+    public void addMultiRecipe(MultiRecipe... recipe) {
+        Collections.addAll(entries, recipe);
+    }
+
     public void addContainerRecipe(ContainerRecipe... recipe) {
         Collections.addAll(containerEntries, recipe);
     }
@@ -154,6 +158,12 @@ public class CraftingDataPacket extends DataPacket {
                             this.putString(CRAFTING_TAG_FURNACE);
                         }
                         break;
+                    case MULTI:
+                        if (protocol >= ProtocolInfo.v1_16_0) { // ??
+                            this.putUUID(((MultiRecipe) recipe).getId());
+                            this.putUnsignedVarInt(0);
+                            break;
+                        }
                 }
             }
 

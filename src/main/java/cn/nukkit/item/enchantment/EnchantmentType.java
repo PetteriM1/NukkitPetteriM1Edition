@@ -20,7 +20,8 @@ public enum EnchantmentType {
     BREAKABLE,
     BOW,
     WEARABLE,
-    TRIDENT;
+    TRIDENT,
+    CROSSBOW;
 
     public boolean canEnchantItem(Item item) {
         if (this == ALL) {
@@ -30,7 +31,7 @@ public enum EnchantmentType {
             return true;
 
         } else if (item instanceof ItemArmor) {
-            if (this == ARMOR) {
+            if (this == ARMOR || this == WEARABLE) {
                 return true;
             }
 
@@ -53,13 +54,17 @@ public enum EnchantmentType {
                 case SWORD:
                     return item.isSword();
                 case DIGGER:
-                    return item.isPickaxe() || item.isShovel() || item.isAxe();
+                    return item.isPickaxe() || item.isShovel() || item.isAxe() || item.isHoe();
                 case BOW:
                     return item instanceof ItemBow;
                 case FISHING_ROD:
                     return item instanceof ItemFishingRod;
+                case WEARABLE:
+                    return item instanceof ItemSkull;
                 case TRIDENT:
                     return item instanceof ItemTrident;
+                case CROSSBOW:
+                    return item instanceof ItemCrossbow;
                 default:
                     return false;
             }

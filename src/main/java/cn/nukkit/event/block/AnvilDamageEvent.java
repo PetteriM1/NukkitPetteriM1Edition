@@ -4,13 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
-import cn.nukkit.inventory.transaction.CraftingTransaction;
 
-/**
- * Event for anvils being damaged.
- * @author GameModsBR
- */
-public class AnvilDamageEvent extends BlockFadeEvent implements Cancellable {
+public class AnvilDamageEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
@@ -18,38 +13,49 @@ public class AnvilDamageEvent extends BlockFadeEvent implements Cancellable {
         return handlers;
     }
 
+    private final int oldDamage;
+    private int newDamage;
+    private DamageCause cause;
     private final Player player;
-    private final CraftingTransaction transaction;
-    private final Cause cause;
+
     /**
      * This event is called when an anvil is damaged.
      * @param block The block (anvil) that has been damaged.
-     * @param newState The new state of the anvil when damaged.
-     * @param player The player who used the anvil.
-     * @param transaction Crafting (anvil use) transaction.
+     * @param oldDamage Old damage value.
+     * @param newDamage New damage value.
      * @param cause Cause of the anvil being damaged.
+     * @param player The player who used the anvil.
      */
-    public AnvilDamageEvent(Block block, Block newState, Player player, CraftingTransaction transaction, Cause cause) {
-        super(block, newState);
-        this.player = player;
-        this.transaction = transaction;
+    public AnvilDamageEvent(Block block, int oldDamage, int newDamage, DamageCause cause, Player player) {
+        super(block);
+        this.oldDamage = oldDamage;
+        this.newDamage = newDamage;
         this.cause = cause;
+        this.player = player;
+    }
+
+    public int getOldDamage() {
+        return this.oldDamage;
+    }
+
+    public int getNewDamage() {
+        return this.newDamage;
+    }
+
+    public void setNewDamage(int newDamage) {
+        this.newDamage = newDamage;
+    }
+
+    public DamageCause getCause() {
+        return this.cause;
     }
 
     public Player getPlayer() {
-        return player;
+        return this.player;
     }
 
-    public CraftingTransaction getTransaction() {
-        return transaction;
-    }
-
-    public Cause getCause() {
-        return cause;
-    }
-
-    public enum Cause {
+    public enum DamageCause {
         USE,
-        IMPACT
+        FALL
     }
 }

@@ -45,6 +45,7 @@ public class InventoryTransactionPacket extends DataPacket {
      */
     public boolean isCraftingPart = false;
     public boolean isEnchantingPart = false;
+    public boolean isRepairItemPart = false;
 
     @Override
     public byte pid() {
