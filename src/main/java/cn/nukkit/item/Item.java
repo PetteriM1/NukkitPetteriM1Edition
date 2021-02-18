@@ -399,7 +399,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // Creative inventory for 407+
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems407.json")).getMapList("items")) {
             try {
-                addCreativeItem(v1_16_0, Item.get((int) map.get("id"), (int) map.getOrDefault("damage", 0), 1, map.get("nbt_hex") != null ? Utils.parseHexBinary((String) map.get("nbt_hex")) : new byte[0]));
+                Item item = fromJson(map);
+                Item newItem = new Item(item.getId(), item.getDamage(), item.getCount());
+                newItem.setCompoundTag(item.getCompoundTag());
+                addCreativeItem(v1_16_0, newItem);
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
