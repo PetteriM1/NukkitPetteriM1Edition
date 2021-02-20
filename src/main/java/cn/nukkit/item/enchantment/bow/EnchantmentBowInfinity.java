@@ -7,8 +7,9 @@ import cn.nukkit.item.enchantment.Enchantment;
  * Nukkit Project
  */
 public class EnchantmentBowInfinity extends EnchantmentBow {
+
     public EnchantmentBowInfinity() {
-        super(Enchantment.ID_BOW_INFINITY, "arrowInfinite", 1);
+        super(Enchantment.ID_BOW_INFINITY, "arrowInfinite", Rarity.VERY_RARE);
     }
 
     @Override

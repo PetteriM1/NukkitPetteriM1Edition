@@ -53,7 +53,16 @@ public class EntityCow extends EntityWalkingAnimal {
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (item.getId() == Item.BUCKET && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            player.getInventory().addItem(Item.get(Item.BUCKET, 1, 1));
+            Item newBucket = Item.get(Item.BUCKET, 1, 1);
+            if (player.getInventory().getItemFast(player.getInventory().getHeldItemIndex()).count > 0) {
+                if (player.getInventory().canAddItem(newBucket)) {
+                    player.getInventory().addItem(newBucket);
+                } else {
+                    player.dropItem(newBucket);
+                }
+            } else {
+                player.getInventory().setItemInHand(newBucket);
+            }
             this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_MILK);
         } else if (item.getId() == Item.WHEAT && !this.isBaby()) {
             player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());

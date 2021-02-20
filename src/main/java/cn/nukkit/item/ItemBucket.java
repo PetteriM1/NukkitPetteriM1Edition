@@ -8,10 +8,14 @@ import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.particle.ExplodeParticle;
+import cn.nukkit.level.sound.FizzSound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author MagicDroidX
@@ -105,13 +109,17 @@ public class ItemBucket extends Item {
                     }
 
                     if (player.isSurvival()) {
-                        Item clone = this.clone();
-                        clone.setCount(this.getCount() - 1);
-                        player.getInventory().setItemInHand(clone);
-                        if (player.getInventory().canAddItem(ev.getItem())) {
-                            player.getInventory().addItem(ev.getItem());
+                        if (this.getCount() - 1 <= 0) {
+                            player.getInventory().setItemInHand(ev.getItem());
                         } else {
-                            player.dropItem(ev.getItem());
+                            Item clone = this.clone();
+                            clone.setCount(this.getCount() - 1);
+                            player.getInventory().setItemInHand(clone);
+                            if (player.getInventory().canAddItem(ev.getItem())) {
+                                player.getInventory().addItem(ev.getItem());
+                            } else {
+                                player.dropItem(ev.getItem());
+                            }
                         }
                     }
 
@@ -127,13 +135,19 @@ public class ItemBucket extends Item {
                 }
             }
         } else if (targetBlock instanceof BlockLiquid) {
+            if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
+                if (!player.isCreative()) {
+                    this.setDamage(0);
+                    player.getInventory().setItemInHand(this);
+                }
+                player.getLevel().addSound(new FizzSound(target, 2.6F + (ThreadLocalRandom.current().nextFloat() - ThreadLocalRandom.current().nextFloat()) * 0.8F));
+                player.getLevel().addParticle(new ExplodeParticle(target.add(0.5, 1, 0.5)));
+                return true;
+            }
+
             Item result = Item.get(BUCKET, 0, 1);
             PlayerBucketEmptyEvent ev = new PlayerBucketEmptyEvent(player, block, face, this, result);
             if (!block.canBeFlowedInto()) {
-                ev.setCancelled(true);
-            }
-
-            if (player.getLevel().getDimension() == Level.DIMENSION_NETHER && this.getDamage() != 10) {
                 ev.setCancelled(true);
             }
 
@@ -142,13 +156,17 @@ public class ItemBucket extends Item {
             if (!ev.isCancelled()) {
                 player.getLevel().setBlock(block, targetBlock, true, true);
                 if (player.isSurvival()) {
-                    Item clone = this.clone();
-                    clone.setCount(this.getCount() - 1);
-                    player.getInventory().setItemInHand(clone);
-                    if (player.getInventory().canAddItem(ev.getItem())) {
-                        player.getInventory().addItem(ev.getItem());
+                    if (this.getCount() - 1 <= 0) {
+                        player.getInventory().setItemInHand(ev.getItem());
                     } else {
-                        player.dropItem(ev.getItem());
+                        Item clone = this.clone();
+                        clone.setCount(this.getCount() - 1);
+                        player.getInventory().setItemInHand(clone);
+                        if (player.getInventory().canAddItem(ev.getItem())) {
+                            player.getInventory().addItem(ev.getItem());
+                        } else {
+                            player.dropItem(ev.getItem());
+                        }
                     }
                 }
 
@@ -195,7 +213,7 @@ public class ItemBucket extends Item {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
-        if (player.isSpectator()) {
+        if (player.isSpectator() || this.getDamage() != 1) {
             return false;
         }
 
@@ -208,9 +226,7 @@ public class ItemBucket extends Item {
         }
 
         if (!player.isCreative()) {
-            this.count--;
-            player.getInventory().setItemInHand(this);
-            player.getInventory().addItem(new ItemBucket());
+            player.getInventory().setItemInHand(new ItemBucket());
         }
 
         player.removeAllEffects();

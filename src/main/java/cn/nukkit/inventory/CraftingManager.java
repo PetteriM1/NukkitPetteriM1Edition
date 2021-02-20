@@ -36,6 +36,7 @@ public class CraftingManager {
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
+    public final Map<UUID, MultiRecipe> multiRecipes = new HashMap<>();
     public final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, BrewingRecipe> brewingRecipesOld = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
@@ -139,6 +140,9 @@ public class CraftingManager {
                         }
                         this.registerRecipe(new FurnaceRecipe(resultItem, inputItem));
                         break;
+                    /*case 4:
+                        this.registerRecipe(new MultiRecipe(UUID.fromString((String) recipe.get("uuid"))));
+                        break;*/
                     default:
                         break;
                 }
@@ -275,6 +279,9 @@ public class CraftingManager {
         }
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk419.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            pk419.addMultiRecipe(recipe);
         }
         for (BrewingRecipe recipe : brewingRecipes.values()) {
             pk419.addBrewingRecipe(recipe);
@@ -564,6 +571,10 @@ public class CraftingManager {
             return recipe.matchItems(inputList, extraOutputList, multiplier);
         }
         return false;
+    }
+
+    public void registerMultiRecipe(MultiRecipe recipe) {
+        this.multiRecipes.put(recipe.getId(), recipe);
     }
 
     public static class Entry {

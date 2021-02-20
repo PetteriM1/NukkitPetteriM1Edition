@@ -7,6 +7,7 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 import java.util.HashMap;
 
@@ -28,7 +29,7 @@ public class EntityHoglin extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return 5;
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 
     @Override

@@ -453,17 +453,6 @@ public class Level implements ChunkManager, Metadatable {
         addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, packet);
     }
 
-    public void addSoundToViewers(Entity entity, cn.nukkit.level.Sound sound) {
-        PlaySoundPacket packet = new PlaySoundPacket();
-        packet.name = sound.getSound();
-        packet.volume = 1f;
-        packet.pitch = 1f;
-        packet.x = entity.getFloorX();
-        packet.y = entity.getFloorY();
-        packet.z = entity.getFloorZ();
-        Server.broadcastPacket(entity.getViewers().values(), packet);
-    }
-
     public void addSound(Vector3 pos, cn.nukkit.level.Sound sound) {
         this.addSound(pos, sound, 1, 1, (Player[]) null);
     }
@@ -2191,9 +2180,9 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        /*if (target.getId() == Item.AIR) {
+        if (target.getId() == Item.AIR) {
             return null;
-        }*/
+        }
 
         if (player != null) {
             PlayerInteractEvent ev = new PlayerInteractEvent(player, item, target, face, Action.RIGHT_CLICK_BLOCK);
