@@ -36,7 +36,13 @@ public class ItemCrossbow extends ItemBow {
 
     @Override
     public boolean onUse(Player player, int ticksUsed) {
-        if (ticksUsed < 20) {
+        int needTickUsed = 20;
+        Enchantment enchantment = this.getEnchantment(Enchantment.ID_CROSSBOW_QUICK_CHARGE);
+        if (enchantment != null) {
+            needTickUsed -= enchantment.getLevel() * 5; //0.25s
+        }
+
+        if (ticksUsed < needTickUsed) {
             return true;
         }
 
