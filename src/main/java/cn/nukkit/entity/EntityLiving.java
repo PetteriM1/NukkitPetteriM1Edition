@@ -160,8 +160,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     protected boolean blockedByShield(EntityDamageEvent source) {
-        Entity damager = source instanceof EntityDamageByEntityEvent? ((EntityDamageByEntityEvent) source).getDamager() : null;
-        if (damager == null || !this.isBlocking() || damager instanceof EntityWeather) {
+        if (!this.isBlocking()) {
+            return false;
+        }
+
+        Entity damager = source instanceof EntityDamageByChildEntityEvent ? ((EntityDamageByChildEntityEvent) source).getChild() : source instanceof EntityDamageByEntityEvent ? ((EntityDamageByEntityEvent) source).getDamager() : null;
+        if (damager == null || damager instanceof EntityWeather) {
             return false;
         }
 
@@ -183,14 +187,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         if (event.getKnockBackAttacker() && damager instanceof EntityLiving) {
             double deltaX = damager.getX() - this.getX();
             double deltaZ = damager.getZ() - this.getZ();
+            ((EntityLiving) damager).attackTime = source.getAttackCooldown();
             ((EntityLiving) damager).knockBack(this, 0, deltaX, deltaZ);
         }
 
-        onBlock(damager, event.getAnimation());
+        onBlock(damager, event.getAnimation(), source.getFinalDamage());
         return true;
     }
 
-    protected void onBlock(Entity entity, boolean animate) {
+    protected void onBlock(Entity entity, boolean animate, float damage) {
         if (animate) {
             getLevel().addSoundToViewers(this, Sound.ITEM_SHIELD_BLOCK);
         }
