@@ -194,6 +194,10 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
     }
 
     protected Item damageArmor(Item armor, Entity damager) {
+        return damageArmor(armor, damager, 0);
+    }
+
+    protected Item damageArmor(Item armor, Entity damager, float damageToShield) {
         if (armor.hasEnchantments()) {
             if (damager != null) {
                 for (Enchantment enchantment : armor.getEnchantments()) {
@@ -213,7 +217,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             return armor;
         }
 
-        armor.setDamage(armor.getDamage() + 1);
+        armor.setDamage(armor.getDamage() + damageToShield >= 4.0f ? (int) damageToShield : 1);
 
         if (armor.getDamage() >= armor.getMaxDurability()) {
             return Item.get(BlockID.AIR, 0, 0);
