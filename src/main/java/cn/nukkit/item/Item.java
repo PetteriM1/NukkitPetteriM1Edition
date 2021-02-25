@@ -402,7 +402,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 Item item = fromJson(map);
                 Item newItem = new Item(item.getId(), item.getDamage(), item.getCount());
                 newItem.setCompoundTag(item.getCompoundTag());
-                addCreativeItem(v1_16_0, newItem); //TODO Restore this when finishing sorting
+                addCreativeItem(v1_16_0, newItem);
             } catch (Exception e) {
                 MainLogger.getLogger().logException(e);
             }
