@@ -1,6 +1,7 @@
 package cn.nukkit.network.rcon;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -48,7 +49,7 @@ public class RCONPacket {
         buffer.put((byte) 0);
         buffer.put((byte) 0);
 
-        buffer.flip();
+        ((Buffer) buffer).flip(); // do not remove the cast
         return buffer;
     }
 
