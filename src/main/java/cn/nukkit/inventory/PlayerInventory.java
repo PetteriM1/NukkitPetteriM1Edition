@@ -259,18 +259,22 @@ public class PlayerInventory extends BaseInventory {
 
     @Override
     public boolean setItem(int index, Item item) {
-        return setItem(index, item, true, false);
+        return setItem(index, item, true);
     }
 
-    private boolean setItem(int index, Item item, boolean send, boolean ignoreArmorEvents) {
+    @Override
+    public boolean setItem(int index, Item item, boolean send) {
         if (index < 0 || index >= this.size) {
             return false;
         } else if (item.getId() == 0 || item.getCount() <= 0) {
-            return this.clear(index);
+            return this.clear(index, send);
         }
 
-        //Armor change
-        if (!ignoreArmorEvents && index >= this.getSize()) {
+        if ((index == 36 && !item.isHelmet()) || (index == 37 && !item.isChestplate()) || (index == 38 && !item.isLeggings()) || (index == 39 && !item.isBoots())) {
+            return false;
+        }
+
+        if (index >= this.getSize()) { // Armor change
             EntityArmorChangeEvent ev = new EntityArmorChangeEvent(this.getHolder(), this.getItem(index), item, index);
             Server.getInstance().getPluginManager().callEvent(ev);
             if (ev.isCancelled() && this.getHolder() != null) {
@@ -287,6 +291,7 @@ public class PlayerInventory extends BaseInventory {
             }
             item = ev.getNewItem();
         }
+
         Item old = this.getItem(index);
         this.slots.put(index, item.clone());
         this.onSlotChange(index, old, send);
