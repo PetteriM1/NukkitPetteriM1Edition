@@ -144,7 +144,6 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(witherMaxHealth()).setValue(witherMaxHealth())};
-        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 

@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class EntityMetadata {
 
-    private final Map<Integer, EntityData> map = new HashMap<>();
+    private Map<Integer, EntityData> map = new HashMap<>();
 
     public EntityData get(int id) {
         return this.getOrDefault(id, null);
@@ -118,5 +118,14 @@ public class EntityMetadata {
 
     public Map<Integer, EntityData> getMap() {
         return new HashMap<>(map);
+    }
+
+    private EntityMetadata replace(Map<Integer, EntityData> map) {
+        this.map = map;
+        return this;
+    }
+
+    public EntityMetadata clone() {
+        return new EntityMetadata().replace(this.getMap());
     }
 }

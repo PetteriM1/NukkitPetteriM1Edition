@@ -164,12 +164,28 @@ public class CraftingTransaction extends InventoryTransaction {
         for (InventoryAction action : actions) {
             if (action instanceof SlotChangeAction) {
                 SlotChangeAction slotChangeAction = (SlotChangeAction) action;
-                if (slotChangeAction.getInventory().getType() == InventoryType.UI && slotChangeAction.getSlot() == 50 &&
-                        !slotChangeAction.getSourceItem().equals(slotChangeAction.getTargetItem())) {
-                    return true;
+                if (slotChangeAction.getInventory().getType() == InventoryType.UI) {
+                    if (slotChangeAction.getSlot() == 50) {
+                        if (!slotChangeAction.getSourceItem().equals(slotChangeAction.getTargetItem())) {
+                            return true;
+                        } else {
+                            Server.getInstance().getLogger().debug("Source equals target");
+                            return false;
+                        }
+                    } else {
+                        Server.getInstance().getLogger().debug("Invalid slot: " + slotChangeAction.getSlot());
+                        return false;
+                    }
+                } else {
+                    Server.getInstance().getLogger().debug("Invalid action type: " + slotChangeAction.getInventory().getType());
+                    return false;
                 }
+            } else {
+                Server.getInstance().getLogger().debug("SlotChangeAction expected, got " + action);
+                return false;
             }
         }
+        Server.getInstance().getLogger().debug("No actions on the list");
         return false;
     }
 }

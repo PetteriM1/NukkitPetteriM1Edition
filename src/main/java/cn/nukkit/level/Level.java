@@ -1118,7 +1118,6 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
-            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             for (int protocolId : targets.keySet()) {
                 ObjectList<Player> players = targets.get(protocolId);
@@ -1155,7 +1154,6 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = flags;
-            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
                 if (target.protocol > 201) {
@@ -2404,7 +2402,8 @@ public class Level implements ChunkManager, Metadatable {
             Int2ObjectMap<ObjectList<Player>> players = Server.shortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
             for (int protocolId : players.keySet()) {
                 ObjectList<Player> targets = players.get(protocolId);
-                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, hand.getId(), hand.getDamage());
+                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId > ProtocolInfo.v1_2_10 ? protocolId : ProtocolInfo.CURRENT_PROTOCOL, // no block palette in <= 1.2.10
+                        hand.getId(), hand.getDamage());
                 this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, soundData, targets.toArray(new Player[0]));
             }
         }
@@ -2785,11 +2784,15 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getHighestBlockAt(int x, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getHighestBlockAt(x & 0x0f, z & 0x0f);
+        return this.getHighestBlockAt(x, z, true);
+    }
+
+    public int getHighestBlockAt(int x, int z, boolean cache) {
+        return this.getChunk(x >> 4, z >> 4, true).getHighestBlockAt(x & 0x0f, z & 0x0f, cache);
     }
 
     public BlockColor getMapColorAt(int x, int z) {
-        int y = getHighestBlockAt(x, z);
+        int y = getHighestBlockAt(x, z, false);
 
         while (y > 1) {
             Block block = getBlock(new Vector3(x, y, z));
@@ -3612,7 +3615,6 @@ public class Level implements ChunkManager, Metadatable {
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
         pk.onGround = entity.onGround;
-        //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         //Server.broadcastPacket(entity.getViewers().values(), pk);
         for (Player p : entity.getViewers().values()) {

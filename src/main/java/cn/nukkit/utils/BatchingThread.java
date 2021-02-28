@@ -95,7 +95,7 @@ public class BatchingThread extends Thread {
                 }
             } else {
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(0, 500000);
                 } catch (Exception ignore) {
                 }
             }
