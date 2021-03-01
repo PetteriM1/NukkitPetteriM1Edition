@@ -27,9 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Log4j2
 public class GlobalBlockPalette {
 
-    private static final AtomicInteger runtimeIdAllocator223 = new AtomicInteger(0);
-    private static final AtomicInteger runtimeIdAllocator261 = new AtomicInteger(0);
-    private static final AtomicInteger runtimeIdAllocator274 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator282 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator291 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator313 = new AtomicInteger(0);
@@ -57,7 +54,6 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId408 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
-    private static final byte[] compiledTable274;
     private static final byte[] compiledTable282;
     private static final byte[] compiledTable291;
     private static final byte[] compiledTable313;
@@ -91,39 +87,27 @@ public class GlobalBlockPalette {
         // 223
         InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
         if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
-        Collection<TableEntry> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-        BinaryStream table223 = new BinaryStream();
-        table223.putUnsignedVarInt(entries223.size());
-        for (TableEntry entry223 : entries223) {
-            registerMapping(223, (entry223.id << 4) | entry223.data);
-            table223.putString(entry223.name);
-            table223.putLShort(entry223.data);
+        Collection<TableEntryOld> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
+        for (TableEntryOld entry : entries223) {
+            legacyToRuntimeId223.put((entry.id << 4) | entry.data, entry.runtimeID);
         }
         // Compiled table not needed for 223
         // 261
         InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
         if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
-        Collection<TableEntry> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-        BinaryStream table261 = new BinaryStream();
-        table261.putUnsignedVarInt(entries261.size());
-        for (TableEntry entry261 : entries261) {
-            registerMapping(261, (entry261.id << 4) | entry261.data);
-            table261.putString(entry261.name);
-            table261.putLShort(entry261.data);
+        Collection<TableEntryOld> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
+        for (TableEntryOld entry : entries261) {
+            legacyToRuntimeId261.put((entry.id << 4) | entry.data, entry.runtimeID);
         }
         // Compiled table not needed 261
         // 274
         InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
         if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
-        Collection<TableEntry> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
-        BinaryStream table274 = new BinaryStream();
-        table274.putUnsignedVarInt(entries274.size());
-        for (TableEntry entry274 : entries274) {
-            registerMapping(274, (entry274.id << 4) | entry274.data);
-            table274.putString(entry274.name);
-            table274.putLShort(entry274.data);
+        Collection<TableEntryOld> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
+        for (TableEntryOld entry : entries274) {
+            legacyToRuntimeId274.put((entry.id << 4) | entry.data, entry.runtimeID);
         }
-        compiledTable274 = table274.getBuffer();
+        // Compiled table not needed 274
         // 282
         InputStream stream282 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
         if (stream282 == null) throw new AssertionError("Unable to locate RuntimeID table 282");
@@ -326,7 +310,7 @@ public class GlobalBlockPalette {
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
-        int legacyId = (protocol >= 388) ? ((id << 6) | meta) : ((id << 4) | meta);
+        int legacyId = protocol >= 388 ? ((id << 6) | meta) : ((id << 4) | meta);
         switch (protocol) {
             // Versions before this doesn't use runtime IDs
             case 223:
@@ -412,12 +396,7 @@ public class GlobalBlockPalette {
 
     private static void registerMapping(int protocol, int legacyId) {
         switch (protocol) { // NOTE: Not all versions are supposed to be here
-            case 223:
-                legacyToRuntimeId223.put(legacyId, runtimeIdAllocator223.getAndIncrement());
-            case 261:
-                legacyToRuntimeId261.put(legacyId, runtimeIdAllocator261.getAndIncrement());
-            case 274:
-                legacyToRuntimeId274.put(legacyId, runtimeIdAllocator274.getAndIncrement());
+            // 223, 261 and 274 registered directly on read
             case 282:
                 legacyToRuntimeId282.put(legacyId, runtimeIdAllocator282.getAndIncrement());
                 break;
@@ -446,9 +425,7 @@ public class GlobalBlockPalette {
 
     public static byte[] getCompiledTable(int protocol) {
         switch (protocol) {
-            // Versions before this doesn't need compiled table in StartGamePacket
-            case 274:
-                return compiledTable274;
+            // Versions before this doesn't send compiled table in StartGamePacket
             case 281:
             case 282:
                 return compiledTable282;
@@ -515,6 +492,14 @@ public class GlobalBlockPalette {
     private static class TableEntry {
         private int id;
         private int data;
+        private String name;
+    }
+
+    @SuppressWarnings("unused")
+    private static class TableEntryOld {
+        private int id;
+        private int data;
+        private int runtimeID;
         private String name;
     }
 }
