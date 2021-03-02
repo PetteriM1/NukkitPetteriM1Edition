@@ -212,4 +212,5 @@ public interface ProtocolInfo {
     byte PLAYER_FOG_PACKET = (byte) 0xa0;
     byte CORRECT_PLAYER_MOVE_PREDICTION_PACKET = (byte) 0xa1;
     byte ITEM_COMPONENT_PACKET = (byte) 0xa2;
+    byte FILTER_TEXT_PACKET = (byte) 0xa3;
 }

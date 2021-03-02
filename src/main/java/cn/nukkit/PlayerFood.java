@@ -130,7 +130,7 @@ public class PlayerFood {
 
     public void sendFoodLevel(int foodLevel) {
         if (this.player.spawned) {
-            this.player.setAttribute(Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(foodLevel));
+            this.player.setAttribute(Attribute.getAttribute(Attribute.MAX_HUNGER).setValue(foodLevel).setDefaultValue(getMaxLevel()));
         }
     }
 

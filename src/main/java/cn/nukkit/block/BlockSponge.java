@@ -6,12 +6,11 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
-import cn.nukkit.level.particle.SmokeParticle;
+import cn.nukkit.level.particle.ExplodeParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.LevelEventPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
-import cn.nukkit.utils.Utils;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -73,7 +72,7 @@ public class BlockSponge extends BlockSolidMeta {
         if (this.getDamage() == WET && level.getDimension() == Level.DIMENSION_NETHER) {
             level.setBlock(block, Block.get(BlockID.SPONGE, DRY), true, true);
             level.addSoundToViewers(block.getLocation(), Sound.RANDOM_FIZZ);
-            level.addParticle(new SmokeParticle(block.getLocation().add(Utils.random.nextDouble(), 1, Utils.random.nextDouble())), null, 8);
+            level.addParticle(new ExplodeParticle(block.getLocation().add(0.5, 1, 0.5)));
             return true;
         } else if (this.getDamage() == DRY && block instanceof BlockWater && performWaterAbsorb(block)) {
             level.setBlock(block, Block.get(BlockID.SPONGE, WET), true, true);

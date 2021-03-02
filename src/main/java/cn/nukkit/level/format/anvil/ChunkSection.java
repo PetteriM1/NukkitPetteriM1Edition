@@ -8,6 +8,7 @@ import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.nbt.tag.ByteArrayTag;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.*;
@@ -26,6 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
+    private static final PalettedBlockStorage EMPTY_STORAGE_PRE419 = new PalettedBlockStorage(0);
+    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage(ProtocolInfo.v1_16_100);
     public static final int STREAM_STORAGE_VERSION = 8;
     public static final int SAVE_STORAGE_VERSION = 7;
 
@@ -621,21 +624,13 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     public void compressStorageLayers() {
         synchronized (storage) {
-            // Remove unused storage layers
-            for (int i = storage.size() - 1; i > 0; i--) {
-                BlockStorage storage = this.storage.get(i);
-                if (storage == null) {
-                    this.storage.remove(i);
-                } else if (storage.hasBlockIds()) {
-                    storage.recheckBlocks();
-                    if (storage.hasBlockIds()) {
-                        break;
-                    } else {
-                        this.storage.remove(i);
-                    }
-                } else {
-                    this.storage.remove(i);
-                }
+            stream.putByte((byte) 8); // Paletted chunk because Mojang messed up the old one
+            stream.putByte((byte) 2);
+            this.storage.writeTo(protocol, stream);
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                EMPTY_STORAGE.writeTo(protocol, stream);
+            } else {
+                EMPTY_STORAGE_PRE419.writeTo(protocol, stream);
             }
         }
     }

@@ -113,15 +113,13 @@ public class Binary {
             int id2 = entry.getKey();
 
             // HACK: Multiversion entity data
-            if (protocol < ProtocolInfo.v1_12_0) {
-                if (protocol == ProtocolInfo.v1_11_0) {
-                    if (id2 >= 40) {
-                        id2 = id2 + 1;
-                    }
-                } else if (protocol <= ProtocolInfo.v1_2_10) {
-                    if (id2 > 35) {
-                        id2 = id2 - 1;
-                    }
+            if (protocol == ProtocolInfo.v1_11_0) {
+                if (id2 >= 40) {
+                    id2 = id2 + 1;
+                }
+            } else if (protocol <= ProtocolInfo.v1_2_10) {
+                if (id2 > 35) {
+                    id2 = id2 - 1;
                 }
             }
 

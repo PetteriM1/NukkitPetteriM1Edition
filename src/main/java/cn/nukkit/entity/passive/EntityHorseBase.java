@@ -26,6 +26,8 @@ import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
  */
 public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideable {
 
+    private boolean saddled;
+
     public EntityHorseBase(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -113,11 +115,12 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
     }
 
     public boolean isSaddled() {
-        return this.canBeSaddled() && this.getDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED);
+        return this.saddled;
     }
 
     public void setSaddled(boolean saddled) {
         if (this.canBeSaddled()) {
+            this.saddled = true;
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED, saddled);
         }
     }
@@ -188,7 +191,7 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
     @Override
     public boolean canDespawn() {
-        if (!this.getPassengers().isEmpty()) {
+        if (this.isSaddled()) {
             return false;
         }
 

@@ -16,12 +16,12 @@ public abstract class EnchantmentDamage extends Enchantment {
         ARTHROPODS
     }
 
-    protected EnchantmentDamage(int id, String name, int weight, TYPE type) {
-        super(id, name, weight, EnchantmentType.SWORD);
+    protected EnchantmentDamage(int id, String name, Rarity rarity, TYPE type) {
+        super(id, name, rarity, EnchantmentType.SWORD);
     }
 
     @Override
-    public boolean isCompatibleWith(Enchantment enchantment) {
+    public boolean checkCompatibility(Enchantment enchantment) {
         return !(enchantment instanceof EnchantmentDamage);
     }
 

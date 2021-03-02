@@ -9,7 +9,9 @@ import java.util.Set;
 
 public class PlayerUIComponent extends BaseInventory {
 
-    protected final PlayerUIInventory playerUI;
+    public static final int CREATED_ITEM_OUTPUT_UI_SLOT = 50;
+
+    private  final PlayerUIInventory playerUI;
     private final int offset;
     private final int size;
 
@@ -101,6 +103,6 @@ public class PlayerUIComponent extends BaseInventory {
 
     @Override
     public void onSlotChange(int index, Item before, boolean send) {
-        this.playerUI.onSlotChangeBase(index + this.offset, before, send);
+        this.playerUI.onSlotChange(index + this.offset, before, send);
     }
 }

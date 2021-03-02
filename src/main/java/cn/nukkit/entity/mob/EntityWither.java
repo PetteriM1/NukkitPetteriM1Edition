@@ -3,6 +3,7 @@ package cn.nukkit.entity.mob;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.*;
+import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.entity.projectile.EntityBlueWitherSkull;
 import cn.nukkit.entity.projectile.EntityWitherSkull;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -56,6 +57,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         this.fireProof = true;
         this.setMaxHealth(witherMaxHealth());
         this.setDamage(new int[]{0, 2, 4, 6});
+        if (this.age == 0) {
+            this.setDataProperty(new IntEntityData(DATA_WITHER_INVULNERABLE_TICKS, 200));
+        }
     }
 
     @Override
@@ -140,7 +144,6 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
         addEntity.speedZ = (float) this.motionZ;
         addEntity.metadata = this.dataProperties;
         addEntity.attributes = new Attribute[]{Attribute.getAttribute(Attribute.MAX_HEALTH).setMaxValue(witherMaxHealth()).setValue(witherMaxHealth())};
-        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
         return addEntity;
     }
 
@@ -153,6 +156,7 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
         if (this.age == 200) {
             this.explode();
+            this.setDataProperty(new IntEntityData(DATA_WITHER_INVULNERABLE_TICKS, 0));
         }
 
         return super.entityBaseTick(tickDiff);

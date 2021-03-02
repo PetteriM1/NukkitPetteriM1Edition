@@ -1,6 +1,5 @@
 package cn.nukkit.entity.item;
 
-import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageEvent;
@@ -141,14 +140,15 @@ public class EntityItem extends Entity {
         boolean hasUpdate = this.entityBaseTick(tickDiff);
 
         if (this.isAlive()) {
-            Entity[] e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
+            //Entity[] e = null;
 
             if (this.pickupDelay > 0 && this.pickupDelay < 32767) {
                 this.pickupDelay -= tickDiff;
                 if (this.pickupDelay < 0) {
                     this.pickupDelay = 0;
                 }
-            } else {
+            }/* else {
+                e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
                 for (Entity entity : e) {
                     if (entity.isPlayer) {
                         if (((Player) entity).pickupEntity(this, true)) {
@@ -157,7 +157,7 @@ public class EntityItem extends Entity {
                         }
                     }
                 }
-            }
+            }*/
 
             if (this.age > 6000) {
                 ItemDespawnEvent ev = new ItemDespawnEvent(this);
@@ -173,6 +173,10 @@ public class EntityItem extends Entity {
 
             if (this.age % 200 == 0 && this.onGround && this.item != null) {
                 if (this.item.getCount() < this.item.getMaxStackSize()) {
+                    //if (e == null) {
+                    Entity[] e = this.getLevel().getNearbyEntities(getBoundingBox().grow(1, 1, 1), this, false);
+                    //}
+
                     for (Entity entity : e) {
                         if (entity instanceof EntityItem) {
                             if (!entity.isAlive()) {
@@ -202,10 +206,7 @@ public class EntityItem extends Entity {
                 }
             }
 
-            if (this.level.getBlockIdAt((int) this.x, (int) this.boundingBox.getMaxY(), (int) this.z) == 8 || this.level.getBlockIdAt((int) this.x, (int) this.boundingBox.getMaxY(), (int) this.z) == 9) {
-                if (!this.isImmobile()) this.setImmobile(true); // Hack: fix weird glitching
-                this.motionY -= this.getGravity() * -0.015;
-            } else if (this.isInsideOfWater()) {
+            if (this.isInsideOfWater()) {
                 this.motionY = this.getGravity() - 0.06;
             } else if (!this.isOnGround()) {
                 this.motionY -= this.getGravity();
@@ -215,7 +216,7 @@ public class EntityItem extends Entity {
                 hasUpdate = true;
             }
 
-            this.move(this.motionX, this.motionY, this.motionZ);
+            //this.move(this.motionX, this.motionY, this.motionZ);
 
             double friction = 1 - this.getDrag();
 
@@ -231,7 +232,7 @@ public class EntityItem extends Entity {
                 this.motionY *= -0.5;
             }
 
-            this.updateMovement();
+            if (this.move(this.motionX, this.motionY, this.motionZ)) this.updateMovement();
         }
 
         if (this.timing != null) this.timing.stopTiming();

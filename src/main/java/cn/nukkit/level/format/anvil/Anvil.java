@@ -174,11 +174,9 @@ public class Anvil extends BaseLevelProvider {
                 stream.put(PAD_256);
             }
             stream.put(chunk.getBiomeIdArray());
-            stream.putByte((byte) 0);
-            if (extraData != null) {
-                stream.put(extraData.getBuffer());
-            } else {
-                stream.putVarInt(0);
+            stream.putByte((byte) 0);// Border blocks
+            if (protocolId < ProtocolInfo.v1_16_100) {
+                stream.putVarInt(0);// There is no extra data anymore but idk when it was removed
             }
             stream.put(blockEntities);
 

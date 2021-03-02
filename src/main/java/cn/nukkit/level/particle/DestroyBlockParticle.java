@@ -26,7 +26,7 @@ public class DestroyBlockParticle extends Particle {
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
-        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
+        packet.data = protocol <= ProtocolInfo.v1_2_10 ? (block.getId() | (block.getDamage() << 8)) : GlobalBlockPalette.getOrCreateRuntimeId(protocol, block.getId(), block.getDamage());
         return new DataPacket[]{packet};
     }
 }

@@ -140,6 +140,14 @@ public class EnchantCommand extends VanillaCommand {
                 return 31;
             case "channeling":
                 return 32;
+            case "multishot":
+                return 33;
+            case "piercing":
+                return 34;
+            case "quick_charge":
+                return 35;
+            case "soul_speed":
+                return 36;
             default:
                 return Integer.parseInt(value);
         }

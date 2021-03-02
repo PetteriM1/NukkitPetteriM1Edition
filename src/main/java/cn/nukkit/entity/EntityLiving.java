@@ -58,8 +58,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     private boolean blocking = false;
 
-    private int airTicks;
-
     protected final boolean isDrowned = this instanceof EntityDrowned;
 
     @Override
@@ -140,7 +138,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 }
 
                 if (damager.isOnFire() && !(damager instanceof Player)) {
-                    this.setOnFire(2 * this.server.getDifficulty());
+                    this.setOnFire(this.server.getDifficulty() << 1);
                 }
 
                 double deltaX = this.x - damager.x;
@@ -162,8 +160,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     protected boolean blockedByShield(EntityDamageEvent source) {
-        Entity damager = source instanceof EntityDamageByEntityEvent? ((EntityDamageByEntityEvent) source).getDamager() : null;
-        if (damager == null || !this.isBlocking() || damager instanceof EntityWeather) {
+        if (!this.isBlocking()) {
+            return false;
+        }
+
+        Entity damager = source instanceof EntityDamageByChildEntityEvent ? ((EntityDamageByChildEntityEvent) source).getChild() : source instanceof EntityDamageByEntityEvent ? ((EntityDamageByEntityEvent) source).getDamager() : null;
+        if (damager == null || damager instanceof EntityWeather) {
             return false;
         }
 
@@ -185,14 +187,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         if (event.getKnockBackAttacker() && damager instanceof EntityLiving) {
             double deltaX = damager.getX() - this.getX();
             double deltaZ = damager.getZ() - this.getZ();
+            ((EntityLiving) damager).attackTime = source.getAttackCooldown();
             ((EntityLiving) damager).knockBack(this, 0, deltaX, deltaZ);
         }
 
-        onBlock(damager, event.getAnimation());
+        onBlock(damager, event.getAnimation(), source.getFinalDamage());
         return true;
     }
 
-    protected void onBlock(Entity entity, boolean animate) {
+    protected void onBlock(Entity entity, boolean animate, float damage) {
         if (animate) {
             getLevel().addSoundToViewers(this, Sound.ITEM_SHIELD_BLOCK);
         }
@@ -308,7 +311,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.attack(new EntityDamageEvent(this, DamageCause.SUFFOCATION, 1));
             }
 
-            if (this.isOnLadder() || this.hasEffect(Effect.LEVITATION)) {
+            if (this.isOnLadder() || this.hasEffect(Effect.LEVITATION) || this.hasEffect(Effect.SLOW_FALLING)) {
                 this.resetFallDistance();
             }
 
@@ -481,7 +484,9 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public void setAirTicks(int ticks) {
         this.airTicks = ticks;
-        this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+        if (this.isPlayer) {
+            this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+        }
     }
 
     public boolean isBlocking() {

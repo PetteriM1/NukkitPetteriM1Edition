@@ -25,7 +25,7 @@ public class EntityWolf extends EntityTameableMob {
 
     private static final String NBT_KEY_COLLAR_COLOR = "CollarColor";
 
-    private int angry = 0;
+    private boolean angry;
 
     private DyeColor collarColor = DyeColor.RED;
 
@@ -76,7 +76,7 @@ public class EntityWolf extends EntityTameableMob {
     public void saveNBT() {
         super.saveNBT();
 
-        this.namedTag.putByte(NBT_KEY_ANGRY, this.angry);
+        this.namedTag.putBoolean(NBT_KEY_ANGRY, this.angry);
         this.namedTag.putByte(NBT_KEY_COLLAR_COLOR, this.collarColor.getDyeData());
     }
 
@@ -86,24 +86,19 @@ public class EntityWolf extends EntityTameableMob {
     }
 
     public boolean isAngry() {
-        return this.angry > 0;
+        return this.angry;
     }
 
     public void setAngry(boolean angry) {
-        this.angry = angry ? 1 : 0;
-
-        if (this.isAngry()) {
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, true);
-        } else {
-            this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, false);
-        }
+        this.angry = angry;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ANGRY, angry);
     }
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.equals(Item.get(Item.BONE))) {
+        if (item.getId() == Item.BONE) {
             if (!this.hasOwner() && !this.isAngry()) {
-                player.getInventory().removeItem(Item.get(Item.BONE, 0, 1));
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                 if (Utils.rand(0, 3) == 3) {
                     EntityEventPacket packet = new EntityEventPacket();
                     packet.eid = this.getId();
@@ -121,17 +116,13 @@ public class EntityWolf extends EntityTameableMob {
                     player.dataPacket(packet);
                 }
             }
-        } else if (item.equals(Item.get(Item.DYE), false)) {
+        } else if (item.getId() == Item.DYE) {
             if (this.hasOwner() && player.equals(this.getOwner())) {
                 this.setCollarColor(((ItemDye) item).getDyeColor());
                 return true;
             }
         } else if (this.hasOwner() && player.equals(this.getOwner()) && !this.isAngry()) {
-            if (this.isSitting()) {
-                this.setSitting(false);
-            } else {
-                this.setSitting(true);
-            }
+            this.setSitting(!this.isSitting());
         }
 
         return super.onInteract(player, item, clickedPos);
@@ -139,39 +130,36 @@ public class EntityWolf extends EntityTameableMob {
 
     @Override
     public boolean attack(EntityDamageEvent ev) {
-        super.attack(ev);
-
-        if (!ev.isCancelled() && ev instanceof EntityDamageByEntityEvent) {
-            if (((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+        if (super.attack(ev)) {
+            if (ev instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
                 this.setAngry(true);
             }
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > 23 && this.distanceSquared(player) < 1.5) {
-                this.attackDelay = 0;
-                HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
-                damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1.5) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
-                if (player instanceof Player) {
-                    HashMap<Integer, Float> armorValues = new ArmorPoints();
+            if (player instanceof Player) {
+                HashMap<Integer, Float> armorValues = new ArmorPoints();
 
-                    float points = 0;
-                    for (Item i : ((Player) player).getInventory().getArmorContents()) {
-                        points += armorValues.getOrDefault(i.getId(), 0f);
-                    }
-
-                    damage.put(EntityDamageEvent.DamageModifier.ARMOR,
-                            (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(
-                                    damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += armorValues.getOrDefault(i.getId(), 0f);
                 }
-                player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(
+                                damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
             }
+            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
         }
     }
 

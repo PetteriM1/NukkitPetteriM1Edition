@@ -12,6 +12,7 @@ public class PunchBlockParticle extends Particle {
     protected final int blockId;
     protected final int blockDamage;
     protected final int index;
+    protected final int face;
 
     public PunchBlockParticle(Vector3 pos, Block block, BlockFace face) {
         this(pos, block.getId(), block.getDamage(), face);
@@ -21,7 +22,8 @@ public class PunchBlockParticle extends Particle {
         super(pos.x, pos.y, pos.z);
         this.blockId = blockId;
         this.blockDamage = blockDamage;
-        this.index = face.getIndex() << 24;
+        this.face = face.getIndex();
+        this.index = this.face << 24;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class PunchBlockParticle extends Particle {
         packet.x = (float) this.x;
         packet.y = (float) this.y;
         packet.z = (float) this.z;
-        packet.data = GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
+        packet.data = protocol <= ProtocolInfo.v1_2_10 ? (blockId | (blockDamage << 8) | (face << 16)) : GlobalBlockPalette.getOrCreateRuntimeId(protocol, blockId, blockDamage) | index;
         return new DataPacket[]{packet};
     }
 }

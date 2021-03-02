@@ -23,8 +23,8 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putBoolean(this.scripting);
         }
 
-        encodePacks(this.resourcePackEntries);
         encodePacks(this.behaviourPackEntries);
+        encodePacks(this.resourcePackEntries);
     }
 
     private void encodePacks(ResourcePack[] packs) {

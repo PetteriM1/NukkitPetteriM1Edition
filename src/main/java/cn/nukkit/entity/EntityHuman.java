@@ -290,10 +290,11 @@ public class EntityHuman extends EntityHumanType {
                 throw new IllegalStateException(this.getClass().getSimpleName() + " must have a valid skin set");
             }
 
-            if (this.isPlayer)
-                this.server.sendFullPlayerListData(player);
-            else
+            if (this.isPlayer) {
+                this.server.updatePlayerListData(this.uuid, this.getId(), ((Player) this).getDisplayName(), this.skin, ((Player) this).getLoginChainData().getXUID(), new Player[]{player});
+            } else {
                 this.server.updatePlayerListData(this.uuid, this.getId(), this.getName(), this.skin, new Player[]{player});
+            }
 
             AddPlayerPacket pk = new AddPlayerPacket();
             pk.uuid = this.uuid;
@@ -357,19 +358,16 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
-    protected void onBlock(Entity entity, boolean animate) {
-        super.onBlock(entity, animate);
+    protected void onBlock(Entity entity, boolean animate, float damage) {
+        super.onBlock(entity, animate, damage);
         Item shield = getInventory().getItemInHand();
         Item shieldOffhand = getOffhandInventory().getItem(0);
         if (shield.getId() == ItemID.SHIELD) {
-            shield = damageArmor(shield, entity);
+            shield = damageArmor(shield, entity, damage, true);
             getInventory().setItemInHand(shield);
         } else if (shieldOffhand.getId() == ItemID.SHIELD) {
-            shieldOffhand = damageArmor(shieldOffhand, entity);
+            shieldOffhand = damageArmor(shieldOffhand, entity, damage, true);
             getOffhandInventory().setItem(0, shieldOffhand);
         }
-        /*if (animate) {
-            //TODO
-        }*/
     }
 }

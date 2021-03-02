@@ -2,10 +2,15 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Utils;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * author: MagicDroidX
@@ -13,6 +18,16 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockWater extends BlockLiquid {
 
+    /**
+     * Used to cache biome check for freezing
+     * 1 = can't freeze, 2 = can freeze
+     */
+    private byte freezing;
+
+    /**
+     * List of biomes where water can freeze
+     */
+    private static final List<Integer> freezingBiomes = Arrays.asList(10, 11, 12, 26, 30, 31, 140, 158);
 
     public BlockWater() {
         this(0);
@@ -62,6 +77,26 @@ public class BlockWater extends BlockLiquid {
     @Override
     public int tickRate() {
         return 5;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_RANDOM) {
+            if (freezing != 1) {
+                freezing = freezingBiomes.contains(level.getBiomeId((int) this.x, (int) this.z)) ? (byte) 2 : (byte) 1;
+            }
+            if (freezing == 2) {
+                if (Utils.rand(1, 3) == 2 && level.getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && level.canBlockSeeSky(this)) {
+                    WaterFrostEvent ev = new WaterFrostEvent(this);
+                    level.getServer().getPluginManager().callEvent(ev);
+                    if (!ev.isCancelled()) {
+                        level.setBlock(this, Block.get(Block.ICE), true, true);
+                    }
+                }
+            }
+            return Level.BLOCK_UPDATE_RANDOM;
+        }
+        return super.onUpdate(type);
     }
 
     @Override

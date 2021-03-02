@@ -37,7 +37,7 @@ public class CommandRequestPacket extends DataPacket {
         this.command = this.getString();
 
         CommandOriginData.Origin type = CommandOriginData.Origin.values()[this.getVarInt()];
-        UUID uuid = this.getUUID();
+        UUID uuid = protocol > ProtocolInfo.v1_2_0 ? this.getUUID() : null;
         String requestId = this.getString();
         Long varLong = null;
         if (type == CommandOriginData.Origin.DEV_CONSOLE || type == CommandOriginData.Origin.TEST) {

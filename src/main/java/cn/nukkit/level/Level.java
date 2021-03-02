@@ -128,6 +128,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.COCOA_BLOCK] = true;
         randomTickBlocks[Block.ICE_FROSTED] = true;
         randomTickBlocks[Block.VINE] = true;
+        randomTickBlocks[Block.WATER] = true;
 
         if (Server.getInstance().requiredProtocol >= 388){
             randomTickBlocks[Block.BAMBOO] = true;
@@ -459,17 +460,6 @@ public class Level implements ChunkManager, Metadatable {
         packet.y = pos.getFloorY();
         packet.z = pos.getFloorZ();
         addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, packet);
-    }
-
-    public void addSoundToViewers(Entity entity, cn.nukkit.level.Sound sound) {
-        PlaySoundPacket packet = new PlaySoundPacket();
-        packet.name = sound.getSound();
-        packet.volume = 1f;
-        packet.pitch = 1f;
-        packet.x = entity.getFloorX();
-        packet.y = entity.getFloorY();
-        packet.z = entity.getFloorZ();
-        Server.broadcastPacket(entity.getViewers().values(), packet);
     }
 
     public void addSound(Vector3 pos, cn.nukkit.level.Sound sound) {
@@ -977,8 +967,9 @@ public class Level implements ChunkManager, Metadatable {
             for (long index : this.chunkPackets.keySet()) {
                 int chunkX = Level.getHashX(index);
                 int chunkZ = Level.getHashZ(index);
-                Player[] chunkPlayers = this.getChunkPlayers(chunkX, chunkZ).values().toArray(new Player[0]);
-                if (chunkPlayers.length > 0) {
+                Map<Integer, Player> map = this.getChunkPlayers(chunkX, chunkZ);
+                if (!map.isEmpty()) {
+                    Player[] chunkPlayers = map.values().toArray(new Player[0]);
                     for (DataPacket pk : this.chunkPackets.get(index)) {
                         Server.broadcastPacket(chunkPlayers, pk);
                     }
@@ -1148,7 +1139,6 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = first ? flags : UpdateBlockPacket.FLAG_NONE;
             updateBlockPacket.dataLayer = dataLayer;
-            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             for (int protocolId : targets.keySet()) {
                 ObjectList<Player> players = targets.get(protocolId);
@@ -1185,7 +1175,6 @@ public class Level implements ChunkManager, Metadatable {
             updateBlockPacket.y = (int) b.y;
             updateBlockPacket.z = (int) b.z;
             updateBlockPacket.flags = flags;
-            //updateBlockPacket.setChannel(Network.CHANNEL_BLOCKS);
 
             try {
                 if (target.protocol > 201) {
@@ -1490,7 +1479,7 @@ public class Level implements ChunkManager, Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.getBlock(x, y, z, false);
                         if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
                             return new Block[]{block};
                         }
@@ -1501,7 +1490,7 @@ public class Level implements ChunkManager, Metadatable {
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
                     for (int y = minY; y <= maxY; ++y) {
-                        Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                        Block block = this.getBlock(x, y, z, false);
                         if (block != null && condition.test(block) && (ignoreCollidesCheck || block.collidesWithBB(bb))) {
                             collides.add(block);
                         }
@@ -1547,7 +1536,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                    Block block = this.getBlock(x, y, z, false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         collides.add(block.getBoundingBox());
                     }
@@ -1577,7 +1566,7 @@ public class Level implements ChunkManager, Metadatable {
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    Block block = this.getBlock(this.temporalVector.setComponents(x, y, z), false);
+                    Block block = this.getBlock(x, y, z, false);
                     if (!block.canPassThrough() && block.collidesWithBB(bb)) {
                         return true;
                     }
@@ -1902,11 +1891,11 @@ public class Level implements ChunkManager, Metadatable {
         block.layer = layer;
         int cx = x >> 4;
         int cz = z >> 4;
-        long index = Level.chunkHash(cx, cz);
+
         if (direct) {
             this.sendBlocks(this.getChunkPlayers(cx, cz).values().toArray(new Player[0]), new Block[]{block}, UpdateBlockPacket.FLAG_ALL_PRIORITY, block.layer);
         } else {
-            this.addBlockChange(index, x, y, z);
+            this.addBlockChange(Level.chunkHash(cx, cz), x, y, z);
         }
 
         for (ChunkLoader loader : this.getChunkLoaders(cx, cz)) {
@@ -2140,12 +2129,12 @@ public class Level implements ChunkManager, Metadatable {
                 ev.setCancelled();
             }
 
+            player.lastBreak = System.currentTimeMillis();
+
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
                 return null;
             }
-
-            player.lastBreak = System.currentTimeMillis();
 
             drops = ev.getDrops();
             dropExp = ev.getDropExp();
@@ -2165,9 +2154,6 @@ public class Level implements ChunkManager, Metadatable {
         if (createParticles) {
             Map<Integer, Player> players = this.getChunkPlayers((int) target.x >> 4, (int) target.z >> 4);
             this.addParticle(new DestroyBlockParticle(target.add(0.5), target), players.values());
-            if (player != null) {
-                players.remove(player.getLoaderId());
-            }
         }
 
         BlockEntity blockEntity = this.getBlockEntity(target);
@@ -2263,9 +2249,9 @@ public class Level implements ChunkManager, Metadatable {
             return null;
         }
 
-        /*if (target.getId() == Item.AIR) {
+        if (target.getId() == Item.AIR) {
             return null;
-        }*/
+        }
 
         if (item.getBlock() instanceof BlockScaffolding && face == BlockFace.UP && block.getId() == BlockID.SCAFFOLDING) {
             while (block instanceof BlockScaffolding) {
@@ -2520,7 +2506,8 @@ public class Level implements ChunkManager, Metadatable {
             Int2ObjectMap<ObjectList<Player>> players = Server.shortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
             for (int protocolId : players.keySet()) {
                 ObjectList<Player> targets = players.get(protocolId);
-                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, hand.getId(), hand.getDamage());
+                int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId > ProtocolInfo.v1_2_10 ? protocolId : ProtocolInfo.CURRENT_PROTOCOL, // no block palette in <= 1.2.10
+                        hand.getId(), hand.getDamage());
                 this.addLevelSoundEvent(hand, LevelSoundEventPacket.SOUND_PLACE, soundData, targets.toArray(new Player[0]));
             }
         }
@@ -2932,11 +2919,15 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getHighestBlockAt(int x, int z) {
-        return this.getChunk(x >> 4, z >> 4, true).getHighestBlockAt(x & 0x0f, z & 0x0f);
+        return this.getHighestBlockAt(x, z, true);
+    }
+
+    public int getHighestBlockAt(int x, int z, boolean cache) {
+        return this.getChunk(x >> 4, z >> 4, true).getHighestBlockAt(x & 0x0f, z & 0x0f, cache);
     }
 
     public BlockColor getMapColorAt(int x, int z) {
-        int y = getHighestBlockAt(x, z);
+        int y = getHighestBlockAt(x, z, false);
 
         while (y > 1) {
             Block block = getBlock(new Vector3(x, y, z));
@@ -3759,7 +3750,6 @@ public class Level implements ChunkManager, Metadatable {
         pk.headYaw = (float) headYaw;
         pk.pitch = (float) pitch;
         pk.onGround = entity.onGround;
-        //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         //Server.broadcastPacket(entity.getViewers().values(), pk);
         for (Player p : entity.getViewers().values()) {
@@ -3895,6 +3885,10 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean canBlockSeeSky(Vector3 pos) {
         return this.getHighestBlockAt(pos.getFloorX(), pos.getFloorZ()) < pos.getY();
+    }
+
+    public boolean canBlockSeeSky(Block block) {
+        return this.getHighestBlockAt((int) block.getX(), (int) block.getZ()) < block.getY();
     }
 
     public int getStrongPower(Vector3 pos, BlockFace direction) {

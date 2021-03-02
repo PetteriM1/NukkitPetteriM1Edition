@@ -15,8 +15,8 @@ public class UpdateBlockPacket extends DataPacket {
     public static final int FLAG_NOGRAPHIC = 0b0100;
     public static final int FLAG_PRIORITY = 0b1000;
 
-    public static final int FLAG_ALL = (3);
-    public static final int FLAG_ALL_PRIORITY = (11);
+    public static final int FLAG_ALL = 3; // FLAG_NEIGHBORS | FLAG_NETWORK
+    public static final int FLAG_ALL_PRIORITY = 11; // FLAG_ALL | FLAG_PRIORITY
 
     public int x;
     public int z;
@@ -45,7 +45,7 @@ public class UpdateBlockPacket extends DataPacket {
             this.putUnsignedVarInt(flags);
         } else {
             this.putUnsignedVarInt(blockId);
-            this.putUnsignedVarInt((176) | blockData & 0xf);
+            this.putUnsignedVarInt(176 | blockData & 0xf); // (0xb << 4) | blockData & 0xf
         }
         if (protocol > 224) {
             this.putUnsignedVarInt(dataLayer);

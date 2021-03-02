@@ -30,6 +30,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     public static final int NETWORK_ID = 33;
 
     private short bombTime = 0;
+    private boolean exploding;
 
     public EntityCreeper(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -67,6 +68,8 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
     }
 
     public void explode() {
+        if (this.closed) return;
+
         EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, this.isPowered() ? 6 : 3);
         this.server.getPluginManager().callEvent(ev);
 
@@ -124,22 +127,26 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
             double distance = target.distance(this);
             if (distance <= 4) {
                 if (target instanceof EntityCreature) {
-                    if (bombTime == 0) {
-                        this.level.addSound(new TNTPrimeSound(this.add(0, getEyeHeight())));
-                        this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
-                    }
-                    this.bombTime += tickDiff;
-                    if (this.bombTime >= 30) {
-                        this.explode();
-                        return false;
+                    if (!exploding) {
+                        if (bombTime == 0) {
+                            this.level.addSound(new TNTPrimeSound(this.add(0, getEyeHeight())));
+                            this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
+                        }
+                        this.bombTime += tickDiff;
+                        if (this.bombTime >= 30) {
+                            this.explode();
+                            return false;
+                        }
                     }
                     if (distance <= 1) {
                         this.stayTime = 10;
                     }
                 }
             } else {
-                this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
-                this.bombTime = 0;
+                if (!exploding) {
+                    this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, false);
+                    this.bombTime = 0;
+                }
 
                 this.motionX = this.getSpeed() * 0.15 * (x / diff);
                 this.motionZ = this.getSpeed() * 0.15 * (z / diff);
@@ -213,10 +220,12 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.getId() == Item.FLINT_AND_STEEL) {
+        if (item.getId() == Item.FLINT_AND_STEEL && !exploding) {
+            this.exploding = true;
             level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
-            this.explode();
-
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_IGNITED, true);
+            level.addSound(new TNTPrimeSound(this.add(0, getEyeHeight())));
+            level.getServer().getScheduler().scheduleDelayedTask(null, this::explode, 30);
             return true;
         }
 

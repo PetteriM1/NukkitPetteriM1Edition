@@ -50,7 +50,7 @@ public abstract class ItemEdible extends Item {
         }
 
         Food food = Food.getByRelative(this);
-        if (!player.isCreative() && food != null && food.eatenBy(player)) {
+        if (!player.isCreative() && !player.isSpectator() && food != null && food.eatenBy(player)) {
             --this.count;
             player.getInventory().setItemInHand(this);
         }
