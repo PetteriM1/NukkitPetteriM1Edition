@@ -5,6 +5,7 @@ import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * Created on 2015/11/21 by xtypr.

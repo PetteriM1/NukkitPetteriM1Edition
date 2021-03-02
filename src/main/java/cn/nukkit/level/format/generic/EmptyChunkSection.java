@@ -3,7 +3,6 @@ package cn.nukkit.level.format.generic;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 
@@ -16,8 +15,6 @@ import java.util.Arrays;
 public class EmptyChunkSection implements ChunkSection {
 
     public static final EmptyChunkSection[] EMPTY = new EmptyChunkSection[16];
-    private static final PalettedBlockStorage EMPTY_STORAGE_PRE419 = new PalettedBlockStorage(BitArrayVersion.V1, 0);
-    private static final PalettedBlockStorage EMPTY_STORAGE = new PalettedBlockStorage(BitArrayVersion.V1, ProtocolInfo.v1_16_100);
 
     private static final byte[] EMPTY_ID_ARRAY = new byte[4096];
     private static final byte[] EMPTY_DATA_ARRAY = new byte[2048];
@@ -217,15 +214,17 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public void writeTo(int protocol, BinaryStream stream) {
-        stream.putByte((byte) 8);
-        stream.putByte((byte) 2);
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            EMPTY_STORAGE.writeTo(protocol, stream);
-            EMPTY_STORAGE.writeTo(protocol, stream);
-        } else {
-            EMPTY_STORAGE_PRE419.writeTo(protocol, stream);
-            EMPTY_STORAGE_PRE419.writeTo(protocol, stream);
-        }
+        stream.put(this.getBytes(protocol));
+    }
+
+    @Override
+    public int getMaximumLayer() {
+        return 0;
+    }
+
+    @Override
+    public CompoundTag toNBT() {
+        return null;
     }
 
     @Override

@@ -9,6 +9,7 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -173,7 +174,7 @@ public class BlockSnowLayer extends BlockFallableMeta {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x,
                 this.y,
                 this.z,

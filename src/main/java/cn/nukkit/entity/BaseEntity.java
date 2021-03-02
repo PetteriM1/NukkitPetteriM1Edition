@@ -516,15 +516,4 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         z += rand.nextGaussian() * 0.007499999832361937 * 6;
         projectile.setMotion(new Vector3(x, y, z));
     }
-
-    @Override
-    protected void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
-        if (onGround && movX == 0 && movY == 0 && movZ == 0 && dx == 0 && dy == 0 && dz == 0) {
-            return;
-        }
-        this.isCollidedVertically = movY != dy;
-        this.isCollidedHorizontally = (movX != dx || movZ != dz);
-        this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
-        this.onGround = (movY != dy && movY < 0);
-    }
 }

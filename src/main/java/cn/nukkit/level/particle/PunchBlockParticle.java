@@ -6,6 +6,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class PunchBlockParticle extends Particle {
 
