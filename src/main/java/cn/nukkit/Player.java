@@ -2440,7 +2440,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         @Override
                         public void onRun() {
-                            this.event = new PlayerAsyncPreLoginEvent(username, uuid, loginChainData, skin, playerInstance.getAddress(), playerInstance.getPort());
+                            this.event = new PlayerAsyncPreLoginEvent(playerInstance);
                             server.getPluginManager().callEvent(this.event);
                         }
 
@@ -2453,7 +2453,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (this.event.getLoginResult() == LoginResult.KICK) {
                                 playerInstance.close(this.event.getKickMessage(), this.event.getKickMessage());
                             } else if (playerInstance.shouldLogin) {
-                                playerInstance.setSkin(this.event.getSkin());
                                 playerInstance.completeLoginSequence();
                                 for (Consumer<Server> action : this.event.getScheduledActions()) {
                                     action.accept(server);
