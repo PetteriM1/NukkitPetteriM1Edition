@@ -46,6 +46,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.BatchingHelper;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
@@ -208,6 +209,7 @@ public class Server {
     public static List<String> noTickingWorlds = new ArrayList<>();
 
     private SpawnerTask spawnerTask;
+    private final BatchingHelper batchingHelper;
 
     /* Some settings */
     private String motd;
@@ -330,7 +332,7 @@ public class Server {
 
         this.scheduler = new ServerScheduler();
 
-        new BatchingThread().start();
+        this.batchingHelper = new BatchingHelper(this);
 
         if (this.getPropertyBoolean("enable-rcon", false)) {
             try {
@@ -672,7 +674,7 @@ public class Server {
             }
         }
 
-        BatchingThread.queue.add(new BatchEntry(players, packets));
+        this.batchingHelper.batchPackets(players, packets);
     }
 
     public void enablePlugins(PluginLoadOrder type) {
@@ -811,6 +813,8 @@ public class Server {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
             }
+
+            this.batchingHelper.shutdown();
 
             if (nameLookup != null) {
                 this.getLogger().debug("Closing name lookup DB...");
