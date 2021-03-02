@@ -1,18 +1,10 @@
 package cn.nukkit.network.protocol;
 
-import cn.nukkit.Server;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
-import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Utils;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import lombok.ToString;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 
 @ToString
 public class StartGamePacket extends DataPacket {
@@ -22,22 +14,6 @@ public class StartGamePacket extends DataPacket {
     public static final int GAME_PUBLISH_SETTING_FRIENDS_ONLY = 2;
     public static final int GAME_PUBLISH_SETTING_FRIENDS_OF_FRIENDS = 3;
     public static final int GAME_PUBLISH_SETTING_PUBLIC = 4;
-
-    private static final byte[] ITEM_DATA_PALETTE_361;
-
-    static {
-        // 361
-        InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtime_item_ids_361.json");
-        if (stream361 == null) throw new AssertionError("Unable to locate item RuntimeID table 361");
-        Collection<ItemData> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<ItemData>>() {}.getType());
-        BinaryStream paletteBuffer361 = new BinaryStream();
-        paletteBuffer361.putUnsignedVarInt(entries361.size());
-        for (ItemData data361 : entries361) {
-            paletteBuffer361.putString(data361.name);
-            paletteBuffer361.putLShort(data361.id);
-        }
-        ITEM_DATA_PALETTE_361 = paletteBuffer361.getBuffer();
-    }
 
     @Override
     public byte pid() {
@@ -118,8 +94,8 @@ public class StartGamePacket extends DataPacket {
         this.putLFloat(this.pitch);
         this.putVarInt(this.seed);
         if (protocol >= 407) {
-            this.putShort(0);
-            this.putString("");
+            this.putLShort(0x00); // SpawnBiomeType - Default
+            this.putString(protocol >= ProtocolInfo.v1_16_100 ? "plains" : ""); // UserDefinedBiomeName
         }
         this.putVarInt(this.dimension);
         this.putVarInt(this.generator);
@@ -136,7 +112,7 @@ public class StartGamePacket extends DataPacket {
         if (protocol > 224) {
             this.putBoolean(this.hasEduFeaturesEnabled);
             if (protocol >= 407) {
-                this.putString("");
+                this.putString(""); // Education Edition Product ID
             }
         }
         this.putLFloat(this.rainLevel);
@@ -155,6 +131,10 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
         this.putGameRules(gameRules);
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.putLInt(0); // Experiment count
+            this.putBoolean(false); // Were experiments previously toggled
+        }
         this.putBoolean(this.bonusChest);
         if (protocol > 201) {
             this.putBoolean(this.hasStartWithMapEnabled);
@@ -192,10 +172,10 @@ public class StartGamePacket extends DataPacket {
                 }
             }
             if (protocol >= 407) {
-                this.putLInt(0);
-                this.putLInt(0);
-                this.putBoolean(false);
-                this.putBoolean(false);
+                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world width
+                this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world height
+                this.putBoolean(false); // Nether type
+                this.putBoolean(false); // Experimental Gameplay
             }
         }
         this.putString(this.levelId);
@@ -203,14 +183,22 @@ public class StartGamePacket extends DataPacket {
         this.putString(this.premiumWorldTemplateId);
         this.putBoolean(this.isTrial);
         if (protocol >= 388) {
-            this.putBoolean(this.isMovementServerAuthoritative);
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
+            } else {
+                this.putBoolean(this.isMovementServerAuthoritative);
+            }
         }
         this.putLLong(this.currentTick);
         this.putVarInt(this.enchantmentSeed);
         if (protocol > 274) {
-            this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                this.putUnsignedVarInt(0); // Custom blocks
+            } else {
+                this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
+            }
             if (protocol >= 361) {
-                this.put(ITEM_DATA_PALETTE_361);
+                this.put(RuntimeItems.getRuntimeMapping(protocol).getItemDataPalette());
             }
             this.putString(this.multiplayerCorrelationId);
             if (protocol == 354 && version != null && version.startsWith("1.11.4")) {

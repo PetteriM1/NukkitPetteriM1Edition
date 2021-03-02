@@ -45,6 +45,7 @@ public class InventoryTransactionPacket extends DataPacket {
      */
     public boolean isCraftingPart = false;
     public boolean isEnchantingPart = false;
+    public boolean isRepairItemPart = false;
 
     @Override
     public byte pid() {
@@ -151,7 +152,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 itemData.blockPos = this.getBlockVector3();
                 itemData.face = this.getBlockFace();
                 itemData.hotbarSlot = this.getVarInt();
-                itemData.itemInHand = this.getSlot();
+                itemData.itemInHand = this.getSlot(this.protocol);
                 itemData.playerPos = this.getVector3f().asVector3();
                 itemData.clickPos = this.getVector3f();
                 try { itemData.blockRuntimeId = (int) this.getUnsignedVarInt(); } catch (Exception ignore) {}
@@ -164,7 +165,7 @@ public class InventoryTransactionPacket extends DataPacket {
                 useItemOnEntityData.entityRuntimeId = this.getEntityRuntimeId();
                 useItemOnEntityData.actionType = (int) this.getUnsignedVarInt();
                 useItemOnEntityData.hotbarSlot = this.getVarInt();
-                useItemOnEntityData.itemInHand = this.getSlot();
+                useItemOnEntityData.itemInHand = this.getSlot(this.protocol);
                 useItemOnEntityData.playerPos = this.getVector3f().asVector3();
                 useItemOnEntityData.clickPos = this.getVector3f().asVector3();
 
@@ -175,7 +176,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
                 releaseItemData.actionType = (int) getUnsignedVarInt();
                 releaseItemData.hotbarSlot = getVarInt();
-                releaseItemData.itemInHand = getSlot();
+                releaseItemData.itemInHand = this.getSlot(this.protocol);
                 releaseItemData.headRot = this.getVector3f().asVector3();
 
                 this.transactionData = releaseItemData;

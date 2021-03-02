@@ -23,6 +23,8 @@ public class SpawnerTask implements Runnable {
     private final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
     private final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
 
+    private boolean mobsNext; // Split monster and animal spawning to different ticks to avoid lag spikes
+
     public SpawnerTask() {
         this.registerAnimalSpawner(ChickenSpawner.class);
         this.registerAnimalSpawner(CowSpawner.class);
@@ -61,6 +63,7 @@ public class SpawnerTask implements Runnable {
         this.registerMobSpawner(WitherSkeletonSpawner.class);
         this.registerMobSpawner(DrownedSpawner.class);
         this.registerMobSpawner(PhantomSpawner.class);
+        this.registerMobSpawner(PiglinSpawner.class);
     }
 
     public boolean registerAnimalSpawner(Class<?> clazz) {
@@ -109,15 +112,20 @@ public class SpawnerTask implements Runnable {
 
     @Override
     public void run() {
-        if (!Server.getInstance().getOnlinePlayers().isEmpty()) {
-            if (Server.getInstance().spawnAnimals) {
-                for (EntitySpawner spawner : animalSpawners.values()) {
-                    spawner.spawn();
+        if (Server.getInstance().getOnlinePlayersCount() != 0) {
+            if (mobsNext) {
+                mobsNext = false;
+                if (Server.getInstance().spawnMobs) {
+                    for (EntitySpawner spawner : mobSpawners.values()) {
+                        spawner.spawn();
+                    }
                 }
-            }
-            if (Server.getInstance().spawnMobs) {
-                for (EntitySpawner spawner : mobSpawners.values()) {
-                    spawner.spawn();
+            } else {
+                mobsNext = true;
+                if (Server.getInstance().spawnAnimals) {
+                    for (EntitySpawner spawner : animalSpawners.values()) {
+                        spawner.spawn();
+                    }
                 }
             }
         }
@@ -151,9 +159,11 @@ public class SpawnerTask implements Runnable {
                     entity.spawnToAll();
                 } else {
                     entity.close();
+                    entity = null;
                 }
             } else {
                 entity.close();
+                entity = null;
             }
         }
         return entity;
@@ -248,6 +258,7 @@ public class SpawnerTask implements Runnable {
     private static int getMaxSpawns(int id, boolean nether, boolean end) {
         switch (id) {
             case EntityZombiePigman.NETWORK_ID:
+            case EntityPiglin.NETWORK_ID:
                 return nether ? 4 : 0;
             case EntityGhast.NETWORK_ID:
             case EntityBlaze.NETWORK_ID:

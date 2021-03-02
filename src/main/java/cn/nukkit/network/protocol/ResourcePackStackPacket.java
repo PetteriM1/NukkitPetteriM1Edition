@@ -37,9 +37,15 @@ public class ResourcePackStackPacket extends DataPacket {
             }
         }
         if (this.protocol >= 313) {
-            this.putBoolean(isExperimental);
+            if (protocol < ProtocolInfo.v1_16_100) {
+                this.putBoolean(isExperimental);
+            }
             if (protocol >= 388) {
                 this.putString(Utils.getVersionByProtocol(protocol));
+            }
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                this.putLInt(0); // Experiments length
+                this.putBoolean(false); // Were experiments previously toggled
             }
         }
     }

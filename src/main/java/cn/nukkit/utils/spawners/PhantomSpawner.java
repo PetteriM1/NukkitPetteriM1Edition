@@ -19,7 +19,9 @@ public class PhantomSpawner extends AbstractEntitySpawner {
         if (level.isMobSpawningAllowedByTime()) {
             if (pos.y < 130 && pos.y > 0 && biomeId != 14 && biomeId != 15 && level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == 0 && level.getBlockLightAt((int) pos.x, (int) pos.y, (int) pos.z) < 8) { // "Phantoms spawn if the player's Y-coordinate is between 1 and 129" - Minecraft Wiki
                 EntityPhantom phantom = (EntityPhantom) this.spawnTask.createEntity("Phantom", pos);
-                phantom.setTarget(player);
+                if (phantom != null) {
+                    phantom.setTarget(player);
+                }
             }
         }
     }

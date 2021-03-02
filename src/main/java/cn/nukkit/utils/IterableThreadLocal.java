@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements Iterable<T> {
 
-    private ConcurrentLinkedDeque<T> allValues = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<T> allValues = new ConcurrentLinkedDeque<>();
 
     @Override
     protected final T initialValue() {

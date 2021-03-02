@@ -25,6 +25,7 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Utils;
 
+import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -178,28 +179,29 @@ public class EntityFishingHook extends EntityProjectile {
 	}
 
 	public void fishBites() {
+		Collection<Player> viewers = this.getViewers().values();
+
+
 		EntityEventPacket pk = new EntityEventPacket();
 		pk.eid = this.getId();
 		pk.event = EntityEventPacket.FISH_HOOK_HOOK;
-		Server.broadcastPacket(this.getViewers().values(), pk);
+		Server.broadcastPacket(viewers, pk);
 
 		EntityEventPacket bubblePk = new EntityEventPacket();
 		bubblePk.eid = this.getId();
 		bubblePk.event = EntityEventPacket.FISH_HOOK_BUBBLE;
-		Server.broadcastPacket(this.getViewers().values(), bubblePk);
+		Server.broadcastPacket(viewers, bubblePk);
 
 		EntityEventPacket teasePk = new EntityEventPacket();
 		teasePk.eid = this.getId();
 		teasePk.event = EntityEventPacket.FISH_HOOK_TEASE;
-		Server.broadcastPacket(this.getViewers().values(), teasePk);
+		Server.broadcastPacket(viewers, teasePk);
 
-		for (int i = 0; i < 5; i++) {
-			this.level.addParticle(new BubbleParticle(this.setComponents(
-					this.x + Utils.random.nextDouble() * 0.5 - 0.25,
-					this.getWaterHeight(),
-					this.z + Utils.random.nextDouble() * 0.5 - 0.25
-			)));
-		}
+		this.level.addParticle(new BubbleParticle(this.setComponents(
+				this.x + Utils.random.nextDouble() * 0.5 - 0.25,
+				this.getWaterHeight(),
+				this.z + Utils.random.nextDouble() * 0.5 - 0.25
+		)), null, 5);
 	}
 
 	public void spawnFish() {
@@ -278,7 +280,6 @@ public class EntityFishingHook extends EntityProjectile {
 			ownerId = this.shootingEntity.getId();
 		}
 		pk.metadata = this.dataProperties.putLong(DATA_OWNER_EID, ownerId);
-		//pk.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
 		player.dataPacket(pk);
 		super.spawnTo(player);
 	}

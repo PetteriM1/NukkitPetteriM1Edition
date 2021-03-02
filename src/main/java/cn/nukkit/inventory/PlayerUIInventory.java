@@ -75,7 +75,7 @@ public class PlayerUIInventory extends BaseInventory {
 
     @Override
     public void sendContents(Player... target) {
-        sendSlot(0, target); //update cursor slot
+        //sendSlot(0, target); //update cursor slot
 
         InventoryContentPacket pk = new InventoryContentPacket();
         pk.slots = new Item[this.getSize()];
@@ -101,29 +101,11 @@ public class PlayerUIInventory extends BaseInventory {
                     p.dataPacket(pk);
                 }
             }
-            if (p.protocol >= ProtocolInfo.v1_16_0) {
+            /*if (p.protocol >= ProtocolInfo.v1_16_0) {
                 p.dataPacket(pk);
-            }
+            }*/
+            //https://github.com/CloudburstMC/Nukkit/commit/f96ce6eb90d47ab99ced368dd7129601f14c0b2b
         }
-    }
-
-    @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        if (player.craftingType == Player.CRAFTING_ANVIL) {
-            if (index >= AnvilInventory.OFFSET) {
-                Inventory inventory = player.getWindowById(Player.ANVIL_WINDOW_ID);
-                if (inventory instanceof AnvilInventory && (index == 50 || index - AnvilInventory.OFFSET < inventory.getSize())) {
-                    inventory.onSlotChange(index == 50 ? 2 : index - AnvilInventory.OFFSET, before, send);
-                }
-            }
-            return;
-        }
-
-        super.onSlotChange(index, before, send);
-    }
-
-    public void onSlotChangeBase(int index, Item before, boolean send) {
-        super.onSlotChange(index, before, send);
     }
 
     @Override

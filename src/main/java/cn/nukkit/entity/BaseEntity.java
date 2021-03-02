@@ -6,6 +6,7 @@ import cn.nukkit.entity.mob.EntityEnderDragon;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.mob.EntityMob;
 import cn.nukkit.entity.mob.EntityRavager;
+import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
@@ -16,6 +17,9 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
+import org.apache.commons.math3.util.FastMath;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * The base class of all entities that have an AI
@@ -24,8 +28,6 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public int stayTime = 0;
     protected int moveTime = 0;
-
-    private int airTicks = 0;
 
     protected float moveMultiplier = 1.0f;
 
@@ -212,6 +214,10 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
             if (!(this instanceof EntityFlyingMob)) {
                 this.kill();
             }
+            return false;
+        }
+
+        if (dx == 0 && dz == 0 && dy == 0) {
             return false;
         }
 
@@ -483,12 +489,31 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     @Override
-    public int getAirTicks() {
-        return this.airTicks;
+    protected void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
+        if (onGround && movX == 0 && movY == 0 && movZ == 0 && dx == 0 && dy == 0 && dz == 0) {
+            return;
+        }
+        this.isCollidedVertically = movY != dy;
+        this.isCollidedHorizontally = (movX != dx || movZ != dz);
+        this.isCollided = (this.isCollidedHorizontally || this.isCollidedVertically);
+        this.onGround = (movY != dy && movY < 0);
     }
 
-    @Override
-    public void setAirTicks(int ticks) {
-        this.airTicks = ticks;
+    public static void setProjectileMotion(EntityProjectile projectile, double pitch, double yawR, double pitchR, double speed) {
+        double verticalMultiplier = Math.cos(pitchR);
+        double x = verticalMultiplier * Math.sin(-yawR);
+        double z = verticalMultiplier * Math.cos(yawR);
+        double y = Math.sin(-(FastMath.toRadians(pitch)));
+        double magnitude = Math.sqrt(x * x + y * y + z * z);
+        if (magnitude > 0) {
+            x += (x * (speed - magnitude)) / magnitude;
+            y += (y * (speed - magnitude)) / magnitude;
+            z += (z * (speed - magnitude)) / magnitude;
+        }
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
+        x += rand.nextGaussian() * 0.007499999832361937 * 6;
+        y += rand.nextGaussian() * 0.007499999832361937 * 6;
+        z += rand.nextGaussian() * 0.007499999832361937 * 6;
+        projectile.setMotion(new Vector3(x, y, z));
     }
 }

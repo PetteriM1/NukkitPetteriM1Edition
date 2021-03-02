@@ -70,9 +70,8 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
                         (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
 
                 EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage);
-                player.attack(ev);
 
-                if (!ev.isCancelled() && this.server.getDifficulty() > 0) {
+                if (player.attack(ev) && !ev.isCancelled() && this.server.getDifficulty() > 0) {
                     player.addEffect(Effect.getEffect(Effect.POISON).setDuration(this.server.getDifficulty() > 1 ? 300 : 140));
                 }
             }
@@ -100,15 +99,5 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Cave Spider";
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
     }
 }

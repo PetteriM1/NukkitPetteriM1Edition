@@ -33,6 +33,10 @@ public class ItemFlintSteel extends ItemTool {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
+        if (player.isAdventure()) {
+            return false;
+        }
+
         if (block.getId() == AIR && (target instanceof BlockSolid || target instanceof BlockSolidMeta || target instanceof BlockLeaves)) {
             if (target.getId() == OBSIDIAN) {
                 if (level.createPortal(target, false)) {
@@ -59,11 +63,10 @@ public class ItemFlintSteel extends ItemTool {
                 return true;
             }
 
-            if (player != null && !player.isCreative() && this.useOn(block)) {
+            if (player != null && !player.isCreative()) {
+                this.useOn(block);
                 if (this.getDamage() >= DURABILITY_FLINT_STEEL) {
                     this.count = 0;
-                } else {
-                    this.meta++;
                 }
             }
             return true;

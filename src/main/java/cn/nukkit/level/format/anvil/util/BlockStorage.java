@@ -1,9 +1,14 @@
 package cn.nukkit.level.format.anvil.util;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.utils.BinaryStream;
 import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlockStorage {
     public static final int SECTION_SIZE = 4096;
@@ -116,12 +121,12 @@ public class BlockStorage {
         int index = getIndex(x, y, z);
         return blockDataHyperA[index];
     }
-    
+
     public int getBlockIdExtra(int x, int y, int z) {
         if (!hasBlockIdExtras) {
             return 0;
         }
-        
+
         int index = getIndex(x, y, z);
         return blockIdsExtra[index] & 0xFF;
     }
@@ -129,32 +134,32 @@ public class BlockStorage {
     public void setBlockId(int x, int y, int z, int id) {
         setBlockId(getIndex(x, y, z), id);
     }
-    
+
     private void setBlockId(int index, int id) {
         byte blockBase = (byte) (id & 0xff);
         blockIds[index] = blockBase;
-        
+
         byte extraBase = (byte) ((id >> 8) & 0xff);
         blockIdsExtra[index] = extraBase;
-        
+
         hasBlockIdExtras |= extraBase != 0;
         hasBlockIds |= blockBase != 0 || hasBlockIdExtras;
     }
-    
+
     public void setBlockData(int x, int y, int z, int data) {
         setBlockData(getIndex(x, y, z), data);
     }
-    
+
     private void setBlockData(int index, int data) {
         byte data1 = (byte) (data & 0xF);
         byte data2 = (byte) (data >> 4 & 0xF);
         byte data3 = (byte) (data >> 8 & 0xFF);
-        short data4 = (short) (data >> 16 & 0xFFFF); 
+        short data4 = (short) (data >> 16 & 0xFFFF);
         blockData.set(index, data1);
         blockDataExtra.set(index, data2);
         blockDataHyperA[index] = data3;
         blockDataHyperB[index] = data4;
-        
+
         hasBlockDataExtras |= data2 != 0;
         hasBlockDataHyperA |= data3 != 0;
         hasBlockDataHyperB |= data4 != 0;
@@ -178,7 +183,7 @@ public class BlockStorage {
     public int[] getAndSetBlock(int x, int y, int z, int id, int meta) {
         return getAndSetBlock(getIndex(x, y, z), id, meta);
     }
-    
+
     private int[] getAndSetBlock(int index, int id, int meta) {
         int oldId = getBlockId(index);
         int oldData = getBlockData(index);
@@ -186,7 +191,7 @@ public class BlockStorage {
         setBlockData(index, meta);
         return new int[] {oldId, oldData};
     }
-    
+
     public int getAndSetFullBlock(int x, int y, int z, int value) {
         return this.getAndSetFullBlock(getIndex(x, y, z), value);
     }
@@ -218,7 +223,7 @@ public class BlockStorage {
         hasBlockIdExtras |= newBlockExtra != 0;
         hasBlockDataExtras |= newDataExtra != 0;
         hasBlockIds |= newBlock != 0 || hasBlockIdExtras || hasBlockDataExtras;
-        
+
         return (oldBlockExtra & 0xff) << 14 | (oldBlock & 0xff) << Block.DATA_BITS | (oldDataExtra & 0xF) << 4 | oldData;
     }
 
@@ -253,7 +258,7 @@ public class BlockStorage {
         blockDataExtra.set(index, dataExtra);
         blockDataHyperA[index] = 0;
         blockDataHyperB[index] = 0;
-        
+
         hasBlockIdExtras |= extra != 0;
         hasBlockDataExtras |= dataExtra != 0;
         hasBlockIds |= block != 0 || hasBlockIdExtras || hasBlockDataExtras;
@@ -368,7 +373,7 @@ public class BlockStorage {
                 break;
             }
         }
-        
+
         for (byte dataId : blockDataExtra.getData()) {
             if (dataId != 0) {
                 hasBlockDataExtras = true;
@@ -376,7 +381,7 @@ public class BlockStorage {
                 break;
             }
         }
-    
+
         if (hasMeta) {
             hasBlockIds = true;
         } else {
@@ -386,6 +391,40 @@ public class BlockStorage {
                     break;
                 }
             }
+        }
+    }
+
+    public void writeTo(int protocol, BinaryStream stream) {
+        int[] ids = this.getBlockIdsExtended();
+        int[] data = this.getBlockDataExtended();
+        int[] blockStates = new int[ids.length];
+        Int2IntOpenHashMap runtime2palette = new Int2IntOpenHashMap();
+        ArrayList<Integer> palette2runtime = new ArrayList<>();
+        AtomicInteger nextPaletteId = new AtomicInteger(0);
+        //TODO Use compressed formats based on the value of this variable
+        AtomicInteger maxRuntimeId = new AtomicInteger(0);
+
+        for (int i = 0; i < blockStates.length; i++) {
+            int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, ids[i], data[i]);
+            int paletteId = runtime2palette.computeIfAbsent(runtimeId, rid -> {
+                int pid = nextPaletteId.getAndIncrement();
+                palette2runtime.add(rid);
+                if (maxRuntimeId.get() < rid) {
+                    maxRuntimeId.set(rid);
+                }
+                return pid;
+            });
+            blockStates[i] = paletteId;
+        }
+
+        int bitsPerBlock = 16;
+        stream.putByte( (byte) (1 | (bitsPerBlock << 1)) );
+        for (int blockState : blockStates) {
+            stream.putLShort(blockState);
+        }
+        stream.putVarInt(palette2runtime.size());
+        for (Integer runtimeId : palette2runtime) {
+            stream.putVarInt(runtimeId);
         }
     }
 

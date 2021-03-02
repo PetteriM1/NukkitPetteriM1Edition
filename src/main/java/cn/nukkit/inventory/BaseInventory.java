@@ -37,6 +37,8 @@ public abstract class BaseInventory implements Inventory {
 
     protected InventoryHolder holder;
 
+    public boolean destroyed = false;
+
     Item air;
 
     public BaseInventory(InventoryHolder holder, InventoryType type) {
@@ -150,7 +152,7 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public boolean setItem(int index, Item item, boolean send) {
-        item = item.clone();
+        //item = item.clone();
         if (index < 0 || index >= this.size || !this.allowedToAdd(item)) {
             return false;
         } else if (item.getId() == 0 || item.getCount() <= 0) {
@@ -176,7 +178,6 @@ public abstract class BaseInventory implements Inventory {
         Item old = this.getItem(index);
         this.slots.put(index, item.clone());
         this.onSlotChange(index, old, send);
-
         return true;
     }
 

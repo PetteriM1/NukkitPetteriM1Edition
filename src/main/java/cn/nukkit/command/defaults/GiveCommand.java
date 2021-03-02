@@ -62,6 +62,11 @@ public class GiveCommand extends VanillaCommand {
             return true;
         }
 
+        if (item.getDamage() < 0) {
+            sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
+            return true;
+        }
+
         try {
             item.setCount(Integer.parseInt(args[2]));
         } catch (Exception e) {

@@ -13,25 +13,19 @@ import java.util.Arrays;
  * Nukkit Project
  */
 public class EmptyChunkSection implements ChunkSection {
+
     public static final EmptyChunkSection[] EMPTY = new EmptyChunkSection[16];
+
+    private static final byte[] EMPTY_ID_ARRAY = new byte[4096];
+    private static final byte[] EMPTY_DATA_ARRAY = new byte[2048];
+    public static byte[] EMPTY_LIGHT_ARR = new byte[2048];
+    public static byte[] EMPTY_SKY_LIGHT_ARR = new byte[2048];
+
     static {
         for (int y = 0; y < EMPTY.length; y++) {
             EMPTY[y] = new EmptyChunkSection(y);
         }
-    }
-    public static byte[] EMPTY_LIGHT_ARR = new byte[2048];
-    public static byte[] EMPTY_SKY_LIGHT_ARR = new byte[2048];
-    static {
         Arrays.fill(EMPTY_SKY_LIGHT_ARR, (byte) 255);
-    }
-    private static byte[] EMPTY_ID_ARRAY = new byte[4096];
-    private static byte[] EMPTY_DATA_ARRAY = new byte[2048];
-    private static byte[] EMPTY_CHUNK_DATA;
-    static {
-        BinaryStream stream = new BinaryStream();
-        stream.putByte((byte) cn.nukkit.level.format.anvil.ChunkSection.STREAM_STORAGE_VERSION);
-        stream.putVarInt(0);
-        EMPTY_CHUNK_DATA = stream.getBuffer();
     }
 
     private final int y;
@@ -130,12 +124,12 @@ public class EmptyChunkSection implements ChunkSection {
     public byte[] getDataArray(int layer) {
         return EMPTY_DATA_ARRAY;
     }
-    
+
     @Override
     public byte[] getDataExtraArray(int layer) {
         return EMPTY_DATA_ARRAY;
     }
-    
+
     @Override
     public byte[] getSkyLightArray() {
         return EMPTY_SKY_LIGHT_ARR;
@@ -220,14 +214,14 @@ public class EmptyChunkSection implements ChunkSection {
 
     @Override
     public void writeTo(int protocol, BinaryStream stream) {
-        //TODO
+        stream.put(this.getBytes(protocol));
     }
 
     @Override
     public int getMaximumLayer() {
         return 0;
     }
-    
+
     @Override
     public CompoundTag toNBT() {
         return null;

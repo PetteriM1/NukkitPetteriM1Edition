@@ -19,12 +19,12 @@ public class ResourcePacksInfoPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBoolean(this.mustAccept);
-        if (protocol >= 332) {
+        if (protocol >= ProtocolInfo.v1_9_0) {
             this.putBoolean(this.scripting);
         }
 
-        encodePacks(this.resourcePackEntries);
         encodePacks(this.behaviourPackEntries);
+        encodePacks(this.resourcePackEntries);
     }
 
     private void encodePacks(ResourcePack[] packs) {
@@ -35,10 +35,13 @@ public class ResourcePacksInfoPacket extends DataPacket {
             this.putLLong(entry.getPackSize());
             this.putString(""); // encryption key
             this.putString(""); // sub-pack name
-            if (protocol > 274) {
+            if (protocol > ProtocolInfo.v1_5_0) {
                 this.putString(""); // content identity
-                if (protocol >= 332) {
+                if (protocol >= ProtocolInfo.v1_9_0) {
                     this.putBoolean(false); // scripting
+                    if (protocol >= ProtocolInfo.v1_16_200) {
+                        this.putBoolean(false); // raytracing capable
+                    }
                 }
             }
         }

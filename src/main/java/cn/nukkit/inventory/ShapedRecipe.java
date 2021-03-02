@@ -24,7 +24,7 @@ public class ShapedRecipe implements CraftingRecipe {
 
     private final CharObjectHashMap<Item> ingredients = new CharObjectHashMap<>();
 
-    private int networkId;
+    private final int networkId;
 
     public ShapedRecipe(Item primaryResult, String[] shape, Map<Character, Item> ingredients, List<Item> extraResults) {
         this(null, 1, primaryResult, shape, ingredients, extraResults);
@@ -103,7 +103,7 @@ public class ShapedRecipe implements CraftingRecipe {
                 this.ingredientsAggregate.add(ingredient);
         }
         this.ingredientsAggregate.sort(CraftingManager.recipeComparator);
-        this.networkId = networkId != null ? networkId : ++CraftingManager.nextNetworkId;
+        this.networkId = networkId != null ? networkId : ++CraftingManager.NEXT_NETWORK_ID;
     }
 
     public int getWidth() {

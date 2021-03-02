@@ -12,7 +12,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -87,15 +86,14 @@ public class EntityStray extends EntityWalkingMob implements EntitySmite {
             this.attackDelay = 0;
 
             double f = 1.3;
-            double yaw = this.yaw + Utils.rand(-12.0, 12.0);
-            double pitch = this.pitch + Utils.rand(-7.0, 7.0);
-            Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getHeight() - 0.18,
-                    this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+            double yawR = FastMath.toRadians(yaw);
+            double pitchR = FastMath.toRadians(pitch);
+            Location pos = new Location(this.x - Math.sin(yawR) * Math.cos(pitchR) * 0.5, this.y + this.getHeight() - 0.18,
+                    this.z + Math.cos(yawR) * Math.cos(pitchR) * 0.5, yaw, pitch, this.level);
             if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) == Block.AIR) {
                 EntityArrow arrow = (EntityArrow) Entity.createEntity("Arrow", pos, this);
                 arrow.isFromStray = true;
-                arrow.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
-                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
+                setProjectileMotion(arrow, pitch, yawR, pitchR, f);
 
                 EntityShootBowEvent ev = new EntityShootBowEvent(this, Item.get(Item.ARROW, 0, 1), arrow, f);
                 this.server.getPluginManager().callEvent(ev);
@@ -128,6 +126,10 @@ public class EntityStray extends EntityWalkingMob implements EntitySmite {
 
         for (int i = 0; i < Utils.rand(0, 2); i++) {
             drops.add(Item.get(Item.ARROW, 0, 1));
+        }
+
+        if (Utils.rand()) {
+            drops.add(Item.get(Item.ARROW, 18, 1));
         }
 
         return drops.toArray(Item.EMPTY_ARRAY);

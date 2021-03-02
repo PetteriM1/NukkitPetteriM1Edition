@@ -24,8 +24,8 @@ public class CraftingDataPacket extends DataPacket {
     public static final String CRAFTING_TAG_SMOKER = "smoker";
 
     private List<Recipe> entries = new ArrayList<>();
-    private List<BrewingRecipe> brewingEntries = new ArrayList<>();
-    private List<ContainerRecipe> containerEntries = new ArrayList<>();
+    private final List<BrewingRecipe> brewingEntries = new ArrayList<>();
+    private final List<ContainerRecipe> containerEntries = new ArrayList<>();
     public boolean cleanRecipes;
 
     public void addShapelessRecipe(ShapelessRecipe... recipe) {
@@ -42,6 +42,10 @@ public class CraftingDataPacket extends DataPacket {
 
     public void addBrewingRecipe(BrewingRecipe... recipe) {
         Collections.addAll(brewingEntries, recipe);
+    }
+
+    public void addMultiRecipe(MultiRecipe... recipe) {
+        Collections.addAll(entries, recipe);
     }
 
     public void addContainerRecipe(ContainerRecipe... recipe) {
@@ -90,7 +94,7 @@ public class CraftingDataPacket extends DataPacket {
                             if (protocol < 361) {
                                 this.putSlot(protocol, ingredient);
                             } else {
-                                this.putRecipeIngredient(ingredient);
+                                this.putRecipeIngredient(this.protocol, ingredient);
                             }
                         }
                         this.putUnsignedVarInt(1);
@@ -119,7 +123,7 @@ public class CraftingDataPacket extends DataPacket {
                                 if (protocol < 361) {
                                     this.putSlot(protocol, shaped.getIngredient(x, z));
                                 } else {
-                                    this.putRecipeIngredient(shaped.getIngredient(x, z));
+                                    this.putRecipeIngredient(this.protocol, shaped.getIngredient(x, z));
                                 }
                             }
                         }
@@ -154,6 +158,12 @@ public class CraftingDataPacket extends DataPacket {
                             this.putString(CRAFTING_TAG_FURNACE);
                         }
                         break;
+                    case MULTI:
+                        if (protocol >= ProtocolInfo.v1_16_0) { // ??
+                            this.putUUID(((MultiRecipe) recipe).getId());
+                            this.putUnsignedVarInt(0);
+                            break;
+                        }
                 }
             }
 

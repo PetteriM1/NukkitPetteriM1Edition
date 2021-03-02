@@ -32,39 +32,32 @@ public class PlayerListPacket extends DataPacket {
                     if (protocol >= 223) {
                         this.putUUID(entry.uuid);
                     }
-                    if (type == TYPE_ADD) {
+                    this.putVarLong(entry.entityId);
+                    this.putString(entry.name);
+                    if (protocol >= 223 && protocol <= 282) {
+                        this.putString("");
+                        this.putVarInt(0);
+                    }
+                    if (protocol < 388) {
+                        this.putSkin(protocol, entry.skin);
                         if (protocol < 223) {
-                            this.putUUID(entry.uuid);
+                            this.putByteArray(new byte[0]);
                         }
-                        this.putVarLong(entry.entityId);
-                        this.putString(entry.name);
-                        if (protocol >= 223 && protocol <= 282) {
-                            this.putString("");
-                            this.putVarInt(0);
-                        }
-                        if (protocol < 388) {
+                    }
+                    this.putString(entry.xboxUserId);
+                    if (protocol >= 223) {
+                        this.putString(entry.platformChatId);
+                        if (protocol >= 388) {
+                            this.putLInt(entry.buildPlatform);
                             this.putSkin(protocol, entry.skin);
-                            if (protocol < 223) {
-                                this.putByteArray(new byte[0]);
-                            }
+                            this.putBoolean(entry.isTeacher);
+                            this.putBoolean(entry.isHost);
                         }
-                        this.putString(entry.xboxUserId);
-                        if (protocol >= 223) {
-                            this.putString(entry.platformChatId);
-                            if (protocol >= 388) {
-                                this.putLInt(entry.buildPlatform);
-                                this.putSkin(protocol, entry.skin);
-                                this.putBoolean(entry.isTeacher);
-                                this.putBoolean(entry.isHost);
-                            }
-                        }
-                    } else if (protocol < 223) {
-                        this.putUUID(entry.uuid);
                     }
                 }
                 if (protocol >= ProtocolInfo.v1_14_60) {
                     for (Entry entry : this.entries) { // WTF Mojang
-                        this.putBoolean(entry.skin.isTrusted());
+                        this.putBoolean(true);
                     }
                 }
                 break;

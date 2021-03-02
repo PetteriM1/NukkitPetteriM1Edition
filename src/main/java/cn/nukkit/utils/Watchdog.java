@@ -39,25 +39,31 @@ public class Watchdog extends Thread {
                     responding = true;
                 } else if (responding) {
                     MainLogger logger = this.server.getLogger();
-                    logger.emergency("--------- Server stopped responding ---------");
-                    logger.emergency(Math.round(diff / 1000d) + " s");
-                    logger.emergency("---------------- Main thread ----------------");
+                    StringBuilder log = new StringBuilder();
 
-                    dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger);
+                    print("--------- Server stopped responding ---------", logger, log);
+                    print(Math.round(diff / 1000d) + " s", logger, log);
+                    print("---------------- Main thread ----------------", logger, log);
 
-                    logger.emergency("---------------- All threads ----------------");
+                    dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger, log);
+
+                    print("---------------- All threads ----------------", logger, log);
                     ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
                     for (int i = 0; i < threads.length; i++) {
-                        if (i != 0) logger.emergency("------------------------------");
-                        dumpThread(threads[i], logger);
+                        if (i != 0) print("------------------------------", logger, log);
+                        dumpThread(threads[i], logger, log);
                     }
-                    logger.emergency("---------------------------------------------");
+                    print("---------------------------------------------", logger, log);
+                    try {
+                        new BugReportGenerator(log.toString()).start();
+                        Thread.sleep(1000); // Wait for the report to be sent
+                    } catch (Exception ignored) {}
                     responding = false;
                     this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
                 }
             }
             try {
-                sleep(Math.max(time / 4, 1000));
+                sleep(Math.max(time >> 2, 1000));
             } catch (InterruptedException ignore) {
                 server.getLogger().emergency("The Watchdog thread has been interrupted and is no longer monitoring the server state");
                 running = false;
@@ -67,20 +73,25 @@ public class Watchdog extends Thread {
         server.getLogger().warning("Watchdog has been stopped");
     }
 
-    private static void dumpThread(ThreadInfo thread, Logger logger) {
-        logger.emergency("Current Thread: " + thread.getThreadName());
-        logger.emergency("\tPID: " + thread.getThreadId() + " | Suspended: " + thread.isSuspended() + " | Native: " + thread.isInNative() + " | State: " + thread.getThreadState());
+    private static void dumpThread(ThreadInfo thread, Logger logger, StringBuilder log) {
+        print("Current Thread: " + thread.getThreadName(), logger, log);
+        print("\tPID: " + thread.getThreadId() + " | Suspended: " + thread.isSuspended() + " | Native: " + thread.isInNative() + " | State: " + thread.getThreadState(), logger, log);
 
         if (thread.getLockedMonitors().length != 0) {
-            logger.emergency("\tThread is waiting on monitor(s):");
+            print("\tThread is waiting on monitor(s):", logger, log);
             for (MonitorInfo monitor : thread.getLockedMonitors()) {
-                logger.emergency("\t\tLocked on:" + monitor.getLockedStackFrame());
+                print("\t\tLocked on:" + monitor.getLockedStackFrame(), logger, log);
             }
         }
 
-        logger.emergency("\tStack:");
+        print("\tStack:", logger, log);
         for (StackTraceElement stack : thread.getStackTrace()) {
-            logger.emergency("\t\t" + stack);
+            print("\t\t" + stack, logger, log);
         }
+    }
+
+    private static void print(String text, Logger logger, StringBuilder log) {
+        logger.emergency(text);
+        log.append(text).append('\n');
     }
 }

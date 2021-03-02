@@ -46,7 +46,7 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
 
         this.getLevel().setBlock(block, this, true, false);
-        this.calculateCurrentChanges(true);
+        this.calculateCurrentChanges(true, true);
         Vector3 pos = getLocation();
 
         for (BlockFace blockFace : Plane.VERTICAL) {
@@ -79,7 +79,7 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
     }
 
-    private void calculateCurrentChanges(boolean force) {
+    private void calculateCurrentChanges(boolean force, boolean stillExists) {
         Vector3 pos = this.getLocation();
 
         int meta = this.getDamage();
@@ -129,10 +129,12 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
 
         if (meta != maxStrength) {
-            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, meta, maxStrength));
+            if (stillExists) {
+                this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, meta, maxStrength));
 
-            this.setDamage(maxStrength);
-            this.level.setBlock(this, this, false, false);
+                this.setDamage(maxStrength);
+                this.level.setBlock(this, this, false, false);
+            }
 
             this.level.updateAroundRedstone(this, null);
             for (BlockFace face : BlockFace.values()) {
@@ -156,14 +158,11 @@ public class BlockRedstoneWire extends BlockFlowable {
 
     @Override
     public boolean onBreak(Item item) {
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true); //TODO: remove
-        //Block air = Block.get(BlockID.AIR);
-        //this.getLevel().setBlock(this, air, true, true);
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
 
         Vector3 pos = getLocation();
 
-        this.calculateCurrentChanges(false);
-        //this.getLevel().setBlock(this, air, true, true);
+        this.calculateCurrentChanges(false, false);
 
         for (BlockFace blockFace : BlockFace.values()) {
             this.level.updateAroundRedstone(pos.getSide(blockFace), null);
@@ -209,7 +208,7 @@ public class BlockRedstoneWire extends BlockFlowable {
             return 0;
         }
 
-        this.calculateCurrentChanges(false);
+        this.calculateCurrentChanges(false, true);
 
         return Level.BLOCK_UPDATE_REDSTONE;
     }

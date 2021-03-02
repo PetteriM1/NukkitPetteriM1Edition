@@ -11,10 +11,10 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
 import cn.nukkit.utils.ThreadCache;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.io.File;
@@ -75,7 +75,6 @@ public class Anvil extends BaseLevelProvider {
 
         CompoundTag levelData = new CompoundTag("Data")
                 .putCompound("GameRules", new CompoundTag())
-
                 .putLong("DayTime", 0)
                 .putInt("GameType", 0)
                 .putString("generatorName", Generator.getGeneratorName(generator))
@@ -106,7 +105,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @Override
-    public AsyncTask requestChunkTask(int protocol, int x, int z) throws ChunkException {
+    public void requestChunkTask(IntSet protocols, int x, int z) throws ChunkException {
         Chunk chunk = (Chunk) this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk Set");
@@ -145,7 +144,6 @@ public class Anvil extends BaseLevelProvider {
             extraData = null;
         }
 
-        BinaryStream stream = ThreadCache.binaryStream.get().reset();
         int subChunkCount = 0;
         cn.nukkit.level.format.ChunkSection[] sections = chunk.getSections();
         for (int i = sections.length - 1; i >= 0; i--) {
@@ -154,38 +152,36 @@ public class Anvil extends BaseLevelProvider {
                 break;
             }
         }
-        if (protocol < ProtocolInfo.v1_12_0) {
-            stream.putByte((byte) subChunkCount);
-        }
-        for (int i = 0; i < subChunkCount; i++) {
-            stream.put(sections[i].getBytes(protocol));
 
-            //TODO: support older chunks
-            /*if (protocol < ProtocolInfo.v1_13_0) {
-                stream.putByte((byte) 0);
-                stream.put(sections[i].getBytes());
-            } else {
-                sections[i].writeTo(protocol, stream);
-            }*/
-        }
-        if (protocol < ProtocolInfo.v1_12_0) {
-            for (byte height : chunk.getHeightMapArray()) {
-                stream.putByte(height);
+        for (int protocolId : protocols) {
+            BinaryStream stream = ThreadCache.binaryStream.get().reset();
+            if (protocolId < ProtocolInfo.v1_12_0) {
+                stream.putByte((byte) subChunkCount);
             }
-            stream.put(PAD_256);
-        }
-        stream.put(chunk.getBiomeIdArray());
-        stream.putByte((byte) 0);
-        if (extraData != null) {
-            stream.put(extraData.getBuffer());
-        } else {
-            stream.putVarInt(0);
-        }
-        stream.put(blockEntities);
 
-        this.getLevel().chunkRequestCallback(protocol, timestamp, x, z, subChunkCount, stream.getBuffer());
+            for (int i = 0; i < subChunkCount; i++) {
+                if (protocolId < ProtocolInfo.v1_13_0) {
+                    stream.putByte((byte) 0);
+                    stream.put(sections[i].getBytes(protocolId));
+                }else {
+                    sections[i].writeTo(protocolId, stream);
+                }
+            }
+            if (protocolId < ProtocolInfo.v1_12_0) {
+                for (byte height : chunk.getHeightMapArray()) {
+                    stream.putByte(height);
+                }
+                stream.put(PAD_256);
+            }
+            stream.put(chunk.getBiomeIdArray());
+            stream.putByte((byte) 0);// Border blocks
+            if (protocolId < ProtocolInfo.v1_16_100) {
+                stream.putVarInt(0);// There is no extra data anymore but idk when it was removed
+            }
+            stream.put(blockEntities);
 
-        return null;
+            this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, subChunkCount, stream.getBuffer());
+        }
     }
 
     private int lastPosition = 0;
@@ -295,7 +291,7 @@ public class Anvil extends BaseLevelProvider {
             return region;
         }
     }
-    
+
     @Override
     public int getMaximumLayer() {
         return 1;

@@ -50,25 +50,30 @@ abstract public class ItemArmor extends Item implements ItemDurable {
     @Override
     public boolean onClickAir(Player player, Vector3 directionVector) {
         boolean equip = false;
-        if (this.isHelmet() && player.getInventory().getHelmet().isNull()) {
+        Item oldSlotItem = Item.get(AIR);
+        if (this.isHelmet()) {
+            oldSlotItem = player.getInventory().getHelmetFast();
             if (player.getInventory().setHelmet(this)) {
                 equip = true;
             }
-        } else if (this.isChestplate() && player.getInventory().getChestplate().isNull()) {
+        } else if (this.isChestplate()) {
+            oldSlotItem = player.getInventory().getChestplateFast();
             if (player.getInventory().setChestplate(this)) {
                 equip = true;
             }
-        } else if (this.isLeggings() && player.getInventory().getLeggings().isNull()) {
+        } else if (this.isLeggings()) {
+            oldSlotItem = player.getInventory().getLeggingsFast();
             if (player.getInventory().setLeggings(this)) {
                 equip = true;
             }
-        } else if (this.isBoots() && player.getInventory().getBoots().isNull()) {
+        } else if (this.isBoots()) {
+            oldSlotItem = player.getInventory().getBootsFast();
             if (player.getInventory().setBoots(this)) {
                 equip = true;
             }
         }
         if (equip) {
-            player.getInventory().clear(player.getInventory().getHeldItemIndex());
+            player.getInventory().setItem(player.getInventory().getHeldItemIndex(), oldSlotItem);
             switch (this.getTier()) {
                 case TIER_CHAIN:
                     player.getLevel().addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_ARMOR_EQUIP_CHAIN);

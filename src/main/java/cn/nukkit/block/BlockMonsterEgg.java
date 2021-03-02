@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntitySilverfish;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Utils;
 
@@ -61,7 +62,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
     @Override
     public boolean onBreak(Item item) {
         if (Server.getInstance().blockListener) {
-            if (this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && Utils.rand(1, 5) == 1) {
+            if (Utils.rand(1, 5) == 1 && !item.hasEnchantment(Enchantment.ID_SILK_TOUCH) && this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12) {
                 EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", this.add(0.5, 0, 0.5));
                 entity.spawnToAll();
                 EntityEventPacket pk = new EntityEventPacket();

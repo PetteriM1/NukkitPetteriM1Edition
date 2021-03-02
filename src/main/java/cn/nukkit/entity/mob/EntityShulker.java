@@ -115,14 +115,4 @@ public class EntityShulker extends EntityWalkingMob {
     @Override
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {
     }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
 }

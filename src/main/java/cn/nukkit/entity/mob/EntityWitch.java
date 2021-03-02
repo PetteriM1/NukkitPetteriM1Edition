@@ -61,44 +61,42 @@ public class EntityWitch extends EntityWalkingMob {
 
     @Override
     public void attackEntity(Entity player) {
-        if (this.getServer().getMobAiEnabled()) {
-            if (this.attackDelay > 60 && Utils.rand(1, 3) == 2 && this.distanceSquared(player) <= 60) {
-                this.attackDelay = 0;
-                if (player.isAlive() && !player.closed) {
+        if (this.attackDelay > 60 && Utils.rand(1, 3) == 2 && this.distanceSquared(player) <= 60) {
+            this.attackDelay = 0;
+            if (player.isAlive() && !player.closed) {
 
-                    double f = 1;
-                    double yaw = this.yaw + Utils.rand(-5.0, 5.0);
-                    Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
-                            this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
+                double f = 1;
+                double yaw = this.yaw + Utils.rand(-5.0, 5.0);
+                Location pos = new Location(this.x - Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, this.y + this.getEyeHeight(),
+                        this.z + Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * 0.5, yaw, pitch, this.level);
 
-                    if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
-                        return;
-                    }
+                if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) != Block.AIR) {
+                    return;
+                }
 
-                    EntityPotion thrownPotion = (EntityPotion) Entity.createEntity("ThrownPotion", pos, this);
+                EntityPotion thrownPotion = (EntityPotion) Entity.createEntity("ThrownPotion", pos, this);
 
-                    double distance = this.distanceSquared(player);
+                double distance = this.distanceSquared(player);
 
-                    if (!player.hasEffect(Effect.SLOWNESS) && distance <= 64) {
-                        thrownPotion.potionId = Potion.SLOWNESS;
-                    } else if (player.getHealth() >= 8) {
-                        thrownPotion.potionId = Potion.POISON;
-                    } else if (!player.hasEffect(Effect.WEAKNESS) && Utils.rand(0, 4) == 0 && distance <= 9) {
-                        thrownPotion.potionId = Potion.WEAKNESS;
-                    } else {
-                        thrownPotion.potionId = Potion.HARMING;
-                    }
+                if (!player.hasEffect(Effect.SLOWNESS) && distance <= 64) {
+                    thrownPotion.potionId = Potion.SLOWNESS;
+                } else if (player.getHealth() >= 8) {
+                    thrownPotion.potionId = Potion.POISON;
+                } else if (!player.hasEffect(Effect.WEAKNESS) && Utils.rand(0, 4) == 0 && distance <= 9) {
+                    thrownPotion.potionId = Potion.WEAKNESS;
+                } else {
+                    thrownPotion.potionId = Potion.HARMING;
+                }
 
-                    thrownPotion.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
-                            Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
-                    ProjectileLaunchEvent launch = new ProjectileLaunchEvent(thrownPotion);
-                    this.server.getPluginManager().callEvent(launch);
-                    if (launch.isCancelled()) {
-                        thrownPotion.close();
-                    } else {
-                        thrownPotion.spawnToAll();
-                        this.level.addSoundToViewers(this, Sound.MOB_WITCH_THROW);
-                    }
+                thrownPotion.setMotion(new Vector3(-Math.sin(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f, -Math.sin(FastMath.toRadians(pitch)) * f * f,
+                        Math.cos(FastMath.toRadians(yaw)) * Math.cos(FastMath.toRadians(pitch)) * f * f));
+                ProjectileLaunchEvent launch = new ProjectileLaunchEvent(thrownPotion);
+                this.server.getPluginManager().callEvent(launch);
+                if (launch.isCancelled()) {
+                    thrownPotion.close();
+                } else {
+                    thrownPotion.spawnToAll();
+                    this.level.addSoundToViewers(this, Sound.MOB_WITCH_THROW);
                 }
             }
         }
@@ -141,16 +139,6 @@ public class EntityWitch extends EntityWalkingMob {
     @Override
     public int getKillExperience() {
         return 5;
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getServer().getDifficulty() == 0) {
-            this.close();
-            return true;
-        }
-
-        return super.entityBaseTick(tickDiff);
     }
 
     @Override

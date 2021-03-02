@@ -67,9 +67,7 @@ public class EntitySnowball extends EntityProjectile {
 
     @Override
     public void onHit() {
-        ItemSnowball egg = new ItemSnowball();
-        for (int i = 0; i < 5; i++) {
-            level.addParticle(new ItemBreakParticle(this, egg));
-        }
+        ItemSnowball snowball = new ItemSnowball();
+        level.addParticle(new ItemBreakParticle(this, snowball), null, 5);
     }
 }

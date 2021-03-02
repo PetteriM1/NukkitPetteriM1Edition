@@ -28,6 +28,7 @@ public class PandaSpawner extends AbstractEntitySpawner {
         }
 
         BaseEntity entity = this.spawnTask.createEntity("Panda", pos.add(0, 1, 0));
+        if (entity == null) return;
         if (Utils.rand(1, 20) == 1) {
             entity.setBaby(true);
         }

@@ -113,15 +113,13 @@ public class Binary {
             int id2 = entry.getKey();
 
             // HACK: Multiversion entity data
-            if (protocol < ProtocolInfo.v1_12_0) {
-                if (protocol == ProtocolInfo.v1_11_0) {
-                    if (id2 >= 40) {
-                        id2 = id2 + 1;
-                    }
-                } else if (protocol <= ProtocolInfo.v1_2_10) {
-                    if (id2 > 35) {
-                        id2 = id2 - 1;
-                    }
+            if (protocol == ProtocolInfo.v1_11_0) {
+                if (id2 >= 40) {
+                    id2 = id2 + 1;
+                }
+            } else if (protocol <= ProtocolInfo.v1_2_10) {
+                if (id2 > 35) {
+                    id2 = id2 - 1;
                 }
             }
 
@@ -499,11 +497,13 @@ public class Binary {
         for (byte[] b : bytes) {
             length += b.length;
         }
-        ByteBuffer buffer = ByteBuffer.allocate(length);
+        byte[] appendedBytes = new byte[length];
+        int index = 0;
         for (byte[] b : bytes) {
-            buffer.put(b);
+            System.arraycopy(b, 0, appendedBytes, index, b.length);
+            index += b.length;
         }
-        return buffer.array();
+        return appendedBytes;
     }
 
     public static byte[] appendBytes(byte byte1, byte[]... bytes2) {
@@ -524,11 +524,14 @@ public class Binary {
         for (byte[] bytes : bytes2) {
             length += bytes.length;
         }
-        ByteBuffer buffer = ByteBuffer.allocate(length);
-        buffer.put(bytes1);
-        for (byte[] bytes : bytes2) {
-            buffer.put(bytes);
+        byte[] appendedBytes = new byte[length];
+        System.arraycopy(bytes1, 0, appendedBytes, 0, bytes1.length);
+        int index = bytes1.length;
+
+        for (byte[] b : bytes2) {
+            System.arraycopy(b, 0, appendedBytes, index, b.length);
+            index += b.length;
         }
-        return buffer.array();
+        return appendedBytes;
     }
 }

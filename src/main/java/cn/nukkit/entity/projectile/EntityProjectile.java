@@ -3,7 +3,6 @@ package cn.nukkit.entity.projectile;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
-import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.entity.item.EntityEndCrystal;
 import cn.nukkit.entity.mob.EntityBlaze;
 import cn.nukkit.event.entity.*;
@@ -45,9 +44,9 @@ public abstract class EntityProjectile extends Entity {
     public EntityProjectile(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
         super(chunk, nbt);
         this.shootingEntity = shootingEntity;
-        if (shootingEntity != null) {
+        /*if (shootingEntity != null) {
             this.setDataProperty(new LongEntityData(DATA_SHOOTER_ID, shootingEntity.getId()));
-        }
+        }*/
     }
 
     public int getResultDamage() {
