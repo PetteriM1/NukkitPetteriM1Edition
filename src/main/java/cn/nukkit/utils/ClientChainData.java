@@ -217,7 +217,7 @@ public final class ClientChainData implements LoginChainData {
         if (skinToken.has("DefaultInputMode")) this.defaultInputMode = skinToken.get("DefaultInputMode").getAsInt();
         if (skinToken.has("UIProfile")) this.UIProfile = skinToken.get("UIProfile").getAsInt();
         if (skinToken.has("CapeData")) this.capeData = skinToken.get("CapeData").getAsString();
-        if (!Server.getInstance().suomiCraftPEMode()) this.rawData = skinToken;
+        this.rawData = skinToken;
     }
 
     private static JsonObject decodeToken(String token) {

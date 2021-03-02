@@ -32,7 +32,7 @@ public class CraftingManager {
     public static BatchPacket packet361 = null;
     public static BatchPacket packet354 = null;
     public static BatchPacket packet388 = null;
-    public static BatchPacket packet407 = null;
+    public static DataPacket packet407 = null;
     public static DataPacket packet419 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
@@ -321,7 +321,7 @@ public class CraftingManager {
             pk407.addContainerRecipe(recipe);
         }
         pk407.tryEncode();
-        packet407 = pk407.compress(Deflater.BEST_COMPRESSION);
+        packet407 = pk407;// .compress(Deflater.BEST_COMPRESSION);
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
         pk388.cleanRecipes = true;
