@@ -19,23 +19,21 @@ import java.util.concurrent.*;
 
 public class BatchingHelper {
 
-    private final Server server;
     private final ExecutorService threadedExecutor;
 
-    public BatchingHelper(Server server) {
-        this.server = server;
+    public BatchingHelper() {
         ThreadFactoryBuilder builder = new ThreadFactoryBuilder();
         builder.setNameFormat("Batching Executor");
         this.threadedExecutor = Executors.newSingleThreadExecutor(builder.build());
     }
 
     public void batchPackets(Player[] players, DataPacket[] packets) {
-        if (this.server.isRunning() && players.length > 0 && packets.length > 0) {
+        if (players.length > 0 && packets.length > 0) {
             this.threadedExecutor.execute(() -> this.batchAndSendPackets(players, packets));
         }
     }
 
-    public void batchAndSendPackets(Player[] players, DataPacket[] packets) {
+    private void batchAndSendPackets(Player[] players, DataPacket[] packets) {
         Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
