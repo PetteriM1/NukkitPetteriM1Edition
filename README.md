@@ -8,9 +8,9 @@ This software boasts many key features over the standard Nukkit, including, **ex
 
 ### How to install Nukkit PM1E: ###
 1. Obtain the .jar from the Jenkins, CircleCI or Google Drive (these can be found in "Releases") and put it in a folder.
-2. On *Windows* systems, create a Start.cmd file and inside put the text: `java -jar [release name].jar`
- 
- On *Linux, BSD or MacOS* systems, use `cd [path/to/the/jar]` to enter the directory of the executable and run: `$ java -jar [release name].jar`
+
+2. On *Windows* systems, create a Start.cmd file and inside put the text: `java -jar [release name].jar`. On *Linux, BSD or MacOS* systems, use `cd [path/to/the/jar]` to enter the directory of the executable and run: `$ java -jar [release name].jar`
+
 3. Join the server using the private IP (if you waht to play locally), this can be achieved with `ipconfig` in CMD prompt. If youhave issues with connecting as a localhost, look here: https://pmmp.readthedocs.io/en/rtfd/faq/connecting/win10localhostcantconnect.html
 
 >KEY NOTE: Java/JRE must be installed in order to run the executable.
