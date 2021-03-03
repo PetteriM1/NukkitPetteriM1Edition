@@ -15,7 +15,7 @@ This software boasts many key features over the standard Nukkit, including, **ex
 
 >KEY NOTE: Java/JRE must be installed in order to run the executable.
 
-####Links
+#Links
 
 See the [wiki](https://github.com/PetteriM1/NukkitPetteriM1Edition/wiki) for more details.
 
