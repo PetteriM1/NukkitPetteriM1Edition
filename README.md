@@ -9,7 +9,7 @@ This software boasts many key features over the standard Nukkit, including, **ex
 ### How to install Nukkit PM1E: ###
 1. Obtain the .jar from the CircleCI or Google Drive (these can be found in "Releases") and put it in a folder.
 
-2. On *Windows* systems, create a Start.cmd file and inside put the text: `java -jar [release name].jar`, or navigate to the directory via PowerShell and run the jar. On *Linux, BSD or MacOS* systems, use `cd [path/to/the/jar]` to enter the directory of the executable and run: `$ java -jar [release name].jar`.
+2. On *Windows* systems, create a Start.cmd file and inside put the text: `java -jar [release name].jar`, or navigate to the directory via PowerShell and run the command. On *Linux, BSD or MacOS* systems, use `cd [path/to/the/jar]` to enter the directory of the executable and run: `$ java -jar [release name].jar`, you can also create a start script.
 
 3. Join the server using the private IP to play locally, this can be found with `ipconfig` in CMD prompt, or by connecting to `127.0.0.1` in the game. If you have issues with connecting as a localhost, launch Windows PowerShell as an administrator and run the following: `CheckNetIsolation LoopbackExempt -a -n="Microsoft.MinecraftUWP_8wekyb3d8bbwe"`.
 
