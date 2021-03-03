@@ -11,7 +11,7 @@ This software boasts many key features over the standard Nukkit, including, **ex
 
 2. On *Windows* systems, create a Start.cmd file and inside put the text: `java -jar [release name].jar`. On *Linux, BSD or MacOS* systems, use `cd [path/to/the/jar]` to enter the directory of the executable and run: `$ java -jar [release name].jar`
 
-3. Join the server using the private IP to play locally, this can be found with `ipconfig` in CMD prompt. If you have issues with connecting as a localhost, look here: https://pmmp.readthedocs.io/en/rtfd/faq/connecting/win10localhostcantconnect.html
+3. Join the server using the private IP to play locally, this can be found with `ipconfig` in CMD prompt. If you have issues with connecting as a localhost, launch Windows PowerShell as an administrator and run the following: `CheckNetIsolation LoopbackExempt -a -n="Microsoft.MinecraftUWP_8wekyb3d8bbwe"`.
 
 >KEY NOTE: Java/JRE must be installed in order to run the executable.
 
