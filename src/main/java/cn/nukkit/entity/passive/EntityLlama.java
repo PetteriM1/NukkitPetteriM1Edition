@@ -148,6 +148,11 @@ public class EntityLlama extends EntityHorseBase {
         return item.getId() == Item.WHEAT;
     }
 
+    @Override
+    public void onPlayerInput(Player player, double strafe, double forward) {
+        // can't be controlled
+    }
+
     private static int getRandomVariant() {
         return VARIANTS[Utils.rand(0, VARIANTS.length - 1)];
     }

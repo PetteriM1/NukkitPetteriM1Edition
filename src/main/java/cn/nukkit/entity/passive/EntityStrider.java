@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityControllable;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.FloatEntityData;
@@ -24,7 +25,7 @@ import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
 /**
  * @author Erik Miller | EinBexiii
  */
-public class EntityStrider extends EntityWalkingAnimal implements EntityRideable {
+public class EntityStrider extends EntityWalkingAnimal implements EntityRideable, EntityControllable {
 
     public final static int NETWORK_ID = 125;
 
@@ -123,6 +124,7 @@ public class EntityStrider extends EntityWalkingAnimal implements EntityRideable
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_SADDLED, saddled);
     }
 
+    @Override
     public void onPlayerInput(Player player, double strafe, double forward) {
         if (player.getInventory().getItemInHand().getId() == Item.CARROT_ON_A_STICK) {
             this.stayTime = 0;
