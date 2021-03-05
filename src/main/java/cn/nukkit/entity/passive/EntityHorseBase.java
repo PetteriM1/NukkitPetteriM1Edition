@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityControllable;
 import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.entity.EntityRideable;
 import cn.nukkit.entity.data.Vector3fEntityData;
@@ -24,7 +25,7 @@ import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
 /**
  * @author PetteriM1
  */
-public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideable {
+public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideable, EntityControllable {
 
     private boolean saddled;
 
@@ -154,6 +155,7 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
         return super.onUpdate(currentTick);
     }
 
+    @Override
     public void onPlayerInput(Player player, double strafe, double forward) {
         this.stayTime = 0;
         this.moveTime = 10;
