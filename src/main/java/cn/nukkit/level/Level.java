@@ -1685,12 +1685,13 @@ public class Level implements ChunkManager, Metadatable {
                     int newLevel = Block.light[chunk.getBlockId(lcx, y, lcz)];
                     if (oldLevel != newLevel) {
                         this.setBlockLightAt(x, y, z, newLevel);
+                        long hash = Hash.hashBlock(x, y, z);
                         if (newLevel < oldLevel) {
-                            removalVisited.put(Hash.hashBlock(x, y, z), changeBlocksPresent);
-                            lightRemovalQueue.add(new Object[]{Hash.hashBlock(x, y, z), oldLevel});
+                            removalVisited.put(hash, changeBlocksPresent);
+                            lightRemovalQueue.add(new Object[]{hash, oldLevel});
                         } else {
-                            visited.put(Hash.hashBlock(x, y, z), changeBlocksPresent);
-                            lightPropagationQueue.add(Hash.hashBlock(x, y, z));
+                            visited.put(hash, changeBlocksPresent);
+                            lightPropagationQueue.add(hash);
                         }
                     }
                 }
@@ -1738,19 +1739,20 @@ public class Level implements ChunkManager, Metadatable {
     private void computeRemoveBlockLight(int x, int y, int z, int currentLight, Queue<Object[]> queue,
                                          Queue<Long> spreadQueue, Map<Long, Object> visited, Map<Long, Object> spreadVisited) {
         int current = this.getBlockLightAt(x, y, z);
-        long index = Hash.hashBlock(x, y, z);
         if (current != 0 && current < currentLight) {
             this.setBlockLightAt(x, y, z, 0);
             if (current > 1) {
+                long index = Hash.hashBlock(x, y, z);
                 if (!visited.containsKey(index)) {
                     visited.put(index, changeBlocksPresent);
-                    queue.add(new Object[]{Hash.hashBlock(x, y, z), current});
+                    queue.add(new Object[]{index, current});
                 }
             }
         } else if (current >= currentLight) {
+            long index = Hash.hashBlock(x, y, z);
             if (!spreadVisited.containsKey(index)) {
                 spreadVisited.put(index, changeBlocksPresent);
-                spreadQueue.add(Hash.hashBlock(x, y, z));
+                spreadQueue.add(index);
             }
         }
     }
@@ -1758,21 +1760,20 @@ public class Level implements ChunkManager, Metadatable {
     private void computeSpreadBlockLight(int x, int y, int z, int currentLight, Queue<Long> queue,
                                          Map<Long, Object> visited) {
         int current = this.getBlockLightAt(x, y, z);
-        long index = Hash.hashBlock(x, y, z);
-
         if (current < currentLight - 1) {
             this.setBlockLightAt(x, y, z, currentLight);
 
+            long index = Hash.hashBlock(x, y, z);
             if (!visited.containsKey(index)) {
                 visited.put(index, changeBlocksPresent);
                 if (currentLight > 1) {
-                    queue.add(Hash.hashBlock(x, y, z));
+                    queue.add(index);
                 }
             }
         }
     }
 
-    private Map<Long, Map<Character, Object>> lightQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private final Map<Long, Map<Character, Object>> lightQueue = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public void addLightUpdate(int x, int y, int z) {
         long index = chunkHash(x >> 4, z >> 4);
@@ -2616,7 +2617,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public synchronized int getBlockLightAt(int x, int y, int z) {
-        return this.getChunkIfLoaded(x >> 4, z >> 4) == null ? 0 : this.getChunkIfLoaded(x >> 4, z >> 4).getBlockLight(x & 0x0f, y & 0xff, z & 0x0f);
+        BaseFullChunk chunk = this.getChunkIfLoaded(x >> 4, z >> 4);
+        return chunk == null ? 0 : chunk.getBlockLight(x & 0x0f, y & 0xff, z & 0x0f);
     }
 
     public synchronized void setBlockLightAt(int x, int y, int z, int level) {
@@ -4110,7 +4112,7 @@ public class Level implements ChunkManager, Metadatable {
             x = Math.floor(portal.getFloorX() >> 3);
             z = Math.floor(portal.getFloorZ() >> 3);
         }
-        return new Position(x, portal.getFloorY(), z, this == nether? Server.getInstance().getDefaultLevel() : nether);
+        return new Position(x, portal.getFloorY(), z, this == nether ? Server.getInstance().getDefaultLevel() : nether);
     }
 
     private ConcurrentMap<Long, Int2ObjectMap<Player>> getChunkSendQueue(int protocol) {
