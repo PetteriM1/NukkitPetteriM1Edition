@@ -191,7 +191,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             ((EntityLiving) damager).knockBack(this, 0, deltaX, deltaZ);
         }
 
-        onBlock(damager, event.getAnimation(), source.getFinalDamage());
+        onBlock(damager, event.getAnimation(), source.getDamage());
         return true;
     }
 
