@@ -6,6 +6,7 @@ import cn.nukkit.block.BlockRail;
 import cn.nukkit.block.BlockRailActivator;
 import cn.nukkit.block.BlockRailPowered;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityControllable;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.ByteEntityData;
 import cn.nukkit.entity.data.IntEntityData;
@@ -37,7 +38,7 @@ import java.util.Objects;
  * Minecart and Riding Project,
  * Package cn.nukkit.entity.item in project Nukkit.
  */
-public abstract class EntityMinecartAbstract extends EntityVehicle {
+public abstract class EntityMinecartAbstract extends EntityVehicle implements EntityControllable {
 
     private String entityName;
     private static final int[][][] matrix = new int[][][]{
@@ -651,13 +652,18 @@ public abstract class EntityMinecartAbstract extends EntityVehicle {
         }
     }
 
+    @Override
+    public void onPlayerInput(Player player, double strafe, double forward) {
+        this.setCurrentSpeed(forward);
+    }
+
     /**
      * Used to multiply the minecart current speed
      *
      * @param speed The speed of the minecart that will be calculated
      */
     public void setCurrentSpeed(double speed) {
-        currentSpeed = speed;
+        this.currentSpeed = speed;
     }
 
     private void prepareDataProperty() {

@@ -101,6 +101,11 @@ public class EntityItem extends Entity {
 
         this.item = NBTIO.getItemHelper(this.namedTag.getCompound("Item"));
 
+        int id = this.item.getId();
+        if (id >= Item.NETHERITE_INGOT && id <= Item.NETHERITE_SCRAP) {
+            this.fireProof = true; // Netherite items are fireproof
+        }
+
         this.server.getPluginManager().callEvent(new ItemSpawnEvent(this));
     }
 
@@ -131,7 +136,7 @@ public class EntityItem extends Entity {
 
         if (this.timing != null) this.timing.startTiming();
 
-        if (this.isInsideOfFire()) {
+        if (!this.fireProof && this.isInsideOfFire()) {
             this.close();
             if (this.timing != null) this.timing.stopTiming();
             return true;
@@ -307,7 +312,7 @@ public class EntityItem extends Entity {
         addEntity.speedX = (float) this.motionX;
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
-        addEntity.metadata = this.dataProperties;
+        addEntity.metadata = this.dataProperties.clone();
         addEntity.item = this.item;
         return addEntity;
     }
