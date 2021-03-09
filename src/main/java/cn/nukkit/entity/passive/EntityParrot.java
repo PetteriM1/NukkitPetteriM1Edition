@@ -70,11 +70,12 @@ public class EntityParrot extends EntityFlyingAnimal {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
+            int id = player.getInventory().getItemInHandFast().getId();
             return player.spawned && player.isAlive() && !player.closed
-                    && (player.getInventory().getItemInHand().getId() == Item.SEEDS
-                    || player.getInventory().getItemInHand().getId() == Item.BEETROOT_SEEDS
-                    || player.getInventory().getItemInHand().getId() == Item.PUMPKIN_SEEDS
-                    || player.getInventory().getItemInHand().getId() == Item.MELON_SEEDS)
+                    && (id == Item.SEEDS
+                    || id == Item.BEETROOT_SEEDS
+                    || id == Item.PUMPKIN_SEEDS
+                    || id == Item.MELON_SEEDS)
                     && distance <= 40;
         }
         return false;

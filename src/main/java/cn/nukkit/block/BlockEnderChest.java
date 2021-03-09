@@ -3,9 +3,12 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityEnderChest;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityPiglin;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -22,7 +25,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
     private static final int[] faces = {2, 5, 3, 4};
 
-    private Set<Player> viewers = new HashSet<>();
+    private final Set<Player> viewers = new HashSet<>();
 
     public BlockEnderChest() {
         this(0);
@@ -134,6 +137,12 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
             player.setViewingEnderChest(this);
             player.addWindow(player.getEnderChestInventory());
+
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
         }
 
         return true;
@@ -142,6 +151,9 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe()) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
             return new Item[]{
                     Item.get(Item.OBSIDIAN, 0, 8)
             };

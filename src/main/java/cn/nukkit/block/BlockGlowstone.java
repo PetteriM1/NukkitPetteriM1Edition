@@ -40,6 +40,10 @@ public class BlockGlowstone extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+
         int count = 2 + Utils.random.nextInt(3);
 
         Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);

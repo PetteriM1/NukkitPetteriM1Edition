@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSnowball;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockSnow extends BlockSolid {
@@ -32,6 +33,9 @@ public class BlockSnow extends BlockSolid {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShovel() && item.getTier() >= ItemTool.TIER_WOODEN) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
             return new Item[]{
                     new ItemSnowball(0, 4)
             };
