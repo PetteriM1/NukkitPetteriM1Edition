@@ -50,8 +50,8 @@ public interface ProtocolInfo {
             v1_16_100_52, v1_16_100, v1_16_200_51, v1_16_200, v1_16_210_50, v1_16_210
     );
 
-    String MINECRAFT_VERSION = "v1.16.200";
-    String MINECRAFT_VERSION_NETWORK = "1.16.200";
+    String MINECRAFT_VERSION = "v1.16.210";
+    String MINECRAFT_VERSION_NETWORK = "1.16.210";
 
     byte BATCH_PACKET = (byte) 0xff;
     byte LOGIN_PACKET = 0x01;
