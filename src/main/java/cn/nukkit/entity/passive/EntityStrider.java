@@ -225,7 +225,7 @@ public class EntityStrider extends EntityWalkingAnimal implements EntityRideable
         if (creature instanceof Player) {
             Player player = (Player) creature;
             return player.spawned && player.isAlive() && !player.closed && distance <= 40
-                    && player.getInventory().getItemInHandFast().getId() == Item.CARROT_ON_A_STICK;
+                    && player.getInventory().getItemInHandFast().getId() == Item.WARPED_FUNGUS_ON_A_STICK;
         }
         return false;
     }
