@@ -465,7 +465,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_16_200_51:
             case v1_16_200:
             case v1_16_210_50:
-            case v1_16_210_53:
+            case v1_16_210:
                 return new ArrayList<>(Item.creative407);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);

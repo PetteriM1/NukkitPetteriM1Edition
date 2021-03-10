@@ -52,6 +52,7 @@ public class EntityGhast extends EntityFlyingMob {
 
         this.fireProof = true;
         this.setMaxHealth(10);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_FIRE_IMMUNE, true);
     }
 
     @Override

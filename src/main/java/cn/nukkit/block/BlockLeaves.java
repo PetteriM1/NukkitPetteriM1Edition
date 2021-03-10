@@ -6,6 +6,7 @@ import cn.nukkit.event.block.LeavesDecayEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
@@ -88,6 +89,9 @@ public class BlockLeaves extends BlockTransparentMeta {
                     toItem()
             };
         } else {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
             if (this.canDropApple() && Utils.random.nextInt(200) == 0) {
                 return new Item[]{
                         Item.get(Item.APPLE)
