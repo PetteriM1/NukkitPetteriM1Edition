@@ -55,7 +55,8 @@ public class EntityRabbit extends EntityJumpingAnimal {
     public boolean targetOption(EntityCreature creature, double distance) {
         if (creature instanceof Player) {
             Player player = (Player) creature;
-            return player.spawned && player.isAlive() && !player.closed && player.getInventory().getItemInHand().getId() == Item.CARROT && distance <= 40;
+            int id = player.getInventory().getItemInHandFast().getId();
+            return player.spawned && player.isAlive() && !player.closed && (id == Item.CARROT || id == Item.GOLDEN_CARROT) && distance <= 40;
         }
         return false;
     }

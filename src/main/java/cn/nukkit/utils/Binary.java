@@ -113,14 +113,13 @@ public class Binary {
             int id2 = entry.getKey();
 
             // HACK: Multiversion entity data
-            if (protocol == ProtocolInfo.v1_11_0) {
-                if (id2 >= 40) {
-                    id2 = id2 + 1;
-                }
+            if (protocol >= ProtocolInfo.v1_16_210) { //TODO: update entity data
+                if (id2 == 80) id2 = 81;
+                else if (id2 == 83) id2 = 84;
+            } else if (protocol == ProtocolInfo.v1_11_0) {
+                if (id2 >= 40) id2 = id2 + 1;
             } else if (protocol <= ProtocolInfo.v1_2_10) {
-                if (id2 > 35) {
-                    id2 = id2 - 1;
-                }
+                if (id2 > 35) id2 = id2 - 1;
             }
 
             stream.putUnsignedVarInt(id2);

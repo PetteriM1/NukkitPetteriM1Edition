@@ -137,7 +137,7 @@ public class EntityLlama extends EntityHorseBase {
 
         if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
-            return player.isAlive() && !player.closed && this.isFeedItem(player.getInventory().getItemInHand()) && distance <= 40;
+            return player.isAlive() && !player.closed && this.isFeedItem(player.getInventory().getItemInHandFast()) && distance <= 40;
         }
 
         return false;
@@ -146,6 +146,11 @@ public class EntityLlama extends EntityHorseBase {
     @Override
     public boolean isFeedItem(Item item) {
         return item.getId() == Item.WHEAT;
+    }
+
+    @Override
+    public void onPlayerInput(Player player, double strafe, double forward) {
+        // can't be controlled
     }
 
     private static int getRandomVariant() {

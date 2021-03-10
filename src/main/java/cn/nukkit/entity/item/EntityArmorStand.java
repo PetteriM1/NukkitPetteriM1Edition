@@ -209,7 +209,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
         this.dataProperties.putInt(Entity.DATA_ARMOR_STAND_POSE_INDEX, pose);
         SetEntityDataPacket setEntityDataPacket = new SetEntityDataPacket();
         setEntityDataPacket.eid = this.getId();
-        setEntityDataPacket.metadata = this.getDataProperties();
+        setEntityDataPacket.metadata = this.getDataProperties().clone();
         getViewers().values().forEach(all -> all.dataPacket(setEntityDataPacket));
     }
 

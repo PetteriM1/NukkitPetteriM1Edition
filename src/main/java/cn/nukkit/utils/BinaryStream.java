@@ -280,6 +280,9 @@ public class BinaryStream {
                 this.putString(skin.getGeometryData());
             }
         } else {
+            if (protocol >= ProtocolInfo.v1_16_210) {
+                this.putString(skin.getPlayFabId());
+            }
             this.putString(skin.getSkinResourcePatch());
             this.putImage(skin.getSkinData());
 
@@ -350,6 +353,9 @@ public class BinaryStream {
     public Skin getSkin(int protocol) { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
+        if (protocol >= ProtocolInfo.v1_16_210) {
+            skin.setPlayFabId(this.getString());
+        }
         skin.setSkinResourcePatch(this.getString());
         skin.setSkinData(this.getImage());
 
@@ -496,7 +502,7 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
-        if (item.getId() == ItemID.SHIELD) {
+        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_12_0) {
             this.getVarLong();
         }
 
@@ -520,6 +526,15 @@ public class BinaryStream {
             clearData = RuntimeItems.hasData(networkFullId);
             networkId = RuntimeItems.getNetworkId(networkFullId);
         }
+
+        // Multiversion: Replace unsupported items
+        // TODO: Send the original item data in nbt and read it from there in getSlot, replace netherite items with diamond items for < 1.16
+        if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
+            networkId = Item.INFO_UPDATE;
+        } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
+            networkId = Item.INFO_UPDATE;
+        }
+
         this.putVarInt(networkId);
 
         int auxValue;
@@ -585,7 +600,7 @@ public class BinaryStream {
             this.putString(block);
         }
 
-        if (item.getId() == ItemID.SHIELD) {
+        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_12_0) {
             this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
     }

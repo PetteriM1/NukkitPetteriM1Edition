@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 
 /**
  * @author MagicDroidX
@@ -68,6 +69,9 @@ public class BlockStone extends BlockSolidMeta {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
             return new Item[]{
                     Item.get(this.getDamage() == 0 ? Item.COBBLESTONE : Item.STONE, this.getDamage(), 1)
             };

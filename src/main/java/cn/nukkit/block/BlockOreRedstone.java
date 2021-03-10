@@ -46,6 +46,9 @@ public class BlockOreRedstone extends BlockSolid {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
             int count = Utils.random.nextInt(2) + 4;
 
             Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);

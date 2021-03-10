@@ -182,7 +182,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             }
 
             for (int slot = 0; slot < 4; slot++) {
-                Item armor = damageArmor(this.inventory.getArmorItem(slot), damager, source.getFinalDamage(), false);
+                Item armor = damageArmor(this.inventory.getArmorItem(slot), damager, source.getDamage(), false);
 
                 inventory.setArmorItem(slot, armor, armor.getId() != BlockID.AIR);
             }
@@ -216,6 +216,8 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
         if (armor.isUnbreakable() || armor instanceof ItemSkull) {
             return armor;
         }
+
+        if (damage < 0) damage = 0;
 
         if (shield) {
             armor.setDamage(armor.getDamage() + damage >= 4.0f ? (int) damage : 1);

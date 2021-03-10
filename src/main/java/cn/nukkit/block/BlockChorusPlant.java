@@ -42,8 +42,9 @@ public class BlockChorusPlant extends BlockTransparent {
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (block.down().isTransparent() &&
-        !(block.down() instanceof BlockChorusPlant) &&
+        Block down = block.down();
+        if (!(down instanceof BlockEndStone) &&
+        !(down instanceof BlockChorusPlant) &&
         !(block.north() instanceof BlockChorusPlant) &&
         !(block.east() instanceof BlockChorusPlant) &&
         !(block.south() instanceof BlockChorusPlant) &&

@@ -74,7 +74,7 @@ public class EntityHorse extends EntityHorseBase {
         if (canTarget && (creature instanceof Player)) {
             Player player = (Player) creature;
             return player.spawned && player.isAlive() && !player.closed &&
-                    this.isFeedItem(player.getInventory().getItemInHand()) && distance <= 40;
+                    this.isFeedItem(player.getInventory().getItemInHandFast()) && distance <= 40;
         }
         return false;
     }

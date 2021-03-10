@@ -279,7 +279,7 @@ public class EntityFishingHook extends EntityProjectile {
 		if (this.shootingEntity != null) {
 			ownerId = this.shootingEntity.getId();
 		}
-		pk.metadata = this.dataProperties.putLong(DATA_OWNER_EID, ownerId);
+		pk.metadata = this.dataProperties.putLong(DATA_OWNER_EID, ownerId).clone();
 		player.dataPacket(pk);
 		super.spawnTo(player);
 	}

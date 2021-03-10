@@ -45,6 +45,9 @@ public class BlockOreCoal extends BlockSolid {
     @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
             int count = 1;
             Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
             if (fortune != null && fortune.getLevel() >= 1) {

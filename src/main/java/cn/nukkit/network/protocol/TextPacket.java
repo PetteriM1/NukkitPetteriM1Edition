@@ -62,9 +62,7 @@ public class TextPacket extends DataPacket {
                 }
         }
         if (protocol >= 223) {
-            if (protocol >= 361) {
-                this.xboxUserId = this.getString();
-            }
+            this.xboxUserId = this.getString();
             this.platformChatId = this.getString();
         }
     }
@@ -101,9 +99,7 @@ public class TextPacket extends DataPacket {
                 }
         }
         if (protocol >= 223) {
-            if (protocol >= 361) {
-                this.putString(this.xboxUserId);
-            }
+            this.putString(this.xboxUserId);
             this.putString(this.platformChatId);
         }
     }
