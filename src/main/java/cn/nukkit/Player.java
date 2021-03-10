@@ -3405,6 +3405,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break packetswitch;
                             }
 
+                            if (this.isBlocking()) {
+                                this.setBlocking(false);
+                            }
+
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
                                     // Hack: Fix client spamming right clicks
@@ -3630,10 +3634,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
                                     if ((target instanceof Player) && !this.level.getGameRules().getBoolean(GameRule.PVP)) {
                                         entityDamageByEntityEvent.setCancelled();
-                                    }
-
-                                    if (!entityDamageByEntityEvent.isCancelled() && this.isBlocking()) {
-                                        this.setBlocking(false);
                                     }
 
                                     if (!target.attack(entityDamageByEntityEvent)) {

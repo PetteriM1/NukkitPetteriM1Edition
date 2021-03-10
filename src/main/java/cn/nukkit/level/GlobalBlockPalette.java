@@ -39,6 +39,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator407 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator408 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator419 = new AtomicInteger(0);
+    private static final AtomicInteger runtimeIdAllocator428 = new AtomicInteger(0);
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -54,6 +55,7 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId407 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId408 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId428 = new Int2IntOpenHashMap();
     private static final byte[] compiledTable282;
     private static final byte[] compiledTable291;
     private static final byte[] compiledTable313;
@@ -82,6 +84,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId407.defaultReturnValue(-1);
         legacyToRuntimeId408.defaultReturnValue(-1);
         legacyToRuntimeId419.defaultReturnValue(-1);
+        legacyToRuntimeId428.defaultReturnValue(-1);
 
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
@@ -307,6 +310,26 @@ public class GlobalBlockPalette {
                 legacyToRuntimeId419.put(legacyId, runtimeId);
             }
         }
+        // 428
+        ListTag<CompoundTag> tag428;
+        try (InputStream stream428 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_428.dat")) {
+            if (stream428 == null) {
+                throw new AssertionError("Unable to locate block state nbt 428");
+            }
+            //noinspection unchecked
+            tag428 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream428)), ByteOrder.LITTLE_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 428", e);
+        }
+        for (CompoundTag state : tag428.getAll()) {
+            int runtimeId = runtimeIdAllocator428.getAndIncrement();
+            if (!state.contains("LegacyStates")) continue;
+            List<CompoundTag> legacyStates = state.getList("LegacyStates", CompoundTag.class).getAll();
+            for (CompoundTag legacyState : legacyStates) {
+                int legacyId = legacyState.getInt("id") << 6 | legacyState.getShort("val");
+                legacyToRuntimeId428.put(legacyId, runtimeId);
+            }
+        }
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
@@ -378,7 +401,6 @@ public class GlobalBlockPalette {
             case 420:
             case 422:
             case ProtocolInfo.v1_16_210_50:
-            case ProtocolInfo.v1_16_210_53:
                 int id419 = legacyToRuntimeId419.get(legacyId);
                 if (id419 == -1) {
                     id419 = legacyToRuntimeId419.get(id << 6);
@@ -389,6 +411,17 @@ public class GlobalBlockPalette {
                     }
                 }
                 return id419;
+            case ProtocolInfo.v1_16_210:
+                int id428 = legacyToRuntimeId428.get(legacyId);
+                if (id428 == -1) {
+                    id428 = legacyToRuntimeId428.get(id << 6);
+                    if (id428 == -1) {
+                        log.info("(428) Creating new runtime ID for unknown block {}", id);
+                        id428 = runtimeIdAllocator428.getAndIncrement();
+                        legacyToRuntimeId428.put(id << 6, id428);
+                    }
+                }
+                return id428;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }

@@ -97,8 +97,8 @@ public class BlockFire extends BlockFlowable {
 
             return Level.BLOCK_UPDATE_NORMAL;
         } else if (type == Level.BLOCK_UPDATE_SCHEDULED && this.level.gameRules.getBoolean(GameRule.DO_FIRE_TICK)) {
-    
-            boolean forever = this.down().getId() == Block.NETHERRACK || this.down().getId() == Block.MAGMA;
+            Block down = this.down();
+            boolean forever = down.getId() == NETHERRACK || down.getId() == MAGMA || (down.getId() == BEDROCK && level.getDimension() == Level.DIMENSION_THE_END);
 
             if (!forever && this.getLevel().isRaining() &&
                     (this.getLevel().canBlockSeeSky(this) ||
@@ -121,7 +121,7 @@ public class BlockFire extends BlockFlowable {
                 return 0;
             }
 
-            if (!this.isBlockTopFacingSurfaceSolid(this.down()) && !this.canNeighborBurn()) {
+            if (!this.isBlockTopFacingSurfaceSolid(down) && !this.canNeighborBurn()) {
                 this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
                 return 0;
             }
