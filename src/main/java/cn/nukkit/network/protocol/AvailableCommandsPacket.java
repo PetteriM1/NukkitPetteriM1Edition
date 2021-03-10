@@ -294,6 +294,16 @@ public class AvailableCommandsPacket extends DataPacket {
                                         id = ARG_TYPE_COMMAND_PRE388;
                                         break;
                                 }
+                            } else if (protocol >= ProtocolInfo.v1_16_210) { //TODO: proper implementation for 1.16.210 command params
+                                if (id == ARG_TYPE_COMMAND) {
+                                    id = 63;
+                                } else if (id == ARG_TYPE_FILE_PATH) {
+                                    id = id + 2; // +1 from .100 and +1 from .210
+                                } else if (id >= ARG_TYPE_STRING) {
+                                    id = id + 3; // +2 from .100 and +1 from .210
+                                } else if (id >= ARG_TYPE_FLOAT) {
+                                    id++;
+                                }
                             } else if (protocol >= ProtocolInfo.v1_16_100) { //TODO: proper implementation for 1.16.100 command params
                                 if (id == ARG_TYPE_FILE_PATH) {
                                     id++;
