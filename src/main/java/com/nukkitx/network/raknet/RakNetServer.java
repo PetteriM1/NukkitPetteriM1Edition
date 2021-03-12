@@ -154,9 +154,9 @@ public class RakNetServer extends RakNet {
 
         RakNetServerSession session = this.sessionsByAddress.get(packet.sender());
 
-        if (session != null /*&& session.getState() == RakNetState.CONNECTED*/) {
-            //this.sendAlreadyConnected(ctx, packet.sender());
-            Server.getInstance().getLogger().debug("The client was already connected. Trying to ignore that and continue.");
+        if (session != null && session.getState() == RakNetState.CONNECTED) {
+            this.sendAlreadyConnected(ctx, packet.sender());
+            //Server.getInstance().getLogger().debug("The client was already connected. Trying to ignore that and continue.");
         /*} else if (this.maxConnections >= 0 && this.maxConnections <= getSessionCount()) {
             this.sendNoFreeIncomingConnections(ctx, packet.sender());*/
         } else if (this.listener != null && !this.listener.onConnectionRequest(packet.sender())) {
@@ -177,8 +177,8 @@ public class RakNetServer extends RakNet {
                     Server.getInstance().getLogger().warning("Unable to create session for " + packet.sender().getHostName() + ": listener is null");
                 }
             }
-        //} else {
-        //    session.sendOpenConnectionReply1(); // Probably a packet loss occurred, send the reply again
+        } else {
+            session.sendOpenConnectionReply1(); // Probably a packet loss occurred, send the reply again
         }
     }
 
