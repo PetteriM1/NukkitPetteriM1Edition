@@ -110,19 +110,18 @@ public class Binary {
         stream.putUnsignedVarInt(map.size());
         for (Map.Entry<Integer, EntityData> entry : map.entrySet()) {
             EntityData d = entry.getValue();
-            int id2 = entry.getKey();
+            int id = entry.getKey();
 
             // HACK: Multiversion entity data
             if (protocol >= ProtocolInfo.v1_16_210) { //TODO: update entity data
-                if (id2 == 80) id2 = 81;
-                else if (id2 == 83) id2 = 84;
+                if (id >= 60) id = id + 1;
             } else if (protocol == ProtocolInfo.v1_11_0) {
-                if (id2 >= 40) id2 = id2 + 1;
+                if (id >= 40) id = id + 1;
             } else if (protocol <= ProtocolInfo.v1_2_10) {
-                if (id2 > 35) id2 = id2 - 1;
+                if (id > 35) id = id - 1;
             }
 
-            stream.putUnsignedVarInt(id2);
+            stream.putUnsignedVarInt(id);
             stream.putUnsignedVarInt(d.getType());
 
             switch (d.getType()) {
