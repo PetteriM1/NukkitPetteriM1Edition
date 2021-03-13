@@ -126,7 +126,7 @@ public class EntityStrider extends EntityWalkingAnimal implements EntityRideable
 
     @Override
     public void onPlayerInput(Player player, double strafe, double forward) {
-        if (player.getInventory().getItemInHand().getId() == Item.CARROT_ON_A_STICK) {
+        if (player.getInventory().getItemInHandFast().getId() == Item.WARPED_FUNGUS_ON_A_STICK) {
             this.stayTime = 0;
             this.moveTime = 10;
             this.yaw = player.yaw;
@@ -225,7 +225,7 @@ public class EntityStrider extends EntityWalkingAnimal implements EntityRideable
         if (creature instanceof Player) {
             Player player = (Player) creature;
             return player.spawned && player.isAlive() && !player.closed && distance <= 40
-                    && player.getInventory().getItemInHand().getId() == Item.CARROT_ON_A_STICK;
+                    && player.getInventory().getItemInHandFast().getId() == Item.WARPED_FUNGUS_ON_A_STICK;
         }
         return false;
     }

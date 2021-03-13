@@ -41,7 +41,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     private final RakNetServer raknet;
 
-    private Set<NukkitSessionListener> sessionListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<NukkitSessionListener> sessionListeners = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private byte[] advertisement;
 

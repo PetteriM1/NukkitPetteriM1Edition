@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityPiglin;
 import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -166,6 +168,12 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
             }
 
             player.addWindow(chest.getInventory());
+
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
         }
 
         return true;
@@ -198,5 +206,20 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     @Override
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public boolean onBreak(Item item, Player player) {
+        boolean broken = this.onBreak(item);
+
+        if (broken && player != null) {
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
+        }
+
+        return broken;
     }
 }

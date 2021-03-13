@@ -280,6 +280,9 @@ public class BinaryStream {
                 this.putString(skin.getGeometryData());
             }
         } else {
+            if (protocol >= ProtocolInfo.v1_16_210) {
+                this.putString(skin.getPlayFabId());
+            }
             this.putString(skin.getSkinResourcePatch());
             this.putImage(skin.getSkinData());
 
@@ -350,6 +353,9 @@ public class BinaryStream {
     public Skin getSkin(int protocol) { // Can be used only with protocol >= 388
         Skin skin = new Skin();
         skin.setSkinId(this.getString());
+        if (protocol >= ProtocolInfo.v1_16_210) {
+            skin.setPlayFabId(this.getString());
+        }
         skin.setSkinResourcePatch(this.getString());
         skin.setSkinData(this.getImage());
 

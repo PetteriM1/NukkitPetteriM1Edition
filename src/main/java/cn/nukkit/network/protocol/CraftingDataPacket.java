@@ -161,7 +161,7 @@ public class CraftingDataPacket extends DataPacket {
                     case MULTI:
                         if (protocol >= ProtocolInfo.v1_16_0) { // ??
                             this.putUUID(((MultiRecipe) recipe).getId());
-                            this.putUnsignedVarInt(0);
+                            this.putUnsignedVarInt(((MultiRecipe) recipe).getNetworkId());
                             break;
                         }
                 }

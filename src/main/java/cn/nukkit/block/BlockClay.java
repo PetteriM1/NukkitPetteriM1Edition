@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemClay;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -37,6 +38,9 @@ public class BlockClay extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
         return new Item[]{
                 new ItemClay(0, 4)
         };

@@ -196,7 +196,7 @@ public class BlockCocoa extends BlockTransparentMeta implements Faceable {
     public Item[] getDrops(Item item) {
         if (this.getDamage() >= 8) {
             return new Item[]{
-                    new ItemDye(3, 3)
+                    new ItemDye(3, Utils.rand(2, 3))
             };
         } else {
             return new Item[]{

@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemPrismarineCrystals;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
@@ -34,6 +35,9 @@ public class BlockSeaLantern extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
         return new Item[]{
                 new ItemPrismarineCrystals(0, Utils.random.nextInt(2, 4))
         };
