@@ -11,10 +11,23 @@ import java.net.InetSocketAddress;
 public interface RakNetServerListener {
 
     /**
+     * Called when a new connection is attempted
+     *
+     * @param address address of the connection
+     * @param realAddress address of the real connection - different generally only when server has PROXY protocol enabled
+     * @return whether the user should be accepted or not
+     */
+    default boolean onConnectionRequest(InetSocketAddress address, InetSocketAddress realAddress) {
+        return onConnectionRequest(address);
+    }
+
+    /**
      * @param address address of user requesting connection
      * @return whether the user should be accepted or not
      */
-    boolean onConnectionRequest(InetSocketAddress address);
+    default boolean onConnectionRequest(InetSocketAddress address) {
+        throw new UnsupportedOperationException("RakNetServerListener#onConnectionRequest is not implemented");
+    }
 
     /**
      * Called when an unconnected client pings the server to retrieve it's status and MOTD.
