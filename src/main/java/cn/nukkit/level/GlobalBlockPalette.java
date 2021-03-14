@@ -312,14 +312,14 @@ public class GlobalBlockPalette {
         }
         // 428
         ListTag<CompoundTag> tag428;
-        try (InputStream stream428 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_419.dat")) {
+        try (InputStream stream428 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_428.dat")) {
             if (stream428 == null) {
-                throw new AssertionError("Unable to locate block state nbt 419");
+                throw new AssertionError("Unable to locate block state nbt 428");
             }
             //noinspection unchecked
             tag428 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream428)), ByteOrder.LITTLE_ENDIAN, false);
         } catch (IOException e) {
-            throw new AssertionError("Unable to load block palette 419", e);
+            throw new AssertionError("Unable to load block palette 428", e);
         }
         for (CompoundTag state : tag428.getAll()) {
             int runtimeId = runtimeIdAllocator428.getAndIncrement();
