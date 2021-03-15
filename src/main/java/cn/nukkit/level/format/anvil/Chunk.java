@@ -11,14 +11,22 @@ import cn.nukkit.level.format.generic.BaseChunk;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.utils.*;
+import cn.nukkit.utils.BinaryStream;
+import cn.nukkit.utils.BlockUpdateEntry;
+import cn.nukkit.utils.ChunkException;
+import cn.nukkit.utils.Zlib;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author MagicDroidX
@@ -78,7 +86,7 @@ public class Chunk extends BaseChunk {
             }
         }
 
-        Map<Integer, Integer> extraData = new HashMap<>();
+        Int2IntMap extraData = new Int2IntOpenHashMap();
 
         Tag extra = nbt.get("ExtraData");
         if (extra instanceof ByteArrayTag) {
@@ -140,9 +148,9 @@ public class Chunk extends BaseChunk {
                         @SuppressWarnings("unchecked")
                         Class<? extends Block> clazz = (Class<? extends Block>) Class.forName("cn.nukkit.block." + name);
 
-                        Constructor constructor = clazz.getDeclaredConstructor();
+                        Constructor<? extends Block> constructor = clazz.getDeclaredConstructor();
                         constructor.setAccessible(true);
-                        block = (Block) constructor.newInstance();
+                        block = constructor.newInstance();
                     }
                 } catch (Throwable e) {
                     continue;
@@ -210,7 +218,7 @@ public class Chunk extends BaseChunk {
         tag.put("V", new ByteTag("V", (byte) 1));
 
         tag.put("TerrainGenerated", new ByteTag("TerrainGenerated", (byte) (isGenerated() ? 1 : 0)));
-        tag.put("TerrainPopulated", new ByteTag("TerrainPopulated", (byte) (terrainPopulated ? 1 : 0)));
+        tag.put("TerrainPopulated", new ByteTag("TerrainPopulated", (byte) (isPopulated() ? 1 : 0)));
 
         return tag;
     }

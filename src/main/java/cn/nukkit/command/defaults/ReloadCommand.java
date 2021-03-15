@@ -23,11 +23,15 @@ public class ReloadCommand extends VanillaCommand {
             return true;
         }
 
-        Command.broadcastCommandMessage(sender, new TranslationContainer(TextFormat.YELLOW + "%nukkit.command.reload.reloading" + TextFormat.WHITE));
+        if (args.length > 0 && "true".equals(args[0])) {
+            Command.broadcastCommandMessage(sender, new TranslationContainer(TextFormat.YELLOW + "%nukkit.command.reload.reloading" + TextFormat.WHITE));
 
-        sender.getServer().reload();
+            sender.getServer().reload();
 
-        Command.broadcastCommandMessage(sender, new TranslationContainer(TextFormat.YELLOW + "%nukkit.command.reload.reloaded" + TextFormat.WHITE));
+            Command.broadcastCommandMessage(sender, new TranslationContainer(TextFormat.YELLOW + "%nukkit.command.reload.reloaded" + TextFormat.WHITE));
+        }else {
+            sender.sendMessage(TextFormat.RED + "reload命令会导致部分插件报错,如确定执行请使用: /reload true");
+        }
 
         return true;
     }
