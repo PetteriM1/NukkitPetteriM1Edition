@@ -482,7 +482,7 @@ public class BinaryStream {
                 int originalID = tag
                         .getCompound("NukkitPetteriM1Edition")
                         .getInt("OriginalID");
-                if (originalID != 0) {
+                if (originalID >= Item.LODESTONECOMPASS && originalID <= Item.NETHERITE_SCRAP) {
                     id = originalID;
                     tag.remove("NukkitPetteriM1Edition");
                     if (tag.isEmpty()) {
