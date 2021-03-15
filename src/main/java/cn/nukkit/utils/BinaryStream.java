@@ -2,7 +2,10 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDurable;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.math.BlockFace;
@@ -532,7 +535,38 @@ public class BinaryStream {
         if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
             networkId = Item.INFO_UPDATE;
         } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
-            networkId = Item.INFO_UPDATE;
+            switch (networkId) {
+                case Item.NETHERITE_SWORD:
+                    networkId = Item.DIAMOND_SWORD;
+                    break;
+                case Item.NETHERITE_SHOVEL:
+                    networkId = Item.DIAMOND_SHOVEL;
+                    break;
+                case Item.NETHERITE_PICKAXE:
+                    networkId = Item.DIAMOND_PICKAXE;
+                    break;
+                case Item.NETHERITE_AXE:
+                    networkId = Item.DIAMOND_AXE;
+                    break;
+                case Item.NETHERITE_HOE:
+                    networkId = Item.DIAMOND_HOE;
+                    break;
+                case Item.NETHERITE_HELMET:
+                    networkId = Item.DIAMOND_HELMET;
+                    break;
+                case Item.NETHERITE_CHESTPLATE:
+                    networkId = Item.DIAMOND_CHESTPLATE;
+                    break;
+                case Item.NETHERITE_LEGGINGS:
+                    networkId = Item.DIAMOND_LEGGINGS;
+                    break;
+                case Item.NETHERITE_BOOTS:
+                    networkId = Item.DIAMOND_BOOTS;
+                    break;
+                default:
+                    networkId = Item.INFO_UPDATE;
+                    break;
+            }
         }
 
         this.putVarInt(networkId);
