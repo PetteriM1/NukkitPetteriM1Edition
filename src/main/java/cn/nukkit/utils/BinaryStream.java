@@ -476,6 +476,26 @@ public class BinaryStream {
             canDestroy[i] = this.getString();
         }
 
+        try {
+            if (nbt.length > 0) {
+                CompoundTag tag = Item.parseCompoundTag(nbt.clone());
+                int originalID = tag
+                        .getCompound("NukkitPetteriM1Edition")
+                        .getInt("OriginalID");
+                if (originalID != 0) {
+                    id = originalID;
+                    tag.remove("NukkitPetteriM1Edition");
+                    if (tag.isEmpty()) {
+                        nbt = null;
+                    }else {
+                        nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Item item = Item.get(
                 id, data, cnt, nbt
         );
@@ -532,9 +552,11 @@ public class BinaryStream {
 
         // Multiversion: Replace unsupported items
         // TODO: Send the original item data in nbt and read it from there in getSlot, replace netherite items with diamond items for < 1.16
+        boolean needOriginalID = false;
         if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
             networkId = Item.INFO_UPDATE;
         } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
+            needOriginalID = true;
             switch (networkId) {
                 case Item.NETHERITE_SWORD:
                     networkId = Item.DIAMOND_SWORD;
@@ -611,6 +633,11 @@ public class BinaryStream {
                     }
                     if (isDurable) {
                         tag.putInt("Damage", item.getDamage());
+                    }
+
+                    if (needOriginalID) {
+                        tag.putCompound("NukkitPetteriM1Edition",
+                                new CompoundTag().putInt("OriginalID", item.getId()));
                     }
 
                     this.putLShort(0xffff);
