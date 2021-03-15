@@ -486,7 +486,7 @@ public class BinaryStream {
                     id = originalID;
                     tag.remove("NukkitPetteriM1Edition");
                     if (tag.isEmpty()) {
-                        nbt = null;
+                        nbt = new byte[0];
                     }else {
                         nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
                     }
@@ -551,7 +551,6 @@ public class BinaryStream {
         }
 
         // Multiversion: Replace unsupported items
-        // TODO: Send the original item data in nbt and read it from there in getSlot, replace netherite items with diamond items for < 1.16
         boolean needOriginalID = false;
         if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
             networkId = Item.INFO_UPDATE;
