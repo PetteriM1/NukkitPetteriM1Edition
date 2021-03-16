@@ -565,12 +565,12 @@ public class BinaryStream {
         }
 
         // Multiversion: Replace unsupported items
-        boolean needOriginalID = false;
+        boolean saveOriginalID = false;
         if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
-            needOriginalID = true; //TODO test
+            saveOriginalID = true;
             networkId = Item.INFO_UPDATE;
         } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
-            needOriginalID = true;
+            saveOriginalID = true;
             switch (networkId) {
                 case Item.NETHERITE_SWORD:
                     networkId = Item.DIAMOND_SWORD;
@@ -633,7 +633,9 @@ public class BinaryStream {
 
         this.putVarInt(auxValue);
 
-        if (item.hasCompoundTag() || (isDurable && protocolId >= ProtocolInfo.v1_12_0) || needOriginalID) {
+        if (item.hasCompoundTag() ||
+                (isDurable && protocolId >= ProtocolInfo.v1_12_0) ||
+                (saveOriginalID && protocolId >= ProtocolInfo.v1_12_0)) {
             if (protocolId < ProtocolInfo.v1_12_0) {
                 byte[] nbt = item.getCompoundTag();
                 this.putLShort(nbt.length);
@@ -655,7 +657,7 @@ public class BinaryStream {
                         tag.putInt("Damage", item.getDamage());
                     }
 
-                    if (needOriginalID) {
+                    if (saveOriginalID) {
                         tag.putCompound(NukkitPetteriM1EditionTag,
                                 new CompoundTag().putInt("OriginalID", item.getId()));
                     }
