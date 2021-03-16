@@ -479,15 +479,25 @@ public class BinaryStream {
         try {
             if (nbt.length > 0) {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
-                int originalID = tag
-                        .getCompound("NukkitPetteriM1Edition")
-                        .getInt("OriginalID");
-                if (originalID >= Item.LODESTONECOMPASS && originalID <= Item.NETHERITE_SCRAP) {
-                    id = originalID;
+                if (tag.contains("NukkitPetteriM1Edition")) {
+                    int originalID = tag.getCompound("NukkitPetteriM1Edition").getInt("OriginalID");
+                    if (/*(id == Item.INFO_UPDATE && originalID != 0) ||*/ //The client not send Item.INFO_UPDATE packets
+                            (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
+                            (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
+                            (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
+                            (id == Item.DIAMOND_AXE && originalID == Item.NETHERITE_AXE) ||
+                            (id == Item.DIAMOND_HOE && originalID == Item.NETHERITE_HOE) ||
+                            (id == Item.DIAMOND_HELMET && originalID == Item.NETHERITE_HELMET) ||
+                            (id == Item.DIAMOND_CHESTPLATE && originalID == Item.NETHERITE_CHESTPLATE) ||
+                            (id == Item.DIAMOND_LEGGINGS && originalID == Item.NETHERITE_LEGGINGS) ||
+                            (id == Item.DIAMOND_BOOTS && originalID == Item.NETHERITE_BOOTS)) {
+                        id = originalID;
+                    }
+
                     tag.remove("NukkitPetteriM1Edition");
                     if (tag.isEmpty()) {
                         nbt = new byte[0];
-                    }else {
+                    } else {
                         nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
                     }
                 }
