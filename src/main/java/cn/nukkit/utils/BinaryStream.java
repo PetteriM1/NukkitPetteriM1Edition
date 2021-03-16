@@ -566,48 +566,59 @@ public class BinaryStream {
 
         // Multiversion: Replace unsupported items
         boolean saveOriginalID = false;
-        if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
-            saveOriginalID = true;
-            networkId = Item.INFO_UPDATE;
-        } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
-            saveOriginalID = true;
-            switch (networkId) {
-                case Item.NETHERITE_SWORD:
-                    networkId = Item.DIAMOND_SWORD;
-                    break;
-                case Item.NETHERITE_SHOVEL:
-                    networkId = Item.DIAMOND_SHOVEL;
-                    break;
-                case Item.NETHERITE_PICKAXE:
-                    networkId = Item.DIAMOND_PICKAXE;
-                    break;
-                case Item.NETHERITE_AXE:
-                    networkId = Item.DIAMOND_AXE;
-                    break;
-                case Item.NETHERITE_HOE:
-                    networkId = Item.DIAMOND_HOE;
-                    break;
-                case Item.NETHERITE_HELMET:
-                    networkId = Item.DIAMOND_HELMET;
-                    break;
-                case Item.NETHERITE_CHESTPLATE:
-                    networkId = Item.DIAMOND_CHESTPLATE;
-                    break;
-                case Item.NETHERITE_LEGGINGS:
-                    networkId = Item.DIAMOND_LEGGINGS;
-                    break;
-                case Item.NETHERITE_BOOTS:
-                    networkId = Item.DIAMOND_BOOTS;
-                    break;
-                case Item.WARPED_FUNGUS_ON_A_STICK:
-                    networkId = Item.CARROT_ON_A_STICK;
-                    break;
-                case Item.RECORD_PIGSTEP:
-                    networkId = Item.RECORD_13;
-                    break;
-                default:
-                    networkId = Item.INFO_UPDATE;
-                    break;
+        if (protocolId < ProtocolInfo.v1_16_0) {
+            if (networkId >= Item.LODESTONECOMPASS) {
+                saveOriginalID = true;
+                switch (networkId) {
+                    case Item.NETHERITE_SWORD:
+                        networkId = Item.DIAMOND_SWORD;
+                        break;
+                    case Item.NETHERITE_SHOVEL:
+                        networkId = Item.DIAMOND_SHOVEL;
+                        break;
+                    case Item.NETHERITE_PICKAXE:
+                        networkId = Item.DIAMOND_PICKAXE;
+                        break;
+                    case Item.NETHERITE_AXE:
+                        networkId = Item.DIAMOND_AXE;
+                        break;
+                    case Item.NETHERITE_HOE:
+                        networkId = Item.DIAMOND_HOE;
+                        break;
+                    case Item.NETHERITE_HELMET:
+                        networkId = Item.DIAMOND_HELMET;
+                        break;
+                    case Item.NETHERITE_CHESTPLATE:
+                        networkId = Item.DIAMOND_CHESTPLATE;
+                        break;
+                    case Item.NETHERITE_LEGGINGS:
+                        networkId = Item.DIAMOND_LEGGINGS;
+                        break;
+                    case Item.NETHERITE_BOOTS:
+                        networkId = Item.DIAMOND_BOOTS;
+                        break;
+                    case Item.WARPED_FUNGUS_ON_A_STICK:
+                        networkId = Item.CARROT_ON_A_STICK;
+                        break;
+                    case Item.RECORD_PIGSTEP:
+                        networkId = Item.RECORD_13;
+                        break;
+                    default:
+                        networkId = Item.INFO_UPDATE;
+                        break;
+                }
+            } else {
+                if (protocolId < ProtocolInfo.v1_14_0) {
+                    if (networkId == Item.HONEYCOMB) {
+                        saveOriginalID = true;
+                        networkId = Item.INFO_UPDATE;
+                    } else if (protocolId < ProtocolInfo.v1_13_0) {
+                        if (networkId == Item.SUSPICIOUS_STEW) {
+                            saveOriginalID = true;
+                            networkId = Item.INFO_UPDATE;
+                        }
+                    }
+                }
             }
         }
 
