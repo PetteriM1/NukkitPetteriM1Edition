@@ -492,7 +492,9 @@ public class BinaryStream {
                             (id == Item.DIAMOND_HELMET && originalID == Item.NETHERITE_HELMET) ||
                             (id == Item.DIAMOND_CHESTPLATE && originalID == Item.NETHERITE_CHESTPLATE) ||
                             (id == Item.DIAMOND_LEGGINGS && originalID == Item.NETHERITE_LEGGINGS) ||
-                            (id == Item.DIAMOND_BOOTS && originalID == Item.NETHERITE_BOOTS)) {
+                            (id == Item.DIAMOND_BOOTS && originalID == Item.NETHERITE_BOOTS) ||
+                            (id == Item.CARROT_ON_A_STICK && originalID == Item.WARPED_FUNGUS_ON_A_STICK) ||
+                            (id == Item.RECORD_13 && originalID == Item.RECORD_PIGSTEP)) {
                         id = originalID;
                     }
 
@@ -596,6 +598,12 @@ public class BinaryStream {
                     break;
                 case Item.NETHERITE_BOOTS:
                     networkId = Item.DIAMOND_BOOTS;
+                    break;
+                case Item.WARPED_FUNGUS_ON_A_STICK:
+                    networkId = Item.CARROT_ON_A_STICK;
+                    break;
+                case Item.RECORD_PIGSTEP:
+                    networkId = Item.RECORD_13;
                     break;
                 default:
                     networkId = Item.INFO_UPDATE;
