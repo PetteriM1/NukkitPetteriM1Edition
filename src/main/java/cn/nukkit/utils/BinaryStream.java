@@ -407,6 +407,8 @@ public class BinaryStream {
         return skin;
     }
 
+    private static final String NukkitPetteriM1EditionTag = "NukkitPetteriM1Edition";
+
     public Item getSlot() {
         return this.getSlot(ProtocolInfo.CURRENT_PROTOCOL);
     }
@@ -479,8 +481,8 @@ public class BinaryStream {
         try {
             if (nbt.length > 0) {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
-                if (tag.contains("NukkitPetteriM1Edition")) {
-                    int originalID = tag.getCompound("NukkitPetteriM1Edition").getInt("OriginalID");
+                if (tag.contains(NukkitPetteriM1EditionTag)) {
+                    int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
                     if ((id == Item.INFO_UPDATE && originalID != 0) ||
                             (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
                             (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
@@ -494,7 +496,7 @@ public class BinaryStream {
                         id = originalID;
                     }
 
-                    tag.remove("NukkitPetteriM1Edition");
+                    tag.remove(NukkitPetteriM1EditionTag);
                     if (tag.isEmpty()) {
                         nbt = new byte[0];
                     } else {
@@ -646,7 +648,7 @@ public class BinaryStream {
                     }
 
                     if (needOriginalID) {
-                        tag.putCompound("NukkitPetteriM1Edition",
+                        tag.putCompound(NukkitPetteriM1EditionTag,
                                 new CompoundTag().putInt("OriginalID", item.getId()));
                     }
 
