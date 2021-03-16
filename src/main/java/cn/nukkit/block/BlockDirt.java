@@ -64,6 +64,16 @@ public class BlockDirt extends BlockSolidMeta {
                 }
                 return true;
             }
+        } else if (item.isShovel()) {
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
+                if (player != null) {
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
+                }
+                return true;
+            }
         }
 
         return false;

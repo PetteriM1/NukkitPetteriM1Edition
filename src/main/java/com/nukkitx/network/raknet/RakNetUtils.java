@@ -4,29 +4,11 @@ import com.nukkitx.network.raknet.util.IntRange;
 import io.netty.buffer.ByteBuf;
 import lombok.experimental.UtilityClass;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Queue;
 
 @UtilityClass
 public class RakNetUtils {
-
-    public static final InetSocketAddress LOOPBACK_V4 = new InetSocketAddress(Inet4Address.getLoopbackAddress(), 19132);
-    public static final InetSocketAddress LOOPBACK_V6 = new InetSocketAddress(Inet6Address.getLoopbackAddress(), 19132);
-    public static final InetSocketAddress[] LOCAL_IP_ADDRESSES_V4 = new InetSocketAddress[20];
-    public static final InetSocketAddress[] LOCAL_IP_ADDRESSES_V6 = new InetSocketAddress[20];
-
-    static {
-        LOCAL_IP_ADDRESSES_V4[0] = LOOPBACK_V4;
-        LOCAL_IP_ADDRESSES_V6[0] = LOOPBACK_V6;
-
-        for (int i = 1; i < 20; i++) {
-            LOCAL_IP_ADDRESSES_V4[i] = new InetSocketAddress("0.0.0.0", 19132);
-            LOCAL_IP_ADDRESSES_V6[i] = new InetSocketAddress("::0", 19132);
-        }
-    }
 
     public static void writeIntRanges(ByteBuf buffer, Queue<IntRange> ackQueue, int mtu) {
         int lengthIndex = buffer.writerIndex();
