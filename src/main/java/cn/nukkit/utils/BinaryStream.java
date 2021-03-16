@@ -483,7 +483,7 @@ public class BinaryStream {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains(NukkitPetteriM1EditionTag)) {
                     int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
-                    if ((id == Item.INFO_UPDATE && originalID != 0) ||
+                    if ((id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
                             (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
                             (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
                             (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
