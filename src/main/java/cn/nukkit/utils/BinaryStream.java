@@ -609,7 +609,7 @@ public class BinaryStream {
                 }
             } else {
                 if (protocolId < ProtocolInfo.v1_14_0) {
-                    if (networkId == Item.HONEYCOMB) {
+                    if (networkId == Item.HONEYCOMB || networkId == Item.HONEY_BOTTLE) {
                         saveOriginalID = true;
                         networkId = Item.INFO_UPDATE;
                     } else if (protocolId < ProtocolInfo.v1_13_0) {
