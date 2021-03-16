@@ -481,7 +481,7 @@ public class BinaryStream {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains("NukkitPetteriM1Edition")) {
                     int originalID = tag.getCompound("NukkitPetteriM1Edition").getInt("OriginalID");
-                    if (/*(id == Item.INFO_UPDATE && originalID != 0) ||*/ //The client not send Item.INFO_UPDATE packets
+                    if ((id == Item.INFO_UPDATE && originalID != 0) ||
                             (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
                             (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
                             (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
@@ -563,6 +563,7 @@ public class BinaryStream {
         // Multiversion: Replace unsupported items
         boolean needOriginalID = false;
         if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
+            needOriginalID = true; //TODO test
             networkId = Item.INFO_UPDATE;
         } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
             needOriginalID = true;
@@ -622,7 +623,7 @@ public class BinaryStream {
 
         this.putVarInt(auxValue);
 
-        if (item.hasCompoundTag() || (isDurable && protocolId >= ProtocolInfo.v1_12_0)) {
+        if (item.hasCompoundTag() || (isDurable && protocolId >= ProtocolInfo.v1_12_0) || needOriginalID) {
             if (protocolId < ProtocolInfo.v1_12_0) {
                 byte[] nbt = item.getCompoundTag();
                 this.putLShort(nbt.length);
