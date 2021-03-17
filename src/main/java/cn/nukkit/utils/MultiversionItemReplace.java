@@ -39,7 +39,25 @@ public class MultiversionItemReplace {
                 return node.getNewId();
             }
         }
+        //Check some items that have no corresponding items, but are not supported by the lower version
+        if ((protocolId < ProtocolInfo.v1_16_0 && originalId >= Item.LODESTONECOMPASS) ||
+                (protocolId < ProtocolInfo.v1_14_0 && originalId >= Item.HONEYCOMB) ||
+                (protocolId < ProtocolInfo.v1_13_0 && originalId >= Item.SUSPICIOUS_STEW)) {
+            return Item.INFO_UPDATE;
+        }
         return 0;
+    }
+
+    public static boolean checkOriginalId(int originalId, int newId) {
+        //TODO improve
+        if (newId == Item.INFO_UPDATE && originalId > Item.SUSPICIOUS_STEW) {
+            return true;
+        }
+        if (NODE_MAP.containsKey(originalId)) {
+            Node node = NODE_MAP.get(originalId);
+            return node.getNewId() == newId;
+        }
+        return false;
     }
 
 

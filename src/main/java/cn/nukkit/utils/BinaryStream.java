@@ -482,22 +482,13 @@ public class BinaryStream {
             if (nbt.length > 0) {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains(NukkitPetteriM1EditionTag)) {
+
                     int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
-                    if ((id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
-                            (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
-                            (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
-                            (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
-                            (id == Item.DIAMOND_AXE && originalID == Item.NETHERITE_AXE) ||
-                            (id == Item.DIAMOND_HOE && originalID == Item.NETHERITE_HOE) ||
-                            (id == Item.DIAMOND_HELMET && originalID == Item.NETHERITE_HELMET) ||
-                            (id == Item.DIAMOND_CHESTPLATE && originalID == Item.NETHERITE_CHESTPLATE) ||
-                            (id == Item.DIAMOND_LEGGINGS && originalID == Item.NETHERITE_LEGGINGS) ||
-                            (id == Item.DIAMOND_BOOTS && originalID == Item.NETHERITE_BOOTS) ||
-                            (id == Item.CARROT_ON_A_STICK && originalID == Item.WARPED_FUNGUS_ON_A_STICK) ||
-                            (id == Item.RECORD_13 && originalID == Item.RECORD_PIGSTEP)) {
+                    if (MultiversionItemReplace.checkOriginalId(originalID, id)) {
                         id = originalID;
                     }
 
+                    //保持nbt不变 Keep nbt the same
                     tag.remove(NukkitPetteriM1EditionTag);
                     if (tag.isEmpty()) {
                         nbt = new byte[0];
@@ -572,63 +563,6 @@ public class BinaryStream {
             clearData = RuntimeItems.hasData(networkFullId);
             networkId = RuntimeItems.getNetworkId(networkFullId);
         }
-
-
-       /* if (protocolId < ProtocolInfo.v1_16_0) {
-            if (networkId >= Item.LODESTONECOMPASS) {
-                saveOriginalID = true;
-                switch (networkId) {
-                    case Item.NETHERITE_SWORD:
-                        networkId = Item.DIAMOND_SWORD;
-                        break;
-                    case Item.NETHERITE_SHOVEL:
-                        networkId = Item.DIAMOND_SHOVEL;
-                        break;
-                    case Item.NETHERITE_PICKAXE:
-                        networkId = Item.DIAMOND_PICKAXE;
-                        break;
-                    case Item.NETHERITE_AXE:
-                        networkId = Item.DIAMOND_AXE;
-                        break;
-                    case Item.NETHERITE_HOE:
-                        networkId = Item.DIAMOND_HOE;
-                        break;
-                    case Item.NETHERITE_HELMET:
-                        networkId = Item.DIAMOND_HELMET;
-                        break;
-                    case Item.NETHERITE_CHESTPLATE:
-                        networkId = Item.DIAMOND_CHESTPLATE;
-                        break;
-                    case Item.NETHERITE_LEGGINGS:
-                        networkId = Item.DIAMOND_LEGGINGS;
-                        break;
-                    case Item.NETHERITE_BOOTS:
-                        networkId = Item.DIAMOND_BOOTS;
-                        break;
-                    case Item.WARPED_FUNGUS_ON_A_STICK:
-                        networkId = Item.CARROT_ON_A_STICK;
-                        break;
-                    case Item.RECORD_PIGSTEP:
-                        networkId = Item.RECORD_13;
-                        break;
-                    default:
-                        networkId = Item.INFO_UPDATE;
-                        break;
-                }
-            } else {
-                if (protocolId < ProtocolInfo.v1_14_0) {
-                    if (networkId == Item.HONEYCOMB || networkId == Item.HONEY_BOTTLE) {
-                        saveOriginalID = true;
-                        networkId = Item.INFO_UPDATE;
-                    } else if (protocolId < ProtocolInfo.v1_13_0) {
-                        if (networkId == Item.SUSPICIOUS_STEW) {
-                            saveOriginalID = true;
-                            networkId = Item.INFO_UPDATE;
-                        }
-                    }
-                }
-            }
-        }*/
 
         this.putVarInt(networkId);
 
