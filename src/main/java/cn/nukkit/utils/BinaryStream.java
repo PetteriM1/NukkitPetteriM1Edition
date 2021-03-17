@@ -479,7 +479,7 @@ public class BinaryStream {
         }
 
         try {
-            if (nbt.length > 0) {
+            if (protocolId < ProtocolInfo.v1_16_0 && nbt.length > 0) {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains(NukkitPetteriM1EditionTag)) {
                     int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
