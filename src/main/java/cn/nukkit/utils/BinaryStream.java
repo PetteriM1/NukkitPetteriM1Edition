@@ -557,12 +557,6 @@ public class BinaryStream {
         }
 
         int networkId = item.getId();
-        boolean clearData = false;
-        if (protocolId >= ProtocolInfo.v1_16_100) {
-            int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
-            clearData = RuntimeItems.hasData(networkFullId);
-            networkId = RuntimeItems.getNetworkId(networkFullId);
-        }
 
         // Multiversion: Replace unsupported items
         boolean saveOriginalID = false;
@@ -620,6 +614,13 @@ public class BinaryStream {
                     }
                 }
             }
+        }
+
+        boolean clearData = false;
+        if (protocolId >= ProtocolInfo.v1_16_100) {
+            int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
+            clearData = RuntimeItems.hasData(networkFullId);
+            networkId = RuntimeItems.getNetworkId(networkFullId);
         }
 
         this.putVarInt(networkId);
