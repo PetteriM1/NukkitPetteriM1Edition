@@ -184,7 +184,13 @@ public class StartGamePacket extends DataPacket {
         this.putBoolean(this.isTrial);
         if (protocol >= 388) {
             if (protocol >= ProtocolInfo.v1_16_100) {
-                this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
+                if (protocol >= ProtocolInfo.v1_16_210) {
+                    this.putUnsignedVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
+                    this.putVarInt(0); // RewindHistorySize
+                    this.putBoolean(false); // isServerAuthoritativeBlockBreaking
+                } else {
+                    this.putVarInt(this.isMovementServerAuthoritative ? 1 : 0); // 2 - rewind
+                }
             } else {
                 this.putBoolean(this.isMovementServerAuthoritative);
             }

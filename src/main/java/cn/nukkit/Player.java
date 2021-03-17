@@ -10,12 +10,11 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandDataVersions;
 import cn.nukkit.entity.*;
 import cn.nukkit.entity.data.*;
-import cn.nukkit.entity.item.*;
+import cn.nukkit.entity.item.EntityBoat;
+import cn.nukkit.entity.item.EntityFishingHook;
+import cn.nukkit.entity.item.EntityItem;
+import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.entity.mob.EntityEnderman;
-import cn.nukkit.entity.passive.EntityHorseBase;
-import cn.nukkit.entity.passive.EntityLlama;
-import cn.nukkit.entity.passive.EntityPig;
-import cn.nukkit.entity.passive.EntityStrider;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
@@ -785,7 +784,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.chunkZ = z;
         pk.subChunkCount = subChunkCount;
         pk.data = payload;
-        //pk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
 
         this.batchDataPacket(pk);
         /*if (this.protocol < ProtocolInfo.v1_12_0) {
@@ -1761,7 +1759,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.motionX = (float) motion.x;
                 pk.motionY = (float) motion.y;
                 pk.motionZ = (float) motion.z;
-                //pk.setChannel(Network.CHANNEL_MOVEMENT);
                 this.dataPacket(pk);
             }
 
@@ -2217,6 +2214,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         final Map<UUID, Player> tempOnlinePlayers = getServer().getOnlinePlayers();
         final boolean op = this.isOp();
 
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CAN_CLIMB, true, false);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_CAN_SHOW_NAMETAG, true, false);
+        this.setDataProperty(new ByteEntityData(DATA_ALWAYS_SHOW_NAMETAG, 1), false);
+        final EntityMetadata entityData = this.dataProperties.clone();
+
         CompletableFuture.runAsync(() -> {
             try {
                 if (!this.connected) return;
@@ -2276,10 +2278,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.server.sendRecipeList(this);
 
                 this.sendPotionEffects(this);
-                this.sendData(this);
-                this.setCanClimb(true);
-                this.setNameTagVisible(true);
-                this.setNameTagAlwaysVisible(true);
+                this.sendData(this, entityData);
 
                 if (!server.checkOpMovement && op) {
                     this.setCheckMovement(false);
@@ -2538,15 +2537,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     if (!this.isAlive() || !this.spawned) {
                         break;
                     }
-                    PlayerInputPacket ipk = (PlayerInputPacket) packet;
-                    if (riding instanceof EntityMinecartAbstract) {
-                        ((EntityMinecartAbstract) riding).setCurrentSpeed(ipk.motionY);
-                    } else if (riding instanceof EntityHorseBase && !(riding instanceof EntityLlama)) {
-                        ((EntityHorseBase) riding).onPlayerInput(this, ipk.motionX, ipk.motionY);
-                    } else if (riding instanceof EntityPig) {
-                        ((EntityPig) riding).onPlayerInput(this, ipk.motionX, ipk.motionY);
-                    } else if (riding instanceof EntityStrider) {
-                        ((EntityStrider) riding).onPlayerInput(this, ipk.motionX, ipk.motionY);
+                    if (riding instanceof EntityControllable) {
+                        PlayerInputPacket ipk = (PlayerInputPacket) packet;
+                        ((EntityControllable) riding).onPlayerInput(this, ipk.motionX, ipk.motionY);
                     }
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
@@ -3250,7 +3243,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 for (int x = 0; x < 128; x++) {
                                     for (int y = 0; y < 128; y++) {
                                         graphics.setColor(new Color(this.getLevel().getMapColorAt(worldX + x, worldZ + y).getRGB()));
-                                        graphics.fillRect(x, y, x, y);
+                                        graphics.fillRect(x, y, x + 1, y + 1);
                                     }
                                 }
 
@@ -3411,6 +3404,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 type = useItemData.actionType;
                             } catch (Exception ignored) {
                                 break packetswitch;
+                            }
+
+                            if (this.isBlocking()) {
+                                this.setBlocking(false);
                             }
 
                             switch (type) {
@@ -3638,10 +3635,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
                                     if ((target instanceof Player) && !this.level.getGameRules().getBoolean(GameRule.PVP)) {
                                         entityDamageByEntityEvent.setCancelled();
-                                    }
-
-                                    if (!entityDamageByEntityEvent.isCancelled() && this.isBlocking()) {
-                                        this.setBlocking(false);
                                     }
 
                                     if (!target.attack(entityDamageByEntityEvent)) {
@@ -3958,7 +3951,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_RAW;
         pk.message = this.server.getLanguage().translateString(message);
-        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -3988,7 +3980,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.type = TextPacket.TYPE_RAW;
             pk.message = this.server.getLanguage().translateString(message, parameters);
         }
-        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -4001,7 +3992,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.type = TextPacket.TYPE_CHAT;
         pk.source = source;
         pk.message = this.server.getLanguage().translateString(message);
-        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -4009,7 +3999,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_POPUP;
         pk.message = message;
-        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -4021,7 +4010,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         TextPacket pk = new TextPacket();
         pk.type = TextPacket.TYPE_TIP;
         pk.message = message;
-        //pk.setChannel(Network.CHANNEL_TEXT);
         this.dataPacket(pk);
     }
 
@@ -4678,7 +4666,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.pitch = (float) pitch;
         pk.yaw = (float) yaw;
         pk.mode = mode;
-        //pk.setChannel(Network.CHANNEL_MOVEMENT);
 
         if (targets != null) {
             if (Arrays.stream(targets).anyMatch(target -> target == this)) {
@@ -4707,7 +4694,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.ySize = 0;
         }
 
-        //pk.setChannel(Network.CHANNEL_MOVEMENT);
         Server.broadcastPacket(targets, pk);
     }
 
@@ -4844,7 +4830,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 chunk.chunkX = chunkPositionX + x;
                 chunk.chunkZ = chunkPositionZ + z;
                 chunk.data = new byte[0];
-                //chunk.setChannel(Network.CHANNEL_WORLD_CHUNKS);
                 this.dataPacket(chunk);
             }
         }
@@ -5669,8 +5654,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    protected void onBlock(Entity entity, boolean animate) {
-        super.onBlock(entity, animate);
+    protected void onBlock(Entity entity, boolean animate, float damage) {
+        super.onBlock(entity, animate, damage);
         if (animate) {
             this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHIELD_SHAKING, true);
             this.getServer().getScheduler().scheduleTask(null, ()-> {

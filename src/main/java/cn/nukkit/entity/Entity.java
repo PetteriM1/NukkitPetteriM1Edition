@@ -111,6 +111,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_RIDER_ROTATION_LOCKED = 57; //byte
     public static final int DATA_RIDER_MAX_ROTATION = 58; //float
     public static final int DATA_RIDER_MIN_ROTATION = 59; //float
+    public static final int DATA_RIDER_ROTATION_OFFSET = 60; //1.16.210+
     public static final int DATA_AREA_EFFECT_CLOUD_RADIUS = 60; //float
     public static final int DATA_AREA_EFFECT_CLOUD_WAITING = 61; //int
     public static final int DATA_AREA_EFFECT_CLOUD_PARTICLE_ID = 62; //int
@@ -126,9 +127,9 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_LIMITED_LIFE = 77;
     public static final int DATA_ARMOR_STAND_POSE_INDEX = 78; // int
     public static final int DATA_ENDER_CRYSTAL_TIME_OFFSET = 79; // int
-    public static final int DATA_ALWAYS_SHOW_NAMETAG = 80; // byte
+    public static final int DATA_ALWAYS_SHOW_NAMETAG = 80; // byte, 81 on 1.16.210+
     public static final int DATA_COLOR_2 = 81; // byte
-    public static final int DATA_SCORE_TAG = 83; //String
+    public static final int DATA_SCORE_TAG = 83; //String, 84 on 1.16.210+
     public static final int DATA_BALLOON_ATTACHED_ENTITY = 84; // long
     public static final int DATA_PUFFERFISH_SIZE = 85;
     public static final int DATA_FLAGS_EXTENDED = 91, DATA_FLAGS2 = DATA_FLAGS_EXTENDED; //long (extended data flags)
@@ -148,6 +149,8 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_HITBOX = 117;
     public static final int DATA_IS_BUOYANT = 118;
     public static final int DATA_BUOYANCY_DATA = 119;
+    public static final int DATA_FREEZING_EFFECT_STRENGTH = 120; //1.16.210+
+    public static final int DATA_GOAT_HORN_COUNT = 122; //1.16.210+
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -243,6 +246,7 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_CELEBRATING = 92;
     public static final int DATA_FLAG_ADMIRING = 93;
     public static final int DATA_FLAG_CELEBRATING_SPECIAL = 94;
+    public static final int DATA_FLAG_RAM_ATTACK = 96; //1.16.210+
 
     public static final double STEP_CLIP_MULTIPLIER = 0.4;
 
@@ -1008,14 +1012,12 @@ public abstract class Entity extends Location implements Metadatable {
         addEntity.speedX = (float) this.motionX;
         addEntity.speedY = (float) this.motionY;
         addEntity.speedZ = (float) this.motionZ;
-        addEntity.metadata = this.dataProperties;
+        addEntity.metadata = this.dataProperties.clone();
 
         addEntity.links = new EntityLink[this.passengers.size()];
         for (int i = 0; i < addEntity.links.length; i++) {
             addEntity.links[i] = new EntityLink(this.id, this.passengers.get(i).id, i == 0 ? EntityLink.TYPE_RIDER : TYPE_PASSENGER, false, false);
         }
-
-        //addEntity.setChannel(Network.CHANNEL_ENTITY_SPAWNING);
 
         return addEntity;
     }
@@ -1045,26 +1047,10 @@ public abstract class Entity extends Location implements Metadatable {
     public void sendData(Player player, EntityMetadata data) {
         SetEntityDataPacket pk = new SetEntityDataPacket();
         pk.eid = this.id;
-        if (player.protocol < 274) {
-            pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
-        } else {
-            pk.metadata = data == null ? this.dataProperties : data;
-        }
+        pk.metadata = data == null ? this.dataProperties.clone() : data;
 
         //player.dataPacket(pk);
         player.batchDataPacket(pk);
-    }
-
-    private EntityMetadata mvReplace(EntityMetadata data) {
-        EntityMetadata updated = new EntityMetadata()
-                .putLong(DATA_FLAGS, data.getLong(DATA_FLAGS))
-                .putShort(DATA_AIR, data.getShort(DATA_AIR))
-                .putShort(43, data.getShort(DATA_MAX_AIR))
-                .putString(DATA_NAMETAG, data.getString(DATA_NAMETAG))
-                .putLong(DATA_LEAD_HOLDER_EID, data.getLong(DATA_LEAD_HOLDER_EID))
-                .putFloat(DATA_SCALE, data.getFloat(DATA_SCALE));
-        // TODO: All other data properties
-        return updated;
     }
 
     public void sendData(Player[] players) {
@@ -1080,20 +1066,12 @@ public abstract class Entity extends Location implements Metadatable {
             if (player == this) {
                 continue;
             }
-            if (player.protocol < 274) {
-                pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
-            } else {
-                pk.metadata = data == null ? this.dataProperties : data;
-            }
+            pk.metadata = data == null ? this.dataProperties.clone() : data;
             //player.dataPacket(pk/*.clone()*/);
             player.batchDataPacket(pk.clone());
         }
         if (this.isPlayer) {
-            if (((Player) this).protocol < 274) {
-                pk.metadata = data == null ? mvReplace(this.dataProperties) : mvReplace(data);
-            } else {
-                pk.metadata = data == null ? this.dataProperties : data;
-            }
+            pk.metadata = data == null ? this.dataProperties.clone() : data;
             //((Player) this).dataPacket(pk);
             ((Player) this).batchDataPacket(pk);
         }
@@ -1462,7 +1440,6 @@ public abstract class Entity extends Location implements Metadatable {
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
-        //pk.setChannel(Network.CHANNEL_MOVEMENT);
         //Server.broadcastPacket(this.hasSpawned.values(), pk);
         for (Player p : this.hasSpawned.values()) {
             p.batchDataPacket(pk);
@@ -2367,11 +2344,7 @@ public abstract class Entity extends Location implements Metadatable {
                 EntityMetadata d = new EntityMetadata().put(this.dataProperties.get(data.getId()));
                 SetEntityDataPacket pk = new SetEntityDataPacket();
                 pk.eid = this.id;
-                if (((Player) this).protocol < 274) {
-                    pk.metadata = d == null ? mvReplace(this.dataProperties) : mvReplace(d);
-                } else {
-                    pk.metadata = d == null ? this.dataProperties : d;
-                }
+                pk.metadata = d == null ? this.dataProperties.clone() : d;
                 //((Player) this).dataPacket(pk);
                 ((Player) this).batchDataPacket(pk);
             }
@@ -2437,15 +2410,19 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setDataFlag(int propertyId, int id, boolean value) {
+        this.setDataFlag(propertyId, id, value, true);
+    }
+
+    public void setDataFlag(int propertyId, int id, boolean value, boolean send) {
         if (this.getDataFlag(propertyId, id) != value) {
             if (propertyId == EntityHuman.DATA_PLAYER_FLAGS) {
                 byte flags = (byte) this.getDataPropertyByte(propertyId);
                 flags ^= 1 << id;
-                this.setDataProperty(new ByteEntityData(propertyId, flags));
+                this.setDataProperty(new ByteEntityData(propertyId, flags), send);
             } else {
                 long flags = this.getDataPropertyLong(propertyId);
                 flags ^= 1L << id;
-                this.setDataProperty(new LongEntityData(propertyId, flags));
+                this.setDataProperty(new LongEntityData(propertyId, flags), send);
             }
         }
     }

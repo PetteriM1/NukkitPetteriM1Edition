@@ -13,8 +13,8 @@ import net.minidev.json.JSONValue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author MagicDroidX
@@ -47,7 +47,8 @@ public class Skin {
 
     private final String fullSkinId = UUID.randomUUID().toString();
     private String skinId;
-    private String skinResourcePatch;
+    private String playFabId = "";
+    private String skinResourcePatch = GEOMETRY_CUSTOM;
     private SerializedImage skinData;
     private final List<SkinAnimation> animations = new ArrayList<>();
     private final List<PersonaPiece> personaPieces = new ArrayList<>();
@@ -275,6 +276,14 @@ public class Skin {
 
     public String getFullSkinId() {
         return fullSkinId;
+    }
+
+    public void setPlayFabId(String playFabId) {
+        this.playFabId = playFabId;
+    }
+
+    public String getPlayFabId() {
+        return this.playFabId;
     }
 
     private static SerializedImage parseBufferedImage(BufferedImage image) {

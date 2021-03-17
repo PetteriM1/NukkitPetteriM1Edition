@@ -120,6 +120,9 @@ public class EntityHuman extends EntityHumanType {
                 if (skinTag.contains("ModelId")) {
                     newSkin.setSkinId(skinTag.getString("ModelId"));
                 }
+                if (skinTag.contains("PlayFabID")) {
+                    newSkin.setPlayFabId(skinTag.getString("PlayFabID"));
+                }
                 if (skinTag.contains("Data")) {
                     byte[] data = skinTag.getByteArray("Data");
                     if (skinTag.contains("SkinImageWidth") && skinTag.contains("SkinImageHeight")) {
@@ -277,6 +280,10 @@ public class EntityHuman extends EntityHumanType {
                 }
             }
 
+            if (!this.getSkin().getPlayFabId().isEmpty()) {
+                skinTag.putString("PlayFabID", this.getSkin().getPlayFabId());
+            }
+
             this.namedTag.putCompound("Skin", skinTag);
         }
     }
@@ -310,7 +317,7 @@ public class EntityHuman extends EntityHumanType {
             pk.yaw = (float) this.yaw;
             pk.pitch = (float) this.pitch;
             pk.item = this.getInventory().getItemInHand();
-            pk.metadata = this.dataProperties;
+            pk.metadata = this.dataProperties.clone();
             player.dataPacket(pk);
 
             if (this.isPlayer) {
@@ -358,19 +365,16 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
-    protected void onBlock(Entity entity, boolean animate) {
-        super.onBlock(entity, animate);
+    protected void onBlock(Entity entity, boolean animate, float damage) {
+        super.onBlock(entity, animate, damage);
         Item shield = getInventory().getItemInHand();
         Item shieldOffhand = getOffhandInventory().getItem(0);
         if (shield.getId() == ItemID.SHIELD) {
-            shield = damageArmor(shield, entity);
+            shield = damageArmor(shield, entity, damage, true);
             getInventory().setItemInHand(shield);
         } else if (shieldOffhand.getId() == ItemID.SHIELD) {
-            shieldOffhand = damageArmor(shieldOffhand, entity);
+            shieldOffhand = damageArmor(shieldOffhand, entity, damage, true);
             getOffhandInventory().setItem(0, shieldOffhand);
         }
-        /*if (animate) {
-            //TODO
-        }*/
     }
 }

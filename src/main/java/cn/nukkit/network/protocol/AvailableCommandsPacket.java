@@ -37,16 +37,17 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_STRING = 29;
     public static final int ARG_TYPE_BLOCK_POSITION = 37;
     public static final int ARG_TYPE_POSITION = 38;
-    public static final int ARG_TYPE_STRING_PRE388 = 27;
-    public static final int ARG_TYPE_POSITION_PRE388 = 29;
     public static final int ARG_TYPE_MESSAGE = 41;
     public static final int ARG_TYPE_RAWTEXT = 43;
     public static final int ARG_TYPE_JSON = 47;
     public static final int ARG_TYPE_COMMAND = 54;
-    public static final int ARG_TYPE_MESSAGE_PRE388 = 32;
-    public static final int ARG_TYPE_RAWTEXT_PRE388 = 34;
-    public static final int ARG_TYPE_JSON_PRE388 = 37;
-    public static final int ARG_TYPE_COMMAND_PRE388 = 44;
+
+    private static final int ARG_TYPE_STRING_PRE388 = 27;
+    private static final int ARG_TYPE_POSITION_PRE388 = 29;
+    private static final int ARG_TYPE_MESSAGE_PRE388 = 32;
+    private static final int ARG_TYPE_RAWTEXT_PRE388 = 34;
+    private static final int ARG_TYPE_JSON_PRE388 = 37;
+    private static final int ARG_TYPE_COMMAND_PRE388 = 44;
 
     public Map<String, CommandDataVersions> commands;
     public final Map<String, List<String>> softEnums = new HashMap<>();
@@ -292,6 +293,22 @@ public class AvailableCommandsPacket extends DataPacket {
                                     case COMMAND:
                                         id = ARG_TYPE_COMMAND_PRE388;
                                         break;
+                                }
+                            } else if (protocol >= ProtocolInfo.v1_16_210) { //TODO: proper implementation for 1.16.210 command params
+                                if (id == ARG_TYPE_COMMAND) {
+                                    id = 63;
+                                } else if (id == ARG_TYPE_FILE_PATH) {
+                                    id = id + 2; // +1 from .100 and +1 from .210
+                                } else if (id >= ARG_TYPE_STRING) {
+                                    id = id + 3; // +2 from .100 and +1 from .210
+                                } else if (id >= ARG_TYPE_FLOAT) {
+                                    id++;
+                                }
+                            } else if (protocol >= ProtocolInfo.v1_16_100) { //TODO: proper implementation for 1.16.100 command params
+                                if (id == ARG_TYPE_FILE_PATH) {
+                                    id++;
+                                } else if (id >= ARG_TYPE_STRING) {
+                                    id = id + 2;
                                 }
                             }
                             type |= id;

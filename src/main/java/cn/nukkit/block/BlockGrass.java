@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.generator.object.ObjectTallGrass;
@@ -126,5 +128,13 @@ public class BlockGrass extends BlockDirt {
 
     @Override
     public void setDamage(int meta) {
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+        return new Item[]{new ItemBlock(Block.get(BlockID.DIRT))};
     }
 }

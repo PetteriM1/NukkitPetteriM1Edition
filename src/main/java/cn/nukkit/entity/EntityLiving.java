@@ -54,7 +54,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     protected float movementSpeed = 0.1f;
 
-    protected int turtleTicks = 200;
+    protected int turtleTicks = 0;
 
     private boolean blocking = false;
 
@@ -160,8 +160,12 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     protected boolean blockedByShield(EntityDamageEvent source) {
-        Entity damager = source instanceof EntityDamageByEntityEvent? ((EntityDamageByEntityEvent) source).getDamager() : null;
-        if (damager == null || !this.isBlocking() || damager instanceof EntityWeather) {
+        if (!this.isBlocking()) {
+            return false;
+        }
+
+        Entity damager = source instanceof EntityDamageByChildEntityEvent ? ((EntityDamageByChildEntityEvent) source).getChild() : source instanceof EntityDamageByEntityEvent ? ((EntityDamageByEntityEvent) source).getDamager() : null;
+        if (damager == null || damager instanceof EntityWeather) {
             return false;
         }
 
@@ -183,14 +187,15 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         if (event.getKnockBackAttacker() && damager instanceof EntityLiving) {
             double deltaX = damager.getX() - this.getX();
             double deltaZ = damager.getZ() - this.getZ();
+            ((EntityLiving) damager).attackTime = source.getAttackCooldown();
             ((EntityLiving) damager).knockBack(this, 0, deltaX, deltaZ);
         }
 
-        onBlock(damager, event.getAnimation());
+        onBlock(damager, event.getAnimation(), source.getDamage());
         return true;
     }
 
-    protected void onBlock(Entity entity, boolean animate) {
+    protected void onBlock(Entity entity, boolean animate, float damage) {
         if (animate) {
             getLevel().addSoundToViewers(this, Sound.ITEM_SHIELD_BLOCK);
         }
@@ -269,26 +274,25 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         if (Timings.livingEntityBaseTickTimer != null) Timings.livingEntityBaseTickTimer.startTiming();
 
         boolean inWater = this.isSubmerged();
-        boolean isBreathing = !inWater;
-        if (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator())) {
-            isBreathing = true;
-        }
 
         if (this instanceof Player) {
-            if (!isBreathing && ((Player) this).getInventory().getHelmetFast() instanceof ItemTurtleShell) {
-                if (turtleTicks > 0) {
-                    isBreathing = true;
-                    turtleTicks--;
-                }
-            } else {
+            Player p = (Player) this;
+            boolean isBreathing = !inWater;
+
+            if (isBreathing && p.getInventory().getHelmetFast() instanceof ItemTurtleShell) {
                 turtleTicks = 200;
+            } else if (turtleTicks > 0) {
+                isBreathing = true;
+                turtleTicks--;
             }
-        }
 
-        // HACK!
-        if (this instanceof Player) {
-            if (((Player) this).protocol <= 282) {
-                if (((Player) this).protocol <= 201) {
+            if (p.isCreative() || p.isSpectator()) {
+                isBreathing = true;
+            }
+
+            // HACK!
+            if (p.protocol <= 282) {
+                if (p.protocol <= 201) {
                     this.setDataFlagSelfOnly(DATA_FLAGS, 33, isBreathing);
                 } else {
                     this.setDataFlagSelfOnly(DATA_FLAGS, 34, isBreathing);
@@ -310,11 +314,11 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                 this.resetFallDistance();
             }
 
-            if (!this.hasEffect(Effect.WATER_BREATHING) && inWater) {
+            if (inWater && !this.hasEffect(Effect.WATER_BREATHING)) {
                 if (this instanceof EntitySwimming || this.isDrowned || (this instanceof Player && (((Player) this).isCreative() || ((Player) this).isSpectator()))) {
                     this.setAirTicks(400);
                 } else {
-                    if (turtleTicks == 0 || turtleTicks == 200) {
+                    if (turtleTicks == 0) {
                         hasUpdate = true;
                         int airTicks = this.getAirTicks() - tickDiff;
 

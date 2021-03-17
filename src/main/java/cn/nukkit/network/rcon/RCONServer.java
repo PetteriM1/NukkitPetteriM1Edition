@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -145,7 +146,7 @@ public class RCONServer extends Thread {
             return;
         }
 
-        buffer.flip();
+        ((Buffer) buffer).flip(); // do not remove the cast
         this.handle(channel, new RCONPacket(buffer));
     }
 
