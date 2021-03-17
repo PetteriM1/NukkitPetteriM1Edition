@@ -479,7 +479,7 @@ public class BinaryStream {
         }
 
         try {
-            if (nbt.length > 0) {
+            if (protocolId < ProtocolInfo.v1_16_0 && nbt.length > 0) { //TODO Modify it when 1.17 is updated
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains(NukkitPetteriM1EditionTag)) {
 
@@ -551,10 +551,12 @@ public class BinaryStream {
 
         // Multiversion: Replace unsupported items
         boolean saveOriginalID = false;
-        int newId = MultiversionItemReplace.getReplaceId(networkId, protocolId);
-        if (newId != 0) {
-            saveOriginalID = true;
-            networkId = newId;
+        if (protocolId < ProtocolInfo.v1_16_0) { //TODO Modify it when 1.17 is updated
+            int newId = MultiversionItemReplace.getReplaceId(networkId, protocolId);
+            if (newId != 0) {
+                saveOriginalID = true;
+                networkId = newId;
+            }
         }
 
         boolean clearData = false;
