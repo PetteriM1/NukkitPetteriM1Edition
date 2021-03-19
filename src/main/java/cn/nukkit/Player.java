@@ -2170,10 +2170,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void completeLoginSequence() {
-        if (!this.connected) {
-            return;
-        }
-
         PlayerLoginEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
         if (ev.isCancelled()) {
@@ -2206,8 +2202,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 startGamePacket.lightningLevel = this.getLevel().getThunderTime();
             }
         }
-        this.quickBatch(startGamePacket);
 
+        CompletableFuture.runAsync(() -> this.quickBatch(startGamePacket)).whenComplete((ignore, error) -> {
+            if (error != null) {
+                this.close("", "Internal Server Error");
+                this.server.getLogger().logException(error);
+            } else if (this.connected){
+                this.completeLoginSequence0();
+            }
+        });
+    }
+
+    protected void completeLoginSequence0() {
         this.loggedIn = true;
 
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
