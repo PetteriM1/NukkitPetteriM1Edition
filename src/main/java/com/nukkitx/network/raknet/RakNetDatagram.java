@@ -11,8 +11,7 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nukkitx.network.raknet.RakNetConstants.FLAG_CONTINUOUS_SEND;
-import static com.nukkitx.network.raknet.RakNetConstants.RAKNET_DATAGRAM_HEADER_SIZE;
+import static com.nukkitx.network.raknet.RakNetConstants.*;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,7 +21,7 @@ public class RakNetDatagram extends AbstractReferenceCounted {
     private static final InternalLogger log = InternalLoggerFactory.getInstance(RakNetDatagram.class);
 
     final List<EncapsulatedPacket> packets = new ArrayList<>();
-    private byte flags = RakNetConstants.FLAG_VALID;
+    byte flags = FLAG_VALID;
     final long sendTime;
     long nextSend;
     int sequenceIndex = -1;
