@@ -2437,7 +2437,6 @@ public class Server {
             put("debug-level", 1);
             put("async-workers", "auto");
             put("zlib-provider", 2);
-            put("async-compression", true);
             put("compression-level", 4);
             put("auto-tick-rate", true);
             put("auto-tick-rate-limit", 20);

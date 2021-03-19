@@ -225,7 +225,11 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         /**
          * Damage caused by hunger
          */
-        HUNGER
+        HUNGER,
+        /**
+         * Damage caused by thorns enchantment
+         */
+        THORNS
     }
 
     private static class DamageModifierFloatEnumMap extends EnumMap<DamageModifier, Float> {
