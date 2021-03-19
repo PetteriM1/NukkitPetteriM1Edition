@@ -42,7 +42,7 @@ public class BlockCoral extends BlockFlowable {
             Block down = this.down();
             if (!down.isSolid()) {
                 this.getLevel().useBreakOn(this);
-            } else if (!isDead()) {
+            } else if (!this.isDead()) {
                 this.getLevel().scheduleUpdate(this, 60 + ThreadLocalRandom.current().nextInt(40));
             }
             return type;
@@ -58,7 +58,7 @@ public class BlockCoral extends BlockFlowable {
         }
         return 0;
     }
-    
+
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = this.down();
@@ -80,7 +80,7 @@ public class BlockCoral extends BlockFlowable {
         }
         return false;
     }
-    
+
     @Override
     public String getName() {
         String[] names = new String[] {
@@ -101,13 +101,13 @@ public class BlockCoral extends BlockFlowable {
             return name;
         }
     }
-    
+
     @Override
     public BlockColor getColor() {
         if (this.isDead()) {
             return BlockColor.GRAY_BLOCK_COLOR;
         }
-        
+
         BlockColor[] colors = new BlockColor[] {
                 BlockColor.BLUE_BLOCK_COLOR,
                 BlockColor.PINK_BLOCK_COLOR,
@@ -121,18 +121,18 @@ public class BlockCoral extends BlockFlowable {
         };
         return colors[this.getDamage() & 0x7];
     }
-    
+
     @Override
     public boolean canSilkTouch() {
         return true;
     }
-    
+
     @Override
     public Item[] getDrops(Item item) {
         if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
             return super.getDrops(item);
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 
