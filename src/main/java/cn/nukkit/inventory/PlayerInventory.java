@@ -270,9 +270,9 @@ public class PlayerInventory extends BaseInventory {
             return this.clear(index, send);
         }
 
-        if ((index == 36 && !item.isHelmet()) || (index == 37 && !item.isChestplate()) || (index == 38 && !item.isLeggings()) || (index == 39 && !item.isBoots())) {
+        /*if ((index == 36 && !item.isHelmet()) || (index == 37 && !item.isChestplate()) || (index == 38 && !item.isLeggings()) || (index == 39 && !item.isBoots())) {
             return false;
-        }
+        }*/
 
         if (index >= this.getSize()) { // Armor change
             EntityArmorChangeEvent ev = new EntityArmorChangeEvent(this.getHolder(), this.getItem(index), item, index);

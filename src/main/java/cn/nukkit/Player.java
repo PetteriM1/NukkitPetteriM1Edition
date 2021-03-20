@@ -4273,6 +4273,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
                 case ENTITY_ATTACK:
+                case THORNS:
                     if (cause instanceof EntityDamageByEntityEvent) {
                         Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
                         killer = e;
