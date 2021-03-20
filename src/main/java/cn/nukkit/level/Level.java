@@ -2,7 +2,10 @@ package cn.nukkit.level;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.block.*;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockGrass;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.block.BlockRedstoneDiode;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.BaseEntity;
 import cn.nukkit.entity.Entity;
@@ -38,6 +41,7 @@ import cn.nukkit.level.generator.task.GenerationTask;
 import cn.nukkit.level.generator.task.LightPopulationTask;
 import cn.nukkit.level.generator.task.PopulationTask;
 import cn.nukkit.level.particle.DestroyBlockParticle;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.level.particle.Particle;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
@@ -2091,6 +2095,8 @@ public class Level implements ChunkManager, Metadatable {
 
         item.useOn(target);
         if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
+            this.addSoundToViewers(target, cn.nukkit.level.Sound.RANDOM_BREAK);
+            this.addParticle(new ItemBreakParticle(target, item));
             item = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
         }
 
@@ -2194,6 +2200,8 @@ public class Level implements ChunkManager, Metadatable {
 
                 if ((!player.isSneaking() || player.getInventory().getItemInHand().isNull()) && target.canBeActivated() && target.onActivate(item, player)) {
                     if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
+                        this.addSoundToViewers(target, cn.nukkit.level.Sound.RANDOM_BREAK);
+                        this.addParticle(new ItemBreakParticle(target, item));
                         item = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
                     }
 
@@ -2211,6 +2219,8 @@ public class Level implements ChunkManager, Metadatable {
             }
         } else if (target.canBeActivated() && target.onActivate(item, null)) {
             if (item.isTool() && item.getDamage() >= item.getMaxDurability()) {
+                this.addSoundToViewers(target, cn.nukkit.level.Sound.RANDOM_BREAK);
+                this.addParticle(new ItemBreakParticle(target, item));
                 item = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
             }
 

@@ -2,7 +2,10 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDurable;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.math.BlockFace;
@@ -404,6 +407,8 @@ public class BinaryStream {
         return skin;
     }
 
+    private static final String NukkitPetteriM1EditionTag = "NukkitPetteriM1Edition";
+
     public Item getSlot() {
         return this.getSlot(ProtocolInfo.CURRENT_PROTOCOL);
     }
@@ -473,6 +478,38 @@ public class BinaryStream {
             canDestroy[i] = this.getString();
         }
 
+        try {
+            if (protocolId < ProtocolInfo.v1_16_0 && nbt.length > 0) {
+                CompoundTag tag = Item.parseCompoundTag(nbt.clone());
+                if (tag.contains(NukkitPetteriM1EditionTag)) {
+                    int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
+                    if ((id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
+                            (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
+                            (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
+                            (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
+                            (id == Item.DIAMOND_AXE && originalID == Item.NETHERITE_AXE) ||
+                            (id == Item.DIAMOND_HOE && originalID == Item.NETHERITE_HOE) ||
+                            (id == Item.DIAMOND_HELMET && originalID == Item.NETHERITE_HELMET) ||
+                            (id == Item.DIAMOND_CHESTPLATE && originalID == Item.NETHERITE_CHESTPLATE) ||
+                            (id == Item.DIAMOND_LEGGINGS && originalID == Item.NETHERITE_LEGGINGS) ||
+                            (id == Item.DIAMOND_BOOTS && originalID == Item.NETHERITE_BOOTS) ||
+                            (id == Item.CARROT_ON_A_STICK && originalID == Item.WARPED_FUNGUS_ON_A_STICK) ||
+                            (id == Item.RECORD_13 && originalID == Item.RECORD_PIGSTEP)) {
+                        id = originalID;
+                    }
+
+                    tag.remove(NukkitPetteriM1EditionTag);
+                    if (tag.isEmpty()) {
+                        nbt = new byte[0];
+                    } else {
+                        nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Item item = Item.get(
                 id, data, cnt, nbt
         );
@@ -520,19 +557,70 @@ public class BinaryStream {
         }
 
         int networkId = item.getId();
+
+        // Multiversion: Replace unsupported items
+        boolean saveOriginalID = false;
+        if (protocolId < ProtocolInfo.v1_16_0) {
+            if (networkId >= Item.LODESTONECOMPASS) {
+                saveOriginalID = true;
+                switch (networkId) {
+                    case Item.NETHERITE_SWORD:
+                        networkId = Item.DIAMOND_SWORD;
+                        break;
+                    case Item.NETHERITE_SHOVEL:
+                        networkId = Item.DIAMOND_SHOVEL;
+                        break;
+                    case Item.NETHERITE_PICKAXE:
+                        networkId = Item.DIAMOND_PICKAXE;
+                        break;
+                    case Item.NETHERITE_AXE:
+                        networkId = Item.DIAMOND_AXE;
+                        break;
+                    case Item.NETHERITE_HOE:
+                        networkId = Item.DIAMOND_HOE;
+                        break;
+                    case Item.NETHERITE_HELMET:
+                        networkId = Item.DIAMOND_HELMET;
+                        break;
+                    case Item.NETHERITE_CHESTPLATE:
+                        networkId = Item.DIAMOND_CHESTPLATE;
+                        break;
+                    case Item.NETHERITE_LEGGINGS:
+                        networkId = Item.DIAMOND_LEGGINGS;
+                        break;
+                    case Item.NETHERITE_BOOTS:
+                        networkId = Item.DIAMOND_BOOTS;
+                        break;
+                    case Item.WARPED_FUNGUS_ON_A_STICK:
+                        networkId = Item.CARROT_ON_A_STICK;
+                        break;
+                    case Item.RECORD_PIGSTEP:
+                        networkId = Item.RECORD_13;
+                        break;
+                    default:
+                        networkId = Item.INFO_UPDATE;
+                        break;
+                }
+            } else {
+                if (protocolId < ProtocolInfo.v1_14_0) {
+                    if (networkId == Item.HONEYCOMB || networkId == Item.HONEY_BOTTLE) {
+                        saveOriginalID = true;
+                        networkId = Item.INFO_UPDATE;
+                    } else if (protocolId < ProtocolInfo.v1_13_0) {
+                        if (networkId == Item.SUSPICIOUS_STEW) {
+                            saveOriginalID = true;
+                            networkId = Item.INFO_UPDATE;
+                        }
+                    }
+                }
+            }
+        }
+
         boolean clearData = false;
         if (protocolId >= ProtocolInfo.v1_16_100) {
             int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
             clearData = RuntimeItems.hasData(networkFullId);
             networkId = RuntimeItems.getNetworkId(networkFullId);
-        }
-
-        // Multiversion: Replace unsupported items
-        // TODO: Send the original item data in nbt and read it from there in getSlot, replace netherite items with diamond items for < 1.16
-        if (protocolId < ProtocolInfo.v1_14_0 && (networkId == Item.HONEYCOMB || (networkId == Item.SUSPICIOUS_STEW && protocolId < ProtocolInfo.v1_13_0))) {
-            networkId = Item.INFO_UPDATE;
-        } else if (protocolId < ProtocolInfo.v1_16_0 && networkId >= Item.LODESTONECOMPASS) {
-            networkId = Item.INFO_UPDATE;
         }
 
         this.putVarInt(networkId);
@@ -557,7 +645,9 @@ public class BinaryStream {
 
         this.putVarInt(auxValue);
 
-        if (item.hasCompoundTag() || (isDurable && protocolId >= ProtocolInfo.v1_12_0)) {
+        if (item.hasCompoundTag() ||
+                (isDurable && protocolId >= ProtocolInfo.v1_12_0) ||
+                (saveOriginalID && protocolId >= ProtocolInfo.v1_12_0)) {
             if (protocolId < ProtocolInfo.v1_12_0) {
                 byte[] nbt = item.getCompoundTag();
                 this.putLShort(nbt.length);
@@ -577,6 +667,11 @@ public class BinaryStream {
                     }
                     if (isDurable) {
                         tag.putInt("Damage", item.getDamage());
+                    }
+
+                    if (saveOriginalID) {
+                        tag.putCompound(NukkitPetteriM1EditionTag,
+                                new CompoundTag().putInt("OriginalID", item.getId()));
                     }
 
                     this.putLShort(0xffff);

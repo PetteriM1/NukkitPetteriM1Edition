@@ -15,8 +15,8 @@ public class BlockRedstoneEvent extends BlockEvent {
         return handlers;
     }
 
-    private int oldPower;
-    private int newPower;
+    private final int oldPower;
+    private final int newPower;
 
     /**
      * Event called on redstone change. E.g Redstone power.

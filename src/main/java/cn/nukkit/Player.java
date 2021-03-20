@@ -51,6 +51,7 @@ import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
+import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.level.particle.PunchBlockParticle;
 import cn.nukkit.level.sound.ExperienceOrbSound;
 import cn.nukkit.math.*;
@@ -3171,10 +3172,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     SetPlayerGameTypePacket setPlayerGameTypePacket = (SetPlayerGameTypePacket) packet;
                     if (setPlayerGameTypePacket.gamemode != this.gamemode) {
                         if (!this.hasPermission("nukkit.command.gamemode")) {
-                            SetPlayerGameTypePacket setPlayerGameTypePacket1 = new SetPlayerGameTypePacket();
+                            this.kick(PlayerKickEvent.Reason.INVALID_PACKET, "Invalid SetPlayerGameTypePacket");
+                            /*SetPlayerGameTypePacket setPlayerGameTypePacket1 = new SetPlayerGameTypePacket();
                             setPlayerGameTypePacket1.gamemode = this.gamemode & 0x01;
                             this.dataPacket(setPlayerGameTypePacket1);
-                            this.adventureSettings.update();
+                            this.adventureSettings.update();*/
                             break;
                         }
                         this.setGamemode(setPlayerGameTypePacket.gamemode, true);
@@ -3591,6 +3593,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (target.onInteract(this, item, useItemOnEntityData.clickPos) && (this.isSurvival() || this.isAdventure())) {
                                         if (item.isTool()) {
                                             if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
+                                                level.addSoundToViewers(this, Sound.RANDOM_BREAK);
+                                                level.addParticle(new ItemBreakParticle(this, item));
                                                 item = new ItemBlock(Block.get(BlockID.AIR));
                                             }
                                         } else {
@@ -3610,6 +3614,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     break;
                                 case InventoryTransactionPacket.USE_ITEM_ON_ENTITY_ACTION_ATTACK:
                                     if (target.getId() == this.getId()) {
+                                        this.kick(PlayerKickEvent.Reason.INVALID_PVP, "Tried to attack invalid player");
                                         return;
                                     }
 
@@ -3650,6 +3655,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                     if (item.isTool() && !this.isCreative()) {
                                         if (item.useOn(target) && item.getDamage() >= item.getMaxDurability()) {
+                                            level.addSoundToViewers(this, Sound.RANDOM_BREAK);
+                                            level.addParticle(new ItemBreakParticle(this, item));
                                             this.inventory.setItemInHand(Item.get(0));
                                         } else {
                                             if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
