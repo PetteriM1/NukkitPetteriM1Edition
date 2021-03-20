@@ -9,11 +9,13 @@ import lombok.ToString;
 @ToString
 public class RemoveEntityPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.REMOVE_ENTITY_PACKET;
+
     public long eid;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.REMOVE_ENTITY_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

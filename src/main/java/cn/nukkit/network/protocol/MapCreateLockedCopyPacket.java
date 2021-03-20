@@ -2,12 +2,14 @@ package cn.nukkit.network.protocol;
 
 public class MapCreateLockedCopyPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.MAP_CREATE_LOCKED_COPY_PACKET;
+
     public long originalMapId;
     public long newMapId;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.MAP_CREATE_LOCKED_COPY_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

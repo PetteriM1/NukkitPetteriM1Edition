@@ -12,6 +12,8 @@ import java.awt.image.BufferedImage;
 @ToString
 public class ClientboundMapItemDataPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.CLIENTBOUND_MAP_ITEM_DATA_PACKET;
+
     public int[] eids = new int[0];
 
     public long mapId;
@@ -36,7 +38,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.CLIENTBOUND_MAP_ITEM_DATA_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

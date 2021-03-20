@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class CompletedUsingItemPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.COMPLETED_USING_ITEM_PACKET;
+
     public static final int ACTION_UNKNOWN = -1;
     public static final int ACTION_EQUIP_ARMOR = 0;
     public static final int ACTION_EAT = 1;
@@ -27,7 +29,7 @@ public class CompletedUsingItemPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.COMPLETED_USING_ITEM_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

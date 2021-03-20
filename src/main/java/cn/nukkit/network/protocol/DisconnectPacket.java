@@ -5,12 +5,14 @@ import lombok.ToString;
 @ToString
 public class DisconnectPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.DISCONNECT_PACKET;
+
     public boolean hideDisconnectionScreen = false;
     public String message;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.DISCONNECT_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

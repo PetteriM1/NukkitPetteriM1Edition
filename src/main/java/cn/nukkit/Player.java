@@ -270,7 +270,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private int failedTransactions;
     public int ticksSinceLastRest;
 
-    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET, ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET);
+    /**
+     * Packets that can be received before the player has logged in
+     */
+    private static final List<Byte> PRE_LOGIN_PACKETS = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET, ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET);
 
     public int getStartActionTick() {
         return startAction;
@@ -517,10 +520,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendCommandData();
     }
 
+    /**
+     * Set visibility of player's admin status on the player list
+     */
     public void setShowAdmin(boolean showAdmin) {
         this.showAdmin = showAdmin;
     }
 
+    /**
+     * Get visibility of player's admin status on the player list
+     */
     public boolean showAdmin() {
         return this.showAdmin;
     }
@@ -587,6 +596,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.enableClientCommand && spawned) this.sendCommandData();
     }
 
+    /**
+     * Are commands enabled for this player on the client side
+     * @return commands enabled
+     */
     public boolean isEnableClientCommand() {
         return this.enableClientCommand;
     }
@@ -1117,6 +1130,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.directDataPacket(packet) ? 0 : -1;
     }
 
+    /**
+     * Get network latency
+     * @return network latency in milliseconds
+     */
     public int getPing() {
         return this.interfaz.getNetworkLatency(this);
     }
@@ -1171,6 +1188,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendSpawnPos((int) pos.x, (int) pos.y, (int) pos.z, level.getDimension());
     }
 
+    /**
+     * Internal: Send player spawn position
+     */
     private void sendSpawnPos(int x, int y, int z, int dimension) {
         SetSpawnPositionPacket pk = new SetSpawnPositionPacket();
         pk.spawnType = SetSpawnPositionPacket.TYPE_PLAYER_SPAWN;
@@ -1230,6 +1250,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
+    /**
+     * Get player's gamemode
+     *
+     * 0 = survival
+     * 1 = creative
+     * 2 = adventure
+     * 3 = spectator
+     *
+     * @return gamemode (number)
+     */
     public int getGamemode() {
         return gamemode;
     }
@@ -1246,6 +1276,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return gamemode;
     }
 
+    /**
+     * Set player's gamemode
+     * @param gamemode new gamemode
+     * @return gamemode changed
+     */
     public boolean setGamemode(int gamemode) {
         return this.setGamemode(gamemode, false, null);
     }
@@ -1329,6 +1364,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
+    /**
+     * Send adventure settings
+     */
     public void sendSettings() {
         this.adventureSettings.update();
     }
@@ -1773,6 +1811,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return false;
     }
 
+    /**
+     * Send all default attributes
+     */
     public void sendAttributes() {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
         pk.entityId = this.getId();
@@ -2299,6 +2340,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.onPlayerCompleteLoginSequence(this);
     }
 
+    /**
+     * Internal: Send full player list to player
+     * @param player player
+     * @param playerList full player list
+     */
     private void sendFullPlayerListInternal(Player player, Map<UUID, Player> playerList) {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
@@ -2318,7 +2364,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (!loggedIn && !beforeLoginAvailablePackets.contains(packet.pid())) {
+        if (!loggedIn && !PRE_LOGIN_PACKETS.contains(packet.pid())) {
             server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + " due to player not logged in yet");
             return;
         }
@@ -4051,7 +4097,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
-
     private void setTitle(String text) {
         SetTitlePacket packet = new SetTitlePacket();
         packet.text = text;
@@ -4203,10 +4248,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.removePlayer(this);
     }
 
+    /**
+     * Save player data to disk
+     */
     public void save() {
         this.save(false);
     }
 
+    /**
+     * Save player data to disk
+     * @param async save asynchronously
+     */
     public void save(boolean async) {
         if (this.closed) {
             throw new IllegalStateException("Tried to save closed player");
@@ -4253,6 +4305,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    /**
+     * Get player's username
+     * @return username
+     */
     public String getName() {
         return this.username;
     }

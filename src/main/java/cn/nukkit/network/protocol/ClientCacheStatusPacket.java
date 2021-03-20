@@ -2,11 +2,13 @@ package cn.nukkit.network.protocol;
 
 public class ClientCacheStatusPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.CLIENT_CACHE_STATUS_PACKET;
+
     public boolean supported;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.CLIENT_CACHE_STATUS_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

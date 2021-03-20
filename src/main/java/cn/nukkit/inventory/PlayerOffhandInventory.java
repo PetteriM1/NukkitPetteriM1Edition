@@ -4,22 +4,17 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityHumanType;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 import cn.nukkit.network.protocol.types.ContainerIds;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
-
-import java.util.Arrays;
 
 public class PlayerOffhandInventory extends BaseInventory {
 
     /**
      * Items that can be put to offhand inventory on Bedrock Edition
      */
-    private static final IntSet OFFHAND_ITEMS = new IntOpenHashSet(Arrays.asList(ItemID.SHIELD, ItemID.ARROW, ItemID.TOTEM, ItemID.MAP, ItemID.FIREWORKS, ItemID.NAUTILUS_SHELL, ItemID.SPARKLER));
+    //private static final IntSet OFFHAND_ITEMS = new IntOpenHashSet(Arrays.asList(ItemID.SHIELD, ItemID.ARROW, ItemID.TOTEM, ItemID.MAP, ItemID.FIREWORKS, ItemID.NAUTILUS_SHELL, ItemID.SPARKLER));
 
     public PlayerOffhandInventory(EntityHumanType holder) {
         super(holder, InventoryType.OFFHAND);

@@ -7,6 +7,8 @@ import lombok.ToString;
 @ToString()
 public class BiomeDefinitionListPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.BIOME_DEFINITION_LIST_PACKET;
+
     // Call the latest version "TAG"
     private static final byte[] TAG; // 361
 
@@ -20,7 +22,7 @@ public class BiomeDefinitionListPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.BIOME_DEFINITION_LIST_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

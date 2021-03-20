@@ -6,6 +6,8 @@ import lombok.ToString;
 @ToString
 public class ResourcePacksInfoPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;
+
     public boolean mustAccept;
     public boolean scripting;
     public ResourcePack[] behaviourPackEntries = new ResourcePack[0];
@@ -49,6 +51,6 @@ public class ResourcePacksInfoPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.RESOURCE_PACKS_INFO_PACKET;
+        return NETWORK_ID;
     }
 }

@@ -12,9 +12,11 @@ import lombok.ToString;
 @ToString
 public class AddItemEntityPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.ADD_ITEM_ENTITY_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.ADD_ITEM_ENTITY_PACKET;
+        return NETWORK_ID;
     }
 
     public long entityUniqueId;

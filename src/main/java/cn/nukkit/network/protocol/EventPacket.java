@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class EventPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.EVENT_PACKET;
+
     public long eid;
     public int unknown1; // event data
     public byte unknown2; // event type
@@ -30,7 +32,7 @@ public class EventPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.EVENT_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

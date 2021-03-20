@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class VideoStreamConnectPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.VIDEO_STREAM_CONNECT_PACKET;
+
     public static final byte ACTION_OPEN = 0;
     public static final byte ACTION_CLOSE = 1;
 
@@ -14,7 +16,7 @@ public class VideoStreamConnectPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.VIDEO_STREAM_CONNECT_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

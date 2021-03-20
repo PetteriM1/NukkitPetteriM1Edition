@@ -7,6 +7,8 @@ import java.util.UUID;
 @ToString
 public class ResourcePackChunkRequestPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET;
+
     public UUID packId;
     public int chunkIndex;
 
@@ -25,6 +27,6 @@ public class ResourcePackChunkRequestPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET;
+        return NETWORK_ID;
     }
 }

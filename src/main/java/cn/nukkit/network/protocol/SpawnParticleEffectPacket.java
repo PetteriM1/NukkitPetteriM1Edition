@@ -6,6 +6,8 @@ import lombok.ToString;
 @ToString
 public class SpawnParticleEffectPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.SPAWN_PARTICLE_EFFECT_PACKET;
+
     public int dimensionId;
     public long uniqueEntityId = -1;
     public Vector3f position;
@@ -13,7 +15,7 @@ public class SpawnParticleEffectPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.SPAWN_PARTICLE_EFFECT_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

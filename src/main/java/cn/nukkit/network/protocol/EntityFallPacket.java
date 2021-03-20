@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class EntityFallPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.ENTITY_FALL_PACKET;
+
     public long eid;
     public float fallDistance;
     public boolean isInVoid;
@@ -22,6 +24,6 @@ public class EntityFallPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.ENTITY_FALL_PACKET;
+        return NETWORK_ID;
     }
 }
