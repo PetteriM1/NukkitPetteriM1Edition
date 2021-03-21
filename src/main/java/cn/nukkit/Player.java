@@ -2686,7 +2686,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     playerActionPacket.entityId = this.id;
-                    Vector3 pos = new Vector3(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
+                    Vector3 pos = this.temporalVector.setComponents(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
                     BlockFace face = BlockFace.fromIndex(playerActionPacket.face);
 
                     actionswitch:
@@ -2747,6 +2747,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             pk.data = 0;
                             this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
                             this.breakingBlock = null;
+                            // HACK: Fix item frames for 1.16.210
+                            if (this.protocol >= ProtocolInfo.v1_16_210 && this.isSurvival()) {
+                                BlockEntity blockEntityItemFrame = this.level.getBlockEntityIfLoaded(pos);
+                                if (blockEntityItemFrame instanceof BlockEntityItemFrame) {
+                                    BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
+                                    Item itemDrop = itemFrame.getItem();
+                                    if (itemDrop.getId() != Item.AIR) {
+                                        ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, itemFrame.getBlock(), itemFrame, itemDrop);
+                                        this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
+                                        if (!itemFrameDropItemEvent.isCancelled()) {
+                                            itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
+                                            itemFrame.setItemRotation(0);
+                                            pos = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
+                                            this.level.dropItem(pos, itemDrop);
+                                            this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
+                                        } else {
+                                            itemFrame.spawnTo(this);
+                                        }
+                                    }
+                                }
+                            }
                             break;
                         case PlayerActionPacket.ACTION_GET_UPDATED_BLOCK:
                         case PlayerActionPacket.ACTION_DROP_ITEM:
@@ -3188,7 +3209,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.craftingType = CRAFTING_SMALL;
                     this.resetCraftingGridType();
 
-                    pos = new Vector3(blockEntityDataPacket.x, blockEntityDataPacket.y, blockEntityDataPacket.z);
+                    pos = this.temporalVector.setComponents(blockEntityDataPacket.x, blockEntityDataPacket.y, blockEntityDataPacket.z);
                     if (pos.distanceSquared(this) > 10000) {
                         break;
                     }
@@ -3232,23 +3253,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
                     ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
                     Vector3 vector3 = this.temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z);
-                    BlockEntity blockEntityItemFrame = this.level.getBlockEntity(vector3);
-                    BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
-                    if (itemFrame != null) {
-                        block = itemFrame.getBlock();
+                    BlockEntity blockEntityItemFrame = this.level.getBlockEntityIfLoaded(vector3);
+                    if (blockEntityItemFrame instanceof BlockEntityItemFrame) {
+                        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
                         Item itemDrop = itemFrame.getItem();
-                        ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, block, itemFrame, itemDrop);
-                        this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
-                        if (!itemFrameDropItemEvent.isCancelled()) {
-                            if (itemDrop.getId() != Item.AIR) {
-                                vector3 = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
-                                this.level.dropItem(vector3, itemDrop);
+                        if (itemDrop.getId() != Item.AIR) {
+                            ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, itemFrame.getBlock(), itemFrame, itemDrop);
+                            this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
+                            if (!itemFrameDropItemEvent.isCancelled()) {
                                 itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
                                 itemFrame.setItemRotation(0);
+                                vector3 = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
+                                this.level.dropItem(vector3, itemDrop);
                                 this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
+                            } else {
+                                itemFrame.spawnTo(this);
                             }
-                        } else {
-                            itemFrame.spawnTo(this);
                         }
                     }
                     break;
