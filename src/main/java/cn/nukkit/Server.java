@@ -913,8 +913,7 @@ public class Server {
     }
 
     public void onPlayerCompleteLoginSequence(Player player) {
-        this.playerList.put(player.getUniqueId(), player);
-        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin(), player.getLoginChainData().getXUID());
+        //this.sendFullPlayerListData(player);
     }
 
     public void addPlayer(InetSocketAddress socketAddress, Player player) {
