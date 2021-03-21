@@ -50,6 +50,7 @@ public class EntityBoat extends EntityVehicle {
 
     protected boolean sinking = true;
     public int woodID;
+    private boolean inWater;
 
     public EntityBoat(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -143,9 +144,9 @@ public class EntityBoat extends EntityVehicle {
         if (this.isAlive()) {
             super.onUpdate(currentTick);
 
+            inWater = false;
             double waterDiff = getWaterLevel();
             if (!hasControllingPassenger()) {
-
                 if (waterDiff > SINKING_DEPTH && !sinking) {
                     sinking = true;
                 } else if (waterDiff < -0.07 && sinking) {
@@ -157,13 +158,15 @@ public class EntityBoat extends EntityVehicle {
                 } else if (waterDiff < 0 || !sinking) {
                     this.motionY = this.motionY > SINKING_MAX_SPEED ? Math.max(this.motionY - 0.02, SINKING_MAX_SPEED) : this.motionY + SINKING_SPEED;
                 }
+            } else if (!inWater && level.getBlockIdAt(NukkitMath.floorDouble(x), ((int) y) - 1, NukkitMath.floorDouble(z)) == 0) {
+                this.motionY = -0.5;
             }
 
             if (this.checkObstruction(this.x, this.y, this.z)) {
                 hasUpdate = true;
             }
 
-            this.move(this.motionX, this.motionY, this.motionZ);
+            //this.move(this.motionX, this.motionY, this.motionZ);
 
             double friction = 1 - this.getDrag();
 
@@ -189,6 +192,8 @@ public class EntityBoat extends EntityVehicle {
             if (!from.equals(to)) {
                 this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
             }
+
+            this.move(this.motionX, this.motionY, this.motionZ);
 
             //TODO: Lily pad collision
             this.updateMovement();
@@ -286,6 +291,7 @@ public class EntityBoat extends EntityVehicle {
                     double level = block.getMaxY();
 
                     diffY = Math.min(maxY - level, diffY);
+                    inWater = true;
                 }
             }
 
@@ -333,7 +339,7 @@ public class EntityBoat extends EntityVehicle {
 
         updatePassengers();
         entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
-
+        entity.resetFallDistance();
         return r;
     }
 

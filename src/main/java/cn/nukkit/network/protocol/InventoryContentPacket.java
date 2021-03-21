@@ -10,9 +10,11 @@ import lombok.ToString;
 @ToString
 public class InventoryContentPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.INVENTORY_CONTENT_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.INVENTORY_CONTENT_PACKET;
+        return NETWORK_ID;
     }
 
     public static final int SPECIAL_INVENTORY = 0;

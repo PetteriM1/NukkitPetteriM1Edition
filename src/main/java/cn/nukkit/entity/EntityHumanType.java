@@ -182,7 +182,7 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             }
 
             for (int slot = 0; slot < 4; slot++) {
-                Item armor = damageArmor(this.inventory.getArmorItem(slot), damager, source.getDamage(), false);
+                Item armor = damageArmor(this.inventory.getArmorItem(slot), damager, source.getDamage(), false, source.getCause());
 
                 inventory.setArmorItem(slot, armor, armor.getId() != BlockID.AIR);
             }
@@ -193,13 +193,9 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
         }
     }
 
-    protected Item damageArmor(Item armor, Entity damager) {
-        return damageArmor(armor, damager, 0, false);
-    }
-
-    protected Item damageArmor(Item armor, Entity damager, float damage, boolean shield) {
+    protected Item damageArmor(Item armor, Entity damager, float damage, boolean shield, DamageCause cause) {
         if (armor.hasEnchantments()) {
-            if (damager != null) {
+            if (damager != null && cause != DamageCause.THORNS) {
                 for (Enchantment enchantment : armor.getEnchantments()) {
                     enchantment.doPostAttack(damager, this);
                 }

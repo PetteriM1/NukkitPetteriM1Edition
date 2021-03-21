@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class UpdateTradePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.UPDATE_TRADE_PACKET;
+
     public byte windowId;
     public byte windowType = 15;
     public int unknownVarInt1;
@@ -20,7 +22,7 @@ public class UpdateTradePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.UPDATE_TRADE_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

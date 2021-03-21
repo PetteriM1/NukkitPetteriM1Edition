@@ -5,12 +5,14 @@ import lombok.ToString;
 @ToString
 public class NetworkStackLatencyPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.NETWORK_STACK_LATENCY_PACKET;
+
     public long timestamp;
     public boolean unknownBool;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.NETWORK_STACK_LATENCY_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

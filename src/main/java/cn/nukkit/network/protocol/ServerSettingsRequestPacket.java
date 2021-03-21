@@ -5,9 +5,11 @@ import lombok.ToString;
 @ToString
 public class ServerSettingsRequestPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.SERVER_SETTINGS_REQUEST_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.SERVER_SETTINGS_REQUEST_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class SpawnExperienceOrbPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.SPAWN_EXPERIENCE_ORB_PACKET;
+
     public float x;
     public float y;
     public float z;
@@ -23,6 +25,6 @@ public class SpawnExperienceOrbPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.SPAWN_EXPERIENCE_ORB_PACKET;
+        return NETWORK_ID;
     }
 }

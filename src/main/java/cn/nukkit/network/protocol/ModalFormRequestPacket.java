@@ -5,12 +5,14 @@ import lombok.ToString;
 @ToString
 public class ModalFormRequestPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.MODAL_FORM_REQUEST_PACKET;
+
     public int formId;
     public String data;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.MODAL_FORM_REQUEST_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

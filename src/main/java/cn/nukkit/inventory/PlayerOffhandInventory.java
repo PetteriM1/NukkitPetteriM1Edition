@@ -11,6 +11,11 @@ import cn.nukkit.network.protocol.types.ContainerIds;
 
 public class PlayerOffhandInventory extends BaseInventory {
 
+    /**
+     * Items that can be put to offhand inventory on Bedrock Edition
+     */
+    //private static final IntSet OFFHAND_ITEMS = new IntOpenHashSet(Arrays.asList(ItemID.SHIELD, ItemID.ARROW, ItemID.TOTEM, ItemID.MAP, ItemID.FIREWORKS, ItemID.NAUTILUS_SHELL, ItemID.SPARKLER));
+
     public PlayerOffhandInventory(EntityHumanType holder) {
         super(holder, InventoryType.OFFHAND);
     }
@@ -77,5 +82,11 @@ public class PlayerOffhandInventory extends BaseInventory {
     @Override
     public EntityHuman getHolder() {
         return (EntityHuman) super.getHolder();
+    }
+
+    @Override
+    public boolean allowedToAdd(Item item) {
+        //return OFFHAND_ITEMS.contains(item.getId());
+        return true;
     }
 }

@@ -260,21 +260,22 @@ public abstract class BaseInventory implements Inventory {
     
     @Override
     public boolean canAddItem(Item item) {
-        item = item.clone();
+        int count = item.getCount();
         boolean checkDamage = item.hasMeta();
         boolean checkTag = item.getCompoundTag() != null;
-        for (int i = 0; i < this.getSize(); ++i) {
-            Item slot = this.getItem(i);
+        int i1 = this.getSize();
+        for (int i = 0; i < i1; ++i) {
+            Item slot = this.getItemFast(i);
             if (item.equals(slot, checkDamage, checkTag)) {
                 int diff;
                 if ((diff = slot.getMaxStackSize() - slot.getCount()) > 0) {
-                    item.setCount(item.getCount() - diff);
+                    count -= diff;
                 }
             } else if (slot.getId() == Item.AIR) {
-                item.setCount(item.getCount() - this.maxStackSize);
+                count -= this.getMaxStackSize();
             }
 
-            if (item.getCount() <= 0) {
+            if (count <= 0) {
                 return true;
             }
         }
@@ -545,7 +546,20 @@ public abstract class BaseInventory implements Inventory {
 
     @Override
     public void sendSlot(int index, Player player) {
-        this.sendSlot(index, new Player[]{player});
+        this.sendSlotTo(index, player);
+    }
+
+    private void sendSlotTo(int index, Player player) {
+        InventorySlotPacket pk = new InventorySlotPacket();
+        pk.slot = index;
+        pk.item = this.getItem(index).clone();
+        int id = player.getWindowId(this);
+        if (id == -1) {
+            this.close(player);
+            return;
+        }
+        pk.inventoryId = id;
+        player.dataPacket(pk);
     }
 
     @Override

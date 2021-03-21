@@ -2,13 +2,15 @@ package cn.nukkit.network.protocol;
 
 public class EmotePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.EMOTE_PACKET;
+
     public long runtimeId;
     public String emoteID;
     public byte flags;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.EMOTE_PACKET;
+        return NETWORK_ID;
     }
 
     @Override
