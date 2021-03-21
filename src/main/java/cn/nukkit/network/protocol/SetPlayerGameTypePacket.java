@@ -9,9 +9,11 @@ import lombok.ToString;
 @ToString
 public class SetPlayerGameTypePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.SET_PLAYER_GAME_TYPE_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.SET_PLAYER_GAME_TYPE_PACKET;
+        return NETWORK_ID;
     }
 
     public int gamemode;

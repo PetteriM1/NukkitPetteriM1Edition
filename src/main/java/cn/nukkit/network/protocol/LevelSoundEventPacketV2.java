@@ -6,6 +6,8 @@ import lombok.ToString;
 @ToString
 public class LevelSoundEventPacketV2 extends LevelSoundEventPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V2;
+
     public int sound;
     public float x;
     public float y;
@@ -41,6 +43,6 @@ public class LevelSoundEventPacketV2 extends LevelSoundEventPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.LEVEL_SOUND_EVENT_PACKET_V2;
+        return NETWORK_ID;
     }
 }

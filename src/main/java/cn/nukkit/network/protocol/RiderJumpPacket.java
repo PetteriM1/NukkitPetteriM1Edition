@@ -5,11 +5,13 @@ import lombok.ToString;
 @ToString
 public class RiderJumpPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.RIDER_JUMP_PACKET;
+
     public int jumpStrength;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.RIDER_JUMP_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

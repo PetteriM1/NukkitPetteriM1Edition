@@ -270,7 +270,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private int failedTransactions;
     public int ticksSinceLastRest;
 
-    private static final List<Byte> beforeLoginAvailablePackets = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET, ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET);
+    /**
+     * Packets that can be received before the player has logged in
+     */
+    private static final List<Byte> PRE_LOGIN_PACKETS = Arrays.asList(ProtocolInfo.BATCH_PACKET, ProtocolInfo.LOGIN_PACKET, ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, ProtocolInfo.SET_LOCAL_PLAYER_AS_INITIALIZED_PACKET, ProtocolInfo.RESOURCE_PACK_CHUNK_REQUEST_PACKET, ProtocolInfo.RESOURCE_PACK_CLIENT_RESPONSE_PACKET, ProtocolInfo.CLIENT_CACHE_STATUS_PACKET, ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET);
 
     public int getStartActionTick() {
         return startAction;
@@ -517,10 +520,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendCommandData();
     }
 
+    /**
+     * Set visibility of player's admin status on the player list
+     */
     public void setShowAdmin(boolean showAdmin) {
         this.showAdmin = showAdmin;
     }
 
+    /**
+     * Get visibility of player's admin status on the player list
+     */
     public boolean showAdmin() {
         return this.showAdmin;
     }
@@ -587,6 +596,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.enableClientCommand && spawned) this.sendCommandData();
     }
 
+    /**
+     * Are commands enabled for this player on the client side
+     * @return commands enabled
+     */
     public boolean isEnableClientCommand() {
         return this.enableClientCommand;
     }
@@ -1117,6 +1130,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.directDataPacket(packet) ? 0 : -1;
     }
 
+    /**
+     * Get network latency
+     * @return network latency in milliseconds
+     */
     public int getPing() {
         return this.interfaz.getNetworkLatency(this);
     }
@@ -1171,6 +1188,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendSpawnPos((int) pos.x, (int) pos.y, (int) pos.z, level.getDimension());
     }
 
+    /**
+     * Internal: Send player spawn position
+     */
     private void sendSpawnPos(int x, int y, int z, int dimension) {
         SetSpawnPositionPacket pk = new SetSpawnPositionPacket();
         pk.spawnType = SetSpawnPositionPacket.TYPE_PLAYER_SPAWN;
@@ -1230,6 +1250,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
+    /**
+     * Get player's gamemode
+     *
+     * 0 = survival
+     * 1 = creative
+     * 2 = adventure
+     * 3 = spectator
+     *
+     * @return gamemode (number)
+     */
     public int getGamemode() {
         return gamemode;
     }
@@ -1246,6 +1276,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return gamemode;
     }
 
+    /**
+     * Set player's gamemode
+     * @param gamemode new gamemode
+     * @return gamemode changed
+     */
     public boolean setGamemode(int gamemode) {
         return this.setGamemode(gamemode, false, null);
     }
@@ -1329,6 +1364,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
+    /**
+     * Send adventure settings
+     */
     public void sendSettings() {
         this.adventureSettings.update();
     }
@@ -1773,6 +1811,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return false;
     }
 
+    /**
+     * Send all default attributes
+     */
     public void sendAttributes() {
         UpdateAttributesPacket pk = new UpdateAttributesPacket();
         pk.entityId = this.getId();
@@ -2305,7 +2346,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (!loggedIn && !beforeLoginAvailablePackets.contains(packet.pid())) {
+        if (!loggedIn && !PRE_LOGIN_PACKETS.contains(packet.pid())) {
             server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + " due to player not logged in yet");
             return;
         }
@@ -2627,7 +2668,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     playerActionPacket.entityId = this.id;
-                    Vector3 pos = new Vector3(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
+                    Vector3 pos = this.temporalVector.setComponents(playerActionPacket.x, playerActionPacket.y, playerActionPacket.z);
                     BlockFace face = BlockFace.fromIndex(playerActionPacket.face);
 
                     actionswitch:
@@ -2688,6 +2729,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             pk.data = 0;
                             this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
                             this.breakingBlock = null;
+                            // HACK: Fix item frames for 1.16.210
+                            if (this.protocol >= ProtocolInfo.v1_16_210 && this.isSurvival()) {
+                                BlockEntity blockEntityItemFrame = this.level.getBlockEntityIfLoaded(pos);
+                                if (blockEntityItemFrame instanceof BlockEntityItemFrame) {
+                                    BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
+                                    Item itemDrop = itemFrame.getItem();
+                                    if (itemDrop.getId() != Item.AIR) {
+                                        ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, itemFrame.getBlock(), itemFrame, itemDrop);
+                                        this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
+                                        if (!itemFrameDropItemEvent.isCancelled()) {
+                                            itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
+                                            itemFrame.setItemRotation(0);
+                                            pos = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
+                                            this.level.dropItem(pos, itemDrop);
+                                            this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
+                                        } else {
+                                            itemFrame.spawnTo(this);
+                                        }
+                                    }
+                                }
+                            }
                             break;
                         case PlayerActionPacket.ACTION_GET_UPDATED_BLOCK:
                         case PlayerActionPacket.ACTION_DROP_ITEM:
@@ -3129,7 +3191,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.craftingType = CRAFTING_SMALL;
                     this.resetCraftingGridType();
 
-                    pos = new Vector3(blockEntityDataPacket.x, blockEntityDataPacket.y, blockEntityDataPacket.z);
+                    pos = this.temporalVector.setComponents(blockEntityDataPacket.x, blockEntityDataPacket.y, blockEntityDataPacket.z);
                     if (pos.distanceSquared(this) > 10000) {
                         break;
                     }
@@ -3173,23 +3235,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
                     ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
                     Vector3 vector3 = this.temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z);
-                    BlockEntity blockEntityItemFrame = this.level.getBlockEntity(vector3);
-                    BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
-                    if (itemFrame != null) {
-                        block = itemFrame.getBlock();
+                    BlockEntity blockEntityItemFrame = this.level.getBlockEntityIfLoaded(vector3);
+                    if (blockEntityItemFrame instanceof BlockEntityItemFrame) {
+                        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
                         Item itemDrop = itemFrame.getItem();
-                        ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, block, itemFrame, itemDrop);
-                        this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
-                        if (!itemFrameDropItemEvent.isCancelled()) {
-                            if (itemDrop.getId() != Item.AIR) {
-                                vector3 = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
-                                this.level.dropItem(vector3, itemDrop);
+                        if (itemDrop.getId() != Item.AIR) {
+                            ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, itemFrame.getBlock(), itemFrame, itemDrop);
+                            this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
+                            if (!itemFrameDropItemEvent.isCancelled()) {
                                 itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
                                 itemFrame.setItemRotation(0);
+                                vector3 = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
+                                this.level.dropItem(vector3, itemDrop);
                                 this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
+                            } else {
+                                itemFrame.spawnTo(this);
                             }
-                        } else {
-                            itemFrame.spawnTo(this);
                         }
                     }
                     break;
@@ -4038,7 +4099,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(pk);
     }
 
-
     private void setTitle(String text) {
         SetTitlePacket packet = new SetTitlePacket();
         packet.text = text;
@@ -4190,10 +4250,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.removePlayer(this);
     }
 
+    /**
+     * Save player data to disk
+     */
     public void save() {
         this.save(false);
     }
 
+    /**
+     * Save player data to disk
+     * @param async save asynchronously
+     */
     public void save(boolean async) {
         if (this.closed) {
             throw new IllegalStateException("Tried to save closed player");
@@ -4240,6 +4307,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    /**
+     * Get player's username
+     * @return username
+     */
     public String getName() {
         return this.username;
     }
@@ -4260,6 +4331,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             switch (cause == null ? DamageCause.CUSTOM : cause.getCause()) {
                 case ENTITY_ATTACK:
+                case THORNS:
                     if (cause instanceof EntityDamageByEntityEvent) {
                         Entity e = ((EntityDamageByEntityEvent) cause).getDamager();
                         killer = e;

@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString
 public class NPCRequestPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.NPC_REQUEST_PACKET;
+
     public long entityRuntimeId;
 
     public RequestType requestType;
@@ -24,7 +26,7 @@ public class NPCRequestPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.NPC_REQUEST_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

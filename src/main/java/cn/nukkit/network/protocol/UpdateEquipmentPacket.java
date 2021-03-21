@@ -5,6 +5,8 @@ import lombok.ToString;
 @ToString(exclude = "namedtag")
 public class UpdateEquipmentPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.UPDATE_EQUIPMENT_PACKET;
+
     public int windowId;
     public int windowType;
     public int unknown;
@@ -14,7 +16,7 @@ public class UpdateEquipmentPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.UPDATE_EQUIPMENT_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

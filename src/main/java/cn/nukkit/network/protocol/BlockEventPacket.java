@@ -9,9 +9,11 @@ import lombok.ToString;
 @ToString
 public class BlockEventPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.BLOCK_EVENT_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.BLOCK_EVENT_PACKET;
+        return NETWORK_ID;
     }
 
     public int x;

@@ -9,13 +9,15 @@ import lombok.ToString;
 @ToString
 public class UpdateAttributesPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;
+
     public Attribute[] entries;
     public long entityId;
     public long frame;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.UPDATE_ATTRIBUTES_PACKET;
+        return NETWORK_ID;
     }
 
     public void decode() {

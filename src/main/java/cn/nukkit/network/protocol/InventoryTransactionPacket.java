@@ -10,6 +10,8 @@ import lombok.ToString;
 @ToString
 public class InventoryTransactionPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.INVENTORY_TRANSACTION_PACKET;
+
     public static final int TYPE_NORMAL = 0;
     public static final int TYPE_MISMATCH = 1;
     public static final int TYPE_USE_ITEM = 2;
@@ -49,7 +51,7 @@ public class InventoryTransactionPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.INVENTORY_TRANSACTION_PACKET;
+        return NETWORK_ID;
     }
 
     @Override
