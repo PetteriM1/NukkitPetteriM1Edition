@@ -9,9 +9,11 @@ import lombok.ToString;
 @ToString
 public class MobEffectPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.MOB_EFFECT_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.MOB_EFFECT_PACKET;
+        return NETWORK_ID;
     }
 
     public static final byte EVENT_ADD = 1;

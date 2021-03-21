@@ -5,11 +5,13 @@ import lombok.ToString;
 @ToString
 public class AddBehaviorTreePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.ADD_BEHAVIOR_TREE_PACKET;
+
     public String behaviorTreeJson;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.ADD_BEHAVIOR_TREE_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

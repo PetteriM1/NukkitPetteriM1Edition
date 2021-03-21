@@ -15,6 +15,8 @@ import java.util.List;
 @ToString
 public class CraftingDataPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.CRAFTING_DATA_PACKET;
+
     public static final String CRAFTING_TAG_CRAFTING_TABLE = "crafting_table";
     public static final String CRAFTING_TAG_CARTOGRAPHY_TABLE = "cartography_table";
     public static final String CRAFTING_TAG_STONECUTTER = "stonecutter";
@@ -196,7 +198,7 @@ public class CraftingDataPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.CRAFTING_DATA_PACKET;
+        return NETWORK_ID;
     }
 
     private int writeEntryLegacy(Object entry, BinaryStream stream) {

@@ -13,6 +13,8 @@ import cn.nukkit.nbt.tag.CompoundTag;
  */
 public class BlockEntityItemFrame extends BlockEntitySpawnable {
 
+    private Item item_;
+
     public BlockEntityItemFrame(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -20,7 +22,7 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
     @Override
     protected void initBlockEntity() {
         if (!namedTag.contains("Item")) {
-            namedTag.putCompound("Item", NBTIO.putItemHelper(new ItemBlock(Block.get(BlockID.AIR))));
+            namedTag.putCompound("Item", NBTIO.putItemHelper(item_ = new ItemBlock(Block.get(BlockID.AIR))));
         }
 
         if (!namedTag.contains("ItemRotation")) {
@@ -57,8 +59,11 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
     }
 
     public Item getItem() {
-        CompoundTag NBTTag = this.namedTag.getCompound("Item");
-        return NBTIO.getItemHelper(NBTTag);
+        if (item_ == null) {
+            CompoundTag NBTTag = this.namedTag.getCompound("Item");
+            item_ = NBTIO.getItemHelper(NBTTag);
+        }
+        return item_;
     }
 
     public void setItem(Item item) {
@@ -66,6 +71,7 @@ public class BlockEntityItemFrame extends BlockEntitySpawnable {
     }
 
     public void setItem(Item item, boolean setChanged) {
+        item_ = null;
         this.namedTag.putCompound("Item", NBTIO.putItemHelper(item));
         if (setChanged) {
             this.setDirty();

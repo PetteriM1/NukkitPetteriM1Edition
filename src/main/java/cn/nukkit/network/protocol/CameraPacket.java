@@ -5,12 +5,14 @@ import lombok.ToString;
 @ToString
 public class CameraPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.CAMERA_PACKET;
+
     public long cameraUniqueId;
     public long playerUniqueId;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.CAMERA_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

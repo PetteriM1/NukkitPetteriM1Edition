@@ -7,6 +7,8 @@ import java.util.UUID;
 @ToString(exclude = "sha256")
 public class ResourcePackDataInfoPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACK_DATA_INFO_PACKET;
+
     public static final int TYPE_INVALID = 0;
     public static final int TYPE_ADDON = 1;
     public static final int TYPE_CACHED = 2;
@@ -55,6 +57,6 @@ public class ResourcePackDataInfoPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.RESOURCE_PACK_DATA_INFO_PACKET;
+        return NETWORK_ID;
     }
 }

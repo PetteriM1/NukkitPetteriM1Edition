@@ -37,4 +37,14 @@ public class ItemFishingRod extends ItemTool {
     public int getMaxDurability() {
         return ItemTool.DURABILITY_FISHING_ROD;
     }
+
+    @Override
+    public boolean noDamageOnAttack() {
+        return true;
+    }
+
+    @Override
+    public boolean noDamageOnBreak() {
+        return true;
+    }
 }

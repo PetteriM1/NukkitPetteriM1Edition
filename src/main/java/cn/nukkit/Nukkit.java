@@ -3,7 +3,6 @@ package cn.nukkit;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.ServerKiller;
 import com.google.common.base.Preconditions;
-import io.netty.util.ResourceLeakDetector;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Log4J2LoggerFactory;
 import lombok.extern.log4j.Log4j2;
@@ -65,7 +64,7 @@ public class Nukkit {
         if (args.length > 0 && args[0].equalsIgnoreCase("-debug")) {
             debug = true;
             InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
-            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+            //ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
             System.out.print("Debug stuff enabled!\n");
             System.out.print("Do you want to skip loading plugins? (yes/no) ");
             loadPlugins = !new Scanner(System.in).nextLine().toLowerCase().startsWith("y");
