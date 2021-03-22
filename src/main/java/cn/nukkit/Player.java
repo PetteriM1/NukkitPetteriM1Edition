@@ -5733,7 +5733,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.gamemode != SPECTATOR;
     }
 
-    @Override
+    /*@Override
     protected void onBlock(Entity entity, boolean animate, float damage) {
         super.onBlock(entity, animate, damage);
         if (animate) {
@@ -5744,7 +5744,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             });
         }
-    }
+    }*/
 
     public int getTimeSinceRest() {
         return ticksSinceLastRest;
