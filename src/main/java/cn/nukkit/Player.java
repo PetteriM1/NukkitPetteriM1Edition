@@ -98,7 +98,6 @@ import java.util.List;
 import java.util.*;
 import java.util.Queue;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1403,22 +1402,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public boolean setDataProperty(EntityData data) {
-        return setDataProperty(data, true);
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public boolean setDataProperty(EntityData data, boolean send) {
-        if (super.setDataProperty(data, send)) {
-            if (send) this.sendData(this, new EntityMetadata().put(this.getDataProperty(data.getId())));
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     protected void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
         if (!this.onGround || movX != 0 || movY != 0 || movZ != 0) {
             boolean onGround = false;
@@ -2244,20 +2227,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 startGamePacket.lightningLevel = this.getLevel().getThunderTime();
             }
         }
+        this.quickBatch(startGamePacket);
 
-        CompletableFuture.runAsync(() -> this.quickBatch(startGamePacket)).whenComplete((ignore, error) -> {
-            if (error != null) {
-                this.close("", "Internal Server Error");
-                this.server.getLogger().logException(error);
-            } else if (this.connected){
-                this.completeLoginSequence0();
-            }
-        });
-    }
-
-    protected void completeLoginSequence0() {
         this.loggedIn = true;
-
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.getAddress(),
@@ -2691,8 +2663,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     ((BlockNoteblock) target).emitSound();
                                     break actionswitch;
                                 case Block.DRAGON_EGG:
-                                    ((BlockDragonEgg) target).teleport();
-                                    break actionswitch;
+                                    if (!this.isCreative()) {
+                                        ((BlockDragonEgg) target).teleport();
+                                        break actionswitch;
+                                    }
                             }
                             Block block = target.getSide(face);
                             if (block.getId() == Block.FIRE) {
@@ -5714,7 +5688,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.gamemode != SPECTATOR;
     }
 
-    @Override
+    /*@Override
     protected void onBlock(Entity entity, boolean animate, float damage) {
         super.onBlock(entity, animate, damage);
         if (animate) {
@@ -5725,7 +5699,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             });
         }
-    }
+    }*/
 
     public int getTimeSinceRest() {
         return ticksSinceLastRest;

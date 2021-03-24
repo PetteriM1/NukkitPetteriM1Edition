@@ -148,6 +148,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         if (this.canDespawn() && this.age > Server.getInstance().despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
+            if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
             return true;
         }
 

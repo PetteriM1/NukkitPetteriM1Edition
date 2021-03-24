@@ -39,6 +39,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
     private EntityArmorInventory armorInventory;
 
     private int vibrateTimer = 0;
+    private boolean vibrating;
 
     public EntityArmorStand(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -270,6 +271,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
             this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
             this.setGenericFlag(Entity.DATA_FLAG_VIBRATING, true);
             this.vibrateTimer = 20;
+            this.vibrating = true;
 
             if (source instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) source;
@@ -304,8 +306,9 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        if (this.getGenericFlag(Entity.DATA_FLAG_VIBRATING) && this.vibrateTimer-- <= 0) {
+        if (this.vibrating && this.vibrateTimer-- <= 0) {
             this.setGenericFlag(Entity.DATA_FLAG_VIBRATING, false);
+            this.vibrating = false;
         }
 
         return hasUpdate;
