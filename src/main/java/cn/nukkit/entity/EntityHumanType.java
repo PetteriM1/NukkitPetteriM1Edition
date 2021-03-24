@@ -213,10 +213,8 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
             return armor;
         }
 
-        if (damage < 0) damage = 0;
-
         if (shield) {
-            armor.setDamage(armor.getDamage() + damage >= 4.0f ? (int) damage : 1);
+            armor.setDamage(armor.getDamage() + (damage >= 4.0f ? ((int) damage) : 1));
         } else {
             armor.setDamage(armor.getDamage() + Math.max((int) (damage / 4), 1));
         }

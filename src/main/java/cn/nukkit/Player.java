@@ -95,7 +95,6 @@ import java.util.List;
 import java.util.*;
 import java.util.Queue;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1400,22 +1399,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public boolean setDataProperty(EntityData data) {
-        return setDataProperty(data, true);
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public boolean setDataProperty(EntityData data, boolean send) {
-        if (super.setDataProperty(data, send)) {
-            if (send) this.sendData(this, new EntityMetadata().put(this.getDataProperty(data.getId())));
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     protected void checkGroundState(double movX, double movY, double movZ, double dx, double dy, double dz) {
         if (!this.onGround || movX != 0 || movY != 0 || movZ != 0) {
             boolean onGround = false;
@@ -2257,116 +2240,87 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.quickBatch(startGamePacket);
 
         this.loggedIn = true;
-
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.getAddress(),
                 String.valueOf(this.getPort())));
 
-        final Map<UUID, Player> tempOnlinePlayers = getServer().getOnlinePlayers();
-        final boolean op = this.isOp();
-
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_CAN_CLIMB, true, false);
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_CAN_SHOW_NAMETAG, true, false);
         this.setDataProperty(new ByteEntityData(DATA_ALWAYS_SHOW_NAMETAG, 1), false);
-        final EntityMetadata entityData = this.dataProperties.clone();
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!this.connected) return;
-                if (this.protocol >= 313) {
-                    if (this.protocol >= 361) {
-                        if (this.protocol >= 419) {
-                            this.dataPacket(new ItemComponentPacket());
-                        }
-                        this.dataPacket(new BiomeDefinitionListPacket());
+        try {
+            if (this.protocol >= ProtocolInfo.v1_8_0) {
+                if (this.protocol >= ProtocolInfo.v1_12_0) {
+                    if (this.protocol >= ProtocolInfo.v1_16_100) {
+                        this.dataPacket(new ItemComponentPacket());
                     }
-                    this.dataPacket(new AvailableEntityIdentifiersPacket());
+                    this.dataPacket(new BiomeDefinitionListPacket());
                 }
-
-                //this.setImmobile(true);
-                if (this.protocol >= 419) {
-                    this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, level.getDimension());
-                }
-                this.getLevel().sendTime(this);
-
-                SetDifficultyPacket diffucultyPK = new SetDifficultyPacket();
-                diffucultyPK.difficulty = this.getServer().getDifficulty();
-                this.dataPacket(diffucultyPK);
-                SetCommandsEnabledPacket enableCommandsPK = new SetCommandsEnabledPacket();
-                enableCommandsPK.enabled = this.isEnableClientCommand();
-                this.dataPacket(enableCommandsPK);
-
-                if (this.isEnableClientCommand()) {
-                    this.getServer().getScheduler().scheduleDelayedTask(null, () -> {
-                        if (this.isOnline()) {
-                            this.sendCommandData();
-                        }
-                    }, 2);
-                }
-                this.adventureSettings.update();
-
-                GameRulesChangedPacket gameRulesPK = new GameRulesChangedPacket();
-                gameRulesPK.gameRules = level.getGameRules();
-                this.dataPacket(gameRulesPK);
-
-                /*if (this.protocol >= 419) {
-                    this.dataPacket(new PlayerFogPacket());
-                }*/
-
-                sendFullPlayerListInternal(this, tempOnlinePlayers);
-
-                this.sendAttributes();
-
-                if (this.protocol < 407 && this.gamemode == Player.SPECTATOR) {
-                    InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                    inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
-                    this.dataPacket(inventoryContentPacket);
-                } else {
-                    this.inventory.sendCreativeContents();
-                }
-                this.sendAllInventories();
-                this.inventory.sendHeldItemIfNotAir(this);
-                this.server.sendRecipeList(this);
-
-                this.sendPotionEffects(this);
-                this.sendData(this, entityData);
-
-                if (!server.checkOpMovement && op) {
-                    this.setCheckMovement(false);
-                }
-
-                if (op || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
-                    this.setRemoveFormat(false);
-                }
-            } catch (Exception e) {
-                this.close("", "Internal Server Error");
-                getServer().getLogger().logException(e);
+                this.dataPacket(new AvailableEntityIdentifiersPacket());
             }
-        });
 
-        this.server.updatePlayerListData(this.getUniqueId(), this.getId(), this.getDisplayName(), this.getSkin(), this.getLoginChainData().getXUID());
-        this.server.playerList.put(this.getUniqueId(), this);
-        this.server.onPlayerCompleteLoginSequence(this);
-    }
+            // this.setImmobile(true);
+            if (this.protocol >= ProtocolInfo.v1_16_100) {
+                this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, this.level.getDimension());
+            }
+            this.getLevel().sendTime(this);
 
-    /**
-     * Internal: Send full player list to player
-     * @param player player
-     * @param playerList full player list
-     */
-    private void sendFullPlayerListInternal(Player player, Map<UUID, Player> playerList) {
-        PlayerListPacket pk = new PlayerListPacket();
-        pk.type = PlayerListPacket.TYPE_ADD;
-        pk.entries = playerList.values().stream()
-                .map(p -> new PlayerListPacket.Entry(
-                        p.getUniqueId(),
-                        p.getId(),
-                        p.getDisplayName(),
-                        p.getSkin(),
-                        p.getLoginChainData().getXUID()))
-                .toArray(PlayerListPacket.Entry[]::new);
-        player.dataPacket(pk);
+            SetDifficultyPacket difficultyPacket = new SetDifficultyPacket();
+            difficultyPacket.difficulty = this.server.getDifficulty();
+            this.dataPacket(difficultyPacket);
+
+            SetCommandsEnabledPacket commandsPacket = new SetCommandsEnabledPacket();
+            commandsPacket.enabled = this.isEnableClientCommand();
+            this.dataPacket(commandsPacket);
+
+            if (this.isEnableClientCommand()) {
+                this.server.getScheduler().scheduleDelayedTask(null, () -> {
+                    if (this.isOnline()) {
+                        this.sendCommandData();
+                    }
+                }, 2);
+            }
+            this.adventureSettings.update();
+
+            GameRulesChangedPacket gameRulesPK = new GameRulesChangedPacket();
+            gameRulesPK.gameRules = level.getGameRules();
+            this.dataPacket(gameRulesPK);
+
+            /*if (this.protocol >= ProtocolInfo.v1_16_100) {
+                this.dataPacket(new PlayerFogPacket());
+            }*/
+
+            this.server.sendFullPlayerListData(this);
+            this.sendAttributes();
+
+            if (this.protocol < ProtocolInfo.v1_16_0 && this.gamemode == Player.SPECTATOR) {
+                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+                inventoryContentPacket.inventoryId = ContainerIds.CREATIVE;
+                this.dataPacket(inventoryContentPacket);
+            } else {
+                this.inventory.sendCreativeContents();
+            }
+            this.sendAllInventories();
+            this.inventory.sendHeldItemIfNotAir(this);
+            this.server.sendRecipeList(this);
+
+            this.sendPotionEffects(this);
+            this.sendData(this, this.dataProperties.clone());
+
+            if (!this.server.checkOpMovement && this.isOp()) {
+                this.setCheckMovement(false);
+            }
+
+            if (this.isOp() || this.hasPermission("nukkit.textcolor") || this.server.suomiCraftPEMode()) {
+                this.setRemoveFormat(false);
+            }
+
+            this.server.onPlayerCompleteLoginSequence(this);
+        } catch (Exception e) {
+            this.close("", "Internal Server Error");
+            this.server.getLogger().logException(e);
+        }
     }
 
     public void handleDataPacket(DataPacket packet) {
@@ -2719,8 +2673,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     ((BlockNoteblock) target).emitSound();
                                     break actionswitch;
                                 case Block.DRAGON_EGG:
-                                    ((BlockDragonEgg) target).teleport();
-                                    break actionswitch;
+                                    if (!this.isCreative()) {
+                                        ((BlockDragonEgg) target).teleport();
+                                        break actionswitch;
+                                    }
                             }
                             Block block = target.getSide(face);
                             if (block.getId() == Block.FIRE) {
@@ -5743,7 +5699,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.gamemode != SPECTATOR;
     }
 
-    @Override
+    /*@Override
     protected void onBlock(Entity entity, boolean animate, float damage) {
         super.onBlock(entity, animate, damage);
         if (animate) {
@@ -5754,7 +5710,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             });
         }
-    }
+    }*/
 
     public int getTimeSinceRest() {
         return ticksSinceLastRest;
