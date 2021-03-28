@@ -6,6 +6,8 @@ import lombok.ToString;
 @ToString
 public class LecternUpdatePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.LECTERN_UPDATE_PACKET;
+
     public int page;
     public int totalPages;
     public BlockVector3 blockPosition;
@@ -13,7 +15,7 @@ public class LecternUpdatePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.LECTERN_UPDATE_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

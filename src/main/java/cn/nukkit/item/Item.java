@@ -1245,4 +1245,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             return null;
         }
     }
+
+    public final int getNetworkId(int protocol) {
+        if (protocol < ProtocolInfo.v1_16_100) return getId();
+        return RuntimeItems.getNetworkId(RuntimeItems.getRuntimeMapping(protocol).getNetworkFullId(this));
+    }
 }

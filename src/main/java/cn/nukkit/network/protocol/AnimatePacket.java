@@ -10,6 +10,8 @@ import lombok.ToString;
 @ToString
 public class AnimatePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.ANIMATE_PACKET;
+
     public long eid;
     public Action action;
     public float rowingTime;
@@ -35,7 +37,7 @@ public class AnimatePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.ANIMATE_PACKET;
+        return NETWORK_ID;
     }
 
     public enum Action {

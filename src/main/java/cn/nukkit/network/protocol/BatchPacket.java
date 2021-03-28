@@ -6,11 +6,13 @@ package cn.nukkit.network.protocol;
  */
 public class BatchPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.BATCH_PACKET;
+
     public byte[] payload;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.BATCH_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

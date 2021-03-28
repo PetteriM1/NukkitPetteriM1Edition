@@ -161,6 +161,7 @@ public interface ItemID {
     int WRITTEN_BOOK = 387;
     int EMERALD = 388;
     int ITEM_FRAME = 389;
+    int FRAME = 389;
     int FLOWER_POT = 390;
     int CARROT = 391;
     int CARROTS = 391;

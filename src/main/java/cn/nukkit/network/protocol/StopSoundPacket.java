@@ -5,12 +5,14 @@ import lombok.ToString;
 @ToString
 public class StopSoundPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.STOP_SOUND_PACKET;
+
     public String name;
     public boolean stopAll;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.STOP_SOUND_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

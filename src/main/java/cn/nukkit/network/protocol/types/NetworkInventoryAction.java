@@ -147,6 +147,14 @@ public class NetworkInventoryAction {
                 if (this.windowId == ContainerIds.ARMOR) {
                     this.inventorySlot += 36;
                     this.windowId = ContainerIds.INVENTORY;
+                    if (this.newItem == null ||
+                            (this.inventorySlot == 36 && !this.newItem.isHelmet() && !this.oldItem.isHelmet()) ||
+                            (this.inventorySlot == 37 && !this.newItem.isChestplate() && !this.oldItem.isChestplate()) ||
+                            (this.inventorySlot == 38 && !this.newItem.isLeggings() && !this.oldItem.isLeggings()) ||
+                            (this.inventorySlot == 39 && !this.newItem.isBoots()) && !this.oldItem.isBoots()) {
+                        player.getServer().getLogger().error("Player " + player.getName() + " tried to set an invalid armor item");
+                        return null;
+                    }
                 }
 
                 // ID 124 with slot 14/15 is enchant inventory

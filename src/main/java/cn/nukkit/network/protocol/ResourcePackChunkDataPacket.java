@@ -7,6 +7,8 @@ import java.util.UUID;
 @ToString(exclude = "data")
 public class ResourcePackChunkDataPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.RESOURCE_PACK_CHUNK_DATA_PACKET;
+
     public UUID packId;
     public int chunkIndex;
     public long progress;
@@ -40,6 +42,6 @@ public class ResourcePackChunkDataPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.RESOURCE_PACK_CHUNK_DATA_PACKET;
+        return NETWORK_ID;
     }
 }

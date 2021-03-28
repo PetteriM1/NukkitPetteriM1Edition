@@ -8,12 +8,14 @@ import java.nio.ByteOrder;
 
 public class LevelEventGenericPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.LEVEL_EVENT_GENERIC_PACKET;
+
     public int eventId;
     public CompoundTag tag;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.LEVEL_EVENT_GENERIC_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

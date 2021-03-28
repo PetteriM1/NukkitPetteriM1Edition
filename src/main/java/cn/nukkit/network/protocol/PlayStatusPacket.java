@@ -5,9 +5,11 @@ import lombok.ToString;
 @ToString
 public class PlayStatusPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.PLAY_STATUS_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.PLAY_STATUS_PACKET;
+        return NETWORK_ID;
     }
 
     public static final int LOGIN_SUCCESS = 0;

@@ -9,9 +9,11 @@ import lombok.ToString;
 @ToString
 public class ContainerClosePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_CLOSE_PACKET;
+
     @Override
     public byte pid() {
-        return ProtocolInfo.CONTAINER_CLOSE_PACKET;
+        return NETWORK_ID;
     }
 
     public int windowId;

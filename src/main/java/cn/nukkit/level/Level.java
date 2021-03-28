@@ -2466,8 +2466,8 @@ public class Level implements ChunkManager, Metadatable {
         return this.getNearbyEntities(bb, null);
     }
 
-    private static Entity[] EMPTY_ENTITY_ARR = new Entity[0];
-    private static Entity[] ENTITY_BUFFER = new Entity[512];
+    private static final Entity[] EMPTY_ENTITY_ARR = new Entity[0];
+    private static final Entity[] ENTITY_BUFFER = new Entity[512];
 
     public Entity[] getNearbyEntities(AxisAlignedBB bb, Entity entity) {
         return getNearbyEntities(bb, entity, false);
@@ -3591,13 +3591,14 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void unloadChunks(boolean force) {
-        this.unloadChunks(100, force);
+        this.unloadChunks(50, force);
     }
 
     public void unloadChunks(int maxUnload, boolean force) {
         if (!this.unloadQueue.isEmpty()) {
             long now = System.currentTimeMillis();
 
+            int unloaded = 0;
             LongList toRemove = null;
             for (Long2LongMap.Entry entry : unloadQueue.long2LongEntrySet()) {
                 long index = entry.getLongKey();
@@ -3608,11 +3609,12 @@ public class Level implements ChunkManager, Metadatable {
 
                 if (!force) {
                     long time = entry.getLongValue();
-                    if (maxUnload <= 0) {
+                    if (unloaded > maxUnload) {
                         break;
                     } else if (time > (now - 20000)) {
                         continue;
                     }
+                    unloaded++;
                 }
 
                 if (toRemove == null) toRemove = new LongArrayList();

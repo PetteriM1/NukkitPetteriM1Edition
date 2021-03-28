@@ -4,11 +4,13 @@ import cn.nukkit.item.Item;
 
 public class CreativeContentPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.CREATIVE_CONTENT_PACKET;
+
     public Item[] entries;
 
     @Override
     public byte pid() {
-        return ProtocolInfo.CREATIVE_CONTENT_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

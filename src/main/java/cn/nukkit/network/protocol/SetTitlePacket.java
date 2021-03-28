@@ -8,6 +8,8 @@ import lombok.ToString;
 @ToString
 public class SetTitlePacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.SET_TITLE_PACKET;
+
     public static final int TYPE_CLEAR = 0;
     public static final int TYPE_RESET = 1;
     public static final int TYPE_TITLE = 2;
@@ -23,7 +25,7 @@ public class SetTitlePacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.SET_TITLE_PACKET;
+        return NETWORK_ID;
     }
 
     @Override

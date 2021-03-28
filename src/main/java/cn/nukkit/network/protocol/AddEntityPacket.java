@@ -19,6 +19,8 @@ import lombok.ToString;
 @ToString
 public class AddEntityPacket extends DataPacket {
 
+    public static final byte NETWORK_ID = ProtocolInfo.ADD_ENTITY_PACKET;
+
     public static final ImmutableMap<Integer, String> LEGACY_IDS = ImmutableMap.<Integer, String>builder()
             .put(51, "minecraft:npc")
             .put(63, "minecraft:player")
@@ -134,7 +136,7 @@ public class AddEntityPacket extends DataPacket {
 
     @Override
     public byte pid() {
-        return ProtocolInfo.ADD_ENTITY_PACKET;
+        return NETWORK_ID;
     }
 
     public long entityUniqueId;
