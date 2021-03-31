@@ -58,7 +58,7 @@ public class ItemArmorStand extends Item {
                         .add(new DoubleTag("", 0))
                         .add(new DoubleTag("", 0)))
                 .putList(new ListTag<FloatTag>("Rotation")
-                        .add(new FloatTag("", this.getDirection((float) player.getYaw())))
+                        .add(new FloatTag("", getDirection((float) player.getYaw())))
                         .add(new FloatTag("", 0)));
 
         if (this.hasCustomName()) {
@@ -78,7 +78,7 @@ public class ItemArmorStand extends Item {
         return false;
     }
 
-    public float getDirection(float yaw) {
+    public static float getDirection(float yaw) {
         return (Math.round(yaw / 22.5f / 2) * 45) - 180;
     }
 }
