@@ -155,8 +155,9 @@ public abstract class EntitySwimmingMob extends EntitySwimming implements Entity
 
         Vector3 target = this.updateMove(tickDiff);
         if (this.getServer().getMobAiEnabled() && (!this.isFriendly() || !(target instanceof Player)) && target instanceof Entity) {
-            if (target != this.followTarget || this.canAttack) {
-                this.attackEntity((Entity) target);
+            Entity entity = (Entity) target;
+            if (!entity.closed && (target != this.followTarget || this.canAttack)) {
+                this.attackEntity(entity);
             }
         }
         return true;
