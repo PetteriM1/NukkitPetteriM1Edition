@@ -38,3 +38,4 @@ resource_packs/*
 .factorypath
 dependency-reduced-pom.xml
 *.log
+/logs

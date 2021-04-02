@@ -278,7 +278,6 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
                 if (event.getDamager() instanceof Player) {
                     Player player = (Player) event.getDamager();
                     if (player.isCreative()) {
-                        this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
                         this.close();
                         return true;
                     }

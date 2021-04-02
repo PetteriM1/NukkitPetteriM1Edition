@@ -281,6 +281,7 @@ public class AvailableCommandsPacket extends DataPacket {
                                         id = ARG_TYPE_STRING_PRE388;
                                         break;
                                     case POSITION:
+                                    case BLOCK_POSITION:
                                         id = ARG_TYPE_POSITION_PRE388;
                                         break;
                                     case MESSAGE:

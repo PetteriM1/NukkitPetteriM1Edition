@@ -3,9 +3,9 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockBedrock;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockObsidian;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.item.EntityEndCrystal;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
@@ -39,17 +39,20 @@ public class ItemEndCrystal extends Item {
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        if ((!(target instanceof BlockBedrock) && !(target instanceof BlockObsidian)) || face != BlockFace.UP) return false;
+        if (!(target instanceof BlockBedrock) && !(target instanceof BlockObsidian)) return false;
         FullChunk chunk = level.getChunk((int) block.getX() >> 4, (int) block.getZ() >> 4);
-
         if (chunk == null) {
             return false;
         }
 
-        for (Entity e : level.getCollidingEntities(new SimpleAxisAlignedBB(block.x, block.y, block.z, block.x + 1, block.y + 1, block.z + 1))) {
-            if (e.getNetworkId() == EntityEndCrystal.NETWORK_ID || (e.isPlayer && !((Player) e).isSpectator())) {
-                return false;
-            }
+        Block up = target.up();
+        if (up.getId() != BlockID.AIR || up.up().getId() != BlockID.AIR) {
+            return false;
+        }
+
+        Entity[] entities = level.getCollidingEntities(new SimpleAxisAlignedBB(target.x, target.y, target.z, target.x + 1, target.y + 2, target.z + 1));
+        if (entities.length != 0) {
+            return false;
         }
 
         CompoundTag nbt = new CompoundTag()

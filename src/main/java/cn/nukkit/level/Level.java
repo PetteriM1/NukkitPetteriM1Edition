@@ -3521,16 +3521,17 @@ public class Level implements ChunkManager, Metadatable {
         // Hack: Fix the y1 glitch, do not teleport players standing at y=1 to spawn on join
         // For some reason player's y coord is 0.999 instead of 1 when they join
         // This may need a better fix later
-        if (spawn.y < 1) {
-            spawn.y = 1.01;
-        }
+        //if (spawn.y < 1) {
+        //    spawn.y = 1.01;
+        //}
 
-        Vector3 v = spawn.floor();
-        FullChunk chunk = this.getChunk((int) v.x >> 4, (int) v.z >> 4, false);
-        int x = (int) v.x & 0x0f;
-        int z = (int) v.z & 0x0f;
+        spawn.y = spawn.y + 0.1;
+        Vector3 pos = spawn.floor();
+        FullChunk chunk = this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, false);
+        int x = (int) pos.x & 0x0f;
+        int z = (int) pos.z & 0x0f;
         if (chunk != null && chunk.isGenerated()) {
-            int y = (int) NukkitMath.clamp(v.y, 1, 254);
+            int y = NukkitMath.clamp((int) pos.y, 1, 254);
             boolean wasAir = chunk.getBlockId(x, y - 1, z) == 0;
             for (; y > 0; --y) {
                 int[] b = chunk.getBlockState(x, y, z);
@@ -3552,17 +3553,17 @@ public class Level implements ChunkManager, Metadatable {
                     b = chunk.getBlockState(x, y, z);
                     block = Block.get(b[0], b[1]);
                     if (!this.isFullBlock(block)) {
-                        return new Position(spawn.x, y == (int) spawn.y ? spawn.y : y, spawn.z, this);
+                        return new Position(pos.x + 0.5, pos.y + 0.1, pos.z + 0.5, this);
                     }
                 } else {
                     ++y;
                 }
             }
 
-            v.y = y;
+            pos.y = y;
         }
 
-        return new Position(spawn.x, v.y, spawn.z, this);
+        return new Position(pos.x + 0.5, pos.y + 0.1, pos.z + 0.5, this);
     }
 
     public int getTime() {
