@@ -30,6 +30,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     private TradeInventory inventory;
     private final List<TradeInventoryRecipe> recipes = new ArrayList<>();
     private int tradeTier = 0;
+    private boolean willing = true;
 
     public EntityVillager(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -68,6 +69,14 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         this.setMaxHealth(10);
 
         this.inventory = new TradeInventory(this);
+
+        CompoundTag offers = this.namedTag.getCompound("Offers");
+        if (offers != null) {
+            ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
+            for (CompoundTag nbt : nbtRecipes.getAll()) {
+                recipes.add(TradeInventoryRecipe.toNBT(nbt));
+            }
+        }
 
         if (!this.namedTag.contains("Profession")) {
             this.setProfession(PROFESSION_GENERIC);
@@ -123,6 +132,14 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         return this.tradeTier;
     }
 
+    public void setWilling(boolean value) {
+        this.willing = value;
+    }
+
+    public boolean isWilling() {
+        return this.willing;
+    }
+
     @Override
     public boolean onInteract(Player player, Item item) {
         if (recipes.size() > 0) {
@@ -132,32 +149,36 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         return false;
     }
 
-    public void addTradeRcipe(TradeInventoryRecipe recipe) {
+    public void addTradeRecipe(TradeInventoryRecipe recipe) {
         this.recipes.add(recipe);
+    }
+
+    public List<TradeInventoryRecipe> getRecipes() {
+        return this.recipes;
     }
 
     public CompoundTag getOffers() {
         CompoundTag nbt = new CompoundTag();
         nbt.putList(recipesToNbt());
-        nbt.putList(getTierExpRequirements());
+        nbt.putList(getDefaultTierExpRequirements());
         return nbt;
     }
 
     private ListTag<CompoundTag> recipesToNbt() {
         ListTag<CompoundTag> tag = new ListTag<>("Recipes");
-        for(TradeInventoryRecipe recipe : this.recipes) {
+        for (TradeInventoryRecipe recipe : this.recipes) {
             tag.add(recipe.toNBT());
         }
         return tag;
     }
 
-    private ListTag<CompoundTag> getTierExpRequirements() {
+    private ListTag<CompoundTag> getDefaultTierExpRequirements() {
         ListTag<CompoundTag> tag = new ListTag<>("TierExpRequirements");
         tag.add(new CompoundTag().putInt("0", 0));
         tag.add(new CompoundTag().putInt("1", 10));
-        tag.add(new CompoundTag().putInt("2", 60));
-        tag.add(new CompoundTag().putInt("3", 160));
-        tag.add(new CompoundTag().putInt("4", 310));
+        tag.add(new CompoundTag().putInt("2", 70));
+        tag.add(new CompoundTag().putInt("3", 150));
+        tag.add(new CompoundTag().putInt("4", 250));
         return tag;
     }
 

@@ -99,4 +99,16 @@ public class TradeInventoryRecipe {
         nbt.putFloat("priceMultiplierB", priceMultiplierB);
         return nbt;
     }
+
+    public static TradeInventoryRecipe toNBT(CompoundTag nbt) {
+        return new TradeInventoryRecipe(NBTIO.getItemHelper(nbt.getCompound("sell")), NBTIO.getItemHelper(nbt.getCompound("buyA")), NBTIO.getItemHelper(nbt.getCompound("buyB")))
+                .setTier(nbt.getInt("tier"))
+                .setBuyCount(nbt.getInt("buyCountA"), A_ITEM)
+                .setBuyCount(nbt.getInt("buyCountB"), B_ITEM)
+                .setMaxUses(nbt.getInt("maxUses"))
+                .setMultiplier(nbt.getInt("priceMultiplierA"), A_ITEM)
+                .setMultiplier(nbt.getInt("priceMultiplierB"), B_ITEM)
+                .setDemand(nbt.getInt("demand"))
+                .setRewardExp(nbt.getInt("rewardExp"));
+    }
 }
