@@ -1,12 +1,22 @@
 package cn.nukkit.entity.passive;
 
+import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
+import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.InventoryHolder;
+import cn.nukkit.inventory.TradeInventory;
+import cn.nukkit.inventory.TradeInventoryRecipe;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 
-public class EntityVillager extends EntityWalkingAnimal {
+import java.util.ArrayList;
+import java.util.List;
+
+public class EntityVillager extends EntityWalkingAnimal implements InventoryHolder {
 
     public static final int PROFESSION_FARMER = 0;
     public static final int PROFESSION_LIBRARIAN = 1;
@@ -16,6 +26,10 @@ public class EntityVillager extends EntityWalkingAnimal {
     public static final int PROFESSION_GENERIC = 5;
 
     public static final int NETWORK_ID = 15;
+
+    private TradeInventory inventory;
+    private final List<TradeInventoryRecipe> recipes = new ArrayList<>();
+    private int tradeTier = 0;
 
     public EntityVillager(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -52,6 +66,8 @@ public class EntityVillager extends EntityWalkingAnimal {
         super.initEntity();
 
         this.setMaxHealth(10);
+
+        this.inventory = new TradeInventory(this);
 
         if (!this.namedTag.contains("Profession")) {
             this.setProfession(PROFESSION_GENERIC);
@@ -97,5 +113,56 @@ public class EntityVillager extends EntityWalkingAnimal {
         } else {
             super.onStruckByLightning(entity);
         }
+    }
+
+    public void setTradeTier(int tier) {
+        this.tradeTier = tier;
+    }
+
+    public int getTradeTier() {
+        return this.tradeTier;
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        if (recipes.size() > 0) {
+            player.addWindow(this.getInventory());
+            return true;
+        }
+        return false;
+    }
+
+    public void addTradeRcipe(TradeInventoryRecipe recipe) {
+        this.recipes.add(recipe);
+    }
+
+    public CompoundTag getOffers() {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putList(recipesToNbt());
+        nbt.putList(getTierExpRequirements());
+        return nbt;
+    }
+
+    private ListTag<CompoundTag> recipesToNbt() {
+        ListTag<CompoundTag> tag = new ListTag<>("Recipes");
+        for(TradeInventoryRecipe recipe : this.recipes) {
+            tag.add(recipe.toNBT());
+        }
+        return tag;
+    }
+
+    private ListTag<CompoundTag> getTierExpRequirements() {
+        ListTag<CompoundTag> tag = new ListTag<>("TierExpRequirements");
+        tag.add(new CompoundTag().putInt("0", 0));
+        tag.add(new CompoundTag().putInt("1", 10));
+        tag.add(new CompoundTag().putInt("2", 60));
+        tag.add(new CompoundTag().putInt("3", 160));
+        tag.add(new CompoundTag().putInt("4", 310));
+        return tag;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return this.inventory;
     }
 }
