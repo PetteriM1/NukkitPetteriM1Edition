@@ -178,7 +178,13 @@ public class AddEntityPacket extends DataPacket {
         } else {
             if (id == null) {
                 if (protocol < ProtocolInfo.v1_16_0) {
-                    id = MV_PRE_407.get(type);
+                    if (protocol < ProtocolInfo.v1_14_0 && type == EntityBee.NETWORK_ID) {
+                        id = LEGACY_IDS.get(EntityBat.NETWORK_ID);
+                    } else if (protocol < ProtocolInfo.v1_13_0 && type == EntityFox.NETWORK_ID) {
+                        id = LEGACY_IDS.get(EntityWolf.NETWORK_ID);
+                    } else {
+                        id = MV_PRE_407.get(type);
+                    }
                 }
                 if (id == null) {
                     id = LEGACY_IDS.get(type);
