@@ -1895,7 +1895,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     if (!ev.isCancelled()) {
                                         this.setMotion(new Vector3(0, expectedVelocity, 0));
                                     }
-                                } else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server")) {
+                                } else if (this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=MOVE, expectedVelocity=" + expectedVelocity + ", diff=" + diff + ", speed.y=" + speed.y)) {
                                     return false;
                                 }
                             }
@@ -2383,7 +2383,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (this.server.getOnlinePlayersCount() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
+                    if (this.server.getOnlinePlayersCount() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull")) {
                         break;
                     }
 
@@ -2596,7 +2596,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.ADVENTURE_SETTINGS_PACKET:
                     AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
                     if (!server.getAllowFlight() && (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) || adventureSettingsPacket.getFlag(AdventureSettingsPacket.FLYING)) && !this.adventureSettings.get(Type.ALLOW_FLIGHT)) {
-                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
+                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=AdventureSettingsPacket, flags=" + (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) ? "ALLOW_FLIGHT " : "") + (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) ? "FLYING" : ""));
                         break;
                     }
                     PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.getFlag(AdventureSettingsPacket.FLYING));
@@ -2791,7 +2791,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
                             if (this.inAirTicks > 30 && this.checkMovement && !server.getAllowFlight() && !this.isSwimming() && !this.isGliding()) {
-                                this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
+                                this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + this.inAirTicks);
                                 break;
                             }
                             this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
@@ -2839,7 +2839,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (!server.getAllowFlight() && this.checkMovement) {
                                 Item chestplate = this.getInventory().getChestplateFast();
                                 if ((chestplate == null || chestplate.getId() != ItemID.ELYTRA) && !server.getAllowFlight()) {
-                                    this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server");
+                                    this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_START_GLIDE");
                                     break;
                                 }
                             }
@@ -3198,7 +3198,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     SetPlayerGameTypePacket setPlayerGameTypePacket = (SetPlayerGameTypePacket) packet;
                     if (setPlayerGameTypePacket.gamemode != this.gamemode) {
                         if (!this.hasPermission("nukkit.command.gamemode")) {
-                            this.kick(PlayerKickEvent.Reason.INVALID_PACKET, "Invalid SetPlayerGameTypePacket");
+                            this.kick(PlayerKickEvent.Reason.INVALID_PACKET, "Invalid SetPlayerGameTypePacket", true, "type=SetPlayerGameTypePacket");
                             /*SetPlayerGameTypePacket setPlayerGameTypePacket1 = new SetPlayerGameTypePacket();
                             setPlayerGameTypePacket1.gamemode = this.gamemode & 0x01;
                             this.dataPacket(setPlayerGameTypePacket1);
@@ -3939,8 +3939,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean kick(PlayerKickEvent.Reason reason, String reasonString, boolean isAdmin) {
+        return kick(reason, reasonString, isAdmin, "");
+    }
+
+    public boolean kick(PlayerKickEvent.Reason reason, String reasonString, boolean isAdmin, String extraData) {
         PlayerKickEvent ev;
-        this.server.getPluginManager().callEvent(ev = new PlayerKickEvent(this, reason, this.getLeaveMessage()));
+        this.server.getPluginManager().callEvent(ev = new PlayerKickEvent(this, reason, reasonString, this.getLeaveMessage(), extraData));
         if (!ev.isCancelled()) {
             String message;
             if (isAdmin) {
