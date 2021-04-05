@@ -37,6 +37,8 @@ public class PlayerKickEvent extends PlayerEvent implements Cancellable {
     protected final Reason reason;
     protected final String reasonString;
 
+    private final String extraData;
+
     public PlayerKickEvent(Player player, String reason, String quitMessage) {
         this(player, Reason.UNKNOWN, reason, new TextContainer(quitMessage));
     }
@@ -54,10 +56,15 @@ public class PlayerKickEvent extends PlayerEvent implements Cancellable {
     }
 
     public PlayerKickEvent(Player player, Reason reason, String reasonString, TextContainer quitMessage) {
+        this(player, reason, reasonString, quitMessage, "");
+    }
+
+    public PlayerKickEvent(Player player, Reason reason, String reasonString, TextContainer quitMessage, String extraData) {
         this.player = player;
         this.quitMessage = quitMessage;
         this.reason = reason;
         this.reasonString = reason.name();
+        this.extraData = extraData;
     }
 
     public String getReason() {
@@ -78,5 +85,9 @@ public class PlayerKickEvent extends PlayerEvent implements Cancellable {
 
     public void setQuitMessage(String joinMessage) {
         this.setQuitMessage(new TextContainer(joinMessage));
+    }
+
+    public String getExtraData() {
+        return extraData;
     }
 }
