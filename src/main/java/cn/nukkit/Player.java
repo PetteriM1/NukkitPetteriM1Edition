@@ -2790,8 +2790,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.scheduleUpdate();
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
-                            if (this.inAirTicks > 40 && this.checkMovement && !server.getAllowFlight() && !this.isCreative() && !this.isSpectator() && !this.isSwimming() && !this.isGliding()) {
-                                this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + this.inAirTicks);
+                            if (this.inAirTicks > 40 && this.checkMovement && !server.getAllowFlight() && !this.isCreative() && !this.isSwimming() && !this.isGliding()) {
+                                if (this.inAirTicks < 150) {
+                                    PlayerInvalidMoveEvent playerInvalidMoveEvent = new PlayerInvalidMoveEvent(this, true);
+                                    this.getServer().getPluginManager().callEvent(playerInvalidMoveEvent);
+                                    if (!playerInvalidMoveEvent.isCancelled()) {
+                                        this.motionY = -4;
+                                    }
+                                } else {
+                                    this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + this.inAirTicks);
+                                }
                                 break;
                             }
                             this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
