@@ -1039,6 +1039,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
+        if (packet.pid() == ProtocolInfo.CREATIVE_CONTENT_PACKET || packet.pid() == ProtocolInfo.INVENTORY_CONTENT_PACKET || packet.pid() == ProtocolInfo.CRAFTING_DATA_PACKET || packet.pid() == ProtocolInfo.ADD_ITEM_ENTITY_PACKET) {
+            return false; //TODO
+        }
+
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
@@ -1048,6 +1052,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (event.isCancelled()) {
                     return false;
                 }
+            }
+
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
+                log.trace("Outbound {}: {}", this.getName(), packet);
             }
 
             this.packetQueue.offer(packet);
@@ -1120,6 +1128,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (ev.isCancelled()) {
                     return false;
                 }
+            }
+
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/ && packet.pid() != ProtocolInfo.BATCH_PACKET) {
+                log.trace("Outbound {}: {}", this.getName(), packet);
             }
 
             this.interfaz.putPacket(this, packet, false, true);

@@ -555,7 +555,7 @@ public class BinaryStream {
     }
 
     public void putSlot(int protocolId, Item item, boolean craftingHack) {
-        if (item == null || item.getId() == 0) {
+        if (item == null || item.getId() == 0 || protocolId >= ProtocolInfo.v1_16_220) { //TODO
             this.putVarInt(0);
             return;
         }
