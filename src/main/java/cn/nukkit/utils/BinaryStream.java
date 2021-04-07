@@ -2,21 +2,25 @@ package cn.nukkit.utils;
 
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDurable;
-import cn.nukkit.item.ItemID;
-import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.item.*;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
+import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.nbt.stream.NBTInputStream;
+import cn.nukkit.nbt.stream.NBTOutputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
+import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.LittleEndianByteBufInputStream;
+import cn.nukkit.network.LittleEndianByteBufOutputStream;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.EntityLink;
+import io.netty.buffer.*;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 
 import java.io.IOException;
@@ -414,6 +418,10 @@ public class BinaryStream {
     }
 
     public Item getSlot(int protocolId) {
+        if (protocolId >= ProtocolInfo.v1_16_220) {
+            return getSlotInternal(protocolId);
+        }
+
         int id = this.getVarInt();
         if (id == 0) {
             return Item.get(0, 0, 0);
@@ -546,6 +554,102 @@ public class BinaryStream {
         return item;
     }
 
+    private Item getSlotInternal(int protocolId) {
+        int id = getVarInt();
+        if (id == 0) {
+            return Item.get(0, 0, 0);
+        }
+
+        int count = getLShort();
+        int damage = (int) getUnsignedVarInt();
+
+        int fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
+        boolean hasData = RuntimeItems.hasData(fullId);
+        id = RuntimeItems.getId(fullId);
+
+        if (hasData) {
+            damage = RuntimeItems.getData(fullId);
+        }
+
+        if (getBoolean()) { // hasNetId
+            getVarInt(); // netId
+        }
+
+        getVarInt(); // blockRuntimeId
+
+        byte[] bytes = getByteArray();
+        ByteBuf buf = AbstractByteBufAllocator.DEFAULT.ioBuffer(bytes.length);
+        buf.writeBytes(bytes);
+
+        byte[] nbt = new byte[0];
+        String[] canPlace;
+        String[] canBreak;
+
+        try (LittleEndianByteBufInputStream stream = new LittleEndianByteBufInputStream(buf); NBTInputStream nbtStream = new NBTInputStream(stream)) {
+            int nbtSize = stream.readShort();
+
+            CompoundTag compoundTag = null;
+            if (nbtSize > 0) {
+                compoundTag = (CompoundTag) Tag.readNamedTag(nbtStream);
+            } else if (nbtSize == -1) {
+                int tagCount = stream.readUnsignedByte();
+                if (tagCount != 1) throw new IllegalArgumentException("Expected 1 tag but got " + tagCount);
+                compoundTag = (CompoundTag) Tag.readNamedTag(nbtStream);
+            }
+
+            if (compoundTag != null && compoundTag.getAllTags().size() > 0) {
+                nbt = NBTIO.write(compoundTag, ByteOrder.LITTLE_ENDIAN, false);
+            }
+
+            canPlace = new String[stream.readInt()];
+            for (int i = 0; i < canPlace.length; i++) {
+                canPlace[i] = stream.readUTF();
+            }
+
+            canBreak = new String[stream.readInt()];
+            for (int i = 0; i < canBreak.length; i++) {
+                canBreak[i] = stream.readUTF();
+            }
+
+            if (id == ItemID.SHIELD) {
+                stream.readLong();
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read item user data", e);
+        } finally {
+            buf.release();
+        }
+
+        Item item = Item.get(id, damage, count, nbt);
+
+        if (canBreak.length > 0 || canPlace.length > 0) {
+            CompoundTag namedTag = item.getNamedTag();
+            if (namedTag == null) {
+                namedTag = new CompoundTag();
+            }
+
+            if (canBreak.length > 0) {
+                ListTag<StringTag> listTag = new ListTag<>("CanDestroy");
+                for (String blockName : canBreak) {
+                    listTag.add(new StringTag("", blockName));
+                }
+                namedTag.put("CanDestroy", listTag);
+            }
+
+            if (canPlace.length > 0) {
+                ListTag<StringTag> listTag = new ListTag<>("CanPlaceOn");
+                for (String blockName : canPlace) {
+                    listTag.add(new StringTag("", blockName));
+                }
+                namedTag.put("CanPlaceOn", listTag);
+            }
+
+            item.setNamedTag(namedTag);
+        }
+
+        return item;
+    }
+
     public void putSlot(Item item) {
         this.putSlot(ProtocolInfo.CURRENT_PROTOCOL, item);
     }
@@ -554,8 +658,13 @@ public class BinaryStream {
         this.putSlot(protocolId, item, false);
     }
 
-    public void putSlot(int protocolId, Item item, boolean craftingHack) {
-        if (item == null || item.getId() == 0 || protocolId >= ProtocolInfo.v1_16_220) { //TODO
+    public void putSlot(int protocolId, Item item, boolean crafting) {
+        if (protocolId >= ProtocolInfo.v1_16_220) {
+            putSlotInternal(protocolId, item, crafting);
+            return;
+        }
+
+        if (item == null || item.getId() == 0) {
             this.putVarInt(0);
             return;
         }
@@ -564,7 +673,7 @@ public class BinaryStream {
 
         // Multiversion: Replace unsupported items
         boolean saveOriginalID = false;
-        if (!craftingHack) {
+        if (!crafting) {
             if (protocolId < ProtocolInfo.v1_16_0) {
                 if (networkId >= Item.LODESTONECOMPASS) {
                     saveOriginalID = true;
@@ -652,7 +761,7 @@ public class BinaryStream {
         this.putVarInt(auxValue);
 
         // Hack: fix recipe list not displaying some items
-        if (craftingHack) {
+        if (crafting) {
             this.putLShort(0);
             this.putVarInt(0);
             this.putVarInt(0);
@@ -736,6 +845,71 @@ public class BinaryStream {
 
         int count = this.getVarInt();
         return Item.get(id, damage, count);
+    }
+
+    private void putSlotInternal(int protocolId, Item item, boolean crafting) {
+        if (item == null || item.getId() == 0) {
+            putByte((byte) 0);
+            return;
+        }
+
+        int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
+        int networkId = RuntimeItems.getNetworkId(networkFullId);
+
+        putVarInt(networkId);
+
+        putLShort(item.getCount());
+        putUnsignedVarInt(item.getDamage());
+
+        if (!crafting) {
+            putBoolean(true);
+            putVarInt(0);
+        }
+
+        if (item instanceof ItemBlock) {
+            putVarInt(GlobalBlockPalette.getOrCreateRuntimeId(protocolId, item.getBlock().getId(), item.getBlock().getDamage()));
+        } else if (crafting) {
+            int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, item.getId(), item.getDamage(), true);
+            putVarInt(Math.max(runtimeId, 0));
+        } else {
+            putVarInt(0);
+        }
+
+        ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+        try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf);
+             NBTOutputStream nbtStream = new NBTOutputStream(stream)) {
+            if (item.hasCompoundTag()) {
+                stream.writeShort(-1);
+                stream.writeByte(1); // Hardcoded in current version
+                Tag.writeNamedTag(NBTIO.read(item.getCompoundTag(), ByteOrder.LITTLE_ENDIAN), nbtStream);
+            } else {
+                userDataBuf.writeShortLE(0);
+            }
+
+            List<String> canPlaceOn = extractStringList(item, "CanPlaceOn");
+            stream.writeInt(canPlaceOn.size());
+            for (String string : canPlaceOn) {
+                stream.writeUTF(string);
+            }
+
+            List<String> canDestroy = extractStringList(item, "CanDestroy");
+            stream.writeInt(canDestroy.size());
+            for (String string : canDestroy) {
+                stream.writeUTF(string);
+            }
+
+            if (item.getId() == ItemID.SHIELD) {
+                stream.writeLong(0);
+            }
+
+            byte[] bytes = new byte[userDataBuf.readableBytes()];
+            userDataBuf.readBytes(bytes);
+            putByteArray(bytes);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to write item user data", e);
+        } finally {
+            userDataBuf.release();
+        }
     }
 
     public void putRecipeIngredient(int protocolId, Item ingredient) {

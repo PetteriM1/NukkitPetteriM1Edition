@@ -107,7 +107,7 @@ public class NetworkInventoryAction {
         this.oldItem = packet.getSlot(packet.protocol);
         this.newItem = packet.getSlot(packet.protocol);
 
-        if (packet.hasNetworkIds && packet.protocol >= 407) {
+        if (packet.hasNetworkIds && packet.protocol >= 407 && packet.protocol < ProtocolInfo.v1_16_220) { //TODO: check this
             this.stackNetworkId = packet.getVarInt();
         }
 

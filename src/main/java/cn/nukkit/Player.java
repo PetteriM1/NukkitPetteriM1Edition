@@ -1039,10 +1039,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         }
 
-        if (packet.pid() == ProtocolInfo.CREATIVE_CONTENT_PACKET || packet.pid() == ProtocolInfo.INVENTORY_CONTENT_PACKET || packet.pid() == ProtocolInfo.CRAFTING_DATA_PACKET || packet.pid() == ProtocolInfo.ADD_ITEM_ENTITY_PACKET) {
-            return false; //TODO
-        }
-
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
@@ -2608,7 +2604,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.ADVENTURE_SETTINGS_PACKET:
                     AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
                     if (!server.getAllowFlight() && (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) || adventureSettingsPacket.getFlag(AdventureSettingsPacket.FLYING)) && !this.adventureSettings.get(Type.ALLOW_FLIGHT)) {
-                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=AdventureSettingsPacket, flags=" + (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) ? "ALLOW_FLIGHT " : "") + (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) ? "FLYING" : ""));
+                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=AdventureSettingsPacket, flags=ALLOW_FLIGHT: " + adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) + ", FLYING: " + adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT));
                         break;
                     }
                     PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.getFlag(AdventureSettingsPacket.FLYING));
