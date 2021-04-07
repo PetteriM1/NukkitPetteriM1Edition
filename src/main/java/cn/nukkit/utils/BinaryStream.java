@@ -11,7 +11,6 @@ import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.stream.NBTInputStream;
-import cn.nukkit.nbt.stream.NBTOutputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
@@ -20,7 +19,9 @@ import cn.nukkit.network.LittleEndianByteBufInputStream;
 import cn.nukkit.network.LittleEndianByteBufOutputStream;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.EntityLink;
-import io.netty.buffer.*;
+import io.netty.buffer.AbstractByteBufAllocator;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 
 import java.io.IOException;
@@ -847,7 +848,7 @@ public class BinaryStream {
         return Item.get(id, damage, count);
     }
 
-    private void putSlotInternal(int protocolId, Item item, boolean crafting) {
+    private void putSlotInternal(int protocolId, Item item, boolean instanceItem) {
         if (item == null || item.getId() == 0) {
             putByte((byte) 0);
             return;
@@ -861,14 +862,14 @@ public class BinaryStream {
         putLShort(item.getCount());
         putUnsignedVarInt(item.getDamage());
 
-        if (!crafting) {
+        if (!instanceItem) {
             putBoolean(true);
             putVarInt(0);
         }
 
         if (item instanceof ItemBlock) {
             putVarInt(GlobalBlockPalette.getOrCreateRuntimeId(protocolId, item.getBlock().getId(), item.getBlock().getDamage()));
-        } else if (crafting) {
+        } else if (instanceItem) {
             int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, item.getId(), item.getDamage(), true);
             putVarInt(Math.max(runtimeId, 0));
         } else {
@@ -876,12 +877,11 @@ public class BinaryStream {
         }
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
-        try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf);
-             NBTOutputStream nbtStream = new NBTOutputStream(stream)) {
+        try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
             if (item.hasCompoundTag()) {
                 stream.writeShort(-1);
                 stream.writeByte(1); // Hardcoded in current version
-                Tag.writeNamedTag(NBTIO.read(item.getCompoundTag(), ByteOrder.LITTLE_ENDIAN), nbtStream);
+                stream.write(item.getCompoundTag());
             } else {
                 userDataBuf.writeShortLE(0);
             }
