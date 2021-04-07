@@ -10,11 +10,9 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockVector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
-import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
-import cn.nukkit.nbt.tag.Tag;
 import cn.nukkit.network.LittleEndianByteBufInputStream;
 import cn.nukkit.network.LittleEndianByteBufOutputStream;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -586,16 +584,16 @@ public class BinaryStream {
         String[] canPlace;
         String[] canBreak;
 
-        try (LittleEndianByteBufInputStream stream = new LittleEndianByteBufInputStream(buf); NBTInputStream nbtStream = new NBTInputStream(stream)) {
+        try (LittleEndianByteBufInputStream stream = new LittleEndianByteBufInputStream(buf)) {
             int nbtSize = stream.readShort();
 
             CompoundTag compoundTag = null;
             if (nbtSize > 0) {
-                compoundTag = (CompoundTag) Tag.readNamedTag(nbtStream);
+                compoundTag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
             } else if (nbtSize == -1) {
                 int tagCount = stream.readUnsignedByte();
                 if (tagCount != 1) throw new IllegalArgumentException("Expected 1 tag but got " + tagCount);
-                compoundTag = (CompoundTag) Tag.readNamedTag(nbtStream);
+                compoundTag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN);
             }
 
             if (compoundTag != null && compoundTag.getAllTags().size() > 0) {
