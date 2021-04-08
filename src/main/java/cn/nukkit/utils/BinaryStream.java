@@ -1,8 +1,12 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemDurable;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
@@ -865,14 +869,9 @@ public class BinaryStream {
             putVarInt(0);
         }
 
-        if (item instanceof ItemBlock) {
-            putVarInt(GlobalBlockPalette.getOrCreateRuntimeId(protocolId, item.getBlock().getId(), item.getBlock().getDamage()));
-        } else if (instanceItem) {
-            int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, item.getId(), item.getDamage(), true);
-            putVarInt(Math.max(runtimeId, 0));
-        } else {
-            putVarInt(0);
-        }
+        Block block = item.getBlockUnsafe();
+        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage(), true);
+        putVarInt(Math.max(runtimeId, 0)); // put 0 if not in the palette
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
         try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
