@@ -136,7 +136,7 @@ public class NetworkInventoryAction {
         packet.putSlot(packet.protocol, this.oldItem);
         packet.putSlot(packet.protocol, this.newItem);
 
-        if (packet.hasNetworkIds && packet.protocol >= 407) {
+        if (packet.hasNetworkIds && packet.protocol >= 407 && packet.protocol < ProtocolInfo.v1_16_220) {
             packet.putVarInt(this.stackNetworkId);
         }
     }
