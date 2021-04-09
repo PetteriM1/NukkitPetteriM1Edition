@@ -29,6 +29,7 @@ public enum InventoryType {
     MINECART_CHEST(27, "Minecart with Chest", 0), //27 CONTAINER
     MINECART_HOPPER(5, "Minecart with Hopper", 8), //5 CONTAINER
     OFFHAND(1, "Offhand", -1), //1 CONTAINER
+    TRADING(3, "Villager Trade", 15), //3 CONTAINER
     BARREL(27, "Barrel", 0);
 
     private final int size;
