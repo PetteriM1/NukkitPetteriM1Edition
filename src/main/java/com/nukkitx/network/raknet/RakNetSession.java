@@ -769,7 +769,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         this.channel.writeAndFlush(new DatagramPacket(buffer, this.address));
     }
 
-    public int getSessionTimeout(){
+    public int getSessionTimeout() {
         return sessionTimeout;
     }
 

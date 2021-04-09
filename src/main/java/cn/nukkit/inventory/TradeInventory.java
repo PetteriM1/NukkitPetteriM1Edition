@@ -1,48 +1,53 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
+import cn.nukkit.entity.passive.EntityVillager;
 import cn.nukkit.item.Item;
+import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.network.protocol.UpdateTradePacket;
 
-import java.util.Map;
+import java.io.IOException;
+import java.nio.ByteOrder;
 
-/**
- * @author NycuRO
- * NukkitX Project
- */
-public class TradeInventory extends ContainerInventory {
+public class TradeInventory extends BaseInventory {
 
-    protected FakeBlockMenu holder;
-
-    public TradeInventory(InventoryHolder holder, InventoryType type, Map<Integer, Item> items, int size, String title) {
-        super(holder, type, items, size, title);
+    public TradeInventory(InventoryHolder holder) {
+        super(holder, InventoryType.TRADING);
     }
 
-    @Override
-    public InventoryType getType() {
-        return InventoryType.TRADING;
+    public void onOpen(Player who) {
+        super.onOpen(who);
+
+        UpdateTradePacket pk = new UpdateTradePacket();
+        pk.windowId = (byte) who.getWindowId(this);
+        pk.windowType = (byte) InventoryType.TRADING.getNetworkType();
+        pk.isWilling = this.getHolder().isWilling();
+        pk.screen2 = true;
+        pk.trader = this.getHolder().getId();
+        pk.tradeTier = this.getHolder().getTradeTier();
+        pk.player = who.getId();
+        try {
+            pk.offers = NBTIO.write(this.getHolder().getOffers(),ByteOrder.LITTLE_ENDIAN);
+        } catch(IOException ignored) {}
+
+        who.dataPacket(pk);
     }
 
-    @Override
-    public String getName() {
-        return "Trade Inventory";
-    }
-
-    @Override
-    public int getSize() {
-        return 2;
-    }
-
-    @Override
-    public FakeBlockMenu getHolder() {
-        return this.holder;
-    }
-
-    @Override
     public void onClose(Player who) {
-        super.onClose(who);
-        for (int i = 0; i < 2; ++i) {
-            this.holder.getLevel().dropItem(this.holder.add(0.5, 0.5, 0.5), this.getItem(i));
+        for (int i = 0; i <= 1; i++) {
+            Item item = getItem(i);
+            if (who.getInventory().canAddItem(item)) {
+                who.getInventory().addItem(item);
+            } else {
+                who.dropItem(item);
+            }
             this.clear(i);
         }
+
+        super.onClose(who);
+    }
+
+    public EntityVillager getHolder() {
+        return (EntityVillager) this.holder;
     }
 }
