@@ -34,7 +34,7 @@ public class InventorySlotPacket extends DataPacket {
         this.reset();
         this.putUnsignedVarInt(this.inventoryId);
         this.putUnsignedVarInt(this.slot);
-        if (protocol >= 407) {
+        if (protocol >= 407 && protocol < ProtocolInfo.v1_16_220) {
             this.putVarInt(networkId);
         }
         this.putSlot(protocol, this.item);

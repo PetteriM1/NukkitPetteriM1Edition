@@ -774,7 +774,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
     }
 
     /** timeout in ms ( 1 second = 1000 ) **/
-    public void setSessionTimeout(int timeout){
+    public void setSessionTimeout(int timeout) {
         this.sessionTimeout = timeout;
     }
 

@@ -24,7 +24,7 @@ public class CreativeContentPacket extends DataPacket {
         int i = 1; //HACK around since 0 is not indexed by client
         for (Item entry : entries) {
             this.putUnsignedVarInt(i++);
-            this.putSlot(protocol, entry);
+            this.putSlot(protocol, entry, protocol >= ProtocolInfo.v1_16_220);
         }
     }
 }
