@@ -3,6 +3,7 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockAir;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
@@ -467,6 +468,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_16_200:
             case v1_16_210_50:
             case v1_16_210:
+            case v1_16_220:
                 return new ArrayList<>(Item.creative407);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
@@ -1011,6 +1013,16 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             return this.block.clone();
         } else {
             return Block.get(BlockID.AIR);
+        }
+    }
+
+    private static final Block air = new BlockAir();
+
+    public Block getBlockUnsafe() {
+        if (this.block != null) {
+            return this.block;
+        } else {
+            return air;
         }
     }
 

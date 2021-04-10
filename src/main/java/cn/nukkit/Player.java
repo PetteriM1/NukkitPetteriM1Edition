@@ -1050,6 +1050,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
 
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/) {
+                log.trace("Outbound {}: {}", this.getName(), packet);
+            }
+
             this.packetQueue.offer(packet);
         }
         return true;
@@ -1120,6 +1124,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (ev.isCancelled()) {
                     return false;
                 }
+            }
+
+            if (Nukkit.DEBUG > 2 /*&& !server.isIgnoredPacket(packet.getClass())*/ && packet.pid() != ProtocolInfo.BATCH_PACKET) {
+                log.trace("Outbound {}: {}", this.getName(), packet);
             }
 
             this.interfaz.putPacket(this, packet, false, true);
@@ -1357,7 +1365,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.resetFallDistance();
 
         this.inventory.sendContents(this);
-        this.inventory.sendContents(this.getViewers().values());
         this.inventory.sendHeldItem(this.hasSpawned.values());
         this.offhandInventory.sendContents(this);
         this.offhandInventory.sendContents(this.getViewers().values());
@@ -2595,7 +2602,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 case ProtocolInfo.ADVENTURE_SETTINGS_PACKET:
                     AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
                     if (!server.getAllowFlight() && (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) || adventureSettingsPacket.getFlag(AdventureSettingsPacket.FLYING)) && !this.adventureSettings.get(Type.ALLOW_FLIGHT)) {
-                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=AdventureSettingsPacket, flags=" + (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) ? "ALLOW_FLIGHT " : "") + (adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) ? "FLYING" : ""));
+                        this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=AdventureSettingsPacket, flags=ALLOW_FLIGHT: " + adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT) + ", FLYING: " + adventureSettingsPacket.getFlag(AdventureSettingsPacket.ALLOW_FLIGHT));
                         break;
                     }
                     PlayerToggleFlightEvent playerToggleFlightEvent = new PlayerToggleFlightEvent(this, adventureSettingsPacket.getFlag(AdventureSettingsPacket.FLYING));

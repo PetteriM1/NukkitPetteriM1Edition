@@ -333,6 +333,10 @@ public class GlobalBlockPalette {
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
+        return getOrCreateRuntimeId(protocol, id, meta, false);
+    }
+
+    public static int getOrCreateRuntimeId(int protocol, int id, int meta, boolean returnMissing) {
         int legacyId = protocol >= 388 ? ((id << 6) | meta) : ((id << 4) | meta);
         switch (protocol) {
             // Versions before this doesn't use runtime IDs
@@ -365,7 +369,7 @@ public class GlobalBlockPalette {
                 int id389 = legacyToRuntimeId389.get(legacyId);
                 if (id389 == -1) {
                     id389 = legacyToRuntimeId389.get(id << 6);
-                    if (id389 == -1) {
+                    if (id389 == -1 && !returnMissing) {
                         log.info("(389) Creating new runtime ID for unknown block {}", id);
                         id389 = runtimeIdAllocator389.getAndIncrement();
                         legacyToRuntimeId389.put(id << 6, id389);
@@ -376,7 +380,7 @@ public class GlobalBlockPalette {
                 int id407 = legacyToRuntimeId407.get(legacyId);
                 if (id407 == -1) {
                     id407 = legacyToRuntimeId407.get(id << 6);
-                    if (id407 == -1) {
+                    if (id407 == -1 && !returnMissing) {
                         log.info("(407) Creating new runtime ID for unknown block {}", id);
                         id407 = runtimeIdAllocator407.getAndIncrement();
                         legacyToRuntimeId407.put(id << 6, id407);
@@ -390,7 +394,7 @@ public class GlobalBlockPalette {
                 int id408 = legacyToRuntimeId408.get(legacyId);
                 if (id408 == -1) {
                     id408 = legacyToRuntimeId408.get(id << 6);
-                    if (id408 == -1) {
+                    if (id408 == -1 && !returnMissing) {
                         log.info("(408) Creating new runtime ID for unknown block {}", id);
                         id408 = runtimeIdAllocator408.getAndIncrement();
                         legacyToRuntimeId408.put(id << 6, id408);
@@ -404,7 +408,7 @@ public class GlobalBlockPalette {
                 int id419 = legacyToRuntimeId419.get(legacyId);
                 if (id419 == -1) {
                     id419 = legacyToRuntimeId419.get(id << 6);
-                    if (id419 == -1) {
+                    if (id419 == -1 && !returnMissing) {
                         log.info("(419) Creating new runtime ID for unknown block {}", id);
                         id419 = runtimeIdAllocator419.getAndIncrement();
                         legacyToRuntimeId419.put(id << 6, id419);
@@ -412,10 +416,11 @@ public class GlobalBlockPalette {
                 }
                 return id419;
             case ProtocolInfo.v1_16_210:
+            case ProtocolInfo.v1_16_220:
                 int id428 = legacyToRuntimeId428.get(legacyId);
                 if (id428 == -1) {
                     id428 = legacyToRuntimeId428.get(id << 6);
-                    if (id428 == -1) {
+                    if (id428 == -1 && !returnMissing) {
                         log.info("(428) Creating new runtime ID for unknown block {}", id);
                         id428 = runtimeIdAllocator428.getAndIncrement();
                         legacyToRuntimeId428.put(id << 6, id428);

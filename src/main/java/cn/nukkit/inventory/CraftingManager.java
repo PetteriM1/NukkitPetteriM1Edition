@@ -33,6 +33,7 @@ public class CraftingManager {
     public static BatchPacket packet388 = null;
     public static DataPacket packet407 = null;
     public static DataPacket packet419 = null;
+    public static DataPacket packet431 = null;
 
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
@@ -267,6 +268,30 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
+        CraftingDataPacket pk431 = new CraftingDataPacket();
+        pk431.cleanRecipes = true;
+        pk431.protocol = 431;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk431.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk431.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk431.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            pk431.addMultiRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk431.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk431.addContainerRecipe(recipe);
+        }
+        pk431.tryEncode();
+        packet431 = pk431;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk419 = new CraftingDataPacket();
         pk419.cleanRecipes = true;
         pk419.protocol = 419;
