@@ -795,6 +795,7 @@ public class Server {
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
                 this.unloadLevel(level, true);
+                this.nextTick = System.currentTimeMillis(); // Fix Watchdog killing the server while saving worlds
             }
 
             this.getLogger().debug("Removing event handlers...");
@@ -2167,7 +2168,7 @@ public class Server {
         Entity.registerEntity("BlazeFireBall", EntityBlazeFireBall.class);
         Entity.registerEntity("GhastFireBall", EntityGhastFireBall.class);
         Entity.registerEntity("ShulkerBullet", EntityShulkerBullet.class);
-        Entity.registerEntity("ThrownLinearingPotion", EntityPotionLinearing.class);
+        Entity.registerEntity("ThrownLingeringPotion", EntityPotionLingering.class);
         Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
         Entity.registerEntity("WitherSkull", EntityWitherSkull.class);
         Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);

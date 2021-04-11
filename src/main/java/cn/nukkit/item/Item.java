@@ -808,7 +808,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public boolean hasEnchantment(int id) {
-        return this.getEnchantment(id) != null;
+        Enchantment e = this.getEnchantment(id);
+        return e != null && e.getLevel() > 0;
     }
 
     public boolean hasEnchantment(short id) {
