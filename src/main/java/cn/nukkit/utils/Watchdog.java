@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.Server;
+import cn.nukkit.utils.bugreport.BugReportGenerator;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
