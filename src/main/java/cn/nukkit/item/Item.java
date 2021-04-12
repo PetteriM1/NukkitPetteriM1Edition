@@ -808,7 +808,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public boolean hasEnchantment(int id) {
-        return this.getEnchantment(id) != null;
+        Enchantment e = this.getEnchantment(id);
+        return e != null && e.getLevel() > 0;
     }
 
     public boolean hasEnchantment(short id) {
@@ -1256,6 +1257,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         } catch (CloneNotSupportedException e) {
             return null;
         }
+    }
+
+    public final int getNetworkId() {
+        return getNetworkId(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
     public final int getNetworkId(int protocol) {
