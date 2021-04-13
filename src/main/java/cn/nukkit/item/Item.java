@@ -402,7 +402,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         for (Map map : new Config(Config.YAML).loadFromStream(Server.class.getClassLoader().getResourceAsStream("creativeitems407.json")).getMapList("items")) {
             try {
                 Item item = fromJson(map);
-                Item newItem = new Item(item.getId(), item.getDamage(), item.getCount());
+                Item newItem = Item.get(item.getId(), item.getDamage(), item.getCount());
                 newItem.setCompoundTag(item.getCompoundTag());
                 addCreativeItem(v1_16_0, newItem);
             } catch (Exception e) {
