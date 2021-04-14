@@ -558,29 +558,29 @@ public class BinaryStream {
     }
 
     private Item getSlotInternal(int protocolId) {
-        int id = getVarInt();
-        if (id == 0) {
+        int networkFullId = this.getVarInt();
+        if (networkFullId == 0) {
             return Item.get(0, 0, 0);
         }
 
-        int count = getLShort();
-        int damage = (int) getUnsignedVarInt();
+        int count = this.getLShort();
+        int damage = (int) this.getUnsignedVarInt();
 
-        int fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
-        id = RuntimeItems.getId(fullId);
+        int fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(networkFullId);
+        int id = RuntimeItems.getId(fullId);
 
-        /*boolean hasData = RuntimeItems.hasData(fullId); // Unnecessary when the damage is read from NBT
-        if (hasData) {
+        if (RuntimeItems.hasData(fullId)) {
             damage = RuntimeItems.getData(fullId);
-        }*/
-
-        if (getBoolean()) { // hasNetId
-            getVarInt(); // netId
         }
 
-        getVarInt(); // blockRuntimeId
 
-        byte[] bytes = getByteArray();
+        if (this.getBoolean()) { // hasNetId
+            this.getVarInt(); // netId
+        }
+
+        this.getVarInt(); // blockRuntimeId
+
+        byte[] bytes = this.getByteArray();
         ByteBuf buf = AbstractByteBufAllocator.DEFAULT.ioBuffer(bytes.length);
         buf.writeBytes(bytes);
 
@@ -861,42 +861,43 @@ public class BinaryStream {
 
     private void putSlotInternal(int protocolId, Item item, boolean instanceItem) {
         if (item == null || item.getId() == 0) {
-            putByte((byte) 0);
+            this.putByte((byte) 0);
             return;
         }
 
         int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
         int networkId = RuntimeItems.getNetworkId(networkFullId);
+        boolean clearMeta = RuntimeItems.hasData(networkFullId);
 
-        putVarInt(networkId);
-        putLShort(item.getCount());
+        this.putVarInt(networkId);
+        this.putLShort(item.getCount());
 
-        boolean useLegacyData = false;
-        if (item.getId() > 256) { // Not a block
-            if (item instanceof ItemDurable || !RuntimeItems.hasData(networkFullId)) {
-                useLegacyData = true;
-            }
+        int damage = 0;
+        if (item.hasMeta() && !clearMeta) {
+            damage = item.getDamage();
         }
-        putUnsignedVarInt(useLegacyData ? item.getDamage() : 0);
+        this.putUnsignedVarInt(damage);
 
         if (!instanceItem) {
-            putBoolean(true);
-            putVarInt(0); //TODO
+            this.putBoolean(true);
+            this.putVarInt(0); //TODO
         }
 
-        Block block = item.getBlockUnsafe();
-        int runtimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
-        putVarInt(runtimeId);
+        int blockRuntimeId = 0;
+        Block block = item.getBlock();
+        if (block != null) {
+            blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
+        }
+        this.putVarInt(blockRuntimeId);
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
         try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
-            if (item.getDamage() != 0) {
-                byte[] nbt = item.getCompoundTag();
+            if (item.hasMeta()) {
                 CompoundTag tag;
-                if (nbt == null || nbt.length == 0) {
+                if (!item.hasCompoundTag()) {
                     tag = new CompoundTag();
                 } else {
-                    tag = NBTIO.read(nbt, ByteOrder.LITTLE_ENDIAN);
+                    tag = item.getNamedTag();
                 }
                 if (tag.contains("Damage")) {
                     tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
@@ -931,7 +932,7 @@ public class BinaryStream {
 
             byte[] bytes = new byte[userDataBuf.readableBytes()];
             userDataBuf.readBytes(bytes);
-            putByteArray(bytes);
+            this.putByteArray(bytes);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to write item user data", e);
         } finally {
