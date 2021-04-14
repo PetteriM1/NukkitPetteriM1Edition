@@ -897,7 +897,7 @@ public class BinaryStream {
                 if (!item.hasCompoundTag()) {
                     tag = new CompoundTag();
                 } else {
-                    tag = item.getNamedTag().clone();
+                    tag = NBTIO.read(item.getCompoundTag(), ByteOrder.LITTLE_ENDIAN);
                 }
                 if (tag.contains("Damage")) {
                     tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
