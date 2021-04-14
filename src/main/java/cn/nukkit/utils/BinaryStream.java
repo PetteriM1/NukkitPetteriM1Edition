@@ -869,17 +869,23 @@ public class BinaryStream {
         int networkId = RuntimeItems.getNetworkId(networkFullId);
 
         putVarInt(networkId);
-
         putLShort(item.getCount());
-        putUnsignedVarInt(item instanceof ItemDurable || item.getId() > 256 ? item.getDamage() : 0);
+
+        boolean useLegacyData = false;
+        if (item.getId() > 256) { // Not a block
+            if (item instanceof ItemDurable || !RuntimeItems.hasData(networkFullId)) {
+                useLegacyData = true;
+            }
+        }
+        putUnsignedVarInt(useLegacyData ? item.getDamage() : 0);
 
         if (!instanceItem) {
             putBoolean(true);
-            putVarInt(0);
+            putVarInt(0); //TODO
         }
 
         Block block = item.getBlockUnsafe();
-        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
+        int runtimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
         putVarInt(runtimeId);
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
