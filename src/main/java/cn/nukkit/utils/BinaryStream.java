@@ -897,7 +897,7 @@ public class BinaryStream {
                 if (!item.hasCompoundTag()) {
                     tag = new CompoundTag();
                 } else {
-                    tag = item.getNamedTag();
+                    tag = item.getNamedTag().clone();
                 }
                 if (tag.contains("Damage")) {
                     tag.put("__DamageConflict__", tag.removeAndGet("Damage"));
