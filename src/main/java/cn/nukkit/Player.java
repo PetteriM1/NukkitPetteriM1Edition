@@ -268,6 +268,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private boolean foodEnabled = true;
     private int failedTransactions;
     public int ticksSinceLastRest;
+    private boolean inSoulSand;
+    private float soulSpeed = 1;
 
     /**
      * Packets that can be received before the player has logged in
@@ -1735,7 +1737,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         // Frost Walker
         if (!revert && delta > 0.0001d) {
-            Enchantment frostWalker = inventory.getBootsFast().getEnchantment(Enchantment.ID_FROST_WALKER);
+            Item boots = inventory.getBootsFast();
+
+            Enchantment frostWalker = boots.getEnchantment(Enchantment.ID_FROST_WALKER);
             if (frostWalker != null && frostWalker.getLevel() > 0 && !this.isSpectator() && this.y >= 1 && this.y <= 255) {
                 int radius = 2 + frostWalker.getLevel();
                 for (int coordX = this.getFloorX() - radius; coordX < this.getFloorX() + radius + 1; coordX++) {
@@ -1750,6 +1754,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                         }
                     }
+                }
+            }
+
+            Enchantment soulSpeedEnchantment = boots.getEnchantment(Enchantment.ID_SOUL_SPEED);
+            if (soulSpeedEnchantment != null && soulSpeedEnchantment.getLevel() > 0) {
+                int down = this.getLevel().getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                if (this.inSoulSand && down != BlockID.SOUL_SAND) {
+                    this.inSoulSand = false;
+                    this.soulSpeed = 1;
+                    this.setMovementSpeed(DEFAULT_SPEED, true);
+                } else if (!this.inSoulSand && down == BlockID.SOUL_SAND) {
+                    this.inSoulSand = true;
+                    this.soulSpeed = (soulSpeedEnchantment.getLevel() * 0.105f) + 1.3f;
+                    this.setMovementSpeed(DEFAULT_SPEED * this.soulSpeed, true);
                 }
             }
         }
