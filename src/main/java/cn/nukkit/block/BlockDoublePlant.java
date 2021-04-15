@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemSeedsWheat;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
@@ -140,5 +141,27 @@ public class BlockDoublePlant extends BlockFlowable {
     @Override
     public BlockColor getColor() {
         return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == Item.DYE && item.getDamage() == 0x0f) { // Bone meal
+            if (this.getDamage() == SUNFLOWER || this.getDamage() == LILAC || this.getDamage() == ROSE_BUSH || this.getDamage() == PEONY) { // Flower
+                if (player != null && !player.isCreative()) {
+                    item.count--;
+                }
+
+                this.level.addParticle(new BoneMealParticle(this));
+                this.level.dropItem(this, this.toItem());
+            }
+            return true;
+        }
+
+        return false;
     }
 }
