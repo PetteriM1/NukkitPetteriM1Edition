@@ -5337,7 +5337,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk1.respawn = !this.isAlive();
         this.dataPacket(pk1);
 
-        if (this.protocol >= 313) {
+        if (this.protocol >= ProtocolInfo.v1_8_0) {
             NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
             pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
             pk0.radius = viewDistance << 4;
@@ -5359,7 +5359,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             spawnPosition.z = spawn.getFloorZ();
             this.dataPacket(spawnPosition);
 
-            this.forceSendEmptyChunks();
+            if (this.getServer().dimensionsEnabled && oldLevel.getDimension() != level.getDimension()) {
+                this.setDimension(level.getDimension());
+            } else {
+                this.forceSendEmptyChunks();
+            }
 
             // Remove old chunks
             for (long index : new ArrayList<>(this.usedChunks.keySet())) {
@@ -5378,10 +5382,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             GameRulesChangedPacket packet = new GameRulesChangedPacket();
             packet.gameRules = level.getGameRules();
             this.dataPacket(packet);
-
-            if (this.getServer().dimensionsEnabled && oldLevel.getDimension() != level.getDimension()) {
-                this.setDimension(level.getDimension());
-            }
 
             this.ticksSinceLastRest = 0;
 

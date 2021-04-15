@@ -567,12 +567,12 @@ public class BinaryStream {
         int damage = (int) getUnsignedVarInt();
 
         int fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
-        boolean hasData = RuntimeItems.hasData(fullId);
         id = RuntimeItems.getId(fullId);
 
+        /*boolean hasData = RuntimeItems.hasData(fullId); // Unnecessary when the damage is read from NBT
         if (hasData) {
             damage = RuntimeItems.getData(fullId);
-        }
+        }*/
 
         if (getBoolean()) { // hasNetId
             getVarInt(); // netId
@@ -869,18 +869,24 @@ public class BinaryStream {
         int networkId = RuntimeItems.getNetworkId(networkFullId);
 
         putVarInt(networkId);
-
         putLShort(item.getCount());
-        putUnsignedVarInt(item.getDamage());
+
+        boolean useLegacyData = false;
+        if (item.getId() > 256) { // Not a block
+            if (item instanceof ItemDurable || !RuntimeItems.hasData(networkFullId)) {
+                useLegacyData = true;
+            }
+        }
+        putUnsignedVarInt(useLegacyData ? item.getDamage() : 0);
 
         if (!instanceItem) {
             putBoolean(true);
-            putVarInt(0);
+            putVarInt(0); //TODO
         }
 
         Block block = item.getBlockUnsafe();
-        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage(), true);
-        putVarInt(Math.max(runtimeId, 0)); // put 0 if not in the palette
+        int runtimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
+        putVarInt(runtimeId);
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
         try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
