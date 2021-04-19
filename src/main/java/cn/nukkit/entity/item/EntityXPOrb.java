@@ -178,7 +178,8 @@ public class EntityXPOrb extends Entity {
             }*/
 
             if (this.closestPlayer == null || this.closestPlayer.distanceSquared(this) > 64.0D) {
-                for (Player p : level.getPlayers().values()) {
+                for (Player p : this.getViewers().values()) {
+                    if (p == this.closestPlayer) continue; // Current closestPlayer is null or too far away
                     if (!p.isSpectator() && p.distanceSquared(this) <= 64) {
                         this.closestPlayer = p;
                         break;

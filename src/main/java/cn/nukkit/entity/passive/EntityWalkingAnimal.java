@@ -45,7 +45,7 @@ public abstract class EntityWalkingAnimal extends EntityWalking implements Entit
         Vector3 target = this.updateMove(tickDiff);
         if (target instanceof Player) {
             if (this.distanceSquared(target) <= 2) {
-                this.pitch = 22;
+                //this.pitch = 22;
                 this.x = this.lastX;
                 this.y = this.lastY;
                 this.z = this.lastZ;

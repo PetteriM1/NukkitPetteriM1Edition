@@ -1,4 +1,4 @@
-package cn.nukkit.utils;
+package cn.nukkit.utils.bugreport;
 
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
