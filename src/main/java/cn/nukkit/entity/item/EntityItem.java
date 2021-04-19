@@ -184,7 +184,7 @@ public class EntityItem extends Entity {
 
                     for (Entity entity : e) {
                         if (entity instanceof EntityItem) {
-                            if (!entity.isAlive()) {
+                            if (entity.closed || !entity.isAlive()) {
                                 continue;
                             }
                             Item closeItem = ((EntityItem) entity).item;
