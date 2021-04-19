@@ -4,6 +4,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 
 public class ItemPotionLingering extends ProjectileItem {
 
+    public ItemPotionLingering() {
+        this(0, 1);
+    }
+
     public ItemPotionLingering(Integer meta) {
         this(meta, 1);
     }
@@ -24,7 +28,7 @@ public class ItemPotionLingering extends ProjectileItem {
 
     @Override
     public String getProjectileEntityType() {
-        return "ThrownLinearingPotion";
+        return "ThrownLingeringPotion";
     }
 
     @Override

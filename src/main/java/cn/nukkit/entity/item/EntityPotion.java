@@ -82,7 +82,7 @@ public class EntityPotion extends EntityProjectile {
         return 0.01f;
     }
 
-    private void splash(Entity collidedWith) {
+    protected void splash(Entity collidedWith) {
         Potion potion = Potion.getPotion(this.potionId);
         PotionCollideEvent event = new PotionCollideEvent(potion, this);
         this.server.getPluginManager().callEvent(event);
@@ -136,6 +136,7 @@ public class EntityPotion extends EntityProjectile {
     @Override
     public void onCollideWithEntity(Entity entity) {
         this.splash(entity);
+        this.close();
     }
 
     @Override
@@ -146,11 +147,13 @@ public class EntityPotion extends EntityProjectile {
 
         if (this.timing != null) this.timing.startTiming();
 
-        if (this.age > 1200) {
+        if (this.isCollided) {
+            this.splash(null);
+        }
+
+        if (this.age > 1200 || this.isCollided) {
             this.close();
             return false;
-        } else if (this.isCollided) {
-            this.splash(null);
         }
 
         if (this.timing != null) this.timing.stopTiming();

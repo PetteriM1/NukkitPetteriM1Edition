@@ -111,7 +111,7 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityBlazeFireBall.NETWORK_ID, "minecraft:small_fireball")
             .put(EntityLlamaSpit.NETWORK_ID, "minecraft:llama_spit")
             .put(95, "minecraft:area_effect_cloud")
-            .put(EntityPotionLinearing.NETWORK_ID, "minecraft:lingering_potion")
+            .put(EntityPotionLingering.NETWORK_ID, "minecraft:lingering_potion")
             .put(EntityFirework.NETWORK_ID, "minecraft:fireworks_rocket")
             .put(EntityEvocationFangs.NETWORK_ID, "minecraft:evocation_fang")
             .put(104, "minecraft:evocation_illager")

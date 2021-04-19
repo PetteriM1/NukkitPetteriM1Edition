@@ -265,6 +265,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private boolean foodEnabled = true;
     private int failedTransactions;
     public int ticksSinceLastRest;
+    private boolean inSoulSand;
+    private float soulSpeed = 1;
 
     /**
      * Packets that can be received before the player has logged in
@@ -1745,7 +1747,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         // Frost Walker
         if (!revert && delta > 0.0001d) {
-            Enchantment frostWalker = inventory.getBootsFast().getEnchantment(Enchantment.ID_FROST_WALKER);
+            Item boots = inventory.getBootsFast();
+
+            Enchantment frostWalker = boots.getEnchantment(Enchantment.ID_FROST_WALKER);
             if (frostWalker != null && frostWalker.getLevel() > 0 && !this.isSpectator() && this.y >= 1 && this.y <= 255) {
                 int radius = 2 + frostWalker.getLevel();
                 for (int coordX = this.getFloorX() - radius; coordX < this.getFloorX() + radius + 1; coordX++) {
@@ -1760,6 +1764,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             }
                         }
                     }
+                }
+            }
+
+            Enchantment soulSpeedEnchantment = boots.getEnchantment(Enchantment.ID_SOUL_SPEED);
+            if (soulSpeedEnchantment != null && soulSpeedEnchantment.getLevel() > 0) {
+                int down = this.getLevel().getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                if (this.inSoulSand && down != BlockID.SOUL_SAND) {
+                    this.inSoulSand = false;
+                    this.soulSpeed = 1;
+                    this.setMovementSpeed(DEFAULT_SPEED, true);
+                } else if (!this.inSoulSand && down == BlockID.SOUL_SAND) {
+                    this.inSoulSand = true;
+                    this.soulSpeed = (soulSpeedEnchantment.getLevel() * 0.105f) + 1.3f;
+                    this.setMovementSpeed(DEFAULT_SPEED * this.soulSpeed, true);
                 }
             }
         }
@@ -3589,10 +3607,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                     if (item.onClickAir(this, directionVector)) {
                                         if (this.isSurvival() || this.isAdventure()) {
-                                            if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
+                                            if (item.getId() == 0 || this.inventory.getItemInHandFast().getId() == item.getId()) {
                                                 this.inventory.setItemInHand(item);
                                             } else {
-                                                server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHand().getId() + " in their hand slot");
+                                                server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHandFast().getId() + " in their hand slot");
                                             }
                                         }
 
@@ -3655,10 +3673,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             }
                                         }
 
-                                        if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
+                                        if (item.getId() == 0 || this.inventory.getItemInHandFast().getId() == item.getId()) {
                                             this.inventory.setItemInHand(item);
                                         } else {
-                                            server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHand().getId() + " in their hand slot");
+                                            server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHandFast().getId() + " in their hand slot");
                                         }
                                     }
                                     break;
@@ -3709,10 +3727,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                             level.addParticle(new ItemBreakParticle(this, item));
                                             this.inventory.setItemInHand(Item.get(0));
                                         } else {
-                                            if (this.inventory.getItemInHand().getId() == item.getId() || item.getId() == 0) {
+                                            if (item.getId() == 0 || this.inventory.getItemInHandFast().getId() == item.getId()) {
                                                 this.inventory.setItemInHand(item);
                                             } else {
-                                                server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHand().getId() + " in their hand slot");
+                                                server.getLogger().debug("Tried to set item " + item.getId() + " but " + this.username + " had item " + this.inventory.getItemInHandFast().getId() + " in their hand slot");
                                             }
                                         }
                                     }
@@ -5347,7 +5365,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk1.respawn = !this.isAlive();
         this.dataPacket(pk1);
 
-        if (this.protocol >= 313) {
+        if (this.protocol >= ProtocolInfo.v1_8_0) {
             NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
             pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
             pk0.radius = viewDistance << 4;
@@ -5369,7 +5387,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             spawnPosition.z = spawn.getFloorZ();
             this.dataPacket(spawnPosition);
 
-            this.forceSendEmptyChunks();
+            if (this.getServer().dimensionsEnabled && oldLevel.getDimension() != level.getDimension()) {
+                this.setDimension(level.getDimension());
+            } else {
+                this.forceSendEmptyChunks();
+            }
 
             // Remove old chunks
             for (long index : new ArrayList<>(this.usedChunks.keySet())) {
@@ -5388,10 +5410,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             GameRulesChangedPacket packet = new GameRulesChangedPacket();
             packet.gameRules = level.getGameRules();
             this.dataPacket(packet);
-
-            if (this.getServer().dimensionsEnabled && oldLevel.getDimension() != level.getDimension()) {
-                this.setDimension(level.getDimension());
-            }
 
             this.ticksSinceLastRest = 0;
 

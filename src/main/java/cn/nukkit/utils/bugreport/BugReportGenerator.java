@@ -1,4 +1,4 @@
-package cn.nukkit.utils;
+package cn.nukkit.utils.bugreport;
 
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
@@ -11,13 +11,15 @@ public class BugReportGenerator extends Thread {
     private final Throwable throwable;
     private final String message;
 
+    public static BugReportPlugin plugin;
+
     BugReportGenerator(Throwable throwable) {
         setName("BugReportGenerator");
         this.throwable = throwable;
         this.message = null;
     }
 
-    BugReportGenerator(String message) {
+    public BugReportGenerator(String message) {
         setName("BugReportGenerator");
         this.throwable = null;
         this.message = message;
@@ -25,6 +27,13 @@ public class BugReportGenerator extends Thread {
 
     @Override
     public void run() {
+        if (plugin != null) {
+            try {
+                plugin.bugReport(throwable, message);
+            } catch (Exception ex) {
+                Server.getInstance().getLogger().error("[BugReport] External bug report failed", ex);
+            }
+        }
         try {
             if (Server.getInstance().sentry != null) {
                 sentry();
