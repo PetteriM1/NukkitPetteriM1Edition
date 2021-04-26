@@ -87,7 +87,7 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission("nukkit.command.gamemode.other", "Allows the user to change the gamemode of other players", Permission.DEFAULT_OP), gamemode);
         gamemode.recalculatePermissibles();
 
-        registerPermission(new Permission("nukkit.command.me", "Allows the user to perform a chat action", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission("nukkit.command.me", "Allows the user to perform a chat action", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.tell", "Allows the user to privately message another player", Permission.DEFAULT_TRUE), commands);
         registerPermission(new Permission("nukkit.command.say", "Allows the user to talk as the console", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.give", "Allows the user to give items to players", Permission.DEFAULT_OP), commands);
@@ -101,6 +101,7 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission("nukkit.command.plugins", "Allows the user to view the list of plugins", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.reload", "Allows the user to reload the server settings", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.version", "Allows the user to view the version of the server", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission("nukkit.command.version.plugins", "Allows the user to view the version of the plugins", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.defaultgamemode", "Allows the user to change the default gamemode", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.status", "Allows the user to view the server performance", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.gc", "Allows the user to fire garbage collection tasks", Permission.DEFAULT_OP), commands);
@@ -110,16 +111,16 @@ public abstract class DefaultPermissions {
         registerPermission(new Permission("nukkit.command.setworldspawn", "Allows the user to change the world spawn", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.weather", "Allows the user to change the weather", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.xp", "Allows the user to give experience", Permission.DEFAULT_OP), commands);
-        registerPermission(new Permission("nukkit.command.transferserver", "Allows the user to transfer to other server", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission("nukkit.command.transferserver", "Allows the user to transfer to other server", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.summon", "Allows the user to summon entities", Permission.DEFAULT_OP), commands);
-        registerPermission(new Permission("nukkit.command.world", "Allows the user to switch world", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission("nukkit.command.world", "Allows the user to switch world", Server.getInstance().suomiCraftPEMode() ? Permission.DEFAULT_TRUE : Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.world.others", "Allows the user to switch world for other players", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.generateworld", "Allows the user to generate new world", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.seed", "Allows the user to see world's seed", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.playsound", "Allows the user to play sounds", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.debug.perform", "Allows the user to create debug paste", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.gamerule", "Allows the user to change game rules", Permission.DEFAULT_OP), commands);
-        registerPermission(new Permission("nukkit.command.spawn", "Allows the user to use spawn command", Permission.DEFAULT_TRUE), commands);
+        registerPermission(new Permission("nukkit.command.spawn", "Allows the user to use spawn command", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.enchant", "Allows the user to enchant items", Permission.DEFAULT_OP), commands);
         registerPermission(new Permission("nukkit.command.difficulty", "Allows the user to change difficulty", Permission.DEFAULT_OP), commands);
 
