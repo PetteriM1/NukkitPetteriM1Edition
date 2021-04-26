@@ -235,7 +235,7 @@ public class Server {
     public boolean spawnEggsEnabled;
     public boolean xpBottlesOnCreative;
     public boolean dimensionsEnabled;
-    boolean callDataPkEv;
+    boolean callDataPkSendEv;
     boolean bedSpawnpoints;
     boolean achievements;
     boolean banAuthFailed;
@@ -2326,7 +2326,7 @@ public class Server {
         this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);
         this.baseTickRate = this.getPropertyInt("base-tick-rate", 1);
         this.suomicraftMode = this.getPropertyBoolean("suomicraft-mode", false);
-        this.callDataPkEv = this.getPropertyBoolean("call-data-pk-send-event", true);
+        this.callDataPkSendEv = this.getPropertyBoolean("call-data-pk-send-event", true);
         this.callBatchPkEv = this.getPropertyBoolean("call-batch-pk-send-event", true);
         this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
         this.mobAI = this.getPropertyBoolean("mob-ai", true);
