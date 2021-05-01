@@ -19,6 +19,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -36,6 +37,8 @@ import co.aikar.timings.TimingsHistory;
 import com.google.common.collect.Iterables;
 import org.apache.commons.math3.util.FastMath;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -254,6 +257,20 @@ public abstract class Entity extends Location implements Metadatable {
 
     private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();
     private static final Map<String, String> shortNames = new HashMap<>();
+
+    private static final Map<Integer, String> entityLegacyMappingOld = new HashMap<>();
+    private static final Map<Integer, String> entityLegacyMapping = new HashMap<>();
+
+    private static final Map<Integer, CompoundTag> entityIdentifiersMap = new HashMap<>();
+    private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
+
+    static {
+        AddEntityPacket.setupLegacyIdentifiers(entityLegacyMappingOld, ProtocolInfo.v1_2_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityLegacyMapping, ProtocolInfo.v1_16_0);
+        initEntityIdentifiers(ProtocolInfo.v1_2_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT313));
+        initEntityIdentifiers(ProtocolInfo.v1_10_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT340));
+        initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
+    }
 
     public final Map<Integer, Player> hasSpawned = new HashMap<>();
 
@@ -871,6 +888,71 @@ public abstract class Entity extends Location implements Metadatable {
         knownEntities.put(name, clazz);
         shortNames.put(clazz.getSimpleName(), name);
         return true;
+    }
+
+    public static boolean registerEntityLegacyIdentifier(int entityId, String identifier) {
+        return registerEntityLegacyIdentifier(entityId, identifier, ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public static boolean registerEntityLegacyIdentifier(int entityId, String identifier, int protocolId) {
+        Map<Integer, String> mapping = protocolId < ProtocolInfo.v1_16_0 ? entityLegacyMappingOld : entityLegacyMapping;
+        return mapping.putIfAbsent(entityId, identifier) == null;
+    }
+
+    public static Map<Integer, String> getEntityLegacyMapping() {
+        return getEntityLegacyMapping(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public static Map<Integer, String> getEntityLegacyMapping(int protocolId) {
+        Map<Integer, String> identifiers = protocolId < ProtocolInfo.v1_16_0 ? entityLegacyMappingOld : entityLegacyMapping;
+        return Collections.unmodifiableMap(identifiers);
+    }
+
+    private static void initEntityIdentifiers(int protocolId, byte[] bytes) {
+        try {
+            CompoundTag identifiers = (CompoundTag) NBTIO.readNetwork(new ByteArrayInputStream(bytes));
+            entityIdentifiersMap.put(protocolId, identifiers);
+            entityIdentifiersCache.put(protocolId, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to init entityIdentifiers", e);
+        }
+    }
+
+    private static int correctEntityIdentifiersProtocol(int protocolId) {
+        if (protocolId >= ProtocolInfo.v1_16_100) {
+            return ProtocolInfo.v1_16_100;
+        } else if (protocolId >= ProtocolInfo.v1_10_0) {
+            return ProtocolInfo.v1_10_0;
+        }
+        return ProtocolInfo.v1_2_0;
+    }
+
+    public static void registerEntityIdentifier(CompoundTag identifier, int protocolId) {
+        int protocol = correctEntityIdentifiersProtocol(protocolId);
+        CompoundTag nbt = entityIdentifiersMap.get(protocol);
+        ListTag<CompoundTag> identifiers = nbt.getList("idlist", CompoundTag.class);
+        identifiers.add(identifier);
+        nbt.putList(identifiers);
+        updateEntityIdentifiersCache(protocol);
+    }
+
+    public static CompoundTag getEntityIdentifiers(int protocolId) {
+        int protocol = correctEntityIdentifiersProtocol(protocolId);
+        return entityIdentifiersMap.get(protocol);
+    }
+
+    private static void updateEntityIdentifiersCache(int protocolId) {
+        try {
+            CompoundTag nbt = entityIdentifiersMap.get(protocolId);
+            entityIdentifiersCache.put(protocolId, NBTIO.writeNetwork(nbt));
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to update entityIdentifiers cache", e);
+        }
+    }
+
+    public static byte[] getEntityIdentifiersCache(int protocolId) {
+        int protocol = correctEntityIdentifiersProtocol(protocolId);
+        return entityIdentifiersCache.get(protocol);
     }
 
     public static CompoundTag getDefaultNBT(Vector3 pos) {
