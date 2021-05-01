@@ -23,7 +23,7 @@ public class BlockItemFrame extends BlockTransparentMeta {
     private final static int[] FACING = new int[]{4, 5, 3, 2, 1, 0}; // TODO when 1.13 support arrives, add UP/DOWN facings
 
     private final static int FACING_BITMASK = 0b0111;
-    private final static int MAP_BIT = 0b1000;
+    //private final static int MAP_BIT = 0b1000;
 
     public BlockItemFrame() {
         this(0);

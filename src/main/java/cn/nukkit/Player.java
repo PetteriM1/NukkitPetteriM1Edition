@@ -1044,7 +1044,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
+            if (server.callDataPkSendEv) {
                 DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
                 this.server.getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
@@ -1080,7 +1080,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
+            if (server.callDataPkSendEv) {
                 DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
                 this.server.getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {
@@ -1120,7 +1120,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         packet.protocol = this.protocol;
 
         try (Timing ignore = Timings.getSendDataPacketTiming(packet)) {
-            if (server.callDataPkEv) {
+            if (server.callDataPkSendEv && packet.pid() != ProtocolInfo.BATCH_PACKET) {
                 DataPacketSendEvent ev = new DataPacketSendEvent(this, packet);
                 this.server.getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {
@@ -5704,6 +5704,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     protected void quickBatch(DataPacket pk) {
         pk.protocol = this.protocol;
+        if (server.callDataPkSendEv) {
+            DataPacketSendEvent event = new DataPacketSendEvent(this, pk);
+            this.server.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return;
+            }
+        }
         pk.tryEncode();
         BinaryStream stream = new BinaryStream();
         byte[] buf = pk.getBuffer();
