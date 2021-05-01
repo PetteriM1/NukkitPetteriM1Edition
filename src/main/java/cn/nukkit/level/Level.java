@@ -529,7 +529,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addLevelSoundEvent(Vector3 pos, int type, int data, int entityType, boolean isBaby, boolean isGlobal, Player[] players) {
-        String identifier = AddEntityPacket.LEGACY_IDS.getOrDefault(entityType, ":");
+        String identifier = Entity.getEntityLegacyMapping().getOrDefault(entityType, ":");
         this.addLevelSoundEvent(pos, type, data, identifier, isBaby, isGlobal, players);
     }
 
