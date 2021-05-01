@@ -69,7 +69,7 @@ public class BannerPattern {
 
         private final static Map<String, Type> BY_NAME = new HashMap<>();
 
-        private String name;
+        private final String name;
 
         Type(String name) {
             this.name = name;

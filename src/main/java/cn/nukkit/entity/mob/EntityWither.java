@@ -26,6 +26,11 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
 
     public static final int NETWORK_ID = 52;
 
+    /**
+        Whether the wither is exploded and dying
+     */
+    private boolean exploded;
+
     public EntityWither(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -173,7 +178,8 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             return;
         }
 
-        if (this.lastDamageCause != null && EntityDamageEvent.DamageCause.SUICIDE != this.lastDamageCause.getCause()) {
+        if (!this.exploded && this.lastDamageCause != null && EntityDamageEvent.DamageCause.SUICIDE != this.lastDamageCause.getCause()) {
+            this.exploded = true;
             this.explode();
         }
 
