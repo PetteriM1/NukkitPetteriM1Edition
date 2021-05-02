@@ -19,7 +19,6 @@ public class TradeInventory extends BaseInventory {
         super.onOpen(who);
 
         UpdateTradePacket pk = new UpdateTradePacket();
-        pk.protocol = who.protocol;
         pk.windowId = (byte) who.getWindowId(this);
         pk.windowType = (byte) InventoryType.TRADING.getNetworkType();
         pk.unknownVarInt1 = 0;
