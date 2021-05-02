@@ -19,15 +19,18 @@ public class TradeInventory extends BaseInventory {
         super.onOpen(who);
 
         UpdateTradePacket pk = new UpdateTradePacket();
+        pk.protocol = who.protocol;
         pk.windowId = (byte) who.getWindowId(this);
         pk.windowType = (byte) InventoryType.TRADING.getNetworkType();
+        pk.unknownVarInt1 = 0;
         pk.isWilling = this.getHolder().isWilling();
         pk.screen2 = true;
         pk.trader = this.getHolder().getId();
         pk.tradeTier = this.getHolder().getTradeTier();
         pk.player = who.getId();
+        pk.displayName = this.getHolder().getNameTag();
         try {
-            pk.offers = NBTIO.write(this.getHolder().getOffers(),ByteOrder.LITTLE_ENDIAN);
+            pk.offers = NBTIO.write(this.getHolder().getOffers(), ByteOrder.LITTLE_ENDIAN, true);
         } catch(IOException ignored) {}
 
         who.dataPacket(pk);

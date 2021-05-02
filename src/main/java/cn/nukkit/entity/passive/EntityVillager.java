@@ -10,6 +10,7 @@ import cn.nukkit.inventory.TradeInventory;
 import cn.nukkit.inventory.TradeInventoryRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 
@@ -28,7 +29,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     public static final int NETWORK_ID = 15;
 
     private TradeInventory inventory;
-    private final List<TradeInventoryRecipe> recipes = new ArrayList<>();
+    private List<TradeInventoryRecipe> recipes;
     private int tradeTier = 0;
     private boolean willing = true;
 
@@ -69,6 +70,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         this.setMaxHealth(10);
 
         this.inventory = new TradeInventory(this);
+        this.recipes = new ArrayList<>();
 
         CompoundTag offers = this.namedTag.getCompound("Offers");
         if (offers != null) {
@@ -141,6 +143,14 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     }
 
     @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (super.onInteract(player, item, clickedPos)) {
+            return true;
+        }
+        return this.onInteract(player, item);
+    }
+
+    @Override
     public boolean onInteract(Player player, Item item) {
         if (recipes.size() > 0) {
             player.addWindow(this.getInventory());
@@ -159,8 +169,8 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     public CompoundTag getOffers() {
         CompoundTag nbt = new CompoundTag();
-        nbt.putList(recipesToNbt());
-        nbt.putList(getDefaultTierExpRequirements());
+        nbt.putList(this.recipesToNbt());
+        nbt.putList(this.getDefaultTierExpRequirements());
         return nbt;
     }
 
