@@ -5173,6 +5173,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public CraftingGrid getCraftingGrid() {
         return this.craftingGrid;
     }
+    
+    public TradeInventory getTradeInventory() {
+        for(Inventory inv : this.windows.keySet()) {
+            if(inv instanceof TradeInventory) {
+                return (TradeInventory) inv;
+            }
+        }
+        return null;
+    }
 
     public void setCraftingGrid(CraftingGrid grid) {
         this.craftingGrid = grid;
