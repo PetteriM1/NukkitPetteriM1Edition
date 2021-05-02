@@ -37,6 +37,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
     private ChunkSection(int y, BlockStorage storage, byte[] blockLight, byte[] skyLight, byte[] compressedLight, boolean hasBlockLight, boolean hasSkyLight) {
         this.y = y;
         this.storage = storage;
+        this.blockLight = blockLight;
         this.skyLight = skyLight;
         this.compressedLight = compressedLight;
         this.hasBlockLight = hasBlockLight;

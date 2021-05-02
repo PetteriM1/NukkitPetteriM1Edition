@@ -413,6 +413,9 @@ public class GlobalBlockPalette {
                 return id419;
             case ProtocolInfo.v1_16_210:
             case ProtocolInfo.v1_16_220:
+            case ProtocolInfo.v1_16_230_50:
+            case ProtocolInfo.v1_16_230:
+            case ProtocolInfo.v1_16_230_54:
                 int id428 = legacyToRuntimeId428.get(legacyId);
                 if (id428 == -1) {
                     id428 = legacyToRuntimeId428.get(id << 6);

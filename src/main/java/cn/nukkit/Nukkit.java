@@ -1,6 +1,5 @@
 package cn.nukkit;
 
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.ServerKiller;
 import com.google.common.base.Preconditions;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -38,10 +37,6 @@ public class Nukkit {
     public static final String NUKKIT = "Nukkit PetteriM1 Edition";
     public final static Properties GIT_INFO = getGitInfo();
     public final static String VERSION = getVersion();
-    public final static String API_VERSION = "CUSTOM";
-    public final static String CODENAME = "On My Way";
-    public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
-    public final static String MINECRAFT_VERSION_NETWORK = ProtocolInfo.MINECRAFT_VERSION_NETWORK;
     public final static String PATH = System.getProperty("user.dir") + '/';
     public final static String DATA_PATH = System.getProperty("user.dir") + '/';
     public final static String PLUGIN_PATH = DATA_PATH + "plugins";

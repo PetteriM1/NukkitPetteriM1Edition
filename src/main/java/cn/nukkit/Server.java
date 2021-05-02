@@ -1225,15 +1225,15 @@ public class Server {
     }
 
     public String getCodename() {
-        return Nukkit.CODENAME;
+        return "PM1E";
     }
 
     public String getVersion() {
-        return Nukkit.MINECRAFT_VERSION;
+        return ProtocolInfo.MINECRAFT_VERSION;
     }
 
     public String getApiVersion() {
-        return Nukkit.API_VERSION;
+        return "CUSTOM";
     }
 
     public String getFilePath() {
