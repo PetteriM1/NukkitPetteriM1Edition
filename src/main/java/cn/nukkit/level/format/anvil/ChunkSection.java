@@ -45,6 +45,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
                          boolean hasBlockLight, boolean hasSkyLight) {
         this.y = y;
         this.storage.addAll(storage);
+        this.blockLight = blockLight;
         this.skyLight = skyLight;
         this.compressedLight = compressedLight;
         this.hasBlockLight = hasBlockLight;

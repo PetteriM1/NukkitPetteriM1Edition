@@ -587,15 +587,14 @@ public class CraftingManager {
         if (shapelessRecipes.containsKey(outputHash)) {
             inputList.sort(recipeComparator);
 
-            UUID inputHash = getMultiItemHash(inputList);
-
             Map<UUID, ShapelessRecipe> recipes = shapelessRecipes.get(outputHash);
 
             if (recipes == null) {
                 return null;
             }
 
-            ShapelessRecipe recipe = recipes.get(inputList);
+            UUID inputHash = getMultiItemHash(inputList);
+            ShapelessRecipe recipe = recipes.get(inputHash);
 
             if (recipe != null && (recipe.matchItems(inputList, extraOutputList) || matchItemsAccumulation(recipe, inputList, primaryOutput, extraOutputList))) {
                 return recipe;

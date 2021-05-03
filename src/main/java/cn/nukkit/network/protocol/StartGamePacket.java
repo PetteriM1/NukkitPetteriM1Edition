@@ -212,7 +212,10 @@ public class StartGamePacket extends DataPacket {
             if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
                 this.putBoolean(this.isOnlySpawningV1Villagers);
             } else if (protocol >= 407) {
-                this.putBoolean(false);
+                this.putBoolean(false); // isInventoryServerAuthoritative
+                if (protocol >= ProtocolInfo.v1_16_230_50) {
+                    this.putString(""); // ??
+                }
             }
         }
     }

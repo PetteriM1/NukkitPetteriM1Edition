@@ -53,8 +53,8 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
     private int reliabilityWriteIndex;
     private int[] orderReadIndex;
     private int[] orderWriteIndex;
-    private int[] sequenceReadIndex;
-    private int[] sequenceWriteIndex;
+    //private int[] sequenceReadIndex;
+    //private int[] sequenceWriteIndex;
 
     private RoundRobinArray<SplitPacketHelper> splitPackets;
     private BitQueue reliableDatagramQueue;
@@ -92,8 +92,8 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         this.reliableDatagramQueue = new BitQueue(512);
         this.orderReadIndex = new int[MAXIMUM_ORDERING_CHANNELS];
         this.orderWriteIndex = new int[MAXIMUM_ORDERING_CHANNELS];
-        this.sequenceReadIndex = new int[MAXIMUM_ORDERING_CHANNELS];
-        this.sequenceWriteIndex = new int[MAXIMUM_ORDERING_CHANNELS];
+        //this.sequenceReadIndex = new int[MAXIMUM_ORDERING_CHANNELS];
+        //this.sequenceWriteIndex = new int[MAXIMUM_ORDERING_CHANNELS];
 
         //noinspection unchecked
         this.orderingHeaps = new FastBinaryMinHeap[MAXIMUM_ORDERING_CHANNELS];
