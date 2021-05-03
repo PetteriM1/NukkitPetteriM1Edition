@@ -42,6 +42,8 @@ public class TradeInventory extends BaseInventory {
         }
         
         who.dataPacket(pk);
+        
+        this.sendContents(who);
     }
     
     public void onClose(Player who) {

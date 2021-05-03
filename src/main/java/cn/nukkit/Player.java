@@ -3191,6 +3191,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             pk.wasServerInitiated = false;
                             this.dataPacket(pk);
                         }
+                        //TODO Find out why the correct id is not returned
+                        TradeInventory tradeInventory = this.getTradeInventory();
+                        if (tradeInventory != null) {
+                            this.removeWindow(tradeInventory, true);
+                        }
                     }
                     break;
                 case ProtocolInfo.BLOCK_ENTITY_DATA_PACKET:
