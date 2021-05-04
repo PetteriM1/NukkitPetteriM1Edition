@@ -188,7 +188,6 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     
     public void setExperience(int experience) {
         this.dataProperties.putInt(DATA_TRADE_EXPERIENCE, experience);
-        //TODO fix
         this.sendData(this.getViewers().values().toArray(new Player[0]),
                 new EntityMetadata().putInt(DATA_TRADE_EXPERIENCE, experience));
     }

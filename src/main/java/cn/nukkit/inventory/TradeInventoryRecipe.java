@@ -81,7 +81,12 @@ public class TradeInventoryRecipe {
         this.rewardsExp = reward;
         return this;
     }
-
+    
+    public TradeInventoryRecipe setTraderExp(int traderExp) {
+        this.traderExp = traderExp;
+        return this;
+    }
+    
     public CompoundTag toNBT() {
         CompoundTag nbt = new CompoundTag();
         nbt.putCompound("buyA", NBTIO.putItemHelper(buyItem, -1));
