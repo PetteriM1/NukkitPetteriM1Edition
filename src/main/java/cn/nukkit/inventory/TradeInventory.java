@@ -44,6 +44,8 @@ public class TradeInventory extends BaseInventory {
         who.dataPacket(pk);
         
         this.sendContents(who);
+        
+        this.getHolder().setTradingWith(who.getId());
     }
     
     public void onClose(Player who) {
@@ -58,6 +60,8 @@ public class TradeInventory extends BaseInventory {
         }
         
         super.onClose(who);
+        
+        this.getHolder().cancelTradingWithPlayer();
     }
     
     public EntityVillager getHolder() {

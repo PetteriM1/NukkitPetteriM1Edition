@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.inventory.Inventory;
@@ -71,18 +72,30 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
         this.inventory = new TradeInventory(this);
         this.recipes = new ArrayList<>();
-
+        
+        this.dataProperties.putLong(DATA_TRADING_PLAYER_EID, 0L);
+        
         CompoundTag offers = this.namedTag.getCompound("Offers");
         if (offers != null) {
             ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
             for (CompoundTag nbt : nbtRecipes.getAll()) {
                 recipes.add(TradeInventoryRecipe.toNBT(nbt));
             }
+        } else {
+            CompoundTag nbt = new CompoundTag("Offers");
+            nbt.putList(new ListTag<CompoundTag>("Recipes"));
+            nbt.putList(this.getDefaultTierExpRequirements());
+            this.namedTag.putCompound("Offers", nbt);
         }
 
         if (!this.namedTag.contains("Profession")) {
             this.setProfession(PROFESSION_GENERIC);
         }
+    
+        if(!this.namedTag.contains("Willing")) {
+            this.setWilling(true);
+        }
+        
     }
 
     public int getProfession() {
@@ -91,6 +104,17 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     public void setProfession(int profession) {
         this.namedTag.putInt("Profession", profession);
+        
+        //TODO fix
+        int variant = 0;
+        
+        this.dataProperties.putShort(DATA_SKIN_ID, profession);
+        this.dataProperties.putInt(DATA_VARIANT, variant);
+        
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata()
+                        .putShort(DATA_SKIN_ID, profession)
+                        .putInt(DATA_VARIANT, variant));
     }
 
     @Override
@@ -127,21 +151,50 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     }
 
     public void setTradeTier(int tier) {
-        this.tradeTier = tier;
+        this.namedTag.putInt("TradeTier", tier);
+        this.dataProperties.putInt(DATA_TRADE_TIER, tier);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putInt(DATA_TRADE_TIER, tier));
     }
 
     public int getTradeTier() {
-        return this.tradeTier;
+        return this.namedTag.getInt("TradeTier");
+    }
+    
+    public void setExperience(int experience) {
+        this.dataProperties.putInt(DATA_TRADE_EXPERIENCE, experience);
+        //TODO fix
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putInt(DATA_TRADE_EXPERIENCE, experience));
+    }
+    
+    public int getExperience() {
+        return this.dataProperties.getInt(DATA_TRADE_EXPERIENCE);
     }
 
     public void setWilling(boolean value) {
-        this.willing = value;
+        this.namedTag.putBoolean("Willing", value);
     }
 
     public boolean isWilling() {
-        return this.willing;
+        return this.namedTag.getBoolean("Willing");
     }
-
+    
+    public void cancelTradingWithPlayer() {
+        this.setTradingWith(0L);
+    }
+    
+    public void setTradingWith(long eid) {
+        this.dataProperties.putLong(DATA_TRADING_PLAYER_EID, eid);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putLong(DATA_TRADING_PLAYER_EID, eid));
+    }
+    
+    public boolean isTrading() {
+        return this.dataProperties.getLong(DATA_TRADING_PLAYER_EID) != 0L;
+    }
+    
+    
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         if (super.onInteract(player, item, clickedPos)) {
@@ -152,7 +205,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     @Override
     public boolean onInteract(Player player, Item item) {
-        if (recipes.size() > 0) {
+        if (recipes.size() > 0 && !this.isTrading()) {
             player.addWindow(this.getInventory());
             return true;
         }
