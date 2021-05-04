@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.data.EntityMetadata;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 
@@ -52,6 +53,14 @@ public class EntityVillagerV2 extends EntityVillager {
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Villager";
+    }
+    
+    @Override
+    public boolean onInteract(Player player, Item item) {
+        if (this.getProfession() == PROFESSION_NITWIT) {
+            return false;
+        }
+        return super.onInteract(player, item);
     }
     
     @Override
