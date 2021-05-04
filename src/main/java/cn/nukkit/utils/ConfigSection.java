@@ -3,6 +3,8 @@ package cn.nukkit.utils;
 import java.util.*;
 
 /**
+ * Config section
+ *
  * Created by fromgate on 26.04.2016.
  */
 @SuppressWarnings("serial")

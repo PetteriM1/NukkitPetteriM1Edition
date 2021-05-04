@@ -1,5 +1,8 @@
 package cn.nukkit.utils;
 
+/**
+ * Hash utils
+ */
 public class Hash {
 
     public static long hashBlock(int x, int y, int z) {

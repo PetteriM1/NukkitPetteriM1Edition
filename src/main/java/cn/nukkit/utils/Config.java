@@ -15,6 +15,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
+ * Config
+ *
  * @author MagicDroidX
  * Nukkit
  */
@@ -35,6 +37,9 @@ public class Config {
     private boolean correct = false;
     private int type = Config.DETECT;
 
+    /**
+     * List of supported config file formats
+     */
     public static final Map<String, Integer> format = new TreeMap<>();
 
     static {
@@ -103,6 +108,9 @@ public class Config {
         this(file.toString(), type, new ConfigSection(defaultMap));
     }
 
+    /**
+     * Reload config from disk
+     */
     public void reload() {
         this.config.clear();
         this.correct = false;
@@ -110,14 +118,35 @@ public class Config {
         this.load(this.file.toString(), this.type);
     }
 
+    /**
+     * Try to load a config file and automatically detect its type
+     *
+     * @param file file path
+     * @return loaded
+     */
     public boolean load(String file) {
         return this.load(file, Config.DETECT);
     }
 
+    /**
+     * Try to load a config file with a given type
+     *
+     * @param file file path
+     * @param type file type
+     * @return loaded
+     */
     public boolean load(String file, int type) {
         return this.load(file, type, new ConfigSection());
     }
 
+    /**
+     * Try to load a config file with a given type and default content
+     *
+     * @param file file path
+     * @param type file type
+     * @param defaultMap default content
+     * @return loaded
+     */
     public boolean load(String file, int type, ConfigSection defaultMap) {
         this.correct = true;
         this.type = type;
@@ -162,6 +191,12 @@ public class Config {
         return true;
     }
 
+    /**
+     * Load Config from InputStream
+     *
+     * @param inputStream InputStream
+     * @return loaded
+     */
     public boolean load(InputStream inputStream) {
         if (inputStream == null) return false;
         if (this.correct) {
@@ -177,6 +212,12 @@ public class Config {
         return correct;
     }
 
+    /**
+     * Load and return a Config from InputStream
+     *
+     * @param inputStream InputStream
+     * @return Config
+     */
     public Config loadFromStream(InputStream inputStream) {
         if (inputStream == null) return null;
         if (this.correct) {
@@ -192,12 +233,22 @@ public class Config {
         return this;
     }
 
+    /**
+     * Check if the config is valid
+     *
+     * @return valid
+     */
     public boolean check() {
         return this.correct;
     }
 
+    /**
+     * Check if the config is valid
+     *
+     * @return valid
+     */
     public boolean isCorrect() {
-        return correct;
+        return this.correct;
     }
 
     /**
@@ -212,16 +263,33 @@ public class Config {
         return save(async);
     }
 
+    /**
+     * Save configuration into provided file. Internal file object will be set to new file.
+     *
+     * @param file file
+     * @return save success
+     */
     public boolean save(File file) {
         this.file = file;
         return save();
     }
 
+    /**
+     * Save the config to disk
+     *
+     * @return saved
+     */
     public boolean save() {
         return this.save(false);
     }
 
-    public boolean save(Boolean async) {
+    /**
+     * Save the config to disk
+     *
+     * @param async async
+     * @return saved
+     */
+    public boolean save(boolean async) {
         if (this.file == null) throw new IllegalStateException("Failed to save Config. File object is undefined.");
         if (this.correct) {
             StringBuilder content = new StringBuilder();
@@ -247,7 +315,6 @@ public class Config {
             }
             if (async) {
                 Server.getInstance().getScheduler().scheduleAsyncTask(new FileWriteTask(this.file, content.toString()));
-
             } else {
                 try {
                     Utils.writeFile(this.file, content.toString());
@@ -261,10 +328,22 @@ public class Config {
         }
     }
 
+    /**
+     * Set a value in the config
+     *
+     * @param key key
+     * @param value value
+     */
     public void set(final String key, Object value) {
         this.config.set(key, value);
     }
 
+    /**
+     * Get a value in the config
+     *
+     * @param key key
+     * @return value
+     */
     public Object get(String key) {
         return this.get(key, null);
     }

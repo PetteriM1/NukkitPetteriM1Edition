@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
 /**
+ * Logger
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

@@ -14,6 +14,13 @@ public abstract class Zlib {
         provider = providers[2];
     }
 
+    /**
+     * Set Zlib provider that is used to compress data
+     *
+     * 0 = ZlibOriginal
+     * 1 = ZlibSingleThreadLowMem
+     * 2 = ZlibThreadLocal (default)
+     */
     public static void setProvider(int providerIndex) {
         switch (providerIndex) {
             case 0:
