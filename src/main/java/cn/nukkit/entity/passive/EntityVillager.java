@@ -89,13 +89,32 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         }
 
         if (!this.namedTag.contains("Profession")) {
-            this.setProfession(PROFESSION_GENERIC);
+            if (this instanceof EntityVillagerV2) {
+                this.setProfession(0);
+            }else {
+                this.setProfession(PROFESSION_GENERIC);
+            }
+        }else {
+            this.setProfession(this.getProfession());
         }
     
         if(!this.namedTag.contains("Willing")) {
             this.setWilling(true);
+        }else {
+            this.setWilling(this.isWilling());
         }
         
+        if (!this.namedTag.contains("TradeTier")) {
+            this.setTradeTier(0);
+        }else {
+            this.setTradeTier(this.getTradeTier());
+        }
+        
+        if (!this.namedTag.contains("MaxTradeTier")) {
+            this.setMaxTradeTier(4);
+        }else {
+            this.setMaxTradeTier(this.getMaxTradeTier());
+        }
     }
 
     public int getProfession() {
@@ -104,17 +123,6 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     public void setProfession(int profession) {
         this.namedTag.putInt("Profession", profession);
-        
-        //TODO fix
-        int variant = 0;
-        
-        this.dataProperties.putShort(DATA_SKIN_ID, profession);
-        this.dataProperties.putInt(DATA_VARIANT, variant);
-        
-        this.sendData(this.getViewers().values().toArray(new Player[0]),
-                new EntityMetadata()
-                        .putShort(DATA_SKIN_ID, profession)
-                        .putInt(DATA_VARIANT, variant));
     }
 
     @Override
@@ -151,6 +159,9 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     }
 
     public void setTradeTier(int tier) {
+        if (tier > 4) {
+            tier = 4;
+        }
         this.namedTag.putInt("TradeTier", tier);
         this.dataProperties.putInt(DATA_TRADE_TIER, tier);
         this.sendData(this.getViewers().values().toArray(new Player[0]),
@@ -159,6 +170,20 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     public int getTradeTier() {
         return this.namedTag.getInt("TradeTier");
+    }
+    
+    public void setMaxTradeTier(int maxTier) {
+        if (maxTier > 4) {
+            maxTier = 4;
+        }
+        this.namedTag.putInt("MaxTradeTier", maxTier);
+        this.dataProperties.putInt(DATA_MAX_TRADE_TIER, maxTier);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putInt(DATA_MAX_TRADE_TIER, maxTier));
+    }
+    
+    public int getMaxTradeTier() {
+        return this.namedTag.getInt("MaxTradeTier");
     }
     
     public void setExperience(int experience) {
