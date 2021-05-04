@@ -6,9 +6,15 @@ import java.util.Objects;
 
 import static cn.nukkit.entity.data.Skin.*;
 
+/**
+ * Serialized image
+ */
 @ToString(exclude = {"data"})
 public class SerializedImage {
 
+    /**
+     * Empty SerializedImage
+     */
     public static final SerializedImage EMPTY = new SerializedImage(0, 0, new byte[0]);
 
     public final int width;
@@ -21,6 +27,12 @@ public class SerializedImage {
         this.data = data;
     }
 
+    /**
+     * Get SerializedImage from legacy skin data
+     *
+     * @param skinData legacy skin data bytes
+     * @return SerializedImage
+     */
     public static SerializedImage fromLegacy(byte[] skinData) {
         Objects.requireNonNull(skinData, "skinData");
         switch (skinData.length) {

@@ -1,8 +1,10 @@
 package cn.nukkit.utils;
 
 /**
+ * Block color
+ *
  * Created by Snake1999 on 2016/1/10.
- * Package cn.nukkit.utils in project nukkit
+ * Package cn.nukkit.utils in project Nukkit
  */
 public class BlockColor  {
 
@@ -135,6 +137,12 @@ public class BlockColor  {
         return (this.red << 16 | this.green << 8 | this.blue) & 0xffffff;
     }
 
+    /**
+     * Get BlockColor by dye item meta value
+     *
+     * @param dyeColorMeta dye item meta value
+     * @return BlockColor
+     */
     public static BlockColor getDyeColor(int dyeColorMeta) {
         return DyeColor.getByDyeData(dyeColorMeta).getColor();
     }

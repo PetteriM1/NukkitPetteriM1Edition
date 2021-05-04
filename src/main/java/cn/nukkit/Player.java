@@ -1913,7 +1913,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.isOnLadder()) {
                             this.resetFallDistance();
                         } else {
-                            if (diff > 1 && expectedVelocity < this.speed.y && (speed.y < -0.2 || speed.y > 4)) {
+                            if (diff > 2 && expectedVelocity < this.speed.y) {
                                 if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(ev);

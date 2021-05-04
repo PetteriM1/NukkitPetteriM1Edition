@@ -2,6 +2,9 @@ package cn.nukkit.utils.bugreport;
 
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
+    /**
+     * Register exception handler
+     */
     public static void registerExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
     }
@@ -11,6 +14,9 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         handle(throwable);
     }
 
+    /**
+     * Handle exception, run BugReportGenerator
+     */
     public void handle(Throwable throwable) {
         throwable.printStackTrace();
 

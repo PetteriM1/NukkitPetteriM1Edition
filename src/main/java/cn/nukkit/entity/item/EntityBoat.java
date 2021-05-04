@@ -201,6 +201,10 @@ public class EntityBoat extends EntityVehicle {
             if (this.age % 5 == 0 && this.passengers.size() < 2) {
                 Entity[] e = this.level.getCollidingEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
                 for (Entity entity : e) {
+                    if (entity.isPlayer && !isPassenger(entity)) {
+                        entity.resetFallDistance(); // Hack: Don't kick players standing on a boat for flying
+                    }
+
                     if (entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || isPassenger(entity)) {
                         continue;
                     }
