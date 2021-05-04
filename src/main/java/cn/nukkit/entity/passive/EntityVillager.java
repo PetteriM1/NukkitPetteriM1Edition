@@ -90,7 +90,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
         if (!this.namedTag.contains("Profession")) {
             if (this instanceof EntityVillagerV2) {
-                this.setProfession(0);
+                this.setProfession(EntityVillagerV2.PROFESSION_UNEMPLOYED);
             }else {
                 this.setProfession(PROFESSION_GENERIC);
             }
