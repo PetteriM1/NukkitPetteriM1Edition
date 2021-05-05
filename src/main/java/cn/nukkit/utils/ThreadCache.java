@@ -2,6 +2,9 @@ package cn.nukkit.utils;
 
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 
+/**
+ * Thread cache
+ */
 public class ThreadCache {
 
     public static void clean() {

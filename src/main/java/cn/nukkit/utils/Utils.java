@@ -12,13 +12,24 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * This class contains miscellaneous stuff used in other parts of the program.
+ *
  * @author MagicDroidX
  * Nukkit Project
  */
 public class Utils {
 
+    /**
+     * A SplittableRandom you can use without having to create a new object every time.
+     */
     public static final SplittableRandom random = new SplittableRandom();
+    /**
+     * An empty damage array used when mobs have no attack damage.
+     */
     public static final int[] emptyDamageArray = new int[] { 0, 0, 0, 0 };
+    /**
+     * List of network ids of monsters. Currently used for example to check which entities will make players unable to sleep when nearby the bed.
+     */
     public static final List<Integer> monstersList = Arrays.asList(EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGhast.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHoglin.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityRavager.NETWORK_ID, EntityShulker.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntitySlime.NETWORK_ID, EntitySpider.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombiePigman.NETWORK_ID, EntityZombieVillager.NETWORK_ID, EntityZombieVillagerV2.NETWORK_ID);
 
     public static void writeFile(String fileName, String content) throws IOException {
@@ -296,6 +307,13 @@ public class Utils {
         return -1;
     }
 
+    /**
+     * Get a random int
+     *
+     * @param min minimum value
+     * @param max maximum value
+     * @return random int between min and max
+     */
     public static int rand(int min, int max) {
         if (min == max) {
             return max;
@@ -303,6 +321,13 @@ public class Utils {
         return random.nextInt(max + 1 - min) + min;
     }
 
+    /**
+     * Get a random double
+     *
+     * @param min minimum value
+     * @param max maximum value
+     * @return random double between min and max
+     */
     public static double rand(double min, double max) {
         if (min == max) {
             return max;
@@ -310,6 +335,11 @@ public class Utils {
         return min + random.nextDouble() * (max-min);
     }
 
+    /**
+     * Get a random boolean
+     *
+     * @return random boolean
+     */
     public static boolean rand() {
         return random.nextBoolean();
     }

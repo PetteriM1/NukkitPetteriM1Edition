@@ -5,6 +5,8 @@ import co.aikar.timings.Timing;
 import co.aikar.timings.TimingsManager;
 
 /**
+ * Level timings
+ *
  * @author Pub4Game
  * @author Tee7even
  */

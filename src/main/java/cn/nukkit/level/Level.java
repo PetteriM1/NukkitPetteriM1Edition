@@ -1474,6 +1474,28 @@ public class Level implements ChunkManager, Metadatable {
         return collides.toArray(new Block[0]);
     }
 
+    public boolean hasCollisionBlocks(AxisAlignedBB bb) {
+        int minX = NukkitMath.floorDouble(bb.minX);
+        int minY = NukkitMath.floorDouble(bb.minY);
+        int minZ = NukkitMath.floorDouble(bb.minZ);
+        int maxX = NukkitMath.ceilDouble(bb.maxX);
+        int maxY = NukkitMath.ceilDouble(bb.maxY);
+        int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+
+        for (int z = minZ; z <= maxZ; ++z) {
+            for (int x = minX; x <= maxX; ++x) {
+                for (int y = minY; y <= maxY; ++y) {
+                    Block block = this.getBlock(x, y, z, false);
+                    if (block != null && block.getId() != 0 && block.collidesWithBB(bb)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public boolean isFullBlock(Vector3 pos) {
         AxisAlignedBB bb;
         if (pos instanceof Block) {
@@ -2299,7 +2321,7 @@ public class Level implements ChunkManager, Metadatable {
                 return null;
             }
 
-            if (server.blockListener) {
+            if (server.mobsFromBlocks) {
                 if (item.getId() == Item.JACK_O_LANTERN || item.getId() == Item.PUMPKIN) {
                     if (block.getSide(BlockFace.DOWN).getId() == Item.SNOW_BLOCK && block.getSide(BlockFace.DOWN, 2).getId() == Item.SNOW_BLOCK) {
                         block.getLevel().setBlock(target, Block.get(BlockID.AIR));

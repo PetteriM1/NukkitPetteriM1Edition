@@ -22,6 +22,11 @@ public class EntityPufferfish extends EntityFish {
     }
 
     @Override
+    int getBucketMeta() {
+        return 5;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }

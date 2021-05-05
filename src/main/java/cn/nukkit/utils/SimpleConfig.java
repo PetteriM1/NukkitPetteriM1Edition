@@ -15,8 +15,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * SimpleConfig for Nukkit
- * added 11/02/2016 by fromgate
+ * Simple config for Nukkit
+ *
+ * Added 11/02/2016 by fromgate
  */
 public abstract class SimpleConfig {
 
@@ -35,10 +36,21 @@ public abstract class SimpleConfig {
         configFile.getParentFile().mkdirs();
     }
 
+    /**
+     * Save the config to disk
+     *
+     * @return saved
+     */
     public boolean save() {
         return save(false);
     }
 
+    /**
+     * Save the config to disk
+     *
+     * @param async async
+     * @return saved
+     */
     public boolean save(boolean async) {
         if (configFile.exists()) try {
             configFile.createNewFile();
@@ -59,6 +71,11 @@ public abstract class SimpleConfig {
         return true;
     }
 
+    /**
+     * Load
+     *
+     * @return loaded
+     */
     public boolean load() {
         if (!this.configFile.exists()) return false;
         Config cfg = new Config(configFile, Config.YAML);

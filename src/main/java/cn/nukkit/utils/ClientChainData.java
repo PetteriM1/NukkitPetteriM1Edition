@@ -259,7 +259,6 @@ public final class ClientChainData implements LoginChainData {
     }
 
     private static boolean verifyChain(List<String> chains) throws Exception {
-
         PublicKey lastKey = null;
         boolean mojangKeyVerified = false;
         for (String chain: chains) {

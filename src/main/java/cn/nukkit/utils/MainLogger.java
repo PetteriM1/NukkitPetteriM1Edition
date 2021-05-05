@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
+ * Main logger
+ *
  * @author MagicDroidX
  * Nukkit
  */

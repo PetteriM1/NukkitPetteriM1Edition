@@ -2,6 +2,9 @@ package cn.nukkit.utils;
 
 import lombok.ToString;
 
+/**
+ * Persona skin piece
+ */
 @ToString
 public class PersonaPiece {
 

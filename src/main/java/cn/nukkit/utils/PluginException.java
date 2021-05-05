@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
 /**
+ * PluginException
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

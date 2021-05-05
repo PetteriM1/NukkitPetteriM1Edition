@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
 /**
+ * LevelException
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

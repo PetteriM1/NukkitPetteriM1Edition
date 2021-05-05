@@ -146,7 +146,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     public boolean entityBaseTick(int tickDiff) {
         if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.startTiming();
 
-        if (this.canDespawn() && this.age > Server.getInstance().despawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
+        if (this.canDespawn() && this.age > Server.getInstance().mobDespawnTicks && !this.hasCustomName() && !(this instanceof EntityBoss)) {
             this.close();
             if (Timings.entityBaseTickTimer != null) Timings.entityBaseTickTimer.stopTiming();
             return true;
@@ -482,7 +482,7 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
     }
 
     public boolean canDespawn() {
-        return Server.getInstance().despawnEntities;
+        return Server.getInstance().despawnMobs;
     }
 
     public int nearbyDistanceMultiplier() {
