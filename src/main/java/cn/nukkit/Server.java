@@ -349,7 +349,7 @@ public class Server {
      */
     public boolean doNotLimitSkinGeometry;
     /**
-     * Mob spawning from blocks & items enabled.
+     * Mob spawning from blocks and items enabled.
      */
     public boolean mobsFromBlocks;
     /**
