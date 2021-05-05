@@ -32,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
+ * BinaryStream
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

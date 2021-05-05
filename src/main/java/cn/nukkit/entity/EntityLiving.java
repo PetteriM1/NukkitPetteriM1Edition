@@ -175,7 +175,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         boolean blocked = (normalizedVector.x * direction.x) + (normalizedVector.z * direction.z) < 0.0;
         boolean knockBack = !(damager instanceof EntityProjectile);
         EntityDamageBlockedEvent event = new EntityDamageBlockedEvent(this, source, knockBack, true);
-        if (!blocked || !source.canBeReducedByArmor()/* || damager instanceof EntityProjectile && ((EntityProjectile) damager).getPierceLevel() > 0*/) {
+        if (!blocked || !source.canBeReducedByArmor() || damager instanceof EntityProjectile && ((EntityProjectile) damager).piercing > 0) {
             event.setCancelled();
         }
 
@@ -363,10 +363,10 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
                             this.level.addParticle(new BubbleParticle(this));
                             this.setMotion(this.getMotion().add(0, -0.3, 0));
                         }
-                    } else if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
+                    } /*else if (block == Block.SOUL_SAND && this.isInsideOfWater()) {
                         this.level.addParticle(new BubbleParticle(this));
                         this.setMotion(this.getMotion().add(0, 0.3, 0));
-                    }
+                    }*/
                 }
             }
 

@@ -88,7 +88,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                 continue;
             }
             DataPacket packet;
-            while ((packet = nukkitSession.inbound.poll()) != null) {
+            while ((packet = nukkitSession.packets.poll()) != null) {
                 try {
                     nukkitSession.player.handleDataPacket(packet);
                 } catch (Exception e) {
@@ -231,8 +231,9 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     @RequiredArgsConstructor
     private class NukkitRakNetSession implements RakNetSessionListener {
+
         private final RakNetServerSession raknet;
-        private final Queue<DataPacket> inbound = PlatformDependent.newSpscQueue();
+        private final Queue<DataPacket> packets = PlatformDependent.newSpscQueue();
         private String disconnectReason = null;
         private Player player;
 
@@ -261,7 +262,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                 buffer.readBytes(packetBuffer);
                 batchPacket.setBuffer(packetBuffer);
                 batchPacket.decode();
-                this.inbound.add(batchPacket);
+                this.packets.add(batchPacket);
             }
         }
 

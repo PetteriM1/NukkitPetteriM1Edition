@@ -8,6 +8,9 @@ import java.io.*;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Default player data serializer that saves the player data as .dat files into the 'players' folder.
+ */
 @RequiredArgsConstructor
 public class DefaultPlayerDataSerializer implements PlayerDataSerializer {
 

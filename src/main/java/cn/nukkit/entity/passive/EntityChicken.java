@@ -78,7 +78,7 @@ public class EntityChicken extends EntityWalkingAnimal {
     public boolean entityBaseTick(int tickDiff) {
         boolean hasUpdate = super.entityBaseTick(tickDiff);
 
-        if (this.getServer().blockListener && !this.isBaby()) {
+        if (this.getServer().mobsFromBlocks && !this.isBaby()) {
             if (this.eggLayTime > 0) {
                 eggLayTime -= tickDiff;
             } else {

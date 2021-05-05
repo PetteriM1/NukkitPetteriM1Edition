@@ -2,18 +2,26 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntitySmite;
+import cn.nukkit.entity.projectile.EntityProjectile;
+import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityShootBowEvent;
+import cn.nukkit.event.entity.ProjectileLaunchEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Location;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
 import cn.nukkit.utils.Utils;
 import co.aikar.timings.Timings;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +89,43 @@ public class EntityDrowned extends EntityWalkingMob implements EntitySmite {
             pk.eid = this.getId();
             pk.event = EntityEventPacket.ARM_SWING;
             Server.broadcastPacket(this.getViewers().values(), pk);
+        } else if (tool != null && tool.getId() == Item.TRIDENT && this.attackDelay > 120 && Utils.rand(1, 32) < 4 && this.distanceSquared(player) <= 55) {
+            this.attackDelay = 0;
+
+            double f = 1.3;
+            double yaw = this.yaw;
+            double pitch = this.pitch;
+            double yawR = FastMath.toRadians(yaw);
+            double pitchR = FastMath.toRadians(pitch);
+            Location pos = new Location(this.x - Math.sin(yawR) * Math.cos(pitchR) * 0.5, this.y + this.getHeight() - 0.18,
+                    this.z + Math.cos(yawR) * Math.cos(pitchR) * 0.5, yaw, pitch, this.level);
+            if (this.getLevel().getBlockIdAt((int) pos.getX(), (int) pos.getY(), (int) pos.getZ()) == Block.AIR) {
+                Entity k = Entity.createEntity("ThrownTrident", pos, this);
+                if (!(k instanceof EntityThrownTrident)) {
+                    return;
+                }
+
+                EntityThrownTrident trident = (EntityThrownTrident) k;
+                setProjectileMotion(trident, pitch, yawR, pitchR, f);
+
+                EntityShootBowEvent ev = new EntityShootBowEvent(this, Item.get(Item.TRIDENT, 0, 1), trident, f);
+                this.server.getPluginManager().callEvent(ev);
+
+                EntityProjectile projectile = ev.getProjectile();
+                if (ev.isCancelled()) {
+                    projectile.close();
+                } else {
+                    ProjectileLaunchEvent launch = new ProjectileLaunchEvent(projectile);
+                    this.server.getPluginManager().callEvent(launch);
+                    if (launch.isCancelled()) {
+                        projectile.close();
+                    } else {
+                        projectile.spawnToAll();
+                        ((EntityThrownTrident) projectile).setPickupMode(EntityThrownTrident.PICKUP_NONE);
+                        this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THROW);
+                    }
+                }
+            }
         }
     }
     

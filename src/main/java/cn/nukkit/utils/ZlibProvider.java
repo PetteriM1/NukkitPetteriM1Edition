@@ -3,6 +3,8 @@ package cn.nukkit.utils;
 import java.io.IOException;
 
 /**
+ * ZlibProvider
+ *
  * @author ScraMTeam
  */
 interface ZlibProvider {

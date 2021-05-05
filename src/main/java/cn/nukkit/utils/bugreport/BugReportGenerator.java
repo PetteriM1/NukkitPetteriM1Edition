@@ -11,6 +11,9 @@ public class BugReportGenerator extends Thread {
     private final Throwable throwable;
     private final String message;
 
+    /**
+     * Allow bug reports to be handled by a plugin
+     */
     public static BugReportPlugin plugin;
 
     BugReportGenerator(Throwable throwable) {
@@ -43,6 +46,9 @@ public class BugReportGenerator extends Thread {
         }
     }
 
+    /**
+     * Send a bug report to Sentry
+     */
     private void sentry() {
         Server.getInstance().getLogger().info("[BugReport] Sending a bug report ...");
 

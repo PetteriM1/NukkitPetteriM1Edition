@@ -44,8 +44,8 @@ public class UpdateTradePacket extends DataPacket {
         } else {
             this.putVarInt(tradeTier);
         }
-        this.putEntityUniqueId(player);
         this.putEntityUniqueId(trader);
+        this.putEntityUniqueId(player);
         this.putString(displayName);
         if (protocol >= 354) {
             this.putBoolean(screen2);

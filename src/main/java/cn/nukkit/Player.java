@@ -488,7 +488,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.startAirTicks = 10;
         }
         this.inAirTicks = 0;
-        this.highestPosition = this.y;
     }
 
     @Override
@@ -1232,7 +1231,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean awardAchievement(String achievementId) {
-        if (!Server.getInstance().achievements) {
+        if (!Server.getInstance().achievementsEnabled) {
             return false;
         }
 
@@ -1923,7 +1922,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.isOnLadder()) {
                             this.resetFallDistance();
                         } else {
-                            if (diff > 1 && expectedVelocity < this.speed.y && (speed.y < -0.2 || speed.y > 4)) {
+                            if (diff > 2 && expectedVelocity < this.speed.y) {
                                 if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(ev);
@@ -2411,7 +2410,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     if (!loginChainData.isXboxAuthed() && server.xboxAuth) {
                         this.close("", "disconnectionScreen.notAuthenticated");
-                        if (server.banAuthFailed) {
+                        if (server.banXBAuthFailed) {
                             this.server.getNetwork().blockAddress(this.socketAddress.getAddress(), 5);
                             this.server.getLogger().notice("Blocked " + getAddress() + " for 5 seconds due to failed Xbox auth");
                         }
@@ -3689,6 +3688,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     float itemDamage = item.getAttackDamage();
                                     for (Enchantment enchantment : item.getEnchantments()) {
                                         itemDamage += enchantment.getDamageBonus(target);
+                                        enchantment.doAttack(this, target);
                                     }
 
                                     Map<DamageModifier, Float> damage = new EnumMap<>(DamageModifier.class);
@@ -3699,7 +3699,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     } else if (target instanceof Player) {
                                         if ((((Player) target).gamemode & 0x01) > 0) {
                                             break;
-                                        } else if (!this.server.pvp) {
+                                        } else if (!this.server.pvpEnabled) {
                                             break;
                                         }
                                     }
@@ -5535,6 +5535,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
 
                 InventoryPickupTridentEvent ev = new InventoryPickupTridentEvent(this.inventory, (EntityThrownTrident) entity);
+
+                int pickupMode = ((EntityThrownTrident) entity).getPickupMode();
+                if (pickupMode == EntityThrownTrident.PICKUP_NONE || (pickupMode == EntityThrownTrident.PICKUP_CREATIVE && !this.isCreative())) {
+                    ev.setCancelled();
+                }
+
                 this.server.getPluginManager().callEvent(ev);
                 if (ev.isCancelled()) {
                     return false;
