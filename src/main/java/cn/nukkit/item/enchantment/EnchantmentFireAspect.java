@@ -29,7 +29,7 @@ public class EnchantmentFireAspect extends Enchantment {
     }
 
     @Override
-    public void doPostAttack(Entity attacker, Entity entity) {
+    public void doAttack(Entity attacker, Entity entity) {
         int duration = Math.max(entity.fireTicks / 20, getLevel() << 2);
 
         EntityCombustByEntityEvent ev = new EntityCombustByEntityEvent(attacker, entity, duration);

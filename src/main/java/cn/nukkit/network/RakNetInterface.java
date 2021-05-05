@@ -46,8 +46,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     public RakNetInterface(Server server) {
         this.server = server;
-        InetSocketAddress bindAddress = new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort());
-        this.raknet = new RakNetServer(bindAddress, Runtime.getRuntime().availableProcessors());
+        this.raknet = new RakNetServer(new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort()), Runtime.getRuntime().availableProcessors());
         this.raknet.bind().join();
         this.raknet.setListener(this);
     }
@@ -88,7 +87,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                 continue;
             }
             DataPacket packet;
-            while ((packet = nukkitSession.inbound.poll()) != null) {
+            while ((packet = nukkitSession.packets.poll()) != null) {
                 try {
                     nukkitSession.player.handleDataPacket(packet);
                 } catch (Exception e) {
@@ -201,7 +200,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(1 + buffer.length);
         byteBuf.writeByte(0xfe);
         byteBuf.writeBytes(buffer);
-        // byteBuf.readerIndex(0);
+        //byteBuf.readerIndex(0);
 
         session.send(byteBuf, immediate ? RakNetPriority.IMMEDIATE : RakNetPriority.MEDIUM, packet.reliability, packet.getChannel());
         return null;
@@ -231,8 +230,9 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     @RequiredArgsConstructor
     private class NukkitRakNetSession implements RakNetSessionListener {
+
         private final RakNetServerSession raknet;
-        private final Queue<DataPacket> inbound = PlatformDependent.newSpscQueue();
+        private final Queue<DataPacket> packets = PlatformDependent.newSpscQueue();
         private String disconnectReason = null;
         private Player player;
 
@@ -261,7 +261,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                 buffer.readBytes(packetBuffer);
                 batchPacket.setBuffer(packetBuffer);
                 batchPacket.decode();
-                this.inbound.add(batchPacket);
+                this.packets.add(batchPacket);
             }
         }
 
