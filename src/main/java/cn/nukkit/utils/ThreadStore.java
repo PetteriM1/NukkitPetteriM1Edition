@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Thread store
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

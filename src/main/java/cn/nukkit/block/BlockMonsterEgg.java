@@ -61,7 +61,7 @@ public class BlockMonsterEgg extends BlockSolidMeta {
 
     @Override
     public boolean onBreak(Item item) {
-        if (Server.getInstance().blockListener) {
+        if (Server.getInstance().mobsFromBlocks) {
             if (Utils.rand(1, 5) == 1 && !item.hasEnchantment(Enchantment.ID_SILK_TOUCH) && this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12) {
                 EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", this.add(0.5, 0, 0.5));
                 entity.spawnToAll();

@@ -9,9 +9,9 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
+ * Various methods for more compact JSON object constructing
+ *
  * @author Tee7even
- *         
- *         Various methods for more compact JSON object constructing
  */
 @SuppressWarnings("unchecked")
 public class JsonUtil {
@@ -56,6 +56,9 @@ public class JsonUtil {
         return GSON.toJsonTree(array).getAsJsonArray();
     }
 
+    /**
+     * JSON Pair
+     */
     public static class JSONPair {
         public final String key;
         public final Object value;

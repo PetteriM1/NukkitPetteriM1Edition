@@ -18,12 +18,19 @@ import cn.nukkit.utils.spawners.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handles the automatic spawning of mobs.
+ */
 public class SpawnerTask implements Runnable {
 
     private final Map<Class<?>, EntitySpawner> animalSpawners = new HashMap<>();
     private final Map<Class<?>, EntitySpawner> mobSpawners = new HashMap<>();
 
-    private boolean mobsNext; // Split monster and animal spawning to different ticks to avoid lag spikes
+    /**
+     * Split monster and animal spawning to different ticks to avoid lag spikes
+     * Animals and monsters are spawned every other time the spawer task runs
+     */
+    private boolean mobsNext;
 
     public SpawnerTask() {
         this.registerAnimalSpawner(ChickenSpawner.class);
@@ -66,6 +73,12 @@ public class SpawnerTask implements Runnable {
         this.registerMobSpawner(PiglinSpawner.class);
     }
 
+    /**
+     * Register animal spawner
+     *
+     * @param clazz spawner class
+     * @return whether the spawner was registered successfully (no errors and not already registered)
+     */
     public boolean registerAnimalSpawner(Class<?> clazz) {
         if (this.animalSpawners.containsKey(clazz)) {
             return false;
@@ -80,14 +93,32 @@ public class SpawnerTask implements Runnable {
         return true;
     }
 
+    /**
+     * Get EntitySpawner for class
+     *
+     * @param clazz spawner class
+     * @return EntitySpawner
+     */
     public EntitySpawner getAnimalSpawner(Class<?> clazz) {
         return this.animalSpawners.get(clazz);
     }
 
+    /**
+     * Unregister animal spawner
+     *
+     * @param clazz spawner class
+     * @return succeed
+     */
     public boolean unregisterAnimalSpawner(Class<?> clazz) {
         return this.animalSpawners.remove(clazz) != null;
     }
 
+    /**
+     * Register monster spawner
+     *
+     * @param clazz spawner class
+     * @return whether the spawner was registered successfully (no errors and not already registered)
+     */
     public boolean registerMobSpawner(Class<?> clazz) {
         if (this.mobSpawners.containsKey(clazz)) {
             return false;
@@ -102,10 +133,22 @@ public class SpawnerTask implements Runnable {
         return true;
     }
 
+    /**
+     * Get EntitySpawner for class
+     *
+     * @param clazz spawner class
+     * @return EntitySpawner
+     */
     public EntitySpawner getMobSpawner(Class<?> clazz) {
         return this.mobSpawners.get(clazz);
     }
 
+    /**
+     * Unregister monster spawner
+     *
+     * @param clazz spawner class
+     * @return succeed
+     */
     public boolean unregisterMobSpawner(Class<?> clazz) {
         return this.mobSpawners.remove(clazz) != null;
     }
@@ -115,7 +158,7 @@ public class SpawnerTask implements Runnable {
         if (Server.getInstance().getOnlinePlayersCount() != 0) {
             if (mobsNext) {
                 mobsNext = false;
-                if (Server.getInstance().spawnMobs) {
+                if (Server.getInstance().spawnMonsters) {
                     for (EntitySpawner spawner : mobSpawners.values()) {
                         spawner.spawn();
                     }
@@ -131,6 +174,14 @@ public class SpawnerTask implements Runnable {
         }
     }
 
+    /**
+     * Check if mob spawning is allowed
+     *
+     * @param level world
+     * @param networkId mob network id
+     * @param player player
+     * @return whether mob spawning is possible near the player
+     */
     static boolean entitySpawnAllowed(Level level, int networkId, Player player) {
         if (networkId == EntityPhantom.NETWORK_ID && (player.ticksSinceLastRest < 72000 || player.isSleeping() || player.isSpectator() || !level.getGameRules().getBoolean(GameRule.DO_INSOMNIA))) {
             return false;
@@ -149,6 +200,13 @@ public class SpawnerTask implements Runnable {
         return count < max;
     }
 
+    /**
+     * Attempt to spawn a mob
+     *
+     * @param type mob id
+     * @param pos position
+     * @return spawned entity or null
+     */
     public BaseEntity createEntity(Object type, Position pos) {
         BaseEntity entity = (BaseEntity) Entity.createEntity((String) type, pos);
         if (entity != null) {
@@ -169,6 +227,12 @@ public class SpawnerTask implements Runnable {
         return entity;
     }
 
+    /**
+     * Check if mob spawn position is too close to player
+     *
+     * @param pos position
+     * @return whether the position is too close to player
+     */
     private static boolean tooNearOfPlayer(Position pos) {
         for (Player p : pos.getLevel().getPlayers().values()) {
             if (p.distanceSquared(pos) < 196) { // 14 blocks
@@ -178,6 +242,14 @@ public class SpawnerTask implements Runnable {
         return false;
     }
 
+    /**
+     * Get safe x / z coordinate for mob spawning
+     *
+     * @param degree
+     * @param safeDegree
+     * @param correctionDegree
+     * @return safe spawn x / z coordinate
+     */
     static int getRandomSafeXZCoord(int degree, int safeDegree, int correctionDegree) {
         int addX = Utils.rand((degree >> 1) * -1, degree >> 1);
         if (addX >= 0) {
@@ -194,6 +266,13 @@ public class SpawnerTask implements Runnable {
         return addX;
     }
 
+    /**
+     * Get safe y coordinate for mob spawning
+     *
+     * @param level world
+     * @param pos initial position
+     * @return safe spawn y coordinate
+     */
     static int getSafeYCoord(Level level, Position pos) {
         int x = (int) pos.x;
         int y = (int) pos.y;
@@ -255,6 +334,14 @@ public class SpawnerTask implements Runnable {
         return y;
     }
 
+    /**
+     * Get maximum amount of mobs in distance
+     *
+     * @param id mob network id
+     * @param nether is nether world
+     * @param end is end world
+     * @return maximum amount of mobs
+     */
     private static int getMaxSpawns(int id, boolean nether, boolean end) {
         switch (id) {
             case EntityZombiePigman.NETWORK_ID:

@@ -32,6 +32,9 @@ public class DummyBossBar {
         this.color = builder.color;
     }
 
+    /**
+     * Boss bar builder
+     */
     public static class Builder {
         private final Player player;
         private final long bossBarId;
@@ -73,18 +76,38 @@ public class DummyBossBar {
         }
     }
 
+    /**
+     * Get boss bar owner
+     *
+     * @return player
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Get boss bar id
+     *
+     * @return boss bar id
+     */
     public long getBossBarId() {
         return bossBarId;
     }
 
+    /**
+     * Get boss bar text
+     *
+     * @return current text
+     */
     public String getText() {
         return text;
     }
 
+    /**
+     * Set the boss bar text and send it to player if changed
+     *
+     * @param text new text
+     */
     public void setText(String text) {
         if (!this.text.equals(text)) {
             this.text = text;
@@ -93,10 +116,20 @@ public class DummyBossBar {
         }
     }
 
+    /**
+     * Get boss bar length
+     *
+     * @return length
+     */
     public float getLength() {
         return length;
     }
 
+    /**
+     * Set boss bar length
+     *
+     * @param length new length
+     */
     public void setLength(float length) {
         if (this.length != length) {
             this.length = length;

@@ -8,6 +8,8 @@ import cn.nukkit.math.Vector3;
 import java.util.Iterator;
 
 /**
+ * Block iterator
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

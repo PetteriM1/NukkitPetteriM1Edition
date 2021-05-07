@@ -6,7 +6,9 @@ import cn.nukkit.entity.mob.EntityPhantom;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 
-
+/**
+ * Base class of the default mob spawners
+ */
 public abstract class AbstractEntitySpawner implements EntitySpawner {
 
     protected SpawnerTask spawnTask;
@@ -24,6 +26,11 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         }
     }
 
+    /**
+     * Attempt to spawn a mob to a player
+     *
+     * @param player player
+     */
     private void spawnTo(Player player) {
         Level level = player.getLevel();
 
@@ -56,6 +63,12 @@ public abstract class AbstractEntitySpawner implements EntitySpawner {
         }
     }
 
+    /**
+     * Checkif mob spawning is allowed in the world the player is in
+     *
+     * @param player player
+     * @return mob spawning allowed
+     */
     private boolean isSpawningAllowed(Player player) {
         if (!player.getLevel().isMobSpawningAllowed() || Utils.rand(1, 4) == 1) {
             return false;

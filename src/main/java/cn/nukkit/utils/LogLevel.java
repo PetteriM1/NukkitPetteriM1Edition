@@ -5,6 +5,8 @@ import org.apache.logging.log4j.util.TriConsumer;
 import java.util.function.BiConsumer;
 
 /**
+ * Log level enum
+ *
  * @author MagicDroidX
  * Nukkit Project
  */
@@ -20,6 +22,9 @@ public enum LogLevel implements Comparable<LogLevel> {
     INFO(MainLogger::info, MainLogger::info),
     DEBUG(MainLogger::debug, MainLogger::debug);
 
+    /**
+     * Default logging level: INFO
+     */
     public static final LogLevel DEFAULT_LEVEL = INFO;
 
     private final BiConsumer<MainLogger, String> logTo;
@@ -38,6 +43,11 @@ public enum LogLevel implements Comparable<LogLevel> {
         logThrowableTo.accept(logger, message, throwable);
     }
 
+    /**
+     * Get log level
+     *
+     * @return log level
+     */
     public int getLevel() {
         return ordinal();
     }

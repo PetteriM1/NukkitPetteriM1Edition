@@ -172,6 +172,13 @@ public enum TextFormat {
         return clean(input, false);
     }
 
+    /**
+     * Cleans the given message of all format codes.
+     *
+     * @param input String to clean.
+     * @param recursive Do recursively.
+     * @return A copy of the input string, without any formatting.
+     */
     public static String clean(final String input, final boolean recursive) {
         if (input == null) {
             return null;
