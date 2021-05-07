@@ -289,7 +289,7 @@ public class Config {
      * @param async async
      * @return saved
      */
-    public boolean save(boolean async) {
+    public boolean save(Boolean async) { // Note: do not change to 'boolean' or plugins will break
         if (this.file == null) throw new IllegalStateException("Failed to save Config. File object is undefined.");
         if (this.correct) {
             StringBuilder content = new StringBuilder();

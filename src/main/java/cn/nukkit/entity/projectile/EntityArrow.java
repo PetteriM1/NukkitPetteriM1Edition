@@ -17,10 +17,6 @@ public class EntityArrow extends EntityProjectile {
 
     public static final int DATA_SOURCE_ID = 17;
 
-    public static final int PICKUP_NONE = 0;
-    public static final int PICKUP_ANY = 1;
-    public static final int PICKUP_CREATIVE = 2;
-
     protected int pickupMode;
     public boolean isFromStray;
     protected boolean critical;
