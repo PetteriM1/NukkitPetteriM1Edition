@@ -11,7 +11,7 @@ public class TradeAction extends InventoryAction {
 
 	@Override
 	public boolean isValid(Player source) {
-		return true;
+		return source.getTradeInventory() != null;
 	}
 
 	@Override
