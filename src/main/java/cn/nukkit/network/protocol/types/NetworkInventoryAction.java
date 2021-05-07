@@ -279,19 +279,6 @@ public class NetworkInventoryAction {
                         return new CraftingTakeResultAction(this.oldItem, this.newItem);
                     case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
                         return new CraftingTransferMaterialAction(this.oldItem, this.newItem, this.inventorySlot);
-                     //TODO more test
-/*                    case SOURCE_TYPE_TRADING_INPUT_1:
-                    case SOURCE_TYPE_TRADING_INPUT_2:
-                    	Optional<Inventory> tradeInv = player.getTopWindow();
-                    	if (!tradeInv.isPresent()) {
-                    	    return null;
-                        }
-                        if(tradeInv.get() instanceof TradeInventory) {
-                            return new SlotChangeAction(tradeInv.get(), this.inventorySlot, this.oldItem, this.newItem);
-                        }
-                        return null;
-                    case SOURCE_TYPE_TRADING_USE_INPUTS:
-                    case SOURCE_TYPE_TRADING_OUTPUT:*/
                     case TradeInventory.FAKE_TRADE_INPUT:
                     case TradeInventory.FAKE_TRADE_OUTPUT:
                         return new TradeAction(this.oldItem, this.newItem);
