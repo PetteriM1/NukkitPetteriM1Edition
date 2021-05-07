@@ -16,7 +16,7 @@ public class TradeAction extends InventoryAction {
 
 	@Override
 	public boolean execute(Player source) {
-		return source.getInventory().contains(this.sourceItem);
+		return true;
 	}
 
 	@Override

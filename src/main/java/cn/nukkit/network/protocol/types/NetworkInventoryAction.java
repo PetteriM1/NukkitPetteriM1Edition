@@ -200,13 +200,20 @@ public class NetworkInventoryAction {
                             this.inventorySlot = 1;
                             break;
                         case TradeInventory.TRADE_INPUT_A:
-                        case TradeInventory.TRADE_INPUT_B:
                             if(player.getTradeInventory() == null) {
                                 player.getServer().getLogger().error("Player " + player.getName() + " does not have trade window open");
                                 return null;
                             }
                             this.windowId = player.getWindowId(player.getTradeInventory());
                             this.inventorySlot = 0;
+                            break;
+                        case TradeInventory.TRADE_INPUT_B:
+                            if(player.getTradeInventory() == null) {
+                                player.getServer().getLogger().error("Player " + player.getName() + " does not have trade window open");
+                                return null;
+                            }
+                            this.windowId = player.getWindowId(player.getTradeInventory());
+                            this.inventorySlot = 1;
                         	break;
                         case TradeInventory.TRADE_OUTPUT:
                             if(player.getTradeInventory() == null) {
@@ -272,7 +279,8 @@ public class NetworkInventoryAction {
                         return new CraftingTakeResultAction(this.oldItem, this.newItem);
                     case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
                         return new CraftingTransferMaterialAction(this.oldItem, this.newItem, this.inventorySlot);
-                    case SOURCE_TYPE_TRADING_INPUT_1:
+                     //TODO more test
+/*                    case SOURCE_TYPE_TRADING_INPUT_1:
                     case SOURCE_TYPE_TRADING_INPUT_2:
                     	Optional<Inventory> tradeInv = player.getTopWindow();
                     	if (!tradeInv.isPresent()) {
@@ -283,7 +291,7 @@ public class NetworkInventoryAction {
                         }
                         return null;
                     case SOURCE_TYPE_TRADING_USE_INPUTS:
-                    case SOURCE_TYPE_TRADING_OUTPUT:
+                    case SOURCE_TYPE_TRADING_OUTPUT:*/
                     case TradeInventory.FAKE_TRADE_INPUT:
                     case TradeInventory.FAKE_TRADE_OUTPUT:
                         return new TradeAction(this.oldItem, this.newItem);
