@@ -1912,7 +1912,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.isOnLadder()) {
                             this.resetFallDistance();
                         } else {
-                            if (diff > 2 && expectedVelocity < this.speed.y) {
+                            if (diff > 2 && expectedVelocity < this.speed.y && this.speed.y != 0) {
                                 if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(ev);
@@ -2815,15 +2815,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
                             if (this.inAirTicks > 40 && this.checkMovement && !server.getAllowFlight() && !this.isCreative() && !this.isSwimming() && !this.isGliding()) {
-                                if (this.inAirTicks < 150) {
+                                /*if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent playerInvalidMoveEvent = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(playerInvalidMoveEvent);
                                     if (!playerInvalidMoveEvent.isCancelled()) {
                                         this.motionY = -4;
                                     }
-                                } else {
+                                } else {*/
                                     this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + this.inAirTicks);
-                                }
+                                //}
                                 break;
                             }
                             this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
