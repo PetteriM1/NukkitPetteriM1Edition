@@ -70,7 +70,7 @@ public class Watchdog extends Thread {
                         Thread.sleep(1000); // Wait for the report to be sent
                     } catch (Exception ignored) {}
                     responding = false;
-                    this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
+                    this.server.forceShutdown("\u00A7cServer stopped responding");
                 }
             }
             try {
