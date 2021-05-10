@@ -28,6 +28,7 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_FLAG_POSTFIX = 0x1000000;
     public static final int ARG_FLAG_SOFT_ENUM = 0x4000000;
 
+    /* From < 1.16.100 */
     public static final int ARG_TYPE_INT = 1;
     public static final int ARG_TYPE_FLOAT = 2;
     public static final int ARG_TYPE_VALUE = 3;
@@ -43,13 +44,6 @@ public class AvailableCommandsPacket extends DataPacket {
     public static final int ARG_TYPE_RAWTEXT = 43;
     public static final int ARG_TYPE_JSON = 47;
     public static final int ARG_TYPE_COMMAND = 54;
-
-    private static final int ARG_TYPE_STRING_PRE388 = 27;
-    private static final int ARG_TYPE_POSITION_PRE388 = 29;
-    private static final int ARG_TYPE_MESSAGE_PRE388 = 32;
-    private static final int ARG_TYPE_RAWTEXT_PRE388 = 34;
-    private static final int ARG_TYPE_JSON_PRE388 = 37;
-    private static final int ARG_TYPE_COMMAND_PRE388 = 44;
 
     public Map<String, CommandDataVersions> commands;
     public final Map<String, List<String>> softEnums = new HashMap<>();
@@ -275,26 +269,48 @@ public class AvailableCommandsPacket extends DataPacket {
                             type |= ARG_FLAG_ENUM | enums.indexOf(parameter.enumData);
                         } else {
                             int id = parameter.type.getId();
-                            if (protocol < 388) {
+                            if (protocol < ProtocolInfo.v1_8_0) {
                                 switch (parameter.type) {
                                     case STRING:
-                                        id = ARG_TYPE_STRING_PRE388;
+                                        id = 0x0f;
                                         break;
                                     case POSITION:
                                     case BLOCK_POSITION:
-                                        id = ARG_TYPE_POSITION_PRE388;
+                                        id = 0x10;
                                         break;
                                     case MESSAGE:
-                                        id = ARG_TYPE_MESSAGE_PRE388;
+                                        id = 0x13;
                                         break;
                                     case RAWTEXT:
-                                        id = ARG_TYPE_RAWTEXT_PRE388;
+                                        id = 0x15;
                                         break;
                                     case JSON:
-                                        id = ARG_TYPE_JSON_PRE388;
+                                        id = 0x18;
                                         break;
                                     case COMMAND:
-                                        id = ARG_TYPE_COMMAND_PRE388;
+                                        id = 0x1f;
+                                        break;
+                                }
+                            } else if (protocol < ProtocolInfo.v1_13_0) {
+                                switch (parameter.type) {
+                                    case STRING:
+                                        id = 27;
+                                        break;
+                                    case POSITION:
+                                    case BLOCK_POSITION:
+                                        id = 29;
+                                        break;
+                                    case MESSAGE:
+                                        id = 32;
+                                        break;
+                                    case RAWTEXT:
+                                        id = 34;
+                                        break;
+                                    case JSON:
+                                        id = 37;
+                                        break;
+                                    case COMMAND:
+                                        id = 44;
                                         break;
                                 }
                             } else if (protocol >= ProtocolInfo.v1_16_210) { //TODO: proper implementation for 1.16.210 command params
