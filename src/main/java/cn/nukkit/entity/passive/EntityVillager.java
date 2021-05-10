@@ -31,8 +31,6 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     private TradeInventory inventory;
     private List<TradeInventoryRecipe> recipes;
-    private int tradeTier = 0;
-    private boolean willing = true;
 
     public EntityVillager(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
