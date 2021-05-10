@@ -142,7 +142,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         public static final int TYPE_BLOCK = 1;
 
         public int type;
-        public int entityUniqueId;
+        public long entityUniqueId;
 
         public int x;
         public int y;

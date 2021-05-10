@@ -21,6 +21,8 @@ public class BoneMealParticle extends Particle {
         packet.y = (float) this.y;
         packet.z = (float) this.z;
         packet.data = 0;
+        packet.protocol = protocol;
+        packet.tryEncode();
         return new DataPacket[]{packet};
     }
 }

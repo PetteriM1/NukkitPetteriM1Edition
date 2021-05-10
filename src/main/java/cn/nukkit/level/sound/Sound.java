@@ -30,5 +30,5 @@ public abstract class Sound extends Vector3 {
         super(x, y, z);
     }
 
-    abstract public DataPacket[] encode();
+    abstract public DataPacket encode();
 }
