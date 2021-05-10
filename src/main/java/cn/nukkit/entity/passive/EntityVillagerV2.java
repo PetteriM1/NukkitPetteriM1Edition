@@ -10,35 +10,20 @@ public class EntityVillagerV2 extends EntityVillager {
 
     public static final int NETWORK_ID = 115;
     
-    // 0 普通
     public static final int PROFESSION_UNEMPLOYED = 0;
-    // 1 农民
     public static final int PROFESSION_FARMER = 1;
-    // 2 渔夫
     public static final int PROFESSION_FISHERMAN = 2;
-    // 3 牧羊人
     public static final int PROFESSION_SHEPHERD = 3;
-    // 4 制箭师
     public static final int PROFESSION_FLETCHER = 4;
-    // 5 图书馆管理员
     public static final int PROFESSION_LIBRARIAN = 5;
-    // 6 制图师
     public static final int PROFESSION_CARTOGRAPHER = 6;
-    // 7 牧师
     public static final int PROFESSION_CLERIC = 7;
-    // 8 盔甲匠
     public static final int PROFESSION_ARMORER = 8;
-    // 9 武器匠
     public static final int PROFESSION_WEAPONSMITH = 9;
-    // 10 工具匠
     public static final int PROFESSION_TOOLSMITH = 10;
-    // 11 屠夫
     public static final int PROFESSION_BUTCHER = 11;
-    // 12 皮匠
     public static final int PROFESSION_LEATHERWORKER = 12;
-    // 13 石匠
     public static final int PROFESSION_STONEMASON = 13;
-    // 14 傻子
     public static final int PROFESSION_NITWIT = 14;
 
     public EntityVillagerV2(FullChunk chunk, CompoundTag nbt) {
