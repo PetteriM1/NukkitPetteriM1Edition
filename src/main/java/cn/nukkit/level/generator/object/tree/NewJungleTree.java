@@ -174,7 +174,7 @@ public class NewJungleTree extends TreeGenerator {
                             for (BlockFace enumfacing : BlockFace.Plane.HORIZONTAL) {
                                 if (rand.nextBoundedInt(4 - l3) == 0) {
                                     BlockFace enumfacing1 = enumfacing.getOpposite();
-                                    this.placeCocoa(worldIn, rand.nextBoundedInt(3), position.add(enumfacing1.getXOffset(), i - 5 + l3, enumfacing1.getZOffset()), enumfacing);
+                                    this.placeCocoa(worldIn, /*rand.nextBoundedInt(3),*/ position.add(enumfacing1.getXOffset(), i - 5 + l3, enumfacing1.getZOffset()), enumfacing);
                                 }
                             }
                         }
@@ -190,7 +190,7 @@ public class NewJungleTree extends TreeGenerator {
         }
     }
 
-    private void placeCocoa(ChunkManager worldIn, int age, BlockVector3 pos, BlockFace side) {
+    private void placeCocoa(ChunkManager worldIn, /*int age,*/ BlockVector3 pos, BlockFace side) {
         this.setBlockAndNotifyAdequately(worldIn, pos, new BlockUnknown(127, getCocoaMeta(side.getIndex())));
     }
 

@@ -65,6 +65,9 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
         if (entity.riding != null) {
             this.dismountEntity(entity);
             entity.resetFallDistance();
+            this.motionX = 0;
+            this.motionZ = 0;
+            this.stayTime = 20;
         } else {
             if (this.isPassenger(entity)) {
                 return false;

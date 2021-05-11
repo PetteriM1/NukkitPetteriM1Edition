@@ -9,7 +9,7 @@ import cn.nukkit.item.Item;
  */
 public abstract class InventoryAction {
 
-    private long creationTime;
+    //private long creationTime;
 
     protected Item sourceItem;
 
@@ -23,7 +23,7 @@ public abstract class InventoryAction {
     }
 
     public long getCreationTime() {
-        return creationTime;
+        return 0; //creationTime;
     }
 
     /**
