@@ -10,7 +10,7 @@ import java.util.Queue;
 @UtilityClass
 public class RakNetUtils {
 
-    public static void writeIntRanges(ByteBuf buffer, Queue<IntRange> ackQueue, int mtu) {
+    public static int writeIntRanges(ByteBuf buffer, Queue<IntRange> ackQueue, int mtu) {
         int lengthIndex = buffer.writerIndex();
         buffer.writeZero(2);
         mtu -= 2;
@@ -50,6 +50,7 @@ public class RakNetUtils {
         buffer.writerIndex(lengthIndex);
         buffer.writeShort(count);
         buffer.writerIndex(finalIndex);
+        return count;
     }
 
     public static boolean verifyUnconnectedMagic(ByteBuf buffer) {
