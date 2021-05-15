@@ -69,7 +69,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
             try {
                 Constructor<? extends Player> constructor = clazz.getConstructor(SourceInterface.class, Long.class, InetSocketAddress.class);
                 Player player = constructor.newInstance(this, ev.getClientId(), ev.getSocketAddress());
-                player.raknetProtocol = session.raknet.protocol;
+                player.raknetProtocol = session.raknet.getProtocolVersion();
                 session.player = player;
                 this.server.addPlayer(address, player);
                 this.sessions.put(address, session);

@@ -15,12 +15,11 @@ import static com.nukkitx.network.raknet.RakNetConstants.*;
 public class RakNetServerSession extends RakNetSession {
 
     private final RakNetServer rakNet;
-    public final int protocol;
 
-    RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, int mtu, EventLoop eventLoop, int protocol) {
-        super(remoteAddress, channel, mtu, eventLoop);
+    RakNetServerSession(RakNetServer rakNet, InetSocketAddress remoteAddress, Channel channel, EventLoop eventLoop, int mtu,
+                        int protocolVersion) {
+        super(remoteAddress, channel, eventLoop, mtu, protocolVersion);
         this.rakNet = rakNet;
-        this.protocol = protocol;
     }
 
     @Override

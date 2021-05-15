@@ -175,10 +175,6 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
             pk.eid = this.getId();
             pk.slots = this.armor;
 
-        /*if (java.time.LocalDate.now().toString().contains("-10-31")) {
-            pk.slots[0] = new ItemBlock(Block.get(Block.JACK_O_LANTERN));
-        }*/
-
             player.dataPacket(pk);
         }
 
@@ -207,21 +203,17 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
     public boolean attack(EntityDamageEvent ev) {
         super.attack(ev);
 
-        if (!ev.isCancelled() && ev.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
+        if (!ev.isCancelled() && ev.getCause() == EntityDamageEvent.DamageCause.DROWNING && !(this instanceof EntityZombieVillager)) {
             CreatureSpawnEvent cse = new CreatureSpawnEvent(EntityDrowned.NETWORK_ID, this, CreatureSpawnEvent.SpawnReason.DROWNED);
             level.getServer().getPluginManager().callEvent(cse);
 
-            if (cse.isCancelled()) {
-                this.close();
-                return true;
-            }
-
-            Entity ent = Entity.createEntity("Drowned", this);
-            if (ent != null) {
-                this.close();
-                ent.spawnToAll();
-            } else {
-                this.close();
+            if (!cse.isCancelled()) {
+                Entity ent = Entity.createEntity("Drowned", this);
+                if (ent != null) {
+                    ent.setHealth(this.getHealth());
+                    this.close();
+                    ent.spawnToAll();
+                }
             }
         }
 
