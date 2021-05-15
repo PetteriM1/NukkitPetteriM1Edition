@@ -35,6 +35,7 @@ import java.util.Scanner;
 public class Nukkit {
 
     public static final String NUKKIT = "Nukkit PetteriM1 Edition";
+    public static final String BRANCH = "https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master";
     public final static Properties GIT_INFO = getGitInfo();
     public final static String VERSION = getVersion();
     public final static String PATH = System.getProperty("user.dir") + '/';

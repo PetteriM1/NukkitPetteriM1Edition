@@ -53,7 +53,7 @@ public class Watchdog extends Thread {
                     StringBuilder log = new StringBuilder();
 
                     print("--------- Server stopped responding ---------", logger, log);
-                    print(Math.round(diff / 1000d) + " s", logger, log);
+                    print("Last response " + Math.round(diff / 1000d) + " seconds ago", logger, log);
                     print("---------------- Main thread ----------------", logger, log);
 
                     dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger, log);
