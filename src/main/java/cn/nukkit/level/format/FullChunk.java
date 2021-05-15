@@ -38,7 +38,7 @@ public interface FullChunk extends Cloneable {
     int getFullBlock(int x, int y, int z, int layer);
 
     default int getBlockRuntimeId(int protocolId, int x, int y, int z) {
-        return getBlockRuntimeId(protocolId, x, y, z, 0);
+        return this.getBlockRuntimeId(protocolId, x, y, z, 0);
     }
 
     default int getBlockRuntimeId(int protocolId, int x, int y, int z, int layer) {

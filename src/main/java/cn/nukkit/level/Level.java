@@ -1139,9 +1139,9 @@ public class Level implements ChunkManager, Metadatable {
                 try {
                     if (protocolId > 201) {
                         if (b instanceof Block) {
-                            packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getFullId());
+                            packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, ((Block) b).getId(), ((Block) b).getDamage());
                         } else {
-                            packet.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocolId, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                            packet.blockRuntimeId = this.getBlockRuntimeId(protocolId, (int) b.x, (int) b.y, (int) b.z, dataLayer);
                         }
                     } else {
                         Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
@@ -1174,9 +1174,9 @@ public class Level implements ChunkManager, Metadatable {
             try {
                 if (target.protocol > 201) {
                     if (b instanceof Block) {
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getFullId());
+                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, ((Block) b).getId(), ((Block) b).getDamage());
                     } else {
-                        updateBlockPacket.blockRuntimeId = GlobalBlockPalette.getOrCreateRuntimeId(target.protocol, getFullBlock((int) b.x, (int) b.y, (int) b.z));
+                        updateBlockPacket.blockRuntimeId = this.getBlockRuntimeId(target.protocol, (int) b.x, (int) b.y, (int) b.z);
                     }
                 } else {
                     Block bl = b instanceof Block ? (Block) b : getBlock((int) b.x, (int) b.y, (int) b.z);
@@ -1651,7 +1651,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public int getBlockRuntimeId(int x, int y, int z, int layer) {
-        return this.getChunk(x >> 4, z >> 4, false).getBlockRuntimeId(x & 0x0f, y & 0xff, z & 0x0f, layer);
+        return this.getBlockRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, x, y, z, layer);
+    }
+
+    public int getBlockRuntimeId(int protocolId, int x, int y, int z, int layer) {
+        return this.getChunk(x >> 4, z >> 4, false).getBlockRuntimeId(protocolId, x & 0x0f, y & 0xff, z & 0x0f, layer);
     }
 
 
