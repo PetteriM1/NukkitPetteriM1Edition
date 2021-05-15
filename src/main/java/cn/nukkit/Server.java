@@ -349,7 +349,7 @@ public class Server {
      */
     public boolean doNotLimitSkinGeometry;
     /**
-     * Mob spawning from blocks & items enabled.
+     * Mob spawning from blocks and items enabled.
      */
     public boolean mobsFromBlocks;
     /**
@@ -796,7 +796,13 @@ public class Server {
             }
             return;
         }
-        instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
+        for (Player player : players) {
+            if (player.protocol >= ProtocolInfo.v1_16_100) {
+                player.batchDataPacket(packet);
+            } else {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
@@ -806,7 +812,13 @@ public class Server {
             }
             return;
         }
-        instance.batchPackets(players, new DataPacket[]{packet});
+        for (Player player : players) {
+            if (player.protocol >= ProtocolInfo.v1_16_100) {
+                player.batchDataPacket(packet);
+            } else {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPackets(Player[] players, DataPacket[] packets) {
@@ -1115,7 +1127,7 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
-        Server.broadcastPacket(players, pk);
+        this.batchPackets(players, new DataPacket[]{pk}); // This is sent "directly" so it always gets thru before possible TYPE_REMOVE packet for NPCs etc.
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {

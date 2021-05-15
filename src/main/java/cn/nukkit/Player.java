@@ -99,6 +99,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * The Player class
@@ -253,6 +254,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private AsyncTask preLoginEventTask = null;
     protected boolean shouldLogin = false;
+
+    private static Stream<Field> pkIDs;
 
     private int lastEnderPearl = 20;
     private int lastChorusFruitTeleport = 20;
@@ -1029,7 +1032,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public boolean batchDataPacket(DataPacket packet) {
-        if (packet instanceof BatchPacket) {
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
             return this.directDataPacket(packet); // We don't want to batch a batched packet
         }
 
@@ -1067,6 +1070,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean dataPacket(DataPacket packet) {
         if (this.protocol >= ProtocolInfo.v1_16_100) {
             return batchDataPacket(packet);
+        }
+
+        if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
+            return this.directDataPacket(packet); // We don't want to batch a batched packet
         }
 
         if (!this.connected) {
@@ -1922,7 +1929,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         if (this.isOnLadder()) {
                             this.resetFallDistance();
                         } else {
-                            if (diff > 2 && expectedVelocity < this.speed.y) {
+                            if (diff > 2 && expectedVelocity < this.speed.y && this.speed.y != 0) {
                                 if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent ev = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(ev);
@@ -1963,7 +1970,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dummyBossBars.values().forEach(DummyBossBar::updateBossEntityPosition);
         }
 
-        updateBlockingFlag();
+        // Shields were added in 1.10
+        // Change this if you map shields to some other item for old versions
+        if (this.protocol >= ProtocolInfo.v1_10_0) {
+            updateBlockingFlag();
+        }
 
         if (!this.isSleeping()) {
             this.ticksSinceLastRest++;
@@ -2094,11 +2105,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void processLogin() {
-        if (!this.server.isWhitelisted((this.username).toLowerCase())) {
+        String lowerName = this.username.toLowerCase();
+        if (!this.server.isWhitelisted(lowerName)) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, this.getServer().getPropertyString("whitelist-reason").replace("§n", "\n"));
             return;
         } else if (this.isBanned()) {
-            String reason = this.server.getNameBans().getEntires().get(this.getName().toLowerCase()).getReason();
+            String reason = this.server.getNameBans().getEntires().get(lowerName).getReason();
             this.kick(PlayerKickEvent.Reason.NAME_BANNED, "You are banned!" + (reason.isEmpty() ? "" : (" Reason: " + reason)));
             return;
         } else if (!server.strongIPBans && this.server.getIPBans().isBanned(this.getAddress())) {
@@ -2116,7 +2128,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         CompoundTag nbt;
-        String lowerName = this.username.toLowerCase();
         File legacyDataFile = new File(server.getDataPath() + "players/" + lowerName + ".dat");
         File dataFile = new File(server.getDataPath() + "players/" + this.uuid.toString() + ".dat");
         if (this.server.savePlayerDataByUuid) {
@@ -2824,15 +2835,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
                             if (this.inAirTicks > 40 && this.checkMovement && !server.getAllowFlight() && !this.isCreative() && !this.isSwimming() && !this.isGliding()) {
-                                if (this.inAirTicks < 150) {
+                                /*if (this.inAirTicks < 150) {
                                     PlayerInvalidMoveEvent playerInvalidMoveEvent = new PlayerInvalidMoveEvent(this, true);
                                     this.getServer().getPluginManager().callEvent(playerInvalidMoveEvent);
                                     if (!playerInvalidMoveEvent.isCancelled()) {
                                         this.motionY = -4;
                                     }
-                                } else {
+                                } else {*/
                                     this.kick(PlayerKickEvent.Reason.FLYING_DISABLED, "Flying is not enabled on this server", true, "type=ACTION_JUMP, inAirTicks=" + this.inAirTicks);
-                                }
+                                //}
                                 break;
                             }
                             this.server.getPluginManager().callEvent(new PlayerJumpEvent(this));
@@ -3903,7 +3914,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.PACKET_VIOLATION_WARNING_PACKET:
                     PacketViolationWarningPacket PVWpk = (PacketViolationWarningPacket) packet;
-                    Optional<String> PVWpkName = Arrays.stream(ProtocolInfo.class.getDeclaredFields()).filter(field -> field.getType() == Byte.TYPE)
+                    if (pkIDs == null) {
+                        pkIDs = Arrays.stream(ProtocolInfo.class.getDeclaredFields()).filter(field -> field.getType() == Byte.TYPE);
+                    }
+                    Optional<String> PVWpkName = pkIDs
                             .filter(field -> {
                                 try {
                                     return field.getByte(null) == ((PacketViolationWarningPacket) packet).packetId;

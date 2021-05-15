@@ -1984,7 +1984,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.checkChunks();
 
         if (!this.onGround || dy != 0) {
-            AxisAlignedBB bb = this.boundingBox.clone();
+            AxisAlignedBB bb = this.boundingBox.growNoUp(0.1, 0.1, 0.1);
             bb.setMinY(bb.getMinY() - 0.75);
 
             this.onGround = this.level.hasCollisionBlocks(bb);

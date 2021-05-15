@@ -16,7 +16,7 @@ public class SummonCommand extends Command {
         this.setPermission("nukkit.command.summon");
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
-                new CommandParameter("entity", CommandParamType.STRING, false),
+                new CommandParameter("entityType", false, CommandParameter.ENUM_TYPE_ENTITY_LIST),
                 new CommandParameter("player", CommandParamType.TARGET, true)
         });
     }
@@ -49,7 +49,7 @@ public class SummonCommand extends Command {
         }
 
         if (playerThatSpawns != null) {
-            Position pos = playerThatSpawns.getPosition();
+            Position pos = playerThatSpawns.getPosition().floor().add(0.5, 0, 0.5);
             Entity ent;
             if ((ent = Entity.createEntity(mob, pos)) != null) {
                 ent.spawnToAll();

@@ -113,6 +113,8 @@ public class Binary {
         for (Map.Entry<Integer, EntityData> entry : map.entrySet()) {
             EntityData d = entry.getValue();
             int id = entry.getKey();
+            int type = d.getType();
+            boolean forceEmptyData = false;
 
             // HACK: Multiversion entity data
             if (protocol >= ProtocolInfo.v1_16_210) { //TODO: update entity data
@@ -120,11 +122,16 @@ public class Binary {
             } else if (protocol == ProtocolInfo.v1_11_0) {
                 if (id >= 40) id = id + 1;
             } else if (protocol <= ProtocolInfo.v1_2_10) {
-                if (id > 35) id = id - 1;
+                if (id >= 29) id = id + 1;
+                if (id > 76) { // DATA_MAX_STRENGTH
+                    id = Entity.DATA_STRENGTH;
+                    type = Entity.DATA_TYPE_INT;
+                    forceEmptyData = true;
+                }
             }
 
             stream.putUnsignedVarInt(id);
-            stream.putUnsignedVarInt(d.getType());
+            stream.putUnsignedVarInt(type);
 
             switch (d.getType()) {
                 case Entity.DATA_TYPE_BYTE:
@@ -134,7 +141,11 @@ public class Binary {
                     stream.putLShort(((ShortEntityData) d).getData());
                     break;
                 case Entity.DATA_TYPE_INT:
-                    stream.putVarInt(((IntEntityData) d).getData());
+                    if (forceEmptyData) {
+                        stream.putVarInt(0);
+                    } else {
+                        stream.putVarInt(((IntEntityData) d).getData());
+                    }
                     break;
                 case Entity.DATA_TYPE_FLOAT:
                     stream.putLFloat(((FloatEntityData) d).getData());

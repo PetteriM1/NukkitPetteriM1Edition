@@ -6,6 +6,7 @@ import cn.nukkit.block.BlockTNT;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityShulkerBox;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityExplosive;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.event.block.BlockUpdateEvent;
@@ -36,6 +37,7 @@ public class WeakExplosion extends Explosion {
     private final Position source;
     private final double size;
     private final Object what;
+    private boolean doesDamage = true;
     private List<Block> affectedBlocks = new ArrayList<>();
 
     public WeakExplosion(Position center, double size, Entity what) {
@@ -48,6 +50,10 @@ public class WeakExplosion extends Explosion {
 
     @Override
     public boolean explodeA() {
+        if (what instanceof EntityExplosive && ((Entity) what).isInsideOfWater()) {
+            this.doesDamage = false;
+            return true;
+        }
         if (this.size < 0.1) return false;
         if (!level.getServer().explosionBreakBlocks) return true;
         Vector3 vector = new Vector3(0, 0, 0);
@@ -121,7 +127,7 @@ public class WeakExplosion extends Explosion {
                 Vector3 motion = entity.subtract(this.source).normalize();
                 int exposure = 1;
                 double impact = (1 - distance) * exposure;
-                int damage = (int) (((impact * impact + impact) / 2) * 5 * explosionSize + 1);
+                int damage = this.doesDamage ? (int) (((impact * impact + impact) / 2) * 5 * explosionSize + 1) : 0;
                 if (this.what instanceof Entity) {
                     entity.attack(new EntityDamageByEntityEvent((Entity) this.what, entity, DamageCause.ENTITY_EXPLOSION, damage));
                 } else if (this.what instanceof Block) {

@@ -503,20 +503,12 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void addSound(Sound sound, Player[] players) {
-        DataPacket[] packets = sound.encode();
-        if (players == null) {
-            if (packets != null) {
-                for (DataPacket packet : packets) {
-                    this.addChunkPacket((int) sound.x >> 4, (int) sound.z >> 4, packet);
-                }
-            }
-        } else {
-            if (packets != null) {
-                if (packets.length == 1) {
-                    Server.broadcastPacket(players, packets[0]);
-                } else {
-                    this.server.batchPackets(players, packets, false);
-                }
+        DataPacket packet = sound.encode();
+        if (packet != null) {
+            if (players == null) {
+                this.addChunkPacket((int) sound.x >> 4, (int) sound.z >> 4, packet);
+            } else {
+                Server.broadcastPacket(players, packet);
             }
         }
     }
@@ -584,7 +576,7 @@ public class Level implements ChunkManager, Metadatable {
         if (players == null) {
             this.addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
         } else {
-            this.server.batchPackets(players, new DataPacket[]{pk}, false);
+            Server.broadcastPacket(players, pk);
         }
     }
 
@@ -1160,7 +1152,9 @@ public class Level implements ChunkManager, Metadatable {
                     throw new IllegalStateException("Unable to create BlockUpdatePacket at (" + b.x + ", " + b.y + ", " + b.z + ") in " + getName() + " for players with protocol " +protocolId);
                 }
 
-                this.server.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
+                for (Player player : players) {
+                    player.batchDataPacket(packet);
+                }
             }
         }
     }
@@ -1503,12 +1497,12 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean hasCollisionBlocks(AxisAlignedBB bb) {
-        int minX = NukkitMath.floorDouble(bb.minX);
-        int minY = NukkitMath.floorDouble(bb.minY);
-        int minZ = NukkitMath.floorDouble(bb.minZ);
-        int maxX = NukkitMath.ceilDouble(bb.maxX);
-        int maxY = NukkitMath.ceilDouble(bb.maxY);
-        int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+        int minX = NukkitMath.floorDouble(bb.getMinX());
+        int minY = NukkitMath.floorDouble(bb.getMinY());
+        int minZ = NukkitMath.floorDouble(bb.getMinZ());
+        int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+        int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+        int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
 
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
