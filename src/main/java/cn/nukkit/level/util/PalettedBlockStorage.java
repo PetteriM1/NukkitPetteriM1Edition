@@ -48,10 +48,6 @@ public class PalettedBlockStorage {
         return (version.getId() << 1) | 1;
     }
 
-    private int getPaletteHeader(BitArrayVersion version, boolean runtime) {
-        return (version.getId() << 1) | (runtime ? 1 : 0);
-    }
-
     public void setBlock(int index, int runtimeId) {
         try {
             int id = this.idFor(runtimeId);

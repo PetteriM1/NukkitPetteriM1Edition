@@ -202,7 +202,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z) {
-        this.knockBack(attacker, damage, x, z, 0.4);
+        this.knockBack(attacker, damage, x, z, 0.3);
     }
 
     public void knockBack(Entity attacker, double damage, double x, double z, double base) {

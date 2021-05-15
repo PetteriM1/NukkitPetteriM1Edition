@@ -7,8 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.UtilityClass;
@@ -27,7 +25,10 @@ public class RuntimeItems {
     private static final Type ENTRY_TYPE = new TypeToken<ArrayList<Entry>>() {
     }.getType();
 
-    private static final Int2ObjectMap<RuntimeItemMapping> itemPalettes = new Int2ObjectOpenHashMap<>();
+    //Don't use a map for better performance while we only have two mappings and we don't allow them to be loaded outside the server jar
+    //private static final Int2ObjectMap<RuntimeItemMapping> itemPalettes = new Int2ObjectOpenHashMap<>();
+    private static RuntimeItemMapping mapping361;
+    private static RuntimeItemMapping mapping419;
 
     public static void init() {
         Server.getInstance().getLogger().debug("Loading runtime items...");
@@ -65,14 +66,21 @@ public class RuntimeItems {
         }
 
         byte[] itemDataPalette = paletteBuffer.getBuffer();
-        itemPalettes.put(protocolId, new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap));
+        //itemPalettes.put(protocolId, new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap));
+        if (protocolId == 361) {
+            mapping361 = new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap);
+        } else if (protocolId == 419) {
+            mapping419 = new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap);
+        } else throw new IllegalArgumentException("Tried to register unknown item mapping: " + protocolId);
     }
 
     public static RuntimeItemMapping getRuntimeMapping(int protocolId) {
         if (protocolId < ProtocolInfo.v1_16_100) {
-            return itemPalettes.get(ProtocolInfo.v1_12_0);
+            //return itemPalettes.get(ProtocolInfo.v1_12_0);
+            return mapping361;
         }
-        return itemPalettes.get(/*protocolId*/ProtocolInfo.v1_16_100);
+        //return itemPalettes.get(/*protocolId*/ProtocolInfo.v1_16_100);
+        return mapping419;
     }
 
     public static int getId(int fullId) {

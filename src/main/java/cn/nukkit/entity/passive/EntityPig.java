@@ -138,6 +138,9 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable, En
         if (entity.riding != null) {
             dismountEntity(entity);
             entity.resetFallDistance();
+            this.motionX = 0;
+            this.motionZ = 0;
+            this.stayTime = 20;
         } else {
             if (isPassenger(entity)) {
                 return false;
