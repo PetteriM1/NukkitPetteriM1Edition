@@ -15,6 +15,7 @@ import cn.nukkit.entity.item.EntityFishingHook;
 import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.entity.mob.EntityEnderman;
+import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
@@ -77,6 +78,7 @@ import co.aikar.timings.Timings;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.gson.JsonParser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
@@ -91,13 +93,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteOrder;
 import java.util.List;
 import java.util.*;
 import java.util.Queue;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -942,6 +949,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.isSpectator()) {
             this.spawnToAll();
+        }
+
+        if (server.updateChecks && this.isOp()) {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    URLConnection request = new URL(Nukkit.BRANCH).openConnection();
+                    request.connect();
+                    InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
+                    String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
+                    content.close();
+
+                    if (Nukkit.getBranch().equals("master")) {
+                        if (!server.getNukkitVersion().equals(latest) && !server.getNukkitVersion().equals("git-null")) {
+                            this.sendMessage("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + server.getNukkitVersion() + " Latest: " + latest);
+                        }
+                    }
+                } catch (Exception ignore) {}
+            });
         }
     }
 
@@ -2774,55 +2799,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
 
-                            if (this.server.isHardcore()) {
-                                this.setBanned(true);
-                                break;
-                            }
-
-                            this.craftingType = CRAFTING_SMALL;
-                            this.resetCraftingGridType();
-
-                            PlayerRespawnEvent playerRespawnEvent = new PlayerRespawnEvent(this, this.getSpawn());
-                            this.server.getPluginManager().callEvent(playerRespawnEvent);
-
-                            Position respawnPos = playerRespawnEvent.getRespawnPosition();
-
-                            this.teleport(respawnPos, null);
-
-                            if (this.protocol < 388) {
-                                RespawnPacket respawnPacket = new RespawnPacket();
-                                respawnPacket.x = (float) respawnPos.x;
-                                respawnPacket.y = (float) respawnPos.y;
-                                respawnPacket.z = (float) respawnPos.z;
-                                this.dataPacket(respawnPacket);
-                            }
-
-                            this.sendExperience();
-                            this.sendExperienceLevel();
-
-                            this.setSprinting(false);
-                            this.setSneaking(false);
-
-                            this.extinguish();
-                            this.setDataProperty(new ShortEntityData(Player.DATA_AIR, 400), false);
-                            this.deadTicks = 0;
-                            this.noDamageTicks = 60;
-
-                            this.removeAllEffects();
-                            this.setHealth(this.getMaxHealth());
-                            this.foodData.setLevel(20, 20);
-
-                            this.sendData(this);
-
-                            this.setMovementSpeed(DEFAULT_SPEED);
-
-                            this.adventureSettings.update();
-                            this.inventory.sendContents(this);
-                            this.inventory.sendArmorContents(this);
-                            this.offhandInventory.sendContents(this);
-
-                            this.spawnToAll();
-                            this.scheduleUpdate();
+                            this.respawn();
                             break;
                         case PlayerActionPacket.ACTION_JUMP:
                             if (this.inAirTicks > 40 && this.checkMovement && !server.getAllowFlight() && !this.isCreative() && !this.isSwimming() && !this.isGliding()) {
@@ -3710,7 +3687,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         }
                                     }
 
-                                    EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, target, DamageCause.ENTITY_ATTACK, damage);
+                                    float knockBack = 0.3f;
+                                    Enchantment knockBackEnchantment = item.getEnchantment(Enchantment.ID_KNOCKBACK);
+                                    if (knockBackEnchantment != null) {
+                                        knockBack += knockBackEnchantment.getLevel() * 0.1f;
+                                    }
+
+                                    EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, target, DamageCause.ENTITY_ATTACK, damage, knockBack);
                                     if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
                                     if ((target instanceof Player) && !this.level.getGameRules().getBoolean(GameRule.PVP)) {
                                         entityDamageByEntityEvent.setCancelled();
@@ -4490,6 +4473,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.scheduleUpdate();
             this.ticksSinceLastRest = 0;
 
+            if (this.getKiller() != null && this.getKiller() instanceof EntityWalkingMob && ((EntityWalkingMob) this.getKiller()).isAngryTo == this.getId()) {
+                ((EntityWalkingMob) this.getKiller()).isAngryTo = -1; // Reset golem target
+            }
+
             if (!ev.getKeepInventory() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
                 for (Item item : ev.getDrops()) {
                     if (!item.hasEnchantment(Enchantment.ID_VANISHING_CURSE)) {
@@ -4527,11 +4514,66 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.y = (float) pos.y;
             pk.z = (float) pos.z;
             pk.respawnState = RespawnPacket.STATE_SEARCHING_FOR_SPAWN;
-
-            this.teleport(pos, null);
-
             this.dataPacket(pk);
+
+            if (level.getGameRules().getBoolean(GameRule.DO_IMMEDIATE_RESPAWN)) {
+                SetHealthPacket healthPk = new SetHealthPacket();
+                healthPk.health = this.getMaxHealth();
+                this.dataPacket(healthPk);
+            }
         }
+    }
+
+    protected void respawn() {
+        if (this.server.isHardcore()) {
+            this.setBanned(true);
+            return;
+        }
+
+        this.craftingType = CRAFTING_SMALL;
+        this.resetCraftingGridType();
+
+        PlayerRespawnEvent playerRespawnEvent = new PlayerRespawnEvent(this, this.getSpawn());
+        this.server.getPluginManager().callEvent(playerRespawnEvent);
+
+        Position respawnPos = playerRespawnEvent.getRespawnPosition();
+
+        this.teleport(respawnPos, null);
+
+        if (this.protocol < 388) {
+            RespawnPacket respawnPacket = new RespawnPacket();
+            respawnPacket.x = (float) respawnPos.x;
+            respawnPacket.y = (float) respawnPos.y;
+            respawnPacket.z = (float) respawnPos.z;
+            this.dataPacket(respawnPacket);
+        }
+
+        this.sendExperience();
+        this.sendExperienceLevel();
+
+        this.setSprinting(false);
+        this.setSneaking(false);
+
+        this.extinguish();
+        this.setDataProperty(new ShortEntityData(Player.DATA_AIR, 400), false);
+        this.deadTicks = 0;
+        this.noDamageTicks = 60;
+
+        this.removeAllEffects();
+        this.setHealth(this.getMaxHealth());
+        this.foodData.setLevel(20, 20);
+
+        this.sendData(this);
+
+        this.setMovementSpeed(DEFAULT_SPEED);
+
+        this.adventureSettings.update();
+        this.inventory.sendContents(this);
+        this.inventory.sendArmorContents(this);
+        this.offhandInventory.sendContents(this);
+
+        this.spawnToAll();
+        this.scheduleUpdate();
     }
 
     @Override
@@ -4643,6 +4685,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.spawned && send) {
             this.setAttribute(Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed).setDefaultValue(speed));
         }
+    }
+
+    public void sendMovementSpeed(float speed) {
+        Attribute attribute = Attribute.getAttribute(Attribute.MOVEMENT_SPEED).setValue(speed);
+        this.setAttribute(attribute);
     }
 
     public Entity getKiller() {

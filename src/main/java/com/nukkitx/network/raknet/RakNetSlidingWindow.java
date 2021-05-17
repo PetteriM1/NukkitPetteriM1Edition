@@ -3,6 +3,7 @@ package com.nukkitx.network.raknet;
 import static com.nukkitx.network.raknet.RakNetConstants.*;
 
 public class RakNetSlidingWindow {
+
     private final int mtu;
     private double cwnd;
     private double ssThresh;

@@ -186,7 +186,7 @@ public class Network {
             processPackets(player, packets);
 
         } catch (Exception e) {
-            if (log.isDebugEnabled()) {
+            if (Nukkit.DEBUG > 1) {
                 log.debug("Error whilst decoding batch packet", e);
             }
         }

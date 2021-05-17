@@ -153,7 +153,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
     @Override
     public boolean attack(EntityDamageEvent ev) {
         if (super.attack(ev)) {
-            if (ev instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) ev).getDamager() instanceof Player) {
+            if (ev instanceof EntityDamageByEntityEvent) {
                 this.isAngryTo = ((EntityDamageByEntityEvent) ev).getDamager().getId();
             }
             return true;
