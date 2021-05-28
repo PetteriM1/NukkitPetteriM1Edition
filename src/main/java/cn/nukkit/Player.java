@@ -1375,7 +1375,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setAdventureSettings(ev.getNewAdventureSettings());
 
         if (this.isSpectator()) {
-            this.adventureSettings.set(Type.FLYING, true);
             this.teleport(this.temporalVector.setComponents(this.x, this.y + 0.1, this.z));
 
             if (this.protocol < 407) {
@@ -1383,16 +1382,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
                 this.dataPacket(inventoryContentPacket);
             }
-        } else {
-            if (this.isSurvival() || this.isAdventure()) {
-                this.adventureSettings.set(Type.FLYING, false);
-            }
-            if (this.protocol < 407) {
-                InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
-                inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-                inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
-                this.dataPacket(inventoryContentPacket);
-            }
+        } else if (this.protocol < 407) {
+            InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
+            inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
+            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
+            this.dataPacket(inventoryContentPacket);
         }
 
         this.resetFallDistance();
@@ -1937,7 +1931,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.inAirTicks = 0;
                     this.highestPosition = this.y;
                 } else {
-                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && !this.adventureSettings.get(Type.ALLOW_FLIGHT) && this.inAirTicks > 20 && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null && !this.hasEffect(Effect.LEVITATION) && !this.hasEffect(Effect.SLOW_FALLING)) {
+                    if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && this.inAirTicks > 20 && !this.getAllowFlight() && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null && !this.hasEffect(Effect.LEVITATION) && !this.hasEffect(Effect.SLOW_FALLING)) {
                         double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
@@ -4700,7 +4694,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.isSpectator() || (this.isCreative() && source.getCause() != DamageCause.SUICIDE)) {
             source.setCancelled();
             return false;
-        } else if (this.adventureSettings.get(Type.ALLOW_FLIGHT) && source.getCause() == DamageCause.FALL) {
+        } else if (source.getCause() == DamageCause.FALL && this.getAllowFlight()) {
             source.setCancelled();
             return false;
         } else if (source.getCause() == DamageCause.FALL) {
