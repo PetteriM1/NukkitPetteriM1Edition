@@ -25,8 +25,6 @@ import cn.nukkit.utils.Utils;
  */
 public class BlockFire extends BlockFlowable {
 
-    private boolean remove = false;
-
     public BlockFire() {
         this(0);
     }
@@ -113,10 +111,6 @@ public class BlockFire extends BlockFlowable {
 
             if (Server.getInstance().suomiCraftPEMode()) {
                 if (forever) return 0;
-                if (!remove) {
-                    this.getLevel().scheduleUpdate(this, Utils.random.nextInt(300, 400));
-                    this.remove = true;
-                }
                 this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
                 return 0;
             }
