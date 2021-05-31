@@ -231,9 +231,6 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
     public static boolean canPush(Block block, BlockFace face, boolean destroyBlocks) {
         if (block.canBePushed() && block.getY() >= 0 && (face != BlockFace.DOWN || block.getY() != 0) && block.getY() <= 255 && (face != BlockFace.UP || block.getY() != 255)) {
             if (!(block instanceof BlockPistonBase)) {
-                if (block.breakWhenPushed()) {
-                    block.level.useBreakOn(block);
-                }
                 if (block instanceof BlockFlowable) {
                     return destroyBlocks;
                 }
@@ -275,7 +272,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
             Block block = this.blockToMove;
 
             if (!canPush(block, this.moveDirection, false)) {
-                if (block instanceof BlockFlowable) {
+                if (block instanceof BlockFlowable || block.breakWhenPushed()) {
                     this.toDestroy.add(this.blockToMove);
                     return true;
                 } else {
@@ -362,7 +359,7 @@ public abstract class BlockPistonBase extends BlockSolidMeta implements Faceable
                             return false;
                         }
 
-                        if (nextBlock instanceof BlockFlowable) {
+                        if (nextBlock instanceof BlockFlowable || block.breakWhenPushed()) {
                             this.toDestroy.add(nextBlock);
                             return true;
                         }

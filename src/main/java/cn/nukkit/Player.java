@@ -3321,6 +3321,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         if (a == null) {
                             this.getServer().getLogger().debug("Unmatched inventory action from " + this.username + ": " + networkInventoryAction);
+                            this.getCursorInventory().sendContents(this);
                             this.sendAllInventories();
                             break packetswitch;
                         }
@@ -3382,6 +3383,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             this.server.getLogger().debug("Got unexpected normal inventory action with incomplete crafting transaction from " + this.username + ", refusing to execute crafting");
                             if (this.protocol >= ProtocolInfo.v1_16_0) {
                                 this.removeAllWindows(false);
+                                this.getCursorInventory().sendContents(this);
                                 this.sendAllInventories();
                             }
                             this.craftingTransaction = null;
@@ -3395,6 +3397,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         } else {
                             this.server.getLogger().debug("Got unexpected normal inventory action with incomplete enchanting transaction from " + this.username + ", refusing to execute enchant " + transactionPacket.toString());
                             this.removeAllWindows(false);
+                            this.getCursorInventory().sendContents(this);
                             this.sendAllInventories();
                             this.enchantTransaction = null;
                         }
@@ -3407,6 +3410,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         } else {
                             this.server.getLogger().debug("Got unexpected normal inventory action with incomplete repair item transaction from " + this.username + ", refusing to execute repair item " + transactionPacket.toString());
                             this.removeAllWindows(false);
+                            this.getCursorInventory().sendContents(this);
                             this.sendAllInventories();
                             this.repairItemTransaction = null;
                         }
@@ -3430,8 +3434,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (transactionPacket.actions.length > 0) {
                                 this.server.getLogger().debug("Expected 0 actions for mismatch, got " + transactionPacket.actions.length + ", " + Arrays.toString(transactionPacket.actions));
                             }
+                            this.getCursorInventory().sendContents(this);
                             this.sendAllInventories();
-
                             break packetswitch;
                         case InventoryTransactionPacket.TYPE_USE_ITEM:
                             UseItemData useItemData;

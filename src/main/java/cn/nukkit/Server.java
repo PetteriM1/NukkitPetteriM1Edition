@@ -1821,23 +1821,27 @@ public class Server {
                 pluginManager.callEvent(event);
             }
 
-            this.getScheduler().scheduleTask(new Task() {
-                boolean hasRun = false;
+            if (async) {
+                this.getScheduler().scheduleTask(new Task() {
+                    boolean hasRun = false;
 
-                @Override
-                public void onRun(int currentTick) {
-                    this.onCancel();
-                }
-
-                // Doing it like this ensures that the player data will be saved in a server shutdown
-                @Override
-                public void onCancel() {
-                    if (!this.hasRun)    {
-                        this.hasRun = true;
-                        saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                    @Override
+                    public void onRun(int currentTick) {
+                        this.onCancel();
                     }
-                }
-            }, async);
+
+                    // Doing it like this ensures that the player data will be saved in a server shutdown
+                    @Override
+                    public void onCancel() {
+                        if (!this.hasRun) {
+                            this.hasRun = true;
+                            saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                        }
+                    }
+                }, true);
+            } else {
+                saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+            }
         }
     }
 
