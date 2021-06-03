@@ -3,7 +3,9 @@ package cn.nukkit.item;
 import cn.nukkit.Player;
 import cn.nukkit.event.player.PlayerItemConsumeEvent;
 import cn.nukkit.item.food.Food;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 /**
  * @author MagicDroidX
@@ -32,7 +34,7 @@ public abstract class ItemEdible extends Item {
         if (player.getFoodData().getLevel() < player.getFoodData().getMaxLevel() || player.isCreative()) {
             return true;
         }
-        if (player.protocol > 361) {
+        if (player.protocol > ProtocolInfo.v1_12_0) {
             player.getFoodData().sendFoodLevel();
         }
         return false;
@@ -45,14 +47,16 @@ public abstract class ItemEdible extends Item {
 
         player.getServer().getPluginManager().callEvent(consumeEvent);
         if (consumeEvent.isCancelled()) {
-            player.getInventory().sendContents(player);
-            return false;
+            return false; // Inventory#sendContents is called in Player
         }
 
         Food food = Food.getByRelative(this);
-        if (!player.isCreative() && !player.isSpectator() && food != null && food.eatenBy(player)) {
-            --this.count;
-            player.getInventory().setItemInHand(this);
+        if (food != null && food.eatenBy(player)) {
+            player.getLevel().addSoundToViewers(player, Sound.RANDOM_BURP);
+            if (!player.isCreative() && !player.isSpectator()) {
+                --this.count;
+                player.getInventory().setItemInHand(this);
+            }
         }
         return true;
     }
