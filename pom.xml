@@ -5,7 +5,7 @@
     <name>Nukkit PetteriM1 Edition</name>
     <groupId>cn.nukkit</groupId>
     <artifactId>Nukkit</artifactId>
-    <version>PM1E</version>
+    <version>alemiz-legacy</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -16,13 +16,18 @@
         <jline.version>3.12.1</jline.version>
         <netty.version>[4.1.47.Final,4.1.999.Final]</netty.version>
     </properties>
-    
+
     <distributionManagement>
         <repository>
-            <id>gdrive</id>
-            <name>Google Drive</name>
-            <url>gdrive:/Public/build/Nukkit_PetteriM1_Edition</url>
+            <id>central</id>
+            <name>releases</name>
+            <url>https://repo.mizerak.eu/artifactory/snapshots</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>snapshots</name>
+            <url>https://repo.mizerak.eu/artifactory/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
