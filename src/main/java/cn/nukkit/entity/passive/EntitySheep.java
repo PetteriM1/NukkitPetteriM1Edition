@@ -23,7 +23,7 @@ public class EntitySheep extends EntityWalkingAnimal {
     public static final int NETWORK_ID = 13;
 
     public boolean sheared = false;
-    public int color = DyeColor.WHITE.getDyeData();
+    public int color;
     public int unshearTicks = -1;
 
     public EntitySheep(FullChunk chunk, CompoundTag nbt) {
@@ -135,10 +135,10 @@ public class EntitySheep extends EntityWalkingAnimal {
     }
 
 
-    public void setColor(int color) {
-        this.color = color;
-        this.namedTag.putByte("Color", color);
-        this.setDataProperty(new ByteEntityData(DATA_COLOUR, color));
+    public void setColor(int woolColor) {
+        this.color = woolColor;
+        this.namedTag.putByte("Color", woolColor);
+        this.setDataProperty(new ByteEntityData(DATA_COLOUR, woolColor));
     }
 
     public int getColor() {
@@ -146,14 +146,14 @@ public class EntitySheep extends EntityWalkingAnimal {
     }
 
     private int randomColor() {
-        int rand = Utils.random.nextInt(0, 2500);
+        int rand = Utils.rand(1, 200);
 
-        if (rand < 125 && 0 <= rand) return DyeColor.WHITE.getDyeData();
-        else if (rand < 250 && 125 <= rand) return DyeColor.GRAY.getDyeData();
-        else if (rand < 375 && 250 <= rand) return DyeColor.LIGHT_GRAY.getDyeData();
-        else if (rand < 500 && 375 <= rand) return DyeColor.GRAY.getDyeData();
-        else if (rand < 541 && 500 <= rand) return DyeColor.PINK.getDyeData();
-        else return DyeColor.BLACK.getDyeData();
+        if (rand == 1) return DyeColor.PINK.getWoolData();
+        else if (rand < 8) return DyeColor.BROWN.getWoolData();
+        else if (rand < 18) return DyeColor.GRAY.getWoolData();
+        else if (rand < 28) return DyeColor.LIGHT_GRAY.getWoolData();
+        else if (rand < 38) return DyeColor.BLACK.getWoolData();
+        else return DyeColor.WHITE.getWoolData();
     }
 
     @Override

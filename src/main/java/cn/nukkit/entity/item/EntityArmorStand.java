@@ -163,8 +163,8 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
                 this.tryChangeEquipment(player, item, j, isArmorSlot);
             }
 
-            this.equipmentInventory.sendContents(player);
-            this.armorInventory.sendContents(player);
+            this.equipmentInventory.sendContents(this.getViewers().values());
+            this.armorInventory.sendContents(this.getViewers().values());
             return flag || flag2;
         }
         return false;

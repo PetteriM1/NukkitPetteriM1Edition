@@ -22,11 +22,11 @@ public enum DyeColor {
     ORANGE(14, 1, "Orange", BlockColor.ORANGE_BLOCK_COLOR),
     WHITE(15, 0, "White", "Bone Meal", BlockColor.WHITE_BLOCK_COLOR);
 
-    private int dyeColorMeta;
-    private int woolColorMeta;
-    private String colorName;
-    private String dyeName;
-    private BlockColor blockColor;
+    private final int dyeColorMeta;
+    private final int woolColorMeta;
+    private final String colorName;
+    private final String dyeName;
+    private final BlockColor blockColor;
 
     private final static DyeColor[] BY_WOOL_DATA;
     private final static DyeColor[] BY_DYE_DATA;
