@@ -283,6 +283,9 @@ public class Skin {
     }
 
     public String getPlayFabId() {
+        if (this.playFabId == null || this.playFabId.isEmpty()) {
+            this.playFabId = this.fullSkinId.replace("-", "").substring(16);
+        }
         return this.playFabId;
     }
 

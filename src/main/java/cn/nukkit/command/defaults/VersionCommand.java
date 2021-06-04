@@ -43,7 +43,7 @@ public class VersionCommand extends VanillaCommand {
             if (sender.isOp()) {
                 CompletableFuture.runAsync(() -> {
                     try {
-                        URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
+                        URLConnection request = new URL(Nukkit.BRANCH).openConnection();
                         request.connect();
                         InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
                         String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);

@@ -264,10 +264,11 @@ public class Effect implements Cloneable {
             }
 
             if (this.id == Effect.SLOWNESS) {
-                if (oldEffect != null) {
+                /*if (oldEffect != null) {
                     player.setMovementSpeed(player.getMovementSpeed() / (1 - 0.15f * (oldEffect.amplifier + 1)), false);
                 }
-                player.setMovementSpeed(player.getMovementSpeed() * (1 - 0.15f * (this.amplifier + 1)));
+                player.setMovementSpeed(player.getMovementSpeed() * (1 - 0.15f * (this.amplifier + 1)));*/
+                player.setMovementSpeed(0.1f * (1 - 0.15f * (this.amplifier + 1)));
             }
         }
 
