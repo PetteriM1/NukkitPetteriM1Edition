@@ -72,10 +72,10 @@ public class BlockColor  {
     public static final BlockColor RED_TERRACOTA_BLOCK_COLOR = new BlockColor(0x8e, 0x3c, 0x2e);
     public static final BlockColor BLACK_TERRACOTA_BLOCK_COLOR = new BlockColor(0x25, 0x16, 0x10);
 
-    private int red;
-    private int green;
-    private int blue;
-    private int alpha;
+    private final int red;
+    private final int green;
+    private final int blue;
+    private final int alpha;
 
     public BlockColor(int red, int green, int blue, int alpha) {
         this.red = red;

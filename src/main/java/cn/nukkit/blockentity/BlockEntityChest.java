@@ -32,15 +32,18 @@ public class BlockEntityChest extends BlockEntitySpawnableContainer implements B
     @Override
     public void close() {
         if (!closed) {
-            unpair();
-
-            for (Player player : new HashSet<>(this.getInventory().getViewers())) {
-                player.removeWindow(this.getInventory());
+            if (this.doubleInventory != null) {
+                for (Player player : new HashSet<>(this.doubleInventory.getViewers())) {
+                    player.removeWindow(this.doubleInventory);
+                }
+                this.doubleInventory = null;
             }
 
-            for (Player player : new HashSet<>(this.getInventory().getViewers())) {
+            for (Player player : new HashSet<>(this.inventory.getViewers())) {
                 player.removeWindow(this.getRealInventory());
             }
+
+            this.inventory.destroyed = true;
             super.close();
         }
     }

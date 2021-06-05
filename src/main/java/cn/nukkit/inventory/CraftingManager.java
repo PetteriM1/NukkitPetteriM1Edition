@@ -2,6 +2,7 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.BatchPacket;
@@ -56,6 +57,9 @@ public class CraftingManager {
 
     private static int RECIPE_COUNT = 0;
     public static int NEXT_NETWORK_ID = 0;
+
+    // Torch with charcoal recipe fix for 1.16.100+
+    private static ShapedRecipe charcoalTorchRecipe419;
 
     public static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {
@@ -302,6 +306,13 @@ public class CraftingManager {
             registerContainerRecipe(new ContainerRecipe(Item.get(fromItemId), Item.get(ingredient), Item.get(toItemId)));
         }
 
+        // Torch with charcoal recipe fix for 1.16.100+
+        // TODO: Update recipes for 1.16+
+        Map<Character, Item> ingredients = new HashMap<>();
+        ingredients.put('A', Item.get(ItemID.COAL, 1)); // Make sure it's charcoal after converting to runtime ids
+        ingredients.put('B', Item.get(ItemID.STICK, -1));
+        charcoalTorchRecipe419 = new ShapedRecipe("Torch_from_charcoal_recipeId", 50, Item.get(BlockID.TORCH, 0, 4), new String[]{"A", "B"}, ingredients, new ArrayList<>());
+
         this.rebuildPacket();
         MainLogger.getLogger().debug("Loaded " + this.recipes.size() + " recipes");
     }
@@ -317,6 +328,8 @@ public class CraftingManager {
                 pk431.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk431.addShapedRecipe(charcoalTorchRecipe419);
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk431.addFurnaceRecipe(recipe);
         }
@@ -341,6 +354,8 @@ public class CraftingManager {
                 pk419.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk431.addShapedRecipe(charcoalTorchRecipe419);
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk419.addFurnaceRecipe(recipe);
         }

@@ -355,7 +355,6 @@ public class EntityBoat extends EntityVehicle {
 
         updatePassengers();
         entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
-        entity.resetFallDistance();
         return r;
     }
 

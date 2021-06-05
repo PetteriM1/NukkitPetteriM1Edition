@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.item.EntityPotion;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.event.block.BlockBurnEvent;
 import cn.nukkit.event.block.BlockIgniteEvent;
@@ -16,6 +17,7 @@ import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.potion.Potion;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
@@ -24,8 +26,6 @@ import cn.nukkit.utils.Utils;
  * Nukkit Project
  */
 public class BlockFire extends BlockFlowable {
-
-    private boolean remove = false;
 
     public BlockFire() {
         this(0);
@@ -67,6 +67,13 @@ public class BlockFire extends BlockFlowable {
 
     @Override
     public void onEntityCollide(Entity entity) {
+        if (entity instanceof EntityPotion) {
+            if (((EntityPotion) entity).potionId == Potion.WATER) {
+                this.level.setBlock(this, Block.get(AIR));
+            }
+            return;
+        }
+
         if (!entity.hasEffect(Effect.FIRE_RESISTANCE) && this.level.getGameRules().getBoolean(GameRule.FIRE_DAMAGE)) {
             entity.attack(new EntityDamageByBlockEvent(this, entity, DamageCause.FIRE, 1));
         }
@@ -113,10 +120,6 @@ public class BlockFire extends BlockFlowable {
 
             if (Server.getInstance().suomiCraftPEMode()) {
                 if (forever) return 0;
-                if (!remove) {
-                    this.getLevel().scheduleUpdate(this, Utils.random.nextInt(250, 300));
-                    this.remove = true;
-                }
                 this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
                 return 0;
             }

@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
-import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_REMOVE;
 import static cn.nukkit.network.protocol.SetEntityLinkPacket.TYPE_RIDE;
 
 /**
@@ -64,7 +63,6 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
 
         if (entity.riding != null) {
             this.dismountEntity(entity);
-            entity.resetFallDistance();
             this.motionX = 0;
             this.motionZ = 0;
             this.stayTime = 20;
@@ -81,17 +79,6 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
             this.passengers.add(entity);
         }
 
-        return true;
-    }
-
-    @Override
-    public boolean dismountEntity(Entity entity) {
-        this.broadcastLinkPacket(entity, TYPE_REMOVE);
-        entity.riding = null;
-        entity.setDataFlag(DATA_FLAGS, DATA_FLAG_RIDING, false);
-        this.passengers.remove(entity);
-        entity.setSeatPosition(new Vector3f());
-        this.updatePassengerPosition(entity);
         return true;
     }
 

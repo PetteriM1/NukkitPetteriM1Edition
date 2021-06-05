@@ -284,6 +284,7 @@ public interface ItemID {
     int HONEY_BOTTLE = 737;
     //
     int LODESTONECOMPASS = 741;
+    int LODESTONE_COMPASS = 741;
     int NETHERITE_INGOT = 742;
     int NETHERITE_SWORD = 743;
     int NETHERITE_SHOVEL = 744;

@@ -2,6 +2,7 @@ package cn.nukkit.utils.bugreport;
 
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
+import cn.nukkit.plugin.Plugin;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
@@ -58,12 +59,30 @@ public class BugReportGenerator extends Thread {
             boolean pluginError = false;
             StackTraceElement[] stackTrace = throwable.getStackTrace();
             if (stackTrace.length > 0) {
-                if (!throwable.getStackTrace()[0].getClassName().startsWith("cn.nukkit")) {
+                String className = throwable.getStackTrace()[0].getClassName();
+                if (!className.startsWith("cn.nukkit")) {
                     pluginError = true;
+                    if (className.startsWith("org.hibernate")) {
+                        return;
+                    }
                 }
             }
-            Server.getInstance().sentry.getContext().addExtra("Plugin Error", String.valueOf(pluginError));
             Server.getInstance().sentry.getContext().addTag("plugin_error", String.valueOf(pluginError));
+        }
+
+        StringBuilder plugins = new StringBuilder();
+        try {
+            for (Plugin plugin : Server.getInstance().getPluginManager().getPlugins().values()) {
+                if (plugins.length() > 0) {
+                    plugins.append(", ");
+                }
+                if (!plugin.isEnabled()) {
+                    plugins.append("*");
+                }
+                plugins.append(plugin.getDescription().getFullName());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         String cpuType = System.getenv("PROCESSOR_IDENTIFIER");
@@ -75,6 +94,7 @@ public class BugReportGenerator extends Thread {
         Server.getInstance().sentry.getContext().addExtra("CPU Type", cpuType == null ? "UNKNOWN" : cpuType);
         Server.getInstance().sentry.getContext().addExtra("Available Cores", String.valueOf(osMXBean.getAvailableProcessors()));
         Server.getInstance().sentry.getContext().addExtra("Players", Server.getInstance().getOnlinePlayersCount() + "/" + Server.getInstance().getMaxPlayers());
+        Server.getInstance().sentry.getContext().addExtra("Plugins", plugins.toString());
         Server.getInstance().sentry.getContext().addTag("nukkit_version", Nukkit.VERSION);
         Server.getInstance().sentry.getContext().addTag("branch", Nukkit.getBranch());
 

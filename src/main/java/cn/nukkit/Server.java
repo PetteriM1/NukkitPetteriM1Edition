@@ -424,6 +424,10 @@ public class Server {
      * Lowest allowed protocol
      */
     public int requiredProtocol;
+    /**
+     * Check for new releases automatically.
+     */
+    public boolean updateChecks;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -697,7 +701,7 @@ public class Server {
         // Check for updates
         CompletableFuture.runAsync(() -> {
             try {
-                URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
+                URLConnection request = new URL(Nukkit.BRANCH).openConnection();
                 request.connect();
                 InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
                 String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
@@ -1827,23 +1831,27 @@ public class Server {
                 pluginManager.callEvent(event);
             }
 
-            this.getScheduler().scheduleTask(new Task() {
-                boolean hasRun = false;
+            if (async) {
+                this.getScheduler().scheduleTask(new Task() {
+                    boolean hasRun = false;
 
-                @Override
-                public void onRun(int currentTick) {
-                    this.onCancel();
-                }
-
-                // Doing it like this ensures that the player data will be saved in a server shutdown
-                @Override
-                public void onCancel() {
-                    if (!this.hasRun)    {
-                        this.hasRun = true;
-                        saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                    @Override
+                    public void onRun(int currentTick) {
+                        this.onCancel();
                     }
-                }
-            }, async);
+
+                    // Doing it like this ensures that the player data will be saved in a server shutdown
+                    @Override
+                    public void onCancel() {
+                        if (!this.hasRun) {
+                            this.hasRun = true;
+                            saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                        }
+                    }
+                }, true);
+            } else {
+                saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+            }
         }
     }
 
@@ -2554,6 +2562,7 @@ public class Server {
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
+        this.updateChecks = this.getPropertyBoolean("update-notifications", false);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2676,6 +2685,7 @@ public class Server {
             put("persona-skins", true);
             put("multi-nether-worlds", "");
             put("call-entity-motion-event", true);
+            put("update-notifications", true);
         }
     }
 
