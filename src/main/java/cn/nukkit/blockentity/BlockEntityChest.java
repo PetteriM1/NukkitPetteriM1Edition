@@ -49,6 +49,12 @@ public class BlockEntityChest extends BlockEntitySpawnableContainer implements B
     }
 
     @Override
+    public void onBreak() {
+        this.unpair();
+        super.onBreak();
+    }
+
+    @Override
     public boolean isBlockEntityValid() {
         int blockID = this.getBlock().getId();
         return blockID == Block.CHEST || blockID == Block.TRAPPED_CHEST;
