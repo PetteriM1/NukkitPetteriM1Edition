@@ -132,7 +132,7 @@ public class StartGamePacket extends DataPacket {
         }
         this.putBoolean(this.commandsEnabled);
         this.putBoolean(this.isTexturePacksRequired);
-        this.putGameRules(gameRules);
+        this.putGameRules(protocol, gameRules);
         if (protocol >= ProtocolInfo.v1_16_100) {
             this.putLInt(0); // Experiment count
             this.putBoolean(false); // Were experiments previously toggled
@@ -214,7 +214,7 @@ public class StartGamePacket extends DataPacket {
             } else if (protocol >= 407) {
                 this.putBoolean(false); // isInventoryServerAuthoritative
                 if (protocol >= ProtocolInfo.v1_16_230_50) {
-                    this.putString(""); // ??
+                    this.putString(""); // serverEngine
                 }
             }
         }
