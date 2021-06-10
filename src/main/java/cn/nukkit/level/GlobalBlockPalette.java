@@ -56,6 +56,7 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId408 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId428 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId440 = new Int2IntOpenHashMap();
     private static final byte[] compiledTable282;
     private static final byte[] compiledTable291;
     private static final byte[] compiledTable313;
@@ -85,6 +86,7 @@ public class GlobalBlockPalette {
         legacyToRuntimeId408.defaultReturnValue(-1);
         legacyToRuntimeId419.defaultReturnValue(-1);
         legacyToRuntimeId428.defaultReturnValue(-1);
+        legacyToRuntimeId440.defaultReturnValue(-1);
 
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
@@ -330,6 +332,24 @@ public class GlobalBlockPalette {
                 legacyToRuntimeId428.put(legacyId, runtimeId);
             }
         }
+        // 440
+        ListTag<CompoundTag> tag440;
+        try (InputStream stream440 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_440.dat")) {
+            if (stream440 == null) {
+                throw new AssertionError("Unable to locate block state nbt 440");
+            }
+            //noinspection unchecked
+            tag440 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream440)), ByteOrder.BIG_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 440", e);
+        }
+        for (CompoundTag state : tag440.getAll()) {
+            int id = state.getInt("id");
+            int data = state.getShort("data");
+            int runtimeId = state.getInt("runtimeId");
+            int legacyId = id << 6 | data;
+            legacyToRuntimeId440.put(legacyId, runtimeId);
+        }
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
@@ -426,6 +446,16 @@ public class GlobalBlockPalette {
                     }
                 }
                 return id428;
+            case ProtocolInfo.v1_17_0:
+                int id440 = legacyToRuntimeId440.get(legacyId);
+                if (id440 == -1) {
+                    id440 = legacyToRuntimeId440.get(id << 6);
+                    if (id440 == -1) {
+                        log.info("(440) Missing runtime id mappings for " + id + ':' + meta);
+                        return 5035; // Update game block
+                    }
+                }
+                return id440;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }

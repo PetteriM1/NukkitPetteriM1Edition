@@ -11,6 +11,7 @@ import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
+import cn.nukkit.event.player.PlayerFishEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.randomitem.Fishing;
 import cn.nukkit.level.MovingObjectPosition;
@@ -228,34 +229,25 @@ public class EntityFishingHook extends EntityProjectile {
 
 	public void reelLine() {
 		if (this.shootingEntity instanceof Player && this.caught) {
+			Player player = (Player) this.shootingEntity;
 			Item item = Fishing.getFishingResult(this.rod);
 			int experience = Utils.random.nextInt(3) + 1;
-			Vector3 motion;
+			Vector3 motion = player.subtract(this).multiply(0.1);
+			motion.y += Math.sqrt(player.distance(this)) * 0.08;
 
-			if (this.shootingEntity != null) {
-				motion = this.shootingEntity.subtract(this).multiply(0.1);
-				motion.y += Math.sqrt(this.shootingEntity.distance(this)) * 0.08;
-			} else {
-				motion = new Vector3();
+			PlayerFishEvent event = new PlayerFishEvent(player, this, item, experience, motion);
+			this.getServer().getPluginManager().callEvent(event);
+
+			if (!event.isCancelled()) {
+				EntityItem itemEntity = new EntityItem(
+						this.level.getChunk((int) this.x >> 4, (int) this.z >> 4, true),
+						Entity.getDefaultNBT(new Vector3(this.x, this.getWaterHeight(), this.z), event.getMotion(), ThreadLocalRandom.current().nextFloat() * 360, 0).putShort("Health", 5).putCompound("Item", NBTIO.putItemHelper(event.getLoot())).putShort("PickupDelay", 1));
+
+				itemEntity.setOwner(player.getName());
+				itemEntity.spawnToAll();
+
+				player.addExperience(event.getExperience());
 			}
-
-			EntityItem itemEntity = new EntityItem(
-					this.level.getChunk((int) this.x >> 4, (int) this.z >> 4, true),
-					Entity.getDefaultNBT(new Vector3(this.x, this.getWaterHeight(), this.z), motion, ThreadLocalRandom.current().nextFloat() * 360, 0).putShort("Health", 5).putCompound("Item", NBTIO.putItemHelper(item)).putShort("PickupDelay", 1));
-
-			if (this.shootingEntity != null && this.shootingEntity instanceof Player) {
-				itemEntity.setOwner(this.shootingEntity.getName());
-			}
-			itemEntity.spawnToAll();
-
-			Player player = (Player) this.shootingEntity;
-			player.addExperience(experience);
-		}
-		if (this.shootingEntity instanceof Player) {
-			EntityEventPacket pk = new EntityEventPacket();
-			pk.eid = this.getId();
-			pk.event = EntityEventPacket.FISH_HOOK_TEASE;
-			Server.broadcastPacket(this.getViewers().values(), pk);
 		}
 		this.close();
 	}

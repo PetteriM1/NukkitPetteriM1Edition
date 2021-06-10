@@ -36,6 +36,7 @@ public class CraftingManager {
     public static DataPacket packet407 = null;
     public static DataPacket packet419 = null;
     public static DataPacket packet431 = null;
+    public static DataPacket packet440 = null;
 
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes313 = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes332 = new Int2ObjectOpenHashMap<>();
@@ -308,8 +309,32 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
+        CraftingDataPacket pk440 = new CraftingDataPacket();
+        pk440.protocol = 440;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk440.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk440.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk440.addShapedRecipe(charcoalTorchRecipe419);
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk440.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            pk440.addMultiRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk440.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk440.addContainerRecipe(recipe);
+        }
+        pk440.tryEncode();
+        packet440 = pk440;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk431 = new CraftingDataPacket();
-        pk431.cleanRecipes = true;
         pk431.protocol = 431;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -335,7 +360,6 @@ public class CraftingManager {
         pk431.tryEncode();
         packet431 = pk431;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk419 = new CraftingDataPacket();
-        pk419.cleanRecipes = true;
         pk419.protocol = 419;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -361,7 +385,6 @@ public class CraftingManager {
         pk419.tryEncode();
         packet419 = pk419;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk407 = new CraftingDataPacket();
-        pk407.cleanRecipes = true;
         pk407.protocol = 407;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -383,7 +406,6 @@ public class CraftingManager {
         packet407 = pk407;// .compress(Deflater.BEST_COMPRESSION);
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
-        pk388.cleanRecipes = true;
         pk388.protocol = 388;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -405,7 +427,6 @@ public class CraftingManager {
         packet388 = pk388.compress(Deflater.BEST_COMPRESSION);
         // 361
         CraftingDataPacket pk361 = new CraftingDataPacket();
-        pk361.cleanRecipes = true;
         pk361.protocol = 361;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -421,7 +442,6 @@ public class CraftingManager {
         packet361 = pk361.compress(Deflater.BEST_COMPRESSION);
         // 354
         CraftingDataPacket pk354 = new CraftingDataPacket();
-        pk354.cleanRecipes = true;
         pk354.protocol = 354;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -437,7 +457,6 @@ public class CraftingManager {
         packet354 = pk354.compress(Deflater.BEST_COMPRESSION);
         // 340
         CraftingDataPacket pk340 = new CraftingDataPacket();
-        pk340.cleanRecipes = true;
         pk340.protocol = 340;
         for (Recipe recipe : this.recipes332) {
             if (recipe instanceof ShapedRecipe) {
@@ -453,7 +472,6 @@ public class CraftingManager {
         packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
         // 313
         CraftingDataPacket pk313 = new CraftingDataPacket();
-        pk313.cleanRecipes = true;
         pk313.protocol = 313;
         for (Recipe recipe : this.recipes313) {
             if (recipe instanceof ShapedRecipe) {

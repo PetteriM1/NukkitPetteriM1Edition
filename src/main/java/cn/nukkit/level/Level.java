@@ -4255,7 +4255,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_16_210) {
+        if (protocol >= ProtocolInfo.v1_17_0) {
+            return ProtocolInfo.v1_17_0;
+        } else if (protocol >= ProtocolInfo.v1_16_210) {
             return ProtocolInfo.v1_16_210;
         } else if (protocol >= ProtocolInfo.v1_16_100) {
             return ProtocolInfo.v1_16_100;
@@ -4276,11 +4278,20 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private static boolean matchMVChunkProtocol(int chunk, int player) {
-        return (chunk == 0 && player < ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_12_0 && player == ProtocolInfo.v1_12_0) || (chunk == ProtocolInfo.v1_13_0 && player == ProtocolInfo.v1_13_0) ||
-                (chunk == ProtocolInfo.v1_14_0 && (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60)) || (chunk == ProtocolInfo.v1_16_0 && player == ProtocolInfo.v1_16_0) ||
-                ((chunk >= ProtocolInfo.v1_16_20 && player >= ProtocolInfo.v1_16_20) && (chunk <= ProtocolInfo.v1_16_100_52 && player <= ProtocolInfo.v1_16_100_52)) ||
-                (chunk >= ProtocolInfo.v1_16_100 && player >= ProtocolInfo.v1_16_100 && chunk < ProtocolInfo.v1_16_210 && player < ProtocolInfo.v1_16_210) ||
-                (chunk >= ProtocolInfo.v1_16_210 && player >= ProtocolInfo.v1_16_210); // remember to change >= on next palette update
+        if (chunk == 0) if (player < ProtocolInfo.v1_12_0) return true;
+        if (chunk == ProtocolInfo.v1_12_0) if (player == ProtocolInfo.v1_12_0) return true;
+        if (chunk == ProtocolInfo.v1_13_0) if (player == ProtocolInfo.v1_13_0) return true;
+        if (chunk == ProtocolInfo.v1_14_0)
+            if (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60) return true;
+        if (chunk == ProtocolInfo.v1_16_0) if (player == ProtocolInfo.v1_16_0) return true;
+        if (chunk == ProtocolInfo.v1_16_20)
+            if (player >= ProtocolInfo.v1_16_20) if (player <= ProtocolInfo.v1_16_100_52) return true;
+        if (chunk == ProtocolInfo.v1_16_100)
+            if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
+        if (chunk == ProtocolInfo.v1_16_210)
+            if (player >= ProtocolInfo.v1_16_210) if (player < ProtocolInfo.v1_17_0) return true;
+        if (chunk == ProtocolInfo.v1_17_0) if (player >= ProtocolInfo.v1_17_0) return true;
+        return false; // Remember to update when block palette changes
     }
 
     private static class CharacterHashMap extends HashMap<Character, Object> {
