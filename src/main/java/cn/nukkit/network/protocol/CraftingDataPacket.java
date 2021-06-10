@@ -28,7 +28,7 @@ public class CraftingDataPacket extends DataPacket {
     private List<Recipe> entries = new ArrayList<>();
     private final List<BrewingRecipe> brewingEntries = new ArrayList<>();
     private final List<ContainerRecipe> containerEntries = new ArrayList<>();
-    public boolean cleanRecipes;
+    public boolean cleanRecipes = true;
 
     public void addShapelessRecipe(ShapelessRecipe... recipe) {
         Collections.addAll(entries, recipe);
