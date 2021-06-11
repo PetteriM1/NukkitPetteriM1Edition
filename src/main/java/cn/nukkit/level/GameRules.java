@@ -192,6 +192,7 @@ public class GameRules {
     public static class Value<T> {
         private final Type type;
         private T value;
+        private boolean canBeChanged;
 
         public Value(Type type, T value) {
             this.type = type;
@@ -205,8 +206,16 @@ public class GameRules {
             this.value = value;
         }
 
+        public boolean isCanBeChanged() {
+            return this.canBeChanged;
+        }
+
+        public void setCanBeChanged(boolean canBeChanged) {
+            this.canBeChanged = canBeChanged;
+        }
+
         public Type getType() {
-            return type;
+            return this.type;
         }
 
         private boolean getValueAsBoolean() {
