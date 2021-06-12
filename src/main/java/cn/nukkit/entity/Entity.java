@@ -258,18 +258,21 @@ public abstract class Entity extends Location implements Metadatable {
     private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();
     private static final Map<String, String> shortNames = new HashMap<>();
 
-    private static final Map<Integer, String> entityLegacyMappingOld = new HashMap<>();
-    private static final Map<Integer, String> entityLegacyMapping = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMappingOld = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping407 = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping440 = new HashMap<>();
 
     private static final Map<Integer, CompoundTag> entityIdentifiersMap = new HashMap<>();
     private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
 
     static {
-        AddEntityPacket.setupLegacyIdentifiers(entityLegacyMappingOld, ProtocolInfo.v1_2_0);
-        AddEntityPacket.setupLegacyIdentifiers(entityLegacyMapping, ProtocolInfo.v1_16_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMappingOld, ProtocolInfo.v1_2_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping407, ProtocolInfo.v1_16_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping440, ProtocolInfo.v1_17_0);
         initEntityIdentifiers(ProtocolInfo.v1_2_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT313));
         initEntityIdentifiers(ProtocolInfo.v1_10_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT340));
         initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
+        initEntityIdentifiers(ProtocolInfo.v1_17_0, AvailableEntityIdentifiersPacket.NBT440);
     }
 
     public final Map<Integer, Player> hasSpawned = new HashMap<>();
@@ -889,22 +892,21 @@ public abstract class Entity extends Location implements Metadatable {
         return true;
     }
 
-    public static boolean registerEntityLegacyIdentifier(int entityId, String identifier) {
-        return registerEntityLegacyIdentifier(entityId, identifier, ProtocolInfo.CURRENT_PROTOCOL);
+    public static Map<Integer, String> getEntityRuntimeMapping() {
+        return getEntityRuntimeMapping(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
-    public static boolean registerEntityLegacyIdentifier(int entityId, String identifier, int protocolId) {
-        Map<Integer, String> mapping = protocolId < ProtocolInfo.v1_16_0 ? entityLegacyMappingOld : entityLegacyMapping;
-        return mapping.putIfAbsent(entityId, identifier) == null;
+    public static Map<Integer, String> getEntityRuntimeMapping(int protocolId) {
+        return Collections.unmodifiableMap(getEntityRuntimeMappingInternal(protocolId));
     }
 
-    public static Map<Integer, String> getEntityLegacyMapping() {
-        return getEntityLegacyMapping(ProtocolInfo.CURRENT_PROTOCOL);
-    }
-
-    public static Map<Integer, String> getEntityLegacyMapping(int protocolId) {
-        Map<Integer, String> identifiers = protocolId < ProtocolInfo.v1_16_0 ? entityLegacyMappingOld : entityLegacyMapping;
-        return Collections.unmodifiableMap(identifiers);
+    protected static Map<Integer, String> getEntityRuntimeMappingInternal(int protocolId) {
+        if (protocolId >= ProtocolInfo.v1_17_0) {
+            return entityRuntimeMapping440;
+        } else if (protocolId >= ProtocolInfo.v1_16_0) {
+            return entityRuntimeMapping407;
+        }
+        return entityRuntimeMappingOld;
     }
 
     private static void initEntityIdentifiers(int protocolId, byte[] bytes) {
@@ -918,7 +920,9 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     private static int correctEntityIdentifiersProtocol(int protocolId) {
-        if (protocolId >= ProtocolInfo.v1_16_100) {
+        if (protocolId >= ProtocolInfo.v1_17_0) {
+            return ProtocolInfo.v1_17_0;
+        } else if (protocolId >= ProtocolInfo.v1_16_100) {
             return ProtocolInfo.v1_16_100;
         } else if (protocolId >= ProtocolInfo.v1_10_0) {
             return ProtocolInfo.v1_10_0;
@@ -926,18 +930,20 @@ public abstract class Entity extends Location implements Metadatable {
         return ProtocolInfo.v1_2_0;
     }
 
-    public static void registerEntityIdentifier(CompoundTag identifier, int protocolId) {
+    public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
+        Map<Integer, String> runtimeMapping = getEntityRuntimeMappingInternal(protocolId);
+        runtimeMapping.put(entityId, identifier);
+
         int protocol = correctEntityIdentifiersProtocol(protocolId);
         CompoundTag nbt = entityIdentifiersMap.get(protocol);
         ListTag<CompoundTag> identifiers = nbt.getList("idlist", CompoundTag.class);
-        identifiers.add(identifier);
+        identifiers.add(nbtEntry);
         nbt.putList(identifiers);
         updateEntityIdentifiersCache(protocol);
     }
 
     public static CompoundTag getEntityIdentifiers(int protocolId) {
-        int protocol = correctEntityIdentifiersProtocol(protocolId);
-        return entityIdentifiersMap.get(protocol);
+        return entityIdentifiersMap.get(correctEntityIdentifiersProtocol(protocolId));
     }
 
     private static void updateEntityIdentifiersCache(int protocolId) {
@@ -950,8 +956,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public static byte[] getEntityIdentifiersCache(int protocolId) {
-        int protocol = correctEntityIdentifiersProtocol(protocolId);
-        return entityIdentifiersCache.get(protocol);
+        return entityIdentifiersCache.get(correctEntityIdentifiersProtocol(protocolId));
     }
 
     public static CompoundTag getDefaultNBT(Vector3 pos) {

@@ -204,7 +204,7 @@ public class AddEntityPacket extends DataPacket {
         }
 
         if (this.mapping == null) {
-            this.mapping = Entity.getEntityLegacyMapping(this.protocol);
+            this.mapping = Entity.getEntityRuntimeMapping(this.protocol);
         }
 
         if (this.protocol < ProtocolInfo.v1_14_0 && type == EntityBee.NETWORK_ID) {
