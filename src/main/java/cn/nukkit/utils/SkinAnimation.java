@@ -2,6 +2,9 @@ package cn.nukkit.utils;
 
 import lombok.ToString;
 
+/**
+ * Skin animation
+ */
 @ToString
 public class SkinAnimation {
 

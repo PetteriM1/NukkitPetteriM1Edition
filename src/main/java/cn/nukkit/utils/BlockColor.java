@@ -1,8 +1,10 @@
 package cn.nukkit.utils;
 
 /**
+ * Block color
+ *
  * Created by Snake1999 on 2016/1/10.
- * Package cn.nukkit.utils in project nukkit
+ * Package cn.nukkit.utils in project Nukkit
  */
 public class BlockColor  {
 
@@ -70,10 +72,10 @@ public class BlockColor  {
     public static final BlockColor RED_TERRACOTA_BLOCK_COLOR = new BlockColor(0x8e, 0x3c, 0x2e);
     public static final BlockColor BLACK_TERRACOTA_BLOCK_COLOR = new BlockColor(0x25, 0x16, 0x10);
 
-    private int red;
-    private int green;
-    private int blue;
-    private int alpha;
+    private final int red;
+    private final int green;
+    private final int blue;
+    private final int alpha;
 
     public BlockColor(int red, int green, int blue, int alpha) {
         this.red = red;
@@ -135,6 +137,12 @@ public class BlockColor  {
         return (this.red << 16 | this.green << 8 | this.blue) & 0xffffff;
     }
 
+    /**
+     * Get BlockColor by dye item meta value
+     *
+     * @param dyeColorMeta dye item meta value
+     * @return BlockColor
+     */
     public static BlockColor getDyeColor(int dyeColorMeta) {
         return DyeColor.getByDyeData(dyeColorMeta).getColor();
     }

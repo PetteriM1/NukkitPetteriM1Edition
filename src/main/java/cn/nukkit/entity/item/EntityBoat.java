@@ -195,20 +195,36 @@ public class EntityBoat extends EntityVehicle {
 
             this.move(this.motionX, this.motionY, this.motionZ);
 
-            //TODO: Lily pad collision
             this.updateMovement();
 
-            if (this.age % 5 == 0 && this.passengers.size() < 2) {
-                Entity[] e = this.level.getCollidingEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
-                for (Entity entity : e) {
-                    if (entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || isPassenger(entity)) {
-                        continue;
+            if (this.age % 5 == 0) {
+                int passengersCount = this.passengers.size();
+                if (passengersCount > 0 && this.age % 2 == 0) {
+                    Block[] blocks = this.level.getCollisionBlocks(this.getBoundingBox().grow(0.1, 0.1, 0.1));
+                    for (Block b : blocks) {
+                        if (b.getId() == Block.LILY_PAD) {
+                            this.level.setBlockAt((int) b.x, (int) b.y, (int) b.z, 0, 0);
+                            this.level.dropItem(b, Item.get(Item.LILY_PAD, 0, 1));
+                        }
                     }
+                }
 
-                    this.mountEntity(entity);
+                if (passengersCount < 2) {
+                    Entity[] e = this.level.getCollidingEntities(this.boundingBox.grow(0.20000000298023224, 0.0D, 0.20000000298023224), this);
+                    for (Entity entity : e) {
+                        if (entity.isPlayer && !isPassenger(entity)) {
+                            entity.resetFallDistance(); // Hack: Don't kick players standing on a boat for flying
+                        }
 
-                    if (this.passengers.size() >= 2) {
-                        break;
+                        if (entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || isPassenger(entity)) {
+                            continue;
+                        }
+
+                        this.mountEntity(entity);
+
+                        if (this.passengers.size() >= 2) {
+                            break;
+                        }
                     }
                 }
             }
@@ -339,7 +355,6 @@ public class EntityBoat extends EntityVehicle {
 
         updatePassengers();
         entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
-        entity.resetFallDistance();
         return r;
     }
 

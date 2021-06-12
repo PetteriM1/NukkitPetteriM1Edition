@@ -1,11 +1,13 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -23,7 +25,7 @@ import java.util.zip.Deflater;
 public class CraftingManager {
 
     private final Collection<Recipe> recipes313 = new ArrayDeque<>();
-    private final Collection<Recipe> recipes340 = new ArrayDeque<>();
+    private final Collection<Recipe> recipes332 = new ArrayDeque<>();
     public final Collection<Recipe> recipes = new ArrayDeque<>();
 
     public static BatchPacket packet313 = null;
@@ -34,18 +36,29 @@ public class CraftingManager {
     public static BatchPacket packet407 = null;
     public static DataPacket packet419 = null;
     public static DataPacket packet431 = null;
+    public static DataPacket packet440 = null;
 
+    private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes313 = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes332 = new Int2ObjectOpenHashMap<>();
     protected final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes = new Int2ObjectOpenHashMap<>();
-    public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
-    public final Map<UUID, MultiRecipe> multiRecipes = new HashMap<>();
-    public final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
-    public final Map<Integer, BrewingRecipe> brewingRecipesOld = new Int2ObjectOpenHashMap<>();
-    public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
-    public final Map<Integer, ContainerRecipe> containerRecipesOld = new Int2ObjectOpenHashMap<>();
+
+    private final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes313 = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes332 = new Int2ObjectOpenHashMap<>();
     protected final Map<Integer, Map<UUID, ShapelessRecipe>> shapelessRecipes = new Int2ObjectOpenHashMap<>();
+
+    public final Map<UUID, MultiRecipe> multiRecipes = new HashMap<>();
+    public final Map<Integer, FurnaceRecipe> furnaceRecipes = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, FurnaceRecipe> furnaceRecipesOld = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, BrewingRecipe> brewingRecipes = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, BrewingRecipe> brewingRecipesOld = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
+    private final Map<Integer, ContainerRecipe> containerRecipesOld = new Int2ObjectOpenHashMap<>();
 
     private static int RECIPE_COUNT = 0;
     public static int NEXT_NETWORK_ID = 0;
+
+    // Torch with charcoal recipe fix for 1.16.100+
+    private static ShapedRecipe charcoalTorchRecipe419;
 
     public static final Comparator<Item> recipeComparator = (i1, i2) -> {
         if (i1.getId() > i2.getId()) {
@@ -162,7 +175,9 @@ public class CraftingManager {
                             sorted.add(Item.fromJsonOld(ingredient));
                         }
                         sorted.sort(recipeComparator);
-                        recipes313.add(new ShapelessRecipe(Item.fromJsonOld(first), sorted));
+                        ShapelessRecipe recipe_ = new ShapelessRecipe(Item.fromJsonOld(first), sorted);
+                        recipes313.add(recipe_);
+                        this.registerShapelessRecipe(313, recipe_);
                         break;
                     case 1:
                         List<Map> output = (List<Map>) recipe.get("output");
@@ -179,7 +194,22 @@ public class CraftingManager {
                         for (Map<String, Object> data : output) {
                             extraResults.add(Item.fromJsonOld(data));
                         }
-                        recipes313.add(new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults));
+                        ShapedRecipe recipe__ = new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults);
+                        recipes313.add(recipe__);
+                        this.registerShapedRecipe(313, recipe__);
+                        break;
+                    case 2:
+                    case 3:
+                        Map<String, Object> resultMap = (Map) recipe.get("output");
+                        Item resultItem = Item.fromJsonOld(resultMap);
+                        Item inputItem;
+                        try {
+                            Map<String, Object> inputMap = (Map) recipe.get("input");
+                            inputItem = Item.fromJsonOld(inputMap);
+                        } catch (Exception old) {
+                            inputItem = Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : -1, 1);
+                        }
+                        this.furnaceRecipesOld.put(getItemHash(inputItem), new FurnaceRecipe(resultItem, inputItem));
                         break;
                     default:
                         break;
@@ -199,7 +229,9 @@ public class CraftingManager {
                             sorted.add(Item.fromJsonOld(ingredient));
                         }
                         sorted.sort(recipeComparator);
-                        recipes340.add(new ShapelessRecipe(Item.fromJsonOld(first), sorted));
+                        ShapelessRecipe recipe_ = new ShapelessRecipe(Item.fromJsonOld(first), sorted);
+                        recipes332.add(recipe_);
+                        this.registerShapelessRecipe(332, recipe_);
                         break;
                     case 1:
                         List<Map> output = (List<Map>) recipe.get("output");
@@ -216,7 +248,9 @@ public class CraftingManager {
                         for (Map<String, Object> data : output) {
                             extraResults.add(Item.fromJsonOld(data));
                         }
-                        recipes340.add(new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults));
+                        ShapedRecipe recipe__ = new ShapedRecipe(Item.fromJsonOld(first), shape, ingredients, extraResults);
+                        recipes332.add(recipe__);
+                        this.registerShapedRecipe(332, recipe__);
                         break;
                     default:
                         break;
@@ -263,13 +297,44 @@ public class CraftingManager {
             registerContainerRecipe(new ContainerRecipe(Item.get(fromItemId), Item.get(ingredient), Item.get(toItemId)));
         }
 
+        // Torch with charcoal recipe fix for 1.16.100+
+        // TODO: Update recipes for 1.16+
+        Map<Character, Item> ingredients = new HashMap<>();
+        ingredients.put('A', Item.get(ItemID.COAL, 1)); // Make sure it's charcoal after converting to runtime ids
+        ingredients.put('B', Item.get(ItemID.STICK, -1));
+        charcoalTorchRecipe419 = new ShapedRecipe("Torch_from_charcoal_recipeId", 50, Item.get(BlockID.TORCH, 0, 4), new String[]{"A", "B"}, ingredients, new ArrayList<>());
+
         this.rebuildPacket();
         MainLogger.getLogger().debug("Loaded " + this.recipes.size() + " recipes");
     }
 
     public void rebuildPacket() {
+        CraftingDataPacket pk440 = new CraftingDataPacket();
+        pk440.protocol = 440;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk440.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk440.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk440.addShapedRecipe(charcoalTorchRecipe419);
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk440.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            pk440.addMultiRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk440.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk440.addContainerRecipe(recipe);
+        }
+        pk440.tryEncode();
+        packet440 = pk440;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk431 = new CraftingDataPacket();
-        pk431.cleanRecipes = true;
         pk431.protocol = 431;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -278,6 +343,8 @@ public class CraftingManager {
                 pk431.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk431.addShapedRecipe(charcoalTorchRecipe419);
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk431.addFurnaceRecipe(recipe);
         }
@@ -293,7 +360,6 @@ public class CraftingManager {
         pk431.tryEncode();
         packet431 = pk431;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk419 = new CraftingDataPacket();
-        pk419.cleanRecipes = true;
         pk419.protocol = 419;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -302,6 +368,8 @@ public class CraftingManager {
                 pk419.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk431.addShapedRecipe(charcoalTorchRecipe419);
         for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
             pk419.addFurnaceRecipe(recipe);
         }
@@ -317,7 +385,6 @@ public class CraftingManager {
         pk419.tryEncode();
         packet419 = pk419;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk407 = new CraftingDataPacket();
-        pk407.cleanRecipes = true;
         pk407.protocol = 407;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -339,7 +406,6 @@ public class CraftingManager {
         packet407 = pk407.compress(Deflater.BEST_COMPRESSION);
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
-        pk388.cleanRecipes = true;
         pk388.protocol = 388;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -361,7 +427,6 @@ public class CraftingManager {
         packet388 = pk388.compress(Deflater.BEST_COMPRESSION);
         // 361
         CraftingDataPacket pk361 = new CraftingDataPacket();
-        pk361.cleanRecipes = true;
         pk361.protocol = 361;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -377,7 +442,6 @@ public class CraftingManager {
         packet361 = pk361.compress(Deflater.BEST_COMPRESSION);
         // 354
         CraftingDataPacket pk354 = new CraftingDataPacket();
-        pk354.cleanRecipes = true;
         pk354.protocol = 354;
         for (Recipe recipe : this.recipes) {
             if (recipe instanceof ShapedRecipe) {
@@ -393,9 +457,8 @@ public class CraftingManager {
         packet354 = pk354.compress(Deflater.BEST_COMPRESSION);
         // 340
         CraftingDataPacket pk340 = new CraftingDataPacket();
-        pk340.cleanRecipes = true;
         pk340.protocol = 340;
-        for (Recipe recipe : this.recipes340) {
+        for (Recipe recipe : this.recipes332) {
             if (recipe instanceof ShapedRecipe) {
                 pk340.addShapedRecipe((ShapedRecipe) recipe);
             } else if (recipe instanceof ShapelessRecipe) {
@@ -409,7 +472,6 @@ public class CraftingManager {
         packet340 = pk340.compress(Deflater.BEST_COMPRESSION);
         // 313
         CraftingDataPacket pk313 = new CraftingDataPacket();
-        pk313.cleanRecipes = true;
         pk313.protocol = 313;
         for (Recipe recipe : this.recipes313) {
             if (recipe instanceof ShapedRecipe) {
@@ -418,10 +480,9 @@ public class CraftingManager {
                 pk313.addShapelessRecipe((ShapelessRecipe) recipe);
             }
         }
-        //TODO: furnace recipes?
-        /*for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+        for (FurnaceRecipe recipe : this.furnaceRecipesOld.values()) {
             pk313.addFurnaceRecipe(recipe);
-        }*/
+        }
         pk313.tryEncode();
         packet313 = pk313.compress(Deflater.BEST_COMPRESSION);
     }
@@ -465,10 +526,23 @@ public class CraftingManager {
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
+        registerShapedRecipe(ProtocolInfo.CURRENT_PROTOCOL, recipe);
+    }
+
+    public void registerShapedRecipe(int protocol, ShapedRecipe recipe) {
         int resultHash = getItemHash(recipe.getResult());
-        Map<UUID, ShapedRecipe> map = shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
-        List<Item> inputList = new LinkedList<>(recipe.getIngredientsAggregate());
-        map.put(getMultiItemHash(inputList), recipe);
+        Map<UUID, ShapedRecipe> map;
+        switch (protocol) {
+            case 313:
+                map = shapedRecipes313.computeIfAbsent(resultHash, k -> new HashMap<>());
+                return;
+            case 332:
+                map = shapedRecipes332.computeIfAbsent(resultHash, k -> new HashMap<>());
+                return;
+            default:
+                map = shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+        }
+        map.put(getMultiItemHash(new LinkedList<>(recipe.getIngredientsAggregate())), recipe);
     }
 
     public void registerRecipe(Recipe recipe) {
@@ -481,12 +555,27 @@ public class CraftingManager {
     }
 
     public void registerShapelessRecipe(ShapelessRecipe recipe) {
+        registerShapelessRecipe(ProtocolInfo.CURRENT_PROTOCOL, recipe);
+    }
+
+    public void registerShapelessRecipe(int protocol, ShapelessRecipe recipe) {
         List<Item> list = recipe.getIngredientsAggregate();
 
         UUID hash = getMultiItemHash(list);
 
         int resultHash = getItemHash(recipe.getResult());
-        Map<UUID, ShapelessRecipe> map = shapelessRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+        Map<UUID, ShapelessRecipe> map;
+
+        switch (protocol) {
+            case 313:
+                map = shapelessRecipes313.computeIfAbsent(resultHash, k -> new HashMap<>());
+                return;
+            case 332:
+                map = shapelessRecipes332.computeIfAbsent(resultHash, k -> new HashMap<>());
+                return;
+            default:
+                map = shapelessRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+        }
 
         map.put(hash, recipe);
     }

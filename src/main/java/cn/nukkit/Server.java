@@ -154,6 +154,7 @@ public class Server {
     private int baseTickRate;
     private int difficulty;
     private int defaultGameMode = Integer.MAX_VALUE;
+    int c_s_spawnThreshold;
 
     private int autoSaveTicker;
     private int autoSaveTicks;
@@ -161,17 +162,16 @@ public class Server {
     private final BaseLang baseLang;
     private boolean forceLanguage;
 
-    private final UUID serverID;
-
     private final String filePath;
     private final String dataPath;
     private final String pluginPath;
 
+    private String ip;
+    private int port;
     private QueryHandler queryHandler;
     private QueryRegenerateEvent queryRegenerateEvent;
+    private final UUID serverID;
     private final Config properties;
-
-    public SentryClient sentry;
 
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
     final Map<UUID, Player> playerList = new HashMap<>();
@@ -200,6 +200,7 @@ public class Server {
         }
     };
 
+    public SentryClient sentry;
     private Level[] levelArray = new Level[0];
     private final ServiceManager serviceManager = new NKServiceManager();
     private Level defaultLevel;
@@ -208,65 +209,217 @@ public class Server {
     private final DB nameLookup;
     private PlayerDataSerializer playerDataSerializer;
     public static List<String> noTickingWorlds = new ArrayList<>();
-
     private SpawnerTask spawnerTask;
     private final BatchingHelper batchingHelper;
 
-    /* Some settings */
-    private String motd;
-    private String ip;
-    private int port;
-    private int viewDistance;
-    private int gamemode;
-    private int skinChangeCooldown;
-    private int spawnRadius;
-    private boolean suomicraftMode;
-    private boolean doLevelGC;
-    private boolean mobAI;
-    private boolean shouldSavePlayerData;
-    private boolean getAllowFlight;
-    private boolean isHardcore;
-    private boolean callBatchPkEv;
-    private boolean forceResources;
+    /**
+     * The server's MOTD. Remember to call network.setName() when updated.
+     */
+    public String motd;
+    /**
+     * SuomiCraft PE optimizations enabled.
+     */
+    public boolean suomicraftMode;
+    /**
+     * Mob AI enabled.
+     */
+    public boolean mobAiEnabled;
+    /**
+     * Default player data saving enabled.
+     */
+    public boolean shouldSavePlayerData;
+    /**
+     * Anti fly checks enabled.
+     */
+    public boolean flyChecks;
+    /**
+     * Hardcore mode enabled.
+     */
+    public boolean isHardcore;
+    /**
+     * Force resource packs.
+     */
+    public boolean forceResources;
+    /**
+     * Force player gamemode to default on every join.
+     */
+    public boolean forceGamemode;
+    /**
+     * The nether dimension and portals enabled.
+     */
+    public boolean netherEnabled;
+    /**
+     * Level garbage collection enabled.
+     */
+    public boolean doLevelGC;
+    /**
+     * Call BatchPacketsEvent on batch packet sending.
+     */
+    public boolean callBatchPkEv;
+    /**
+     * Whitelist enabled.
+     */
     public boolean whitelistEnabled;
-    private boolean forceGamemode;
-    private boolean netherEnabled;
+    /**
+     * Xbox authentication enabled.
+     */
     public boolean xboxAuth;
+    /**
+     * Spawn eggs enabled.
+     */
     public boolean spawnEggsEnabled;
+    /**
+     * XP bottles can be used on creative.
+     */
     public boolean xpBottlesOnCreative;
+    /**
+     * Dimension changes enabled.
+     */
     public boolean dimensionsEnabled;
-    boolean callDataPkSendEv;
-    boolean bedSpawnpoints;
-    boolean achievements;
-    boolean banAuthFailed;
-    boolean endEnabled;
-    boolean pvp;
-    boolean announceAchievements;
-    boolean checkOpMovement;
-    boolean doNotLimitInteractions;
-    public int despawnTicks;
-    int chunksPerTick;
-    int spawnThreshold;
-    int c_s_spawnThreshold;
+    /**
+     * Call DataPacketSendEvent on data packet sending.
+     */
+    public boolean callDataPkSendEv;
+    /**
+     * Bed spawnpoints enabled.
+     */
+    public boolean bedSpawnpoints;
+    /**
+     * Server side achievements enabled.
+     */
+    public boolean achievementsEnabled;
+    /**
+     * Temporary ban player on failed Xbox authentication.
+     */
+    public boolean banXBAuthFailed;
+    /**
+     * The end dimension and portals enabled.
+     */
+    public boolean endEnabled;
+    /**
+     * Pvp enabled. Can be changed per world using game rules.
+     */
+    public boolean pvpEnabled;
+    /**
+     * Announce server side announcements to all players.
+     */
+    public boolean announceAchievements;
+    /**
+     * Enable movement checks for OPs.
+     */
+    public boolean checkOpMovement;
+    /**
+     * Disable player interaction spam limiter.
+     */
+    public boolean doNotLimitInteractions;
+    /**
+     * After how many ticks mobs are despawned.
+     */
+    public int mobDespawnTicks;
+    /**
+     * How many chunks are sent to player per tick.
+     */
+    public int chunksPerTick;
+    /**
+     * How many chunks needs to be sent before the player can spawn.
+     */
+    public int spawnThreshold;
+    /**
+     * Zlib compression level for packets
+     */
     public int networkCompressionLevel;
+    /**
+     * Maximum view distance.
+     */
+    public int viewDistance;
+    /**
+     * Server's default gamemode.
+     */
+    public int gamemode;
+    /**
+     * Minimum amount of ticks between player skin changes.
+     */
+    public int skinChangeCooldown;
+    /**
+     * Spawn protection radius.
+     */
+    public int spawnRadius;
+    /**
+     * Do not limit the maximum size of player skins.
+     */
     public boolean doNotLimitSkinGeometry;
-    public boolean blockListener;
+    /**
+     * Mob spawning from blocks and items enabled.
+     */
+    public boolean mobsFromBlocks;
+    /**
+     * Explosions breaking blocks enabled.
+     */
     public boolean explosionBreakBlocks;
-    public boolean vanillaBB;
+    /**
+     * Boss bars enabled for wither and ender dragon.
+     */
+    public boolean vanillaBossBar;
+    /**
+     * Stop command allowed in game.
+     */
     public boolean stopInGame;
+    /**
+     * OP command allowed in game.
+     */
     public boolean opInGame;
+    /**
+     * Sky light updates enabled.
+     */
     public boolean lightUpdates;
+    /**
+     * Showing plugins in query enabled.
+     */
     public boolean queryPlugins;
-    public boolean despawnEntities;
+    /**
+     * Mob despawning enabled.
+     */
+    public boolean despawnMobs;
+    /**
+     * Strong RakNet level IP bans enabled.
+     */
     public boolean strongIPBans;
+    /**
+     * Auto spawning of animals enabled.
+     */
     public boolean spawnAnimals;
-    public boolean spawnMobs;
+    /**
+     * Auto spawning of monsters enabled.
+     */
+    public boolean spawnMonsters;
+    /**
+     * Anvils enabled.
+     */
     public boolean anvilsEnabled;
+    /**
+     * Player data is saved by player uuid instead of by player name.
+     */
     public boolean savePlayerDataByUuid;
+    /**
+     * More vanilla like portal logics enabled.
+     */
     public boolean vanillaPortals;
+    /**
+     * Persona skins allowed.
+     */
     public boolean personaSkins;
+    /**
+     * Chunk caching enabled.
+     */
     public boolean cacheChunks;
+    /**
+     * Call EntityMotionEvent on entity movement.
+     */
     public boolean callEntityMotionEv;
+    /**
+     * Check for new releases automatically.
+     */
+    public boolean updateChecks;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -540,7 +693,7 @@ public class Server {
         // Check for updates
         CompletableFuture.runAsync(() -> {
             try {
-                URLConnection request = new URL("https://api.github.com/repos/PetteriM1/NukkitPetteriM1Edition/commits/master").openConnection();
+                URLConnection request = new URL(Nukkit.BRANCH).openConnection();
                 request.connect();
                 InputStreamReader content = new InputStreamReader((InputStream) request.getContent());
                 String latest = "git-" + new JsonParser().parse(content).getAsJsonObject().get("sha").getAsString().substring(0, 7);
@@ -639,7 +792,13 @@ public class Server {
             }
             return;
         }
-        instance.batchPackets(players.toArray(new Player[0]), new DataPacket[]{packet});
+        for (Player player : players) {
+            if (player.protocol >= ProtocolInfo.v1_16_100) {
+                player.batchDataPacket(packet);
+            } else {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
@@ -649,7 +808,13 @@ public class Server {
             }
             return;
         }
-        instance.batchPackets(players, new DataPacket[]{packet});
+        for (Player player : players) {
+            if (player.protocol >= ProtocolInfo.v1_16_100) {
+                player.batchDataPacket(packet);
+            } else {
+                player.dataPacket(packet);
+            }
+        }
     }
 
     public static void broadcastPackets(Player[] players, DataPacket[] packets) {
@@ -956,7 +1121,7 @@ public class Server {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId)};
-        Server.broadcastPacket(players, pk);
+        this.batchPackets(players, new DataPacket[]{pk}); // This is sent "directly" so it always gets thru before possible TYPE_REMOVE packet for NPCs etc.
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
@@ -1002,7 +1167,9 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol >= ProtocolInfo.v1_16_220) {
+        if (player.protocol >= ProtocolInfo.v1_17_0) {
+            player.dataPacket(CraftingManager.packet440);
+        } else if (player.protocol >= ProtocolInfo.v1_16_220) {
             player.dataPacket(CraftingManager.packet431);
         } else if (player.protocol >= ProtocolInfo.v1_16_100) {
             player.dataPacket(CraftingManager.packet419);
@@ -1386,7 +1553,7 @@ public class Server {
     }
 
     public boolean getAllowFlight() {
-        return getAllowFlight;
+        return flyChecks;
     }
 
     public boolean isHardcore() {
@@ -1415,7 +1582,7 @@ public class Server {
     }
 
     public boolean getMobAiEnabled() {
-        return this.mobAI;
+        return this.mobAiEnabled;
     }
 
     public MainLogger getLogger() {
@@ -1656,23 +1823,27 @@ public class Server {
                 pluginManager.callEvent(event);
             }
 
-            this.getScheduler().scheduleTask(new Task() {
-                boolean hasRun = false;
+            if (async) {
+                this.getScheduler().scheduleTask(new Task() {
+                    boolean hasRun = false;
 
-                @Override
-                public void onRun(int currentTick) {
-                    this.onCancel();
-                }
-
-                // Doing it like this ensures that the player data will be saved in a server shutdown
-                @Override
-                public void onCancel() {
-                    if (!this.hasRun)    {
-                        this.hasRun = true;
-                        saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                    @Override
+                    public void onRun(int currentTick) {
+                        this.onCancel();
                     }
-                }
-            }, async);
+
+                    // Doing it like this ensures that the player data will be saved in a server shutdown
+                    @Override
+                    public void onCancel() {
+                        if (!this.hasRun) {
+                            this.hasRun = true;
+                            saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                        }
+                    }
+                }, true);
+            } else {
+                saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+            }
         }
     }
 
@@ -2329,29 +2500,29 @@ public class Server {
         this.callDataPkSendEv = this.getPropertyBoolean("call-data-pk-send-event", true);
         this.callBatchPkEv = this.getPropertyBoolean("call-batch-pk-send-event", true);
         this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
-        this.mobAI = this.getPropertyBoolean("mob-ai", true);
+        this.mobAiEnabled = this.getPropertyBoolean("mob-ai", true);
         this.netherEnabled = this.getPropertyBoolean("nether", true);
         this.endEnabled = this.getPropertyBoolean("end", false);
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
-        this.achievements = this.getPropertyBoolean("achievements", true);
+        this.achievementsEnabled = this.getPropertyBoolean("achievements", true);
         this.dimensionsEnabled = this.getPropertyBoolean("dimensions", false);
-        this.banAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
-        this.pvp = this.getPropertyBoolean("pvp", true);
+        this.banXBAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
+        this.pvpEnabled = this.getPropertyBoolean("pvp", true);
         this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
         this.spawnEggsEnabled = this.getPropertyBoolean("spawn-eggs", true);
         this.xpBottlesOnCreative = this.getPropertyBoolean("xp-bottles-on-creative", false);
         this.shouldSavePlayerData = this.getPropertyBoolean("save-player-data", true);
-        this.blockListener = this.getPropertyBoolean("block-listener", true);
+        this.mobsFromBlocks = this.getPropertyBoolean("block-listener", true);
         this.explosionBreakBlocks = this.getPropertyBoolean("explosion-break-blocks", true);
-        this.vanillaBB = this.getPropertyBoolean("vanilla-bossbars", false);
+        this.vanillaBossBar = this.getPropertyBoolean("vanilla-bossbars", false);
         this.stopInGame = this.getPropertyBoolean("stop-in-game", false);
         this.opInGame = this.getPropertyBoolean("op-in-game", false);
         this.lightUpdates = this.getPropertyBoolean("light-updates", false);
         this.queryPlugins = this.getPropertyBoolean("query-plugins", false);
-        this.getAllowFlight = this.getPropertyBoolean("allow-flight", false);
+        this.flyChecks = this.getPropertyBoolean("allow-flight", false);
         this.isHardcore = this.getPropertyBoolean("hardcore", false);
-        this.despawnEntities = this.getPropertyBoolean("entity-despawn-task", true);
+        this.despawnMobs = this.getPropertyBoolean("entity-despawn-task", true);
         this.forceResources = this.getPropertyBoolean("force-resources", false);
         this.whitelistEnabled = this.getPropertyBoolean("white-list", false);
         this.checkOpMovement = this.getPropertyBoolean("check-op-movement", false);
@@ -2359,14 +2530,14 @@ public class Server {
         this.doNotLimitInteractions = this.getPropertyBoolean("do-not-limit-interactions", false);
         this.motd = this.getPropertyString("motd", "Minecraft Server");
         this.viewDistance = this.getPropertyInt("view-distance", 8);
-        this.despawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 12000);
+        this.mobDespawnTicks = this.getPropertyInt("ticks-per-entity-despawns", 12000);
         this.port = this.getPropertyInt("server-port", 19132);
         this.ip = this.getPropertyString("server-ip", "0.0.0.0");
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
-        this.spawnMobs = this.getPropertyBoolean("spawn-mobs", true);
+        this.spawnMonsters = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
         this.anvilsEnabled = this.getPropertyBoolean("anvils-enabled", true);
@@ -2377,6 +2548,7 @@ public class Server {
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
+        this.updateChecks = this.getPropertyBoolean("update-notifications", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2498,6 +2670,7 @@ public class Server {
             put("persona-skins", true);
             put("multi-nether-worlds", "");
             put("call-entity-motion-event", true);
+            put("update-notifications", true);
         }
     }
 

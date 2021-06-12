@@ -8,11 +8,21 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * An utility that is used to send debugpaste reports to hastebin.com
+ */
 public class HastebinUtility {
 
     public static final String BIN_URL = "https://hastebin.com/documents", USER_AGENT = "Mozilla/5.0";
     public static final Pattern PATTERN = Pattern.compile("\\{\"key\":\"([\\S\\s]*)\"}");
 
+    /**
+     * Upload text to hastebin.com
+     *
+     * @param string text
+     * @return hastebin.com link of the uploaded content
+     * @throws IOException error
+     */
     public static String upload(final String string) throws IOException {
         final URL url = new URL(BIN_URL);
         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -44,6 +54,13 @@ public class HastebinUtility {
         }
     }
 
+    /**
+     * Upload a File to hastebin.com
+     *
+     * @param file file
+     * @return hastebin.com link of the uploaded content
+     * @throws IOException error
+     */
     public static String upload(final File file) throws IOException {
         final StringBuilder content = new StringBuilder();
         List<String> lines = new ArrayList<>();

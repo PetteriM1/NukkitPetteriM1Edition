@@ -82,7 +82,7 @@ public class EntityEnderPearl extends EntityProjectile {
             if (!portal) {
                 teleport();
 
-                if (Server.getInstance().blockListener) {
+                if (Server.getInstance().mobsFromBlocks) {
                     if (Utils.rand(1, 20) == 5) {
                         CreatureSpawnEvent ev = new CreatureSpawnEvent(NETWORK_ID, CreatureSpawnEvent.SpawnReason.ENDER_PEARL);
                         level.getServer().getPluginManager().callEvent(ev);

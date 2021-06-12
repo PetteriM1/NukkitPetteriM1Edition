@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
 /**
+ * ServerException
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

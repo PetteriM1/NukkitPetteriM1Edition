@@ -25,6 +25,10 @@ public abstract class EntityProjectile extends Entity {
 
     public static final int DATA_SHOOTER_ID = 17;
 
+    public static final int PICKUP_NONE = 0;
+    public static final int PICKUP_ANY = 1;
+    public static final int PICKUP_CREATIVE = 2;
+
     public Entity shootingEntity;
 
     protected double getDamage() {
@@ -36,6 +40,8 @@ public abstract class EntityProjectile extends Entity {
     }
 
     public boolean hadCollision = false;
+
+    public int piercing;
 
     public EntityProjectile(FullChunk chunk, CompoundTag nbt) {
         this(chunk, nbt, null);

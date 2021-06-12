@@ -4,6 +4,8 @@ import cn.nukkit.block.Block;
 import cn.nukkit.math.Vector3;
 
 /**
+ * Entry of a block update
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

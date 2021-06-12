@@ -186,4 +186,9 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     public Inventory getInventory() {
         return this.inventory;
     }
+
+    @Override
+    public boolean canDespawn() {
+        return false;
+    }
 }

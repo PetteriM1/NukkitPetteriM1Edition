@@ -138,6 +138,8 @@ public class FloatingTextParticle extends Particle {
             PlayerListPacket playerAdd = new PlayerListPacket();
             playerAdd.entries = entry;
             playerAdd.type = PlayerListPacket.TYPE_ADD;
+            playerAdd.protocol = protocol;
+            playerAdd.tryEncode();
             packets.add(playerAdd);
 
             AddPlayerPacket pk = new AddPlayerPacket();
@@ -155,11 +157,15 @@ public class FloatingTextParticle extends Particle {
             pk.pitch = 0;
             pk.metadata = this.metadata;
             pk.item = Item.get(Item.AIR);
+            pk.protocol = protocol;
+            pk.tryEncode();
             packets.add(pk);
 
             PlayerListPacket playerRemove = new PlayerListPacket();
             playerRemove.entries = entry;
             playerRemove.type = PlayerListPacket.TYPE_REMOVE;
+            playerRemove.protocol = protocol;
+            playerRemove.tryEncode();
             packets.add(playerRemove);
         }
         return packets.toArray(new DataPacket[0]);

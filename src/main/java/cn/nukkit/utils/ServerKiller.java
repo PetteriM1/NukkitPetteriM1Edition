@@ -3,6 +3,8 @@ package cn.nukkit.utils;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A task that kills the server process after given time.
+ *
  * @author MagicDroidX
  * Nukkit Project
  */

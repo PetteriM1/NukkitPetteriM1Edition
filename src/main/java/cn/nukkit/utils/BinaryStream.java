@@ -32,6 +32,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
+ * BinaryStream
+ *
  * @author MagicDroidX
  * Nukkit Project
  */
@@ -270,12 +272,14 @@ public class BinaryStream {
         this.putSkin(ProtocolInfo.CURRENT_PROTOCOL, skin);
     }
 
+    private static byte[] steveSkinDecoded;
+
     public void putSkin(int protocol, Skin skin) {
         this.putString(skin.getSkinId());
 
         if (protocol < ProtocolInfo.v1_13_0) {
             if (skin.isPersona()) { // Hack: Replace persona skins with steve skins for < 1.13 players to avoid invisible skins
-                this.putByteArray(Base64.getDecoder().decode(Skin.STEVE_SKIN));
+                this.putByteArray(steveSkinDecoded != null ? steveSkinDecoded : (steveSkinDecoded = Base64.getDecoder().decode(Skin.STEVE_SKIN)));
                 if (protocol >= ProtocolInfo.v1_2_13) {
                     this.putByteArray(skin.getCapeData().data);
                 }
@@ -1073,10 +1077,17 @@ public class BinaryStream {
     }
 
     public void putGameRules(GameRules gameRules) {
+        this.putGameRules(ProtocolInfo.CURRENT_PROTOCOL, gameRules);
+    }
+
+    public void putGameRules(int protocol, GameRules gameRules) {
         Map<GameRule, GameRules.Value> rules = gameRules.getGameRules();
         this.putUnsignedVarInt(rules.size());
         rules.forEach((gameRule, value) -> {
             putString(gameRule.getName().toLowerCase());
+            if (protocol >= ProtocolInfo.v1_17_0) {
+                this.putBoolean(false); // isEditable
+            }
             value.write(this);
         });
     }

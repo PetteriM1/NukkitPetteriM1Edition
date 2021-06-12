@@ -776,12 +776,11 @@ public abstract class Entity extends Location implements Metadatable {
                 z + radius
         );
 
-        FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
-        FloatEntityData bbW = new FloatEntityData(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
-        this.dataProperties.put(bbH);
-        this.dataProperties.put(bbW);
-
         if (send) {
+            FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
+            FloatEntityData bbW = new FloatEntityData(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
+            this.dataProperties.put(bbH);
+            this.dataProperties.put(bbW);
             sendData(this.hasSpawned.values().toArray(new Player[0]), new EntityMetadata().put(bbH).put(bbW));
         }
     }
@@ -1069,7 +1068,7 @@ public abstract class Entity extends Location implements Metadatable {
                 player.dataPacket(pkk);
             }
 
-            if (this.server.vanillaBB && this instanceof EntityBoss) {
+            if (this.server.vanillaBossBar && this instanceof EntityBoss) {
                 BossEventPacket pkBoss = new BossEventPacket();
                 pkBoss.bossEid = this.id;
                 pkBoss.type = BossEventPacket.TYPE_SHOW;
@@ -1641,6 +1640,8 @@ public abstract class Entity extends Location implements Metadatable {
         entity.setSeatPosition(new Vector3f());
         updatePassengerPosition(entity);
 
+        // Avoid issues with anti fly
+        entity.resetFallDistance();
         return true;
     }
 
@@ -1738,7 +1739,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void resetFallDistance() {
-        this.highestPosition = 0;
+        this.highestPosition = this.y;
     }
 
     protected void updateFallState(boolean onGround) {
@@ -1760,21 +1761,21 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void fall(float fallDistance) {
-        if (!this.hasEffect(Effect.SLOW_FALLING)) {
-            float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
+        if (fallDistance > 0.75) {
+            if (!this.hasEffect(Effect.SLOW_FALLING)) {
+                float damage = (float) Math.floor(fallDistance - 3 - (this.hasEffect(Effect.JUMP) ? this.getEffect(Effect.JUMP).getAmplifier() + 1 : 0));
 
-            Block down = this.level.getBlock(this.floor().down());
-            if (down.getId() == BlockID.HAY_BALE) {
-                damage -= (damage * 0.8f);
-            }
-
-            if (damage > 0) {
-                if (!this.isPlayer || level.getGameRules().getBoolean(GameRule.FALL_DAMAGE)) {
-                    this.attack(new EntityDamageEvent(this, DamageCause.FALL, damage));
+                Block down = this.level.getBlock(this.floor().down());
+                if (down.getId() == BlockID.HAY_BALE) {
+                    damage -= (damage * 0.8f);
                 }
-            }
 
-            if (fallDistance > 0.75) {
+                if (damage > 0) {
+                    if (!this.isPlayer || level.getGameRules().getBoolean(GameRule.FALL_DAMAGE)) {
+                        this.attack(new EntityDamageEvent(this, DamageCause.FALL, damage));
+                    }
+                }
+
                 if (down.getId() == BlockID.FARMLAND) {
                     Event ev;
 
@@ -1966,10 +1967,10 @@ public abstract class Entity extends Location implements Metadatable {
         this.checkChunks();
 
         if (!this.onGround || dy != 0) {
-            AxisAlignedBB bb = this.boundingBox.clone();
+            AxisAlignedBB bb = this.boundingBox.growNoUp(0.1, 0.1, 0.1);
             bb.minY -= 0.75;
 
-            this.onGround = this.level.getCollisionBlocks(bb).length > 0;
+            this.onGround = this.level.hasCollisionBlocks(bb);
         }
         this.isCollided = this.onGround;
         this.updateFallState(this.onGround);

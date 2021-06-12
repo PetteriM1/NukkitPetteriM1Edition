@@ -22,6 +22,7 @@ public class EntityThrownTrident extends EntityProjectile {
 
     protected Item trident;
 
+    protected int pickupMode;
     public boolean alreadyCollided;
 
     @Override
@@ -67,6 +68,7 @@ public class EntityThrownTrident extends EntityProjectile {
         super.initEntity();
 
         this.trident = namedTag.contains("Trident") ? NBTIO.getItemHelper(namedTag.getCompound("Trident")) : Item.get(0);
+        this.pickupMode = namedTag.contains("pickup") ? namedTag.getByte("pickup") : PICKUP_ANY;
     }
 
     @Override
@@ -74,6 +76,7 @@ public class EntityThrownTrident extends EntityProjectile {
         super.saveNBT();
 
         this.namedTag.put("Trident", NBTIO.putItemHelper(this.trident));
+        this.namedTag.putByte("pickup", this.pickupMode);
     }
 
     public Item getItem() {
@@ -134,5 +137,13 @@ public class EntityThrownTrident extends EntityProjectile {
     @Override
     public void onHit() {
         this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
+    }
+
+    public int getPickupMode() {
+        return this.pickupMode;
+    }
+
+    public void setPickupMode(int pickupMode) {
+        this.pickupMode = pickupMode;
     }
 }

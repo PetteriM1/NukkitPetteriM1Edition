@@ -172,7 +172,7 @@ public class ItemBucket extends Item {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
                 }
 
-                if (Server.getInstance().blockListener) {
+                if (Server.getInstance().mobsFromBlocks) {
                     switch (this.getDamage()) {
                         case 2:
                             Entity e2 = Entity.createEntity("Cod", block);

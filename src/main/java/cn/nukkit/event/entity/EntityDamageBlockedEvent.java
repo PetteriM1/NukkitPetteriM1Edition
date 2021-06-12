@@ -13,8 +13,8 @@ public class EntityDamageBlockedEvent extends EntityEvent implements Cancellable
     }
 
     private final EntityDamageEvent damage;
-    private boolean knockBackAttacker;
-    private boolean animation;
+    private final boolean knockBackAttacker;
+    private final boolean animation;
 
     public EntityDamageBlockedEvent(Entity entity, EntityDamageEvent damage, boolean knockBack, boolean animation) {
         this.entity = entity;

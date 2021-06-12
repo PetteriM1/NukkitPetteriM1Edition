@@ -20,7 +20,7 @@ public abstract class EntityWalkingMob extends EntityWalking implements EntityMo
     /**
      * For golems: entity id of the target
      */
-    public long isAngryTo;
+    public long isAngryTo = -1;
 
     public EntityWalkingMob(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);

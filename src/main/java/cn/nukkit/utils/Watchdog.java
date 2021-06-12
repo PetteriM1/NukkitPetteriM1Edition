@@ -7,12 +7,18 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 
+/**
+ * Watchdog monitors the server's main thread and kills the server if it gets frozen.
+ */
 public class Watchdog extends Thread {
 
     private final Server server;
     private final long time;
-    public volatile boolean running;
     private boolean responding = true;
+    /**
+     * Watchdog running
+     */
+    public volatile boolean running;
 
     public Watchdog(Server server, long time) {
         this.server = server;
@@ -22,6 +28,9 @@ public class Watchdog extends Thread {
         this.setDaemon(true);
     }
 
+    /**
+     * Shotdown Watchdog
+     */
     public void kill() {
         running = false;
         interrupt();
@@ -44,7 +53,7 @@ public class Watchdog extends Thread {
                     StringBuilder log = new StringBuilder();
 
                     print("--------- Server stopped responding ---------", logger, log);
-                    print(Math.round(diff / 1000d) + " s", logger, log);
+                    print("Last response " + Math.round(diff / 1000d) + " seconds ago", logger, log);
                     print("---------------- Main thread ----------------", logger, log);
 
                     dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE), logger, log);
@@ -61,7 +70,7 @@ public class Watchdog extends Thread {
                         Thread.sleep(1000); // Wait for the report to be sent
                     } catch (Exception ignored) {}
                     responding = false;
-                    this.server.forceShutdown("\u00A7cServer stopped responding \nKilled by thread watchdog after " + Math.round(diff / 1000d) + " seconds");
+                    this.server.forceShutdown("\u00A7cServer stopped responding");
                 }
             }
             try {
@@ -75,6 +84,13 @@ public class Watchdog extends Thread {
         server.getLogger().warning("Watchdog has been stopped");
     }
 
+    /**
+     * Dump thread stack trace
+     *
+     * @param thread thread to dump
+     * @param logger logger
+     * @param log bug report generator input
+     */
     private static void dumpThread(ThreadInfo thread, Logger logger, StringBuilder log) {
         print("Current Thread: " + thread.getThreadName(), logger, log);
         print("\tPID: " + thread.getThreadId() + " | Suspended: " + thread.isSuspended() + " | Native: " + thread.isInNative() + " | State: " + thread.getThreadState(), logger, log);
@@ -92,6 +108,12 @@ public class Watchdog extends Thread {
         }
     }
 
+    /**
+     * Print a line to log
+     *
+     * @param logger logger
+     * @param log bug report generator input
+     */
     private static void print(String text, Logger logger, StringBuilder log) {
         logger.emergency(text);
         log.append(text).append('\n');
