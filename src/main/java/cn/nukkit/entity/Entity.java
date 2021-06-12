@@ -2273,6 +2273,10 @@ public abstract class Entity extends Location implements Metadatable {
             to = ev.getTo();
         }
 
+        if (riding != null) {
+            riding.dismountEntity(this);
+        }
+
         this.ySize = 0;
 
         if (cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
