@@ -134,6 +134,9 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_BALLOON_ATTACHED_ENTITY = 84; // long
     public static final int DATA_PUFFERFISH_SIZE = 85;
     public static final int DATA_FLAGS_EXTENDED = 91, DATA_FLAGS2 = DATA_FLAGS_EXTENDED; //long (extended data flags)
+    public static final int DATA_TRADE_TIER = 100;
+    public static final int DATA_MAX_TRADE_TIER = 101;
+    public static final int DATA_TRADE_EXPERIENCE = 102;
     public static final int DATA_SKIN_ID = 103; // int ???
     public static final int DATA_COMMAND_BLOCK_TICK_DELAY = 105; //int
     public static final int DATA_COMMAND_BLOCK_EXECUTE_ON_FIRST_TICK = 106; //byte

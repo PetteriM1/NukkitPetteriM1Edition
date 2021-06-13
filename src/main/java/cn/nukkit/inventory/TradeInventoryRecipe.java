@@ -16,7 +16,7 @@ public class TradeInventoryRecipe {
     @Getter
     private Item secondBuyItem;
 
-    private int tier = -1;
+    private int tier = 0;
     private int maxUses = 999;
     private int buyCountA = 0;
     private int buyCountB = 0;
@@ -28,7 +28,7 @@ public class TradeInventoryRecipe {
     private float priceMultiplierB = 0F;
 
     public TradeInventoryRecipe(Item sellItem, Item buyItem) {
-        this(sellItem, buyItem, Item.get(0));
+        this(sellItem, buyItem, null);
     }
 
     public TradeInventoryRecipe(Item sellItem, Item buyItem, Item secondBuyItem) {
@@ -81,11 +81,18 @@ public class TradeInventoryRecipe {
         this.rewardsExp = reward;
         return this;
     }
-
+    
+    public TradeInventoryRecipe setTraderExp(int traderExp) {
+        this.traderExp = traderExp;
+        return this;
+    }
+    
     public CompoundTag toNBT() {
         CompoundTag nbt = new CompoundTag();
         nbt.putCompound("buyA", NBTIO.putItemHelper(buyItem, -1));
-        nbt.putCompound("buyB", NBTIO.putItemHelper(secondBuyItem,-1));
+        if(secondBuyItem != null) {
+            nbt.putCompound("buyB", NBTIO.putItemHelper(secondBuyItem,-1));
+        }
         nbt.putCompound("sell", NBTIO.putItemHelper(sellItem, -1));
         nbt.putInt("tier", tier);
         nbt.putInt("buyCountA", buyCountA);

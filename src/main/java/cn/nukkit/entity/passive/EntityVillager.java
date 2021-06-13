@@ -2,6 +2,7 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.entity.mob.EntityWitch;
 import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.inventory.Inventory;
@@ -10,6 +11,7 @@ import cn.nukkit.inventory.TradeInventory;
 import cn.nukkit.inventory.TradeInventoryRecipe;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 
@@ -28,9 +30,7 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     public static final int NETWORK_ID = 15;
 
     private TradeInventory inventory;
-    private final List<TradeInventoryRecipe> recipes = new ArrayList<>();
-    private int tradeTier = 0;
-    private boolean willing = true;
+    private List<TradeInventoryRecipe> recipes;
 
     public EntityVillager(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -69,17 +69,49 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         this.setMaxHealth(10);
 
         this.inventory = new TradeInventory(this);
-
+        this.recipes = new ArrayList<>();
+        
+        this.dataProperties.putLong(DATA_TRADING_PLAYER_EID, 0L);
+        
         CompoundTag offers = this.namedTag.getCompound("Offers");
         if (offers != null) {
             ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
             for (CompoundTag nbt : nbtRecipes.getAll()) {
                 recipes.add(TradeInventoryRecipe.toNBT(nbt));
             }
+        } else {
+            CompoundTag nbt = new CompoundTag("Offers");
+            nbt.putList(new ListTag<CompoundTag>("Recipes"));
+            nbt.putList(this.getDefaultTierExpRequirements());
+            this.namedTag.putCompound("Offers", nbt);
         }
 
         if (!this.namedTag.contains("Profession")) {
-            this.setProfession(PROFESSION_GENERIC);
+            if (this instanceof EntityVillagerV2) {
+                this.setProfession(EntityVillagerV2.PROFESSION_UNEMPLOYED);
+            }else {
+                this.setProfession(PROFESSION_GENERIC);
+            }
+        }else {
+            this.setProfession(this.getProfession());
+        }
+    
+        if(!this.namedTag.contains("Willing")) {
+            this.setWilling(true);
+        }else {
+            this.setWilling(this.isWilling());
+        }
+        
+        if (!this.namedTag.contains("TradeTier")) {
+            this.setTradeTier(0);
+        }else {
+            this.setTradeTier(this.getTradeTier());
+        }
+        
+        if (!this.namedTag.contains("MaxTradeTier")) {
+            this.setMaxTradeTier(4);
+        }else {
+            this.setMaxTradeTier(this.getMaxTradeTier());
         }
     }
 
@@ -125,24 +157,77 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
     }
 
     public void setTradeTier(int tier) {
-        this.tradeTier = tier;
+        if (tier > 4) {
+            tier = 4;
+        }
+        this.namedTag.putInt("TradeTier", tier);
+        this.dataProperties.putInt(DATA_TRADE_TIER, tier);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putInt(DATA_TRADE_TIER, tier));
     }
 
     public int getTradeTier() {
-        return this.tradeTier;
+        return this.namedTag.getInt("TradeTier");
+    }
+    
+    public void setMaxTradeTier(int maxTier) {
+        if (maxTier > 4) {
+            maxTier = 4;
+        }
+        this.namedTag.putInt("MaxTradeTier", maxTier);
+        this.dataProperties.putInt(DATA_MAX_TRADE_TIER, maxTier);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putInt(DATA_MAX_TRADE_TIER, maxTier));
+    }
+    
+    public int getMaxTradeTier() {
+        return this.namedTag.getInt("MaxTradeTier");
+    }
+    
+    public void setExperience(int experience) {
+        this.dataProperties.putInt(DATA_TRADE_EXPERIENCE, experience);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putInt(DATA_TRADE_EXPERIENCE, experience));
+    }
+    
+    public int getExperience() {
+        return this.dataProperties.getInt(DATA_TRADE_EXPERIENCE);
     }
 
     public void setWilling(boolean value) {
-        this.willing = value;
+        this.namedTag.putBoolean("Willing", value);
     }
 
     public boolean isWilling() {
-        return this.willing;
+        return this.namedTag.getBoolean("Willing");
+    }
+    
+    public void cancelTradingWithPlayer() {
+        this.setTradingWith(0L);
+    }
+    
+    public void setTradingWith(long eid) {
+        this.dataProperties.putLong(DATA_TRADING_PLAYER_EID, eid);
+        this.sendData(this.getViewers().values().toArray(new Player[0]),
+                new EntityMetadata().putLong(DATA_TRADING_PLAYER_EID, eid));
+    }
+    
+    public boolean isTrading() {
+        return this.dataProperties.getLong(DATA_TRADING_PLAYER_EID) != 0L;
+    }
+    
+    
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (super.onInteract(player, item, clickedPos)) {
+            return true;
+        }
+        return this.onInteract(player, item);
     }
 
     @Override
     public boolean onInteract(Player player, Item item) {
-        if (recipes.size() > 0) {
+        if (recipes.size() > 0 && !this.isTrading()) {
             player.addWindow(this.getInventory());
             return true;
         }
@@ -159,8 +244,8 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
     public CompoundTag getOffers() {
         CompoundTag nbt = new CompoundTag();
-        nbt.putList(recipesToNbt());
-        nbt.putList(getDefaultTierExpRequirements());
+        nbt.putList(this.recipesToNbt());
+        nbt.putList(this.getDefaultTierExpRequirements());
         return nbt;
     }
 

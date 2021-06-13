@@ -199,6 +199,30 @@ public class NetworkInventoryAction {
                             this.windowId = Player.ANVIL_WINDOW_ID;
                             this.inventorySlot = 1;
                             break;
+                        case TradeInventory.TRADE_INPUT_A:
+                            if(player.getTradeInventory() == null) {
+                                player.getServer().getLogger().error("Player " + player.getName() + " does not have trade window open");
+                                return null;
+                            }
+                            this.windowId = player.getWindowId(player.getTradeInventory());
+                            this.inventorySlot = 0;
+                            break;
+                        case TradeInventory.TRADE_INPUT_B:
+                            if(player.getTradeInventory() == null) {
+                                player.getServer().getLogger().error("Player " + player.getName() + " does not have trade window open");
+                                return null;
+                            }
+                            this.windowId = player.getWindowId(player.getTradeInventory());
+                            this.inventorySlot = 1;
+                        	break;
+                        case TradeInventory.TRADE_OUTPUT:
+                            if(player.getTradeInventory() == null) {
+                                player.getServer().getLogger().error("Player " + player.getName() + " does not have trade window open");
+                                return null;
+                            }
+                            this.windowId = player.getWindowId(player.getTradeInventory());
+                            this.inventorySlot = 2;
+                        	break;
                     }
                 }
 
@@ -255,6 +279,9 @@ public class NetworkInventoryAction {
                         return new CraftingTakeResultAction(this.oldItem, this.newItem);
                     case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
                         return new CraftingTransferMaterialAction(this.oldItem, this.newItem, this.inventorySlot);
+                    case TradeInventory.FAKE_TRADE_INPUT:
+                    case TradeInventory.FAKE_TRADE_OUTPUT:
+                        return new TradeAction(this.oldItem, this.newItem);
                 }
 
                 if (this.windowId >= SOURCE_TYPE_ANVIL_OUTPUT && this.windowId <= SOURCE_TYPE_ANVIL_INPUT) {
