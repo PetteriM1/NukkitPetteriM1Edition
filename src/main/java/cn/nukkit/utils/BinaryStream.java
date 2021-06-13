@@ -1081,14 +1081,17 @@ public class BinaryStream {
     }
 
     public void putGameRules(int protocol, GameRules gameRules) {
-        Map<GameRule, GameRules.Value> rules = gameRules.getGameRules();
-        this.putUnsignedVarInt(rules.size());
-        rules.forEach((gameRule, value) -> {
-            putString(gameRule.getName().toLowerCase());
-            if (protocol >= ProtocolInfo.v1_17_0) {
-                this.putBoolean(false); // isEditable
+        Map<GameRule, GameRules.Value> allGameRules = gameRules.getGameRules();
+        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
+        allGameRules.forEach((gameRule, value) -> {
+            if (protocol > value.getMinProtocol()) {
+                rulesToSend.put(gameRule, value);
             }
-            value.write(this);
+        });
+        this.putUnsignedVarInt(rulesToSend.size());
+        rulesToSend.forEach((gameRule, value) -> {
+            putString(gameRule.getName().toLowerCase());
+            value.write(protocol, this);
         });
     }
 

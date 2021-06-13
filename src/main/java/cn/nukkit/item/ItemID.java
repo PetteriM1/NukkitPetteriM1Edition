@@ -281,7 +281,7 @@ public interface ItemID {
     // 735 not yet in Minecraft
     int HONEYCOMB = 736;
     int HONEY_BOTTLE = 737;
-    //
+    // 738 - 740 not yet in Minecraft
     int LODESTONECOMPASS = 741;
     int LODESTONE_COMPASS = 741;
     int NETHERITE_INGOT = 742;
@@ -297,6 +297,6 @@ public interface ItemID {
     int NETHERITE_SCRAP = 752;
     //
     int WARPED_FUNGUS_ON_A_STICK = 757;
-    // 758 chain (block)
+    //
     int RECORD_PIGSTEP = 759;
 }

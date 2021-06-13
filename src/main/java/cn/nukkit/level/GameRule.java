@@ -9,8 +9,8 @@ public enum GameRule {
     DO_DAYLIGHT_CYCLE("doDaylightCycle"),
     DO_ENTITY_DROPS("doEntityDrops"),
     DO_FIRE_TICK("doFireTick"),
-    DO_IMMEDIATE_RESPAWN("doImmediateRespawn"),
     DO_INSOMNIA("doInsomnia"),
+    DO_IMMEDIATE_RESPAWN("doImmediateRespawn"),
     DO_MOB_LOOT("doMobLoot"),
     DO_MOB_SPAWNING("doMobSpawning"),
     DO_TILE_DROPS("doTileDrops"),
@@ -18,6 +18,8 @@ public enum GameRule {
     DROWNING_DAMAGE("drowningDamage"),
     FALL_DAMAGE("fallDamage"),
     FIRE_DAMAGE("fireDamage"),
+    FREEZE_DAMAGE("freezeDamage"),
+    FUNCTION_COMMAND_LIMIT("functionCommandLimit"),
     KEEP_INVENTORY("keepInventory"),
     MAX_COMMAND_CHAIN_LENGTH("maxCommandChainLength"),
     MOB_GRIEFING("mobGriefing"),
@@ -26,8 +28,10 @@ public enum GameRule {
     RANDOM_TICK_SPEED("randomTickSpeed"),
     SEND_COMMAND_FEEDBACK("sendCommandFeedback"),
     SHOW_COORDINATES("showCoordinates"),
+    SHOW_DEATH_MESSAGES("showDeathMessages"),
+    SPAWN_RADIUS("spawnRadius"),
     TNT_EXPLODES("tntExplodes"),
-    SHOW_DEATH_MESSAGE("showDeathMessage");
+    SHOW_TAGS("showTags");
 
     private final String name;
 

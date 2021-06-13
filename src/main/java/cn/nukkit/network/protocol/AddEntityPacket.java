@@ -132,6 +132,8 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityStrider.NETWORK_ID, "minecraft:strider")
             .put(EntityZoglin.NETWORK_ID, "minecraft:zoglin")
             .put(EntityPiglinBrute.NETWORK_ID, "minecraft:piglin_brute")
+            .put(EntityGoat.NETWORK_ID, "minecraft:goat")
+            .put(EntityAxolotl.NETWORK_ID, "minecraft:axolotl")
             .build();
 
     private static final ImmutableMap<Integer, String> MV_PRE_407 = ImmutableMap.<Integer, String>builder()
@@ -177,17 +179,23 @@ public class AddEntityPacket extends DataPacket {
             this.putUnsignedVarInt(this.type);
         } else {
             if (id == null) {
-                if (protocol < ProtocolInfo.v1_16_0) {
-                    if (protocol < ProtocolInfo.v1_14_0 && type == EntityBee.NETWORK_ID) {
-                        id = LEGACY_IDS.get(EntityBat.NETWORK_ID);
-                    } else if (protocol < ProtocolInfo.v1_13_0 && type == EntityFox.NETWORK_ID) {
-                        id = LEGACY_IDS.get(EntityWolf.NETWORK_ID);
-                    } else {
-                        id = MV_PRE_407.get(type);
+                if (protocol < ProtocolInfo.v1_17_0 && type == EntityGoat.NETWORK_ID) {
+                    id = LEGACY_IDS.get(EntitySheep.NETWORK_ID);
+                } else if (protocol < ProtocolInfo.v1_17_0 && type == EntityAxolotl.NETWORK_ID) {
+                    id = LEGACY_IDS.get(EntityTropicalFish.NETWORK_ID);
+                } else {
+                    if (protocol < ProtocolInfo.v1_16_0) {
+                        if (protocol < ProtocolInfo.v1_14_0 && type == EntityBee.NETWORK_ID) {
+                            id = LEGACY_IDS.get(EntityBat.NETWORK_ID);
+                        } else if (protocol < ProtocolInfo.v1_13_0 && type == EntityFox.NETWORK_ID) {
+                            id = LEGACY_IDS.get(EntityWolf.NETWORK_ID);
+                        } else {
+                            id = MV_PRE_407.get(type);
+                        }
                     }
-                }
-                if (id == null) {
-                    id = LEGACY_IDS.get(type);
+                    if (id == null) {
+                        id = LEGACY_IDS.get(type);
+                    }
                 }
             }
             this.putString(this.id);

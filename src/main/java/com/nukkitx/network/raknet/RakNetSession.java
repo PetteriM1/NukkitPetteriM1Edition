@@ -230,7 +230,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
             // Check if we have received acknowledge datagram
             if ((potentialFlags & FLAG_ACK) != 0) {
                 this.onAcknowledge(buffer, this.incomingAcks, false);
-            } else if((potentialFlags & FLAG_NACK) != 0) {
+            } else if ((potentialFlags & FLAG_NACK) != 0) {
                 this.onAcknowledge(buffer, this.incomingNaks, true);
             } else {
                 buffer.readerIndex(0);
