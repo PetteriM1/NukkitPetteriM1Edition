@@ -550,7 +550,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         customItems.put(id, c);
         list[id] = c;
 
-        if (RuntimeItems.getRuntimeMapping(ProtocolInfo.v1_16_100).registeredCustomItem(id)) {
+        if (RuntimeItems.getRuntimeMapping(v1_16_100).registeredCustomItem(id)) {
+            addCreativeItem(v1_16_0, get(id));
             return true;
         }else {
             customItems.remove(id);
@@ -561,9 +562,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static boolean deleteCustomItem(int id) {
         if (customItems.containsKey(id)) {
+            removeCreativeItem(get(id));
             customItems.remove(id);
             list[id] = null;
-            return RuntimeItems.getRuntimeMapping(ProtocolInfo.v1_16_100).deleteCustomItem(id);
+            return RuntimeItems.getRuntimeMapping(v1_16_100).deleteCustomItem(id);
         }else {
             return false;
         }

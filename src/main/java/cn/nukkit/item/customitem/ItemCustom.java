@@ -9,15 +9,15 @@ import cn.nukkit.nbt.tag.CompoundTag;
 public abstract class ItemCustom extends Item {
 
     public ItemCustom(int id) {
-        super(id);
+        this(id, 0, 1, UNKNOWN_STR);
     }
 
     public ItemCustom(int id, Integer meta) {
-        super(id, meta);
+        this(id, meta, 1, UNKNOWN_STR);
     }
 
     public ItemCustom(int id, Integer meta, int count) {
-        super(id, meta, count);
+        this(id, meta, count, UNKNOWN_STR);
     }
 
     public ItemCustom(int id, Integer meta, int count, String name) {
@@ -28,20 +28,22 @@ public abstract class ItemCustom extends Item {
         return false;
     }
 
+    public int getCreativeCategory() {
+        return 4;
+    }
+
     public CompoundTag getComponentsData() {
         CompoundTag data = new CompoundTag();
         data.putCompound("components", new CompoundTag()
                 .putCompound("item_properties", new CompoundTag()
                         .putBoolean("allow_off_hand", this.allowOffHand())
                         .putBoolean("hand_equipped", this.isTool())
-                        .putInt("creative_category", 3)
+                        .putInt("creative_category", this.getCreativeCategory())
                         .putInt("max_stack_size", this.getMaxStackSize()))
                 .putCompound("minecraft:icon", new CompoundTag()
                         .putString("texture", this.getName()))
         );
         return data;
     }
-
-
 
 }
