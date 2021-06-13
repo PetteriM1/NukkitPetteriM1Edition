@@ -420,6 +420,10 @@ public class Server {
      * Check for new releases automatically.
      */
     public boolean updateChecks;
+    /**
+     * Allow adding custom items
+     */
+    public boolean enableCustomItems;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2547,6 +2551,7 @@ public class Server {
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
         this.updateChecks = this.getPropertyBoolean("update-notifications", true);
+        this.enableCustomItems = this.getPropertyBoolean("enable_custom_items", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2669,6 +2674,7 @@ public class Server {
             put("multi-nether-worlds", "");
             put("call-entity-motion-event", true);
             put("update-notifications", true);
+            put("enable_custom_items", true);
         }
     }
 

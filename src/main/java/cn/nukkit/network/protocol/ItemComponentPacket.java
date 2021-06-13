@@ -12,7 +12,7 @@ public class ItemComponentPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.ITEM_COMPONENT_PACKET;
 
-    private Entry[] entries = Entry.EMPTY_ARRAY;
+    public Entry[] entries = Entry.EMPTY_ARRAY;
 
     public void setEntries(Entry[] entries) {
         this.entries = entries == null? null : entries.length == 0? Entry.EMPTY_ARRAY : entries.clone();

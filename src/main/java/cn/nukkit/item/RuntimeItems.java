@@ -68,9 +68,9 @@ public class RuntimeItems {
         byte[] itemDataPalette = paletteBuffer.getBuffer();
         //itemPalettes.put(protocolId, new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap));
         if (protocolId == 361) {
-            mapping361 = new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap);
+            mapping361 = new RuntimeItemMapping(protocolId, entries, itemDataPalette, legacyNetworkMap, networkLegacyMap);
         } else if (protocolId == 419) {
-            mapping419 = new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap);
+            mapping419 = new RuntimeItemMapping(protocolId, entries, itemDataPalette, legacyNetworkMap, networkLegacyMap);
         } else throw new IllegalArgumentException("Tried to register unknown item mapping: " + protocolId);
     }
 

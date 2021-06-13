@@ -1,5 +1,6 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.Server;
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.utils.Utils;
 import lombok.ToString;
@@ -46,8 +47,18 @@ public class ResourcePackStackPacket extends DataPacket {
                 this.putString(Utils.getVersionByProtocol(protocol));
             }
             if (protocol >= ProtocolInfo.v1_16_100) {
-                this.putLInt(0); // Experiments length
-                this.putBoolean(false); // Were experiments previously toggled
+                if (Server.getInstance().enableCustomItems) {
+                    this.putLInt(2); // Experiments length
+                    this.putString("data_driven_items");
+                    this.putBoolean(true);
+                    this.putString("experimental_custom_ui");
+                    this.putBoolean(true);
+
+                    this.putBoolean(true); // Were experiments previously toggled
+                }else {
+                    this.putLInt(0); // Experiments length
+                    this.putBoolean(false); // Were experiments previously toggled
+                }
             }
         }
     }
