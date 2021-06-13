@@ -556,7 +556,7 @@ public class BinaryStream {
             item.setNamedTag(namedTag);
         }
 
-        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_12_0) {
+        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_11_0) {
             this.getVarLong();
         }
 
@@ -786,7 +786,7 @@ public class BinaryStream {
             this.putLShort(0);
             this.putVarInt(0);
             this.putVarInt(0);
-            if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_12_0) {
+            if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_11_0) {
                 this.putVarLong(0);
             }
             return;
@@ -842,7 +842,7 @@ public class BinaryStream {
             this.putString(block);
         }
 
-        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_12_0) {
+        if (item.getId() == ItemID.SHIELD && protocolId >= ProtocolInfo.v1_11_0) {
             this.putVarLong(0); //"blocking tick" (ffs mojang)
         }
     }

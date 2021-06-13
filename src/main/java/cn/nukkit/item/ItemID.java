@@ -102,6 +102,7 @@ public interface ItemID {
     int KELP = 335;
     int BRICK = 336;
     int CLAY = 337;
+    int CLAY_BALL = 337;
     int SUGARCANE = 338;
     int SUGAR_CANE = 338;
     int SUGAR_CANES = 338;

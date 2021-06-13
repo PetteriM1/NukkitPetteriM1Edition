@@ -197,7 +197,7 @@ public class EntityHorseBase extends EntityWalkingAnimal implements EntityRideab
         }
 
         for (Entity passenger : new ArrayList<>(this.passengers)) {
-            if (!passenger.isAlive() || this.isInsideOfWater()) {
+            if (!passenger.isAlive() || (this.getNetworkId() != EntitySkeletonHorse.NETWORK_ID && this.isInsideOfWater())) {
                 this.dismountEntity(passenger);
                 continue;
             }
