@@ -2,6 +2,7 @@ package cn.nukkit.item.customitem;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.item.ItemDurable;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.ByteTag;
@@ -13,7 +14,7 @@ import cn.nukkit.utils.Utils;
 /**
  * @author lt_name
  */
-public class ItemCustomTool extends ItemCustom {
+public class ItemCustomTool extends ItemCustom implements ItemDurable {
 
     public ItemCustomTool(int id) {
         this(id, 0, 1, UNKNOWN_STR);
