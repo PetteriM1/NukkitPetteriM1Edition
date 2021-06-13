@@ -85,6 +85,11 @@ public class ItemCustomTool extends ItemCustom implements ItemDurable {
         } else {
             this.meta++;
         }
+
+        if (this.meta > this.getMaxDurability()) {
+            this.count--;
+        }
+
         return true;
     }
 
@@ -98,6 +103,10 @@ public class ItemCustomTool extends ItemCustom implements ItemDurable {
             this.meta += 2;
         } else {
             this.meta++;
+        }
+
+        if (this.meta > this.getMaxDurability()) {
+            this.count--;
         }
 
         return true;
