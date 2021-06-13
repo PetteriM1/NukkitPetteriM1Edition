@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDurable;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.item.RuntimeItems;
+import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
@@ -494,11 +495,12 @@ public class BinaryStream {
         }
 
         try {
-            if (protocolId < ProtocolInfo.v1_16_0 && nbt.length > 0) {
+            if (protocolId < ProtocolInfo.v1_16_100 && nbt.length > 0) {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains(NukkitPetteriM1EditionTag)) {
                     int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
-                    if ((id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
+                    if ((id == Item.INFO_UPDATE && Item.getCustomItems().containsKey(originalID)) ||
+                            (id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
                             (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
                             (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
                             (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
@@ -752,6 +754,9 @@ public class BinaryStream {
             int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
             clearData = RuntimeItems.hasData(networkFullId);
             networkId = RuntimeItems.getNetworkId(networkFullId);
+        }else if (item instanceof ItemCustom) { //Replace all custom items for versions below 1.16.100
+            saveOriginalID = true;
+            networkId = Item.INFO_UPDATE;
         }
 
         this.putVarInt(networkId);

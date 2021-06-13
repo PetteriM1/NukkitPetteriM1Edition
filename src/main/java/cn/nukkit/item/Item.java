@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
+import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -541,6 +542,35 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             }
         }
         return -1;
+    }
+
+    private static final HashMap<Integer, Class<? extends Item>> customItems = new HashMap<>();
+
+    public static boolean registeredCustomItem(int id, Class<? extends ItemCustom> c) {
+        customItems.put(id, c);
+        list[id] = c;
+
+        if (RuntimeItems.getRuntimeMapping(ProtocolInfo.v1_16_100).registeredCustomItem(id)) {
+            return true;
+        }else {
+            customItems.remove(id);
+            list[id] = null;
+            return false;
+        }
+    }
+
+    public static boolean deleteCustomItem(int id) {
+        if (customItems.containsKey(id)) {
+            customItems.remove(id);
+            list[id] = null;
+            return RuntimeItems.getRuntimeMapping(ProtocolInfo.v1_16_100).deleteCustomItem(id);
+        }else {
+            return false;
+        }
+    }
+
+    public static HashMap<Integer, Class<? extends Item>> getCustomItems() {
+        return customItems;
     }
 
     public static Item get(int id) {

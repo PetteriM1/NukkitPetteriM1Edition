@@ -953,28 +953,30 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (Server.getInstance().enableCustomItems) {
-            HashMap<Integer, Class<? extends Item>> customItems = RuntimeItems.getRuntimeMapping(this.protocol).getCustomItems();
+            ArrayList<Integer> customItems = RuntimeItems.getRuntimeMapping(this.protocol).getCustomItems();
 
-            ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
-            itemComponentPacket.entries = new ItemComponentPacket.Entry[customItems.size()];
+            if (!customItems.isEmpty()) {
+                ItemComponentPacket itemComponentPacket = new ItemComponentPacket();
+                itemComponentPacket.entries = new ItemComponentPacket.Entry[customItems.size()];
 
-            int i = 0;
-            for (Integer id : customItems.keySet()) {
-                Item item = Item.get(id);
-                if (!(item instanceof ItemCustom)) {
-                    continue;
+                int i = 0;
+                for (Integer id : customItems) {
+                    Item item = Item.get(id);
+                    if (!(item instanceof ItemCustom)) {
+                        continue;
+                    }
+
+                    ItemCustom itemCustom = (ItemCustom) item;
+                    CompoundTag data = itemCustom.getComponentsData();
+                    data.putShort("minecraft:identifier", i);
+
+                    itemComponentPacket.entries[i] = new ItemComponentPacket.Entry(("customitem:" + item.getName()).toLowerCase(), data);
+
+                    i++;
                 }
 
-                ItemCustom itemCustom = (ItemCustom) item;
-                CompoundTag data = itemCustom.getComponentsData();
-                data.putShort("minecraft:identifier", i);
-
-                itemComponentPacket.entries[i] = new ItemComponentPacket.Entry("CustomItem:" + item.getName(), data);
-
-                i++;
+                this.dataPacket(itemComponentPacket);
             }
-
-            this.dataPacket(itemComponentPacket);
         }
 
         if (server.updateChecks && this.isOp()) {

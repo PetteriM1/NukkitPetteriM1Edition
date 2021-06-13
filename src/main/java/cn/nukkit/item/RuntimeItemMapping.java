@@ -6,15 +6,15 @@ import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 public class RuntimeItemMapping {
 
     private final int protocolId;
 
     private final Collection<RuntimeItems.Entry> entries;
-    private final HashMap<Integer, Class<? extends Item>> customItems = new HashMap<>();
+    private final ArrayList<Integer> customItems = new ArrayList<>();
 
     private final Int2IntMap legacyNetworkMap;
     private final Int2IntMap networkLegacyMap;
@@ -35,16 +35,38 @@ public class RuntimeItemMapping {
         this.networkLegacyMap.defaultReturnValue(-1);
     }
 
-    public void registeredCustomItem(int id, Class<? extends ItemCustom> classz) {
-        if (!Server.getInstance().enableCustomItems) {
-            return;
+    synchronized boolean registeredCustomItem(int id) {
+        if (!Server.getInstance().enableCustomItems || customItems.contains(id)) {
+            return false;
         }
-        this.customItems.put(id, classz);
-        Item.list[id] = classz;
+        this.customItems.add(id);
+
+        int fullId = RuntimeItems.getFullId(id, 0);
+        this.legacyNetworkMap.put(fullId, id << 1);
+        this.networkLegacyMap.put(id, fullId);
+
         this.refreshItemPalette();
+
+        return true;
     }
 
-    public void refreshItemPalette() {
+    synchronized boolean deleteCustomItem(int id) {
+        if (!customItems.contains(id)) {
+            return false;
+        }
+
+        this.customItems.remove(id);
+
+        int fullId = RuntimeItems.getFullId(id, 0);
+        this.legacyNetworkMap.remove(fullId);
+        this.networkLegacyMap.remove(id);
+
+        this.refreshItemPalette();
+
+        return true;
+    }
+
+    private synchronized void refreshItemPalette() {
         BinaryStream paletteBuffer = new BinaryStream();
         paletteBuffer.putUnsignedVarInt(entries.size() + customItems.size());
 
@@ -58,11 +80,11 @@ public class RuntimeItemMapping {
         }
 
         if (Server.getInstance().enableCustomItems && !customItems.isEmpty() && protocolId >= ProtocolInfo.v1_16_100) {
-            for(Integer id : customItems.keySet()) {
+            for(Integer id : customItems) {
                 Item item = Item.get(id);
                 if (item instanceof ItemCustom) {
                     ItemCustom itemCustom = (ItemCustom) item;
-                    paletteBuffer.putString("CustomItem:" + itemCustom.getName());
+                    paletteBuffer.putString(("customitem:" + itemCustom.getName()).toLowerCase());
                     paletteBuffer.putLShort(id);
                     paletteBuffer.putBoolean(true); // Component item
                 }
@@ -72,8 +94,8 @@ public class RuntimeItemMapping {
         this.itemDataPalette = paletteBuffer.getBuffer();
     }
 
-    public HashMap<Integer, Class<? extends Item>> getCustomItems() {
-        return new HashMap<>(customItems);
+    public ArrayList<Integer> getCustomItems() {
+        return new ArrayList<>(customItems);
     }
 
     public int getNetworkFullId(Item item) {
