@@ -2,11 +2,17 @@ package cn.nukkit.item.customitem;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author lt_name
  */
 public abstract class ItemCustom extends Item {
+
+    @Setter
+    @Getter
+    private String textureName;
 
     public ItemCustom(int id) {
         this(id, 0, 1, UNKNOWN_STR);
@@ -22,6 +28,7 @@ public abstract class ItemCustom extends Item {
 
     public ItemCustom(int id, Integer meta, int count, String name) {
         super(id, meta, count, name);
+        this.textureName = name;
     }
 
     public boolean allowOffHand() {
@@ -41,7 +48,7 @@ public abstract class ItemCustom extends Item {
                         .putInt("creative_category", this.getCreativeCategory())
                         .putInt("max_stack_size", this.getMaxStackSize()))
                 .putCompound("minecraft:icon", new CompoundTag()
-                        .putString("texture", this.getName()))
+                        .putString("texture", this.getTextureName()))
         );
         return data;
     }
