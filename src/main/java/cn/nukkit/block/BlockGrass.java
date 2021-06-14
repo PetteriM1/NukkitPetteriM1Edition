@@ -54,8 +54,11 @@ public class BlockGrass extends BlockDirt {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0F) {
             ObjectTallGrass.growGrass(this.getLevel(), this, new NukkitRandom());
             this.level.addParticle(new BoneMealParticle(this));
-            if (player != null && !player.isCreative()) {
-                item.count--;
+            if (player != null) {
+                if (!player.isCreative()) {
+                    item.count--;
+                }
+                player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
             }
             return true;
         } else if (item.isHoe()) {

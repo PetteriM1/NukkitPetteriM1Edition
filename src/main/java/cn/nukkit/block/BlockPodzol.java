@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Sound;
 
 /**
  * Created on 2015/11/22 by xtypr.
@@ -33,12 +34,18 @@ public class BlockPodzol extends BlockDirt {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return false;
-    }
-
-    @Override
     public boolean onActivate(Item item, Player player) {
+        if (item.isShovel()) {
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
+                if (player != null) {
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
+                }
+                return true;
+            }
+        }
         return false;
     }
 

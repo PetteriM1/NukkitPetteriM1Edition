@@ -127,20 +127,42 @@ public class AddEntityPacket extends DataPacket {
         mapping.put(EntityRavager.NETWORK_ID, "minecraft:ravager");
         mapping.put(EntityVillagerV2.NETWORK_ID, "minecraft:villager_v2");
         mapping.put(EntityZombieVillagerV2.NETWORK_ID, "minecraft:zombie_villager_v2");
-        mapping.put(EntityFox.NETWORK_ID, "minecraft:fox");
-        mapping.put(EntityBee.NETWORK_ID, "minecraft:bee");
-        mapping.put(EntityPiglin.NETWORK_ID, "minecraft:piglin");
-        mapping.put(EntityHoglin.NETWORK_ID, "minecraft:hoglin");
-        mapping.put(EntityStrider.NETWORK_ID, "minecraft:strider");
-        mapping.put(EntityZoglin.NETWORK_ID, "minecraft:zoglin");
-        mapping.put(EntityPiglinBrute.NETWORK_ID, "minecraft:piglin_brute");
+
+        // Correct new entities for older protocols
+        if (protocolId < ProtocolInfo.v1_13_0) {
+            mapping.put(EntityFox.NETWORK_ID, mapping.get(EntityWolf.NETWORK_ID));
+        } else {
+            mapping.put(EntityFox.NETWORK_ID, "minecraft:fox");
+        }
+
+        if (protocolId < ProtocolInfo.v1_14_0) {
+            mapping.put(EntityBee.NETWORK_ID, mapping.get(EntityBat.NETWORK_ID));
+        } else {
+            mapping.put(EntityBee.NETWORK_ID, "minecraft:bee");
+        }
 
         if (protocolId < ProtocolInfo.v1_16_0) {
-            mapping.put(EntityPiglin.NETWORK_ID, "minecraft:zombie_pigman");
-            mapping.put(EntityHoglin.NETWORK_ID, "minecraft:pig");
-            mapping.put(EntityStrider.NETWORK_ID, "minecraft:pig");
-            mapping.put(EntityZoglin.NETWORK_ID, "minecraft:pig");
-            mapping.put(EntityPiglinBrute.NETWORK_ID, "minecraft:zombie_pigman");
+            mapping.put(EntityPiglin.NETWORK_ID, mapping.get(EntityZombiePigman.NETWORK_ID));
+            mapping.put(EntityHoglin.NETWORK_ID, mapping.get(EntityPig.NETWORK_ID));
+            mapping.put(EntityStrider.NETWORK_ID, mapping.get(EntityPig.NETWORK_ID));
+            mapping.put(EntityZoglin.NETWORK_ID, mapping.get(EntityPig.NETWORK_ID));
+            mapping.put(EntityPiglinBrute.NETWORK_ID, mapping.get(EntityZombiePigman.NETWORK_ID));
+        } else {
+            mapping.put(EntityPiglin.NETWORK_ID, "minecraft:piglin");
+            mapping.put(EntityHoglin.NETWORK_ID, "minecraft:hoglin");
+            mapping.put(EntityStrider.NETWORK_ID, "minecraft:strider");
+            mapping.put(EntityZoglin.NETWORK_ID, "minecraft:zoglin");
+            mapping.put(EntityPiglinBrute.NETWORK_ID, "minecraft:piglin_brute");
+        }
+
+        if (protocolId < ProtocolInfo.v1_17_0 ) {
+            mapping.put(EntityGoat.NETWORK_ID, mapping.get(EntitySheep.NETWORK_ID));
+            mapping.put(EntityGlowSquid.NETWORK_ID, mapping.get(EntitySquid.NETWORK_ID));
+            mapping.put(EntityAxolotl.NETWORK_ID, mapping.get(EntityTropicalFish.NETWORK_ID));
+        } else {
+            mapping.put(EntityGoat.NETWORK_ID, "minecraft:goat");
+            mapping.put(EntityGlowSquid.NETWORK_ID, "minecraft:glow_squid");
+            mapping.put(EntityAxolotl.NETWORK_ID, "minecraft:axolotl");
         }
     }
 
@@ -204,16 +226,8 @@ public class AddEntityPacket extends DataPacket {
         }
 
         if (this.mapping == null) {
-            this.mapping = Entity.getEntityLegacyMapping(this.protocol);
+            this.mapping = Entity.getEntityRuntimeMapping(this.protocol);
         }
-
-        if (this.protocol < ProtocolInfo.v1_14_0 && type == EntityBee.NETWORK_ID) {
-            this.id = this.mapping.get(EntityBat.NETWORK_ID);
-        } else if (this.protocol < ProtocolInfo.v1_13_0 && type == EntityFox.NETWORK_ID) {
-            this.id = this.mapping.get(EntityWolf.NETWORK_ID);
-        } else {
-            this.id = this.mapping.get(type);
-        }
-        this.putString(this.id);
+        this.putString(this.mapping.get(type));
     }
 }

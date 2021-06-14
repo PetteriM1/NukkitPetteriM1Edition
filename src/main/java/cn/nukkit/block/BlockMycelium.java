@@ -1,11 +1,13 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
@@ -75,5 +77,26 @@ public class BlockMycelium extends BlockSolid {
     @Override
     public boolean canSilkTouch() {
         return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.isShovel()) {
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
+                if (player != null) {
+                    player.getLevel().addSoundToViewers(player, Sound.STEP_GRASS);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -199,8 +199,8 @@ public class EntityBoat extends EntityVehicle {
 
             if (this.age % 5 == 0) {
                 int passengersCount = this.passengers.size();
-                if (passengersCount > 0 && this.age % 2 == 0) {
-                    Block[] blocks = this.level.getCollisionBlocks(this.getBoundingBox().grow(0.1, 0.1, 0.1));
+                if (passengersCount > 0) {
+                    Block[] blocks = this.level.getCollisionBlocks(this.getBoundingBox().grow(0.1, 0.3, 0.1));
                     for (Block b : blocks) {
                         if (b.getId() == Block.LILY_PAD) {
                             this.level.setBlockAt((int) b.x, (int) b.y, (int) b.z, 0, 0);

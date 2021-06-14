@@ -3,6 +3,10 @@ package cn.nukkit.potion;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.EntitySmite;
+import cn.nukkit.entity.mob.EntityBlaze;
+import cn.nukkit.entity.mob.EntityEnderman;
+import cn.nukkit.entity.passive.EntitySnowGolem;
+import cn.nukkit.entity.passive.EntityStrider;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityRegainHealthEvent;
@@ -176,6 +180,11 @@ public class Potion implements Cloneable {
 
     public void applyPotion(Entity entity, double health) {
         if (!(entity instanceof EntityLiving)) {
+            return;
+        }
+
+        if (this.id == WATER && (entity instanceof EntityEnderman || entity instanceof EntityStrider || entity instanceof EntitySnowGolem || entity instanceof EntityBlaze)) {
+            entity.attack(new EntityDamageEvent(entity, DamageCause.MAGIC, 1f));
             return;
         }
 
