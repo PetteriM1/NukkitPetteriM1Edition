@@ -23,7 +23,7 @@ public class ResourcePackStackPacket extends DataPacket {
     /**
      * v1.16.100 and above
      */
-    public List<ExperimentData> experiments = new ObjectArrayList<>();
+    public final List<ExperimentData> experiments = new ObjectArrayList<>();
 
     @Override
     public void decode() {
@@ -74,8 +74,7 @@ public class ResourcePackStackPacket extends DataPacket {
 
     @Value
     public static class ExperimentData {
-        private final String name;
-        private final boolean enabled;
+        String name;
+        boolean enabled;
     }
-
 }
