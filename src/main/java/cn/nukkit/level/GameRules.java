@@ -1,6 +1,7 @@
 package cn.nukkit.level;
 
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -21,13 +22,13 @@ public class GameRules {
     public static GameRules getDefault() {
         GameRules gameRules = new GameRules();
 
-        gameRules.gameRules.put(COMMAND_BLOCKS_ENABLED, new Value<>(Type.BOOLEAN, false));
+        gameRules.gameRules.put(COMMAND_BLOCKS_ENABLED, new Value<>(Type.BOOLEAN, false, 291)); // Vanilla: default true
         gameRules.gameRules.put(COMMAND_BLOCK_OUTPUT, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(DO_DAYLIGHT_CYCLE, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(DO_ENTITY_DROPS, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(DO_FIRE_TICK, new Value(Type.BOOLEAN, true));
-        gameRules.gameRules.put(DO_IMMEDIATE_RESPAWN, new Value(Type.BOOLEAN, false));
-        gameRules.gameRules.put(DO_INSOMNIA, new Value(Type.BOOLEAN, false));
+        gameRules.gameRules.put(DO_INSOMNIA, new Value(Type.BOOLEAN, false, 281)); // Vanilla: default true
+        gameRules.gameRules.put(DO_IMMEDIATE_RESPAWN, new Value(Type.BOOLEAN, false, 332));
         gameRules.gameRules.put(DO_MOB_LOOT, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(DO_MOB_SPAWNING, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(DO_TILE_DROPS, new Value<>(Type.BOOLEAN, true));
@@ -35,16 +36,20 @@ public class GameRules {
         gameRules.gameRules.put(DROWNING_DAMAGE, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(FALL_DAMAGE, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(FIRE_DAMAGE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(FREEZE_DAMAGE, new Value<>(Type.BOOLEAN, true, 440));
+        gameRules.gameRules.put(FUNCTION_COMMAND_LIMIT, new Value<>(Type.INTEGER, 10000, 332));
         gameRules.gameRules.put(KEEP_INVENTORY, new Value<>(Type.BOOLEAN, false));
         gameRules.gameRules.put(MAX_COMMAND_CHAIN_LENGTH, new Value<>(Type.INTEGER, 65536));
         gameRules.gameRules.put(MOB_GRIEFING, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(NATURAL_REGENERATION, new Value<>(Type.BOOLEAN, true));
         gameRules.gameRules.put(PVP, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(RANDOM_TICK_SPEED, new Value<>(Type.INTEGER, 3));
-        gameRules.gameRules.put(SEND_COMMAND_FEEDBACK, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(RANDOM_TICK_SPEED, new Value<>(Type.INTEGER, 3, 313)); // Vanilla: default 1
+        gameRules.gameRules.put(SEND_COMMAND_FEEDBACK, new Value<>(Type.BOOLEAN, true, 361));
         gameRules.gameRules.put(SHOW_COORDINATES, new Value<>(Type.BOOLEAN, false));
+        gameRules.gameRules.put(SHOW_DEATH_MESSAGES, new Value<>(Type.BOOLEAN, true, 332));
+        gameRules.gameRules.put(SPAWN_RADIUS, new Value<>(Type.INTEGER, 5, 361));
         gameRules.gameRules.put(TNT_EXPLODES, new Value<>(Type.BOOLEAN, true));
-        gameRules.gameRules.put(SHOW_DEATH_MESSAGE, new Value<>(Type.BOOLEAN, true));
+        gameRules.gameRules.put(SHOW_TAGS, new Value<>(Type.BOOLEAN, true, 389));
 
         return gameRules;
     }
@@ -192,10 +197,18 @@ public class GameRules {
     public static class Value<T> {
         private final Type type;
         private T value;
+        private boolean canBeChanged;
+        private int minProtocol;
 
         public Value(Type type, T value) {
             this.type = type;
             this.value = value;
+        }
+
+        public Value(Type type, T value, int minProtocol) {
+            this.type = type;
+            this.value = value;
+            this.minProtocol = minProtocol;
         }
 
         private void setValue(T value, Type type) {
@@ -205,8 +218,20 @@ public class GameRules {
             this.value = value;
         }
 
+        public boolean isCanBeChanged() {
+            return this.canBeChanged;
+        }
+
+        public void setCanBeChanged(boolean canBeChanged) {
+            this.canBeChanged = canBeChanged;
+        }
+
         public Type getType() {
-            return type;
+            return this.type;
+        }
+
+        public int getMinProtocol() {
+            return minProtocol;
         }
 
         private boolean getValueAsBoolean() {
@@ -231,6 +256,13 @@ public class GameRules {
         }
 
         public void write(BinaryStream pk) {
+            write(ProtocolInfo.CURRENT_PROTOCOL, pk);
+        }
+
+        public void write(int protocol, BinaryStream pk) {
+            if (protocol >= ProtocolInfo.v1_17_0) {
+                pk.putBoolean(this.canBeChanged);
+            }
             pk.putUnsignedVarInt(type.ordinal());
             type.write(pk, this);
         }

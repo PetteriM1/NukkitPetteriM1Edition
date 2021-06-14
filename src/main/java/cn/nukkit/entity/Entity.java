@@ -14,6 +14,7 @@ import cn.nukkit.event.player.PlayerInteractEvent.Action;
 import cn.nukkit.event.player.PlayerTeleportEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.*;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
@@ -1184,6 +1185,17 @@ public abstract class Entity extends Location implements Metadatable {
         if (source.isCancelled()) {
             return false;
         }
+
+        // Hack: fire aspect
+        if (source instanceof EntityDamageByEntityEvent) {
+            Enchantment[] enchantments = ((EntityDamageByEntityEvent) source).getEnchantments();
+            if (enchantments != null) {
+                for (Enchantment enchantment : enchantments) {
+                    enchantment.doAttack(((EntityDamageByEntityEvent) source).getDamager(), this);
+                }
+            }
+        }
+
         if (this.absorption > 0) { // Damage Absorption
             this.setAbsorption(Math.max(0, this.absorption + source.getDamage(EntityDamageEvent.DamageModifier.ABSORPTION)));
         }
@@ -2348,6 +2360,10 @@ public abstract class Entity extends Location implements Metadatable {
             to = ev.getTo();
         }
 
+        if (riding != null) {
+            riding.dismountEntity(this);
+        }
+
         this.ySize = 0;
 
         if (cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
@@ -2371,10 +2387,12 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void respawnToAll() {
-        for (Player player : this.hasSpawned.values()) {
+        Collection<Player> players = new ArrayList<>(this.hasSpawned.values());
+        this.hasSpawned.clear();
+
+        for (Player player : players) {
             this.spawnTo(player);
         }
-        this.hasSpawned.clear();
     }
 
     public void spawnToAll() {

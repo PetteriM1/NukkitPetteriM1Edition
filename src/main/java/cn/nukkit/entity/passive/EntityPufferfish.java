@@ -62,7 +62,7 @@ public class EntityPufferfish extends EntityFish {
             if (damager instanceof Player) {
                 if (this.puffed > 0) return true;
                 this.puffed = 200;
-                damager.addEffect(Effect.getEffect(Effect.POISON).setDuration(140));
+                damager.addEffect(Effect.getEffect(Effect.POISON).setDuration(200));
                 this.setDataProperty(new ByteEntityData(DATA_PUFFERFISH_SIZE, 2));
             }
         }
