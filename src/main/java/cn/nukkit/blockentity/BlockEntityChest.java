@@ -5,6 +5,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.inventory.BaseInventory;
 import cn.nukkit.inventory.ChestInventory;
 import cn.nukkit.inventory.DoubleChestInventory;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -110,13 +111,17 @@ public class BlockEntityChest extends BlockEntitySpawnableContainer implements B
     }
 
     public BlockEntityChest getPair() {
-        if (this.isPaired()) {
-            BlockEntity blockEntity = this.getLevel().getBlockEntityIfLoaded(new Vector3(this.namedTag.getInt("pairx"), this.y, this.namedTag.getInt("pairz")));
+        if (!this.isPaired()) {
+            return null;
+        }
+
+        Level level = this.getLevel();
+        if (level != null) {
+            BlockEntity blockEntity = level.getBlockEntityIfLoaded(new Vector3(this.namedTag.getInt("pairx"), this.y, this.namedTag.getInt("pairz")));
             if (blockEntity instanceof BlockEntityChest) {
                 return (BlockEntityChest) blockEntity;
             }
         }
-
         return null;
     }
 
