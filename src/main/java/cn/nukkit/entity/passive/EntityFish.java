@@ -23,7 +23,7 @@ public abstract class EntityFish extends EntityWaterAnimal {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.getId() == Item.BUCKET && item.getDamage() == 0 && this.isInsideOfWater()) {
+        if (item.getId() == Item.BUCKET && (item.getDamage() == 0 || item.getDamage() == 8) && this.isInsideOfWater()) {
             this.close();
             if (item.getCount() <= 1) {
                 player.getInventory().setItemInHand(Item.get(Item.BUCKET, this.getBucketMeta(), 1));
@@ -36,7 +36,7 @@ public abstract class EntityFish extends EntityWaterAnimal {
                 return true;
             }
         }
-        return false;
+        return super.onInteract(player, item, clickedPos);
     }
 
     abstract int getBucketMeta();

@@ -270,4 +270,9 @@ public class BlockRail extends BlockFlowable implements Faceable {
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
 }

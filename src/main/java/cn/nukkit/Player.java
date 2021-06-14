@@ -3661,15 +3661,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         return;
                                     }
 
-                                    float itemDamage = item.getAttackDamage();
-                                    for (Enchantment enchantment : item.getEnchantments()) {
-                                        itemDamage += enchantment.getDamageBonus(target);
-                                        enchantment.doAttack(this, target);
-                                    }
-
-                                    Map<DamageModifier, Float> damage = new EnumMap<>(DamageModifier.class);
-                                    damage.put(DamageModifier.BASE, itemDamage);
-
                                     if (!this.canInteractEntity(target, isCreative() ? 8 : 5)) {
                                         break;
                                     } else if (target instanceof Player) {
@@ -3680,13 +3671,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         }
                                     }
 
+                                    Enchantment[] enchantments = item.getEnchantments();
+
+                                    float itemDamage = item.getAttackDamage();
+                                    for (Enchantment enchantment : enchantments) {
+                                        itemDamage += enchantment.getDamageBonus(target);
+                                    }
+
+                                    Map<DamageModifier, Float> damage = new EnumMap<>(DamageModifier.class);
+                                    damage.put(DamageModifier.BASE, itemDamage);
+
                                     float knockBack = 0.3f;
                                     Enchantment knockBackEnchantment = item.getEnchantment(Enchantment.ID_KNOCKBACK);
                                     if (knockBackEnchantment != null) {
                                         knockBack += knockBackEnchantment.getLevel() * 0.1f;
                                     }
 
-                                    EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, target, DamageCause.ENTITY_ATTACK, damage, knockBack);
+                                    EntityDamageByEntityEvent entityDamageByEntityEvent = new EntityDamageByEntityEvent(this, target, DamageCause.ENTITY_ATTACK, damage, knockBack, enchantments);
                                     if (this.isSpectator()) entityDamageByEntityEvent.setCancelled();
                                     if ((target instanceof Player) && !this.level.getGameRules().getBoolean(GameRule.PVP)) {
                                         entityDamageByEntityEvent.setCancelled();
@@ -4330,7 +4331,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        boolean showMessages = this.level.getGameRules().getBoolean(GameRule.SHOW_DEATH_MESSAGE);
+        boolean showMessages = this.level.getGameRules().getBoolean(GameRule.SHOW_DEATH_MESSAGES);
         String message = "";
         List<String> params = new ArrayList<>();
         EntityDamageEvent cause = this.getLastDamageCause();

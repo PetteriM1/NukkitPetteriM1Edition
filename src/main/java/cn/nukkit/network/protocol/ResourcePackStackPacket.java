@@ -2,7 +2,11 @@ package cn.nukkit.network.protocol;
 
 import cn.nukkit.resourcepacks.ResourcePack;
 import cn.nukkit.utils.Utils;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.ToString;
+import lombok.Value;
+
+import java.util.List;
 
 @ToString
 public class ResourcePackStackPacket extends DataPacket {
@@ -12,7 +16,14 @@ public class ResourcePackStackPacket extends DataPacket {
     public boolean mustAccept = false;
     public ResourcePack[] behaviourPackStack = new ResourcePack[0];
     public ResourcePack[] resourcePackStack = new ResourcePack[0];
+    /**
+     * Below v1.16.100
+     */
     public boolean isExperimental = false;
+    /**
+     * v1.16.100 and above
+     */
+    public final List<ExperimentData> experiments = new ObjectArrayList<>();
 
     @Override
     public void decode() {
@@ -46,7 +57,11 @@ public class ResourcePackStackPacket extends DataPacket {
                 this.putString(Utils.getVersionByProtocol(protocol));
             }
             if (protocol >= ProtocolInfo.v1_16_100) {
-                this.putLInt(0); // Experiments length
+                this.putLInt(this.experiments.size());
+                for (ExperimentData experimentData : this.experiments) {
+                    this.putString(experimentData.getName());
+                    this.putBoolean(experimentData.isEnabled());
+                }
                 this.putBoolean(false); // Were experiments previously toggled
             }
         }
@@ -55,5 +70,11 @@ public class ResourcePackStackPacket extends DataPacket {
     @Override
     public byte pid() {
         return NETWORK_ID;
+    }
+
+    @Value
+    public static class ExperimentData {
+        String name;
+        boolean enabled;
     }
 }
