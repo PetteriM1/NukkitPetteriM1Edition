@@ -547,6 +547,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     private static final HashMap<Integer, Class<? extends Item>> customItems = new HashMap<>();
 
     public static boolean registeredCustomItem(int id, Class<? extends ItemCustom> c) {
+        if (id < 10000 || id > 65535) {
+            //Below 10000 is reserved for vanilla items
+            throw new IllegalArgumentException("Custom item id cannot be less than 10000 or greater than 65535");
+        }
+
+
         customItems.put(id, c);
         list[id] = c;
 

@@ -27,8 +27,12 @@ public abstract class ItemCustom extends Item {
     }
 
     public ItemCustom(int id, Integer meta, int count, String name) {
+        this(id, meta, count, name, name);
+    }
+
+    public ItemCustom(int id, Integer meta, int count, String name, String textureName) {
         super(id, meta, count, name);
-        this.textureName = name;
+        this.textureName = textureName;
     }
 
     public boolean allowOffHand() {

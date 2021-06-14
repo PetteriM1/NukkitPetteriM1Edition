@@ -26,7 +26,11 @@ public abstract class ItemCustomEdible extends ItemCustom {
     }
 
     public ItemCustomEdible(int id, Integer meta, int count, String name) {
-        super(id, meta, count, name);
+        this(id, meta, count, name, name);
+    }
+
+    public ItemCustomEdible(int id, Integer meta, int count, String name, String textureName) {
+        super(id, meta, count, name, textureName);
     }
 
     @Override

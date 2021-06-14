@@ -29,7 +29,11 @@ public abstract class ItemCustomTool extends ItemCustom implements ItemDurable {
     }
 
     public ItemCustomTool(int id, Integer meta, int count, String name) {
-        super(id, meta, count, name);
+        this(id, meta, count, name, name);
+    }
+
+    public ItemCustomTool(int id, Integer meta, int count, String name, String textureName) {
+        super(id, meta, count, name, textureName);
     }
 
     @Override
