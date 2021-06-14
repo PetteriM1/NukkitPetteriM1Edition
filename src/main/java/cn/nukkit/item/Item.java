@@ -5,6 +5,8 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
+import cn.nukkit.item.RuntimeItemMapping.LegacyEntry;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
@@ -17,9 +19,16 @@ import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -310,15 +319,16 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         initCreativeItems();
     }
 
-    private static final ArrayList<Item> creative137 = new ArrayList<>();
-    private static final ArrayList<Item> creative274 = new ArrayList<>();
-    private static final ArrayList<Item> creative291 = new ArrayList<>();
-    private static final ArrayList<Item> creative313 = new ArrayList<>();
-    private static final ArrayList<Item> creative332 = new ArrayList<>();
-    private static final ArrayList<Item> creative340 = new ArrayList<>();
-    private static final ArrayList<Item> creative354 = new ArrayList<>();
-    private static final ArrayList<Item> creative389 = new ArrayList<>();
-    private static final ArrayList<Item> creative407 = new ArrayList<>();
+    private static final List<Item> creative137 = new ObjectArrayList<>();
+    private static final List<Item> creative274 = new ObjectArrayList<>();
+    private static final List<Item> creative291 = new ObjectArrayList<>();
+    private static final List<Item> creative313 = new ObjectArrayList<>();
+    private static final List<Item> creative332 = new ObjectArrayList<>();
+    private static final List<Item> creative340 = new ObjectArrayList<>();
+    private static final List<Item> creative354 = new ObjectArrayList<>();
+    private static final List<Item> creative389 = new ObjectArrayList<>();
+    private static final List<Item> creative407 = new ObjectArrayList<>();
+    private static final List<Item> creative440 = new ObjectArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -408,6 +418,26 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // New creative items mapping
+        registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.CURRENT_PROTOCOL, creative440);
+    }
+
+    private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
+        JsonArray itemsArray;
+        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creative_items_" + protocolId + ".json")) {
+            itemsArray = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("items");
+        } catch (Exception e) {
+            throw new AssertionError("Error loading required block states!");
+        }
+
+        for (JsonElement element : itemsArray) {
+            Item item = RuntimeItems.getMapping(protocolId).parseCreativeItem(element.getAsJsonObject(), true, blockPaletteProtocol);
+            if (item != null && !item.getName().equals(UNKNOWN_STR)) {
+                // Add only implemented items
+                creativeItems.add(item.clone());
+            }
+        }
     }
 
     public static void clearCreativeItems() {
@@ -420,13 +450,14 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item.creative354.clear();
         Item.creative389.clear();
         Item.creative407.clear();
+        Item.creative440.clear();
     }
 
-    public static ArrayList<Item> getCreativeItems() {
+    public static List<Item> getCreativeItems() {
         return getCreativeItems(CURRENT_PROTOCOL);
     }
 
-    public static ArrayList<Item> getCreativeItems(int protocol) {
+    public static List<Item> getCreativeItems(int protocol) {
         switch (protocol) {
             case v1_2_0:
             case v1_2_5_11:
@@ -437,26 +468,26 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_2_13:
             case v1_2_13_11:
             case v1_4_0:
-                return new ArrayList<>(Item.creative137);
+                return new ObjectArrayList<>(Item.creative137);
             case v1_5_0:
-                return new ArrayList<>(Item.creative274);
+                return new ObjectArrayList<>(Item.creative274);
             case v1_6_0_5:
             case v1_6_0:
             case v1_7_0:
-                return new ArrayList<>(Item.creative291);
+                return new ObjectArrayList<>(Item.creative291);
             case v1_8_0:
-                return new ArrayList<>(Item.creative313);
+                return new ObjectArrayList<>(Item.creative313);
             case v1_9_0:
-                return new ArrayList<>(Item.creative332);
+                return new ObjectArrayList<>(Item.creative332);
             case v1_10_0:
-                return new ArrayList<>(Item.creative340);
+                return new ObjectArrayList<>(Item.creative340);
             case v1_11_0:
             case v1_12_0:
             case v1_13_0:
-                return new ArrayList<>(Item.creative354);
+                return new ObjectArrayList<>(Item.creative354);
             case v1_14_0:
             case v1_14_60:
-                return new ArrayList<>(Item.creative389);
+                return new ObjectArrayList<>(Item.creative389);
             case v1_16_0:
             case v1_16_20:
             case v1_16_100_0:
@@ -471,8 +502,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_16_230_50:
             case v1_16_230:
             case v1_16_230_54:
+                return new ObjectArrayList<>(Item.creative407);
             case v1_17_0:
-                return new ArrayList<>(Item.creative407);
+                return new ObjectArrayList<>(Item.creative440);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
@@ -1256,12 +1288,22 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
     }
 
-    public final int getNetworkId() {
-        return getNetworkId(ProtocolInfo.CURRENT_PROTOCOL);
+    public final RuntimeEntry getRuntimeEntry() {
+        return this.getRuntimeEntry(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
-    public final int getNetworkId(int protocol) {
-        if (protocol < ProtocolInfo.v1_16_100) return getId();
-        return RuntimeItems.getNetworkId(RuntimeItems.getRuntimeMapping(protocol).getNetworkFullId(this));
+    public final RuntimeEntry getRuntimeEntry(int protocolId) {
+        return RuntimeItems.getMapping(protocolId).toRuntime(this.getId(), this.getDamage());
+    }
+
+    public final int getNetworkId() {
+        return this.getNetworkId(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public final int getNetworkId(int protocolId) {
+        if (protocolId < ProtocolInfo.v1_16_100) {
+            return getId();
+        }
+        return this.getRuntimeEntry(protocolId).getRuntimeId();
     }
 }
