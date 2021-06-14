@@ -5,7 +5,7 @@
     <name>Nukkit PetteriM1 Edition</name>
     <groupId>cn.nukkit</groupId>
     <artifactId>Nukkit</artifactId>
-    <version>alemiz-legacy</version>
+    <version>alemiz-more-blocks</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
