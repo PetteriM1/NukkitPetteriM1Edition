@@ -2679,7 +2679,7 @@ public class Server {
             put("multi-nether-worlds", "");
             put("call-entity-motion-event", true);
             put("update-notifications", true);
-            put("enable_custom_items", true);
+            put("enable_custom_items", false);
         }
     }
 

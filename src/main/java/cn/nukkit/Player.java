@@ -2272,7 +2272,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         ResourcePacksInfoPacket infoPacket = new ResourcePacksInfoPacket();
         infoPacket.resourcePackEntries = this.server.getResourcePackManager().getResourceStack();
-        infoPacket.mustAccept = this.server.getForceResources();
+        //Custom item need resource pack
+        infoPacket.mustAccept = this.server.getForceResources() || this.server.enableCustomItems;
         this.dataPacket(infoPacket);
     }
 
@@ -2572,7 +2573,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case ResourcePackClientResponsePacket.STATUS_HAVE_ALL_PACKS:
                             ResourcePackStackPacket stackPacket = new ResourcePackStackPacket();
-                            stackPacket.mustAccept = this.server.getForceResources();
+                            //Custom item need resource pack
+                            stackPacket.mustAccept = this.server.getForceResources() || this.server.enableCustomItems;
                             stackPacket.resourcePackStack = this.server.getResourcePackManager().getResourceStack();
                             if (this.server.enableCustomItems) {
                                 stackPacket.experiments.add(
