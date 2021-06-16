@@ -536,6 +536,7 @@ public class Server {
 
         Block.init();
         Enchantment.init();
+        RuntimeItems.init();
         Item.init();
         EnumBiome.values();
         Effect.init();
@@ -543,7 +544,6 @@ public class Server {
         Attribute.init();
         DispenseBehaviorRegister.init();
         GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, 0, 0);
-        RuntimeItems.init();
 
         // Convert legacy data before plugins get the chance to mess with it
         try {

@@ -3,11 +3,9 @@ package cn.nukkit.utils;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
-import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemDurable;
-import cn.nukkit.item.ItemID;
-import cn.nukkit.item.RuntimeItems;
-import cn.nukkit.item.customitem.ItemCustom;
+import cn.nukkit.item.*;
+import cn.nukkit.item.RuntimeItemMapping.LegacyEntry;
+import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import cn.nukkit.level.GlobalBlockPalette;
@@ -427,31 +425,32 @@ public class BinaryStream {
 
     public Item getSlot(int protocolId) {
         if (protocolId >= ProtocolInfo.v1_16_220) {
-            return getSlotInternal(protocolId);
+            return this.getSlotInternal(protocolId);
         }
 
-        int id = this.getVarInt();
-        if (id == 0) {
+        int runtimeId = this.getVarInt();
+        if (runtimeId == 0) {
             return Item.get(0, 0, 0);
         }
 
-        boolean hasData = false;
-        int fullId = -1;
-        if (protocolId >= ProtocolInfo.v1_16_100) {
-            fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
-            hasData = RuntimeItems.hasData(fullId);
-            id = RuntimeItems.getId(fullId);
+        int auxValue = this.getVarInt();
+        int damage = auxValue >> 8;
+        if (damage == Short.MAX_VALUE) {
+            damage = -1;
         }
 
-        int auxValue = this.getVarInt();
-        int data = auxValue >> 8;
-        if (data == Short.MAX_VALUE) {
-            data = -1;
+        int id;
+        if (protocolId < ProtocolInfo.v1_16_100) {
+            id = runtimeId;
+        } else {
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+            LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
+            id = legacyEntry.getLegacyId();
+            if (legacyEntry.isHasDamage()) {
+                damage = legacyEntry.getDamage();
+            }
         }
-        // Swap data to network data
-        if (hasData) {
-            data = RuntimeItems.getData(fullId);
-        }
+
         int cnt = auxValue & 0xff;
 
         int nbtLen = this.getLShort();
@@ -468,7 +467,7 @@ public class BinaryStream {
                     CompoundTag tag = NBTIO.read(stream, ByteOrder.LITTLE_ENDIAN, true);
                     // Hack for tool damage
                     if (tag.contains("Damage")) {
-                        data = tag.getInt("Damage");
+                        damage = tag.getInt("Damage");
                         tag.remove("Damage");
                     }
                     if (tag.contains("__DamageConflict__")) {
@@ -495,12 +494,11 @@ public class BinaryStream {
         }
 
         try {
-            if (protocolId < ProtocolInfo.v1_16_100 && nbt.length > 0) {
+            if (protocolId < ProtocolInfo.v1_16_0 && nbt.length > 0) {
                 CompoundTag tag = Item.parseCompoundTag(nbt.clone());
                 if (tag.contains(NukkitPetteriM1EditionTag)) {
                     int originalID = tag.getCompound(NukkitPetteriM1EditionTag).getInt("OriginalID");
-                    if ((id == Item.INFO_UPDATE && Item.getCustomItems().containsKey(originalID)) ||
-                            (id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
+                    if ((id == Item.INFO_UPDATE && originalID >= Item.SUSPICIOUS_STEW) ||
                             (id == Item.DIAMOND_SWORD && originalID == Item.NETHERITE_SWORD) ||
                             (id == Item.DIAMOND_SHOVEL && originalID == Item.NETHERITE_SHOVEL) ||
                             (id == Item.DIAMOND_PICKAXE && originalID == Item.NETHERITE_PICKAXE) ||
@@ -527,9 +525,7 @@ public class BinaryStream {
             e.printStackTrace();
         }
 
-        Item item = Item.get(
-                id, data, cnt, nbt
-        );
+        Item item = Item.get(id, damage, cnt, nbt);
 
         if (canDestroy.length > 0 || canPlaceOn.length > 0) {
             CompoundTag namedTag = item.getNamedTag();
@@ -564,29 +560,30 @@ public class BinaryStream {
     }
 
     private Item getSlotInternal(int protocolId) {
-        int id = getVarInt();
-        if (id == 0) {
+        int runtimeId = this.getVarInt();
+        if (runtimeId == 0) {
             return Item.get(0, 0, 0);
         }
 
-        int count = getLShort();
-        int damage = (int) getUnsignedVarInt();
+        int count = this.getLShort();
+        int damage = (int) this.getUnsignedVarInt();
 
-        int fullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
-        id = RuntimeItems.getId(fullId);
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+        LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
 
-        /*boolean hasData = RuntimeItems.hasData(fullId); // Unnecessary when the damage is read from NBT
-        if (hasData) {
-            damage = RuntimeItems.getData(fullId);
-        }*/
-
-        if (getBoolean()) { // hasNetId
-            getVarInt(); // netId
+        int id = legacyEntry.getLegacyId();
+        if (legacyEntry.isHasDamage()) {
+            damage = legacyEntry.getDamage();
         }
 
-        getVarInt(); // blockRuntimeId
 
-        byte[] bytes = getByteArray();
+        if (this.getBoolean()) { // hasNetId
+            this.getVarInt(); // netId
+        }
+
+        this.getVarInt(); // blockRuntimeId
+
+        byte[] bytes = this.getByteArray();
         ByteBuf buf = AbstractByteBufAllocator.DEFAULT.ioBuffer(bytes.length);
         buf.writeBytes(bytes);
 
@@ -678,7 +675,7 @@ public class BinaryStream {
 
     public void putSlot(int protocolId, Item item, boolean crafting) {
         if (protocolId >= ProtocolInfo.v1_16_220) {
-            putSlotInternal(protocolId, item, crafting);
+            this.putSlotInternal(protocolId, item, crafting);
             return;
         }
 
@@ -687,61 +684,61 @@ public class BinaryStream {
             return;
         }
 
-        int networkId = item.getId();
+        int runtimeId = item.getId();
 
         // Multiversion: Replace unsupported items
         boolean saveOriginalID = false;
         if (!crafting) {
             if (protocolId < ProtocolInfo.v1_16_0) {
-                if (networkId >= Item.LODESTONECOMPASS) {
+                if (runtimeId >= Item.LODESTONECOMPASS) {
                     saveOriginalID = true;
-                    switch (networkId) {
+                    switch (runtimeId) {
                         case Item.NETHERITE_SWORD:
-                            networkId = Item.DIAMOND_SWORD;
+                            runtimeId = Item.DIAMOND_SWORD;
                             break;
                         case Item.NETHERITE_SHOVEL:
-                            networkId = Item.DIAMOND_SHOVEL;
+                            runtimeId = Item.DIAMOND_SHOVEL;
                             break;
                         case Item.NETHERITE_PICKAXE:
-                            networkId = Item.DIAMOND_PICKAXE;
+                            runtimeId = Item.DIAMOND_PICKAXE;
                             break;
                         case Item.NETHERITE_AXE:
-                            networkId = Item.DIAMOND_AXE;
+                            runtimeId = Item.DIAMOND_AXE;
                             break;
                         case Item.NETHERITE_HOE:
-                            networkId = Item.DIAMOND_HOE;
+                            runtimeId = Item.DIAMOND_HOE;
                             break;
                         case Item.NETHERITE_HELMET:
-                            networkId = Item.DIAMOND_HELMET;
+                            runtimeId = Item.DIAMOND_HELMET;
                             break;
                         case Item.NETHERITE_CHESTPLATE:
-                            networkId = Item.DIAMOND_CHESTPLATE;
+                            runtimeId = Item.DIAMOND_CHESTPLATE;
                             break;
                         case Item.NETHERITE_LEGGINGS:
-                            networkId = Item.DIAMOND_LEGGINGS;
+                            runtimeId = Item.DIAMOND_LEGGINGS;
                             break;
                         case Item.NETHERITE_BOOTS:
-                            networkId = Item.DIAMOND_BOOTS;
+                            runtimeId = Item.DIAMOND_BOOTS;
                             break;
                         case Item.WARPED_FUNGUS_ON_A_STICK:
-                            networkId = Item.CARROT_ON_A_STICK;
+                            runtimeId = Item.CARROT_ON_A_STICK;
                             break;
                         case Item.RECORD_PIGSTEP:
-                            networkId = Item.RECORD_13;
+                            runtimeId = Item.RECORD_13;
                             break;
                         default:
-                            networkId = Item.INFO_UPDATE;
+                            runtimeId = Item.INFO_UPDATE;
                             break;
                     }
                 } else {
                     if (protocolId < ProtocolInfo.v1_14_0) {
-                        if (networkId == Item.HONEYCOMB || networkId == Item.HONEY_BOTTLE) {
+                        if (runtimeId == Item.HONEYCOMB || runtimeId == Item.HONEY_BOTTLE) {
                             saveOriginalID = true;
-                            networkId = Item.INFO_UPDATE;
+                            runtimeId = Item.INFO_UPDATE;
                         } else if (protocolId < ProtocolInfo.v1_13_0) {
-                            if (networkId == Item.SUSPICIOUS_STEW) {
+                            if (runtimeId == Item.SUSPICIOUS_STEW) {
                                 saveOriginalID = true;
-                                networkId = Item.INFO_UPDATE;
+                                runtimeId = Item.INFO_UPDATE;
                             }
                         }
                     }
@@ -749,17 +746,15 @@ public class BinaryStream {
             }
         }
 
-        boolean clearData = false;
+        int damage = item.hasMeta() ? item.getDamage() : -1;
         if (protocolId >= ProtocolInfo.v1_16_100) {
-            int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
-            clearData = RuntimeItems.hasData(networkFullId);
-            networkId = RuntimeItems.getNetworkId(networkFullId);
-        }else if (item instanceof ItemCustom) { //Replace all custom items for versions below 1.16.100
-            saveOriginalID = true;
-            networkId = Item.INFO_UPDATE;
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+            RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+            runtimeId = runtimeEntry.getRuntimeId();
+            damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
         }
 
-        this.putVarInt(networkId);
+        this.putVarInt(runtimeId);
 
         int auxValue;
         boolean isDurable = item instanceof ItemDurable;
@@ -771,7 +766,7 @@ public class BinaryStream {
                 if (protocolId < ProtocolInfo.v1_16_100) {
                     meta = item.hasMeta() ? item.getDamage() : -1;
                 } else {
-                    meta = clearData ? 0 : item.hasMeta() ? item.getDamage() : -1;
+                    meta = damage;
                 }
                 auxValue |= ((meta & 0x7fff) << 8);
             }
@@ -847,55 +842,30 @@ public class BinaryStream {
         }
     }
 
-    public Item getRecipeIngredient(int protocolId) {
-        int networkId = this.getVarInt();
-        if (networkId == 0) {
-            return Item.get(0, 0, 0);
-        }
-
-        int id = networkId;
-        if (protocolId >= ProtocolInfo.v1_16_100) {
-            int legacyFullId = RuntimeItems.getRuntimeMapping(protocolId).getLegacyFullId(id);
-            id = RuntimeItems.getId(legacyFullId);
-        }
-
-        int damage = this.getVarInt();
-        if (damage == 0x7fff) {
-            damage = -1;
-        }
-
-        int count = this.getVarInt();
-        return Item.get(id, damage, count);
-    }
-
     private void putSlotInternal(int protocolId, Item item, boolean instanceItem) {
         if (item == null || item.getId() == 0) {
-            putByte((byte) 0);
+            this.putByte((byte) 0);
             return;
         }
 
-        int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(item);
-        int networkId = RuntimeItems.getNetworkId(networkFullId);
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+        RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+        int runtimeId = runtimeEntry.getRuntimeId();
+        int damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
 
-        putVarInt(networkId);
-        putLShort(item.getCount());
+        this.putVarInt(runtimeId);
+        this.putLShort(item.getCount());
 
-        boolean useLegacyData = false;
-        if (item.getId() > 256) { // Not a block
-            if (item instanceof ItemDurable || !RuntimeItems.hasData(networkFullId)) {
-                useLegacyData = true;
-            }
-        }
-        putUnsignedVarInt(useLegacyData ? item.getDamage() : 0);
+        this.putUnsignedVarInt(damage);
 
         if (!instanceItem) {
-            putBoolean(true);
-            putVarInt(0); //TODO
+            this.putBoolean(true);
+            this.putVarInt(0); //TODO
         }
 
         Block block = item.getBlockUnsafe();
-        int runtimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
-        putVarInt(runtimeId);
+        int blockRuntimeId = block == null ? 0 : GlobalBlockPalette.getOrCreateRuntimeId(protocolId, block.getId(), block.getDamage());
+        this.putVarInt(blockRuntimeId);
 
         ByteBuf userDataBuf = ByteBufAllocator.DEFAULT.ioBuffer();
         try (LittleEndianByteBufOutputStream stream = new LittleEndianByteBufOutputStream(userDataBuf)) {
@@ -948,26 +918,58 @@ public class BinaryStream {
         }
     }
 
-    public void putRecipeIngredient(int protocolId, Item ingredient) {
-        if (ingredient == null || ingredient.getId() == 0) {
+    public Item getRecipeIngredient(int protocolId) {
+        int runtimeId = this.getVarInt();
+        if (runtimeId == 0) {
+            return Item.get(0, 0, 0);
+        }
+
+        int damage = this.getVarInt();
+        if (damage == 0x7fff) {
+            damage = -1;
+        }
+
+        int id;
+        if (protocolId < ProtocolInfo.v1_16_100) {
+            id = runtimeId;
+        } else {
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+            LegacyEntry legacyEntry = mapping.fromRuntime(runtimeId);
+            id = legacyEntry.getLegacyId();
+            if (legacyEntry.isHasDamage()) {
+                damage = legacyEntry.getDamage();
+            }
+        }
+
+        int count = this.getVarInt();
+        return Item.get(id, damage, count);
+    }
+
+    public void putRecipeIngredient(int protocolId, Item item) {
+        if (item == null || item.getId() == 0) {
             this.putVarInt(0);
             return;
         }
 
-        int networkId = ingredient.getId();
-        int damage = ingredient.hasMeta() ? ingredient.getDamage() : 0x7fff;
+        int runtimeId = item.getId();
+        int damage = item.hasMeta() ? item.getDamage() : 0x7fff;
 
         if (protocolId >= ProtocolInfo.v1_16_100) {
-            int networkFullId = RuntimeItems.getRuntimeMapping(protocolId).getNetworkFullId(ingredient);
-            networkId = RuntimeItems.getNetworkId(networkFullId);
-            if (RuntimeItems.hasData(networkFullId)) {
-                damage = 0;
+            RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
+            if (!item.hasMeta()) {
+                RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), 0);
+                runtimeId = runtimeEntry.getRuntimeId();
+                damage = 0x7fff;
+            } else {
+                RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+                runtimeId = runtimeEntry.getRuntimeId();
+                damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
             }
         }
 
-        this.putVarInt(networkId);
+        this.putVarInt(runtimeId);
         this.putVarInt(damage);
-        this.putVarInt(ingredient.getCount());
+        this.putVarInt(item.getCount());
     }
 
     private static List<String> extractStringList(Item item, String tagName) {

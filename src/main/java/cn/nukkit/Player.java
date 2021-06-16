@@ -953,7 +953,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (Server.getInstance().enableCustomItems) {
-            ArrayList<Integer> customItems = RuntimeItems.getRuntimeMapping(this.protocol).getCustomItems();
+            ArrayList<Integer> customItems = RuntimeItems.getMapping(this.protocol).getCustomItems();
 
             if (!customItems.isEmpty()) {
                 ItemComponentPacket itemComponentPacket = new ItemComponentPacket();

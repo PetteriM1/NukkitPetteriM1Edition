@@ -2,85 +2,87 @@ package cn.nukkit.item;
 
 import cn.nukkit.Server;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.utils.BinaryStream;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+@Log4j2
 @UtilityClass
 public class RuntimeItems {
 
-    private static final Gson GSON = new Gson();
-    private static final Type ENTRY_TYPE = new TypeToken<ArrayList<Entry>>() {
-    }.getType();
+    private static final Map<String, Integer> legacyString2LegacyInt = new HashMap<>();
 
-    //Don't use a map for better performance while we only have two mappings and we don't allow them to be loaded outside the server jar
+    // Don't use a map for better performance while we only have two mappings and we don't allow them to be loaded outside the server jar
     //private static final Int2ObjectMap<RuntimeItemMapping> itemPalettes = new Int2ObjectOpenHashMap<>();
     private static RuntimeItemMapping mapping361;
     private static RuntimeItemMapping mapping419;
+    private static RuntimeItemMapping mapping440;
+
+    private static boolean initialized;
 
     public static void init() {
-        Server.getInstance().getLogger().debug("Loading runtime items...");
-        registerMapping(ProtocolInfo.v1_12_0, "runtime_item_ids_361.json");
-        registerMapping(ProtocolInfo.v1_16_100, "runtime_item_ids_419.json");
-    }
-
-    private static void registerMapping(int protocolId, String fileName) {
-        InputStream stream = Server.class.getClassLoader().getResourceAsStream(fileName);
-        if (stream == null) {
-            throw new AssertionError("Unable to load " + fileName);
+        if (initialized) {
+            throw new IllegalStateException("RuntimeItems were already generated!");
+        }
+        initialized = true;
+        log.info("Loading runtime items...");
+        InputStream itemIdsStream = Server.class.getClassLoader().getResourceAsStream("legacy_item_ids.json");
+        if (itemIdsStream == null) {
+            throw new AssertionError("Unable to load legacy_item_ids.json");
         }
 
-        InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-        Collection<Entry> entries = GSON.fromJson(reader, ENTRY_TYPE);
+        JsonObject json = JsonParser.parseReader(new InputStreamReader(itemIdsStream)).getAsJsonObject();
+        for (String identifier : json.keySet()) {
+            legacyString2LegacyInt.put(identifier, json.get(identifier).getAsInt());
+        }
 
-        BinaryStream paletteBuffer = new BinaryStream();
-        paletteBuffer.putUnsignedVarInt(entries.size());
+        InputStream mappingStream = Server.class.getClassLoader().getResourceAsStream("item_mappings.json");
+        if (mappingStream == null) {
+            throw new AssertionError("Unable to load item_mappings.json");
+        }
+        JsonObject itemMapping = JsonParser.parseReader(new InputStreamReader(mappingStream)).getAsJsonObject();
 
-        Int2IntMap legacyNetworkMap = new Int2IntOpenHashMap();
-        Int2IntMap networkLegacyMap = new Int2IntOpenHashMap();
-        for (Entry entry : entries) {
-            paletteBuffer.putString(entry.name);
-            paletteBuffer.putLShort(entry.id);
-
-            if (protocolId >= ProtocolInfo.v1_16_100) {
-                paletteBuffer.putBoolean(false); // Component item
-                if (entry.oldId != null) {
-                    boolean hasData = entry.oldData != null;
-                    int fullId = getFullId(entry.oldId, hasData ? entry.oldData : 0);
-                    legacyNetworkMap.put(fullId, (entry.id << 1) | (hasData ? 1 : 0));
-                    networkLegacyMap.put(entry.id, fullId | (hasData ? 1 : 0));
-                }
+        Map<String, MappingEntry> mappingEntries = new HashMap<>();
+        for (String legacyName : itemMapping.keySet()) {
+            JsonObject convertData = itemMapping.getAsJsonObject(legacyName);
+            for (String damageStr : convertData.keySet()) {
+                String identifier = convertData.get(damageStr).getAsString();
+                int damage = Integer.parseInt(damageStr);
+                mappingEntries.put(identifier, new MappingEntry(legacyName, damage));
             }
         }
 
-        byte[] itemDataPalette = paletteBuffer.getBuffer();
-        //itemPalettes.put(protocolId, new RuntimeItemMapping(protocolId, itemDataPalette, legacyNetworkMap, networkLegacyMap));
-        if (protocolId == 361) {
-            mapping361 = new RuntimeItemMapping(protocolId, entries, itemDataPalette, legacyNetworkMap, networkLegacyMap);
-        } else if (protocolId == 419) {
-            mapping419 = new RuntimeItemMapping(protocolId, entries, itemDataPalette, legacyNetworkMap, networkLegacyMap);
-        } else throw new IllegalArgumentException("Tried to register unknown item mapping: " + protocolId);
+        mapping361 = new RuntimeItemMapping(mappingEntries, "runtime_item_ids_361.json", ProtocolInfo.v1_12_0);
+        mapping419 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_419.json", ProtocolInfo.v1_16_100);
+        mapping440 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_440.json", ProtocolInfo.v1_17_0);
     }
 
-    public static RuntimeItemMapping getRuntimeMapping(int protocolId) {
+    public static RuntimeItemMapping getMapping(int protocolId) {
         if (protocolId < ProtocolInfo.v1_16_100) {
-            //return itemPalettes.get(ProtocolInfo.v1_12_0);
             return mapping361;
+        } else if (protocolId < ProtocolInfo.v1_17_0) {
+            return mapping419;
         }
-        //return itemPalettes.get(/*protocolId*/ProtocolInfo.v1_16_100);
-        return mapping419;
+        return mapping440;
+    }
+
+    public static int getLegacyIdFromLegacyString(String identifier) {
+        return legacyString2LegacyInt.getOrDefault(identifier, -1);
+    }
+
+    @Data
+    public static class MappingEntry {
+        private final String legacyName;
+        private final int damage;
     }
 
     public static int getId(int fullId) {
