@@ -37,6 +37,11 @@ public abstract class ItemCustomTool extends ItemCustom implements ItemDurable {
     }
 
     @Override
+    public int getCreativeCategory() {
+        return 3;
+    }
+
+    @Override
     public CompoundTag getComponentsData() {
         CompoundTag data = super.getComponentsData();
 
