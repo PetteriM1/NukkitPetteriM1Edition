@@ -910,12 +910,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.sendPosition(this, yaw, pitch, MovePlayerPacket.MODE_RESET);
 
         if (this.getHealth() < 1 || this.protocol < 274) {
-            pos = this.getSpawn();
+            /*pos = this.getSpawn();
             RespawnPacket respawnPacket = new RespawnPacket();
             respawnPacket.x = (float) pos.x;
             respawnPacket.y = (float) pos.y;
             respawnPacket.z = (float) pos.z;
-            this.dataPacket(respawnPacket);
+            this.dataPacket(respawnPacket);*/
+            //Fix player dies, quit the server and rejoin can't move
+            this.resapwn();
         }
 
         this.getLevel().sendTime(this);
