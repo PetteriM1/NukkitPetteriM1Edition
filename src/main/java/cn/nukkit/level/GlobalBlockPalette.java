@@ -562,11 +562,12 @@ public class GlobalBlockPalette {
     }
 
     public static int getLegacyFullId(int protocolId, int runtimeId) {
-        if (protocolId < ProtocolInfo.v1_17_0) {
-            return runtimeIdToLegacy428.get(runtimeId);
-        } else {
+        if (protocolId >= ProtocolInfo.v1_17_0) {
             return runtimeIdToLegacy440.get(runtimeId);
+        } else if (protocolId >= ProtocolInfo.v1_16_210) {
+            return runtimeIdToLegacy428.get(runtimeId);
         }
+        throw new IllegalArgumentException("Tried to get legacyFullId of unsupported protocol: " + protocolId);
     }
 
     @SuppressWarnings("unused")
