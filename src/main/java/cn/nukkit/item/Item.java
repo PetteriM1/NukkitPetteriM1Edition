@@ -5,9 +5,8 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
-import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
-import cn.nukkit.item.RuntimeItemMapping.LegacyEntry;
 import cn.nukkit.inventory.Fuel;
+import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -230,6 +229,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
             list[FIREWORKS] = ItemFirework.class; //401
             list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
+            list[FIREWORKSCHARGE] = ItemFireworkStar.class; //402
             list[COMPARATOR] = ItemRedstoneComparator.class; //404
             list[NETHER_BRICK] = ItemNetherBrick.class; //405
             list[QUARTZ] = ItemQuartz.class; //406
@@ -260,6 +260,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[DARK_OAK_DOOR] = ItemDoorDarkOak.class; //431
             list[CHORUS_FRUIT] = ItemChorusFruit.class; //432
             list[POPPED_CHORUS_FRUIT] = ItemChorusFruitPopped.class; //433
+            list[BANNER_PATTERN] = ItemBannerPattern.class; //434
             list[DRAGON_BREATH] = ItemDragonBreath.class; //437
             list[SPLASH_POTION] = ItemPotionSplash.class; //438
             list[LINGERING_POTION] = ItemPotionLingering.class; //441
@@ -267,6 +268,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[SHULKER_SHELL] = ItemShulkerShell.class; //445
             list[BANNER] = ItemBanner.class; //446
             list[TOTEM] = ItemTotem.class; //450
+            list[IRON_NUGGET] = ItemNuggetIron.class; //452
             list[TRIDENT] = ItemTrident.class; //455
             list[BEETROOT] = ItemBeetroot.class; //457
             list[BEETROOT_SEEDS] = ItemSeedsBeetroot.class; //458
@@ -276,8 +278,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[PUFFERFISH] = ItemPufferfish.class; //462
             list[COOKED_SALMON] = ItemSalmonCooked.class; //463
             list[DRIED_KELP] = ItemDriedKelp.class; //464
+            list[NAUTILUS_SHELL] = ItemNautilusShell.class; //465
             list[GOLDEN_APPLE_ENCHANTED] = ItemAppleGoldEnchanted.class; //466
+            list[HEART_OF_THE_SEA] = ItemHeartOfTheSea.class; //467
+            list[SCUTE] = ItemScute.class; //468
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
+            list[PHANTOM_MEMBRANE] = ItemPhantomMembrane.class; //470
             list[CROSSBOW] = ItemCrossbow.class; //471
             list[SWEET_BERRIES] = ItemSweetBerries.class; //477
             list[RECORD_11] = ItemRecord11.class; //510
@@ -294,6 +300,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[RECORD_WAIT] = ItemRecordWait.class; //511
             list[SHIELD] = ItemShield.class; //513
             list[SUSPICIOUS_STEW] = ItemSuspiciousStew.class; //734
+            list[HONEYCOMB] = ItemHoneycomb.class; //736
             list[HONEY_BOTTLE] = ItemHoneyBottle.class; //737
             list[NETHERITE_INGOT] = ItemIngotNetherite.class; //742
             list[NETHERITE_SWORD] = ItemSwordNetherite.class; //743

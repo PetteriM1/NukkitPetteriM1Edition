@@ -2,13 +2,8 @@ package cn.nukkit.item;
 
 import cn.nukkit.Server;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.utils.BinaryStream;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -17,10 +12,6 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +21,6 @@ public class RuntimeItems {
 
     private static final Map<String, Integer> legacyString2LegacyInt = new HashMap<>();
 
-    // Don't use a map for better performance while we only have two mappings and we don't allow them to be loaded outside the server jar
-    //private static final Int2ObjectMap<RuntimeItemMapping> itemPalettes = new Int2ObjectOpenHashMap<>();
     private static RuntimeItemMapping mapping361;
     private static RuntimeItemMapping mapping419;
     private static RuntimeItemMapping mapping440;
