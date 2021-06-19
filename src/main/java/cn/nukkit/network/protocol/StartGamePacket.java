@@ -206,7 +206,7 @@ public class StartGamePacket extends DataPacket {
                 this.put(GlobalBlockPalette.getCompiledTable(this.protocol));
             }
             if (protocol >= 361) {
-                this.put(RuntimeItems.getRuntimeMapping(protocol).getItemDataPalette());
+                this.put(RuntimeItems.getMapping(protocol).getItemPalette());
             }
             this.putString(this.multiplayerCorrelationId);
             if (protocol == 354 && version != null && version.startsWith("1.11.4")) {
