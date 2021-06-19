@@ -14,7 +14,7 @@ public class PlayerRespawnEvent extends PlayerEvent {
 
     private Position position;
 
-    private boolean firstSpawn;
+    private final boolean firstSpawn;
 
     public PlayerRespawnEvent(Player player, Position position) {
         this(player, position, false);

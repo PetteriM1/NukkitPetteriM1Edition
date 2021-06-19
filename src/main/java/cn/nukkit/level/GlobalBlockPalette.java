@@ -58,6 +58,8 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId428 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId440 = new Int2IntOpenHashMap();
+    private static final Int2IntMap runtimeIdToLegacy428 = new Int2IntOpenHashMap();
+    private static final Int2IntMap runtimeIdToLegacy440 = new Int2IntOpenHashMap();
     private static final byte[] compiledTable282;
     private static final byte[] compiledTable291;
     private static final byte[] compiledTable313;
@@ -88,6 +90,8 @@ public class GlobalBlockPalette {
         legacyToRuntimeId419.defaultReturnValue(-1);
         legacyToRuntimeId428.defaultReturnValue(-1);
         legacyToRuntimeId440.defaultReturnValue(-1);
+        runtimeIdToLegacy428.defaultReturnValue(-1);
+        runtimeIdToLegacy440.defaultReturnValue(-1);
 
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
@@ -331,6 +335,7 @@ public class GlobalBlockPalette {
             for (CompoundTag legacyState : legacyStates) {
                 int legacyId = legacyState.getInt("id") << 6 | legacyState.getShort("val");
                 legacyToRuntimeId428.put(legacyId, runtimeId);
+                runtimeIdToLegacy428.put(runtimeId, legacyId);
             }
         }
         // 440
@@ -350,6 +355,7 @@ public class GlobalBlockPalette {
             int runtimeId = state.getInt("runtimeId");
             int legacyId = id << 6 | data;
             legacyToRuntimeId440.put(legacyId, runtimeId);
+            runtimeIdToLegacy440.put(runtimeId, legacyId);
         }
     }
 
@@ -554,6 +560,15 @@ public class GlobalBlockPalette {
             default: // 388+
                 return getOrCreateRuntimeId(protocol, legacyId >> Block.DATA_BITS, legacyId & Block.DATA_MASK);
         }
+    }
+
+    public static int getLegacyFullId(int protocolId, int runtimeId) {
+        if (protocolId >= ProtocolInfo.v1_17_0) {
+            return runtimeIdToLegacy440.get(runtimeId);
+        } else if (protocolId >= ProtocolInfo.v1_16_210) {
+            return runtimeIdToLegacy428.get(runtimeId);
+        }
+        throw new IllegalArgumentException("Tried to get legacyFullId of unsupported protocol: " + protocolId);
     }
 
     @SuppressWarnings("unused")
