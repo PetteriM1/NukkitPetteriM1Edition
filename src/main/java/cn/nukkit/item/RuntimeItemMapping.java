@@ -84,7 +84,7 @@ public class RuntimeItemMapping {
 
             this.runtime2Legacy.put(runtimeId, legacyEntry);
             this.identifier2Legacy.put(identifier, legacyEntry);
-            this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage));
+            this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage, false));
         }
 
         this.generatePalette();
@@ -133,7 +133,7 @@ public class RuntimeItemMapping {
 
         this.runtime2Legacy.put(legacyId, legacyEntry);
         this.identifier2Legacy.put(identifier, legacyEntry);
-        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false));
+        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false, false));
     }
 
 
@@ -141,10 +141,18 @@ public class RuntimeItemMapping {
         BinaryStream paletteBuffer = new BinaryStream();
         paletteBuffer.putUnsignedVarInt(this.legacy2Runtime.size());
         for (RuntimeEntry entry : this.legacy2Runtime.values()) {
-            paletteBuffer.putString(entry.getIdentifier());
-            paletteBuffer.putLShort(entry.getRuntimeId());
-            if (this.protocolId >= ProtocolInfo.v1_16_100) {
-                paletteBuffer.putBoolean(false); // Component item
+            if (entry.isCustomItem()) {
+                if (Server.getInstance().enableCustomItems && protocolId >= ProtocolInfo.v1_16_100) {
+                    paletteBuffer.putString("customitem:" + entry.getIdentifier());
+                    paletteBuffer.putLShort(entry.getRuntimeId());
+                    paletteBuffer.putBoolean(true); // Component item
+                }
+            }else {
+                paletteBuffer.putString(entry.getIdentifier());
+                paletteBuffer.putLShort(entry.getRuntimeId());
+                if (this.protocolId >= ProtocolInfo.v1_16_100) {
+                    paletteBuffer.putBoolean(false); // Component item
+                }
             }
         }
         this.itemPalette = paletteBuffer.getBuffer();
@@ -251,5 +259,6 @@ public class RuntimeItemMapping {
         private final String identifier;
         private final int runtimeId;
         private final boolean hasDamage;
+        private final boolean isCustomItem;
     }
 }
