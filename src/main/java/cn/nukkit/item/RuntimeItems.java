@@ -21,8 +21,6 @@ public class RuntimeItems {
 
     private static final Map<String, Integer> legacyString2LegacyInt = new HashMap<>();
 
-    // Don't use a map for better performance while we only have two mappings and we don't allow them to be loaded outside the server jar
-    //private static final Int2ObjectMap<RuntimeItemMapping> itemPalettes = new Int2ObjectOpenHashMap<>();
     private static RuntimeItemMapping mapping361;
     private static RuntimeItemMapping mapping419;
     private static RuntimeItemMapping mapping440;

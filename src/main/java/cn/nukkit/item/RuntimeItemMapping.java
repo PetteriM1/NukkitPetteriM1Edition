@@ -1,6 +1,8 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Server;
+import cn.nukkit.item.RuntimeItems.MappingEntry;
+
 import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -36,7 +38,7 @@ public class RuntimeItemMapping {
 
     private byte[] itemPalette;
 
-    public RuntimeItemMapping(Map<String, RuntimeItems.MappingEntry> mappings, String itemStatesFile, int protocolId) {
+    public RuntimeItemMapping(Map<String, MappingEntry> mappings, String itemStatesFile, int protocolId) {
         this.protocolId = protocolId;
         InputStream stream = Server.class.getClassLoader().getResourceAsStream(itemStatesFile);
         if (stream == null) {
@@ -62,7 +64,7 @@ public class RuntimeItemMapping {
             int legacyId;
 
             if (mappings.containsKey(identifier)) {
-                RuntimeItems.MappingEntry mapping = mappings.get(identifier);
+                MappingEntry mapping = mappings.get(identifier);
                 legacyId = RuntimeItems.getLegacyIdFromLegacyString(mapping.getLegacyName());
                 if (legacyId == -1) {
                     throw new IllegalStateException("Unable to match  " + mapping + " with legacyId");
@@ -82,12 +84,11 @@ public class RuntimeItemMapping {
 
             this.runtime2Legacy.put(runtimeId, legacyEntry);
             this.identifier2Legacy.put(identifier, legacyEntry);
-            this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage, false));
+            this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage));
         }
 
         this.generatePalette();
     }
-
 
     synchronized boolean registeredCustomItem(ItemCustom itemCustom) {
         if (!Server.getInstance().enableCustomItems || this.customItems.contains(itemCustom.getId())) {
@@ -132,25 +133,18 @@ public class RuntimeItemMapping {
 
         this.runtime2Legacy.put(legacyId, legacyEntry);
         this.identifier2Legacy.put(identifier, legacyEntry);
-        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false, false));
+        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false));
     }
+
 
     private void generatePalette() {
         BinaryStream paletteBuffer = new BinaryStream();
         paletteBuffer.putUnsignedVarInt(this.legacy2Runtime.size());
         for (RuntimeEntry entry : this.legacy2Runtime.values()) {
-            if (entry.isCustomItem()) {
-                if (Server.getInstance().enableCustomItems && protocolId >= ProtocolInfo.v1_16_100) {
-                    paletteBuffer.putString("customitem:" + entry.getIdentifier());
-                    paletteBuffer.putLShort(entry.getRuntimeId());
-                    paletteBuffer.putBoolean(true); // Component item
-                }
-            }else {
-                paletteBuffer.putString(entry.getIdentifier());
-                paletteBuffer.putLShort(entry.getRuntimeId());
-                if (this.protocolId >= ProtocolInfo.v1_16_100) {
-                    paletteBuffer.putBoolean(false); // Component item
-                }
+            paletteBuffer.putString(entry.getIdentifier());
+            paletteBuffer.putLShort(entry.getRuntimeId());
+            if (this.protocolId >= ProtocolInfo.v1_16_100) {
+                paletteBuffer.putBoolean(false); // Component item
             }
         }
         this.itemPalette = paletteBuffer.getBuffer();
@@ -187,7 +181,7 @@ public class RuntimeItemMapping {
             if (!ignoreUnknown) {
                 throw new IllegalStateException("Can not find legacyEntry for " + identifier);
             }
-            Server.getInstance().getLogger().debug("Can not find legacyEntry for " + identifier);
+            log.debug("Can not find legacyEntry for " + identifier);
             return null;
         }
 
@@ -224,6 +218,7 @@ public class RuntimeItemMapping {
         return Item.get(legacyId, damage, count, nbtBytes);
     }
 
+
     public LegacyEntry fromIdentifier(String identifier) {
         return this.identifier2Legacy.get(identifier);
     }
@@ -256,6 +251,5 @@ public class RuntimeItemMapping {
         private final String identifier;
         private final int runtimeId;
         private final boolean hasDamage;
-        private final boolean isCustomItem;
     }
 }

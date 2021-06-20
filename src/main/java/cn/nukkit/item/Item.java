@@ -7,7 +7,6 @@ import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
-import cn.nukkit.item.customitem.ItemCustom;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -453,11 +452,11 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item.creative440.clear();
     }
 
-    public static List<Item> getCreativeItems() {
+    public static ArrayList<Item> getCreativeItems() {
         return getCreativeItems(CURRENT_PROTOCOL);
     }
 
-    public static List<Item> getCreativeItems(int protocol) {
+    public static ArrayList<Item> getCreativeItems(int protocol) {
         switch (protocol) {
             case v1_2_0:
             case v1_2_5_11:
@@ -468,26 +467,26 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_2_13:
             case v1_2_13_11:
             case v1_4_0:
-                return new ObjectArrayList<>(Item.creative137);
+                return new ArrayList<>(Item.creative137);
             case v1_5_0:
-                return new ObjectArrayList<>(Item.creative274);
+                return new ArrayList<>(Item.creative274);
             case v1_6_0_5:
             case v1_6_0:
             case v1_7_0:
-                return new ObjectArrayList<>(Item.creative291);
+                return new ArrayList<>(Item.creative291);
             case v1_8_0:
-                return new ObjectArrayList<>(Item.creative313);
+                return new ArrayList<>(Item.creative313);
             case v1_9_0:
-                return new ObjectArrayList<>(Item.creative332);
+                return new ArrayList<>(Item.creative332);
             case v1_10_0:
-                return new ObjectArrayList<>(Item.creative340);
+                return new ArrayList<>(Item.creative340);
             case v1_11_0:
             case v1_12_0:
             case v1_13_0:
-                return new ObjectArrayList<>(Item.creative354);
+                return new ArrayList<>(Item.creative354);
             case v1_14_0:
             case v1_14_60:
-                return new ObjectArrayList<>(Item.creative389);
+                return new ArrayList<>(Item.creative389);
             case v1_16_0:
             case v1_16_20:
             case v1_16_100_0:
@@ -502,16 +501,16 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_16_230_50:
             case v1_16_230:
             case v1_16_230_54:
-                return new ObjectArrayList<>(Item.creative407);
+                return new ArrayList<>(Item.creative407);
             case v1_17_0:
-                return new ObjectArrayList<>(Item.creative440);
+                return new ArrayList<>(Item.creative440);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
     }
 
     public static void addCreativeItem(Item item) {
-        addCreativeItem(v1_16_0, item);
+        addCreativeItem(v1_17_0, item);
     }
 
     public static void addCreativeItem(int protocol, Item item) {
