@@ -3,7 +3,6 @@ package cn.nukkit.form.window;
 import cn.nukkit.form.element.*;
 import cn.nukkit.form.response.FormResponseCustom;
 import cn.nukkit.form.response.FormResponseData;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ public class FormWindowCustom extends FormWindow {
             return;
         }
 
-        List<String> elementResponses = new Gson().fromJson(data, new ListTypeToken().getType());
+        List<String> elementResponses = GSON.fromJson(data, new ListTypeToken().getType());
 
         int i = 0;
 

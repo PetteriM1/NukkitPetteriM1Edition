@@ -1,6 +1,7 @@
 package cn.nukkit.level;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
@@ -92,11 +93,13 @@ public class GlobalBlockPalette {
         runtimeIdToLegacy428.defaultReturnValue(-1);
         runtimeIdToLegacy440.defaultReturnValue(-1);
 
+        Gson GSON = new Gson();
+
         Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
         InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
         if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
-        Collection<TableEntryOld> entries223 = new Gson().fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
+        Collection<TableEntryOld> entries223 = GSON.fromJson(new InputStreamReader(stream223, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
         for (TableEntryOld entry : entries223) {
             legacyToRuntimeId223.put((entry.id << 4) | entry.data, entry.runtimeID);
         }
@@ -104,7 +107,7 @@ public class GlobalBlockPalette {
         // 261
         InputStream stream261 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_261.json");
         if (stream261 == null) throw new AssertionError("Unable to locate RuntimeID table 261");
-        Collection<TableEntryOld> entries261 = new Gson().fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
+        Collection<TableEntryOld> entries261 = GSON.fromJson(new InputStreamReader(stream261, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
         for (TableEntryOld entry : entries261) {
             legacyToRuntimeId261.put((entry.id << 4) | entry.data, entry.runtimeID);
         }
@@ -112,7 +115,7 @@ public class GlobalBlockPalette {
         // 274
         InputStream stream274 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_274.json");
         if (stream274 == null) throw new AssertionError("Unable to locate RuntimeID table 274");
-        Collection<TableEntryOld> entries274 = new Gson().fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
+        Collection<TableEntryOld> entries274 = GSON.fromJson(new InputStreamReader(stream274, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntryOld>>(){}.getType());
         for (TableEntryOld entry : entries274) {
             legacyToRuntimeId274.put((entry.id << 4) | entry.data, entry.runtimeID);
         }
@@ -120,86 +123,86 @@ public class GlobalBlockPalette {
         // 282
         InputStream stream282 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_282.json");
         if (stream282 == null) throw new AssertionError("Unable to locate RuntimeID table 282");
-        Collection<TableEntry> entries282 = new Gson().fromJson(new InputStreamReader(stream282, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries282 = GSON.fromJson(new InputStreamReader(stream282, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table282 = new BinaryStream();
         table282.putUnsignedVarInt(entries282.size());
-        for (TableEntry entry282 : entries282) {
-            registerMapping(282, (entry282.id << 4) | entry282.data);
-            table282.putString(entry282.name);
-            table282.putLShort(entry282.data);
+        for (TableEntry entry : entries282) {
+            legacyToRuntimeId282.put((entry.id << 4) | entry.data, runtimeIdAllocator282.getAndIncrement());
+            table282.putString(entry.name);
+            table282.putLShort(entry.data);
         }
         compiledTable282 = table282.getBuffer();
         // 291
         InputStream stream291 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_291.json");
         if (stream291 == null) throw new AssertionError("Unable to locate RuntimeID table 291");
-        Collection<TableEntry> entries291 = new Gson().fromJson(new InputStreamReader(stream291, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries291 = GSON.fromJson(new InputStreamReader(stream291, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table291 = new BinaryStream();
         table291.putUnsignedVarInt(entries291.size());
-        for (TableEntry entry291 : entries291) {
-            registerMapping(291, (entry291.id << 4) | entry291.data);
-            table291.putString(entry291.name);
-            table291.putLShort(entry291.data);
+        for (TableEntry entry : entries291) {
+            legacyToRuntimeId291.put((entry.id << 4) | entry.data, runtimeIdAllocator291.getAndIncrement());
+            table291.putString(entry.name);
+            table291.putLShort(entry.data);
         }
         compiledTable291 = table291.getBuffer();
         // 313
         InputStream stream313 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_313.json");
         if (stream313 == null) throw new AssertionError("Unable to locate RuntimeID table 313");
-        Collection<TableEntry> entries313 = new Gson().fromJson(new InputStreamReader(stream313, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries313 = GSON.fromJson(new InputStreamReader(stream313, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table313 = new BinaryStream();
         table313.putUnsignedVarInt(entries313.size());
-        for (TableEntry entry313 : entries313) {
-            registerMapping(313, (entry313.id << 4) | entry313.data);
-            table313.putString(entry313.name);
-            table313.putLShort(entry313.data);
+        for (TableEntry entry : entries313) {
+            legacyToRuntimeId313.put((entry.id << 4) | entry.data, runtimeIdAllocator313.getAndIncrement());
+            table313.putString(entry.name);
+            table313.putLShort(entry.data);
         }
         compiledTable313 = table313.getBuffer();
         // 332
         InputStream stream332 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_332.json");
         if (stream332 == null) throw new AssertionError("Unable to locate RuntimeID table 332");
-        Collection<TableEntry> entries332 = new Gson().fromJson(new InputStreamReader(stream332, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries332 = GSON.fromJson(new InputStreamReader(stream332, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table332 = new BinaryStream();
         table332.putUnsignedVarInt(entries332.size());
-        for (TableEntry entry332 : entries332) {
-            registerMapping(332, (entry332.id << 4) | entry332.data);
-            table332.putString(entry332.name);
-            table332.putLShort(entry332.data);
+        for (TableEntry entry : entries332) {
+            legacyToRuntimeId332.put((entry.id << 4) | entry.data, runtimeIdAllocator332.getAndIncrement());
+            table332.putString(entry.name);
+            table332.putLShort(entry.data);
         }
         compiledTable332 = table332.getBuffer();
         // 340
         InputStream stream340 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_340.json");
         if (stream340 == null) throw new AssertionError("Unable to locate RuntimeID table 340");
-        Collection<TableEntry> entries340 = new Gson().fromJson(new InputStreamReader(stream340, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries340 = GSON.fromJson(new InputStreamReader(stream340, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table340 = new BinaryStream();
         table340.putUnsignedVarInt(entries340.size());
-        for (TableEntry entry340 : entries340) {
-            registerMapping(340, (entry340.id << 4) | entry340.data);
-            table340.putString(entry340.name);
-            table340.putLShort(entry340.data);
+        for (TableEntry entry : entries340) {
+            legacyToRuntimeId340.put((entry.id << 4) | entry.data, runtimeIdAllocator340.getAndIncrement());
+            table340.putString(entry.name);
+            table340.putLShort(entry.data);
         }
         compiledTable340 = table340.getBuffer();
         // 354
         InputStream stream354 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_354.json");
         if (stream354 == null) throw new AssertionError("Unable to locate RuntimeID table 354");
-        Collection<TableEntry> entries354 = new Gson().fromJson(new InputStreamReader(stream354, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries354 = GSON.fromJson(new InputStreamReader(stream354, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table354 = new BinaryStream();
         table354.putUnsignedVarInt(entries354.size());
-        for (TableEntry entry354 : entries354) {
-            registerMapping(354, (entry354.id << 4) | entry354.data);
-            table354.putString(entry354.name);
-            table354.putLShort(entry354.data);
+        for (TableEntry entry : entries354) {
+            legacyToRuntimeId354.put((entry.id << 4) | entry.data, runtimeIdAllocator354.getAndIncrement());
+            table354.putString(entry.name);
+            table354.putLShort(entry.data);
         }
         compiledTable354 = table354.getBuffer();
         // 361
         InputStream stream361 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_361.json");
         if (stream361 == null) throw new AssertionError("Unable to locate RuntimeID table 361");
-        Collection<TableEntry> entries361 = new Gson().fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
+        Collection<TableEntry> entries361 = GSON.fromJson(new InputStreamReader(stream361, StandardCharsets.UTF_8), new TypeToken<Collection<TableEntry>>(){}.getType());
         BinaryStream table361 = new BinaryStream();
         table361.putUnsignedVarInt(entries361.size());
-        for (TableEntry entry361 : entries361) {
-            registerMapping(361, (entry361.id << 4) | entry361.data);
-            table361.putString(entry361.name);
-            table361.putLShort(entry361.data);
-            table361.putLShort(entry361.id);
+        for (TableEntry entry : entries361) {
+            legacyToRuntimeId361.put((entry.id << 4) | entry.data, runtimeIdAllocator361.getAndIncrement());
+            table361.putString(entry.name);
+            table361.putLShort(entry.data);
+            table361.putLShort(entry.id);
         }
         compiledTable361 = table361.getBuffer();
         // 388
@@ -213,13 +216,13 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
-        for (CompoundTag state388 : tag388.getAll()) {
+        for (CompoundTag state : tag388.getAll()) {
             int runtimeId = runtimeIdAllocator388.getAndIncrement();
-            if (!state388.contains("meta")) continue;
-            for (int val : state388.getIntArray("meta")) {
-                legacyToRuntimeId388.put(state388.getShort("id") << 6 | val, runtimeId);
+            if (!state.contains("meta")) continue;
+            for (int val : state.getIntArray("meta")) {
+                legacyToRuntimeId388.put(state.getShort("id") << 6 | val, runtimeId);
             }
-            state388.remove("meta");
+            state.remove("meta");
         }
         // 389
         InputStream stream389 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_389.dat");
@@ -359,140 +362,118 @@ public class GlobalBlockPalette {
     }
 
     public static int getOrCreateRuntimeId(int protocol, int id, int meta) {
+        if (protocol < 223) throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         int legacyId = protocol >= 388 ? ((id << 6) | meta) : ((id << 4) | meta);
+        int runtimeId;
         switch (protocol) {
             // Versions before this doesn't use runtime IDs
             case 223:
             case 224:
-                return legacyToRuntimeId223.get(legacyId);
+                runtimeId = legacyToRuntimeId223.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId223.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 261:
-                return legacyToRuntimeId261.get(legacyId);
+                runtimeId = legacyToRuntimeId261.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId261.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 274:
-                return legacyToRuntimeId274.get(legacyId);
+                runtimeId = legacyToRuntimeId274.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId274.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 281:
             case 282:
-                return legacyToRuntimeId282.get(legacyId);
+                runtimeId = legacyToRuntimeId282.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId282.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 291:
-                return legacyToRuntimeId291.get(legacyId);
+                runtimeId = legacyToRuntimeId291.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId291.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 313:
-                return legacyToRuntimeId313.get(legacyId);
+                runtimeId = legacyToRuntimeId313.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId313.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 332:
-                return legacyToRuntimeId332.get(legacyId);
+                runtimeId = legacyToRuntimeId332.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId332.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 340:
-                return legacyToRuntimeId340.get(legacyId);
+                runtimeId = legacyToRuntimeId340.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId340.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 354:
-                return legacyToRuntimeId354.get(legacyId);
+                runtimeId = legacyToRuntimeId354.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId354.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 361:
-                return legacyToRuntimeId361.get(legacyId);
+                runtimeId = legacyToRuntimeId361.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId361.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 388:
-                return legacyToRuntimeId388.get(legacyId);
+                runtimeId = legacyToRuntimeId388.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId388.get(id << 6);
+                    if (runtimeId == -1) runtimeId = legacyToRuntimeId388.get(BlockID.INFO_UPDATE << 6);
+                }
+                return runtimeId;
             case 389:
             case 390:
-                int id389 = legacyToRuntimeId389.get(legacyId);
-                if (id389 == -1) {
-                    id389 = legacyToRuntimeId389.get(id << 6);
-                    if (id389 == -1) {
-                        log.info("(389) Creating new runtime ID for unknown block {}", id);
-                        id389 = runtimeIdAllocator389.getAndIncrement();
-                        legacyToRuntimeId389.put(id << 6, id389);
-                    }
+                runtimeId = legacyToRuntimeId389.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId389.get(id << 6);
+                    if (runtimeId == -1) runtimeId = legacyToRuntimeId389.get(BlockID.INFO_UPDATE << 6);
                 }
-                return id389;
+                return runtimeId;
             case 407:
-                int id407 = legacyToRuntimeId407.get(legacyId);
-                if (id407 == -1) {
-                    id407 = legacyToRuntimeId407.get(id << 6);
-                    if (id407 == -1) {
-                        log.info("(407) Creating new runtime ID for unknown block {}", id);
-                        id407 = runtimeIdAllocator407.getAndIncrement();
-                        legacyToRuntimeId407.put(id << 6, id407);
-                    }
+                runtimeId = legacyToRuntimeId407.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId407.get(id << 6);
+                    if (runtimeId == -1) runtimeId = legacyToRuntimeId407.get(BlockID.INFO_UPDATE << 6);
                 }
-                return id407;
+                return runtimeId;
             case 408:
             case 409:
             case 410:
             case 411:
-                int id408 = legacyToRuntimeId408.get(legacyId);
-                if (id408 == -1) {
-                    id408 = legacyToRuntimeId408.get(id << 6);
-                    if (id408 == -1) {
-                        log.info("(408) Creating new runtime ID for unknown block {}", id);
-                        id408 = runtimeIdAllocator408.getAndIncrement();
-                        legacyToRuntimeId408.put(id << 6, id408);
-                    }
+                runtimeId = legacyToRuntimeId408.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId408.get(id << 6);
+                    if (runtimeId == -1) runtimeId = legacyToRuntimeId408.get(BlockID.INFO_UPDATE << 6);
                 }
-                return id408;
+                return runtimeId;
             case 419:
             case 420:
             case 422:
             case ProtocolInfo.v1_16_210_50:
-                int id419 = legacyToRuntimeId419.get(legacyId);
-                if (id419 == -1) {
-                    id419 = legacyToRuntimeId419.get(id << 6);
-                    if (id419 == -1) {
-                        log.info("(419) Creating new runtime ID for unknown block {}", id);
-                        id419 = runtimeIdAllocator419.getAndIncrement();
-                        legacyToRuntimeId419.put(id << 6, id419);
-                    }
+                runtimeId = legacyToRuntimeId419.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId419.get(id << 6);
+                    if (runtimeId == -1) runtimeId = legacyToRuntimeId419.get(BlockID.INFO_UPDATE << 6);
                 }
-                return id419;
+                return runtimeId;
             case ProtocolInfo.v1_16_210:
             case ProtocolInfo.v1_16_220:
             case ProtocolInfo.v1_16_230_50:
             case ProtocolInfo.v1_16_230:
             case ProtocolInfo.v1_16_230_54:
-                int id428 = legacyToRuntimeId428.get(legacyId);
-                if (id428 == -1) {
-                    id428 = legacyToRuntimeId428.get(id << 6);
-                    if (id428 == -1) {
-                        log.info("(428) Creating new runtime ID for unknown block {}", id);
-                        id428 = runtimeIdAllocator428.getAndIncrement();
-                        legacyToRuntimeId428.put(id << 6, id428);
-                    }
+                runtimeId = legacyToRuntimeId428.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId428.get(id << 6);
+                    if (runtimeId == -1) runtimeId = legacyToRuntimeId428.get(BlockID.INFO_UPDATE << 6);
                 }
-                return id428;
+                return runtimeId;
             case ProtocolInfo.v1_17_0:
-                int id440 = legacyToRuntimeId440.get(legacyId);
-                if (id440 == -1) {
-                    id440 = legacyToRuntimeId440.get(id << 6);
-                    if (id440 == -1) {
-                        log.info("(440) Missing runtime id mappings for " + id + ':' + meta);
-                        return 5035; // Update game block
+                runtimeId = legacyToRuntimeId440.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId440.get(id << 6);
+                    if (runtimeId == -1) {
+                        log.info("(440) Missing block runtime id mappings for " + id + ':' + meta);
+                        runtimeId = legacyToRuntimeId428.get(BlockID.INFO_UPDATE << 6);
                     }
                 }
-                return id440;
+                return runtimeId;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
-        }
-    }
-
-    private static void registerMapping(int protocol, int legacyId) {
-        switch (protocol) { // NOTE: Not all versions are supposed to be here
-            // 223, 261 and 274 registered directly on read
-            case 282:
-                legacyToRuntimeId282.put(legacyId, runtimeIdAllocator282.getAndIncrement());
-                break;
-            case 291:
-                legacyToRuntimeId291.put(legacyId, runtimeIdAllocator291.getAndIncrement());
-                break;
-            case 313:
-                legacyToRuntimeId313.put(legacyId, runtimeIdAllocator313.getAndIncrement());
-                break;
-            case 332:
-                legacyToRuntimeId332.put(legacyId, runtimeIdAllocator332.getAndIncrement());
-                break;
-            case 340:
-                legacyToRuntimeId340.put(legacyId, runtimeIdAllocator340.getAndIncrement());
-                break;
-            case 354:
-                legacyToRuntimeId354.put(legacyId, runtimeIdAllocator354.getAndIncrement());
-                break;
-            case 361:
-                legacyToRuntimeId361.put(legacyId, runtimeIdAllocator361.getAndIncrement());
-                break;
-            default: // Not used for 388+
-                throw new IllegalArgumentException("Tried to register mapping for unsupported protocol version: " + protocol);
         }
     }
 
@@ -527,35 +508,56 @@ public class GlobalBlockPalette {
             case 411:
                 return compiledTable408;
             default: // Unused since 1.16.100 (419)
-                throw new IllegalArgumentException("Tried to get compiled runtime id table for unsupported protocol version: " + protocol);
+                throw new IllegalArgumentException("Tried to get compiled block runtime id table for unsupported protocol version: " + protocol);
         }
     }
 
     public static int getOrCreateRuntimeId(int protocol, int legacyId) throws NoSuchElementException {
+        if (protocol < 223) throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
+        int runtimeId;
         switch (protocol) {
-            // Versions before this doesn't use runtime IDs
             case 223:
             case 224:
-                return legacyToRuntimeId223.get(legacyId);
+                runtimeId = legacyToRuntimeId223.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId223.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 261:
-                return legacyToRuntimeId261.get(legacyId);
+                runtimeId = legacyToRuntimeId261.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId261.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 274:
-                return legacyToRuntimeId274.get(legacyId);
+                runtimeId = legacyToRuntimeId274.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId274.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 281:
             case 282:
-                return legacyToRuntimeId282.get(legacyId);
+                runtimeId = legacyToRuntimeId282.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId282.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 291:
-                return legacyToRuntimeId291.get(legacyId);
+                runtimeId = legacyToRuntimeId291.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId291.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 313:
-                return legacyToRuntimeId313.get(legacyId);
+                runtimeId = legacyToRuntimeId313.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId313.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 332:
-                return legacyToRuntimeId332.get(legacyId);
+                runtimeId = legacyToRuntimeId332.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId332.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 340:
-                return legacyToRuntimeId340.get(legacyId);
+                runtimeId = legacyToRuntimeId340.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId340.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 354:
-                return legacyToRuntimeId354.get(legacyId);
+                runtimeId = legacyToRuntimeId354.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId354.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             case 361:
-                return legacyToRuntimeId361.get(legacyId);
+                runtimeId = legacyToRuntimeId361.get(legacyId);
+                if (runtimeId == -1) runtimeId = legacyToRuntimeId361.get(BlockID.INFO_UPDATE << 4);
+                return runtimeId;
             default: // 388+
                 return getOrCreateRuntimeId(protocol, legacyId >> 4, legacyId & 0xf);
         }
@@ -567,7 +569,7 @@ public class GlobalBlockPalette {
         } else if (protocolId >= ProtocolInfo.v1_16_210) {
             return runtimeIdToLegacy428.get(runtimeId);
         }
-        throw new IllegalArgumentException("Tried to get legacyFullId of unsupported protocol: " + protocolId);
+        throw new IllegalArgumentException("Tried to get legacyFullId for unsupported protocol version: " + protocolId);
     }
 
     @SuppressWarnings("unused")
