@@ -136,7 +136,6 @@ public class RuntimeItemMapping {
         this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false, false));
     }
 
-
     private void generatePalette() {
         BinaryStream paletteBuffer = new BinaryStream();
         paletteBuffer.putUnsignedVarInt(this.legacy2Runtime.size());
