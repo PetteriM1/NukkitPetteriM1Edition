@@ -6,6 +6,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
+import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -17,9 +18,16 @@ import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.Utils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -221,6 +229,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
             list[FIREWORKS] = ItemFirework.class; //401
             list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
+            list[FIREWORKSCHARGE] = ItemFireworkStar.class; //402
             list[COMPARATOR] = ItemRedstoneComparator.class; //404
             list[NETHER_BRICK] = ItemNetherBrick.class; //405
             list[QUARTZ] = ItemQuartz.class; //406
@@ -251,6 +260,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[DARK_OAK_DOOR] = ItemDoorDarkOak.class; //431
             list[CHORUS_FRUIT] = ItemChorusFruit.class; //432
             list[POPPED_CHORUS_FRUIT] = ItemChorusFruitPopped.class; //433
+            list[BANNER_PATTERN] = ItemBannerPattern.class; //434
             list[DRAGON_BREATH] = ItemDragonBreath.class; //437
             list[SPLASH_POTION] = ItemPotionSplash.class; //438
             list[LINGERING_POTION] = ItemPotionLingering.class; //441
@@ -258,6 +268,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[SHULKER_SHELL] = ItemShulkerShell.class; //445
             list[BANNER] = ItemBanner.class; //446
             list[TOTEM] = ItemTotem.class; //450
+            list[IRON_NUGGET] = ItemNuggetIron.class; //452
             list[TRIDENT] = ItemTrident.class; //455
             list[BEETROOT] = ItemBeetroot.class; //457
             list[BEETROOT_SEEDS] = ItemSeedsBeetroot.class; //458
@@ -267,8 +278,12 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[PUFFERFISH] = ItemPufferfish.class; //462
             list[COOKED_SALMON] = ItemSalmonCooked.class; //463
             list[DRIED_KELP] = ItemDriedKelp.class; //464
+            list[NAUTILUS_SHELL] = ItemNautilusShell.class; //465
             list[GOLDEN_APPLE_ENCHANTED] = ItemAppleGoldEnchanted.class; //466
+            list[HEART_OF_THE_SEA] = ItemHeartOfTheSea.class; //467
+            list[SCUTE] = ItemScute.class; //468
             list[TURTLE_SHELL] = ItemTurtleShell.class; //469
+            list[PHANTOM_MEMBRANE] = ItemPhantomMembrane.class; //470
             list[CROSSBOW] = ItemCrossbow.class; //471
             list[SWEET_BERRIES] = ItemSweetBerries.class; //477
             list[RECORD_11] = ItemRecord11.class; //510
@@ -285,6 +300,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[RECORD_WAIT] = ItemRecordWait.class; //511
             list[SHIELD] = ItemShield.class; //513
             list[SUSPICIOUS_STEW] = ItemSuspiciousStew.class; //734
+            list[HONEYCOMB] = ItemHoneycomb.class; //736
             list[HONEY_BOTTLE] = ItemHoneyBottle.class; //737
             list[NETHERITE_INGOT] = ItemIngotNetherite.class; //742
             list[NETHERITE_SWORD] = ItemSwordNetherite.class; //743
@@ -310,15 +326,16 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         initCreativeItems();
     }
 
-    private static final ArrayList<Item> creative137 = new ArrayList<>();
-    private static final ArrayList<Item> creative274 = new ArrayList<>();
-    private static final ArrayList<Item> creative291 = new ArrayList<>();
-    private static final ArrayList<Item> creative313 = new ArrayList<>();
-    private static final ArrayList<Item> creative332 = new ArrayList<>();
-    private static final ArrayList<Item> creative340 = new ArrayList<>();
-    private static final ArrayList<Item> creative354 = new ArrayList<>();
-    private static final ArrayList<Item> creative389 = new ArrayList<>();
-    private static final ArrayList<Item> creative407 = new ArrayList<>();
+    private static final List<Item> creative137 = new ObjectArrayList<>();
+    private static final List<Item> creative274 = new ObjectArrayList<>();
+    private static final List<Item> creative291 = new ObjectArrayList<>();
+    private static final List<Item> creative313 = new ObjectArrayList<>();
+    private static final List<Item> creative332 = new ObjectArrayList<>();
+    private static final List<Item> creative340 = new ObjectArrayList<>();
+    private static final List<Item> creative354 = new ObjectArrayList<>();
+    private static final List<Item> creative389 = new ObjectArrayList<>();
+    private static final List<Item> creative407 = new ObjectArrayList<>();
+    private static final List<Item> creative440 = new ObjectArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -408,6 +425,26 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 MainLogger.getLogger().logException(e);
             }
         }
+
+        // New creative items mapping
+        registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.CURRENT_PROTOCOL, creative440);
+    }
+
+    private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
+        JsonArray itemsArray;
+        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creativeitems" + protocolId + ".json")) {
+            itemsArray = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("items");
+        } catch (Exception e) {
+            throw new AssertionError("Error loading required block states!");
+        }
+
+        for (JsonElement element : itemsArray) {
+            Item item = RuntimeItems.getMapping(protocolId).parseCreativeItem(element.getAsJsonObject(), true, blockPaletteProtocol);
+            if (item != null && !item.getName().equals(UNKNOWN_STR)) {
+                // Add only implemented items
+                creativeItems.add(item.clone());
+            }
+        }
     }
 
     public static void clearCreativeItems() {
@@ -420,6 +457,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item.creative354.clear();
         Item.creative389.clear();
         Item.creative407.clear();
+        Item.creative440.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -471,8 +509,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_16_230_50:
             case v1_16_230:
             case v1_16_230_54:
-            case v1_17_0:
                 return new ArrayList<>(Item.creative407);
+            case v1_17_0:
+                return new ArrayList<>(Item.creative440);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
@@ -1256,12 +1295,22 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
     }
 
-    public final int getNetworkId() {
-        return getNetworkId(ProtocolInfo.CURRENT_PROTOCOL);
+    public final RuntimeEntry getRuntimeEntry() {
+        return this.getRuntimeEntry(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
-    public final int getNetworkId(int protocol) {
-        if (protocol < ProtocolInfo.v1_16_100) return getId();
-        return RuntimeItems.getNetworkId(RuntimeItems.getRuntimeMapping(protocol).getNetworkFullId(this));
+    public final RuntimeEntry getRuntimeEntry(int protocolId) {
+        return RuntimeItems.getMapping(protocolId).toRuntime(this.getId(), this.getDamage());
+    }
+
+    public final int getNetworkId() {
+        return this.getNetworkId(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public final int getNetworkId(int protocolId) {
+        if (protocolId < ProtocolInfo.v1_16_100) {
+            return getId();
+        }
+        return this.getRuntimeEntry(protocolId).getRuntimeId();
     }
 }

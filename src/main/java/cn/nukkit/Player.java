@@ -896,32 +896,50 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (this.hasPermission(Server.BROADCAST_CHANNEL_USERS)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_USERS, this);
         }
+
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
 
-        Position pos = this.level.getSafeSpawn(this);
-
-        PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(this, pos, true);
-
+        boolean dead = this.getHealth() < 1;
+        PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(this, this.level.getSafeSpawn(dead ? this.getSpawn() : this), true);
         this.server.getPluginManager().callEvent(respawnEvent);
 
-        // Fix falling
-        this.sendPosition(this, yaw, pitch, MovePlayerPacket.MODE_RESET);
+        if (dead) {
+            if (this.server.isHardcore()) {
+                this.setBanned(true);
+                return;
+            }
 
-        if (this.getHealth() < 1 || this.protocol < 274) {
-            pos = this.getSpawn();
-            RespawnPacket respawnPacket = new RespawnPacket();
-            respawnPacket.x = (float) pos.x;
-            respawnPacket.y = (float) pos.y;
-            respawnPacket.z = (float) pos.z;
-            this.dataPacket(respawnPacket);
+            this.teleport(respawnEvent.getRespawnPosition(), null);
+
+            if (this.protocol < ProtocolInfo.v1_13_0) {
+                RespawnPacket respawnPacket = new RespawnPacket();
+                respawnPacket.x = (float) respawnEvent.getRespawnPosition().x;
+                respawnPacket.y = (float) respawnEvent.getRespawnPosition().y;
+                respawnPacket.z = (float) respawnEvent.getRespawnPosition().z;
+                this.dataPacket(respawnPacket);
+            }
+
+            this.setHealth(this.getMaxHealth());
+            this.foodData.setLevel(20, 20);
+            this.sendData(this);
+        } else {
+            this.setPosition(respawnEvent.getRespawnPosition());
+            this.sendPosition(respawnEvent.getRespawnPosition(), yaw, pitch, MovePlayerPacket.MODE_RESET);
+
+            if (this.protocol < ProtocolInfo.v1_5_0) {
+                RespawnPacket respawnPacket = new RespawnPacket();
+                respawnPacket.x = (float) respawnEvent.getRespawnPosition().x;
+                respawnPacket.y = (float) respawnEvent.getRespawnPosition().y;
+                respawnPacket.z = (float) respawnEvent.getRespawnPosition().z;
+                this.dataPacket(respawnPacket);
+            }
+
+            this.getLevel().sendTime(this);
+            this.getLevel().sendWeather(this);
         }
 
-        this.getLevel().sendTime(this);
-        this.getLevel().sendWeather(this);
-
-        //this.setImmobile(false);
         this.spawned = true;
 
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
@@ -1699,7 +1717,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.server.getPluginManager().callEvent(ev);
 
                 if (!(revert = ev.isCancelled())) {
-                    if (this.server.getMobAiEnabled() && this.level.getCurrentTick() % 20 == 0) {
+                    if (this.server.getMobAiEnabled() && this.age % 20 == 0) {
                         AxisAlignedBB aab = new AxisAlignedBB(
                                 this.getX() - 0.6f,
                                 this.getY() + 1.45f,
@@ -1876,7 +1894,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.failedTransactions = 0;
 
-        if (this.fishing != null && this.server.getTick() % 20 == 0) {
+        if (this.fishing != null && this.age % 20 == 0) {
             if (this.distanceSquared(fishing) > 1089) { // 33 blocks
                 this.stopFishing(false);
             }
@@ -2304,7 +2322,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 this.dataPacket(new AvailableEntityIdentifiersPacket());
             }
 
-            // this.setImmobile(true);
             if (this.protocol >= ProtocolInfo.v1_16_100) {
                 this.sendSpawnPos((int) this.x, (int) this.y, (int) this.z, this.level.getDimension());
             }
@@ -2970,7 +2987,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
 
-                            ((EntityRideable) riding).mountEntity(this);
+                            ((EntityRideable) riding).dismountEntity(this);
                             break;
                     }
                     break;
@@ -5426,8 +5443,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean switchLevel(Level level) {
         Level oldLevel = this.level;
         if (super.switchLevel(level)) {
-            //this.setImmobile(true);
-
             SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
             spawnPosition.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
             Position spawn = level.getSpawnLocation();
@@ -5461,8 +5476,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.dataPacket(packet);
 
             this.ticksSinceLastRest = 0;
-
-            //this.setImmobile(false);
             return true;
         }
 
