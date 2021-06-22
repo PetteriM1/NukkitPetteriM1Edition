@@ -22,6 +22,7 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AnimatePacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 
 import java.util.ArrayList;
@@ -338,7 +339,9 @@ public class EntityBoat extends EntityVehicle {
 
             entity.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1));
             entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90));
-            entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90));
+            if (entity.isPlayer && ((Player) entity).protocol >= ProtocolInfo.v1_16_210) {
+                entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90));
+            }
             entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_MIN_ROTATION, this.passengers.indexOf(entity) == 1 ? -90 : 1));
         }
 
