@@ -1,5 +1,6 @@
 package com.nukkitx.network.raknet;
 
+import cn.nukkit.Server;
 import com.nukkitx.network.NetworkUtils;
 import com.nukkitx.network.util.DisconnectReason;
 import io.netty.buffer.ByteBuf;
@@ -129,6 +130,7 @@ public class RakNetServerSession extends RakNetSession {
         buffer.writeLong(this.rakNet.guid);
 
         this.sendDirect(buffer);
+        Server.getInstance().getLogger().debug("Connection failure");
     }
 
     private void sendConnectionRequestAccepted(long time) {

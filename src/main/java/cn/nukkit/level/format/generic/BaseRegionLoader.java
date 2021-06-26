@@ -54,7 +54,7 @@ abstract public class BaseRegionLoader {
 
             this.lastUsed = System.currentTimeMillis();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to load r." + regionX + '.' + regionZ + '.' + ext, e);
         }
     }
 

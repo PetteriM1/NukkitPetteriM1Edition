@@ -140,6 +140,10 @@ public class RakNetServer extends RakNet {
                 }
             }
         } else {
+            if (session.getState() != RakNetState.INITIALIZING) {
+                Server.getInstance().getLogger().warning("New connection attempt in state " + session.getState().toString());
+            }
+            session.setMtu(mtu);
             session.sendOpenConnectionReply1(); // Probably a packet loss occurred, send the reply again
         }
     }
