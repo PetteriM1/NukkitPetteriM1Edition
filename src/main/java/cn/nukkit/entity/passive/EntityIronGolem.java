@@ -125,4 +125,9 @@ public class EntityIronGolem extends EntityWalkingMob {
 
         return false;
     }
+
+    @Override
+    public boolean canTarget(Entity entity) {
+        return entity.canBeFollowed() && entity.getId() == this.isAngryTo;
+    }
 }

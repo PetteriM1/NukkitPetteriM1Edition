@@ -161,7 +161,7 @@ public class EntityStrider extends EntityWalkingAnimal implements EntityRideable
 
     @Override
     protected void checkTarget() {
-        if (this.passengers.isEmpty() || !(this.getPassengers().get(0) instanceof Player) || ((Player) this.getPassengers().get(0)).getInventory().getItemInHand().getId() != Item.WARPED_FUNGUS_ON_A_STICK) {
+        if (this.passengers.isEmpty() || !(this.getPassengers().get(0) instanceof Player) || ((Player) this.getPassengers().get(0)).getInventory().getItemInHandFast().getId() != Item.WARPED_FUNGUS_ON_A_STICK) {
             super.checkTarget();
         }
     }

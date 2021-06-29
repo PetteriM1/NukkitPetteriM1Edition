@@ -6,6 +6,7 @@ import cn.nukkit.block.*;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -1099,12 +1100,37 @@ public abstract class Entity extends Location implements Metadatable {
             return false;
         }
 
-        // Hack: fire aspect
         if (source instanceof EntityDamageByEntityEvent) {
+            // Hack: fire aspect
             Enchantment[] enchantments = ((EntityDamageByEntityEvent) source).getEnchantments();
             if (enchantments != null) {
                 for (Enchantment enchantment : enchantments) {
                     enchantment.doAttack(((EntityDamageByEntityEvent) source).getDamager(), this);
+                }
+            }
+
+            // Wolf targets
+            if (source.getEntity() instanceof Player) {
+                for (Entity entity : source.getEntity().getLevel().getNearbyEntities(source.getEntity().getBoundingBox().grow(17, 17, 17), source.getEntity())) {
+                    if (entity instanceof EntityWolf) {
+                        if (((EntityWolf) entity).hasOwner()) {
+                            ((EntityWolf) entity).isAngryTo = ((EntityDamageByEntityEvent) source).getDamager().getId();
+                            ((EntityWolf) entity).setAngry(true);
+                        }
+                    }
+                }
+            } else if (((EntityDamageByEntityEvent) source).getDamager() instanceof Player) {
+                for (Entity entity : ((EntityDamageByEntityEvent) source).getDamager().getLevel().getNearbyEntities(((EntityDamageByEntityEvent) source).getDamager().getBoundingBox().grow(17, 17, 17), ((EntityDamageByEntityEvent) source).getDamager())) {
+                    if (entity.getId() != source.getEntity().getId()) {
+                        if (entity instanceof EntityWolf) {
+                            if (((EntityWolf) entity).hasOwner()) {
+                                if (((EntityWolf) entity).getOwner().equals(((EntityDamageByEntityEvent) source).getDamager())) {
+                                    ((EntityWolf) entity).isAngryTo = source.getEntity().getId();
+                                    ((EntityWolf) entity).setAngry(true);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
