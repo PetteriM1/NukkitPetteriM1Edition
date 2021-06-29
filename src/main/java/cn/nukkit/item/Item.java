@@ -228,8 +228,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
             list[FIREWORKS] = ItemFirework.class; //401
-            list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
             list[FIREWORKSCHARGE] = ItemFireworkStar.class; //402
+            list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
             list[COMPARATOR] = ItemRedstoneComparator.class; //404
             list[NETHER_BRICK] = ItemNetherBrick.class; //405
             list[QUARTZ] = ItemQuartz.class; //406
