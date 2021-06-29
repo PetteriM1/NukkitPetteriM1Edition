@@ -32,7 +32,7 @@ public class RuntimeItems {
             throw new IllegalStateException("RuntimeItems were already generated!");
         }
         initialized = true;
-        log.info("Loading runtime items...");
+        log.debug("Loading runtime items...");
         InputStream itemIdsStream = Server.class.getClassLoader().getResourceAsStream("legacy_item_ids.json");
         if (itemIdsStream == null) {
             throw new AssertionError("Unable to load legacy_item_ids.json");
@@ -59,7 +59,7 @@ public class RuntimeItems {
             }
         }
 
-        mapping361 = new RuntimeItemMapping(mappingEntries, "runtime_item_ids_361.json", ProtocolInfo.v1_12_0);
+        mapping361 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_361.json", ProtocolInfo.v1_12_0);
         mapping419 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_419.json", ProtocolInfo.v1_16_100);
         mapping440 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_440.json", ProtocolInfo.v1_17_0);
     }

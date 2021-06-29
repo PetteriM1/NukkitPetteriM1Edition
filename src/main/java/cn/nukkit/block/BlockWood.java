@@ -142,5 +142,6 @@ public class BlockWood extends BlockSolidMeta {
                 return BlockColor.SAND_BLOCK_COLOR;
             case JUNGLE:
                 return BlockColor.DIRT_BLOCK_COLOR;
-        }    }
+        }
+    }
 }

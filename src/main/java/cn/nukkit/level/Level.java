@@ -1011,12 +1011,11 @@ public class Level implements ChunkManager, Metadatable {
             server.getPluginManager().callEvent(ev);
             if (!ev.isCancelled()) {
                 bolt.spawnToAll();
+                this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_THUNDER, -1, EntityLightning.NETWORK_ID);
+                this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_EXPLODE, -1, EntityLightning.NETWORK_ID);
             } else {
                 bolt.setEffect(false);
             }
-
-            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_THUNDER, -1, EntityLightning.NETWORK_ID);
-            this.addLevelSoundEvent(vector, LevelSoundEventPacket.SOUND_EXPLODE, -1, EntityLightning.NETWORK_ID);
         }
     }
 

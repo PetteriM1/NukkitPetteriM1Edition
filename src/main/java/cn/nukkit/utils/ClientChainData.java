@@ -35,6 +35,8 @@ public final class ClientChainData implements LoginChainData {
     private static final String MOJANG_PUBLIC_KEY_BASE64 = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V";
     private static final PublicKey MOJANG_PUBLIC_KEY;
 
+    private static final Gson GSON = new Gson();
+
     static {
         try {
             MOJANG_PUBLIC_KEY = generateKey(MOJANG_PUBLIC_KEY_BASE64);
@@ -223,11 +225,11 @@ public final class ClientChainData implements LoginChainData {
     private static JsonObject decodeToken(String token) {
         String[] base = token.split("\\.");
         if (base.length < 2) return null;
-        return new Gson().fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
+        return GSON.fromJson(new String(Base64.getDecoder().decode(base[1]), StandardCharsets.UTF_8), JsonObject.class);
     }
 
     private void decodeChainData() {
-        Map<String, List<String>> map = new Gson().fromJson(new String(bs.get(bs.getLInt()), StandardCharsets.UTF_8),
+        Map<String, List<String>> map = GSON.fromJson(new String(bs.get(bs.getLInt()), StandardCharsets.UTF_8),
                 new MapTypeToken().getType());
         if (map.isEmpty() || !map.containsKey("chain") || map.get("chain").isEmpty()) return;
         List<String> chains = map.get("chain");

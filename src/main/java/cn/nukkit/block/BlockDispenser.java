@@ -198,11 +198,6 @@ public class BlockDispenser extends BlockSolidMeta implements Faceable {
         }
     }
 
-    @Override
-    public boolean canHarvestWithHand() {
-        return true;
-    }
-
     public Vector3 getDispensePosition() {
         BlockFace facing = getBlockFace();
         return this.add(
