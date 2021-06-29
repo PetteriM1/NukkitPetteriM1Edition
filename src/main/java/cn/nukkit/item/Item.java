@@ -432,7 +432,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
         JsonArray itemsArray;
-        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creative_items_" + protocolId + ".json")) {
+        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creativeitems" + protocolId + ".json")) {
             itemsArray = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("items");
         } catch (Exception e) {
             throw new AssertionError("Error loading required block states!");

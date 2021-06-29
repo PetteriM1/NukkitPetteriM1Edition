@@ -370,7 +370,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     protected Timing timing;
 
-    public boolean isPlayer = false;
+    public final boolean isPlayer;
 
     private volatile boolean initialized;
     private volatile boolean initialized2;
@@ -416,7 +416,8 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Entity(FullChunk chunk, CompoundTag nbt) {
-        if (!(this instanceof Player)) {
+        this.isPlayer = this instanceof Player;
+        if (!this.isPlayer) {
             this.init(chunk, nbt);
         }
     }
@@ -479,7 +480,6 @@ public abstract class Entity extends Location implements Metadatable {
 
         this.timing = Timings.getEntityTiming(this);
 
-        this.isPlayer = this instanceof Player;
         this.temporalVector = new Vector3();
 
         this.id = entityCount++;

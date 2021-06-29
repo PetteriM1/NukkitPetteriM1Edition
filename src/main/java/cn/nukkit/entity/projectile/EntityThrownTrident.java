@@ -1,12 +1,15 @@
 package cn.nukkit.entity.projectile;
 
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
+import cn.nukkit.event.weather.LightningStrikeEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.NBTIO;
@@ -125,6 +128,17 @@ public class EntityThrownTrident extends EntityProjectile {
         this.hadCollision = true;
         this.onHit();
         this.close();
+        if (trident != null && level.isThundering() && trident.hasEnchantment(Enchantment.ID_TRIDENT_CHANNELING) && level.canBlockSeeSky(this)) {
+            EntityLightning bolt = new EntityLightning(this.getChunk(), getDefaultNBT(this));
+            LightningStrikeEvent strikeEvent = new LightningStrikeEvent(level, bolt);
+            server.getPluginManager().callEvent(strikeEvent);
+            if (!strikeEvent.isCancelled()) {
+                bolt.spawnToAll();
+                level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_THUNDER);
+            } else {
+                bolt.setEffect(false);
+            }
+        }
         EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
         newTrident.alreadyCollided = true;
         newTrident.setItem(trident);

@@ -97,7 +97,7 @@ public class RegionLoader extends BaseRegionLoader {
     protected void saveChunk(int x, int z, byte[] chunkData) throws IOException {
         int length = chunkData.length + 1;
         if (length + 4 > MAX_SECTOR_LENGTH) {
-            throw new ChunkException("Chunk is too big! " + (length + 4) + " > " + MAX_SECTOR_LENGTH);
+            throw new ChunkException("Chunk [" + x + ", " + z + "] is too big! " + (length + 4) + " > " + MAX_SECTOR_LENGTH);
         }
         int sectors = (int) Math.ceil((length + 4) / 4096d);
         int index = getChunkOffset(x, z);
