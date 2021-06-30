@@ -26,9 +26,4 @@ public class ItemWarpedFungusOnAStick extends ItemTool {
     public boolean noDamageOnBreak() {
         return true;
     }
-
-    @Override
-    public int getMaxStackSize() {
-        return 1;
-    }
 }

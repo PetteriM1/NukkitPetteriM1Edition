@@ -1,7 +1,6 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.block.*;
-import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.entity.passive.EntitySkeletonHorse;
 import cn.nukkit.level.format.FullChunk;
@@ -32,8 +31,8 @@ public abstract class EntityWalking extends BaseEntity {
         if (!(target instanceof EntityCreature) || (!((EntityCreature) target).closed && !this.targetOption((EntityCreature) target, this.distanceSquared(target))) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
 
-            for (Entity entity : this.getViewers().values()) {
-                if (entity == this || !(entity instanceof EntityCreature) || (entity instanceof EntityAnimal || !entity.canBeFollowed())) {
+            for (Entity entity : this.getLevel().getEntities()) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity.closed || !this.canTarget(entity)) {
                     continue;
                 }
 

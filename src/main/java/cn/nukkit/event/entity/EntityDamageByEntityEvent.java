@@ -34,7 +34,7 @@ public class EntityDamageByEntityEvent extends EntityDamageEvent {
     }
 
     public EntityDamageByEntityEvent(Entity damager, Entity entity, DamageCause cause, Map<DamageModifier, Float> modifiers, float knockBack) {
-        this(damager, entity, cause, modifiers, knockBack, null);
+        this(damager, entity, cause, modifiers, knockBack, new Enchantment[0]);
     }
 
     public EntityDamageByEntityEvent(Entity damager, Entity entity, DamageCause cause, Map<DamageModifier, Float> modifiers, float knockBack, Enchantment[] enchantments) {
@@ -67,7 +67,7 @@ public class EntityDamageByEntityEvent extends EntityDamageEvent {
         this.knockBack = knockBack;
     }
 
-    public Enchantment[] getEnchantments() {
+    public Enchantment[] getWeaponEnchantments() {
         return enchantments;
     }
 }
