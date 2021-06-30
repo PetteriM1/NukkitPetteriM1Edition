@@ -16,6 +16,7 @@ import cn.nukkit.entity.item.EntityItem;
 import cn.nukkit.entity.item.EntityXPOrb;
 import cn.nukkit.entity.mob.EntityEnderman;
 import cn.nukkit.entity.mob.EntityWalkingMob;
+import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
 import cn.nukkit.event.block.ItemFrameDropItemEvent;
@@ -2429,7 +2430,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (this.protocol < getServer().getPropertyInt("multiversion-min-protocol")) {
+                    if (this.protocol < server.minimumProtocol) {
                         this.close("", "Multiversion support for this Minecraft version is disabled");
                         this.server.getLogger().debug(this.username + " disconnected with protocol " + this.protocol);
                         break;
@@ -4483,6 +4484,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (this.getKiller() != null && this.getKiller() instanceof EntityWalkingMob && ((EntityWalkingMob) this.getKiller()).isAngryTo == this.getId()) {
                 ((EntityWalkingMob) this.getKiller()).isAngryTo = -1; // Reset golem target
+                if (this.getKiller() instanceof EntityWolf) {
+                    ((EntityWolf) this.getKiller()).setAngry(false);
+                }
             }
 
             if (!ev.getKeepInventory() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {

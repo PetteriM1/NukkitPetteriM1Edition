@@ -103,7 +103,7 @@ public class ShapelessRecipe implements CraftingRecipe {
 
     @Override
     public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerShapelessRecipe(this);
+        manager.registerShapelessRecipe(388, this);
     }
 
     @Override

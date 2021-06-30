@@ -1,5 +1,6 @@
 package cn.nukkit.level.particle;
 
+import cn.nukkit.Server;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -109,6 +110,7 @@ public abstract class Particle extends Vector3 {
     }
 
     public DataPacket[] encode() {
+        Server.mvw("Particle#encode()");
         return this.mvEncode(ProtocolInfo.CURRENT_PROTOCOL);
     }
 

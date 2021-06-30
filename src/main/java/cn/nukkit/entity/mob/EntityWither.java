@@ -220,4 +220,9 @@ public class EntityWither extends EntityFlyingMob implements EntityBoss, EntityS
             explosion.explodeB();
         }
     }
+
+    @Override
+    public boolean canTarget(Entity entity) {
+        return entity.canBeFollowed();
+    }
 }

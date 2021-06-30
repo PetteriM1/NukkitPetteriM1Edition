@@ -228,8 +228,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHER_STAR] = ItemNetherStar.class; //399
             list[PUMPKIN_PIE] = ItemPumpkinPie.class; //400
             list[FIREWORKS] = ItemFirework.class; //401
-            list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
             list[FIREWORKSCHARGE] = ItemFireworkStar.class; //402
+            list[ENCHANTED_BOOK] = ItemBookEnchanted.class; //403
             list[COMPARATOR] = ItemRedstoneComparator.class; //404
             list[NETHER_BRICK] = ItemNetherBrick.class; //405
             list[QUARTZ] = ItemQuartz.class; //406
@@ -427,7 +427,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
 
         // New creative items mapping
-        registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.CURRENT_PROTOCOL, creative440);
+        registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.v1_17_0, creative440);
     }
 
     private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
@@ -461,6 +461,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public static ArrayList<Item> getCreativeItems() {
+        Server.mvw("Item#getCreativeItems()");
         return getCreativeItems(CURRENT_PROTOCOL);
     }
 
@@ -518,7 +519,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public static void addCreativeItem(Item item) {
-        addCreativeItem(389, item);
+        Server.mvw("Item#addCreativeItem(Item)");
+        addCreativeItem(v1_16_0, item);
     }
 
     public static void addCreativeItem(int protocol, Item item) {
@@ -547,6 +549,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 break;
             case v1_16_0:
                 Item.creative407.add(item.clone());
+                break;
+            case v1_17_0:
+                Item.creative440.add(item.clone());
                 break;
             default:
                 throw new IllegalArgumentException("Tried to register creative items for unsupported protocol version: " + protocol);
@@ -1296,6 +1301,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public final RuntimeEntry getRuntimeEntry() {
+        Server.mvw("Item#getRuntimeEntry()");
         return this.getRuntimeEntry(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
@@ -1304,6 +1310,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public final int getNetworkId() {
+        Server.mvw("Item#getNetworkId()");
         return this.getNetworkId(ProtocolInfo.CURRENT_PROTOCOL);
     }
 

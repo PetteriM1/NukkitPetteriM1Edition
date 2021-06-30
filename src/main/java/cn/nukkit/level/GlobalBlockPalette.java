@@ -534,6 +534,16 @@ public class GlobalBlockPalette {
         throw new IllegalArgumentException("Tried to get legacyFullId for unsupported protocol version: " + protocolId);
     }
 
+    public static int getOrCreateRuntimeId(int legacyId) throws NoSuchElementException {
+        Server.mvw("GlobalBlockPalette#getOrCreateRuntimeId(int)");
+        return getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, legacyId >> 4, legacyId & 0xf);
+    }
+
+    public static int getLegacyFullId(int runtimeId) {
+        Server.mvw("GlobalBlockPalette#getLegacyFullId(int)");
+        return getLegacyFullId(ProtocolInfo.CURRENT_PROTOCOL, runtimeId);
+    }
+
     @SuppressWarnings("unused")
     private static class TableEntry {
         private int id;
