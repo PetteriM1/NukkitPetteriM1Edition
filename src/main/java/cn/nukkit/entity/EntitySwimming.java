@@ -74,11 +74,7 @@ public abstract class EntitySwimming extends BaseEntity {
     }
 
     public Vector3 updateMove(int tickDiff) {
-        if (this.getServer().getMobAiEnabled() && !isImmobile()) {
-            if (!this.isMovement()) {
-                return null;
-            }
-
+        if (this.isMovement() && !isImmobile()) {
             if (this.isKnockback()) {
                 this.move(this.motionX, this.motionY, this.motionZ);
                 this.motionY -= this.getGravity();

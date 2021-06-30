@@ -234,7 +234,7 @@ public class Level implements ChunkManager, Metadatable {
                 generator.init(new PopChunkManager(getSeed()), rand);
                 return generator;
             } catch (Throwable e) {
-                e.printStackTrace();
+                Server.getInstance().getLogger().logException(e);
                 return null;
             }
         }
@@ -321,7 +321,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public static long blockHash(int x, int y, int z) {
         if (y < 0 || y >= 256) {
-            throw new IllegalArgumentException("Y coordinate y is out of range!");
+            throw new IllegalArgumentException("Y coordinate " + y + " is out of range!");
         }
         return (((long) x & (long) 0xFFFFFFF) << 36) | (((long) y & (long) 0xFF) << 28) | ((long) z & (long) 0xFFFFFFF);
     }

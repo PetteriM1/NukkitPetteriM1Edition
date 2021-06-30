@@ -729,7 +729,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     /**
      * Returns whether the player is currently using an item (right-click and hold).
      *
-     * @return bool
+     * @return whether the player is currently using an item
      */
     public boolean isUsingItem() {
         return this.getDataFlag(DATA_FLAGS, DATA_FLAG_ACTION) && this.startAction > -1;
@@ -1426,18 +1426,34 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.adventureSettings.update();
     }
 
+    /**
+     * Check player game mode
+     * @return whether player is in survival mode
+     */
     public boolean isSurvival() {
         return this.gamemode == SURVIVAL;
     }
 
+    /**
+     * Check player game mode
+     * @return whether player is in creative mode
+     */
     public boolean isCreative() {
         return this.gamemode == CREATIVE;
     }
 
+    /**
+     * Check player game mode
+     * @return whether player is in spectator mode
+     */
     public boolean isSpectator() {
         return this.gamemode == SPECTATOR;
     }
 
+    /**
+     * Check player game mode
+     * @return whether player is in adventure mode
+     */
     public boolean isAdventure() {
         return this.gamemode == ADVENTURE;
     }
@@ -1597,12 +1613,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    /**
+     * Internal: Check nearby entities and try to pick them up
+     */
     protected void checkNearEntities() {
         Entity[] e = this.level.getNearbyEntities(this.boundingBox.grow(1, 0.5, 1), this);
         for (Entity entity : e) {
             //entity.scheduleUpdate();
 
-            if (!entity.isAlive() || !this.isAlive()) {
+            if (!entity.isAlive()) {
                 continue;
             }
 
@@ -1610,6 +1629,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
+    /**
+     * Internal: Process player movement
+     *
+     * @param tickDiff tick diff
+     */
     protected void processMovement(int tickDiff) {
         if (!this.isAlive() || !this.spawned || this.newPosition == null || this.teleportPosition != null || this.isSleeping()) {
             return;
@@ -1913,11 +1937,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.processMovement(tickDiff);
             this.motionX = this.motionY = this.motionZ = 0; // HACK: fix player knockback being messed up
 
-            //if (currentTick % 2 == 0) {
-                if (!this.isSpectator()) {
-                    this.checkNearEntities();
-                }
-            //}
+            if (!this.isSpectator() && this.isAlive()) {
+                this.checkNearEntities();
+            }
 
             this.entityBaseTick(tickDiff);
 

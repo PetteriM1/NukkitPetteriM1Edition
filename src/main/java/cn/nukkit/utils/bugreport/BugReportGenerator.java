@@ -84,7 +84,7 @@ public class BugReportGenerator extends Thread {
                 plugins.append(plugin.getDescription().getFullName());
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Server.getInstance().getLogger().logException(ex);
         }
 
         String cpuType = System.getenv("PROCESSOR_IDENTIFIER");

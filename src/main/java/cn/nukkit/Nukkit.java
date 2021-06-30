@@ -104,12 +104,14 @@ public class Nukkit {
     private static Properties getGitInfo() {
         InputStream gitFileStream = Nukkit.class.getClassLoader().getResourceAsStream("git.properties");
         if (gitFileStream == null) {
+            log.debug("Unable to find git.properties");
             return null;
         }
         Properties properties = new Properties();
         try {
             properties.load(gitFileStream);
         } catch (IOException e) {
+            log.debug("Unable to load git.properties", e);
             return null;
         }
         return properties;
