@@ -117,7 +117,8 @@ public class BlockWood extends BlockSolidMeta {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (item.isAxe()) {
-            Block strippedBlock = Block.get(getStrippedId(), getStrippedDamage());
+            Block strippedBlock = Block.get(this.getStrippedId(), 0);
+            strippedBlock.setDamage(this.getStrippedDamage());
             item.useOn(this);
             this.level.setBlock(this, strippedBlock, true, true);
             return true;

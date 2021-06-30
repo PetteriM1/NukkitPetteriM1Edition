@@ -380,4 +380,31 @@ public interface BlockID {
     int WOOD_BARK = 467;
     int COMPOSTER = 468;
     int PISTON_HEAD_STICKY = 472;
+
+    int LODESTONE = 477;
+    int CRIMSON_ROOTS = 478;
+    int WARPED_ROOTS = 479;
+    int CRIMSON_STEM = 480;
+    int WARPED_STEM = 481;
+    int WARPED_WART_BLOCK = 482;
+    int CRIMSON_FUNGUS = 483;
+    int WARPED_FUNGUS = 484;
+    int SHROOMLIGHT = 485;
+    int WEEPING_VINES = 486;
+    int CRIMSON_NYLIUM = 487;
+    int WARPED_NYLIUM = 488;
+    int BASALT = 489;
+    int POLISHED_BASALT = 490;
+    int SOUL_SOIL = 491;
+    int SOUL_FIRE = 492;
+    int NETHER_SPROUTS_BLOCK = 493;
+    int TARGET = 494;
+    int STRIPPED_CRIMSON_STEM = 495;
+    int STRIPPED_WARPED_STEM = 496;
+    int CRIMSON_PLANKS = 497;
+    int WARPED_PLANKS = 498;
+    int CRIMSON_DOOR_BLOCK = 499;
+    int WARPED_DOOR_BLOCK = 500;
+    int CRIMSON_TRAPDOOR = 501;
+    int WARPED_TRAPDOOR = 502;
 }

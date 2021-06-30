@@ -390,6 +390,18 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[PISTON_HEAD_STICKY] = BlockPistonHeadSticky.class; //472
             }
 
+            if (Server.getInstance().requiredProtocol >= ProtocolInfo.v1_16_0){
+                list[CRIMSON_STEM] = BlockStemCrimson.class; //480
+                list[WARPED_STEM] = BlockStemWarped.class; //481
+                list[WARPED_WART_BLOCK] = BlockWarpedWartBlock.class; //482
+                list[CRIMSON_NYLIUM] = BlockNyliumCrimson.class; //487
+                list[WARPED_NYLIUM] = BlockNyliumWarped.class; //488
+                list[STRIPPED_CRIMSON_STEM] = BlockStemStrippedCrimson.class; //495
+                list[STRIPPED_WARPED_STEM] = BlockStemStrippedWarped.class; //496
+                list[CRIMSON_PLANKS] = BlockPlanksCrimson.class; //497
+                list[WARPED_PLANKS] = BlockPlanksWarped.class; //498
+            }
+
             for (int id = 0; id < MAX_BLOCK_ID; id++) {
                 Class<?> c = list[id];
                 if (c != null) {
