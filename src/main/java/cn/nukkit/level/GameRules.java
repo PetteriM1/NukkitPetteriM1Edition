@@ -1,5 +1,6 @@
 package cn.nukkit.level;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
@@ -256,6 +257,7 @@ public class GameRules {
         }
 
         public void write(BinaryStream pk) {
+            Server.mvw("GameRules#write(BinaryStream)");
             write(ProtocolInfo.CURRENT_PROTOCOL, pk);
         }
 

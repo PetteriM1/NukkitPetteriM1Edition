@@ -190,7 +190,7 @@ public class ShapedRecipe implements CraftingRecipe {
 
     @Override
     public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerShapedRecipe(this);
+        manager.registerShapedRecipe(388, this);
     }
 
     @Override

@@ -2430,7 +2430,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    if (this.protocol < getServer().getPropertyInt("multiversion-min-protocol")) {
+                    if (this.protocol < server.minimumProtocol) {
                         this.close("", "Multiversion support for this Minecraft version is disabled");
                         this.server.getLogger().debug(this.username + " disconnected with protocol " + this.protocol);
                         break;
