@@ -526,7 +526,7 @@ public class BinaryStream {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Server.getInstance().getLogger().logException(e);
         }
 
         Item item = Item.get(id, damage, cnt, nbt);

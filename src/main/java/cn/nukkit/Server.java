@@ -2578,7 +2578,11 @@ public class Server {
      */
     public static void mvw(String action) {
         if (getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
-            getInstance().getLogger().warning("Default " + action + " used by a plugin. This can cause instability with the multiversion.");
+            if (Nukkit.DEBUG > 1) {
+                getInstance().getLogger().logException(new PluginException("Default " + action + " used by a plugin. This can cause instability with the multiversion."));
+            } else {
+                getInstance().getLogger().warning("Default " + action + " used by a plugin. This can cause instability with the multiversion.");
+            }
         }
     }
 
