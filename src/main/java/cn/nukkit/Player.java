@@ -5751,7 +5751,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         itemsWithMending.add(inventory.getSize() + i);
                     }
                 }
-                if (inventory.getItemInHand().getEnchantment((short)Enchantment.ID_MENDING) != null) {
+                if (inventory.getItemInHandFast().getEnchantment((short)Enchantment.ID_MENDING) != null) {
                     itemsWithMending.add(inventory.getHeldItemIndex());
                 }
                 if (!itemsWithMending.isEmpty()) {

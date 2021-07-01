@@ -4260,9 +4260,7 @@ public class Level implements ChunkManager, Metadatable {
             return ProtocolInfo.v1_16_210;
         } else if (protocol >= ProtocolInfo.v1_16_100) {
             return ProtocolInfo.v1_16_100;
-        } else if (protocol >= ProtocolInfo.v1_16_20 && protocol <= ProtocolInfo.v1_16_100_52) {
-            return ProtocolInfo.v1_16_20;
-        } else if (protocol == ProtocolInfo.v1_16_0) {
+        } else if (protocol >= ProtocolInfo.v1_16_0 && protocol <= ProtocolInfo.v1_16_100_52) {
             return ProtocolInfo.v1_16_0;
         } else if (protocol == ProtocolInfo.v1_14_0 || protocol == ProtocolInfo.v1_14_60) {
             return ProtocolInfo.v1_14_0;
@@ -4282,9 +4280,8 @@ public class Level implements ChunkManager, Metadatable {
         if (chunk == ProtocolInfo.v1_13_0) if (player == ProtocolInfo.v1_13_0) return true;
         if (chunk == ProtocolInfo.v1_14_0)
             if (player == ProtocolInfo.v1_14_0 || player == ProtocolInfo.v1_14_60) return true;
-        if (chunk == ProtocolInfo.v1_16_0) if (player == ProtocolInfo.v1_16_0) return true;
-        if (chunk == ProtocolInfo.v1_16_20)
-            if (player >= ProtocolInfo.v1_16_20) if (player <= ProtocolInfo.v1_16_100_52) return true;
+        if (chunk == ProtocolInfo.v1_16_0)
+            if (player >= ProtocolInfo.v1_16_0) if (player <= ProtocolInfo.v1_16_100_52) return true;
         if (chunk == ProtocolInfo.v1_16_100)
             if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
         if (chunk == ProtocolInfo.v1_16_210)
