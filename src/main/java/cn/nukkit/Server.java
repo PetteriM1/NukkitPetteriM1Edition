@@ -536,6 +536,7 @@ public class Server {
 
         Block.init();
         Enchantment.init();
+        GlobalBlockPalette.init();
         RuntimeItems.init();
         Item.init();
         EnumBiome.values();

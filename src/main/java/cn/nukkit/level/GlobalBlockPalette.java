@@ -21,12 +21,14 @@ import java.io.InputStreamReader;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Log4j2
 public class GlobalBlockPalette {
+
+    private static final Gson GSON = new Gson();
+    private static boolean initialized;
 
     private static final AtomicInteger runtimeIdAllocator282 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator291 = new AtomicInteger(0);
@@ -56,16 +58,16 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId440 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy428 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy440 = new Int2IntOpenHashMap();
-    private static final byte[] compiledTable282;
-    private static final byte[] compiledTable291;
-    private static final byte[] compiledTable313;
-    private static final byte[] compiledTable332;
-    private static final byte[] compiledTable340;
-    private static final byte[] compiledTable354;
-    private static final byte[] compiledTable361;
-    private static final byte[] compiledTable388;
-    private static final byte[] compiledTable389;
-    private static final byte[] compiledTable407;
+    private static byte[] compiledTable282;
+    private static byte[] compiledTable291;
+    private static byte[] compiledTable313;
+    private static byte[] compiledTable332;
+    private static byte[] compiledTable340;
+    private static byte[] compiledTable354;
+    private static byte[] compiledTable361;
+    private static byte[] compiledTable388;
+    private static byte[] compiledTable389;
+    private static byte[] compiledTable407;
 
     static {
         legacyToRuntimeId223.defaultReturnValue(-1);
@@ -86,10 +88,15 @@ public class GlobalBlockPalette {
         legacyToRuntimeId440.defaultReturnValue(-1);
         runtimeIdToLegacy428.defaultReturnValue(-1);
         runtimeIdToLegacy440.defaultReturnValue(-1);
+    }
 
-        Gson GSON = new Gson();
+    public static void init() {
+        if (initialized) {
+            throw new IllegalStateException("BlockPalette was already generated!");
+        }
+        initialized = true;
+        log.debug("Loading block palette...");
 
-        Server.getInstance().getLogger().debug("Loading block palette...");
         // 223
         InputStream stream223 = Server.class.getClassLoader().getResourceAsStream("runtimeid_table_223.json");
         if (stream223 == null) throw new AssertionError("Unable to locate RuntimeID table 223");
@@ -294,14 +301,7 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError("Unable to load block palette 428", e);
         }
-        for (CompoundTag state : tag428.getAll()) {
-            int id = state.getInt("id");
-            int data = state.getShort("data");
-            int runtimeId = state.getInt("runtimeId");
-            int legacyId = id << 6 | data;
-            legacyToRuntimeId428.put(legacyId, runtimeId);
-            runtimeIdToLegacy428.put(runtimeId, legacyId);
-        }
+        loadBlockStates(tag428, legacyToRuntimeId428, runtimeIdToLegacy428);
         // 440
         ListTag<CompoundTag> tag440;
         try (InputStream stream440 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_440.dat")) {
@@ -313,13 +313,19 @@ public class GlobalBlockPalette {
         } catch (IOException e) {
             throw new AssertionError("Unable to load block palette 440", e);
         }
-        for (CompoundTag state : tag440.getAll()) {
+        loadBlockStates(tag440, legacyToRuntimeId440, runtimeIdToLegacy440);
+    }
+
+    private static void loadBlockStates(ListTag<CompoundTag> blockStates, Int2IntMap legacyToRuntime, Int2IntMap runtimeIdToLegacy) {
+        for (CompoundTag state : blockStates.getAll()) {
             int id = state.getInt("id");
             int data = state.getShort("data");
             int runtimeId = state.getInt("runtimeId");
             int legacyId = id << 6 | data;
-            legacyToRuntimeId440.put(legacyId, runtimeId);
-            runtimeIdToLegacy440.put(runtimeId, legacyId);
+            legacyToRuntime.put(legacyId, runtimeId);
+            if (!runtimeIdToLegacy.containsKey(runtimeId)) {
+                runtimeIdToLegacy.put(runtimeId, legacyId);
+            }
         }
     }
 

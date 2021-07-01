@@ -139,7 +139,7 @@ public class RuntimeItemMapping {
             if (!ignoreUnknown) {
                 throw new IllegalStateException("Can not find legacyEntry for " + identifier);
             }
-            log.debug("Can not find legacyEntry for " + identifier);
+            log.trace("Can not find legacyEntry for " + identifier);
             return null;
         }
 
