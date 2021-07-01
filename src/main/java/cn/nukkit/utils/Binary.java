@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.math.BlockVector3;
@@ -103,6 +104,7 @@ public class Binary {
     }
 
     public static byte[] writeMetadata(EntityMetadata metadata) {
+        Server.mvw("Binary#writeMetadata(EntityMetadata)");
         return writeMetadata(ProtocolInfo.CURRENT_PROTOCOL, metadata);
     }
 

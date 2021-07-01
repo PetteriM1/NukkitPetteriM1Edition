@@ -345,6 +345,10 @@ public class Server {
      */
     public int spawnRadius;
     /**
+     * Minimum allowed protocol version.
+     */
+    public int minimumProtocol;
+    /**
      * Do not limit the maximum size of player skins.
      */
     public boolean doNotLimitSkinGeometry;
@@ -2556,6 +2560,7 @@ public class Server {
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
         this.updateChecks = this.getPropertyBoolean("update-notifications", true);
+        this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
         this.enableCustomItems = this.getPropertyBoolean("enable_custom_items", true);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
@@ -2568,6 +2573,19 @@ public class Server {
             StringTokenizer tokenizer = new StringTokenizer(list, ", ");
             while (tokenizer.hasMoreTokens()) {
                 noTickingWorlds.add(tokenizer.nextToken());
+            }
+        }
+    }
+
+    /**
+     * Internal: Warn user about non multiversion compatible plugins.
+     */
+    public static void mvw(String action) {
+        if (getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+            if (Nukkit.DEBUG > 1) {
+                getInstance().getLogger().logException(new PluginException("Default " + action + " used by a plugin. This can cause instability with the multiversion."));
+            } else {
+                getInstance().getLogger().warning("Default " + action + " used by a plugin. This can cause instability with the multiversion.");
             }
         }
     }

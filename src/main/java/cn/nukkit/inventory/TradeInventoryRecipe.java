@@ -48,7 +48,7 @@ public class TradeInventoryRecipe {
     }
 
     public TradeInventoryRecipe setBuyCount(int count, int type) {
-        switch(type) {
+        switch (type) {
             case 0:
                 this.buyCountA = count;
                 break;
@@ -66,7 +66,7 @@ public class TradeInventoryRecipe {
     }
 
     public TradeInventoryRecipe setMultiplier(float multiplier, int type) {
-        switch(type) {
+        switch (type) {
             case 0:
                 this.priceMultiplierA = multiplier;
                 break;

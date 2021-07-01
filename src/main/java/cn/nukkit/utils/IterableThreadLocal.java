@@ -1,5 +1,7 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
+
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -66,7 +68,7 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Server.getInstance().getLogger().logException(e);
         }
     }
 

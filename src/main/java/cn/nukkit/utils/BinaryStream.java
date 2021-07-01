@@ -1,5 +1,6 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.Skin;
@@ -268,6 +269,7 @@ public class BinaryStream {
     }
 
     public void putSkin(Skin skin) {
+        Server.mvw("BinaryStream#putSkin(Skin)");
         this.putSkin(ProtocolInfo.CURRENT_PROTOCOL, skin);
     }
 
@@ -360,6 +362,7 @@ public class BinaryStream {
     }
 
     public Skin getSkin() {
+        Server.mvw("BinaryStream#getSkin()");
         return getSkin(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
@@ -420,6 +423,7 @@ public class BinaryStream {
     private static final String NukkitPetteriM1EditionTag = "NukkitPetteriM1Edition";
 
     public Item getSlot() {
+        Server.mvw("BinaryStream#getSlot()");
         return this.getSlot(ProtocolInfo.CURRENT_PROTOCOL);
     }
 
@@ -522,7 +526,7 @@ public class BinaryStream {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Server.getInstance().getLogger().logException(e);
         }
 
         Item item = Item.get(id, damage, cnt, nbt);
@@ -666,6 +670,7 @@ public class BinaryStream {
     }
 
     public void putSlot(Item item) {
+        Server.mvw("BinaryStream#putSlot(Item)");
         this.putSlot(ProtocolInfo.CURRENT_PROTOCOL, item);
     }
 
@@ -1084,6 +1089,7 @@ public class BinaryStream {
     }
 
     public void putGameRules(GameRules gameRules) {
+        Server.mvw("BinaryStream#putGameRules(GameRules)");
         this.putGameRules(ProtocolInfo.CURRENT_PROTOCOL, gameRules);
     }
 
