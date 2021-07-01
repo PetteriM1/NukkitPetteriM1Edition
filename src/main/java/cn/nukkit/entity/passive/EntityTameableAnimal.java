@@ -2,15 +2,18 @@ package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.EntityTameable;
-import cn.nukkit.entity.data.ByteEntityData;
-import cn.nukkit.entity.data.StringEntityData;
+import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
 public abstract class EntityTameableAnimal extends EntityWalkingAnimal implements EntityTameable {
 
-    public static final int DATA_TAMED_FLAG = 16;
-    public static final int DATA_OWNER_NAME = 17;
+    private Player owner = null;
+
+    private String ownerUUID = "";
+
+    private boolean sitting = false;
 
     public EntityTameableAnimal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -20,86 +23,105 @@ public abstract class EntityTameableAnimal extends EntityWalkingAnimal implement
     protected void initEntity() {
         super.initEntity();
 
-        if (getDataProperty(DATA_TAMED_FLAG) == null) {
-            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) 0));
-        }
-
-        if (getDataProperty(DATA_OWNER_NAME) == null) {
-            setDataProperty(new StringEntityData(DATA_OWNER_NAME, ""));
-        }
-
-        String ownerName = "";
-
-        if (namedTag != null) {
-            if (namedTag.contains("Owner")) {
-                ownerName = namedTag.getString("Owner");
+        if (this.namedTag != null) {
+            String ownerName = namedTag.getString(NAMED_TAG_OWNER);
+            if (ownerName != null && !ownerName.isEmpty()) {
+                Player player = this.getServer().getPlayerExact(ownerName);
+                if (player != null) {
+                    this.setOwner(player);
+                }
+                this.setSitting(namedTag.getBoolean(NAMED_TAG_SITTING));
             }
-
-            if (!ownerName.isEmpty()) {
-                this.setOwnerName(ownerName);
-                this.setTamed(true);
-            }
-
-            this.setSitting(namedTag.getBoolean("Sitting"));
         }
     }
 
     @Override
     public void saveNBT() {
         super.saveNBT();
-
-        if (this.getOwnerName() == null) {
-            namedTag.putString("Owner", "");
-        } else {
-            namedTag.putString("Owner", getOwnerName());
+        namedTag.putBoolean(NAMED_TAG_SITTING, this.sitting);
+        if (this.owner != null) {
+            namedTag.putString(NAMED_TAG_OWNER, this.owner.getName());
+            namedTag.putString(NAMED_TAG_OWNER_UUID, owner.getUniqueId().toString());
         }
-
-        namedTag.putBoolean("Sitting", isSitting());
-    }
-
-    public String getOwnerName() {
-        return getDataPropertyString(DATA_OWNER_NAME);
-    }
-
-    public void setOwnerName(String playerName) {
-        setDataProperty(new StringEntityData(DATA_OWNER_NAME, playerName));
     }
 
     @Override
     public Player getOwner() {
-        return getServer().getPlayer(getOwnerName());
+        this.checkOwner();
+        return this.owner;
     }
 
     @Override
-    public String getName() {
-        return getNameTag();
+    public boolean hasOwner() {
+        return hasOwner(true);
     }
 
-    public boolean isTamed() {
-        return (getDataPropertyByte(DATA_TAMED_FLAG) & 4) != 0;
-    }
-
-    public void setTamed(boolean flag) {
-        int var = getDataPropertyByte(DATA_TAMED_FLAG);
-
-        if (flag) {
-            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) (var | 4)));
+    public boolean hasOwner(boolean checkOnline) {
+        if (checkOnline) {
+            this.checkOwner();
+            return this.owner != null;
         } else {
-            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) (var & -5)));
+            if (this.namedTag != null) {
+                String ownerName = namedTag.getString(NAMED_TAG_OWNER);
+                return ownerName != null && !ownerName.isEmpty();
+            }
+            return false;
         }
     }
 
-    public boolean isSitting() {
-        return (getDataPropertyByte(DATA_TAMED_FLAG) & 1) != 0;
+    @Override
+    public void setOwner(Player player) {
+        this.owner = player;
+        this.setDataProperty(new LongEntityData(DATA_OWNER_EID, player.getId()));
+        this.setTamed(true);
     }
 
-    public void setSitting(boolean flag) {
-        int var = getDataPropertyByte(DATA_TAMED_FLAG);
+    @Override
+    public boolean isSitting() {
+        return this.sitting;
+    }
 
-        if (flag) {
-            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) (var | 1)));
-        } else {
-            setDataProperty(new ByteEntityData(DATA_TAMED_FLAG, (byte) (var & -2)));
+    @Override
+    public void setSitting(boolean sit) {
+        this.sitting = sit;
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SITTING, sit);
+    }
+
+    public void setTamed(boolean tamed) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_TAMED, tamed);
+    }
+
+    @Override
+    public String getOwnerUUID() {
+        return this.ownerUUID;
+    }
+
+    @Override
+    public void setOwnerUUID(String ownerUUID) {
+        this.ownerUUID = ownerUUID;
+    }
+
+    @Override
+    public Vector3 updateMove(int tickDiff) {
+        if (this.sitting) {
+            return this.target;
+        }
+
+        return super.updateMove(tickDiff);
+    }
+
+    /**
+     * If the owner is online, set owner properly
+     */
+    public void checkOwner() {
+        if (this.owner == null && this.namedTag != null) {
+            String ownerName = namedTag.getString(NAMED_TAG_OWNER);
+            if (ownerName != null && !ownerName.isEmpty()) {
+                Player player = this.getServer().getPlayerExact(ownerName);
+                if (player != null) {
+                    this.setOwner(player);
+                }
+            }
         }
     }
 }

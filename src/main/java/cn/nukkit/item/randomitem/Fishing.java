@@ -54,9 +54,9 @@ public final class Fishing {
     }
 
     public static Item getFishingResult(int fortuneLevel, int lureLevel) {
-        float treasureChance = limitRange(0, 1, 0.05f + 0.01f * fortuneLevel - 0.01f * lureLevel);
-        float junkChance = limitRange(0, 1, 0.05f - 0.025f * fortuneLevel - 0.01f * lureLevel);
-        float fishChance = limitRange(0, 1, 1 - treasureChance - junkChance);
+        float treasureChance = limitRange(0.05f + 0.01f * fortuneLevel - 0.01f * lureLevel);
+        float junkChance = limitRange(0.05f - 0.025f * fortuneLevel - 0.01f * lureLevel);
+        float fishChance = limitRange(1 - treasureChance - junkChance);
         putSelector(FISHES, fishChance);
         putSelector(TREASURES, treasureChance);
         putSelector(JUNKS, junkChance);
@@ -65,8 +65,8 @@ public final class Fishing {
         return null;
     }
 
-    private static float limitRange(float min, float max, float value) {
-        if (value >= max) return max;
-        return Math.max(value, min);
+    private static float limitRange(float value) {
+        if (value >= 1f) return 1f;
+        return Math.max(value, 0f);
     }
 }

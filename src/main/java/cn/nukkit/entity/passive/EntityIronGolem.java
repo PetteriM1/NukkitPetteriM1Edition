@@ -118,11 +118,19 @@ public class EntityIronGolem extends EntityWalkingMob {
     public boolean attack(EntityDamageEvent ev) {
         if (super.attack(ev)) {
             if (ev instanceof EntityDamageByEntityEvent) {
-                this.isAngryTo = ((EntityDamageByEntityEvent) ev).getDamager().getId();
+                Entity damager = ((EntityDamageByEntityEvent) ev).getDamager();
+                if (!damager.isPlayer || ((Player) damager).isSurvival() || ((Player) damager).isAdventure()) {
+                    this.isAngryTo = damager.getId();
+                }
             }
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public boolean canTarget(Entity entity) {
+        return entity.canBeFollowed() && entity.getId() == this.isAngryTo;
     }
 }

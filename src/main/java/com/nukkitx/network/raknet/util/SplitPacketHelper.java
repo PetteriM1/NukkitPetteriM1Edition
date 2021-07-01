@@ -24,9 +24,9 @@ public class SplitPacketHelper extends AbstractReferenceCounted {
         Preconditions.checkNotNull(packet, "packet");
         Preconditions.checkArgument(packet.isSplit(), "packet is not split");
         Preconditions.checkState(this.refCnt() > 0, "packet has been released");
-        Preconditions.checkElementIndex((int) packet.getPartIndex(), this.packets.length);
+        Preconditions.checkElementIndex(packet.getPartIndex(), this.packets.length);
 
-        int partIndex = (int) packet.getPartIndex();
+        int partIndex = packet.getPartIndex();
         if (this.packets[partIndex] != null) {
             // Duplicate
             return null;
