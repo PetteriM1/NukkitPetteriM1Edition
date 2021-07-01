@@ -1,7 +1,6 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.block.*;
-import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.entity.passive.EntitySkeletonHorse;
 import cn.nukkit.level.format.FullChunk;
@@ -32,8 +31,8 @@ public abstract class EntityWalking extends BaseEntity {
         if (!(target instanceof EntityCreature) || (!((EntityCreature) target).closed && !this.targetOption((EntityCreature) target, this.distanceSquared(target))) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
 
-            for (Entity entity : this.getViewers().values()) {
-                if (entity == this || !(entity instanceof EntityCreature) || (entity instanceof EntityAnimal || !entity.canBeFollowed())) {
+            for (Entity entity : this.getLevel().getEntities()) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity.closed || !this.canTarget(entity)) {
                     continue;
                 }
 
@@ -125,11 +124,7 @@ public abstract class EntityWalking extends BaseEntity {
     }
 
     public Vector3 updateMove(int tickDiff) {
-        if (this.getServer().getMobAiEnabled() && !isImmobile()) {
-            if (!this.isMovement()) {
-                return null;
-            }
-
+        if (this.isMovement() && !isImmobile()) {
             if (this.isKnockback()) {
                 this.move(this.motionX, this.motionY, this.motionZ);
                 this.motionY -= this.getGravity();
@@ -137,16 +132,26 @@ public abstract class EntityWalking extends BaseEntity {
                 return null;
             }
 
+            Block levelBlock = getLevelBlock();
+            boolean inWater = levelBlock.getId() == 8 || levelBlock.getId() == 9;
+            int downId = level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+            if (inWater && (downId == 0 || downId == 8 || downId == 9 || downId == BlockID.LAVA || downId == BlockID.STILL_LAVA || downId == BlockID.SIGN_POST || downId == BlockID.WALL_SIGN)) onGround = false;
+            if (downId == 0 || downId == BlockID.SIGN_POST || downId == BlockID.WALL_SIGN) onGround = false;
             if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
                 double x = this.followTarget.x - this.x;
                 double z = this.followTarget.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
-                if (this.stayTime > 0 || this.distance(this.followTarget) <= (this.getWidth() / 2 + 0.05)) {
+                if (!inWater && (this.stayTime > 0 || this.distance(this.followTarget) <= (this.getWidth() / 2 + 0.05))) {
                     this.motionX = 0;
                     this.motionZ = 0;
                 } else {
-                    if (this.isInsideOfWater()) {
+                    if (levelBlock.getId() == BlockID.WATER) {
+                        BlockWater blockWater = (BlockWater) levelBlock;
+                        Vector3 flowVector = blockWater.getFlowVector();
+                        motionX = flowVector.getX() * .05;
+                        motionZ = flowVector.getZ() * .05;
+                    } else if (levelBlock.getId() == BlockID.STILL_WATER) {
                         this.motionX = this.getSpeed() * moveMultiplier * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * moveMultiplier * 0.05 * (z / diff);
                         if (!this.isDrowned) this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0, 2.0), Utils.rand(-0.5, 0), Utils.rand(-2.0, 2.0))));
@@ -166,11 +171,16 @@ public abstract class EntityWalking extends BaseEntity {
                 double z = this.target.z - this.z;
 
                 double diff = Math.abs(x) + Math.abs(z);
-                if (this.stayTime > 0 || (this.distance(this.target) <= (this.getWidth() / 2 + 0.05) * nearbyDistanceMultiplier() && !this.isInsideOfWater())) {
+                if (!inWater && (this.stayTime > 0 || (this.distance(this.target) <= (this.getWidth() / 2 + 0.05) * nearbyDistanceMultiplier()))) {
                     this.motionX = 0;
                     this.motionZ = 0;
                 } else {
-                    if (this.isInsideOfWater()) {
+                    if (levelBlock.getId() == BlockID.WATER) {
+                        BlockWater blockWater = (BlockWater) levelBlock;
+                        Vector3 flowVector = blockWater.getFlowVector();
+                        motionX = flowVector.getX() * .05;
+                        motionZ = flowVector.getZ() * .05;
+                    } else if (levelBlock.getId() == BlockID.STILL_WATER) {
                         this.motionX = this.getSpeed() * moveMultiplier * 0.05 * (x / diff);
                         this.motionZ = this.getSpeed() * moveMultiplier * 0.05 * (z / diff);
                         if (!this.isDrowned) this.level.addParticle(new BubbleParticle(this.add(Utils.rand(-2.0, 2.0), Utils.rand(-0.5, 0), Utils.rand(-2.0, 2.0))));
@@ -185,7 +195,7 @@ public abstract class EntityWalking extends BaseEntity {
             double dx = this.motionX;
             double dz = this.motionZ;
             boolean isJump = this.checkJump(dx, dz);
-            if (this.stayTime > 0) {
+            if (this.stayTime > 0 && !inWater) {
                 this.stayTime -= tickDiff;
                 this.move(0, this.motionY, 0);
             } else {
@@ -199,7 +209,7 @@ public abstract class EntityWalking extends BaseEntity {
             }
 
             if (!isJump) {
-                if (this.onGround) {
+                if (this.onGround && !inWater) {
                     this.motionY = 0;
                 } else if (this.motionY > -this.getGravity() * 4) {
                     int b = this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));

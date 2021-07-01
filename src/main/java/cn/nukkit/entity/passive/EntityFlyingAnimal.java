@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.Player;
 import cn.nukkit.entity.EntityFlying;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -29,7 +28,7 @@ public abstract class EntityFlyingAnimal extends EntityFlying implements EntityA
 
         Vector3 target = this.updateMove(tickDiff);
 
-        if (target instanceof Player) {
+        /*if (target instanceof Player) {
             if (this.distanceSquared(target) <= 2) {
                 //this.pitch = 22;
                 this.x = this.lastX;
@@ -38,7 +37,7 @@ public abstract class EntityFlyingAnimal extends EntityFlying implements EntityA
             }
         } else if (target != null && this.distanceSquared(target) <= 1) {
             this.moveTime = 0;
-        }
+        }*/
 
         return true;
     }

@@ -190,11 +190,6 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean canPassThrough() {
-        return isOpen();
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return isOpen();
+        return this.isOpen();
     }
 }

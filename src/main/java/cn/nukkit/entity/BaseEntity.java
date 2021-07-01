@@ -517,4 +517,8 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
         z += rand.nextGaussian() * 0.007499999832361937 * 6;
         projectile.setMotion(new Vector3(x, y, z));
     }
+
+    public boolean canTarget(Entity entity) {
+        return entity instanceof Player && entity.canBeFollowed();
+    }
 }
