@@ -8,7 +8,6 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.network.protocol.DataPacket;
-import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -57,7 +56,7 @@ public class CraftingManager {
     public final Map<Integer, CampfireRecipe> campfireRecipes = new Int2ObjectOpenHashMap<>();
 
     private static int RECIPE_COUNT = 0;
-    public static int NEXT_NETWORK_ID = 0;
+    static int NEXT_NETWORK_ID = 0;
 
     // Torch with charcoal recipe fix for 1.16.100+
     private static ShapedRecipe charcoalTorchRecipe419;
@@ -542,7 +541,8 @@ public class CraftingManager {
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
-        registerShapedRecipe(ProtocolInfo.CURRENT_PROTOCOL, recipe);
+        Server.mvw("CraftingManager#registerShapedRecipe(ShapedRecipe)");
+        this.registerShapedRecipe(388, recipe);
     }
 
     public void registerShapedRecipe(int protocol, ShapedRecipe recipe) {
@@ -551,12 +551,15 @@ public class CraftingManager {
         switch (protocol) {
             case 313:
                 map = shapedRecipes313.computeIfAbsent(resultHash, k -> new HashMap<>());
-                return;
+                break;
             case 332:
                 map = shapedRecipes332.computeIfAbsent(resultHash, k -> new HashMap<>());
-                return;
-            default:
+                break;
+            case 388:
                 map = shapedRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+                break;
+            default:
+                throw new IllegalArgumentException("Tried to register a shaped recipe for unsupported protocol version: " + protocol);
         }
         map.put(getMultiItemHash(new LinkedList<>(recipe.getIngredientsAggregate())), recipe);
     }
@@ -571,28 +574,28 @@ public class CraftingManager {
     }
 
     public void registerShapelessRecipe(ShapelessRecipe recipe) {
-        registerShapelessRecipe(ProtocolInfo.CURRENT_PROTOCOL, recipe);
+        Server.mvw("CraftingManager#registerShapelessRecipe(ShapelessRecipe)");
+        this.registerShapelessRecipe(388, recipe);
     }
 
     public void registerShapelessRecipe(int protocol, ShapelessRecipe recipe) {
         List<Item> list = recipe.getIngredientsAggregate();
-
         UUID hash = getMultiItemHash(list);
-
         int resultHash = getItemHash(recipe.getResult());
         Map<UUID, ShapelessRecipe> map;
-
         switch (protocol) {
             case 313:
                 map = shapelessRecipes313.computeIfAbsent(resultHash, k -> new HashMap<>());
-                return;
+                break;
             case 332:
                 map = shapelessRecipes332.computeIfAbsent(resultHash, k -> new HashMap<>());
-                return;
-            default:
+                break;
+            case 388:
                 map = shapelessRecipes.computeIfAbsent(resultHash, k -> new HashMap<>());
+                break;
+            default:
+                throw new IllegalArgumentException("Tried to register a shapeless recipe for unsupported protocol version: " + protocol);
         }
-
         map.put(hash, recipe);
     }
 

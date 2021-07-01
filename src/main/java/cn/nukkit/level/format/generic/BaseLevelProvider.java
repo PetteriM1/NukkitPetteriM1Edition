@@ -309,7 +309,7 @@ public abstract class BaseLevelProvider implements LevelProvider {
             try {
                 com.google.common.io.Files.copy(old, new File(file + ".bak"));
             } catch (IOException e) {
-                e.printStackTrace();
+                Server.getInstance().getLogger().logException(e);
             }
         }
         try {

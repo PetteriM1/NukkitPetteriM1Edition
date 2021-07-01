@@ -5,12 +5,14 @@ import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.mob.EntityDrowned;
+import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTurtleShell;
+import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.format.FullChunk;
@@ -21,6 +23,7 @@ import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.network.protocol.AnimatePacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.TextPacket;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockIterator;
 import co.aikar.timings.Timings;
@@ -239,6 +242,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         super.kill();
         EntityDeathEvent ev = new EntityDeathEvent(this, this.getDrops());
         this.server.getPluginManager().callEvent(ev);
+
+        this.checkTameableEntityDeath();
 
         if (this.level.getGameRules().getBoolean(GameRule.DO_MOB_LOOT) && this.lastDamageCause != null && DamageCause.VOID != this.lastDamageCause.getCause()) {
             if (ev.getEntity() instanceof BaseEntity) {
@@ -499,5 +504,45 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public boolean dropsOnNaturalDeath() {
         return true;
+    }
+
+    private void checkTameableEntityDeath() {
+        if (this instanceof EntityTameable) {
+            if (!((EntityTameable) this).hasOwner()) {
+                return;
+            }
+
+            if (((EntityTameable) this).getOwner() == null) {
+                return;
+            }
+
+            // TODO: More detailed death messages
+            String killedEntity;
+            if (this instanceof EntityWolf) {
+                killedEntity = "%entity.wolf.name";
+            } else {
+                killedEntity = this.getName();
+            }
+
+            TranslationContainer deathMessage = new TranslationContainer("death.attack.generic", killedEntity);
+            if (this.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                Entity damageEntity = ((EntityDamageByEntityEvent) this.getLastDamageCause()).getDamager();
+                if (damageEntity instanceof Player) {
+                    deathMessage = new TranslationContainer("death.attack.player", killedEntity, damageEntity.getName());
+                } else {
+                    if (damageEntity instanceof EntityWolf) {
+                        ((EntityWolf) damageEntity).setAngry(false);
+                    }
+                    deathMessage = new TranslationContainer("death.attack.mob", killedEntity, damageEntity.getName());
+                }
+            }
+
+            TextPacket tameDeathMessage = new TextPacket();
+            tameDeathMessage.type = TextPacket.TYPE_TRANSLATION;
+            tameDeathMessage.message = deathMessage.getText();
+            tameDeathMessage.parameters = deathMessage.getParameters();
+            tameDeathMessage.isLocalized = true;
+            ((EntityTameable) this).getOwner().dataPacket(tameDeathMessage);
+        }
     }
 }

@@ -1,5 +1,8 @@
 package cn.nukkit.utils.bugreport;
 
+import cn.nukkit.Nukkit;
+import cn.nukkit.Server;
+
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     /**
@@ -22,6 +25,10 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
         try {
             new BugReportGenerator(throwable).start();
-        } catch (Exception ignored) {}
+        } catch (Exception ex) {
+            if (Nukkit.DEBUG > 1) {
+                Server.getInstance().getLogger().logException(ex);
+            }
+        }
     }
 }

@@ -321,7 +321,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
             list[HARD_STAINED_GLASS] = BlockHardGlassStained.class; //254
             list[RESERVED6] = BlockReserved6.class; //255
 
-            if (Server.getInstance().requiredProtocol >= ProtocolInfo.v1_13_0){
+            if (Server.getInstance().minimumProtocol >= ProtocolInfo.v1_13_0){
                 list[PRISMARINE_STAIRS] = BlockStairsPrismarine.class; //257
                 list[DARK_PRISMARINE_STAIRS] = BlockStairsDarkPrismarine.class; //258
                 list[PRISMARINE_BRICKS_STAIRS] = BlockStairsPrismarineBrick.class; //259
@@ -390,7 +390,7 @@ public abstract class Block extends Position implements Metadatable, Cloneable, 
                 list[PISTON_HEAD_STICKY] = BlockPistonHeadSticky.class; //472
             }
 
-            if (Server.getInstance().requiredProtocol >= ProtocolInfo.v1_16_0){
+            if (Server.getInstance().minimumProtocol >= ProtocolInfo.v1_16_0){
                 list[CRIMSON_STEM] = BlockStemCrimson.class; //480
                 list[WARPED_STEM] = BlockStemWarped.class; //481
                 list[WARPED_WART_BLOCK] = BlockWarpedWartBlock.class; //482

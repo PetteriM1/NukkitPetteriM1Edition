@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.Player;
 import cn.nukkit.entity.EntityJumping;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -27,7 +26,7 @@ public abstract class EntityJumpingAnimal extends EntityJumping implements Entit
         this.entityBaseTick(tickDiff);
 
         Vector3 target = this.updateMove(tickDiff);
-        if (target instanceof Player) {
+        /*if (target instanceof Player) {
             if (this.distanceSquared(target) <= 2) {
                 //this.pitch = 22;
                 this.x = this.lastX;
@@ -36,7 +35,7 @@ public abstract class EntityJumpingAnimal extends EntityJumping implements Entit
             }
         } else if (target != null && this.distanceSquared(target) <= 1) {
             this.moveTime = 0;
-        }
+        }*/
         return true;
     }
 }

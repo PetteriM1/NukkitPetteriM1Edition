@@ -2,7 +2,6 @@ package cn.nukkit.entity;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
-import cn.nukkit.entity.passive.EntityAnimal;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.math.NukkitMath;
@@ -31,8 +30,8 @@ public abstract class EntityJumping extends BaseEntity {
         if (!(target instanceof EntityCreature) || (!((EntityCreature) target).closed && !this.targetOption((EntityCreature) target, this.distanceSquared(target))) || !((Entity) target).canBeFollowed()) {
             double near = Integer.MAX_VALUE;
 
-            for (Entity entity : this.getViewers().values()) {
-                if (entity == this || !(entity instanceof EntityCreature) || entity instanceof EntityAnimal || !entity.canBeFollowed() || entity.closed) {
+            for (Entity entity : this.getLevel().getEntities()) {
+                if (entity == this || !(entity instanceof EntityCreature) || entity.closed || !this.canTarget(entity)) {
                     continue;
                 }
 
@@ -107,11 +106,7 @@ public abstract class EntityJumping extends BaseEntity {
     }
 
     public Vector3 updateMove(int tickDiff) {
-        if (this.getServer().getMobAiEnabled() && !isImmobile()) {
-            if (!this.isMovement()) {
-                return null;
-            }
-
+        if (this.isMovement() && !isImmobile()) {
             if (this.isKnockback()) {
                 this.move(this.motionX, this.motionY, this.motionZ);
                 this.motionY -= this.getGravity();

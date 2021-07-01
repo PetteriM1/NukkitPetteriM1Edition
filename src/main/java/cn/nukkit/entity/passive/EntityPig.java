@@ -194,7 +194,7 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable, En
 
     @Override
     public void onPlayerInput(Player player, double strafe, double forward) {
-        if (player.getInventory().getItemInHand().getId() == Item.CARROT_ON_A_STICK) {
+        if (player.getInventory().getItemInHandFast().getId() == Item.CARROT_ON_A_STICK) {
             this.stayTime = 0;
             this.moveTime = 10;
             this.yaw = player.yaw;
@@ -227,7 +227,7 @@ public class EntityPig extends EntityWalkingAnimal implements EntityRideable, En
 
     @Override
     protected void checkTarget() {
-        if (this.passengers.isEmpty() || !(this.getPassengers().get(0) instanceof Player) || ((Player) this.getPassengers().get(0)).getInventory().getItemInHand().getId() != Item.CARROT_ON_A_STICK) {
+        if (this.passengers.isEmpty() || !(this.getPassengers().get(0) instanceof Player) || ((Player) this.getPassengers().get(0)).getInventory().getItemInHandFast().getId() != Item.CARROT_ON_A_STICK) {
             super.checkTarget();
         }
     }

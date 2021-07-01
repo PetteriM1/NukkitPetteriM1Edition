@@ -345,6 +345,10 @@ public class Server {
      */
     public int spawnRadius;
     /**
+     * Minimum allowed protocol version.
+     */
+    public int minimumProtocol;
+    /**
      * Do not limit the maximum size of player skins.
      */
     public boolean doNotLimitSkinGeometry;
@@ -420,10 +424,6 @@ public class Server {
      * Whatever allow spawner drops.
      */
     public boolean dropSpawners;
-    /**
-     * Lowest allowed protocol
-     */
-    public int requiredProtocol;
     /**
      * Check for new releases automatically.
      */
@@ -540,6 +540,7 @@ public class Server {
 
         Block.init();
         Enchantment.init();
+        GlobalBlockPalette.init();
         RuntimeItems.init();
         Item.init();
         EnumBiome.values();
@@ -2562,12 +2563,12 @@ public class Server {
         this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
         this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
-        this.requiredProtocol = this.getPropertyInt("multiversion-min-protocol");
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
         this.updateChecks = this.getPropertyBoolean("update-notifications", false);
+        this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -2579,6 +2580,19 @@ public class Server {
             StringTokenizer tokenizer = new StringTokenizer(list, ", ");
             while (tokenizer.hasMoreTokens()) {
                 noTickingWorlds.add(tokenizer.nextToken());
+            }
+        }
+    }
+
+    /**
+     * Internal: Warn user about non multiversion compatible plugins.
+     */
+    public static void mvw(String action) {
+        if (getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+            if (Nukkit.DEBUG > 1) {
+                getInstance().getLogger().logException(new PluginException("Default " + action + " used by a plugin. This can cause instability with the multiversion."));
+            } else {
+                getInstance().getLogger().warning("Default " + action + " used by a plugin. This can cause instability with the multiversion.");
             }
         }
     }

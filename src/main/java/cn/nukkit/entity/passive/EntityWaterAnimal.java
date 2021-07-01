@@ -1,6 +1,5 @@
 package cn.nukkit.entity.passive;
 
-import cn.nukkit.Player;
 import cn.nukkit.entity.EntitySwimming;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
@@ -36,14 +35,14 @@ public abstract class EntityWaterAnimal extends EntitySwimming implements Entity
         this.entityBaseTick(tickDiff);
 
         Vector3 target = this.updateMove(tickDiff);
-        if (target instanceof Player) {
+        /*if (target instanceof Player) {
             if (this.distanceSquared(target) <= 2) {
                 //this.pitch = 22;
                 this.x = this.lastX;
                 this.y = this.lastY;
                 this.z = this.lastZ;
             }
-        }
+        }*/
         return true;
     }
 }
