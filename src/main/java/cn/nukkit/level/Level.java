@@ -599,9 +599,9 @@ public class Level implements ChunkManager, Metadatable {
     public void addParticle(Particle particle, Player[] players, int count) {
         Int2ObjectMap<ObjectList<Player>> targets;
         if (players == null) {
-            targets = Server.shortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
+            targets = Server.sortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
         } else {
-            targets = Server.shortPlayers(players);
+            targets = Server.sortPlayers(players);
         }
 
         for (int protocolId : targets.keySet()) {
@@ -1091,7 +1091,7 @@ public class Level implements ChunkManager, Metadatable {
             chunks = new LongOpenHashSet();
         }
 
-        Int2ObjectMap<ObjectList<Player>> targets = Server.shortPlayers(target);
+        Int2ObjectMap<ObjectList<Player>> targets = Server.sortPlayers(target);
         for (Vector3 b : blocks) {
             if (b == null) {
                 continue;
@@ -2422,7 +2422,7 @@ public class Level implements ChunkManager, Metadatable {
 
 
         if (playSound) {
-            Int2ObjectMap<ObjectList<Player>> players = Server.shortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
+            Int2ObjectMap<ObjectList<Player>> players = Server.sortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
             for (int protocolId : players.keySet()) {
                 ObjectList<Player> targets = players.get(protocolId);
                 int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId > ProtocolInfo.v1_2_10 ? protocolId : ProtocolInfo.CURRENT_PROTOCOL, // no block palette in <= 1.2.10

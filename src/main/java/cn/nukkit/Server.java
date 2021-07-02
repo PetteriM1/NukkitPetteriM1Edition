@@ -337,7 +337,7 @@ public class Server {
      */
     public int gamemode;
     /**
-     * Minimum amount of ticks between player skin changes.
+     * Minimum amount of time between player skin changes.
      */
     public int skinChangeCooldown;
     /**
@@ -1622,14 +1622,29 @@ public class Server {
         return scheduler;
     }
 
+    /**
+     * Get current tick
+     *
+     * @return current tick
+     */
     public int getTick() {
         return tickCounter;
     }
 
+    /**
+     * Get ticks per second
+     *
+     * @return TPS
+     */
     public float getTicksPerSecond() {
         return ((float) Math.round(this.maxTick * 100)) / 100;
     }
 
+    /**
+     * Get average ticks per second
+     *
+     * @return average TPS
+     */
     public float getTicksPerSecondAverage() {
         float sum = 0;
         int count = this.tickAverage.length;
@@ -1852,6 +1867,14 @@ public class Server {
         }
     }
 
+    /**
+     * Internal: Save offline player data
+     *
+     * @param serializer serializer
+     * @param tag compound tag
+     * @param name player name
+     * @param uuid player uuid
+     */
     private void saveOfflinePlayerDataInternal(PlayerDataSerializer serializer, CompoundTag tag, String name, UUID uuid) {
         try (OutputStream dataStream = serializer.write(name, uuid)) {
             NBTIO.writeGZIPCompressed(tag, dataStream, ByteOrder.BIG_ENDIAN);
@@ -1860,6 +1883,9 @@ public class Server {
         }
     }
 
+    /**
+     * Internal: Convert legacy player saves to the uuid based saving
+     */
     private void convertLegacyPlayerData() {
         File dataDirectory = new File(getDataPath(), "players/");
 
@@ -1908,6 +1934,12 @@ public class Server {
         }
     }
 
+    /**
+     * Get an online player by name
+     *
+     * @param name player name
+     * @return Player or null
+     */
     public Player getPlayer(String name) {
         Player found = null;
         name = name.toLowerCase();
@@ -1928,6 +1960,12 @@ public class Server {
         return found;
     }
 
+    /**
+     * Get an online player by exact player name
+     *
+     * @param name exact player name
+     * @return Player or null
+     */
     public Player getPlayerExact(String name) {
         for (Player player : this.getOnlinePlayers().values()) {
             if (player.getName().equalsIgnoreCase(name)) {
@@ -1938,6 +1976,12 @@ public class Server {
         return null;
     }
 
+    /**
+     * Get players that match with the name
+     *
+     * @param partialName name
+     * @return matching players
+     */
     public Player[] matchPlayer(String partialName) {
         partialName = partialName.toLowerCase();
         List<Player> matchedPlayer = new ArrayList<>();
@@ -1952,6 +1996,11 @@ public class Server {
         return matchedPlayer.toArray(new Player[0]);
     }
 
+    /**
+     * Internal: Remove a player from the server
+     *
+     * @param player player
+     */
     public void removePlayer(Player player) {
         if (this.players.remove(player.getSocketAddress()) != null) {
             return;
@@ -1965,24 +2014,51 @@ public class Server {
         }
     }
 
+    /**
+     * Get all levels
+     *
+     * @return levels
+     */
     public Map<Integer, Level> getLevels() {
         return levels;
     }
 
+    /**
+     * Get default level
+     *
+     * @return default level
+     */
     public Level getDefaultLevel() {
         return defaultLevel;
     }
 
+    /**
+     * Change the default level
+     *
+     * @param defaultLevel new default level
+     */
     public void setDefaultLevel(Level defaultLevel) {
         if (defaultLevel == null || (this.isLevelLoaded(defaultLevel.getFolderName()) && defaultLevel != this.defaultLevel)) {
             this.defaultLevel = defaultLevel;
         }
     }
 
+    /**
+     * Check whether a level is loaded
+     *
+     * @param name level name
+     * @return is loaded
+     */
     public boolean isLevelLoaded(String name) {
         return this.getLevelByName(name) != null;
     }
 
+    /**
+     * Get a level by ID
+     *
+     * @param levelId level ID
+     * @return Level or null
+     */
     public Level getLevel(int levelId) {
         if (this.levels.containsKey(levelId)) {
             return this.levels.get(levelId);
@@ -1990,6 +2066,12 @@ public class Server {
         return null;
     }
 
+    /**
+     * Get a level by name
+     *
+     * @param name level name
+     * @return Level or null
+     */
     public Level getLevelByName(String name) {
         for (Level level : this.levelArray) {
             if (level.getFolderName().equalsIgnoreCase(name)) {
@@ -2000,19 +2082,41 @@ public class Server {
         return null;
     }
 
+    /**
+     * Unload a level
+     *
+     * Notice: the default level cannot be unloaded without forceUnload=true
+     *
+     * @param level Level
+     * @return unloaded
+     */
     public boolean unloadLevel(Level level) {
         return this.unloadLevel(level, false);
     }
 
+    /**
+     * Unload a level
+     *
+     * Notice: the default level cannot be unloaded without forceUnload=true
+     *
+     * @param level Level
+     * @param forceUnload force unload (ignore cancelled events and default level)
+     * @return unloaded
+     */
     public boolean unloadLevel(Level level, boolean forceUnload) {
         if (level == this.defaultLevel && !forceUnload) {
             throw new IllegalStateException("The default level cannot be unloaded while running, please switch levels.");
         }
 
         return level.unload(forceUnload);
-
     }
 
+    /**
+     * Load a level by name
+     *
+     * @param name level name
+     * @return loaded
+     */
     public boolean loadLevel(String name) {
         if (Objects.equals(name.trim(), "")) {
             throw new LevelException("Invalid empty level name");
@@ -2059,22 +2163,62 @@ public class Server {
         return true;
     }
 
+    /**
+     * Generate a new level
+     *
+     * @param name level name
+     * @return generated
+     */
     public boolean generateLevel(String name) {
         return this.generateLevel(name, Utils.random.nextLong());
     }
 
+    /**
+     * Generate a new level
+     *
+     * @param name level name
+     * @param seed level seed
+     * @return generated
+     */
     public boolean generateLevel(String name, long seed) {
         return this.generateLevel(name, seed, null);
     }
 
+    /**
+     * Generate a new level
+     *
+     * @param name level name
+     * @param seed level seed
+     * @param generator level generator
+     * @return generated
+     */
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator) {
         return this.generateLevel(name, seed, generator, new HashMap<>());
     }
 
+    /**
+     * Generate a new level
+     *
+     * @param name level name
+     * @param seed level seed
+     * @param generator level generator
+     * @param options level generator options
+     * @return generated
+     */
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {
         return generateLevel(name, seed, generator, options, null);
     }
 
+    /**
+     * Generate a new level
+     *
+     * @param name level name
+     * @param seed level seed
+     * @param generator level generator
+     * @param options level generator options
+     * @param provider level provider
+     * @return generated
+     */
     public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options, Class<? extends LevelProvider> provider) {
         if (Objects.equals(name.trim(), "") || this.isLevelGenerated(name)) {
             return false;
@@ -2116,12 +2260,16 @@ public class Server {
         }
 
         this.pluginManager.callEvent(new LevelInitEvent(level));
-
         this.pluginManager.callEvent(new LevelLoadEvent(level));
-
         return true;
     }
 
+    /**
+     * Check whether a level by name is generated
+     *
+     * @param name level name
+     * @return level found
+     */
     public boolean isLevelGenerated(String name) {
         if (Objects.equals(name.trim(), "")) {
             return false;
@@ -2135,60 +2283,144 @@ public class Server {
         return true;
     }
 
+    /**
+     * Get BaseLang (server's default language)
+     *
+     * @return BaseLang
+     */
     public BaseLang getLanguage() {
         return baseLang;
     }
 
+    /**
+     * Is forcing language enabled
+     *
+     * @return force-language enabled
+     */
     public boolean isLanguageForced() {
         return forceLanguage;
     }
 
+    /**
+     * Get Network
+     *
+     * @return Network
+     */
     public Network getNetwork() {
         return network;
     }
 
+    /**
+     * Get server.properties
+     *
+     * @return server.properties as a Config
+     */
     public Config getProperties() {
         return this.properties;
     }
 
+    /**
+     * Get a value from server.properties
+     *
+     * @param variable key
+     * @return value
+     */
     public Object getProperty(String variable) {
         return this.getProperty(variable, null);
     }
 
+    /**
+     * Get a value from server.properties
+     *
+     * @param variable key
+     * @param defaultValue default value
+     * @return value
+     */
     public Object getProperty(String variable, Object defaultValue) {
         return this.properties.exists(variable) ? this.properties.get(variable) : defaultValue;
     }
 
+    /**
+     * Set a string value in server.properties
+     *
+     * @param variable key
+     * @param value value
+     */
     public void setPropertyString(String variable, String value) {
         this.properties.set(variable, value);
         this.properties.save();
     }
 
+    /**
+     * Get a string value from server.properties
+     *
+     * @param key key
+     * @return value
+     */
     public String getPropertyString(String key) {
         return this.getPropertyString(key, null);
     }
 
+    /**
+     * Get a string value from server.properties
+     *
+     * @param key key
+     * @param defaultValue default value
+     * @return value
+     */
     public String getPropertyString(String key, String defaultValue) {
         return this.properties.exists(key) ? this.properties.get(key).toString() : defaultValue;
     }
 
+    /**
+     * Get an int value from server.properties
+     *
+     * @param variable key
+     * @return value
+     */
     public int getPropertyInt(String variable) {
         return this.getPropertyInt(variable, null);
     }
 
+    /**
+     * Get an int value from server.properties
+     *
+     * @param variable key
+     * @param defaultValue default value
+     * @return value
+     */
     public int getPropertyInt(String variable, Integer defaultValue) {
         return this.properties.exists(variable) ? (!this.properties.get(variable).equals("") ? Integer.parseInt(String.valueOf(this.properties.get(variable))) : defaultValue) : defaultValue;
     }
 
+    /**
+     * Set an int value in server.properties
+     *
+     * @param variable key
+     * @param value value
+     */
     public void setPropertyInt(String variable, int value) {
         this.properties.set(variable, value);
         this.properties.save();
     }
 
+    /**
+     * Get a boolean value from server.properties
+     *
+     * @param variable key
+     * @return value
+     */
     public boolean getPropertyBoolean(String variable) {
         return this.getPropertyBoolean(variable, null);
     }
 
+    /**
+     * Get a boolean value from server.properties
+     *
+     * @param variable key
+     * @param defaultValue default value
+     * @return value
+     */
     public boolean getPropertyBoolean(String variable, Object defaultValue) {
         Object value = this.properties.exists(variable) ? this.properties.get(variable) : defaultValue;
         if (value instanceof Boolean) {
@@ -2204,11 +2436,23 @@ public class Server {
         return false;
     }
 
+    /**
+     * Set a boolean value in server.properties
+     *
+     * @param variable key
+     * @param value value
+     */
     public void setPropertyBoolean(String variable, boolean value) {
         this.properties.set(variable, value ? "1" : "0");
         this.properties.save();
     }
 
+    /**
+     * Get plugin commands
+     *
+     * @param name command name
+     * @return PluginIdentifiableCommand or null
+     */
     public PluginIdentifiableCommand getPluginCommand(String name) {
         Command command = this.commandMap.getCommand(name);
         if (command instanceof PluginIdentifiableCommand) {
@@ -2218,14 +2462,29 @@ public class Server {
         }
     }
 
+    /**
+     * Get list of banned players
+     *
+     * @return ban list
+     */
     public BanList getNameBans() {
         return this.banByName;
     }
 
+    /**
+     * Get list of IP bans
+     *
+     * @return IP bans
+     */
     public BanList getIPBans() {
         return this.banByIP;
     }
 
+    /**
+     * Give player the operator status
+     *
+     * @param name player name
+     */
     public void addOp(String name) {
         this.operators.set(name.toLowerCase(), true);
         Player player = this.getPlayerExact(name);
@@ -2235,6 +2494,11 @@ public class Server {
         this.operators.save(true);
     }
 
+    /**
+     * Remove player's operator status
+     *
+     * @param name player name
+     */
     public void removeOp(String name) {
         this.operators.remove(name.toLowerCase());
         Player player = this.getPlayerExact(name);
@@ -2244,53 +2508,115 @@ public class Server {
         this.operators.save();
     }
 
+    /**
+     * Add a player to whitelist
+     *
+     * @param name player name
+     */
     public void addWhitelist(String name) {
         this.whitelist.set(name.toLowerCase(), true);
         this.whitelist.save(true);
     }
 
+    /**
+     * Remove a player from whitelist
+     *
+     * @param name player name
+     */
     public void removeWhitelist(String name) {
         this.whitelist.remove(name.toLowerCase());
         this.whitelist.save(true);
     }
 
+    /**
+     * Check whether a player is whitelisted
+     *
+     * @param name player name
+     * @return is whitelisted or whitelist is not enabled
+     */
     public boolean isWhitelisted(String name) {
         return !this.hasWhitelist() || this.operators.exists(name, true) || this.whitelist.exists(name, true);
     }
 
+    /**
+     * Check whether a player is an operator
+     *
+     * @param name player name
+     * @return is operator
+     */
     public boolean isOp(String name) {
         return this.operators.exists(name, true);
     }
 
+    /**
+     * Get whitelist config
+     *
+     * @return whitelist
+     */
     public Config getWhitelist() {
         return whitelist;
     }
 
+    /**
+     * Get operator list config
+     *
+     * @return operators
+     */
     public Config getOps() {
         return operators;
     }
 
+    /**
+     * Reload whitelist
+     */
     public void reloadWhitelist() {
         this.whitelist.reload();
     }
 
+    /**
+     * Get service manager
+     *
+     * @return service manager
+     */
     public ServiceManager getServiceManager() {
         return serviceManager;
     }
 
+    /**
+     * Should player data saving be enabled
+     *
+     * @return player data saving enabled
+     */
     public boolean shouldSavePlayerData() {
         return shouldSavePlayerData;
     }
 
+    /**
+     * How often player is allowed to change skin in game (in seconds)
+     *
+     * @return skin change cooldown
+     */
     public int getPlayerSkinChangeCooldown() {
         return skinChangeCooldown;
     }
 
+    /**
+     * Get nether world for a level
+     *
+     * @param world level
+     * @return nether world for that level
+     */
     public Level getNetherWorld(String world) {
         return multiNetherWorlds.contains(world) ? this.getLevelByName(world + "-nether") : this.getLevelByName("nether");
     }
 
-    public static Int2ObjectMap<ObjectList<Player>> shortPlayers(Player[] players) {
+    /**
+     * Sort players by protocol version
+     *
+     * @param players players
+     * @return players sorted by protocol
+     */
+    public static Int2ObjectMap<ObjectList<Player>> sortPlayers(Player[] players) {
         Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
@@ -2298,7 +2624,13 @@ public class Server {
         return targets;
     }
 
-    public static Int2ObjectMap<ObjectList<Player>> shortPlayers(Collection<Player> players) {
+    /**
+     * Sort players by protocol version
+     *
+     * @param players players
+     * @return players sorted by protocol
+     */
+    public static Int2ObjectMap<ObjectList<Player>> sortPlayers(Collection<Player> players) {
         Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
         for (Player player : players) {
             targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
@@ -2317,6 +2649,11 @@ public class Server {
         return (Thread.currentThread() == currentThread);
     }
 
+    /**
+     * Get server's primary thread
+     *
+     * @return primary thread
+     */
     public Thread getPrimaryThread() {
         return currentThread;
     }
@@ -2465,18 +2802,38 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.MUSIC, BlockEntityMusic.class);
     }
 
+    /**
+     * Is nether enabled on this server
+     *
+     * @return nether enabled
+     */
     public boolean isNetherAllowed() {
         return this.netherEnabled;
     }
 
+    /**
+     * Get player data serializer that is used to save player data
+     *
+     * @return player data serializer
+     */
     public PlayerDataSerializer getPlayerDataSerializer() {
         return playerDataSerializer;
     }
 
+    /**
+     * Set player data serializer that is used to save player data
+     *
+     * @param playerDataSerializer player data serializer
+     */
     public void setPlayerDataSerializer(PlayerDataSerializer playerDataSerializer) {
         this.playerDataSerializer = Preconditions.checkNotNull(playerDataSerializer, "playerDataSerializer");
     }
 
+    /**
+     * Get the Server instance
+     *
+     * @return Server
+     */
     public static Server getInstance() {
         return instance;
     }
@@ -2490,6 +2847,11 @@ public class Server {
         return suomicraftMode;
     }
 
+    /**
+     * Get the mob spawner task
+     *
+     * @return spawner task
+     */
     public SpawnerTask getSpawnerTask() {
         return this.spawnerTask;
     }

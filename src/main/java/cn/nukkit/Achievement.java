@@ -11,7 +11,6 @@ import java.util.HashMap;
  */
 public class Achievement {
 
-    @SuppressWarnings("serial")
     public static final HashMap<String, Achievement> achievements = new HashMap<String, Achievement>() {
         {
             put("mineWood", new Achievement("Getting Wood"));
