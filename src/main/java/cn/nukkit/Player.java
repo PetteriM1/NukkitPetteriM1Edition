@@ -189,8 +189,17 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected String iusername;
     protected String displayName;
 
+    /**
+     * Client protocol version
+     */
     public int protocol = 999;
+    /**
+     * Client RakNet protocol version
+     */
     public int raknetProtocol;
+    /**
+     * Client version string
+     */
     protected String version;
 
     protected int startAction = -1;
@@ -281,7 +290,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private int failedTransactions;
     public int ticksSinceLastRest;
     private boolean inSoulSand;
-    private float soulSpeed = 1;
 
     /**
      * Packets that can be received before the player has logged in
@@ -1855,12 +1863,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 int down = this.getLevel().getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
                 if (this.inSoulSand && down != BlockID.SOUL_SAND) {
                     this.inSoulSand = false;
-                    this.soulSpeed = 1;
                     this.setMovementSpeed(DEFAULT_SPEED, true);
                 } else if (!this.inSoulSand && down == BlockID.SOUL_SAND) {
                     this.inSoulSand = true;
-                    this.soulSpeed = (soulSpeedEnchantment.getLevel() * 0.105f) + 1.3f;
-                    this.setMovementSpeed(DEFAULT_SPEED * this.soulSpeed, true);
+                    float soulSpeed = (soulSpeedEnchantment.getLevel() * 0.105f) + 1.3f;
+                    this.setMovementSpeed(DEFAULT_SPEED * soulSpeed, true);
                 }
             }
         }

@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public class BannerPattern {
 
-    private Type type;
-    private DyeColor color;
+    private final Type type;
+    private final DyeColor color;
 
     public BannerPattern(Type type, DyeColor color) {
         this.type = type;

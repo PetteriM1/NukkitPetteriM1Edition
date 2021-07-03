@@ -62,6 +62,11 @@ public class BlockRailDetector extends BlockRail {
     }
 
     @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
     public void onEntityCollide(Entity entity) {
         updateState();
     }
@@ -69,6 +74,7 @@ public class BlockRailDetector extends BlockRail {
     protected void updateState() {
         boolean wasPowered = isActive();
         boolean isPowered = false;
+        boolean changed = false;
 
         for (Entity entity : level.getNearbyEntities(new AxisAlignedBB(
                 getFloorX() + 0.125D,
@@ -87,15 +93,19 @@ public class BlockRailDetector extends BlockRail {
             setActive(true);
             level.scheduleUpdate(this, this, 0);
             level.scheduleUpdate(this, this.down(), 0);
+            changed = true;
         }
 
         if (!isPowered && wasPowered) {
             setActive(false);
             level.scheduleUpdate(this, this, 0);
             level.scheduleUpdate(this, this.down(), 0);
+            changed = true;
         }
 
-        level.updateComparatorOutputLevel(this);
+        if (changed) {
+            level.updateComparatorOutputLevel(this);
+        }
     }
 
     @Override

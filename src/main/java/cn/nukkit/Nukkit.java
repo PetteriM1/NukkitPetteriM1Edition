@@ -41,8 +41,17 @@ public class Nukkit {
     public final static String PATH = System.getProperty("user.dir") + '/';
     public final static String DATA_PATH = System.getProperty("user.dir") + '/';
     public final static String PLUGIN_PATH = DATA_PATH + "plugins";
+    /**
+     * Server start time
+     */
     public final static long START_TIME = System.currentTimeMillis();
+    /**
+     * Console title enabled
+     */
     public static boolean TITLE = true;
+    /**
+     * Debug logging level
+     */
     public static int DEBUG = 1;
 
     public static void main(String[] args) {
