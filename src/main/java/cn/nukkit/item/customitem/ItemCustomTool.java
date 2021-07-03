@@ -16,6 +16,21 @@ import cn.nukkit.utils.Utils;
  */
 public abstract class ItemCustomTool extends ItemCustom implements ItemDurable {
 
+    public static final int DURABILITY_WOODEN = ItemTool.DURABILITY_WOODEN;
+    public static final int DURABILITY_GOLD = ItemTool.DURABILITY_GOLD;
+    public static final int DURABILITY_STONE = ItemTool.DURABILITY_STONE;
+    public static final int DURABILITY_IRON = ItemTool.DURABILITY_IRON;
+    public static final int DURABILITY_DIAMOND = ItemTool.DURABILITY_DIAMOND;
+    public static final int DURABILITY_NETHERITE = ItemTool.DURABILITY_NETHERITE;
+    public static final int DURABILITY_FLINT_STEEL = ItemTool.DURABILITY_FLINT_STEEL;
+    public static final int DURABILITY_SHEARS = ItemTool.DURABILITY_SHEARS;
+    public static final int DURABILITY_BOW = ItemTool.DURABILITY_BOW;
+    public static final int DURABILITY_CROSSBOW = ItemTool.DURABILITY_CROSSBOW;
+    public static final int DURABILITY_TRIDENT = ItemTool.DURABILITY_TRIDENT;
+    public static final int DURABILITY_FISHING_ROD = ItemTool.DURABILITY_FISHING_ROD;
+    public static final int DURABILITY_CARROT_ON_A_STICK = ItemTool.DURABILITY_CARROT_ON_A_STICK;
+    public static final int DURABILITY_WARPED_FUNGUS_ON_A_STICK = ItemTool.DURABILITY_WARPED_FUNGUS_ON_A_STICK;
+
     public ItemCustomTool(int id) {
         this(id, 0, 1, UNKNOWN_STR);
     }
@@ -139,6 +154,11 @@ public abstract class ItemCustomTool extends ItemCustom implements ItemDurable {
     @Override
     public boolean isTool() {
         return true;
+    }
+
+    @Override
+    public int getMaxDurability() {
+        return DURABILITY_WOODEN;
     }
 
     @Override
