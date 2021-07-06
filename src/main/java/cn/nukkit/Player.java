@@ -1832,7 +1832,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             Enchantment soulSpeedEnchantment = boots.getEnchantment(Enchantment.ID_SOUL_SPEED);
             if (soulSpeedEnchantment != null && soulSpeedEnchantment.getLevel() > 0) {
-                int down = this.getLevel().getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                int down = this.getLevel().getBlockIdAt(chunk, getFloorX(), getFloorY() - 1, getFloorZ());
                 if (this.inSoulSand && down != BlockID.SOUL_SAND) {
                     this.inSoulSand = false;
                     this.setMovementSpeed(DEFAULT_SPEED, true);
@@ -2236,10 +2236,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if ((level = this.server.getLevelByName(nbt.getString("Level"))) == null || nbt.getShort("Health") < 1) {
             this.setLevel(this.server.getDefaultLevel());
             nbt.putString("Level", this.level.getName());
+            Position sp = this.level.getSpawnLocation();
             nbt.getList("Pos", DoubleTag.class)
-                    .add(new DoubleTag("0", this.level.getSpawnLocation().x))
-                    .add(new DoubleTag("1", this.level.getSpawnLocation().y))
-                    .add(new DoubleTag("2", this.level.getSpawnLocation().z));
+                    .add(new DoubleTag("0", sp.x))
+                    .add(new DoubleTag("1", sp.y))
+                    .add(new DoubleTag("2", sp.z));
         } else {
             this.setLevel(level);
         }
@@ -4751,7 +4752,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return false;
         } else if (source.getCause() == DamageCause.FALL) {
             Position pos = this.getPosition().floor().add(0.5, -1, 0.5);
-            int block = this.getLevel().getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+            int block = this.getLevel().getBlockIdAt(chunk, (int) pos.x, (int) pos.y, (int) pos.z);
             if (block == Block.SLIME_BLOCK || block == Block.COBWEB) {
                 if (!this.isSneaking()) {
                     source.setCancelled();

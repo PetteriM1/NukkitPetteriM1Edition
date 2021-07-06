@@ -34,7 +34,7 @@ public class BlockEntityJukebox extends BlockEntitySpawnable {
 
     @Override
     public boolean isBlockEntityValid() {
-        return this.getLevel().getBlockIdAt(getFloorX(), getFloorY(), getFloorZ()) == Block.JUKEBOX;
+        return this.getLevel().getBlockIdAt(chunk, getFloorX(), getFloorY(), getFloorZ()) == Block.JUKEBOX;
     }
 
     public void setRecordItem(Item recordItem) {
