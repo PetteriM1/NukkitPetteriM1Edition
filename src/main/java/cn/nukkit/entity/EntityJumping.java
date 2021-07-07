@@ -80,10 +80,10 @@ public abstract class EntityJumping extends BaseEntity {
 
     protected boolean checkJump() {
         if (this.motionY == this.getGravity() * 2) {
-            int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
+            int b = level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
             return b == BlockID.WATER || b == BlockID.STILL_WATER;
         } else {
-            int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+            int b = level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
             if (b == BlockID.WATER || b == BlockID.STILL_WATER) {
                 this.motionY = this.getGravity() * 2;
                 return true;
@@ -179,7 +179,7 @@ public abstract class EntityJumping extends BaseEntity {
                 if (this.onGround) {
                     this.motionY = 0;
                 } else if (this.motionY > -this.getGravity() * 4) {
-                    int b = this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+                    int b = this.level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
                     if (b != Block.WATER && b != Block.STILL_WATER && b != Block.LAVA && b != Block.STILL_LAVA) {
                         this.motionY -= this.getGravity();
                     }

@@ -118,7 +118,7 @@ public class EntityEnderman extends EntityWalkingMob {
             return true;
         }
 
-        int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
+        int b = level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
         if (b == BlockID.WATER || b == BlockID.STILL_WATER) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
             if (isAngry()) {

@@ -36,7 +36,7 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
 
     @Override
     public boolean isBlockEntityValid() {
-        return this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ()) == Block.DROPPER;
+        return this.level.getBlockIdAt(chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ()) == Block.DROPPER;
     }
 
     @Override
