@@ -176,9 +176,22 @@ public class Server {
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
     final Map<UUID, Player> playerList = new HashMap<>();
 
+    /**
+     * Worlds where automatic mob spawning is disabled.
+     */
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
+    /**
+     * Worlds where automatic saving is disabled.
+     */
     public static final List<String> nonAutoSaveWorlds = new ArrayList<>();
+    /**
+     * Worlds that have their own nether worlds.
+     */
     public static final List<String> multiNetherWorlds = new ArrayList<>();
+    /**
+     * Worlds where random block ticking is disabled.
+     */
+    public static final List<String> noTickingWorlds = new ArrayList<>();
 
     private static final Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
 
@@ -208,7 +221,6 @@ public class Server {
     private Watchdog watchdog;
     private final DB nameLookup;
     private PlayerDataSerializer playerDataSerializer;
-    public static List<String> noTickingWorlds = new ArrayList<>();
     private SpawnerTask spawnerTask;
     private final BatchingHelper batchingHelper;
 
@@ -216,6 +228,10 @@ public class Server {
      * The server's MOTD. Remember to call network.setName() when updated.
      */
     public String motd;
+    /**
+     * Disconnection message shown to players who are not allowed to join due to whitelist.
+     */
+    public String whitelistReason;
     /**
      * SuomiCraft PE optimizations enabled.
      */
@@ -2920,6 +2936,7 @@ public class Server {
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
         this.updateChecks = this.getPropertyBoolean("update-notifications", true);
         this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
+        this.whitelistReason = this.getPropertyString("whitelist-reason", "§cServer is white-listed").replace("§n", "\n");
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
