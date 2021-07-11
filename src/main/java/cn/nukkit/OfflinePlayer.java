@@ -21,7 +21,6 @@ public class OfflinePlayer implements IPlayer {
     private final CompoundTag namedTag;
 
     /**
-     * 初始化这个{@code OfflinePlayer}对象。<br>
      * Initializes the object {@code OfflinePlayer}.
      *
      * @param server 这个玩家所在服务器的{@code Server}对象。<br>

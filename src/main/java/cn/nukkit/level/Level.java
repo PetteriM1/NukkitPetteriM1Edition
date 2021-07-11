@@ -608,9 +608,9 @@ public class Level implements ChunkManager, Metadatable {
     public void addParticle(Particle particle, Player[] players, int count) {
         Int2ObjectMap<ObjectList<Player>> targets;
         if (players == null) {
-            targets = Server.shortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
+            targets = Server.sortPlayers(this.getChunkPlayers(particle.getChunkX(), particle.getChunkZ()).values());
         } else {
-            targets = Server.shortPlayers(players);
+            targets = Server.sortPlayers(players);
         }
 
         for (int protocolId : targets.keySet()) {
@@ -1111,7 +1111,7 @@ public class Level implements ChunkManager, Metadatable {
             chunks = new LongOpenHashSet();
         }
 
-        Int2ObjectMap<ObjectList<Player>> targets = Server.shortPlayers(target);
+        Int2ObjectMap<ObjectList<Player>> targets = Server.sortPlayers(target);
         for (Vector3 b : blocks) {
             if (b == null) {
                 continue;
@@ -2530,7 +2530,7 @@ public class Level implements ChunkManager, Metadatable {
 
 
         if (playSound) {
-            Int2ObjectMap<ObjectList<Player>> players = Server.shortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
+            Int2ObjectMap<ObjectList<Player>> players = Server.sortPlayers(this.getChunkPlayers(hand.getChunkX(), hand.getChunkZ()).values());
             for (int protocolId : players.keySet()) {
                 ObjectList<Player> targets = players.get(protocolId);
                 int soundData = GlobalBlockPalette.getOrCreateRuntimeId(protocolId > ProtocolInfo.v1_2_10 ? protocolId : ProtocolInfo.CURRENT_PROTOCOL, // no block palette in <= 1.2.10
@@ -2699,6 +2699,15 @@ public class Level implements ChunkManager, Metadatable {
     @Override
     public synchronized int getBlockIdAt(int x, int y, int z,  int layer) {
         return this.getChunk(x >> 4, z >> 4, true).getBlockId(x & 0x0f, y & 0xff, z & 0x0f, layer);
+    }
+
+    public int getBlockIdAt(FullChunk chunk, int x, int y, int z) {
+        return this.getBlockIdAt(chunk, x, y, z, 0);
+    }
+
+    public int getBlockIdAt(FullChunk chunk, int x, int y, int z, int layer) {
+        if (chunk == null) chunk = this.getChunk(x >> 4, z >> 4, true);
+        return chunk.getBlockId(x & 0x0f, y & 0xff, z & 0x0f, layer);
     }
 
     @Override
@@ -3537,15 +3546,7 @@ public class Level implements ChunkManager, Metadatable {
             spawn = this.getSpawnLocation();
         }
 
-        // Hack: Fix the y1 glitch, do not teleport players standing at y=1 to spawn on join
-        // For some reason player's y coord is 0.999 instead of 1 when they join
-        // This may need a better fix later
-        //if (spawn.y < 1) {
-        //    spawn.y = 1.01;
-        //}
-
-        spawn.y = spawn.y + 0.1;
-        Vector3 pos = spawn.floor();
+        Vector3 pos = new Vector3(spawn.getFloorX(), (int) Math.floor(spawn.y + 0.1), spawn.getFloorZ());
         FullChunk chunk = this.getChunk((int) pos.x >> 4, (int) pos.z >> 4, false);
         int x = (int) pos.x & 0x0f;
         int z = (int) pos.z & 0x0f;

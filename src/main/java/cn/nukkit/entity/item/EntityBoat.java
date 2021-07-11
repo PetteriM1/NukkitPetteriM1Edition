@@ -159,7 +159,7 @@ public class EntityBoat extends EntityVehicle {
                 } else if (waterDiff < 0 || !sinking) {
                     this.motionY = this.motionY > SINKING_MAX_SPEED ? Math.max(this.motionY - 0.02, SINKING_MAX_SPEED) : this.motionY + SINKING_SPEED;
                 }
-            } else if (!inWater && level.getBlockIdAt(NukkitMath.floorDouble(x), ((int) y) - 1, NukkitMath.floorDouble(z)) == 0) {
+            } else if (!inWater && level.getBlockIdAt(chunk, NukkitMath.floorDouble(x), ((int) y) - 1, NukkitMath.floorDouble(z)) == 0) {
                 this.motionY = -0.5;
             }
 

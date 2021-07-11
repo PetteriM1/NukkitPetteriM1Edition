@@ -48,7 +48,7 @@ public class KickCommand extends VanillaCommand {
 
         Player player = sender.getServer().getPlayer(name);
         if (player != null) {
-            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN, reason.toString());
+            player.kick(PlayerKickEvent.Reason.KICKED_BY_ADMIN, reason.toString(), true, "source=" + sender.getName() + ", reason=" + reason.toString());
             if (reason.length() >= 1) {
                 Command.broadcastCommandMessage(sender, new TranslationContainer("commands.kick.success.reason", player.getName(), reason.toString())
                 );
