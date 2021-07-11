@@ -37,10 +37,6 @@ public class BlockRailPowered extends BlockRail {
 
     @Override
     public int onUpdate(int type) {
-        // Warning: I din't recommended this on slow networks server or slow client
-        //          Network below 86Kb/s. This will became unresponsive to clients 
-        //          When updating the block state. Espicially on the world with many rails. 
-        //          Trust me, I tested this on my server.
         if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE || type == Level.BLOCK_UPDATE_SCHEDULED) {
             if (super.onUpdate(type) == Level.BLOCK_UPDATE_NORMAL) {
                 return 0; // Already broken
@@ -50,7 +46,6 @@ public class BlockRailPowered extends BlockRail {
                     || checkSurrounding(this, true, 0)
                     || checkSurrounding(this, false, 0);
 
-            // Avoid Block minstake
             if (isActive() != isPowered) {
                 setActive(isPowered);
                 level.updateAround(down());

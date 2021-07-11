@@ -37,16 +37,32 @@ public class AdventureSettings implements Cloneable {
         }
     }
 
+    /**
+     * Set an adventure setting value
+     *
+     * @param type adventure setting
+     * @param value new value
+     * @return AdventureSettings
+     */
     public AdventureSettings set(Type type, boolean value) {
         this.values.put(type, value);
         return this;
     }
 
+    /**
+     * Get an adventure setting value
+     *
+     * @param type adventure setting
+     * @return value
+     */
     public boolean get(Type type) {
         Boolean value = this.values.get(type);
         return value == null ? type.getDefaultValue() : value;
     }
 
+    /**
+     * Send adventure settings values to the player
+     */
     public void update() {
         AdventureSettingsPacket pk = new AdventureSettingsPacket();
         for (Type t : Type.values()) {
@@ -90,10 +106,20 @@ public class AdventureSettings implements Cloneable {
             this.defaultValue = defaultValue;
         }
 
+        /**
+         * Get ID
+         *
+         * @return ID
+         */
         public int getId() {
             return id;
         }
 
+        /**
+         * Get default value
+         *
+         * @return default value
+         */
         public boolean getDefaultValue() {
             return this.defaultValue;
         }

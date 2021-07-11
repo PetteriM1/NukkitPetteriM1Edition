@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.defaults.StatusCommand;
 import cn.nukkit.math.NukkitMath;
 import cn.nukkit.plugin.Plugin;
+import cn.nukkit.utils.TextFormat;
 import com.sun.management.OperatingSystemMXBean;
 
 import java.lang.management.ManagementFactory;
@@ -100,7 +101,7 @@ public class BugReportGenerator extends Thread {
         Server.getInstance().sentry.getContext().addExtra("Memory", usedMB + " MB (" + NukkitMath.round(usage, 2) + "%) of " + maxMB + " MB");
         Server.getInstance().sentry.getContext().addExtra("CPU Type", cpuType == null ? "UNKNOWN" : cpuType);
         Server.getInstance().sentry.getContext().addExtra("Available Cores", String.valueOf(osMXBean.getAvailableProcessors()));
-        Server.getInstance().sentry.getContext().addExtra("Uptime", StatusCommand.formatUptime(System.currentTimeMillis() - Nukkit.START_TIME));
+        Server.getInstance().sentry.getContext().addExtra("Uptime", TextFormat.clean(StatusCommand.formatUptime(System.currentTimeMillis() - Nukkit.START_TIME)));
         Server.getInstance().sentry.getContext().addExtra("Players", Server.getInstance().getOnlinePlayersCount() + "/" + Server.getInstance().getMaxPlayers());
         Server.getInstance().sentry.getContext().addExtra("Plugins", plugins.toString());
         Server.getInstance().sentry.getContext().addTag("nukkit_version", Nukkit.VERSION);

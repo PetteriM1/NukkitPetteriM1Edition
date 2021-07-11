@@ -147,7 +147,7 @@ public class BlockEntityBeacon extends BlockEntitySpawnable {
     private boolean hasSkyAccess() {
         //Check every block from our y coord to the top of the world
         for (int y = getFloorY() + 1; y <= 255; y++) {
-            int testBlockId = level.getBlockIdAt(getFloorX(), y, getFloorZ());
+            int testBlockId = level.getBlockIdAt(chunk, getFloorX(), y, getFloorZ());
             if (!Block.transparent[testBlockId]) {
                 //There is no sky access
                 return false;
