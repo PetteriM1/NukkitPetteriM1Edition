@@ -4285,7 +4285,7 @@ public class Level implements ChunkManager, Metadatable {
             if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
         if (chunk == ProtocolInfo.v1_16_210)
             if (player >= ProtocolInfo.v1_16_210) if (player < ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_0 && player < ProtocolInfo.v1_17_0) return true;
+        if (chunk == ProtocolInfo.v1_17_0 && player < ProtocolInfo.v1_17_10) return true;
         if (chunk == ProtocolInfo.v1_17_10 && player >= ProtocolInfo.v1_17_10) return true;
         return false; // Remember to update when block palette changes
     }
