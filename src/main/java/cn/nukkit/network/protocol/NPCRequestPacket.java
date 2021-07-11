@@ -15,6 +15,8 @@ public class NPCRequestPacket extends DataPacket {
 
     public int actionType;
 
+    public String sceneName;
+
     public enum RequestType {
         SET_ACTIONS,
         EXECUTE_ACTION,
@@ -35,6 +37,9 @@ public class NPCRequestPacket extends DataPacket {
         this.requestType = RequestType.values()[this.getByte()];
         this.commandString = this.getString();
         this.actionType = this.getByte();
+        if (this.protocol >= ProtocolInfo.v1_17_10) {
+            this.sceneName = this.getString();
+        }
     }
 
     @Override
@@ -43,5 +48,8 @@ public class NPCRequestPacket extends DataPacket {
         this.putByte((byte) requestType.ordinal());
         this.putString(this.commandString);
         this.putByte((byte) this.actionType);
+        if (this.protocol >= ProtocolInfo.v1_17_10) {
+            this.putString(this.sceneName);
+        }
     }
 }

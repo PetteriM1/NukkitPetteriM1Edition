@@ -56,8 +56,10 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId419 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId428 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId440 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId448 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy428 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy440 = new Int2IntOpenHashMap();
+    private static final Int2IntMap runtimeIdToLegacy448 = new Int2IntOpenHashMap();
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
     private static byte[] compiledTable313;
@@ -86,8 +88,10 @@ public class GlobalBlockPalette {
         legacyToRuntimeId419.defaultReturnValue(-1);
         legacyToRuntimeId428.defaultReturnValue(-1);
         legacyToRuntimeId440.defaultReturnValue(-1);
+        legacyToRuntimeId448.defaultReturnValue(-1);
         runtimeIdToLegacy428.defaultReturnValue(-1);
         runtimeIdToLegacy440.defaultReturnValue(-1);
+        runtimeIdToLegacy448.defaultReturnValue(-1);
     }
 
     public static void init() {
@@ -314,6 +318,18 @@ public class GlobalBlockPalette {
             throw new AssertionError("Unable to load block palette 440", e);
         }
         loadBlockStates(tag440, legacyToRuntimeId440, runtimeIdToLegacy440);
+        // 448
+        ListTag<CompoundTag> tag448;
+        try (InputStream stream448 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_448.dat")) {
+            if (stream448 == null) {
+                throw new AssertionError("Unable to locate block state nbt 448");
+            }
+            //noinspection unchecked
+            tag448 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream448)), ByteOrder.BIG_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 448", e);
+        }
+        loadBlockStates(tag448, legacyToRuntimeId448, runtimeIdToLegacy448);
     }
 
     private static void loadBlockStates(ListTag<CompoundTag> blockStates, Int2IntMap legacyToRuntime, Int2IntMap runtimeIdToLegacy) {
@@ -441,6 +457,16 @@ public class GlobalBlockPalette {
                     }
                 }
                 return runtimeId;
+            case ProtocolInfo.v1_17_10:
+                runtimeId = legacyToRuntimeId448.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId448.get(id << 6);
+                    if (runtimeId == -1) {
+                        log.info("(448) Missing block runtime id mappings for " + id + ':' + meta);
+                        runtimeId = legacyToRuntimeId448.get(BlockID.INFO_UPDATE << 6);
+                    }
+                }
+                return runtimeId;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }
@@ -532,7 +558,9 @@ public class GlobalBlockPalette {
     }
 
     public static int getLegacyFullId(int protocolId, int runtimeId) {
-        if (protocolId >= ProtocolInfo.v1_17_0) {
+        if (protocolId >= ProtocolInfo.v1_17_10) {
+            return runtimeIdToLegacy448.get(runtimeId);
+        } else if (protocolId >= ProtocolInfo.v1_17_0) {
             return runtimeIdToLegacy440.get(runtimeId);
         } else if (protocolId >= ProtocolInfo.v1_16_210) {
             return runtimeIdToLegacy428.get(runtimeId);

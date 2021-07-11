@@ -383,6 +383,8 @@ public class Utils {
                 return "1.16.230";
             case ProtocolInfo.v1_17_0:
                 return "1.17.0";
+            case ProtocolInfo.v1_17_10:
+                return "1.17.10";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
         }

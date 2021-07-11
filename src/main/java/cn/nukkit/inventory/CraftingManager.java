@@ -7,6 +7,7 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.BatchPacket;
 import cn.nukkit.network.protocol.CraftingDataPacket;
 import cn.nukkit.network.protocol.DataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.MainLogger;
@@ -36,6 +37,7 @@ public class CraftingManager {
     public static DataPacket packet419 = null;
     public static DataPacket packet431 = null;
     public static DataPacket packet440 = null;
+    public static DataPacket packet448 = null;
 
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes313 = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes332 = new Int2ObjectOpenHashMap<>();
@@ -308,81 +310,12 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
-        CraftingDataPacket pk440 = new CraftingDataPacket();
-        pk440.protocol = 440;
-        for (Recipe recipe : this.recipes) {
-            if (recipe instanceof ShapedRecipe) {
-                pk440.addShapedRecipe((ShapedRecipe) recipe);
-            } else if (recipe instanceof ShapelessRecipe) {
-                pk440.addShapelessRecipe((ShapelessRecipe) recipe);
-            }
-        }
-        // Torch with charcoal recipe fix for 1.16.100+
-        pk440.addShapedRecipe(charcoalTorchRecipe419);
-        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pk440.addFurnaceRecipe(recipe);
-        }
-        for (MultiRecipe recipe : this.multiRecipes.values()) {
-            pk440.addMultiRecipe(recipe);
-        }
-        for (BrewingRecipe recipe : brewingRecipes.values()) {
-            pk440.addBrewingRecipe(recipe);
-        }
-        for (ContainerRecipe recipe : containerRecipes.values()) {
-            pk440.addContainerRecipe(recipe);
-        }
-        pk440.tryEncode();
-        packet440 = pk440;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
-        CraftingDataPacket pk431 = new CraftingDataPacket();
-        pk431.protocol = 431;
-        for (Recipe recipe : this.recipes) {
-            if (recipe instanceof ShapedRecipe) {
-                pk431.addShapedRecipe((ShapedRecipe) recipe);
-            } else if (recipe instanceof ShapelessRecipe) {
-                pk431.addShapelessRecipe((ShapelessRecipe) recipe);
-            }
-        }
-        // Torch with charcoal recipe fix for 1.16.100+
-        pk431.addShapedRecipe(charcoalTorchRecipe419);
-        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pk431.addFurnaceRecipe(recipe);
-        }
-        for (MultiRecipe recipe : this.multiRecipes.values()) {
-            pk431.addMultiRecipe(recipe);
-        }
-        for (BrewingRecipe recipe : brewingRecipes.values()) {
-            pk431.addBrewingRecipe(recipe);
-        }
-        for (ContainerRecipe recipe : containerRecipes.values()) {
-            pk431.addContainerRecipe(recipe);
-        }
-        pk431.tryEncode();
-        packet431 = pk431;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
-        CraftingDataPacket pk419 = new CraftingDataPacket();
-        pk419.protocol = 419;
-        for (Recipe recipe : this.recipes) {
-            if (recipe instanceof ShapedRecipe) {
-                pk419.addShapedRecipe((ShapedRecipe) recipe);
-            } else if (recipe instanceof ShapelessRecipe) {
-                pk419.addShapelessRecipe((ShapelessRecipe) recipe);
-            }
-        }
-        // Torch with charcoal recipe fix for 1.16.100+
-        pk431.addShapedRecipe(charcoalTorchRecipe419);
-        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
-            pk419.addFurnaceRecipe(recipe);
-        }
-        for (MultiRecipe recipe : this.multiRecipes.values()) {
-            pk419.addMultiRecipe(recipe);
-        }
-        for (BrewingRecipe recipe : brewingRecipes.values()) {
-            pk419.addBrewingRecipe(recipe);
-        }
-        for (ContainerRecipe recipe : containerRecipes.values()) {
-            pk419.addContainerRecipe(recipe);
-        }
-        pk419.tryEncode();
-        packet419 = pk419;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
+        //.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
+        packet448 = this.constructPacket(ProtocolInfo.v1_17_10);
+        packet440 = this.constructPacket(ProtocolInfo.v1_17_0);
+        packet431 = this.constructPacket(ProtocolInfo.v1_16_220);
+        packet419 = this.constructPacket(ProtocolInfo.v1_16_100);
+
         CraftingDataPacket pk407 = new CraftingDataPacket();
         pk407.protocol = 407;
         for (Recipe recipe : this.recipes) {
@@ -484,6 +417,34 @@ public class CraftingManager {
         }
         pk313.tryEncode();
         packet313 = pk313.compress(Deflater.BEST_COMPRESSION);
+    }
+
+    private DataPacket constructPacket(int protocolId) {
+        CraftingDataPacket packet = new CraftingDataPacket();
+        packet.protocol = protocolId;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                packet.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                packet.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        // Torch with charcoal recipe fix for 1.16.100+
+        packet.addShapedRecipe(charcoalTorchRecipe419);
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            packet.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            packet.addMultiRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            packet.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            packet.addContainerRecipe(recipe);
+        }
+        packet.tryEncode();
+        return packet;
     }
 
     public Collection<Recipe> getRecipes() {
