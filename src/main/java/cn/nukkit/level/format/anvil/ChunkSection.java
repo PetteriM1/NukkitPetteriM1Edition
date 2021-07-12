@@ -67,8 +67,9 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
             for (int z = 0; z < 16; z++) {
                 for (int y = 0; y < 16; y++) {
                     int index = getAnvilIndex(x, y, z);
-                    storage.setBlockId(x, y, z, blocks[index]);
+                    // Set block data first so we can overwrite it when removing data values from air in setBlockId
                     storage.setBlockData(x, y, z, data.get(index));
+                    storage.setBlockId(x, y, z, blocks[index]);
                 }
             }
         }
