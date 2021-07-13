@@ -98,7 +98,7 @@ public class BanIpCommand extends VanillaCommand {
 
         for (Player player : /*new ArrayList<>(*/sender.getServer().getOnlinePlayers().values()/*)*/) {
             if (player.getAddress().equals(ip)) {
-                player.kick(PlayerKickEvent.Reason.IP_BANNED, !reason.isEmpty() ? reason : "IP banned");
+                player.kick(PlayerKickEvent.Reason.IP_BANNED, !reason.isEmpty() ? reason : "IP banned", true, "source=" + sender.getName() + ", reason=" + reason);
             }
         }
 

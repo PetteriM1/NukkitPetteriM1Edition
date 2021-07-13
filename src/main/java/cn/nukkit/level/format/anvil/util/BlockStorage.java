@@ -37,7 +37,12 @@ public class BlockStorage {
     }
 
     public void setBlockId(int x, int y, int z, int id) {
-        blockIds[getIndex(x, y, z)] = (byte) (id & 0xff);
+        int index = getIndex(x, y, z);
+        int value = id & 0xff;
+        blockIds[index] = (byte) value;
+        if (value == 0) {
+            blockData.remove(index);
+        }
     }
 
     public void setBlockData(int x, int y, int z, int data) {

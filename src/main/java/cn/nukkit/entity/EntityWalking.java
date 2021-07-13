@@ -81,10 +81,10 @@ public abstract class EntityWalking extends BaseEntity {
 
     protected boolean checkJump(double dx, double dz) {
         if (this.motionY == this.getGravity() * 2) {
-            int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
+            int b = level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) this.y, NukkitMath.floorDouble(this.z));
             return b == BlockID.WATER || b == BlockID.STILL_WATER;
         } else if (!(this instanceof EntitySkeletonHorse)) {
-            int b = level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+            int b = level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
             if (b == BlockID.WATER || b == BlockID.STILL_WATER) {
                 if (!this.isDrowned || this.target == null) {
                     this.motionY = this.getGravity() * 2;
@@ -134,7 +134,7 @@ public abstract class EntityWalking extends BaseEntity {
 
             Block levelBlock = getLevelBlock();
             boolean inWater = levelBlock.getId() == 8 || levelBlock.getId() == 9;
-            int downId = level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+            int downId = level.getBlockIdAt(chunk, getFloorX(), getFloorY() - 1, getFloorZ());
             if (inWater && (downId == 0 || downId == 8 || downId == 9 || downId == BlockID.LAVA || downId == BlockID.STILL_LAVA || downId == BlockID.SIGN_POST || downId == BlockID.WALL_SIGN)) onGround = false;
             if (downId == 0 || downId == BlockID.SIGN_POST || downId == BlockID.WALL_SIGN) onGround = false;
             if (this.followTarget != null && !this.followTarget.closed && this.followTarget.isAlive() && this.followTarget.canBeFollowed()) {
@@ -212,7 +212,7 @@ public abstract class EntityWalking extends BaseEntity {
                 if (this.onGround && !inWater) {
                     this.motionY = 0;
                 } else if (this.motionY > -this.getGravity() * 4) {
-                    int b = this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+                    int b = this.level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
                     if (b != Block.WATER && b != Block.STILL_WATER && b != Block.LAVA && b != Block.STILL_LAVA) {
                         this.motionY -= this.getGravity();
                     }

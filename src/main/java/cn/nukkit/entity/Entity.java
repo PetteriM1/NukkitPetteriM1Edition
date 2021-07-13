@@ -1874,7 +1874,7 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         return false;*/
-        int bid = level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+        int bid = level.getBlockIdAt(chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ());
         return bid == BlockID.WATER || bid == BlockID.STILL_WATER;
     }
 
@@ -2566,7 +2566,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isOnLadder() {
-        int b = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+        int b = this.level.getBlockIdAt(chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ());
         return b == Block.LADDER || b == Block.VINES || b == Block.COBWEB;
     }
 

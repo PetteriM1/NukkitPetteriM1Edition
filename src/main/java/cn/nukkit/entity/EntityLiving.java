@@ -359,7 +359,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             // Check collisions with blocks
             if (this instanceof Player) {
                 if (this.age % 5 == 0) {
-                    int block = this.level.getBlockIdAt(getFloorX(), getFloorY() - 1, getFloorZ());
+                    int block = this.level.getBlockIdAt(chunk, getFloorX(), getFloorY() - 1, getFloorZ());
                     if (block == Block.CACTUS) {
                         Block.get(Block.CACTUS).onEntityCollide(this);
                     } else if (block == Block.MAGMA) {

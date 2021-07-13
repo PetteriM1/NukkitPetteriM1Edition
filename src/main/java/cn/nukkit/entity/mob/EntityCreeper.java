@@ -174,7 +174,7 @@ public class EntityCreeper extends EntityWalkingMob implements EntityExplosive {
             if (this.onGround) {
                 this.motionY = 0;
             } else if (this.motionY > -this.getGravity() * 4) {
-                int b = this.level.getBlockIdAt(NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
+                int b = this.level.getBlockIdAt(chunk, NukkitMath.floorDouble(this.x), (int) (this.y + 0.8), NukkitMath.floorDouble(this.z));
                 if (b != BlockID.WATER && b != BlockID.STILL_WATER) {
                     this.motionY -= this.getGravity();
                 }
