@@ -2298,6 +2298,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void completeLoginSequence() {
+        if (this.loggedIn) {
+            this.server.getLogger().debug("Tried to call completeLoginSequence but player is already logged in");
+            return;
+        }
+
         PlayerLoginEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
         if (ev.isCancelled()) {
