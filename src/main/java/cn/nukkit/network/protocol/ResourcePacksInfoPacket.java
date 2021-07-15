@@ -10,7 +10,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
 
     public boolean mustAccept;
     public boolean scripting;
-    public boolean forceEnable;
+    public boolean forceServerPacks;
     public ResourcePack[] behaviourPackEntries = new ResourcePack[0];
     public ResourcePack[] resourcePackEntries = new ResourcePack[0];
 
@@ -25,7 +25,7 @@ public class ResourcePacksInfoPacket extends DataPacket {
         if (protocol >= ProtocolInfo.v1_9_0) {
             this.putBoolean(this.scripting);
             if (protocol >= ProtocolInfo.v1_17_10) {
-                this.putBoolean(this.forceEnable);
+                this.putBoolean(this.forceServerPacks);
             }
         }
 

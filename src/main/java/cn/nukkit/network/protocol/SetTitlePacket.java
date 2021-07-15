@@ -22,8 +22,8 @@ public class SetTitlePacket extends DataPacket {
     public int fadeInTime = 0;
     public int stayTime = 0;
     public int fadeOutTime = 0;
-    private String xboxUserId = "";
-    private String platformChatId = "";
+    private String xuid = "";
+    private String platformOnlineId = "";
 
     @Override
     public byte pid() {
@@ -38,8 +38,8 @@ public class SetTitlePacket extends DataPacket {
         this.stayTime = this.getVarInt();
         this.fadeOutTime = this.getVarInt();
         if (protocol >= ProtocolInfo.v1_17_10) {
-            this.xboxUserId = this.getString();
-            this.platformChatId = this.getString();
+            this.xuid = this.getString();
+            this.platformOnlineId = this.getString();
         }
     }
 
@@ -52,8 +52,8 @@ public class SetTitlePacket extends DataPacket {
         this.putVarInt(stayTime);
         this.putVarInt(fadeOutTime);
         if (protocol >= ProtocolInfo.v1_17_10) {
-            this.putString(xboxUserId);
-            this.putString(platformChatId);
+            this.putString(xuid);
+            this.putString(platformOnlineId);
         }
     }
 }
