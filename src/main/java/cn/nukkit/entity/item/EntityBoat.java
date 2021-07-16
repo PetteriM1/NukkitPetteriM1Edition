@@ -371,7 +371,7 @@ public class EntityBoat extends EntityVehicle {
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (this.passengers.size() >= 2) {
+        if (this.passengers.size() >= 2 || getWaterLevel() < -SINKING_DEPTH) {
             return false;
         }
 
@@ -417,6 +417,7 @@ public class EntityBoat extends EntityVehicle {
                 diffX *= 0.05000000074505806;
                 diffZ *= 0.05000000074505806;
                 diffX *= 1 + entityCollisionReduction;
+                diffZ *= 1 + entityCollisionReduction;
 
                 if (this.riding == null) {
                     motionX -= diffX;
