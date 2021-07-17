@@ -2327,6 +2327,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void completeLoginSequence() {
+        if (this.loggedIn) {
+            this.server.getLogger().warning("(BUG) Tried to call completeLoginSequence but player is already logged in");
+            return;
+        }
+
         PlayerLoginEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
         if (ev.isCancelled()) {
@@ -2395,22 +2400,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             commandsPacket.enabled = this.isEnableClientCommand();
             this.dataPacket(commandsPacket);
 
-            if (this.isEnableClientCommand()) {
-                this.server.getScheduler().scheduleDelayedTask(null, () -> {
-                    if (this.isOnline()) {
-                        this.sendCommandData();
-                    }
-                }, 2);
-            }
             this.adventureSettings.update();
 
             GameRulesChangedPacket gameRulesPK = new GameRulesChangedPacket();
-            gameRulesPK.gameRules = level.getGameRules();
+            gameRulesPK.gameRulesMap = level.getGameRules().getGameRules();
             this.dataPacket(gameRulesPK);
-
-            /*if (this.protocol >= ProtocolInfo.v1_16_100) {
-                this.dataPacket(new PlayerFogPacket());
-            }*/
 
             this.server.sendFullPlayerListData(this);
             this.sendAttributes();
@@ -2425,6 +2419,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.sendAllInventories();
             this.inventory.sendHeldItemIfNotAir(this);
             this.server.sendRecipeList(this);
+
+            if (this.isEnableClientCommand()) {
+                this.sendCommandData();
+            }
 
             this.sendPotionEffects(this);
             this.sendData(this, this.dataProperties.clone());
@@ -4310,9 +4308,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (this.loggedIn) {
                 this.server.removeOnlinePlayer(this);
+                this.loggedIn = false;
             }
-
-            this.loggedIn = false;
 
             if (ev != null && !Objects.equals(this.username, "") && this.spawned && !Objects.equals(ev.getQuitMessage().toString(), "")) {
                 this.server.broadcastMessage(ev.getQuitMessage());
@@ -4347,6 +4344,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.chunk = null;
 
         this.server.removePlayer(this);
+
+        if (this.loggedIn) {
+            this.server.getLogger().warning("(BUG) Player still logged in");
+            this.interfaz.close(this, notify ? reason : "");
+            this.server.removeOnlinePlayer(this);
+            this.loggedIn = false;
+        }
     }
 
     /**
@@ -5559,7 +5563,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             // Update game rules
             GameRulesChangedPacket packet = new GameRulesChangedPacket();
-            packet.gameRules = level.getGameRules();
+            packet.gameRulesMap = level.getGameRules().getGameRules();
             this.dataPacket(packet);
 
             this.ticksSinceLastRest = 0;

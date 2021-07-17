@@ -1,6 +1,7 @@
 package com.nukkitx.network.raknet;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.Server;
 import com.nukkitx.network.SessionConnection;
 import com.nukkitx.network.raknet.util.*;
 import com.nukkitx.network.util.DisconnectReason;
@@ -789,21 +790,26 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
 
     private void onAcknowledge(ByteBuf buffer, Queue<IntRange> queue, boolean nack) {
         this.checkForClosed();
-        int size = buffer.readUnsignedShort();
-        for (int i = 0; i < size; i++) {
-            boolean singleton = buffer.readBoolean();
-            int start = buffer.readUnsignedMediumLE();
-            // We don't need the upper limit if it's a singleton
-            int end = singleton ? start : buffer.readMediumLE();
-            if (start > end) {
-                if (Nukkit.DEBUG > 2) {
-                    log.trace("{} sent an IntRange with a start value {} greater than an end value of {}", this.address,
-                            start, end);
+        try {
+            int size = buffer.readUnsignedShort();
+            for (int i = 0; i < size; i++) {
+                boolean singleton = buffer.readBoolean();
+                int start = buffer.readUnsignedMediumLE();
+                // We don't need the upper limit if it's a singleton
+                int end = singleton ? start : buffer.readMediumLE();
+                if (start > end) {
+                    if (Nukkit.DEBUG > 2) {
+                        log.trace("{} sent an IntRange with a start value {} greater than an end value of {}", this.address,
+                                start, end);
+                    }
+                    this.disconnect(DisconnectReason.BAD_PACKET);
+                    return;
                 }
-                this.disconnect(DisconnectReason.BAD_PACKET);
-                return;
+                queue.offer(new IntRange(start, end));
             }
-            queue.offer(new IntRange(start, end));
+        } catch (Exception ex) {
+            Server.getInstance().getLogger().error("Received bad acknowledge datagram from " + this.address, ex);
+            this.disconnect(DisconnectReason.BAD_PACKET);
         }
     }
 

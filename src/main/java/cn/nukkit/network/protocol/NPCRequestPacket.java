@@ -8,12 +8,10 @@ public class NPCRequestPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.NPC_REQUEST_PACKET;
 
     public long entityRuntimeId;
-
     public RequestType requestType;
-
     public String commandString;
-
     public int actionType;
+    public String sceneName;
 
     public enum RequestType {
         SET_ACTIONS,
@@ -35,6 +33,9 @@ public class NPCRequestPacket extends DataPacket {
         this.requestType = RequestType.values()[this.getByte()];
         this.commandString = this.getString();
         this.actionType = this.getByte();
+        if (this.protocol >= ProtocolInfo.v1_17_10) {
+            this.sceneName = this.getString();
+        }
     }
 
     @Override
@@ -43,5 +44,8 @@ public class NPCRequestPacket extends DataPacket {
         this.putByte((byte) requestType.ordinal());
         this.putString(this.commandString);
         this.putByte((byte) this.actionType);
+        if (this.protocol >= ProtocolInfo.v1_17_10) {
+            this.putString(this.sceneName);
+        }
     }
 }
