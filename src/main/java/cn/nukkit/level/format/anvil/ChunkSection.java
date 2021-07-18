@@ -67,8 +67,9 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
             for (int z = 0; z < 16; z++) {
                 for (int y = 0; y < 16; y++) {
                     int index = getAnvilIndex(x, y, z);
-                    storage.setBlockId(x, y, z, blocks[index]);
+                    // Set block data first so we can overwrite it when removing data values from air in setBlockId
                     storage.setBlockData(x, y, z, data.get(index));
+                    storage.setBlockId(x, y, z, blocks[index]);
                 }
             }
         }
@@ -257,16 +258,14 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getSkyLightArray() {
-        if (this.skyLight != null) return skyLight;
-        if (hasSkyLight) {
-            if (compressedLight != null) {
-                inflate();
-                return this.skyLight;
+        if (this.skyLight != null) return this.skyLight;
+        if (this.hasSkyLight) {
+            if (this.compressedLight != null) {
+                this.inflate();
+                if (this.skyLight != null) return this.skyLight;
             }
-            return EmptyChunkSection.EMPTY_SKY_LIGHT_ARR;
-        } else {
-            return EmptyChunkSection.EMPTY_LIGHT_ARR;
         }
+        return EmptyChunkSection.EMPTY_SKY_LIGHT_ARR;
     }
 
     private void inflate() {
@@ -297,13 +296,12 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public byte[] getLightArray() {
-        if (this.blockLight != null) return blockLight;
-        if (hasBlockLight) {
-            inflate();
-            return this.blockLight;
-        } else {
-            return EmptyChunkSection.EMPTY_LIGHT_ARR;
+        if (this.blockLight != null) return this.blockLight;
+        if (this.hasBlockLight) {
+            this.inflate();
+            if (this.blockLight != null) return this.blockLight;
         }
+        return EmptyChunkSection.EMPTY_LIGHT_ARR;
     }
 
     @Override

@@ -1108,6 +1108,20 @@ public class BinaryStream {
         });
     }
 
+    public void putGameRulesMap(int protocol, Map<GameRule, GameRules.Value> allGameRules) {
+        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
+        allGameRules.forEach((gameRule, value) -> {
+            if (protocol > value.getMinProtocol()) {
+                rulesToSend.put(gameRule, value);
+            }
+        });
+        this.putUnsignedVarInt(rulesToSend.size());
+        rulesToSend.forEach((gameRule, value) -> {
+            putString(gameRule.getName().toLowerCase());
+            value.write(protocol, this);
+        });
+    }
+
     /**
      * Reads and returns an EntityUniqueID
      *

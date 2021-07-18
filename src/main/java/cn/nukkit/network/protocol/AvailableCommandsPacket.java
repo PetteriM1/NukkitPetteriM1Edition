@@ -243,7 +243,11 @@ public class AvailableCommandsPacket extends DataPacket {
 
             putString(name);
             putString(data.description);
-            putByte((byte) data.flags);
+            if (protocol >= ProtocolInfo.v1_17_10) {
+                putLShort(data.flags);
+            } else {
+                putByte((byte) data.flags);
+            }
             putByte((byte) data.permission);
 
             putLInt(data.aliases == null ? -1 : enums.indexOf(data.aliases));

@@ -43,6 +43,19 @@ public class NibbleArray implements Cloneable {
         }
     }
 
+    public void remove(int index) {
+        if (index >= data.length << 1 || index < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        int half = index >> 1;
+        byte previous = data[half];
+        if ((index & 1) == 0) {
+            data[half] = (byte) (previous & 0xf0);
+        } else {
+            data[half] = (byte) (previous & 0x0f);
+        }
+    }
+
     public void fill(byte value) {
         Preconditions.checkArgument(value >= 0 && value < 16, "Nibbles must have a value between 0 and 15.");
         value &= 0xf;
