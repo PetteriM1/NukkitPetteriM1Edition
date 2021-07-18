@@ -203,6 +203,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         //byteBuf.readerIndex(0);
 
         session.send(byteBuf, immediate ? RakNetPriority.IMMEDIATE : RakNetPriority.MEDIUM, packet.reliability, packet.getChannel());
+        this.network.addStatistics(buffer.length, 0);
         return null;
     }
 
@@ -262,6 +263,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
                 batchPacket.setBuffer(packetBuffer);
                 batchPacket.decode();
                 this.packets.add(batchPacket);
+                RakNetInterface.this.network.addStatistics(0, packetBuffer.length);
             }
         }
 
