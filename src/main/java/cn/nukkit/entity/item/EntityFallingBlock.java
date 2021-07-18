@@ -1,5 +1,6 @@
 package cn.nukkit.entity.item;
 
+import cn.nukkit.Player;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
@@ -10,11 +11,12 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.sound.AnvilFallSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.network.protocol.AddEntityPacket;
 
 /**
  * @author MagicDroidX
@@ -87,9 +89,29 @@ public class EntityFallingBlock extends Entity {
             return;
         }
 
-        setDataProperty(new IntEntityData(DATA_VARIANT, GlobalBlockPalette.getOrCreateRuntimeId(ProtocolInfo.CURRENT_PROTOCOL, this.blockId, this.damage)));
-
         this.fireProof = true;
+    }
+
+    @Override // Multiversion: display correct block
+    public void spawnTo(Player player) {
+        if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
+            AddEntityPacket addEntity = new AddEntityPacket();
+            addEntity.type = this.getNetworkId();
+            addEntity.entityUniqueId = this.id;
+            addEntity.entityRuntimeId = this.id;
+            addEntity.yaw = (float) this.yaw;
+            addEntity.headYaw = (float) this.yaw;
+            addEntity.pitch = (float) this.pitch;
+            addEntity.x = (float) this.x;
+            addEntity.y = (float) this.y;
+            addEntity.z = (float) this.z;
+            addEntity.speedX = (float) this.motionX;
+            addEntity.speedY = (float) this.motionY;
+            addEntity.speedZ = (float) this.motionZ;
+            addEntity.metadata = this.dataProperties.clone().put(new IntEntityData(DATA_VARIANT, GlobalBlockPalette.getOrCreateRuntimeId(player.protocol, this.blockId, this.damage)));
+            player.dataPacket(addEntity);
+            this.hasSpawned.put(player.getLoaderId(), player);
+        }
     }
 
     public boolean canCollideWith(Entity entity) {
