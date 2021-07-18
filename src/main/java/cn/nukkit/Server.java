@@ -41,6 +41,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.metadata.EntityMetadataStore;
 import cn.nukkit.metadata.LevelMetadataStore;
 import cn.nukkit.metadata.PlayerMetadataStore;
+import cn.nukkit.metrics.NukkitMetrics;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -715,6 +716,10 @@ public class Server {
             this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, spawnerTicks, spawnerTicks);
         }
 
+        if (this.getPropertyBoolean("bstats-metrics", true)) {
+            new NukkitMetrics(this);
+        }
+
         // Check for updates
         CompletableFuture.runAsync(() -> {
             try {
@@ -1194,7 +1199,9 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol >= ProtocolInfo.v1_17_0) {
+        if (player.protocol >= ProtocolInfo.v1_17_10) {
+            player.dataPacket(CraftingManager.packet448);
+        } else if (player.protocol >= ProtocolInfo.v1_17_0) {
             player.dataPacket(CraftingManager.packet440);
         } else if (player.protocol >= ProtocolInfo.v1_16_220) {
             player.dataPacket(CraftingManager.packet431);
@@ -3084,6 +3091,7 @@ public class Server {
             put("multi-nether-worlds", "");
             put("call-entity-motion-event", true);
             put("update-notifications", true);
+            put("bstats-metrics", true);
         }
     }
 

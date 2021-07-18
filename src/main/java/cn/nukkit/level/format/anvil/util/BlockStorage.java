@@ -139,6 +139,11 @@ public class BlockStorage {
         byte blockBase = (byte) (id & 0xff);
         blockIds[index] = blockBase;
 
+        if (blockBase == 0) {
+            // Make sure AIR doesn't have any data
+            setBlockData(index, 0);
+        }
+
         byte extraBase = (byte) ((id >> 8) & 0xff);
         blockIdsExtra[index] = extraBase;
 

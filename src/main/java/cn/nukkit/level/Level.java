@@ -973,7 +973,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (gameRules.isStale()) {
             GameRulesChangedPacket packet = new GameRulesChangedPacket();
-            packet.gameRules = gameRules;
+            packet.gameRulesMap = gameRules.getGameRules();
             Server.broadcastPacket(players.values().toArray(new Player[0]), packet);
             gameRules.refresh();
         }
@@ -4394,7 +4394,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_17_0) {
+        if (protocol >= ProtocolInfo.v1_17_10) {
+            return ProtocolInfo.v1_17_10;
+        } else if (protocol >= ProtocolInfo.v1_17_0) {
             return ProtocolInfo.v1_17_0;
         } else if (protocol >= ProtocolInfo.v1_16_210) {
             return ProtocolInfo.v1_16_210;
@@ -4426,7 +4428,8 @@ public class Level implements ChunkManager, Metadatable {
             if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
         if (chunk == ProtocolInfo.v1_16_210)
             if (player >= ProtocolInfo.v1_16_210) if (player < ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_0) if (player >= ProtocolInfo.v1_17_0) return true;
+        if (chunk == ProtocolInfo.v1_17_0) if (player == ProtocolInfo.v1_17_0) return true;
+        if (chunk == ProtocolInfo.v1_17_10) if (player >= ProtocolInfo.v1_17_10) return true;
         return false; // Remember to update when block palette changes
     }
 

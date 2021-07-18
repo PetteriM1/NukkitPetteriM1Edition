@@ -65,16 +65,18 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
 
     @Override
     public boolean onUpdate(int currentTick) {
-        // The rolling amplitude
+        if (y < -16) {
+            this.close();
+        }
+
+        if (closed) {
+            return false;
+        }
+
         if (getRollingAmplitude() > 0) {
             setRollingAmplitude(getRollingAmplitude() - 1);
         }
 
-        // A killer task
-        if (y < -16) {
-            this.close();
-        }
-        // Movement code
         updateMovement();
         return true;
     }
