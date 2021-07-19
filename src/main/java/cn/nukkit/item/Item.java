@@ -527,7 +527,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static void addCreativeItem(Item item) {
         Server.mvw("Item#addCreativeItem(Item)");
-        addCreativeItem(v1_16_0, item);
+        addCreativeItem(v1_17_10, item);
     }
 
     public static void addCreativeItem(int protocol, Item item) {
