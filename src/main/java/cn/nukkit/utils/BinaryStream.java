@@ -794,11 +794,23 @@ public class BinaryStream {
 
         if (item.hasCompoundTag() ||
                 (isDurable && protocolId >= ProtocolInfo.v1_12_0) ||
-                (saveOriginalID && protocolId >= ProtocolInfo.v1_12_0)) {
+                saveOriginalID) {
             if (protocolId < ProtocolInfo.v1_12_0) {
-                byte[] nbt = item.getCompoundTag();
-                this.putLShort(nbt.length);
-                this.put(nbt);
+                if (saveOriginalID) {
+                    try {
+                        CompoundTag tag = item.hasCompoundTag() ? item.getNamedTag() : new CompoundTag();
+                        tag.putCompound(NukkitPetteriM1EditionTag, new CompoundTag().putInt("OriginalID", item.getId()));
+                        byte[] nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
+                        this.putLShort(nbt.length);
+                        this.put(nbt);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }else {
+                    byte[] nbt = item.getCompoundTag();
+                    this.putLShort(nbt.length);
+                    this.put(nbt);
+                }
             } else {
                 try {
                     // Hack for tool damage
