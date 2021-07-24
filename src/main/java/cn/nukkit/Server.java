@@ -2903,7 +2903,7 @@ public class Server {
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
         this.achievementsEnabled = this.getPropertyBoolean("achievements", true);
-        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", false);
+        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", true);
         this.banXBAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
         this.pvpEnabled = this.getPropertyBoolean("pvp", true);
         this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
@@ -3063,7 +3063,7 @@ public class Server {
             put("timeout-milliseconds", 25000);
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
-            put("dimensions", false);
+            put("dimensions", true);
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
             put("strong-ip-bans", false);

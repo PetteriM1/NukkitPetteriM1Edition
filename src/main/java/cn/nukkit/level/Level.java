@@ -709,8 +709,9 @@ public class Level implements ChunkManager, Metadatable {
 
     public Map<Integer, Player> getChunkPlayers(int chunkX, int chunkZ) {
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.playerLoaders.containsKey(index)) {
-            return new HashMap<>(this.playerLoaders.get(index));
+        Map<Integer, Player> map = this.playerLoaders.get(index);
+        if (map != null) {
+            return new HashMap<>(map);
         } else {
             return new HashMap<>();
         }
@@ -718,8 +719,9 @@ public class Level implements ChunkManager, Metadatable {
 
     public ChunkLoader[] getChunkLoaders(int chunkX, int chunkZ) {
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.chunkLoaders.containsKey(index)) {
-            return this.chunkLoaders.get(index).values().toArray(new ChunkLoader[0]);
+        Map<Integer, ChunkLoader> map = this.chunkLoaders.get(index);
+        if (map != null) {
+            return map.values().toArray(new ChunkLoader[0]);
         } else {
             return new ChunkLoader[0];
         }
@@ -740,16 +742,24 @@ public class Level implements ChunkManager, Metadatable {
     public void registerChunkLoader(ChunkLoader loader, int chunkX, int chunkZ, boolean autoLoad) {
         int hash = loader.getLoaderId();
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (!this.chunkLoaders.containsKey(index)) {
-            this.chunkLoaders.put(index, new HashMap<>());
-            this.playerLoaders.put(index, new HashMap<>());
-        } else if (this.chunkLoaders.get(index).containsKey(hash)) {
-            return;
-        }
 
-        this.chunkLoaders.get(index).put(hash, loader);
-        if (loader instanceof Player) {
-            this.playerLoaders.get(index).put(hash, (Player) loader);
+        Map<Integer, ChunkLoader> map = this.chunkLoaders.get(index);
+        if (map == null) {
+            Map<Integer, ChunkLoader> newChunkLoader = new HashMap<>();
+            newChunkLoader.put(hash, loader);
+            this.chunkLoaders.put(index, newChunkLoader);
+            Map<Integer, Player> newPlayerLoader = new HashMap<>();
+            if (loader instanceof Player) {
+                newPlayerLoader.put(hash, (Player) loader);
+            }
+            this.playerLoaders.put(index, newPlayerLoader);
+        } else if (map.containsKey(hash)) {
+            return;
+        } else {
+            this.chunkLoaders.get(index).put(hash, loader);
+            if (loader instanceof Player) {
+                this.playerLoaders.get(index).put(hash, (Player) loader);
+            }
         }
 
         if (!this.loaders.containsKey(hash)) {
@@ -3060,6 +3070,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.x = pos.getFloorX();
         pk.y = pos.getFloorY();
         pk.z = pos.getFloorZ();
+        pk.dimension = this.getDimension();
         for (Player p : getPlayers().values()) p.dataPacket(pk);
     }
 
@@ -3238,7 +3249,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isChunkInUse(long hash) {
-        return this.chunkLoaders.containsKey(hash) && !this.chunkLoaders.get(hash).isEmpty();
+        Map<Integer, ChunkLoader> map = this.chunkLoaders.get(hash);
+        return map != null && !map.isEmpty();
     }
 
     public boolean loadChunk(int x, int z) {
