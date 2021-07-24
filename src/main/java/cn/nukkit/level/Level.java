@@ -4012,6 +4012,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {
+        if (this.dimension == DIMENSION_THE_END) return false;
         final int maxPortalSize = 23;
         final int targX = target.getFloorX();
         final int targY = target.getFloorY();
