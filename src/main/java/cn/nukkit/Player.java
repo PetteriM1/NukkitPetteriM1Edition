@@ -3537,7 +3537,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             if (!transaction.execute()) {
                                 this.server.getLogger().debug("Failed to execute inventory transaction from " + this.username + " with actions: " + Arrays.toString(transactionPacket.actions));
                                 failedTransactions++;
-                                if (failedTransactions > 10) {
+                                if (failedTransactions > 15) { //撤回合成事件时，如果玩家点的太快会到12
                                     this.close("", "Too many failed inventory transactions");
                                 }
                                 break packetswitch;
