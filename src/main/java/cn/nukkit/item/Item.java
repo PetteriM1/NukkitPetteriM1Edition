@@ -618,6 +618,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
         if (RuntimeItems.getMapping(v1_17_0).registeredCustomItem(item)) {
             addCreativeItem(v1_17_0, item);
+            addCreativeItem(v1_17_10, item);
         }
         return true;
     }
