@@ -370,10 +370,11 @@ public class EntityHuman extends EntityHumanType {
         Item shieldOffhand = getOffhandInventory().getItem(0);
         if (shieldOffhand.getId() == ItemID.SHIELD) {
             getOffhandInventory().setItem(0, damageArmor(shieldOffhand, entity, damage, true, null));
-        }
-        Item shield = getInventory().getItemInHand();
-        if (shield.getId() == ItemID.SHIELD) {
-            getInventory().setItemInHand(damageArmor(shield, entity, damage, true, null));
+        } else {
+            Item shield = getInventory().getItemInHand();
+            if (shield.getId() == ItemID.SHIELD) {
+                getInventory().setItemInHand(damageArmor(shield, entity, damage, true, null));
+            }
         }
     }
 }
