@@ -2396,7 +2396,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.getLogger().info(this.getServer().getLanguage().translateString("nukkit.player.logIn",
                 TextFormat.AQUA + this.username + TextFormat.WHITE,
                 this.getAddress(),
-                String.valueOf(this.getPort())));
+                String.valueOf(this.getPort()),
+                this.protocol + " (" + Utils.getVersionByProtocol(this.protocol) + ")"));
 
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_CAN_CLIMB, true, false);
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_CAN_SHOW_NAMETAG, true, false);

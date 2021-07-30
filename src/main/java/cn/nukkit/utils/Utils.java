@@ -348,13 +348,45 @@ public class Utils {
     /**
      * Get game version string by protocol version.
      * For internal usage!
-     * Starting from 388 / 1.13.0
      *
      * @param protocol protocol version
      * @return game version string
      */
     public static String getVersionByProtocol(int protocol) {
         switch (protocol) {
+            case ProtocolInfo.v1_2_0:
+                return "1.2.0";
+            case ProtocolInfo.v1_2_5_11:
+            case ProtocolInfo.v1_2_5:
+                return "1.2.5";
+            case ProtocolInfo.v1_2_6:
+                return "1.2.6";
+            case ProtocolInfo.v1_2_7:
+                return "1.2.7";
+            case ProtocolInfo.v1_2_10:
+                return "1.2.10";
+            case ProtocolInfo.v1_2_13:
+            case ProtocolInfo.v1_2_13_11:
+                return "1.2.13";
+            case ProtocolInfo.v1_4_0:
+                return "1.4.0";
+            case ProtocolInfo.v1_5_0:
+                return "1.5.0";
+            case ProtocolInfo.v1_6_0_5:
+            case ProtocolInfo.v1_6_0:
+                return "1.6.0";
+            case ProtocolInfo.v1_7_0:
+                return "1.7.0";
+            case ProtocolInfo.v1_8_0:
+                return "1.8.0";
+            case ProtocolInfo.v1_9_0:
+                return "1.9.0";
+            case ProtocolInfo.v1_10_0:
+                return "1.10.0";
+            case ProtocolInfo.v1_11_0:
+                return "1.11.0";
+            case ProtocolInfo.v1_12_0:
+                return "1.12.0";
             case ProtocolInfo.v1_13_0:
                 return "1.13.0";
             case ProtocolInfo.v1_14_0:
