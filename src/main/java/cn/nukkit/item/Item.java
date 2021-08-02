@@ -618,6 +618,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
         if (RuntimeItems.getMapping(v1_17_0).registeredCustomItem(item)) {
             addCreativeItem(v1_17_0, item);
+        }
+        if (RuntimeItems.getMapping(v1_17_10).registeredCustomItem(item)) {
             addCreativeItem(v1_17_10, item);
         }
         return true;
@@ -631,7 +633,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
             ItemCustom item = (ItemCustom) get(id);
             return RuntimeItems.getMapping(v1_16_100).deleteCustomItem(item) &&
-                    RuntimeItems.getMapping(v1_17_0).deleteCustomItem(item);
+                    RuntimeItems.getMapping(v1_17_0).deleteCustomItem(item) &&
+                    RuntimeItems.getMapping(v1_17_10).deleteCustomItem(item);
         }else {
             return false;
         }
