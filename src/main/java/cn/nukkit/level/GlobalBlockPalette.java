@@ -88,8 +88,10 @@ public class GlobalBlockPalette {
         legacyToRuntimeId419.defaultReturnValue(-1);
         legacyToRuntimeId428.defaultReturnValue(-1);
         legacyToRuntimeId440.defaultReturnValue(-1);
+        legacyToRuntimeId448.defaultReturnValue(-1);
         runtimeIdToLegacy428.defaultReturnValue(-1);
         runtimeIdToLegacy440.defaultReturnValue(-1);
+        runtimeIdToLegacy448.defaultReturnValue(-1);
     }
 
     public static void init() {

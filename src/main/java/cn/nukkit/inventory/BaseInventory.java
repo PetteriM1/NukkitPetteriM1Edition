@@ -39,7 +39,7 @@ public abstract class BaseInventory implements Inventory {
 
     public boolean destroyed = false;
 
-    Item air;
+    final Item air;
 
     public BaseInventory(InventoryHolder holder, InventoryType type) {
         this(holder, type, new HashMap<>());

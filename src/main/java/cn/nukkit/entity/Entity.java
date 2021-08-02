@@ -2686,4 +2686,20 @@ public abstract class Entity extends Location implements Metadatable {
     public float getMountedYOffset() {
         return getHeight() * 0.75F;
     }
+
+    /**
+     * Check whether there is blocks above the entity
+     *
+     * @return no blocks above
+     */
+    public boolean canSeeSky() {
+        int px = this.getFloorX();
+        int pz = this.getFloorZ();
+        for (int py = this.getFloorY(); py < 256; py++) {
+            if (level.getBlockIdAt(chunk, px, py, pz) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

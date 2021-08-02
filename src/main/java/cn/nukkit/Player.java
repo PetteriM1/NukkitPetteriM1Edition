@@ -2271,6 +2271,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.setLevel(level);
         }
 
+        if (nbt.contains("SpawnLevel")) {
+            Level spawnLevel = server.getLevelByName(nbt.getString("SpawnLevel"));
+            if (spawnLevel != null) {
+                this.spawnPosition = new Position(
+                        nbt.getInt("SpawnX"),
+                        nbt.getInt("SpawnY"),
+                        nbt.getInt("SpawnZ"),
+                        level
+                );
+            }
+        }
+
         this.ticksSinceLastRest = nbt.getInt("TimeSinceRest");
 
         for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
