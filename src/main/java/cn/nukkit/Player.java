@@ -286,6 +286,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private int failedTransactions;
     public int ticksSinceLastRest;
     private boolean inSoulSand;
+    private boolean dimensionChangeInProgress;
 
     /**
      * Packets that can be received before the player has logged in
@@ -633,7 +634,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         Map<String, CommandDataVersions> data = new HashMap<>();
 
         for (Command command : this.server.getCommandMap().getCommands().values()) {
-            if (!command.testPermissionSilent(this)) {
+            if (!command.testPermissionSilent(this) || !command.isRegistered()) {
                 continue;
             }
 
@@ -774,6 +775,27 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         level.unregisterChunkLoader(this, x, z);
         this.loadQueue.remove(index);
+    }
+
+    private void unloadChunks(boolean online) {
+        for (long index : this.usedChunks.keySet()) {
+            int chunkX = Level.getHashX(index);
+            int chunkZ = Level.getHashZ(index);
+            this.level.unregisterChunkLoader(this, chunkX, chunkZ);
+
+            for (Entity entity : level.getChunkEntities(chunkX, chunkZ).values()) {
+                if (entity != this) {
+                    if (online) {
+                        entity.despawnFrom(this);
+                    } else {
+                        entity.hasSpawned.remove(loaderId);
+                    }
+                }
+            }
+        }
+
+        this.usedChunks.clear();
+        this.loadQueue.clear();
     }
 
     public Position getSpawn() {
@@ -1074,7 +1096,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (!loadQueue.isEmpty()) {
                 NetworkChunkPublisherUpdatePacket packet = new NetworkChunkPublisherUpdatePacket();
                 packet.position = this.asBlockVector3();
-                packet.radius = viewDistance << 4;
+                packet.radius = this.chunkRadius << 4;
                 this.dataPacket(packet);
             }
         }
@@ -2123,15 +2145,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
-        if (!this.packetQueue.isEmpty()) {
-            List<DataPacket> toBatch = new ArrayList<>();
-            DataPacket packet;
-            while ((packet = this.packetQueue.poll()) != null) {
-                toBatch.add(packet);
-            }
-            DataPacket[] arr = toBatch.toArray(new DataPacket[0]);
-            this.server.batchPackets(new Player[]{this}, arr, false);
-        }
+        this.processBatchPackets();
 
         if (!this.isOnline()) {
             return;
@@ -2143,6 +2157,18 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.loadQueue.isEmpty() || !this.spawned) {
             this.sendNextChunk();
+        }
+    }
+
+    private void processBatchPackets() {
+        if (!this.packetQueue.isEmpty()) {
+            List<DataPacket> toBatch = new ArrayList<>();
+            DataPacket packet;
+            while ((packet = this.packetQueue.poll()) != null) {
+                toBatch.add(packet);
+            }
+            DataPacket[] arr = toBatch.toArray(new DataPacket[0]);
+            this.server.batchPackets(new Player[]{this}, arr, false);
         }
     }
 
@@ -2900,6 +2926,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break packetswitch;
                         case PlayerActionPacket.ACTION_DIMENSION_CHANGE_ACK:
                             this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_RESET);
+                            this.dummyBossBars.values().forEach(DummyBossBar::reshow);
                             break;
                         case PlayerActionPacket.ACTION_START_GLIDE:
                             if (!server.getAllowFlight() && this.checkMovement) {
@@ -4255,18 +4282,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.removeAllWindows(true);
 
-            for (long index : new ArrayList<>(this.usedChunks.keySet())) {
-                int chunkX = Level.getHashX(index);
-                int chunkZ = Level.getHashZ(index);
-                this.level.unregisterChunkLoader(this, chunkX, chunkZ);
-                this.usedChunks.remove(index);
-
-                for (Entity entity : level.getChunkEntities(chunkX, chunkZ).values()) {
-                    if (entity != this) {
-                        entity.getViewers().remove(loaderId);
-                    }
-                }
-            }
+            this.unloadChunks(false);
 
             super.close();
 
@@ -4289,8 +4305,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     String.valueOf(this.getPort()),
                     this.getServer().getLanguage().translateString(reason)));
             this.windows.clear();
-            this.usedChunks.clear();
-            this.loadQueue.clear();
             this.hasSpawned.clear();
             this.spawnPosition = null;
 
@@ -4999,22 +5013,20 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
                 this.forceMovement = this.teleportPosition;
             }
-            this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_TELEPORT);
 
-            this.checkTeleportPosition(cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL);
+            if (this.dimensionChangeInProgress) {
+                this.dimensionChangeInProgress = false;
+            } else {
+                this.sendPosition(this, this.yaw, this.pitch, MovePlayerPacket.MODE_TELEPORT);
+                this.checkTeleportPosition(cause == PlayerTeleportEvent.TeleportCause.ENDER_PEARL);
+                this.dummyBossBars.values().forEach(DummyBossBar::reshow);
+            }
 
             this.resetFallDistance();
             this.nextChunkOrderRun = 0;
             this.newPosition = null;
 
             this.stopFishing(false);
-
-            // DummyBossBar
-            this.dummyBossBars.values().forEach(DummyBossBar::reshow);
-            // Weather
-            this.getLevel().sendWeather(this);
-            // Update time
-            this.getLevel().sendTime(this);
             return true;
         }
 
@@ -5057,6 +5069,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 pk.x = spawn.getFloorX();
                 pk.y = spawn.getFloorY();
                 pk.z = spawn.getFloorZ();
+                pk.dimension = location.getLevel().getDimension();
                 this.dataPacket(pk);
             }
 
@@ -5471,63 +5484,56 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * @param dimension dimension id
      */
     public void setDimension(int dimension) {
-        ChangeDimensionPacket pk1 = new ChangeDimensionPacket();
-        pk1.dimension = dimension;
-        pk1.x = (float) this.x;
-        pk1.y = (float) this.y;
-        pk1.z = (float) this.z;
-        pk1.respawn = !this.isAlive();
-        this.dataPacket(pk1);
+        this.dimensionChangeInProgress = true;
+
+        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+        changeDimensionPacket.dimension = dimension;
+        changeDimensionPacket.x = (float) this.x;
+        changeDimensionPacket.y = (float) this.y;
+        changeDimensionPacket.z = (float) this.z;
+        changeDimensionPacket.respawn = !this.isAlive();
+        this.dataPacket(changeDimensionPacket);
 
         if (this.protocol >= ProtocolInfo.v1_8_0) {
             NetworkChunkPublisherUpdatePacket pk0 = new NetworkChunkPublisherUpdatePacket();
             pk0.position = new BlockVector3((int) this.x, (int) this.y, (int) this.z);
-            pk0.radius = viewDistance << 4;
+            pk0.radius = this.chunkRadius << 4;
             this.dataPacket(pk0);
         }
     }
 
     @Override
-    public boolean switchLevel(Level level) {
-        Level oldLevel = this.level;
-        if (super.switchLevel(level)) {
-            SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
-            spawnPosition.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
-            Position spawn = level.getSpawnLocation();
-            spawnPosition.x = spawn.getFloorX();
-            spawnPosition.y = spawn.getFloorY();
-            spawnPosition.z = spawn.getFloorZ();
-            this.dataPacket(spawnPosition);
+    protected void preSwitchLevel() {
+        // Make sure batch packets from the previous world gets through first
+        this.processBatchPackets();
 
-            if (this.getServer().dimensionsEnabled && oldLevel.getDimension() != level.getDimension()) {
-                this.setDimension(level.getDimension());
-            } else {
-                this.forceSendEmptyChunks();
-            }
+        // Remove old chunks
+        this.unloadChunks(true);
+    }
 
-            // Remove old chunks
-            for (long index : new ArrayList<>(this.usedChunks.keySet())) {
-                int chunkX = Level.getHashX(index);
-                int chunkZ = Level.getHashZ(index);
-                this.unloadChunk(chunkX, chunkZ, oldLevel);
-            }
+    @Override
+    protected void afterSwitchLevel() {
+        // Send spawn to update compass position
+        SetSpawnPositionPacket spawnPosition = new SetSpawnPositionPacket();
+        spawnPosition.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
+        Position spawn = level.getSpawnLocation();
+        spawnPosition.x = spawn.getFloorX();
+        spawnPosition.y = spawn.getFloorY();
+        spawnPosition.z = spawn.getFloorZ();
+        spawnPosition.dimension = level.getDimension();
+        this.dataPacket(spawnPosition);
 
-            this.usedChunks.clear();
-            this.loadQueue.clear();
+        // Update time and weather
+        level.sendTime(this);
+        level.sendWeather(this);
 
-            level.sendTime(this);
-            level.sendWeather(this);
+        // Update game rules
+        GameRulesChangedPacket packet = new GameRulesChangedPacket();
+        packet.gameRulesMap = level.getGameRules().getGameRules();
+        this.dataPacket(packet);
 
-            // Update game rules
-            GameRulesChangedPacket packet = new GameRulesChangedPacket();
-            packet.gameRulesMap = level.getGameRules().getGameRules();
-            this.dataPacket(packet);
-
-            this.ticksSinceLastRest = 0;
-            return true;
-        }
-
-        return false;
+        // Reset sleeping timer
+        this.ticksSinceLastRest = 0;
     }
 
     /**
