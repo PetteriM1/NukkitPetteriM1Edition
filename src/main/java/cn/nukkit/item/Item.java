@@ -429,7 +429,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
         // New creative items mapping
         registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.v1_17_0, creative440);
-        registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.v1_17_10, creative448);
+        registerCreativeItemsNew(ProtocolInfo.v1_17_10, ProtocolInfo.v1_17_10, creative448);
     }
 
     private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
@@ -437,7 +437,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creativeitems" + protocolId + ".json")) {
             itemsArray = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("items");
         } catch (Exception e) {
-            throw new AssertionError("Error loading required block states!");
+            throw new AssertionError("Error loading required block states!", e);
         }
 
         for (JsonElement element : itemsArray) {
