@@ -805,7 +805,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void checkTime() {
         if (!this.stopTime && this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
-            this.time = (this.time + 1) % TIME_FULL;
+            this.time = (this.time + tickRate) % TIME_FULL;
         }
     }
 

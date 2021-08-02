@@ -806,7 +806,7 @@ public class BinaryStream {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                }else {
+                } else {
                     byte[] nbt = item.getCompoundTag();
                     this.putLShort(nbt.length);
                     this.put(nbt);
