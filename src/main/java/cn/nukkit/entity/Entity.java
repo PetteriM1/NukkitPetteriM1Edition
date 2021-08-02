@@ -1281,7 +1281,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isAlive() {
-        return this.health > 0;
+        return this.health >= 1;
     }
 
     public boolean isClosed() {
@@ -1918,13 +1918,28 @@ public abstract class Entity extends Location implements Metadatable {
                 this.chunk.removeEntity(this);
             }
             this.despawnFromAll();
+
+            if (this.isPlayer) {
+                this.preSwitchLevel();
+            }
         }
 
         this.setLevel(targetLevel);
         this.level.addEntity(this);
         this.chunk = null;
 
+        if (this.isPlayer) {
+            this.afterSwitchLevel();
+        }
         return true;
+    }
+
+    protected void preSwitchLevel() {
+        // Override in Player
+    }
+
+    protected void afterSwitchLevel() {
+        // Override in Player
     }
 
     public Position getPosition() {
@@ -2289,15 +2304,33 @@ public abstract class Entity extends Location implements Metadatable {
             return false;
         }
 
-        if (pos instanceof Position && ((Position) pos).level != null && ((Position) pos).level != this.level) {
-            if (!this.switchLevel(((Position) pos).getLevel())) {
-                return false;
-            }
-        }
+        if (pos instanceof Position) {
+            Level oldLevel = this.level;
+            Level newLevel = ((Position) pos).level;
 
-        this.x = pos.x;
-        this.y = pos.y;
-        this.z = pos.z;
+            if (newLevel != null && newLevel != oldLevel) {
+                if (!this.switchLevel(newLevel)) {
+                    return false;
+                }
+
+                this.x = pos.x;
+                this.y = pos.y;
+                this.z = pos.z;
+
+                // Dimension change
+                if (this.isPlayer && this.server.dimensionsEnabled && newLevel.getDimension() != oldLevel.getDimension()) {
+                    ((Player) this).setDimension(newLevel.getDimension());
+                }
+            } else {
+                this.x = pos.x;
+                this.y = pos.y;
+                this.z = pos.z;
+            }
+        } else {
+            this.x = pos.x;
+            this.y = pos.y;
+            this.z = pos.z;
+        }
 
         this.recalculateBoundingBox();
 
