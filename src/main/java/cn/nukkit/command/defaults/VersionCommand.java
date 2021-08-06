@@ -1,6 +1,7 @@
 package cn.nukkit.command.defaults;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.command.CommandMap;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.lang.TranslationContainer;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -56,7 +57,8 @@ public class VersionCommand extends VanillaCommand {
                                 sender.sendMessage("\u00A7aYou are running the latest version.");
                             }
                         }
-                    } catch (Exception ignore) {}
+                    } catch (Exception ignore) {
+                    }
                 });
             }
         } else {
@@ -101,5 +103,10 @@ public class VersionCommand extends VanillaCommand {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean unregister(CommandMap commandMap) {
+        return false;
     }
 }

@@ -1761,17 +1761,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.lastPitch = to.pitch;
 
             if (!isFirst) {
-                List<Block> blocksAround = new ArrayList<>(this.blocksAround);
-                List<Block> collidingBlocks = new ArrayList<>(this.collisionBlocks);
+                List<Block> blocksAround = null;
+                List<Block> collisionBlocks = null;
+                if (!this.server.suomiCraftPEMode()) {
+                    blocksAround = new ArrayList<>(this.blocksAround);
+                    collisionBlocks = new ArrayList<>(this.collisionBlocks);
+                    this.blocksAround = null;
+                    this.collisionBlocks = null;
+                }
 
                 PlayerMoveEvent ev = new PlayerMoveEvent(this, from, to);
-
-                this.blocksAround = null;
-                this.collisionBlocks = null;
-
                 this.server.getPluginManager().callEvent(ev);
 
                 if (!(revert = ev.isCancelled())) {
+                    if (this.server.suomiCraftPEMode()) {
+                        this.blocksAround = null;
+                        this.collisionBlocks = null;
+                    }
                     if (this.server.getMobAiEnabled() && this.age % 20 == 0) {
                         AxisAlignedBB aab = new AxisAlignedBB(
                                 this.getX() - 0.6f,
@@ -1798,9 +1804,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } else {
                         this.addMovement(this.x, this.y + this.getEyeHeight(), this.z, this.yaw, this.pitch, this.yaw);
                     }
-                } else {
+                } else if (!this.server.suomiCraftPEMode()) {
                     this.blocksAround = blocksAround;
-                    this.collisionBlocks = collidingBlocks;
+                    this.collisionBlocks = collisionBlocks;
                 }
             }
 

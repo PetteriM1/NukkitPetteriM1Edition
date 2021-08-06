@@ -2,6 +2,7 @@ package cn.nukkit.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.mob.*;
+import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.io.*;
@@ -24,6 +25,10 @@ public class Utils {
      * A SplittableRandom you can use without having to create a new object every time.
      */
     public static final SplittableRandom random = new SplittableRandom();
+    /**
+     * A NukkitRandom you can use without having to create a new object every time.
+     */
+    public static final NukkitRandom nukkitRandom = new NukkitRandom();
     /**
      * An empty damage array used when mobs have no attack damage.
      */
