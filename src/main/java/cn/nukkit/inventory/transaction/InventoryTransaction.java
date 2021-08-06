@@ -136,6 +136,7 @@ public class InventoryTransaction {
             }
 
             if (!action.isValid(this.source)) {
+                invalid = true;
                 return false;
             }
 
