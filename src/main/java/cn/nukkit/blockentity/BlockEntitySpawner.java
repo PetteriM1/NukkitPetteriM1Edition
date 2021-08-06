@@ -155,6 +155,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                             continue;
                         }
                         entity.spawnToAll();
+                        nearbyEntities++;
                     }
                 }
             }
