@@ -151,6 +151,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean playedBefore;
     public boolean spawned = false;
     public boolean loggedIn = false;
+    private boolean verified = false;
+    private int unverifiedPackets;
     public int gamemode;
     public long lastBreak = -1;
     private BlockVector3 lastBreakPosition = new BlockVector3();
@@ -2492,8 +2494,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             return;
         }
 
+        if (!verified && packet.pid() != ProtocolInfo.LOGIN_PACKET && packet.pid() != ProtocolInfo.BATCH_PACKET) {
+            server.getLogger().warning("Ignoring " + packet.getClass().getSimpleName() + " from " + getAddress() + " due to player not verified yet");
+            if (unverifiedPackets++ > 100) {
+                this.close("", "Too many failed login attempts");
+            }
+            return;
+        }
+
         if (!loggedIn && !PRE_LOGIN_PACKETS.contains(packet.pid())) {
-            server.getLogger().debug("Ignoring " + packet.getClass().getSimpleName() + " by " + username + " due to player not logged in yet");
+            server.getLogger().warning("Ignoring " + packet.getClass().getSimpleName() + " from " + username + " due to player not logged in yet");
             return;
         }
 
@@ -2609,6 +2619,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     Player playerInstance = this;
+                    this.verified = true;
+
                     this.preLoginEventTask = new AsyncTask() {
                         private PlayerAsyncPreLoginEvent event;
 
