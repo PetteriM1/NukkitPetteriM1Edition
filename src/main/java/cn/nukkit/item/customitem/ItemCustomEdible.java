@@ -37,20 +37,11 @@ public abstract class ItemCustomEdible extends ItemCustom {
     public CompoundTag getComponentsData() {
         CompoundTag data = super.getComponentsData();
 
-        if(this.isDrink()) {
-            data.getCompound("components")
-                    .putCompound("minecraft:food",
-                            new CompoundTag()
-                                    .putInt("nutrition", 0)
-                                    .putBoolean("can_always_eat",true)
-                    );
-        }else {
-            data.getCompound("components")
-                    .putCompound("minecraft:food",
-                            new CompoundTag()
-                                    .putInt("nutrition", 0)
-                    );
-        }
+        data.getCompound("components").putCompound("minecraft:food",
+                new CompoundTag()
+                        .putInt("nutrition", 0)
+                        .putBoolean("can_always_eat", this.canAlwaysEat())
+        );
 
         data.getCompound("components").getCompound("item_properties")
                 .putInt("use_duration", this.getEatTick())
@@ -96,12 +87,12 @@ public abstract class ItemCustomEdible extends ItemCustom {
         return 40;
     }
 
-    public boolean isFood() {
-        return true;
-    }
-
     public boolean isDrink() {
         return false;
+    }
+
+    public boolean canAlwaysEat() {
+        return true /*this.isDrink()*/;
     }
 
 }
