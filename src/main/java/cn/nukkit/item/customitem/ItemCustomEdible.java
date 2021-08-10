@@ -92,7 +92,7 @@ public abstract class ItemCustomEdible extends ItemCustom {
     }
 
     public boolean canAlwaysEat() {
-        return true /*this.isDrink()*/;
+        return this.isDrink();
     }
 
 }
