@@ -52,7 +52,7 @@ public abstract class ItemCustom extends Item {
                         .putInt("creative_category", this.getCreativeCategory())
                         .putInt("max_stack_size", this.getMaxStackSize()))
                 .putCompound("minecraft:icon", new CompoundTag()
-                        .putString("texture", this.getTextureName()))
+                        .putString("texture", this.getTextureName() != null ? this.getTextureName() : this.name))
         );
         return data;
     }
