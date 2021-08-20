@@ -118,7 +118,7 @@ public class EntityArrow extends EntityProjectile {
             this.setCritical(false);
         }
 
-        if (this.fireTicks > 0 && this.level.isRaining() && this.level.canBlockSeeSky(this)) {
+        if (this.fireTicks > 0 && this.level.isRaining() && this.canSeeSky()) {
             this.extinguish();
         }
 

@@ -115,7 +115,7 @@ public class EntitySnowGolem extends EntityWalkingMob {
 
     @Override
     public boolean entityBaseTick(int tickDiff) {
-        if (this.age % 20 == 0 && (this.level.getDimension() == Level.DIMENSION_NETHER || (this.level.isRaining() && this.level.canBlockSeeSky(this)))) {
+        if (this.age % 20 == 0 && (this.level.getDimension() == Level.DIMENSION_NETHER || (this.level.isRaining() && this.canSeeSky()))) {
             this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.FIRE_TICK, 1));
         }
 
