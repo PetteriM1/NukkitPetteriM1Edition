@@ -299,4 +299,6 @@ public interface ItemID {
     int WARPED_FUNGUS_ON_A_STICK = 757;
     //
     int RECORD_PIGSTEP = 759;
+
+    int SPYGLASS = 772; //625?
 }
