@@ -19,7 +19,6 @@ import cn.nukkit.entity.mob.EntityWalkingMob;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.entity.projectile.EntityThrownTrident;
-import cn.nukkit.event.block.ItemFrameDropItemEvent;
 import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -2021,7 +2020,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             if (this.isOnFire() && this.lastUpdate % 10 == 0) {
                 if (this.isCreative() && !this.isInsideOfFire()) {
                     this.extinguish();
-                } else if (this.getLevel().isRaining() && this.getLevel().canBlockSeeSky(this)) {
+                } else if (this.getLevel().isRaining() && this.canSeeSky()) {
                     this.extinguish();
                 }
             }
@@ -2864,6 +2863,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         ((BlockDragonEgg) target).teleport();
                                         break actionswitch;
                                     }
+                                case Block.ITEM_FRAME_BLOCK:
+                                    BlockEntity itemFrame = this.level.getBlockEntityIfLoaded(pos);
+                                    if (itemFrame instanceof BlockEntityItemFrame && ((BlockEntityItemFrame) itemFrame).dropItem(this)) {
+                                        break actionswitch;
+                                    }
                             }
                             Block block = target.getSide(face);
                             if (block.getId() == Block.FIRE) {
@@ -2899,27 +2903,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             pk.data = 0;
                             this.getLevel().addChunkPacket(pos.getFloorX() >> 4, pos.getFloorZ() >> 4, pk);
                             this.breakingBlock = null;
-                            // HACK: Fix item frames for 1.16.210
-                            if (this.protocol >= ProtocolInfo.v1_16_210 && this.isSurvival()) {
-                                BlockEntity blockEntityItemFrame = this.level.getBlockEntityIfLoaded(pos);
-                                if (blockEntityItemFrame instanceof BlockEntityItemFrame) {
-                                    BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
-                                    Item itemDrop = itemFrame.getItem();
-                                    if (itemDrop.getId() != Item.AIR) {
-                                        ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, itemFrame.getBlock(), itemFrame, itemDrop);
-                                        this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
-                                        if (!itemFrameDropItemEvent.isCancelled()) {
-                                            itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
-                                            itemFrame.setItemRotation(0);
-                                            pos = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
-                                            this.level.dropItem(pos, itemDrop);
-                                            this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
-                                        } else {
-                                            itemFrame.spawnTo(this);
-                                        }
-                                    }
-                                }
-                            }
                             break;
                         case PlayerActionPacket.ACTION_GET_UPDATED_BLOCK:
                         case PlayerActionPacket.ACTION_DROP_ITEM:
@@ -3016,8 +2999,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break packetswitch;
                         case PlayerActionPacket.ACTION_CONTINUE_BREAK:
                             if (this.isBreakingBlock()) {
-                                block = this.level.getBlock(pos);
-                                this.level.addParticle(new PunchBlockParticle(pos, block, face));
+                                this.level.addParticle(new PunchBlockParticle(pos, this.breakingBlock, face));
                             }
                             break;
                         case PlayerActionPacket.ACTION_START_SWIMMING:
@@ -3122,7 +3104,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Block block = this.level.getBlock(this.temporalVector.setComponents(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z), false);
                     item = block.toItem();
                     if (pickRequestPacket.addUserData) {
-                        BlockEntity blockEntity = this.getLevel().getBlockEntity(new Vector3(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
+                        BlockEntity blockEntity = this.getLevel().getBlockEntityIfLoaded(this.temporalVector.setComponents(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
                         if (blockEntity != null) {
                             CompoundTag nbt = blockEntity.getCleanedNBT();
                             if (nbt != null) {
@@ -3370,24 +3352,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.ITEM_FRAME_DROP_ITEM_PACKET:
                     ItemFrameDropItemPacket itemFrameDropItemPacket = (ItemFrameDropItemPacket) packet;
-                    Vector3 vector3 = this.temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z);
-                    BlockEntity blockEntityItemFrame = this.level.getBlockEntityIfLoaded(vector3);
-                    if (blockEntityItemFrame instanceof BlockEntityItemFrame) {
-                        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntityItemFrame;
-                        Item itemDrop = itemFrame.getItem();
-                        if (itemDrop.getId() != Item.AIR) {
-                            ItemFrameDropItemEvent itemFrameDropItemEvent = new ItemFrameDropItemEvent(this, itemFrame.getBlock(), itemFrame, itemDrop);
-                            this.server.getPluginManager().callEvent(itemFrameDropItemEvent);
-                            if (!itemFrameDropItemEvent.isCancelled()) {
-                                itemFrame.setItem(new ItemBlock(Block.get(BlockID.AIR)));
-                                itemFrame.setItemRotation(0);
-                                vector3 = this.temporalVector.setComponents(itemFrame.x + 0.5, itemFrame.y, itemFrame.z + 0.5);
-                                this.level.dropItem(vector3, itemDrop);
-                                this.getLevel().addSoundToViewers(this, Sound.BLOCK_ITEMFRAME_REMOVE_ITEM);
-                            } else {
-                                itemFrame.spawnTo(this);
-                            }
-                        }
+                    BlockEntity itemFrame = this.level.getBlockEntityIfLoaded(this.temporalVector.setComponents(itemFrameDropItemPacket.x, itemFrameDropItemPacket.y, itemFrameDropItemPacket.z));
+                    if (itemFrame instanceof BlockEntityItemFrame) {
+                        ((BlockEntityItemFrame) itemFrame).dropItem(this);
                     }
                     break;
                 case ProtocolInfo.MAP_INFO_REQUEST_PACKET:

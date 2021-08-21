@@ -200,8 +200,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
         super.attack(source);
 
-        this.target = null;
-        this.stayTime = 0;
+        if (!source.isCancelled()) {
+            this.target = null;
+            this.stayTime = 0;
+        }
+
         return true;
     }
 

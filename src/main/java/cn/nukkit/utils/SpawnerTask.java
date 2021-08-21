@@ -71,6 +71,7 @@ public class SpawnerTask implements Runnable {
         this.registerMobSpawner(DrownedSpawner.class);
         this.registerMobSpawner(PhantomSpawner.class);
         this.registerMobSpawner(PiglinSpawner.class);
+        this.registerMobSpawner(HoglinSpawner.class);
     }
 
     /**
@@ -346,6 +347,7 @@ public class SpawnerTask implements Runnable {
         switch (id) {
             case EntityZombiePigman.NETWORK_ID:
             case EntityPiglin.NETWORK_ID:
+            case EntityHoglin.NETWORK_ID:
                 return nether ? 4 : 0;
             case EntityGhast.NETWORK_ID:
             case EntityBlaze.NETWORK_ID:

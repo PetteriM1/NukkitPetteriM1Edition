@@ -228,6 +228,18 @@ public class Network {
         return null;
     }
 
+    public DataPacket getPacket(int id) {
+        Class<? extends DataPacket> clazz = this.packetPool[id];
+        if (clazz != null) {
+            try {
+                return clazz.newInstance();
+            } catch (Exception e) {
+                Server.getInstance().getLogger().logException(e);
+            }
+        }
+        return null;
+    }
+
     public void sendPacket(InetSocketAddress socketAddress, ByteBuf payload) {
         for (AdvancedSourceInterface sourceInterface : this.advancedInterfaces) {
             sourceInterface.sendRawPacket(socketAddress, payload);
