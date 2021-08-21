@@ -46,6 +46,8 @@ import cn.nukkit.inventory.transaction.data.UseItemData;
 import cn.nukkit.inventory.transaction.data.UseItemOnEntityData;
 import cn.nukkit.item.*;
 import cn.nukkit.item.customitem.ItemCustom;
+import cn.nukkit.item.customitem.ItemCustomArmor;
+import cn.nukkit.item.customitem.ItemCustomTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.food.Food;
 import cn.nukkit.lang.TextContainer;
@@ -5773,7 +5775,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 if (!itemsWithMending.isEmpty()) {
                     int itemToRepair = itemsWithMending.get(Utils.random.nextInt(itemsWithMending.size()));
                     Item toRepair = inventory.getItem(itemToRepair);
-                    if (toRepair instanceof ItemTool || toRepair instanceof ItemArmor) {
+                    if (toRepair instanceof ItemTool || toRepair instanceof ItemArmor ||
+                            toRepair instanceof ItemCustomTool || toRepair instanceof ItemCustomArmor) {
                         if (toRepair.getDamage() > 0) {
                             int dmg = toRepair.getDamage() - 2;
                             if (dmg < 0) {
