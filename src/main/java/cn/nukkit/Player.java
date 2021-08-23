@@ -1005,7 +1005,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.spawnToAll();
         }
 
-        if (Server.getInstance().enableCustomItems) {
+        if (this.server.enableCustomItems) {
             ArrayList<Integer> customItems = RuntimeItems.getMapping(this.protocol).getCustomItems();
 
             if (!customItems.isEmpty()) {
@@ -2369,8 +2369,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         ResourcePacksInfoPacket infoPacket = new ResourcePacksInfoPacket();
         infoPacket.resourcePackEntries = this.server.getResourcePackManager().getResourceStack();
-        //Custom item need resource pack
-        infoPacket.mustAccept = this.server.getForceResources() || this.server.enableCustomItems;
+        infoPacket.mustAccept = this.server.getForceResources();
         this.dataPacket(infoPacket);
     }
 
@@ -2678,8 +2677,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                         case ResourcePackClientResponsePacket.STATUS_HAVE_ALL_PACKS:
                             ResourcePackStackPacket stackPacket = new ResourcePackStackPacket();
-                            //Custom item need resource pack
-                            stackPacket.mustAccept = this.server.getForceResources() || this.server.enableCustomItems;
+                            stackPacket.mustAccept = this.server.getForceResources();
                             stackPacket.resourcePackStack = this.server.getResourcePackManager().getResourceStack();
                             if (this.server.enableCustomItems) {
                                 stackPacket.experiments.add(
