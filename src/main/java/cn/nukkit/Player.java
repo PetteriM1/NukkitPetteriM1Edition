@@ -281,6 +281,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private static Stream<Field> pkIDs;
 
+    private int lastEmote;
     private int lastEnderPearl = 20;
     private int lastChorusFruitTeleport = 20;
     public long lastSkinChange = -1;
@@ -4014,7 +4015,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse(" UNKNOWN") + " from " + this.username + ": " + PVWpk.toString());
                     break;
                 case ProtocolInfo.EMOTE_PACKET:
+                    if (!this.spawned || server.getTick() - this.lastEmote < 20) {
+                        return;
+                    }
+                    this.lastEmote = server.getTick();
                     EmotePacket emotePacket = (EmotePacket) packet;
+                    if (emotePacket.runtimeId != this.id) {
+                        server.getLogger().warning(this.username + " tried to send EmotePacket with invalid entity id: " + emotePacket.runtimeId + "!=" + this.id);
+                        return;
+                    }
                     this.emote(emotePacket);
                     break;
                 default:
@@ -5855,9 +5864,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (ev.isCancelled()) {
             fishingHook.close();
         } else {
-            fishingHook.spawnToAll();
             this.fishing = fishingHook;
             fishingHook.rod = fishingRod;
+            fishingHook.checkLure();
+            fishingHook.spawnToAll();
         }
     }
 

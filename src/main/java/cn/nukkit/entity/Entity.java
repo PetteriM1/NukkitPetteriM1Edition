@@ -620,8 +620,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setSprinting(boolean value) {
-        this.sprinting = value;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+        if (this.sprinting != value) {
+            this.sprinting = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+        }
     }
 
     public boolean isGliding() {
@@ -633,8 +635,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setGliding(boolean value) {
-        this.gliding = value;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GLIDING, value);
+        if (this.gliding != value) {
+            this.gliding = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_GLIDING, value);
+            this.recalculateBoundingBox(true);
+        }
     }
 
     public boolean isImmobile() {
