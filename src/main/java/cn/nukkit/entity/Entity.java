@@ -373,8 +373,8 @@ public abstract class Entity extends Location implements Metadatable {
 
     public final boolean isPlayer;
 
-    private volatile boolean initialized;
-    private volatile boolean initialized2;
+    private volatile boolean init;
+    private volatile boolean initEntity;
 
     public float getHeight() {
         return 0;
@@ -382,6 +382,10 @@ public abstract class Entity extends Location implements Metadatable {
 
     public float getEyeHeight() {
         return this.getHeight() / 2 + 0.1f;
+    }
+
+    protected float getBreathableHeight() {
+        return isSwimming() || isGliding() ? -1f : 1.62f; // Hack: fix air while swimming in one block deep water
     }
 
     public float getWidth() {
@@ -424,13 +428,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     protected void initEntity() {
-        if (this.initialized2) {
-            // We've already initialized this entity
-            this.server.getLogger().debug("[initEntity] Entity is already initialized: " + this.getName() + " (" + this.id + ')');
-            return;
+        if (this.initEntity) {
+            throw new RuntimeException("Entity is already initialized: " + this.getName() + " (" + this.id + ')');
         }
 
-        this.initialized2 = true;
+        this.initEntity = true;
 
         if (this.namedTag.contains("ActiveEffects")) {
             ListTag<CompoundTag> effects = this.namedTag.getList("ActiveEffects", CompoundTag.class);
@@ -458,7 +460,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
         }
 
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_HAS_COLLISION, true);
+        this.dataProperties.put(new LongEntityData(DATA_FLAGS, this.getDataPropertyLong(DATA_FLAGS) ^ 1L << DATA_FLAG_HAS_COLLISION));
         this.dataProperties.putFloat(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
         this.dataProperties.putFloat(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
         this.dataProperties.putInt(DATA_HEALTH, (int) this.health);
@@ -471,13 +473,11 @@ public abstract class Entity extends Location implements Metadatable {
             throw new ChunkException("Invalid garbage Chunk given to Entity");
         }
 
-        if (this.initialized) {
-            // We've already initialized this entity
-            this.server.getLogger().debug("[init] Entity is already initialized: " + this.getName() + " (" + this.id + ')');
-            return;
+        if (this.init) {
+            throw new RuntimeException("Entity is already initialized: " + this.getName() + " (" + this.id + ')');
         }
 
-        this.initialized = true;
+        this.init = true;
 
         this.timing = Timings.getEntityTiming(this);
 
@@ -621,8 +621,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setSwimming(boolean value) {
-        this.swimming = value;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SWIMMING, value);
+        if (this.swimming != value) {
+            this.swimming = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SWIMMING, value);
+            this.recalculateBoundingBox(true);
+        }
     }
 
     public boolean isSprinting() {
@@ -634,8 +637,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setSprinting(boolean value) {
-        this.sprinting = value;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+        if (this.sprinting != value) {
+            this.sprinting = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPRINTING, value);
+        }
     }
 
     public boolean isGliding() {
@@ -647,8 +652,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setGliding(boolean value) {
-        this.gliding = value;
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GLIDING, value);
+        if (this.gliding != value) {
+            this.gliding = value;
+            this.setDataFlag(DATA_FLAGS, DATA_FLAG_GLIDING, value);
+            this.recalculateBoundingBox(true);
+        }
     }
 
     public boolean isImmobile() {
@@ -689,9 +697,11 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setScale(float scale) {
-        this.scale = scale;
-        this.setDataProperty(new FloatEntityData(DATA_SCALE, this.scale));
-        this.recalculateBoundingBox();
+        if (this.scale != scale) {
+            this.scale = scale;
+            this.setDataProperty(new FloatEntityData(DATA_SCALE, this.scale));
+            this.recalculateBoundingBox(true);
+        }
     }
 
     public float getScale() {
@@ -770,19 +780,19 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void recalculateBoundingBox(boolean send) {
-        float height = this.getHeight() * this.scale;
+        float height = this.getHeight();
         double radius = (this.getWidth() * this.scale) / 2d;
         this.boundingBox.setBounds(
                 this.x - radius,
                 this.y + this.ySize,
                 z - radius,
                 x + radius,
-                y + height + this.ySize,
+                y + height * this.scale + this.ySize,
                 z + radius
         );
 
         if (send) {
-            FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight());
+            FloatEntityData bbH = new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, height);
             FloatEntityData bbW = new FloatEntityData(DATA_BOUNDING_BOX_WIDTH, this.getWidth());
             this.dataProperties.put(bbH);
             this.dataProperties.put(bbW);
@@ -1059,6 +1069,10 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void spawnTo(Player player) {
+        if (!init || !initEntity) {
+            this.server.getLogger().warning("(BUG) Spawned an entity that is not initialized yet: " + this.getName() + " (" + this.id + ')');
+        }
+
         if (!this.hasSpawned.containsKey(player.getLoaderId()) && player.usedChunks.containsKey(Level.chunkHash(this.chunk.getX(), this.chunk.getZ()))) {
             player.dataPacket(createAddEntityPacket());
             this.hasSpawned.put(player.getLoaderId(), player);
@@ -1285,7 +1299,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isAlive() {
-        return this.health > 0;
+        return this.health >= 1;
     }
 
     public boolean isClosed() {
@@ -1922,13 +1936,28 @@ public abstract class Entity extends Location implements Metadatable {
                 this.chunk.removeEntity(this);
             }
             this.despawnFromAll();
+
+            if (this.isPlayer) {
+                this.preSwitchLevel();
+            }
         }
 
         this.setLevel(targetLevel);
         this.level.addEntity(this);
         this.chunk = null;
 
+        if (this.isPlayer) {
+            this.afterSwitchLevel();
+        }
         return true;
+    }
+
+    protected void preSwitchLevel() {
+        // Override in Player
+    }
+
+    protected void afterSwitchLevel() {
+        // Override in Player
     }
 
     public Position getPosition() {
@@ -1940,7 +1969,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isSubmerged() {
-        double y = this.y + this.getEyeHeight() - (this.isSwimming() || this.isGliding() ? 1 : 0);
+        double y = this.y + this.getBreathableHeight();
         Block block = this.level.getBlock(this.temporalVector.setComponents(NukkitMath.floorDouble(this.x), NukkitMath.floorDouble(y), NukkitMath.floorDouble(this.z)));
 
         if (block instanceof BlockWater) {
@@ -1963,7 +1992,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isInsideOfSolid() {
-        double y = this.y + this.getEyeHeight();
+        double y = this.y + this.getBreathableHeight();
         Block block = this.level.getBlock(
                 this.temporalVector.setComponents(
                         NukkitMath.floorDouble(this.x),
@@ -2293,15 +2322,33 @@ public abstract class Entity extends Location implements Metadatable {
             return false;
         }
 
-        if (pos instanceof Position && ((Position) pos).level != null && ((Position) pos).level != this.level) {
-            if (!this.switchLevel(((Position) pos).getLevel())) {
-                return false;
-            }
-        }
+        if (pos instanceof Position) {
+            Level oldLevel = this.level;
+            Level newLevel = ((Position) pos).level;
 
-        this.x = pos.x;
-        this.y = pos.y;
-        this.z = pos.z;
+            if (newLevel != null && newLevel != oldLevel) {
+                if (!this.switchLevel(newLevel)) {
+                    return false;
+                }
+
+                this.x = pos.x;
+                this.y = pos.y;
+                this.z = pos.z;
+
+                // Dimension change
+                if (this.isPlayer && this.server.dimensionsEnabled && newLevel.getDimension() != oldLevel.getDimension()) {
+                    ((Player) this).setDimension(newLevel.getDimension());
+                }
+            } else {
+                this.x = pos.x;
+                this.y = pos.y;
+                this.z = pos.z;
+            }
+        } else {
+            this.x = pos.x;
+            this.y = pos.y;
+            this.z = pos.z;
+        }
 
         this.recalculateBoundingBox();
 
@@ -2656,5 +2703,22 @@ public abstract class Entity extends Location implements Metadatable {
 
     public float getMountedYOffset() {
         return getHeight() * 0.75F;
+    }
+
+    /**
+     * Check whether there is blocks above the entity
+     *
+     * @return no blocks above
+     */
+    public boolean canSeeSky() {
+        int px = this.getFloorX();
+        int py = this.getFloorY();
+        int pz = this.getFloorZ();
+        for (int i = 255; i >= py; i--) {
+            if (level.getBlockIdAt(chunk, px, i, pz) != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -128,7 +128,7 @@ public class EntityThrownTrident extends EntityProjectile {
         this.hadCollision = true;
         this.onHit();
         this.close();
-        if (trident != null && level.isThundering() && trident.hasEnchantment(Enchantment.ID_TRIDENT_CHANNELING) && level.canBlockSeeSky(this)) {
+        if (trident != null && level.isThundering() && trident.hasEnchantment(Enchantment.ID_TRIDENT_CHANNELING) && this.canSeeSky()) {
             EntityLightning bolt = new EntityLightning(this.getChunk(), getDefaultNBT(this));
             LightningStrikeEvent strikeEvent = new LightningStrikeEvent(level, bolt);
             server.getPluginManager().callEvent(strikeEvent);
@@ -140,11 +140,12 @@ public class EntityThrownTrident extends EntityProjectile {
             }
         }
         EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
-        newTrident.alreadyCollided = true;
-        newTrident.setItem(trident);
         if (this.getServer().suomiCraftPEMode()) {
             newTrident.namedTag = this.namedTag.clone();
         }
+        newTrident.alreadyCollided = true;
+        newTrident.pickupMode = this.pickupMode;
+        newTrident.setItem(this.trident);
         newTrident.spawnToAll();
     }
 

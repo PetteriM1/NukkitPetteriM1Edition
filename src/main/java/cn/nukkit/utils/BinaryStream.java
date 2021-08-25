@@ -429,7 +429,7 @@ public class BinaryStream {
 
     public Item getSlot(int protocolId) {
         if (protocolId >= ProtocolInfo.v1_16_220) {
-            return this.getSlotInternal(protocolId);
+            return this.getSlotNew(protocolId);
         }
 
         int runtimeId = this.getVarInt();
@@ -563,7 +563,7 @@ public class BinaryStream {
         return item;
     }
 
-    private Item getSlotInternal(int protocolId) {
+    private Item getSlotNew(int protocolId) {
         int runtimeId = this.getVarInt();
         if (runtimeId == 0) {
             return Item.get(0, 0, 0);
@@ -680,7 +680,7 @@ public class BinaryStream {
 
     public void putSlot(int protocolId, Item item, boolean crafting) {
         if (protocolId >= ProtocolInfo.v1_16_220) {
-            this.putSlotInternal(protocolId, item, crafting);
+            this.putSlotNew(protocolId, item, crafting);
             return;
         }
 
@@ -694,7 +694,10 @@ public class BinaryStream {
         // Multiversion: Replace unsupported items
         boolean saveOriginalID = false;
         if (!crafting) {
-            if (protocolId < ProtocolInfo.v1_16_0) {
+            if (runtimeId == Item.SPYGLASS) { // Protocol always < v1_16_220
+                saveOriginalID = true;
+                runtimeId = Item.INFO_UPDATE;
+            } else if (protocolId < ProtocolInfo.v1_16_0) {
                 if (runtimeId >= Item.LODESTONECOMPASS) {
                     saveOriginalID = true;
                     switch (runtimeId) {
@@ -725,12 +728,6 @@ public class BinaryStream {
                         case Item.NETHERITE_BOOTS:
                             runtimeId = Item.DIAMOND_BOOTS;
                             break;
-                        case Item.WARPED_FUNGUS_ON_A_STICK:
-                            runtimeId = Item.CARROT_ON_A_STICK;
-                            break;
-                        case Item.RECORD_PIGSTEP:
-                            runtimeId = Item.RECORD_13;
-                            break;
                         default:
                             runtimeId = Item.INFO_UPDATE;
                             break;
@@ -754,7 +751,12 @@ public class BinaryStream {
         int damage = item.hasMeta() ? item.getDamage() : -1;
         if (protocolId >= ProtocolInfo.v1_16_100) {
             RuntimeItemMapping mapping = RuntimeItems.getMapping(protocolId);
-            RuntimeEntry runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+            RuntimeEntry runtimeEntry;
+            if (runtimeId == Item.INFO_UPDATE) { // Fix unknown item mapping errors with 1.16.100+ item replacements
+                runtimeEntry = mapping.toRuntime(Item.INFO_UPDATE, item.getDamage());
+            } else {
+                runtimeEntry = mapping.toRuntime(item.getId(), item.getDamage());
+            }
             runtimeId = runtimeEntry.getRuntimeId();
             damage = runtimeEntry.isHasDamage() ? 0 : item.getDamage();
         }
@@ -794,11 +796,23 @@ public class BinaryStream {
 
         if (item.hasCompoundTag() ||
                 (isDurable && protocolId >= ProtocolInfo.v1_12_0) ||
-                (saveOriginalID && protocolId >= ProtocolInfo.v1_12_0)) {
+                saveOriginalID) {
             if (protocolId < ProtocolInfo.v1_12_0) {
-                byte[] nbt = item.getCompoundTag();
-                this.putLShort(nbt.length);
-                this.put(nbt);
+                if (saveOriginalID) {
+                    try {
+                        CompoundTag tag = item.hasCompoundTag() ? item.getNamedTag() : new CompoundTag();
+                        tag.putCompound(NukkitPetteriM1EditionTag, new CompoundTag().putInt("OriginalID", item.getId()));
+                        byte[] nbt = NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
+                        this.putLShort(nbt.length);
+                        this.put(nbt);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    byte[] nbt = item.getCompoundTag();
+                    this.putLShort(nbt.length);
+                    this.put(nbt);
+                }
             } else {
                 try {
                     // Hack for tool damage
@@ -847,7 +861,7 @@ public class BinaryStream {
         }
     }
 
-    private void putSlotInternal(int protocolId, Item item, boolean instanceItem) {
+    private void putSlotNew(int protocolId, Item item, boolean instanceItem) {
         if (item == null || item.getId() == 0) {
             this.putByte((byte) 0);
             return;
@@ -1095,6 +1109,20 @@ public class BinaryStream {
 
     public void putGameRules(int protocol, GameRules gameRules) {
         Map<GameRule, GameRules.Value> allGameRules = gameRules.getGameRules();
+        Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
+        allGameRules.forEach((gameRule, value) -> {
+            if (protocol > value.getMinProtocol()) {
+                rulesToSend.put(gameRule, value);
+            }
+        });
+        this.putUnsignedVarInt(rulesToSend.size());
+        rulesToSend.forEach((gameRule, value) -> {
+            putString(gameRule.getName().toLowerCase());
+            value.write(protocol, this);
+        });
+    }
+
+    public void putGameRulesMap(int protocol, Map<GameRule, GameRules.Value> allGameRules) {
         Map<GameRule, GameRules.Value> rulesToSend = new HashMap<>();
         allGameRules.forEach((gameRule, value) -> {
             if (protocol > value.getMinProtocol()) {

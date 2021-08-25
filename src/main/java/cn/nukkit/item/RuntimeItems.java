@@ -24,6 +24,7 @@ public class RuntimeItems {
     private static RuntimeItemMapping mapping361;
     private static RuntimeItemMapping mapping419;
     private static RuntimeItemMapping mapping440;
+    private static RuntimeItemMapping mapping448;
 
     private static boolean initialized;
 
@@ -62,15 +63,18 @@ public class RuntimeItems {
         mapping361 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_361.json", ProtocolInfo.v1_12_0);
         mapping419 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_419.json", ProtocolInfo.v1_16_100);
         mapping440 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_440.json", ProtocolInfo.v1_17_0);
+        mapping448 = new RuntimeItemMapping(mappingEntries, "runtime_item_states_448.json", ProtocolInfo.v1_17_10);
     }
 
     public static RuntimeItemMapping getMapping(int protocolId) {
-        if (protocolId < ProtocolInfo.v1_16_100) {
-            return mapping361;
-        } else if (protocolId < ProtocolInfo.v1_17_0) {
+        if (protocolId >= ProtocolInfo.v1_17_10) {
+            return mapping448;
+        } else if (protocolId >= ProtocolInfo.v1_17_0) {
+            return mapping440;
+        } else if (protocolId >= ProtocolInfo.v1_16_100) {
             return mapping419;
         }
-        return mapping440;
+        return mapping361;
     }
 
     public static int getLegacyIdFromLegacyString(String identifier) {

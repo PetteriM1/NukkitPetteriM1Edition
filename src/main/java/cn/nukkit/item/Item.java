@@ -315,6 +315,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
             list[WARPED_FUNGUS_ON_A_STICK] = ItemWarpedFungusOnAStick.class; //757
             list[RECORD_PIGSTEP] = ItemRecordPigstep.class; //759
+            list[SPYGLASS] = ItemSpyglass.class; //772
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
@@ -336,6 +337,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     private static final List<Item> creative389 = new ObjectArrayList<>();
     private static final List<Item> creative407 = new ObjectArrayList<>();
     private static final List<Item> creative440 = new ObjectArrayList<>();
+    private static final List<Item> creative448 = new ObjectArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -428,6 +430,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
         // New creative items mapping
         registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.v1_17_0, creative440);
+        registerCreativeItemsNew(ProtocolInfo.v1_17_10, ProtocolInfo.v1_17_10, creative448);
     }
 
     private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
@@ -435,7 +438,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creativeitems" + protocolId + ".json")) {
             itemsArray = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("items");
         } catch (Exception e) {
-            throw new AssertionError("Error loading required block states!");
+            throw new AssertionError("Error loading required block states!", e);
         }
 
         for (JsonElement element : itemsArray) {
@@ -458,6 +461,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item.creative389.clear();
         Item.creative407.clear();
         Item.creative440.clear();
+        Item.creative448.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -505,6 +509,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_16_200_51:
             case v1_16_200:
             case v1_16_210_50:
+            case v1_16_210_53:
             case v1_16_210:
             case v1_16_220:
             case v1_16_230_50:
@@ -513,6 +518,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 return new ArrayList<>(Item.creative407);
             case v1_17_0:
                 return new ArrayList<>(Item.creative440);
+            case v1_17_10:
+                return new ArrayList<>(Item.creative448);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
@@ -552,6 +559,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 break;
             case v1_17_0:
                 Item.creative440.add(item.clone());
+                break;
+            case v1_17_10:
+                Item.creative448.add(item.clone());
                 break;
             default:
                 throw new IllegalArgumentException("Tried to register creative items for unsupported protocol version: " + protocol);

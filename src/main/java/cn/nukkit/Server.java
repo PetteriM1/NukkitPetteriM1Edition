@@ -41,6 +41,7 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.metadata.EntityMetadataStore;
 import cn.nukkit.metadata.LevelMetadataStore;
 import cn.nukkit.metadata.PlayerMetadataStore;
+import cn.nukkit.metrics.NukkitMetrics;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
@@ -176,9 +177,22 @@ public class Server {
     private final Map<InetSocketAddress, Player> players = new HashMap<>();
     final Map<UUID, Player> playerList = new HashMap<>();
 
+    /**
+     * Worlds where automatic mob spawning is disabled.
+     */
     public static final List<String> disabledSpawnWorlds = new ArrayList<>();
+    /**
+     * Worlds where automatic saving is disabled.
+     */
     public static final List<String> nonAutoSaveWorlds = new ArrayList<>();
+    /**
+     * Worlds that have their own nether worlds.
+     */
     public static final List<String> multiNetherWorlds = new ArrayList<>();
+    /**
+     * Worlds where random block ticking is disabled.
+     */
+    public static final List<String> noTickingWorlds = new ArrayList<>();
 
     private static final Pattern uuidPattern = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
 
@@ -208,7 +222,6 @@ public class Server {
     private Watchdog watchdog;
     private final DB nameLookup;
     private PlayerDataSerializer playerDataSerializer;
-    public static List<String> noTickingWorlds = new ArrayList<>();
     private SpawnerTask spawnerTask;
     private final BatchingHelper batchingHelper;
 
@@ -216,6 +229,10 @@ public class Server {
      * The server's MOTD. Remember to call network.setName() when updated.
      */
     public String motd;
+    /**
+     * Disconnection message shown to players who are not allowed to join due to whitelist.
+     */
+    public String whitelistReason;
     /**
      * SuomiCraft PE optimizations enabled.
      */
@@ -695,6 +712,10 @@ public class Server {
             this.scheduler.scheduleDelayedRepeatingTask(this.spawnerTask, spawnerTicks, spawnerTicks);
         }
 
+        if (this.getPropertyBoolean("bstats-metrics", true)) {
+            new NukkitMetrics(this);
+        }
+
         // Check for updates
         CompletableFuture.runAsync(() -> {
             try {
@@ -1172,7 +1193,9 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol >= ProtocolInfo.v1_17_0) {
+        if (player.protocol >= ProtocolInfo.v1_17_10) {
+            player.dataPacket(CraftingManager.packet448);
+        } else if (player.protocol >= ProtocolInfo.v1_17_0) {
             player.dataPacket(CraftingManager.packet440);
         } else if (player.protocol >= ProtocolInfo.v1_16_220) {
             player.dataPacket(CraftingManager.packet431);
@@ -2876,7 +2899,7 @@ public class Server {
         this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
         this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
         this.achievementsEnabled = this.getPropertyBoolean("achievements", true);
-        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", false);
+        this.dimensionsEnabled = this.getPropertyBoolean("dimensions", true);
         this.banXBAuthFailed = this.getPropertyBoolean("temp-ip-ban-failed-xbox-auth", false);
         this.pvpEnabled = this.getPropertyBoolean("pvp", true);
         this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", false);
@@ -2920,6 +2943,7 @@ public class Server {
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
         this.updateChecks = this.getPropertyBoolean("update-notifications", true);
         this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
+        this.whitelistReason = this.getPropertyString("whitelist-reason", "§cServer is white-listed").replace("§n", "\n");
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -3034,7 +3058,7 @@ public class Server {
             put("timeout-milliseconds", 25000);
             put("multiversion-min-protocol", 0);
             put("vanilla-bossbars", false);
-            put("dimensions", false);
+            put("dimensions", true);
             put("whitelist-reason", "§cServer is white-listed");
             put("chemistry-resources-enabled", false);
             put("strong-ip-bans", false);
@@ -3055,6 +3079,7 @@ public class Server {
             put("multi-nether-worlds", "");
             put("call-entity-motion-event", true);
             put("update-notifications", true);
+            put("bstats-metrics", true);
         }
     }
 

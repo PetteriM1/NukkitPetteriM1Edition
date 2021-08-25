@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Player;
 import cn.nukkit.entity.mob.*;
+import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.io.*;
@@ -23,6 +25,10 @@ public class Utils {
      * A SplittableRandom you can use without having to create a new object every time.
      */
     public static final SplittableRandom random = new SplittableRandom();
+    /**
+     * A NukkitRandom you can use without having to create a new object every time.
+     */
+    public static final NukkitRandom nukkitRandom = new NukkitRandom();
     /**
      * An empty damage array used when mobs have no attack damage.
      */
@@ -345,7 +351,7 @@ public class Utils {
     }
 
     /**
-     * Get game version string by protocol version
+     * Get game version string by protocol version.
      * For internal usage!
      * Starting from 388 / 1.13.0
      *
@@ -373,6 +379,7 @@ public class Utils {
             case ProtocolInfo.v1_16_200:
                 return "1.16.200";
             case ProtocolInfo.v1_16_210_50:
+            case ProtocolInfo.v1_16_210_53:
             case ProtocolInfo.v1_16_210:
                 return "1.16.210";
             case ProtocolInfo.v1_16_220:
@@ -383,8 +390,52 @@ public class Utils {
                 return "1.16.230";
             case ProtocolInfo.v1_17_0:
                 return "1.17.0";
+            case ProtocolInfo.v1_17_10:
+                return "1.17.10";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
+        }
+    }
+
+    /**
+     * Get player's operating system/device name from login chain data.
+     * NOTICE: It's possible to spoof this.
+     *
+     * @param player player
+     * @return operating system/device name
+     */
+    public static String getOS(Player player) {
+        switch(player.getLoginChainData().getDeviceOS()) {
+            case 1:
+                return "Android";
+            case 2:
+                return "iOS";
+            case 3:
+                return "macOS";
+            case 4:
+                return "Fire";
+            case 5:
+                return "Gear VR";
+            case 6:
+                return "HoloLens";
+            case 7:
+                return "Windows 10";
+            case 8:
+                return "Windows";
+            case 9:
+                return "Dedicated";
+            case 10:
+                return "tvOS";
+            case 11:
+                return "PlayStation";
+            case 12:
+                return "Switch";
+            case 13:
+                return "Xbox";
+            case 14:
+                return "Windows Phone";
+            default:
+                return "Unknown";
         }
     }
 }

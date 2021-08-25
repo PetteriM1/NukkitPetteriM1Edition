@@ -1,7 +1,10 @@
 package cn.nukkit.network.protocol;
 
+import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GameRules;
 import lombok.ToString;
+
+import java.util.Map;
 
 /**
  * @author MagicDroidX
@@ -18,6 +21,7 @@ public class GameRulesChangedPacket extends DataPacket {
     }
 
     public GameRules gameRules;
+    public Map<GameRule, GameRules.Value> gameRulesMap;
 
     @Override
     public void decode() {
@@ -26,6 +30,10 @@ public class GameRulesChangedPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        putGameRules(protocol, gameRules);
+        if (gameRulesMap == null) { // For compatibility
+            putGameRules(protocol, gameRules);
+        } else {
+            putGameRulesMap(protocol, gameRulesMap);
+        }
     }
 }

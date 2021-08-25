@@ -1,6 +1,7 @@
 package com.nukkitx.network.raknet;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.Server;
 import com.nukkitx.network.SessionConnection;
 import com.nukkitx.network.raknet.util.*;
 import com.nukkitx.network.util.DisconnectReason;
@@ -236,6 +237,9 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
                 buffer.readerIndex(0);
                 this.onRakNetDatagram(buffer);
             }
+        } catch (Exception ex) {
+            Server.getInstance().getLogger().error("Received bad datagram from " + this.address, ex);
+            this.disconnect(DisconnectReason.BAD_PACKET);
         } finally {
             buffer.release();
         }

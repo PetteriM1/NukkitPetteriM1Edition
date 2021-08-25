@@ -6,6 +6,7 @@ import cn.nukkit.blockentity.BlockEntityChest;
 import cn.nukkit.entity.mob.EntitySkeleton;
 import cn.nukkit.entity.mob.EntitySpider;
 import cn.nukkit.entity.mob.EntityZombie;
+import cn.nukkit.inventory.Inventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.level.ChunkManager;
@@ -118,9 +119,12 @@ public class PopulatorDungeon extends Populator {
                                 level.setBlockAt(tx, y, tz, CHEST, 2);
                                 Vector3 vec = new Vector3(tx, y, tz);
                                 FullChunk ck = level.getChunk(vec.getChunkX(), vec.getChunkZ());
-                                BlockEntityChest be = (BlockEntityChest) BlockEntity.createBlockEntity(BlockEntity.CHEST, ck, BlockEntity.getDefaultCompound(vec, BlockEntity.CHEST));
-                                be.getInventory().setContents(getChestLoot(be.getInventory().getSize()));
-                                ck.addBlockEntity(be);
+                                BlockEntity be = BlockEntity.createBlockEntity(BlockEntity.CHEST, ck, BlockEntity.getDefaultCompound(vec, BlockEntity.CHEST));
+                                if (be != null) {
+                                    Inventory inv = ((BlockEntityChest) be).getInventory();
+                                    inv.setContents(getChestLoot(inv.getSize()));
+                                    ck.addBlockEntity(be);
+                                }
                                 break;
                             }
                         }

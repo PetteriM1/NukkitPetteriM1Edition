@@ -1,7 +1,6 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.IntPositionEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
@@ -29,7 +28,6 @@ public class EntityHuman extends EntityHumanType {
     public static final int DATA_PLAYER_FLAG_DEAD = 2;
 
     public static final int DATA_PLAYER_FLAGS = 26;
-
     public static final int DATA_PLAYER_BUTTON_TEXT = 40;
 
     protected UUID uuid;
@@ -59,7 +57,7 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getEyeHeight() {
-        return isSwimming() || isGliding() ? 0.58f : 1.62f;
+        return isSwimming() || isGliding() ? 0.42f : 1.62f;
     }
 
     @Override
@@ -356,24 +354,16 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
-    public void setSwimming(boolean value) {
-        boolean oldValue = isSwimming();
-        super.setSwimming(value);
-        if (value != oldValue) {
-            setDataProperty(new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight()), true);
-        }
-    }
-
-    @Override
     protected void onBlock(Entity entity, boolean animate, float damage) {
         super.onBlock(entity, animate, damage);
         Item shieldOffhand = getOffhandInventory().getItem(0);
         if (shieldOffhand.getId() == ItemID.SHIELD) {
             getOffhandInventory().setItem(0, damageArmor(shieldOffhand, entity, damage, true, null));
-        }
-        Item shield = getInventory().getItemInHand();
-        if (shield.getId() == ItemID.SHIELD) {
-            getInventory().setItemInHand(damageArmor(shield, entity, damage, true, null));
+        } else {
+            Item shield = getInventory().getItemInHand();
+            if (shield.getId() == ItemID.SHIELD) {
+                getInventory().setItemInHand(damageArmor(shield, entity, damage, true, null));
+            }
         }
     }
 }

@@ -709,8 +709,9 @@ public class Level implements ChunkManager, Metadatable {
 
     public Map<Integer, Player> getChunkPlayers(int chunkX, int chunkZ) {
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.playerLoaders.containsKey(index)) {
-            return new HashMap<>(this.playerLoaders.get(index));
+        Map<Integer, Player> map = this.playerLoaders.get(index);
+        if (map != null) {
+            return new HashMap<>(map);
         } else {
             return new HashMap<>();
         }
@@ -718,8 +719,9 @@ public class Level implements ChunkManager, Metadatable {
 
     public ChunkLoader[] getChunkLoaders(int chunkX, int chunkZ) {
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (this.chunkLoaders.containsKey(index)) {
-            return this.chunkLoaders.get(index).values().toArray(new ChunkLoader[0]);
+        Map<Integer, ChunkLoader> map = this.chunkLoaders.get(index);
+        if (map != null) {
+            return map.values().toArray(new ChunkLoader[0]);
         } else {
             return new ChunkLoader[0];
         }
@@ -740,16 +742,24 @@ public class Level implements ChunkManager, Metadatable {
     public void registerChunkLoader(ChunkLoader loader, int chunkX, int chunkZ, boolean autoLoad) {
         int hash = loader.getLoaderId();
         long index = Level.chunkHash(chunkX, chunkZ);
-        if (!this.chunkLoaders.containsKey(index)) {
-            this.chunkLoaders.put(index, new HashMap<>());
-            this.playerLoaders.put(index, new HashMap<>());
-        } else if (this.chunkLoaders.get(index).containsKey(hash)) {
-            return;
-        }
 
-        this.chunkLoaders.get(index).put(hash, loader);
-        if (loader instanceof Player) {
-            this.playerLoaders.get(index).put(hash, (Player) loader);
+        Map<Integer, ChunkLoader> map = this.chunkLoaders.get(index);
+        if (map == null) {
+            Map<Integer, ChunkLoader> newChunkLoader = new HashMap<>();
+            newChunkLoader.put(hash, loader);
+            this.chunkLoaders.put(index, newChunkLoader);
+            Map<Integer, Player> newPlayerLoader = new HashMap<>();
+            if (loader instanceof Player) {
+                newPlayerLoader.put(hash, (Player) loader);
+            }
+            this.playerLoaders.put(index, newPlayerLoader);
+        } else if (map.containsKey(hash)) {
+            return;
+        } else {
+            this.chunkLoaders.get(index).put(hash, loader);
+            if (loader instanceof Player) {
+                this.playerLoaders.get(index).put(hash, (Player) loader);
+            }
         }
 
         if (!this.loaders.containsKey(hash)) {
@@ -795,7 +805,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public void checkTime() {
         if (!this.stopTime && this.gameRules.getBoolean(GameRule.DO_DAYLIGHT_CYCLE)) {
-            this.time = (this.time + 1) % TIME_FULL;
+            this.time = (this.time + tickRate) % TIME_FULL;
         }
     }
 
@@ -964,7 +974,7 @@ public class Level implements ChunkManager, Metadatable {
 
         if (gameRules.isStale()) {
             GameRulesChangedPacket packet = new GameRulesChangedPacket();
-            packet.gameRules = gameRules;
+            packet.gameRulesMap = gameRules.getGameRules();
             Server.broadcastPacket(players.values().toArray(new Player[0]), packet);
             gameRules.refresh();
         }
@@ -1016,7 +1026,7 @@ public class Level implements ChunkManager, Metadatable {
         List<Entity> list = new ArrayList<>();
 
         for (Entity entity : this.getCollidingEntities(axisalignedbb)) {
-            if (entity.isAlive() && canBlockSeeSky(entity)) {
+            if (entity.isAlive() && entity.canSeeSky()) {
                 list.add(entity);
             }
         }
@@ -3060,6 +3070,7 @@ public class Level implements ChunkManager, Metadatable {
         pk.x = pos.getFloorX();
         pk.y = pos.getFloorY();
         pk.z = pos.getFloorZ();
+        pk.dimension = this.getDimension();
         for (Player p : getPlayers().values()) p.dataPacket(pk);
     }
 
@@ -3238,7 +3249,8 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean isChunkInUse(long hash) {
-        return this.chunkLoaders.containsKey(hash) && !this.chunkLoaders.get(hash).isEmpty();
+        Map<Integer, ChunkLoader> map = this.chunkLoaders.get(hash);
+        return map != null && !map.isEmpty();
     }
 
     public boolean loadChunk(int x, int z) {
@@ -3992,7 +4004,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean shouldMobBurn(BaseEntity entity) {
         int time = this.getTime() % TIME_FULL;
-        return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
+        return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && entity.canSeeSky();
     }
 
     public boolean isMobSpawningAllowed() {
@@ -4000,6 +4012,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public boolean createPortal(Block target, boolean fireCharge) {
+        if (this.dimension == DIMENSION_THE_END) return false;
         final int maxPortalSize = 23;
         final int targX = target.getFloorX();
         final int targY = target.getFloorY();
@@ -4251,7 +4264,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_17_0) {
+        if (protocol >= ProtocolInfo.v1_17_10) {
+            return ProtocolInfo.v1_17_10;
+        } else if (protocol >= ProtocolInfo.v1_17_0) {
             return ProtocolInfo.v1_17_0;
         } else if (protocol >= ProtocolInfo.v1_16_210) {
             return ProtocolInfo.v1_16_210;
@@ -4283,7 +4298,8 @@ public class Level implements ChunkManager, Metadatable {
             if (player >= ProtocolInfo.v1_16_100) if (player < ProtocolInfo.v1_16_210) return true;
         if (chunk == ProtocolInfo.v1_16_210)
             if (player >= ProtocolInfo.v1_16_210) if (player < ProtocolInfo.v1_17_0) return true;
-        if (chunk == ProtocolInfo.v1_17_0) if (player >= ProtocolInfo.v1_17_0) return true;
+        if (chunk == ProtocolInfo.v1_17_0) if (player == ProtocolInfo.v1_17_0) return true;
+        if (chunk == ProtocolInfo.v1_17_10) if (player >= ProtocolInfo.v1_17_10) return true;
         return false; // Remember to update when block palette changes
     }
 

@@ -27,15 +27,16 @@ public class CraftingManager {
     private final Collection<Recipe> recipes332 = new ArrayDeque<>();
     public final Collection<Recipe> recipes = new ArrayDeque<>();
 
-    public static BatchPacket packet313 = null;
-    public static BatchPacket packet340 = null;
-    public static BatchPacket packet361 = null;
-    public static BatchPacket packet354 = null;
-    public static BatchPacket packet388 = null;
-    public static BatchPacket packet407 = null;
-    public static DataPacket packet419 = null;
-    public static DataPacket packet431 = null;
-    public static DataPacket packet440 = null;
+    public static BatchPacket packet313;
+    public static BatchPacket packet340;
+    public static BatchPacket packet361;
+    public static BatchPacket packet354;
+    public static BatchPacket packet388;
+    public static BatchPacket packet407;
+    public static DataPacket packet419;
+    public static DataPacket packet431;
+    public static DataPacket packet440;
+    public static DataPacket packet448;
 
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes313 = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes332 = new Int2ObjectOpenHashMap<>();
@@ -308,6 +309,31 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
+        CraftingDataPacket pk448 = new CraftingDataPacket();
+        pk448.protocol = 448;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk448.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk448.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk448.addShapedRecipe(charcoalTorchRecipe419);
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk448.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            pk448.addMultiRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk448.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk448.addContainerRecipe(recipe);
+        }
+        pk448.tryEncode();
+        packet448 = pk448;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk440 = new CraftingDataPacket();
         pk440.protocol = 440;
         for (Recipe recipe : this.recipes) {

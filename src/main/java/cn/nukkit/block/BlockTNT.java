@@ -5,16 +5,17 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.entity.projectile.EntityArrow;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.sound.TNTPrimeSound;
-import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Utils;
 
 /**
  * Created on 2015/12/8 by xtypr.
@@ -67,7 +68,7 @@ public class BlockTNT extends BlockSolid {
 
     public void prime(int fuse, Entity source) {
         this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
-        double mot = (new NukkitRandom()).nextSignedFloat() * 6.283185307179586;
+        double mot = Utils.nukkitRandom.nextSignedFloat() * 6.283185307179586;
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos")
                         .add(new DoubleTag("", this.x + 0.5))
@@ -109,7 +110,7 @@ public class BlockTNT extends BlockSolid {
             this.level.addSoundToViewers(this, Sound.MOB_GHAST_FIREBALL);
             this.prime(80, player);
             return true;
-        } else if (item.hasEnchantment(Enchantment.ID_FIRE_ASPECT)) {
+        } else if (item instanceof ItemTool && item.hasEnchantment(Enchantment.ID_FIRE_ASPECT)) {
             item.useOn(this);
             this.prime(80, player);
             return true;
