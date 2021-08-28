@@ -92,16 +92,8 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     protected void initEntity() {
-        this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true);
-
-        // HACK: Fix gravity on 1.2.11 and lower
-        if (this instanceof Player) {
-            if (((Player) this).protocol <= 201) {
-                this.setDataFlagSelfOnly(DATA_FLAGS, 46, true);
-            }
-        }
-
+        this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false, false);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true, false);
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0), false);
 
         if (!(this instanceof Player)) {
@@ -202,6 +194,11 @@ public class EntityHuman extends EntityHumanType {
 
             this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.skin
                     .getSkinData().data, this.getNameTag().getBytes(StandardCharsets.UTF_8));
+        } else {
+            // HACK: Fix gravity on 1.2.11 and lower
+            if (((Player) this).protocol <= 201) {
+                this.setDataFlag(DATA_FLAGS, 46, true, false);
+            }
         }
 
         super.initEntity();

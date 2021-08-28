@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
@@ -72,6 +73,9 @@ public class BlockChorusPlant extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
         return Utils.rand() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : new Item[0];
     }
 

@@ -13,6 +13,7 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.event.player.PlayerFishEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBookEnchanted;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.randomitem.Fishing;
 import cn.nukkit.level.MovingObjectPosition;
@@ -237,6 +238,12 @@ public class EntityFishingHook extends EntityProjectile {
 		if (this.shootingEntity instanceof Player && this.caught) {
 			Player player = (Player) this.shootingEntity;
 			Item item = Fishing.getFishingResult(this.rod);
+			if (item instanceof ItemBookEnchanted) {
+				if (!item.hasEnchantments()) {
+					item = item.clone();
+					item.addEnchantment(Enchantment.getEnchantment(Utils.rand(0, 36)));
+				}
+			}
 			int experience = Utils.random.nextInt(3) + 1;
 			Vector3 motion = player.subtract(this).multiply(0.1);
 			motion.y += Math.sqrt(player.distance(this)) * 0.08;

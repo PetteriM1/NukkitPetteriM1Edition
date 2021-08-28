@@ -30,6 +30,8 @@ public class EntityFirework extends Entity {
 
     @Override
     public void initEntity() {
+        super.initEntity();
+
         ThreadLocalRandom rand = ThreadLocalRandom.current();
         this.lifetime = 30 + rand.nextInt(6) + rand.nextInt(7);
 

@@ -9,7 +9,9 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Erik Miller | EinBexiii
@@ -29,7 +31,7 @@ public class EntityHoglin extends EntityWalkingMob {
 
     @Override
     public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
+        return Utils.rand(1, 3);
     }
 
     @Override
@@ -68,5 +70,22 @@ public class EntityHoglin extends EntityWalkingMob {
             }
             player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
         }
+    }
+
+    @Override
+    public Item[] getDrops() {
+        List<Item> drops = new ArrayList<>();
+
+        if (!this.isBaby()) {
+            for (int i = 0; i < Utils.rand(2, 4); i++) {
+                drops.add(Item.get(this.isOnFire() ? Item.COOKED_PORKCHOP : Item.RAW_PORKCHOP, 0, 1));
+            }
+
+            if (Utils.rand()) {
+                drops.add(Item.get(Item.LEATHER));
+            }
+        }
+
+        return drops.toArray(new Item[0]);
     }
 }

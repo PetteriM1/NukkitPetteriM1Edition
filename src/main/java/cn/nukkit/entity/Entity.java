@@ -446,6 +446,10 @@ public abstract class Entity extends Location implements Metadatable {
         this.dataProperties.putInt(DATA_HEALTH, (int) this.health);
 
         this.scheduleUpdate();
+
+        if (this.isPlayer) {
+            this.sendData((Player) this);
+        }
     }
 
     protected final void init(FullChunk chunk, CompoundTag nbt) {
