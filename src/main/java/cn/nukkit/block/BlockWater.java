@@ -9,6 +9,8 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * @author MagicDroidX
  * Nukkit Project
@@ -78,7 +80,7 @@ public class BlockWater extends BlockLiquid {
                 freezing = Utils.freezingBiomes.contains(level.getBiomeId((int) this.x, (int) this.z)) ? (byte) 2 : (byte) 1;
             }
             if (freezing == 2) {
-                if (Utils.rand(1, 5) == 2 && level.getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && level.canBlockSeeSky(this)) {
+                if (ThreadLocalRandom.current().nextInt(10) == 0 && level.getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12 && level.canBlockSeeSky(this)) {
                     WaterFrostEvent ev = new WaterFrostEvent(this);
                     level.getServer().getPluginManager().callEvent(ev);
                     if (!ev.isCancelled()) {
