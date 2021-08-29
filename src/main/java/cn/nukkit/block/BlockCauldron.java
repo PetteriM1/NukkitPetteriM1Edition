@@ -6,22 +6,31 @@ import cn.nukkit.blockentity.BlockEntityCauldron;
 import cn.nukkit.event.player.PlayerBucketEmptyEvent;
 import cn.nukkit.event.player.PlayerBucketFillEvent;
 import cn.nukkit.item.*;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.SmokeParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.MathHelper;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.Tag;
+import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.Utils;
 
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author CreeperFace
  * Nukkit Project
  */
 public class BlockCauldron extends BlockSolidMeta {
+
+    /**
+     * Used to cache biome check for freezing
+     * 1 = can't freeze, 2 = can freeze
+     */
+    private byte freezing;
 
     public BlockCauldron() {
         super(0);
@@ -255,6 +264,16 @@ public class BlockCauldron extends BlockSolidMeta {
 
                 this.getLevel().addSoundToViewers(this, Sound.CAULDRON_TAKEPOTION);
                 break;
+            case BlockID.SHULKER_BOX:
+                if (isEmpty() || cauldron.isCustomColor() || cauldron.hasPotion()) {
+                    break;
+                }
+
+                player.getInventory().setItemInHand(Item.get(Item.UNDYED_SHULKER_BOX).setCompoundTag(item.getCompoundTag()));
+                setFillLevel(getFillLevel() - 1);
+                this.level.setBlock(this, this, true);
+                this.getLevel().addSoundToViewers(this, Sound.CAULDRON_TAKEPOTION);
+                break;
             default:
                 return true;
         }
@@ -307,6 +326,21 @@ public class BlockCauldron extends BlockSolidMeta {
         }
 
         return new Item[0];
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_RANDOM && level.isRaining() && !this.isFull()) {
+            if (freezing < 1) {
+                freezing = Utils.freezingBiomes.contains(level.getBiomeId((int) this.x, (int) this.z)) ? (byte) 2 : (byte) 1;
+            }
+            if (freezing == 1 && ThreadLocalRandom.current().nextInt(20) == 0 && level.canBlockSeeSky(this)) {
+                this.setFillLevel(this.getFillLevel() + 1);
+                this.getLevel().setBlock(this, this, true, true);
+                return Level.BLOCK_UPDATE_RANDOM;
+            }
+        }
+        return super.onUpdate(type);
     }
 
     @Override

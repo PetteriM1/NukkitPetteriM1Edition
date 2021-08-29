@@ -76,12 +76,12 @@ public class BlockRailDetector extends BlockRail {
         boolean isPowered = false;
         boolean changed = false;
 
-        for (Entity entity : level.getNearbyEntities(new AxisAlignedBB(
+        for (Entity entity : level.getCollidingEntities(new AxisAlignedBB(
                 getFloorX() + 0.125D,
                 getFloorY(),
                 getFloorZ() + 0.125D,
                 getFloorX() + 0.875D,
-                getFloorY() + 0.525D,
+                getFloorY() + 0.750D,
                 getFloorZ() + 0.875D))) {
             if (entity instanceof EntityMinecartAbstract) {
                 isPowered = true;

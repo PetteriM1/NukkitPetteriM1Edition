@@ -4,13 +4,18 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.network.protocol.ProtocolInfo;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.SplittableRandom;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,7 +41,11 @@ public class Utils {
     /**
      * List of network ids of monsters. Currently used for example to check which entities will make players unable to sleep when nearby the bed.
      */
-    public static final List<Integer> monstersList = Arrays.asList(EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGhast.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHoglin.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityRavager.NETWORK_ID, EntityShulker.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntitySlime.NETWORK_ID, EntitySpider.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombiePigman.NETWORK_ID, EntityZombieVillager.NETWORK_ID, EntityZombieVillagerV2.NETWORK_ID);
+    public static final IntSet monstersList = new IntOpenHashSet(Arrays.asList(EntityBlaze.NETWORK_ID, EntityCaveSpider.NETWORK_ID, EntityCreeper.NETWORK_ID, EntityDrowned.NETWORK_ID, EntityElderGuardian.NETWORK_ID, EntityEnderman.NETWORK_ID, EntityEndermite.NETWORK_ID, EntityEvoker.NETWORK_ID, EntityGhast.NETWORK_ID, EntityGuardian.NETWORK_ID, EntityHoglin.NETWORK_ID, EntityHusk.NETWORK_ID, EntityPiglinBrute.NETWORK_ID, EntityPillager.NETWORK_ID, EntityRavager.NETWORK_ID, EntityShulker.NETWORK_ID, EntitySilverfish.NETWORK_ID, EntitySkeleton.NETWORK_ID, EntitySlime.NETWORK_ID, EntitySpider.NETWORK_ID, EntityStray.NETWORK_ID, EntityVex.NETWORK_ID, EntityVindicator.NETWORK_ID, EntityWitch.NETWORK_ID, EntityWither.NETWORK_ID, EntityWitherSkeleton.NETWORK_ID, EntityZoglin.NETWORK_ID, EntityZombie.NETWORK_ID, EntityZombiePigman.NETWORK_ID, EntityZombieVillager.NETWORK_ID, EntityZombieVillagerV2.NETWORK_ID));
+    /**
+     * List of biomes where water can freeze
+     */
+    public static final IntSet freezingBiomes = new IntOpenHashSet(Arrays.asList(10, 11, 12, 26, 30, 31, 140, 158));
 
     public static void writeFile(String fileName, String content) throws IOException {
         writeFile(fileName, new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));

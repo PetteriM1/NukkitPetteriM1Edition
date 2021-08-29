@@ -151,7 +151,7 @@ public class EntityThrownTrident extends EntityProjectile {
 
     @Override
     public void onHit() {
-        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT);
     }
 
     public int getPickupMode() {

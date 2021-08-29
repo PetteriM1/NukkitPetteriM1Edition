@@ -883,18 +883,23 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 ++count;
 
-                this.usedChunks.put(index, false);
-                this.level.registerChunkLoader(this, chunkX, chunkZ, false);
+                try {
+                    this.usedChunks.put(index, false);
+                    this.level.registerChunkLoader(this, chunkX, chunkZ, false);
 
-                if (!this.level.populateChunk(chunkX, chunkZ)) {
-                    if (this.spawned && this.teleportPosition == null) {
-                        continue;
-                    } else {
-                        break;
+                    if (!this.level.populateChunk(chunkX, chunkZ)) {
+                        if (this.spawned && this.teleportPosition == null) {
+                            continue;
+                        } else {
+                            break;
+                        }
                     }
-                }
 
-                iter.remove();
+                    iter.remove();
+                } catch (Exception ex) {
+                    server.getLogger().logException(ex);
+                    return;
+                }
 
                 PlayerChunkRequestEvent ev = new PlayerChunkRequestEvent(this, chunkX, chunkZ);
                 this.server.getPluginManager().callEvent(ev);
