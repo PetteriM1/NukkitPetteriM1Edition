@@ -84,7 +84,7 @@ public class RuntimeItemMapping {
 
             this.runtime2Legacy.put(runtimeId, legacyEntry);
             this.identifier2Legacy.put(identifier, legacyEntry);
-            this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage, false));
+            this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, runtimeId, hasDamage));
         }
 
         this.generatePalette();
@@ -133,7 +133,7 @@ public class RuntimeItemMapping {
 
         this.runtime2Legacy.put(legacyId, legacyEntry);
         this.identifier2Legacy.put(identifier, legacyEntry);
-        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false, false));
+        this.legacy2Runtime.put(fullId, new RuntimeEntry(identifier, legacyId, false));
     }
 
     private void generatePalette() {
@@ -259,5 +259,16 @@ public class RuntimeItemMapping {
         private final int runtimeId;
         private final boolean hasDamage;
         private final boolean isCustomItem;
+
+        public RuntimeEntry(String identifier, int runtimeId, boolean hasDamage) {
+            this(identifier, runtimeId, hasDamage, false);
+        }
+
+        public RuntimeEntry(String identifier, int runtimeId, boolean hasDamage, boolean isCustomItem) {
+            this.identifier = identifier;
+            this.runtimeId = runtimeId;
+            this.hasDamage = hasDamage;
+            this.isCustomItem = isCustomItem;
+        }
     }
 }
