@@ -5,7 +5,6 @@ import cn.nukkit.network.protocol.LoginPacket;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
 
@@ -269,8 +268,9 @@ public final class ClientChainData implements LoginChainData {
     private static boolean verifyChain(List<String> chains) throws Exception {
         ECPublicKey lastKey = null;
         boolean mojangKeyVerified = false;
-        for (String chain : chains) {
-            JWSObject jws = JWSObject.parse(chain);
+        Iterator<String> iterator = chains.iterator();
+        while (iterator.hasNext()) {
+            JWSObject jws = JWSObject.parse(iterator.next());
 
             URI x5u = jws.getHeader().getX509CertURL();
             if (x5u == null) {
@@ -285,25 +285,25 @@ public final class ClientChainData implements LoginChainData {
                 return false;
             }
 
-            if (!verify(lastKey, jws)) {
+            if (!jws.verify(new ECDSAVerifier(lastKey))) {
                 return false;
+            }
+
+            if (mojangKeyVerified) {
+                return !iterator.hasNext();
             }
 
             if (lastKey.equals(MOJANG_PUBLIC_KEY)) {
                 mojangKeyVerified = true;
             }
 
-            String base64key = jws.getPayload().toJSONObject().getAsString("identityPublicKey");
-            if (base64key == null) {
+            Object base64key = jws.getPayload().toJSONObject().get("identityPublicKey");
+            if (!(base64key instanceof String)) {
                 throw new RuntimeException("No key found");
             }
-            lastKey = generateKey(base64key);
+            lastKey = generateKey((String) base64key);
         }
         return mojangKeyVerified;
-    }
-
-    private static boolean verify(ECPublicKey key, JWSObject object) throws JOSEException {
-        return object.verify(new ECDSAVerifier(key));
     }
 
     private static class MapTypeToken extends TypeToken<Map<String, List<String>>> {
