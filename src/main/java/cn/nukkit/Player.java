@@ -2593,35 +2593,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    Player playerInstance = this;
                     this.verified = true;
 
-                    this.preLoginEventTask = new AsyncTask() {
-                        private PlayerAsyncPreLoginEvent event;
-
-                        @Override
-                        public void onRun() {
-                            this.event = new PlayerAsyncPreLoginEvent(playerInstance);
-                            server.getPluginManager().callEvent(this.event);
+                    Consumer<PlayerAsyncPreLoginEvent> callback = event -> {
+                        if (this.closed) {
+                            return;
                         }
 
-                        @Override
-                        public void onCompletion(Server server) {
-                            if (playerInstance.closed) {
-                                return;
-                            }
-
-                            if (this.event.getLoginResult() == LoginResult.KICK) {
-                                playerInstance.close(this.event.getKickMessage(), this.event.getKickMessage());
-                            } else if (playerInstance.shouldLogin) {
-                                playerInstance.completeLoginSequence();
-                                for (Consumer<Server> action : this.event.getScheduledActions()) {
-                                    action.accept(server);
-                                }
+                        if (event.getLoginResult() == LoginResult.KICK) {
+                            this.close(event.getKickMessage(), event.getKickMessage());
+                        } else if (this.shouldLogin) {
+                            this.completeLoginSequence();
+                            for (Consumer<Server> action : event.getScheduledActions()) {
+                                action.accept(server);
                             }
                         }
                     };
 
+                    this.preLoginEventTask = new PreLoginTask(new PlayerAsyncPreLoginEvent(this), this, callback);
                     this.server.getScheduler().scheduleAsyncTask(this.preLoginEventTask);
                     this.processLogin();
                     break;
@@ -5888,6 +5877,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void setTimeSinceRest(int timeSinceRest) {
         this.ticksSinceLastRest = timeSinceRest;
+    }
+
+    public boolean shouldLogin() {
+        return this.shouldLogin;
     }
 
     @Override

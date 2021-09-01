@@ -3,10 +3,12 @@ package cn.nukkit.event.player;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.HandlerList;
+import cn.nukkit.utils.CompletableFutureCombiner;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -26,6 +28,8 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
     private String kickMessage = "Plugin Reason";
 
     private final List<Consumer<Server>> scheduledActions = new ArrayList<>();
+
+    private CompletableFutureCombiner combiner;
 
     public PlayerAsyncPreLoginEvent(Player player) {
         this.player = player;
@@ -73,6 +77,17 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
 
     public List<Consumer<Server>> getScheduledActions() {
         return new ArrayList<>(scheduledActions);
+    }
+
+    public void addCompletableFuture(CompletableFuture<?> future) {
+        if (this.combiner == null) {
+            this.combiner  = new CompletableFutureCombiner();
+        }
+        this.combiner.addFuture(future);
+    }
+
+    public CompletableFutureCombiner getCombiner() {
+        return this.combiner;
     }
 
     public void allow() {
