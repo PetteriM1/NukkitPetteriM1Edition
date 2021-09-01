@@ -101,4 +101,9 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
             explode.explodeB();
         }
     }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "End Crystal";
+    }
 }

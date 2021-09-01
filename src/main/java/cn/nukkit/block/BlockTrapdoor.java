@@ -217,4 +217,9 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     public BlockFace getBlockFace() {
         return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
+
+    @Override
+    public boolean canPassThrough() {
+        return this.isOpen();
+    }
 }

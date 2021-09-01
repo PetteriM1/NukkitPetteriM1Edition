@@ -57,9 +57,9 @@ public class ItemEndCrystal extends Item {
 
         CompoundTag nbt = new CompoundTag()
                 .putList(new ListTag<DoubleTag>("Pos")
-                        .add(new DoubleTag("", block.getX() + 0.5))
-                        .add(new DoubleTag("", block.getY()))
-                        .add(new DoubleTag("", block.getZ() + 0.5)))
+                        .add(new DoubleTag("", target.x + 0.5))
+                        .add(new DoubleTag("", up.y))
+                        .add(new DoubleTag("", target.z + 0.5)))
                 .putList(new ListTag<DoubleTag>("Motion")
                         .add(new DoubleTag("", 0))
                         .add(new DoubleTag("", 0))
@@ -67,6 +67,10 @@ public class ItemEndCrystal extends Item {
                 .putList(new ListTag<FloatTag>("Rotation")
                         .add(new FloatTag("", ThreadLocalRandom.current().nextFloat() * 360))
                         .add(new FloatTag("", 0)));
+
+        if (this.hasCustomName()) {
+            nbt.putString("CustomName", this.getCustomName());
+        }
 
         Entity entity = Entity.createEntity("EndCrystal", chunk, nbt);
 

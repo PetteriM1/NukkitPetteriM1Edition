@@ -7,7 +7,6 @@ import cn.nukkit.item.ItemSeedsPumpkin;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
-import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.utils.Utils;
 
 /**
@@ -58,8 +57,7 @@ public class BlockStemPumpkin extends BlockCrops {
                             return Level.BLOCK_UPDATE_RANDOM;
                         }
                     }
-                    NukkitRandom random = new NukkitRandom();
-                    Block side = this.getSide(Plane.HORIZONTAL.random(random));
+                    Block side = this.getSide(Plane.HORIZONTAL.random(Utils.nukkitRandom));
                     Block d = side.down();
                     if (side.getId() == AIR && (d.getId() == FARMLAND || d.getId() == GRASS || d.getId() == DIRT)) {
                         BlockGrowEvent ev = new BlockGrowEvent(side, Block.get(PUMPKIN));

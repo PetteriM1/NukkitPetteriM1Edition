@@ -38,7 +38,11 @@ public class BiomeSelector {
                 }
             } else {
                 if (rainfall < 0f) {
-                    biome = EnumBiome.OCEAN;
+                    if (temperature < -0.4f) {
+                        biome = EnumBiome.FROZEN_OCEAN;
+                    } else {
+                        biome = EnumBiome.OCEAN;
+                    }
                 } else {
                     biome = EnumBiome.DEEP_OCEAN;
                 }

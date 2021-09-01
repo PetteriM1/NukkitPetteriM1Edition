@@ -318,6 +318,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[NETHERITE_SCRAP] = ItemScrapNetherite.class; //752
             list[WARPED_FUNGUS_ON_A_STICK] = ItemWarpedFungusOnAStick.class; //757
             list[RECORD_PIGSTEP] = ItemRecordPigstep.class; //759
+            list[SPYGLASS] = ItemSpyglass.class; //772
 
             if (Server.getInstance().minimumProtocol >= ProtocolInfo.v1_13_0){
                 list[KELP] = ItemKelp.class; //335

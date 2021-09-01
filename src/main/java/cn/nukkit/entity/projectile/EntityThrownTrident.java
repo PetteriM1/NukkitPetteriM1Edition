@@ -140,17 +140,18 @@ public class EntityThrownTrident extends EntityProjectile {
             }
         }
         EntityThrownTrident newTrident = (EntityThrownTrident) Entity.createEntity("ThrownTrident", this);
-        newTrident.alreadyCollided = true;
-        newTrident.setItem(trident);
         if (this.getServer().suomiCraftPEMode()) {
             newTrident.namedTag = this.namedTag.clone();
         }
+        newTrident.alreadyCollided = true;
+        newTrident.pickupMode = this.pickupMode;
+        newTrident.setItem(this.trident);
         newTrident.spawnToAll();
     }
 
     @Override
     public void onHit() {
-        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT_GROUND);
+        this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_ITEM_TRIDENT_HIT);
     }
 
     public int getPickupMode() {

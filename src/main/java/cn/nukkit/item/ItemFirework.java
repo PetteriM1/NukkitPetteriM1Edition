@@ -148,8 +148,8 @@ public class ItemFirework extends Item {
 
     public static class FireworkExplosion {
 
-        private List<DyeColor> colors = new ArrayList<>();
-        private List<DyeColor> fades = new ArrayList<>();
+        private final List<DyeColor> colors = new ArrayList<>();
+        private final List<DyeColor> fades = new ArrayList<>();
         private boolean flicker = false;
         private boolean trail = false;
         private ExplosionType type = ExplosionType.CREEPER_SHAPED;

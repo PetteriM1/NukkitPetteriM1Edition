@@ -1,7 +1,6 @@
 package cn.nukkit.entity;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.data.FloatEntityData;
 import cn.nukkit.entity.data.IntPositionEntityData;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.item.Item;
@@ -29,7 +28,6 @@ public class EntityHuman extends EntityHumanType {
     public static final int DATA_PLAYER_FLAG_DEAD = 2;
 
     public static final int DATA_PLAYER_FLAGS = 26;
-
     public static final int DATA_PLAYER_BUTTON_TEXT = 40;
 
     protected UUID uuid;
@@ -59,7 +57,7 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     public float getEyeHeight() {
-        return isSwimming() || isGliding() ? 0.58f : 1.62f;
+        return isSwimming() || isGliding() ? 0.42f : 1.62f;
     }
 
     @Override
@@ -94,16 +92,8 @@ public class EntityHuman extends EntityHumanType {
 
     @Override
     protected void initEntity() {
-        this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false);
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true);
-
-        // HACK: Fix gravity on 1.2.11 and lower
-        if (this instanceof Player) {
-            if (((Player) this).protocol <= 201) {
-                this.setDataFlagSelfOnly(DATA_FLAGS, 46, true);
-            }
-        }
-
+        this.setDataFlag(DATA_PLAYER_FLAGS, DATA_PLAYER_FLAG_SLEEP, false, false);
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_GRAVITY, true, false);
         this.setDataProperty(new IntPositionEntityData(DATA_PLAYER_BED_POSITION, 0, 0, 0), false);
 
         if (!(this instanceof Player)) {
@@ -204,6 +194,11 @@ public class EntityHuman extends EntityHumanType {
 
             this.uuid = Utils.dataToUUID(String.valueOf(this.getId()).getBytes(StandardCharsets.UTF_8), this.skin
                     .getSkinData().data, this.getNameTag().getBytes(StandardCharsets.UTF_8));
+        } else {
+            // HACK: Fix gravity on 1.2.11 and lower
+            if (((Player) this).protocol <= 201) {
+                this.setDataFlag(DATA_FLAGS, 46, true, false);
+            }
         }
 
         super.initEntity();
@@ -352,15 +347,6 @@ public class EntityHuman extends EntityHumanType {
             }
 
             super.close();
-        }
-    }
-
-    @Override
-    public void setSwimming(boolean value) {
-        boolean oldValue = isSwimming();
-        super.setSwimming(value);
-        if (value != oldValue) {
-            setDataProperty(new FloatEntityData(DATA_BOUNDING_BOX_HEIGHT, this.getHeight()), true);
         }
     }
 
