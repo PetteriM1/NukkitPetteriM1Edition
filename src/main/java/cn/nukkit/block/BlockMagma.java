@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -58,7 +59,8 @@ public class BlockMagma extends BlockSolid {
         if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
             if (entity instanceof Player) {
                 Player p = (Player) entity;
-                if (p.getInventory().getBootsFast().hasEnchantment(Enchantment.ID_FROST_WALKER)) {
+                PlayerInventory inv = p.getInventory();
+                if (inv == null || inv.getBootsFast().hasEnchantment(Enchantment.ID_FROST_WALKER)) {
                     return;
                 }
                 if (!p.isCreative() && !p.isSpectator() && !p.isSneaking()) {
