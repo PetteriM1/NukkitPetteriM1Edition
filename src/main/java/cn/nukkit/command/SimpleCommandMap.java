@@ -53,7 +53,6 @@ public class SimpleCommandMap implements CommandMap {
         this.register("nukkit", new SetWorldSpawnCommand("setworldspawn"));
         this.register("nukkit", new TeleportCommand("tp"));
         this.register("nukkit", new TimeCommand("time"));
-        this.register("nukkit", new TimingsCommand("timings"));
         this.register("nukkit", new ReloadCommand("reload"));
         this.register("nukkit", new WeatherCommand("weather"));
         this.register("nukkit", new XpCommand("xp"));
@@ -79,6 +78,7 @@ public class SimpleCommandMap implements CommandMap {
             this.register("nukkit", new PlaySoundCommand("playsound"));
             this.register("nukkit", new DebugPasteCommand("debugpaste"));
             this.register("nukkit", new GarbageCollectorCommand("gc"));
+            this.register("nukkit", new TimingsCommand("timings"));
         }
     }
 

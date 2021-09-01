@@ -337,12 +337,15 @@ public class EntityBoat extends EntityVehicle {
         if (entity.riding != null) {
             updatePassengers(true);
 
-            entity.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1));
-            entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90));
-            if (entity.isPlayer && ((Player) entity).protocol >= ProtocolInfo.v1_16_210) {
-                entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90));
+            entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1), !entity.isPlayer);
+            if (entity.isPlayer) {
+                entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90), false);
+                if (((Player) entity).protocol >= ProtocolInfo.v1_16_210) {
+                    entity.setDataProperty(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90), false);
+                }
+                entity.setDataProperty(new FloatEntityData(DATA_RIDER_MIN_ROTATION, this.passengers.indexOf(entity) == 1 ? -90 : 1), false);
+                entity.sendData(((Player) entity));
             }
-            entity.setDataPropertyAndSendOnlyToSelf(new FloatEntityData(DATA_RIDER_MIN_ROTATION, this.passengers.indexOf(entity) == 1 ? -90 : 1));
         }
 
         return r;
@@ -359,7 +362,11 @@ public class EntityBoat extends EntityVehicle {
 
         if (r) {
             updatePassengers();
-            entity.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
+            if (entity.isPlayer) {
+                entity.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
+            } else {
+                entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0), true);
+            }
         }
         return r;
     }

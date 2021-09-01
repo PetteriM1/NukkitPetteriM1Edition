@@ -10,7 +10,6 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.level.generator.object.ObjectTallGrass;
 import cn.nukkit.level.particle.BoneMealParticle;
-import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Utils;
@@ -52,7 +51,7 @@ public class BlockGrass extends BlockDirt {
     @Override
     public boolean onActivate(Item item, Player player) {
         if (item.getId() == Item.DYE && item.getDamage() == 0x0F) {
-            ObjectTallGrass.growGrass(this.getLevel(), this, new NukkitRandom());
+            ObjectTallGrass.growGrass(this.getLevel(), this, Utils.nukkitRandom);
             this.level.addParticle(new BoneMealParticle(this));
             if (player != null) {
                 if (!player.isCreative()) {

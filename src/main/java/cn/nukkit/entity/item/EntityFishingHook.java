@@ -13,6 +13,8 @@ import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.event.player.PlayerFishEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBookEnchanted;
+import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.item.randomitem.Fishing;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.format.FullChunk;
@@ -37,11 +39,12 @@ public class EntityFishingHook extends EntityProjectile {
 
 	public static final int NETWORK_ID = 77;
 
-	public int waitChance = 240;
+	public int waitChance = 120;
+	public int waitTimer = 240;
 	public boolean attracted = false;
 	public int attractTimer = 0;
 	public boolean caught = false;
-	public int coughtTimer = 0;
+	public int caughtTimer = 0;
 	public boolean canCollide = true;
 
 	public Vector3 fish = null;
@@ -59,8 +62,8 @@ public class EntityFishingHook extends EntityProjectile {
 	@Override
 	protected void initEntity() {
 		super.initEntity();
-		if (age > 0) {
-			close();
+		if (this.age > 0) {
+			this.close();
 		}
 	}
 
@@ -132,34 +135,39 @@ public class EntityFishingHook extends EntityProjectile {
 		}
 
 		if (inWater) {
+			if (this.waitTimer == 240) {
+				this.waitTimer = this.waitChance << 1;
+			} else if (this.waitTimer == 360) {
+				this.waitTimer = this.waitChance * 3;
+			}
 			if (!this.attracted) {
-				if (this.waitChance > 0) {
-					--this.waitChance;
+				if (this.waitTimer > 0) {
+					--this.waitTimer;
 				}
-				if (this.waitChance == 0) {
+				if (this.waitTimer == 0) {
 					if (Utils.random.nextInt(100) < 90) {
 						this.attractTimer = (Utils.random.nextInt(40) + 20);
 						this.spawnFish();
 						this.caught = false;
 						this.attracted = true;
 					} else {
-						this.waitChance = 120;
+						this.waitTimer = this.waitChance;
 					}
 				}
 			} else if (!this.caught) {
 				if (this.attractFish()) {
-					this.coughtTimer = (Utils.random.nextInt(20) + 30);
+					this.caughtTimer = (Utils.random.nextInt(20) + 30);
 					this.fishBites();
 					this.caught = true;
 				}
 			} else {
-				if (this.coughtTimer > 0) {
-					--this.coughtTimer;
+				if (this.caughtTimer > 0) {
+					--this.caughtTimer;
 				}
-				if (this.coughtTimer == 0) {
+				if (this.caughtTimer == 0) {
 					this.attracted = false;
 					this.caught = false;
-					this.waitChance = 360;
+					this.waitTimer = this.waitChance * 3;
 				}
 			}
 		}
@@ -181,7 +189,6 @@ public class EntityFishingHook extends EntityProjectile {
 
 	public void fishBites() {
 		Collection<Player> viewers = this.getViewers().values();
-
 
 		EntityEventPacket pk = new EntityEventPacket();
 		pk.eid = this.getId();
@@ -231,6 +238,12 @@ public class EntityFishingHook extends EntityProjectile {
 		if (this.shootingEntity instanceof Player && this.caught) {
 			Player player = (Player) this.shootingEntity;
 			Item item = Fishing.getFishingResult(this.rod);
+			if (item instanceof ItemBookEnchanted) {
+				if (!item.hasEnchantments()) {
+					item = item.clone();
+					item.addEnchantment(Enchantment.getEnchantment(Utils.rand(0, 36)));
+				}
+			}
 			int experience = Utils.random.nextInt(3) + 1;
 			Vector3 motion = player.subtract(this).multiply(0.1);
 			motion.y += Math.sqrt(player.distance(this)) * 0.08;
@@ -296,6 +309,15 @@ public class EntityFishingHook extends EntityProjectile {
 		if (entity.attack(ev)) {
 			setDataProperty(new LongEntityData(DATA_TARGET_EID, entity.getId()));
 			canCollide = false;
+		}
+	}
+
+	public void checkLure() {
+		if (rod != null) {
+			Enchantment ench = rod.getEnchantment(Enchantment.ID_LURE);
+			if (ench != null) {
+				this.waitChance = 120 - (25 * ench.getLevel());
+			}
 		}
 	}
 }

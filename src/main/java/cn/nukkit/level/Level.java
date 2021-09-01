@@ -130,6 +130,7 @@ public class Level implements ChunkManager, Metadatable {
         randomTickBlocks[Block.ICE_FROSTED] = true;
         randomTickBlocks[Block.VINE] = true;
         randomTickBlocks[Block.WATER] = true;
+        randomTickBlocks[Block.CAULDRON_BLOCK] = true;
     }
 
     private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
@@ -1026,7 +1027,7 @@ public class Level implements ChunkManager, Metadatable {
         List<Entity> list = new ArrayList<>();
 
         for (Entity entity : this.getCollidingEntities(axisalignedbb)) {
-            if (entity.isAlive() && canBlockSeeSky(entity)) {
+            if (entity.isAlive() && entity.canSeeSky()) {
                 list.add(entity);
             }
         }
@@ -4004,7 +4005,7 @@ public class Level implements ChunkManager, Metadatable {
 
     public boolean shouldMobBurn(BaseEntity entity) {
         int time = this.getTime() % TIME_FULL;
-        return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && this.canBlockSeeSky(entity);
+        return !entity.isOnFire() && !this.raining && !entity.isBaby() && (time < 12567 || time > 23450) && !entity.isInsideOfWater() && entity.canSeeSky();
     }
 
     public boolean isMobSpawningAllowed() {

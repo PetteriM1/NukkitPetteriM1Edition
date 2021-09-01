@@ -125,15 +125,12 @@ public class EntityEnderman extends EntityWalkingMob {
                 setAngry(0);
             }
             tp();
-        } else if (this.getLevel().isRaining() && this.getLevel().canBlockSeeSky(this) && Utils.rand(1, 5) == 1) {
-            this.attack(1f);
-            tp();
         } else if (Utils.rand(0, 500) == 20) {
             tp();
         }
 
-        if (this.age % 20 == 0 && this.level.isRaining() && this.level.canBlockSeeSky(this)) {
-            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 2));
+        if (this.level.isRaining() && Utils.rand(1, 5) == 1 && this.canSeeSky()) {
+            this.attack(new EntityDamageEvent(this, EntityDamageEvent.DamageCause.DROWNING, 1f));
             if (isAngry()) {
                 setAngry(0);
             }

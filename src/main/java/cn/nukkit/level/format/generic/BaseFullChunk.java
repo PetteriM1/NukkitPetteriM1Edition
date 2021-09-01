@@ -218,6 +218,10 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     @Override
     public void setProvider(LevelProvider provider) {
         this.provider = provider;
+
+        if (provider != null) {
+            this.providerClass = provider.getClass();
+        }
     }
 
     @Override
@@ -325,7 +329,9 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
         }
         for (int y = 255; y >= 0; --y) {
             if (getBlockId(x, y, z) != 0x00) {
-                this.setHeightMap(x, z, y);
+                if (cache) {
+                    this.setHeightMap(x, z, y);
+                }
                 return y;
             }
         }
