@@ -3970,7 +3970,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     return false;
                                 }
                             }).map(Field::getName).findFirst();
-                    this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse(" UNKNOWN") + " from " + this.username + ": " + PVWpk.toString());
+                    this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse(" UNKNOWN") + " from " + this.username + " (Protocol " + this.protocol + "): " + PVWpk.toString());
                     break;
                 case ProtocolInfo.EMOTE_PACKET:
                     if (!this.spawned || server.getTick() - this.lastEmote < 20) {

@@ -35,13 +35,15 @@ public class LoginPacket extends DataPacket {
     @Override
     public void decode() {
         this.protocol_ = this.getInt();
-        if (protocol_ == 0) {
+        if (this.protocol_ == 0) {
             setOffset(getOffset() + 2);
             this.protocol_ = getInt();
         }
-        this.setBuffer(this.getByteArray(), 0);
-        decodeChainData();
-        decodeSkinData();
+        if (ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol_)) { // Avoid errors with unsupported versions
+            this.setBuffer(this.getByteArray(), 0);
+            decodeChainData();
+            decodeSkinData();
+        }
     }
 
     @Override
