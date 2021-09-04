@@ -90,7 +90,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
         this.maxSpawnDelay = this.namedTag.getShort(TAG_MAX_SPAWN_DELAY);
         this.maxNearbyEntities = this.namedTag.getShort(TAG_MAX_NEARBY_ENTITIES);
         this.requiredPlayerRange = this.namedTag.getShort(TAG_REQUIRED_PLAYER_RANGE);
-        this.requiredPlayerRange2 = (int) Math.pow(this.requiredPlayerRange2, 2);
+        this.requiredPlayerRange2 = (int) Math.pow(this.requiredPlayerRange, 2);
         this.minSpawnCount = this.namedTag.getShort(TAG_MINIMUM_SPAWN_COUNT);
         this.maxSpawnCount = this.namedTag.getShort(TAG_MAXIMUM_SPAWN_COUNT);
 
@@ -132,7 +132,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
                                     this.level
                             );
                     Block block = level.getBlock(pos);
-                    // Mobs shouldn't spawn in walls and they shouldn't retry to
+                    // Mobs shouldn't spawn in walls, and they shouldn't retry to
                     if (
                             block.getId() != 0 && block.getId() != BlockID.SIGN_POST && block.getId() != BlockID.WALL_SIGN &&
                                     block.getId() != BlockID.STILL_WATER && block.getId() != BlockID.WATER &&
@@ -230,7 +230,7 @@ public class BlockEntitySpawner extends BlockEntitySpawnable {
 
     public void setRequiredPlayerRange(int range) {
         this.requiredPlayerRange = range;
-        this.requiredPlayerRange2 = (int) Math.pow(this.requiredPlayerRange2, 2);
+        this.requiredPlayerRange2 = (int) Math.pow(this.requiredPlayerRange, 2);
     }
 
     public void setMaxNearbyEntities(int count) {

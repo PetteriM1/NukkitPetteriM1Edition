@@ -3656,7 +3656,6 @@ public class Level implements ChunkManager, Metadatable {
 
                     if (this.unloadChunk(X, Z, true)) {
                         this.unloadQueue.remove(index);
-                        --maxUnload;
                     }
                 }
             }
