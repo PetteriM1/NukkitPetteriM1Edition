@@ -25,7 +25,7 @@ abstract public class BaseRegionLoader {
     protected int lastSector;
     protected LevelProvider levelProvider;
 
-    private RandomAccessFile randomAccessFile;
+    private final RandomAccessFile randomAccessFile;
 
     // TODO: A simple array will perform better and use less memory
     protected final Map<Integer, Integer[]> locationTable = new HashMap<>();
