@@ -2,6 +2,7 @@ package cn.nukkit.entity;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.entity.mob.EntityEnderDragon;
 import cn.nukkit.entity.mob.EntityFlyingMob;
 import cn.nukkit.entity.mob.EntityMob;
@@ -527,5 +528,14 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     public boolean canTarget(Entity entity) {
         return entity instanceof Player && entity.canBeFollowed();
+    }
+
+    @Override
+    protected void checkBlockCollision() {
+        for (Block block : this.getCollisionBlocks()) {
+            block.onEntityCollide(this);
+        }
+
+        // TODO: portals
     }
 }
