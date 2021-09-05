@@ -21,7 +21,8 @@ public class MooshroomSpawner extends AbstractEntitySpawner {
             return;
         }
 
-        if (level.getBiomeId((int) pos.x, (int) pos.z) != 14) {
+        int bid = level.getBiomeId((int) pos.x, (int) pos.z);
+        if (bid != 14 && bid != 15) {
         } else if (level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) != Block.MYCELIUM) {
         } else if (pos.y > 255 || pos.y < 1) {
         } else if (level.isAnimalSpawningAllowedByTime()) {

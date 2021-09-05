@@ -30,12 +30,8 @@ public class BiomeSelector {
         float rainfall = this.rainfall.noise2D(x, z, true);
         EnumBiome biome;
         if (noiseOcean < -0.3f) {
-            if (noiseOcean < -0.46f) {
-                if (noiseOcean < -0.5f) {
-                    biome = EnumBiome.MUSHROOM_ISLAND;
-                } else {
-                    biome = EnumBiome.MUSHROOM_ISLAND_SHORE;
-                }
+            if (noiseOcean < -0.6f) {
+                biome = EnumBiome.MUSHROOM_ISLAND_SHORE;
             } else {
                 if (rainfall < 0f) {
                     if (temperature < -0.4f) {
