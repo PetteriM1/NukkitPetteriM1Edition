@@ -5895,4 +5895,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public String toString() {
         return "Player(name='" + getName() + "', location=" + super.toString() + ')';
     }
+
+    @Override
+    public void setAirTicks(int ticks) {
+        if (this.airTicks != ticks) {
+            if (this.spawned || ticks > this.airTicks) { // Don't consume air before spawned
+                this.airTicks = ticks;
+                this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+            }
+        }
+    }
 }
