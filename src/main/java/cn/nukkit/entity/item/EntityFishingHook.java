@@ -25,6 +25,7 @@ import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Utils;
 
@@ -266,7 +267,7 @@ public class EntityFishingHook extends EntityProjectile {
 	}
 
 	@Override
-	public void spawnTo(Player player) {
+	protected DataPacket createAddEntityPacket() {
 		AddEntityPacket pk = new AddEntityPacket();
 		pk.entityRuntimeId = this.getId();
 		pk.entityUniqueId = this.getId();
@@ -285,8 +286,7 @@ public class EntityFishingHook extends EntityProjectile {
 			ownerId = this.shootingEntity.getId();
 		}
 		pk.metadata = this.dataProperties.putLong(DATA_OWNER_EID, ownerId).clone();
-		player.dataPacket(pk);
-		super.spawnTo(player);
+		return pk;
 	}
 
 	@Override
