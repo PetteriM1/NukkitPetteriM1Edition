@@ -3,7 +3,6 @@ package cn.nukkit.entity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
@@ -490,9 +489,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public void setAirTicks(int ticks) {
         this.airTicks = ticks;
-        if (this.isPlayer) {
-            this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
-        }
     }
 
     public boolean isBlocking() {
