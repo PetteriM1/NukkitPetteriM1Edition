@@ -29,6 +29,7 @@ import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.lang.BaseLang;
 import cn.nukkit.lang.TextContainer;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.EnumLevel;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
@@ -653,29 +654,7 @@ public class Server {
                         this.loadLevel(fs.getName());
                     }
                 }
-                if (netherEnabled) {
-                    if (this.getLevelByName("nether") == null) {
-                        this.generateLevel("nether", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
-                        this.loadLevel("nether");
-                    }
-                    String list = this.getPropertyString("multi-nether-worlds");
-                    if (!list.trim().isEmpty()) {
-                        StringTokenizer tokenizer = new StringTokenizer(list, ", ");
-                        while (tokenizer.hasMoreTokens()) {
-                            String world = tokenizer.nextToken();
-                            multiNetherWorlds.add(world);
-                            String nether = world + "-nether";
-                            if (this.getLevelByName(nether) == null) {
-                                this.generateLevel(nether, System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_NETHER));
-                                this.loadLevel(nether);
-                            }
-                        }
-                    }
-                }
-                if (this.getLevelByName("the_end") == null && endEnabled) {
-                    this.generateLevel("the_end", System.currentTimeMillis(), Generator.getGenerator(Generator.TYPE_THE_END));
-                    this.loadLevel("the_end");
-                }
+                EnumLevel.initLevels();
             } catch (Exception e) {
                 this.getLogger().error("Unable to load levels", e);
             }
