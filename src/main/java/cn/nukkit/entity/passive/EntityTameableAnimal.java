@@ -1,13 +1,12 @@
 package cn.nukkit.entity.passive;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.EntityTameable;
 import cn.nukkit.entity.data.LongEntityData;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 
-public abstract class EntityTameableAnimal extends EntityWalkingAnimal implements EntityTameable {
+public abstract class EntityTameableAnimal extends cn.nukkit.entity.passive.EntityTameable implements cn.nukkit.entity.EntityTameable {
 
     private Player owner = null;
 
