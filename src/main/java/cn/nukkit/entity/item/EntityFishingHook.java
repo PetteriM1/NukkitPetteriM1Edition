@@ -21,10 +21,10 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.BubbleParticle;
 import cn.nukkit.level.particle.WaterParticle;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.math.Vector3f;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.nukkit.utils.Utils;
 
@@ -46,6 +46,7 @@ public class EntityFishingHook extends EntityProjectile {
 	public boolean caught = false;
 	public int caughtTimer = 0;
 	public boolean canCollide = true;
+	private long target = 0;
 
 	public Vector3 fish = null;
 
@@ -99,21 +100,18 @@ public class EntityFishingHook extends EntityProjectile {
 
 	@Override
 	public boolean onUpdate(int currentTick) {
-		boolean hasUpdate = false;
-		long target = getDataPropertyLong(DATA_TARGET_EID);
-		if (target != 0L) {
-			Entity entity = getLevel().getEntity(target);
-			if (entity == null || !entity.isAlive()) {
-				setDataProperty(new LongEntityData(DATA_TARGET_EID, 0L));
-				canCollide = true;
+		boolean hasUpdate = super.onUpdate(currentTick);
+
+		if (this.target != 0) {
+			Entity ent = this.level.getEntity(this.target);
+			if (ent == null || !ent.isAlive()) {
+				this.setTarget(0);
 			} else {
-				Vector3f offset = entity.getMountedOffset(this);
-				setPosition(new Vector3(entity.x + offset.x, entity.y + offset.y, entity.z + offset.z));
+				this.setPosition(new Vector3(ent.x, ent.y + (getHeight() * 0.75f), ent.z));
 			}
 			hasUpdate = true;
 		}
 
-		hasUpdate |= super.onUpdate(currentTick);
 		if (hasUpdate) {
 			return false;
 		}
@@ -266,7 +264,7 @@ public class EntityFishingHook extends EntityProjectile {
 	}
 
 	@Override
-	public void spawnTo(Player player) {
+	protected DataPacket createAddEntityPacket() {
 		AddEntityPacket pk = new AddEntityPacket();
 		pk.entityRuntimeId = this.getId();
 		pk.entityUniqueId = this.getId();
@@ -285,13 +283,12 @@ public class EntityFishingHook extends EntityProjectile {
 			ownerId = this.shootingEntity.getId();
 		}
 		pk.metadata = this.dataProperties.putLong(DATA_OWNER_EID, ownerId).clone();
-		player.dataPacket(pk);
-		super.spawnTo(player);
+		return pk;
 	}
 
 	@Override
 	public boolean canCollide() {
-		return canCollide;
+		return this.canCollide;
 	}
 
 	@Override
@@ -307,8 +304,7 @@ public class EntityFishingHook extends EntityProjectile {
 		}
 
 		if (entity.attack(ev)) {
-			setDataProperty(new LongEntityData(DATA_TARGET_EID, entity.getId()));
-			canCollide = false;
+			this.setTarget(entity.getId());
 		}
 	}
 
@@ -319,5 +315,11 @@ public class EntityFishingHook extends EntityProjectile {
 				this.waitChance = 120 - (25 * ench.getLevel());
 			}
 		}
+	}
+
+	public void setTarget(long eid) {
+		this.target = eid;
+		this.setDataProperty(new LongEntityData(DATA_TARGET_EID, eid));
+		this.canCollide = eid == 0;
 	}
 }

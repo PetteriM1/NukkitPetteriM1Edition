@@ -33,6 +33,11 @@ public class RakNetConstants {
      */
     public static final int SESSION_TIMEOUT_MS = Server.getInstance().getPropertyInt("timeout-milliseconds", 25000);
 
+    /**
+     * How many stale datagrams a {@link RakNetSession} can hold before being forcefully closed.
+     */
+    public static final int MAXIMUM_STALE_DATAGRAMS = 2000;
+
     /*
         Flags
      */

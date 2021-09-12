@@ -766,7 +766,7 @@ public class Level implements ChunkManager, Metadatable {
         } else if (map.containsKey(hash)) {
             return;
         } else {
-            this.chunkLoaders.get(index).put(hash, loader);
+            map.put(hash, loader);
             if (loader instanceof Player) {
                 this.playerLoaders.get(index).put(hash, (Player) loader);
             }
@@ -3706,7 +3706,7 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     public void regenerateChunk(int x, int z) {
-        this.unloadChunk(x, z, false);
+        this.unloadChunk(x, z, false, false);
         this.cancelUnloadChunkRequest(x, z);
         provider.setChunk(x, z, provider.getEmptyChunk(x, z));
         this.generateChunk(x, z);
@@ -3799,7 +3799,6 @@ public class Level implements ChunkManager, Metadatable {
 
                     if (this.unloadChunk(X, Z, true)) {
                         this.unloadQueue.remove(index);
-                        --maxUnload;
                     }
                 }
             }
