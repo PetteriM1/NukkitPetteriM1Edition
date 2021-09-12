@@ -12,6 +12,7 @@ import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.spawners.*;
 
@@ -279,7 +280,8 @@ public class SpawnerTask implements Runnable {
         int y = (int) pos.y;
         int z = (int) pos.z;
 
-        if (level.getBlockIdAt(x, y, z) == Block.AIR) {
+        BaseFullChunk chunk = level.getChunk(x >> 4, z >> 4, true);
+        if (level.getBlockIdAt(chunk, x, y, z) == Block.AIR) {
             while (true) {
                 y--;
                 if (y > 255) {
@@ -290,13 +292,13 @@ public class SpawnerTask implements Runnable {
                     y = 0;
                     break;
                 }
-                if (level.getBlockIdAt(x, y, z) != Block.AIR) {
+                if (level.getBlockIdAt(chunk, x, y, z) != Block.AIR) {
                     int checkNeedDegree = 3;
                     int checkY = y;
                     while (true) {
                         checkY++;
                         checkNeedDegree--;
-                        if (checkY > 255 || checkY < 1 || level.getBlockIdAt(x, checkY, z) != Block.AIR) {
+                        if (checkY > 255 || checkY < 1 || level.getBlockIdAt(chunk, x, checkY, z) != Block.AIR) {
                             break;
                         }
                         if (checkNeedDegree <= 0) {
@@ -316,13 +318,13 @@ public class SpawnerTask implements Runnable {
                     y = 0;
                     break;
                 }
-                if (level.getBlockIdAt(x, y, z) != Block.AIR) {
+                if (level.getBlockIdAt(chunk, x, y, z) != Block.AIR) {
                     int checkNeedDegree = 3;
                     int checkY = y;
                     while (true) {
                         checkY--;
                         checkNeedDegree--;
-                        if (checkY > 255 || checkY < 1 || level.getBlockIdAt(x, checkY, z) != Block.AIR) {
+                        if (checkY > 255 || checkY < 1 || level.getBlockIdAt(chunk, x, checkY, z) != Block.AIR) {
                             break;
                         }
                         if (checkNeedDegree <= 0) {

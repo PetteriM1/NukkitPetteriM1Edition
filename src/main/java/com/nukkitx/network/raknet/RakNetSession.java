@@ -449,12 +449,14 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
             }
         }
 
-        // Send packets that are stale first
-        this.sendStaleDatagrams(curTime);
-        // Now send usual packets
-        this.sendDatagrams(curTime);
-        // Finally flush channel
-        this.channel.flush();
+        // Send packets that are stale first. This function returns whether to continue
+        // to send rest of the datagrams, as it might close the session due to too many stale datagrams
+        if (this.sendStaleDatagrams(curTime)) {
+            // Now send usual packets
+            this.sendDatagrams(curTime);
+            // Finally, flush channel
+            this.channel.flush();
+        }
     }
 
     private void handleIncomingAcknowledge(long curTime, Queue<IntRange> queue, boolean nack) {
@@ -497,12 +499,12 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
         this.sendDatagram(datagram, curTime);
     }
 
-    private void sendStaleDatagrams(long curTime) {
+    private boolean sendStaleDatagrams(long curTime) {
         if (this.sentDatagrams.isEmpty()) {
-            return;
+            return true;
         }
 
-        boolean hasResent = false;
+        int resendCount = 0;
         int transmissionBandwidth = this.slidingWindow.getRetransmissionBandwidth(this.unackedBytes);
 
         for (RakNetDatagram datagram : this.sentDatagrams.values()) {
@@ -512,17 +514,24 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
                     break;
                 }
                 transmissionBandwidth -= size;
-
-                if (!hasResent) {
-                    hasResent = true;
-                }
+                resendCount++;
                 this.sendDatagram(datagram, curTime);
             }
         }
 
-        if (hasResent) {
+        if (resendCount > MAXIMUM_STALE_DATAGRAMS) {
+            if (Nukkit.DEBUG > 1) {
+                log.debug("Too many stale datagrams from " + this.address);
+            }
+            this.close(DisconnectReason.TIMED_OUT);
+            return false;
+        }
+
+        if (resendCount > 0) {
             this.slidingWindow.onResend(curTime);
         }
+
+        return true;
     }
 
     private void sendDatagrams(long curTime) {

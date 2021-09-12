@@ -3,13 +3,13 @@ package cn.nukkit.entity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.data.ShortEntityData;
 import cn.nukkit.entity.mob.EntityDrowned;
 import cn.nukkit.entity.mob.EntityWolf;
 import cn.nukkit.entity.projectile.EntityProjectile;
 import cn.nukkit.entity.weather.EntityWeather;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTurtleShell;
 import cn.nukkit.lang.TranslationContainer;
@@ -284,7 +284,8 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
             Player p = (Player) this;
             boolean isBreathing = !inWater;
 
-            if (isBreathing && p.getInventory().getHelmetFast() instanceof ItemTurtleShell) {
+            PlayerInventory inv = p.getInventory();
+            if (isBreathing && inv != null && inv.getHelmetFast() instanceof ItemTurtleShell) {
                 turtleTicks = 200;
             } else if (turtleTicks > 0) {
                 isBreathing = true;
@@ -488,9 +489,6 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
 
     public void setAirTicks(int ticks) {
         this.airTicks = ticks;
-        if (this.isPlayer) {
-            this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
-        }
     }
 
     public boolean isBlocking() {

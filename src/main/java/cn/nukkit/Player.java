@@ -2701,11 +2701,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     Vector3 newPos = new Vector3(movePlayerPacket.x, movePlayerPacket.y - this.getEyeHeight(), movePlayerPacket.z);
                     double dis = newPos.distanceSquared(this);
 
-                    if (dis < 0.01 && movePlayerPacket.yaw % 360 == this.yaw && movePlayerPacket.pitch % 360 == this.pitch) {
+                    if (dis < 0.001 && movePlayerPacket.yaw % 360 == this.yaw && movePlayerPacket.pitch % 360 == this.pitch) {
                         break;
                     }
 
-                    if (dis > 100) {
+                    if (dis > 81) {
                         this.sendPosition(this, movePlayerPacket.yaw, movePlayerPacket.pitch, MovePlayerPacket.MODE_RESET);
                         break;
                     }
@@ -3055,7 +3055,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     break;
                 case ProtocolInfo.BLOCK_PICK_REQUEST_PACKET:
                     BlockPickRequestPacket pickRequestPacket = (BlockPickRequestPacket) packet;
-                    Block block = this.level.getBlock(this.temporalVector.setComponents(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z), false);
+                    Block block = this.level.getBlock(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z, false);
                     item = block.toItem();
                     if (pickRequestPacket.addUserData) {
                         BlockEntity blockEntity = this.getLevel().getBlockEntityIfLoaded(this.temporalVector.setComponents(pickRequestPacket.x, pickRequestPacket.y, pickRequestPacket.z));
@@ -3958,7 +3958,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     return false;
                                 }
                             }).map(Field::getName).findFirst();
-                    this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse(" UNKNOWN") + " from " + this.username + ": " + PVWpk.toString());
+                    this.getServer().getLogger().warning("PacketViolationWarningPacket" + PVWpkName.map(name -> " for packet " + name).orElse(" UNKNOWN") + " from " + this.username + " (Protocol " + this.protocol + "): " + PVWpk.toString());
                     break;
                 case ProtocolInfo.EMOTE_PACKET:
                     if (!this.spawned || server.getTick() - this.lastEmote < 20) {
@@ -5886,5 +5886,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Override
     public String toString() {
         return "Player(name='" + getName() + "', location=" + super.toString() + ')';
+    }
+
+    @Override
+    public void setAirTicks(int ticks) {
+        if (this.airTicks != ticks) {
+            if (this.spawned || ticks > this.airTicks) { // Don't consume air before spawned
+                this.airTicks = ticks;
+                this.setDataPropertyAndSendOnlyToSelf(new ShortEntityData(DATA_AIR, ticks));
+            }
+        }
     }
 }
