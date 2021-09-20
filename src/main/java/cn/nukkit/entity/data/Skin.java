@@ -65,6 +65,7 @@ public class Skin {
     private String skinColor = "#0";
     private String armSize = "wide";
     private boolean trusted = true;
+    private String geometryDataEngineVersion;
 
     public boolean isValid() {
         return isValidSkin() && isValidResourcePatch();
@@ -257,6 +258,14 @@ public class Skin {
 
     public boolean isPrimaryUser() {
         return primaryUser;
+    }
+
+    public void setGeometryDataEngineVersion(String geometryDataEngineVersion) {
+        this.geometryDataEngineVersion = geometryDataEngineVersion;
+    }
+
+    public String getGeometryDataEngineVersion() {
+        return geometryDataEngineVersion;
     }
 
     public boolean isTrusted() {

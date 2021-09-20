@@ -314,6 +314,9 @@ public class BinaryStream {
 
             this.putImage(skin.getCapeData());
             this.putString(skin.getGeometryData());
+            if (protocol >= ProtocolInfo.v1_17_30) {
+                this.putString(skin.getGeometryDataEngineVersion());
+            }
             this.putString(skin.getAnimationData());
             if (protocol < ProtocolInfo.v1_17_30) {
                 this.putBoolean(skin.isPremium());
@@ -395,6 +398,9 @@ public class BinaryStream {
 
         skin.setCapeData(this.getImage());
         skin.setGeometryData(this.getString());
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            skin.setGeometryDataEngineVersion(this.getString());
+        }
         skin.setAnimationData(this.getString());
         if (protocol < ProtocolInfo.v1_17_30) {
             skin.setPremium(this.getBoolean());
