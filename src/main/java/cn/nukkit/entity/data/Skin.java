@@ -65,7 +65,7 @@ public class Skin {
     private String skinColor = "#0";
     private String armSize = "wide";
     private boolean trusted = true;
-    private String geometryDataEngineVersion;
+    private String geometryDataEngineVersion = "";
 
     public boolean isValid() {
         return isValidSkin() && isValidResourcePatch();
