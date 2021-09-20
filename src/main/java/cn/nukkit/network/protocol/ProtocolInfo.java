@@ -49,17 +49,18 @@ public interface ProtocolInfo {
     int v1_17_0 = 440;
     int v1_17_10 = 448;
     int v1_17_20_20 = 453;
+    int v1_17_30 = 465;
 
-    int CURRENT_PROTOCOL = v1_17_10;
+    int CURRENT_PROTOCOL = v1_17_30;
 
     List<Integer> SUPPORTED_PROTOCOLS = Ints.asList(
             v1_2_0, v1_2_5_11, v1_2_5, v1_2_6, v1_2_7, v1_2_10, v1_2_13, v1_2_13_11, v1_4_0, v1_5_0, v1_6_0_5, v1_6_0, v1_7_0,
             v1_8_0, v1_9_0, v1_10_0, v1_11_0, v1_12_0, v1_13_0, v1_14_0, v1_14_60, v1_16_0, v1_16_20, v1_16_100_0, v1_16_100_51,
             v1_16_100_52, v1_16_100, v1_16_200_51, v1_16_200, v1_16_210_50, v1_16_210_53, v1_16_210, v1_16_220, v1_16_230_50, v1_16_230,
-            v1_16_230_54, v1_17_0, v1_17_10, v1_17_20_20
+            v1_16_230_54, v1_17_0, v1_17_10, v1_17_20_20, v1_17_30
     );
 
-    String MINECRAFT_VERSION_NETWORK = "1.17.10";
+    String MINECRAFT_VERSION_NETWORK = "1.17.30";
     String MINECRAFT_VERSION = 'v' + MINECRAFT_VERSION_NETWORK;
 
     byte BATCH_PACKET = (byte) 0xff;
