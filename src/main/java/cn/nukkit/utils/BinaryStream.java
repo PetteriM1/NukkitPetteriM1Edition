@@ -314,10 +314,15 @@ public class BinaryStream {
 
             this.putImage(skin.getCapeData());
             this.putString(skin.getGeometryData());
+            if (protocol >= ProtocolInfo.v1_17_30) {
+                this.putString(skin.getGeometryDataEngineVersion());
+            }
             this.putString(skin.getAnimationData());
-            this.putBoolean(skin.isPremium());
-            this.putBoolean(skin.isPersona());
-            this.putBoolean(skin.isCapeOnClassic());
+            if (protocol < ProtocolInfo.v1_17_30) {
+                this.putBoolean(skin.isPremium());
+                this.putBoolean(skin.isPersona());
+                this.putBoolean(skin.isCapeOnClassic());
+            }
             this.putString(skin.getCapeId());
             this.putString(skin.getFullSkinId());
             if (protocol >= ProtocolInfo.v1_14_60) {
@@ -343,6 +348,13 @@ public class BinaryStream {
                     for (String color : colors) {
                         this.putString(color);
                     }
+                }
+
+                if (protocol >= ProtocolInfo.v1_17_30) {
+                    this.putBoolean(skin.isPremium());
+                    this.putBoolean(skin.isPersona());
+                    this.putBoolean(skin.isCapeOnClassic());
+                    this.putBoolean(skin.isPrimaryUser());
                 }
             }
         }
@@ -386,10 +398,15 @@ public class BinaryStream {
 
         skin.setCapeData(this.getImage());
         skin.setGeometryData(this.getString());
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            skin.setGeometryDataEngineVersion(this.getString());
+        }
         skin.setAnimationData(this.getString());
-        skin.setPremium(this.getBoolean());
-        skin.setPersona(this.getBoolean());
-        skin.setCapeOnClassic(this.getBoolean());
+        if (protocol < ProtocolInfo.v1_17_30) {
+            skin.setPremium(this.getBoolean());
+            skin.setPersona(this.getBoolean());
+            skin.setCapeOnClassic(this.getBoolean());
+        }
         skin.setCapeId(this.getString());
         this.getString(); // TODO: Full skin id
         if (protocol >= ProtocolInfo.v1_14_60) {
@@ -415,6 +432,13 @@ public class BinaryStream {
                     colors.add(this.getString());
                 }
                 skin.getTintColors().add(new PersonaPieceTint(pieceType, colors));
+            }
+
+            if (protocol >= ProtocolInfo.v1_17_30) {
+                skin.setPremium(this.getBoolean());
+                skin.setPersona(this.getBoolean());
+                skin.setCapeOnClassic(this.getBoolean());
+                skin.setPrimaryUser(this.getBoolean());
             }
         }
         return skin;
