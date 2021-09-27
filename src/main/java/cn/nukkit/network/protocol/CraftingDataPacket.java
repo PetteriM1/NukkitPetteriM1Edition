@@ -190,6 +190,10 @@ public class CraftingDataPacket extends DataPacket {
                     this.putVarInt(recipe.getIngredient().getNetworkId(protocol));
                     this.putVarInt(recipe.getResult().getNetworkId(protocol));
                 }
+
+                if (protocol >= ProtocolInfo.v1_17_30) {
+                    this.putUnsignedVarInt(0); // Material reducers size
+                }
             }
         }
 

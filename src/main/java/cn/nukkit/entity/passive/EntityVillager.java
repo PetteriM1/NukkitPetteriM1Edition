@@ -72,18 +72,22 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
         this.recipes = new ArrayList<>();
         
         this.dataProperties.putLong(DATA_TRADING_PLAYER_EID, 0L);
-        
-        CompoundTag offers = this.namedTag.getCompound("Offers");
-        if (offers != null) {
-            ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
-            for (CompoundTag nbt : nbtRecipes.getAll()) {
-                recipes.add(TradeInventoryRecipe.toNBT(nbt));
+
+        try {
+            CompoundTag offers = this.namedTag.getCompound("Offers");
+            if (offers != null) {
+                ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
+                for (CompoundTag nbt : nbtRecipes.getAll()) {
+                    recipes.add(TradeInventoryRecipe.toNBT(nbt));
+                }
+            } else {
+                CompoundTag nbt = new CompoundTag("Offers");
+                nbt.putList(new ListTag<CompoundTag>("Recipes"));
+                nbt.putList(this.getDefaultTierExpRequirements());
+                this.namedTag.putCompound("Offers", nbt);
             }
-        } else {
-            CompoundTag nbt = new CompoundTag("Offers");
-            nbt.putList(new ListTag<CompoundTag>("Recipes"));
-            nbt.putList(this.getDefaultTierExpRequirements());
-            this.namedTag.putCompound("Offers", nbt);
+        } catch (Exception ex) {
+            server.getLogger().error("Failed to load trade recipes for a villager with entity id " + this.id, ex);
         }
 
         if (!this.namedTag.contains("Profession")) {
