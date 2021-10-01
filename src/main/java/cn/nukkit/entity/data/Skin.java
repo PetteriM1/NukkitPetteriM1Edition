@@ -59,11 +59,13 @@ public class Skin {
     private boolean premium;
     private boolean persona;
     private boolean capeOnClassic;
+    private boolean primaryUser = true;
     private String capeId;
     public boolean isLegacySlim;
     private String skinColor = "#0";
     private String armSize = "wide";
     private boolean trusted = true;
+    private String geometryDataEngineVersion = "";
 
     public boolean isValid() {
         return isValidSkin() && isValidResourcePatch();
@@ -248,6 +250,22 @@ public class Skin {
 
     public void setCapeOnClassic(boolean capeOnClassic) {
         this.capeOnClassic = capeOnClassic;
+    }
+
+    public void setPrimaryUser(boolean primaryUser) {
+        this.primaryUser = primaryUser;
+    }
+
+    public boolean isPrimaryUser() {
+        return primaryUser;
+    }
+
+    public void setGeometryDataEngineVersion(String geometryDataEngineVersion) {
+        this.geometryDataEngineVersion = geometryDataEngineVersion;
+    }
+
+    public String getGeometryDataEngineVersion() {
+        return geometryDataEngineVersion;
     }
 
     public boolean isTrusted() {

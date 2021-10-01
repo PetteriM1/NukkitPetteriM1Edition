@@ -37,6 +37,7 @@ public class CraftingManager {
     public static DataPacket packet431;
     public static DataPacket packet440;
     public static DataPacket packet448;
+    public static DataPacket packet465;
 
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes313 = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, Map<UUID, ShapedRecipe>> shapedRecipes332 = new Int2ObjectOpenHashMap<>();
@@ -309,6 +310,31 @@ public class CraftingManager {
     }
 
     public void rebuildPacket() {
+        CraftingDataPacket pk465 = new CraftingDataPacket();
+        pk465.protocol = 465;
+        for (Recipe recipe : this.recipes) {
+            if (recipe instanceof ShapedRecipe) {
+                pk465.addShapedRecipe((ShapedRecipe) recipe);
+            } else if (recipe instanceof ShapelessRecipe) {
+                pk465.addShapelessRecipe((ShapelessRecipe) recipe);
+            }
+        }
+        // Torch with charcoal recipe fix for 1.16.100+
+        pk465.addShapedRecipe(charcoalTorchRecipe419);
+        for (FurnaceRecipe recipe : this.furnaceRecipes.values()) {
+            pk465.addFurnaceRecipe(recipe);
+        }
+        for (MultiRecipe recipe : this.multiRecipes.values()) {
+            pk465.addMultiRecipe(recipe);
+        }
+        for (BrewingRecipe recipe : brewingRecipes.values()) {
+            pk465.addBrewingRecipe(recipe);
+        }
+        for (ContainerRecipe recipe : containerRecipes.values()) {
+            pk465.addContainerRecipe(recipe);
+        }
+        pk465.tryEncode();
+        packet465 = pk465;//.compress(Deflater.BEST_COMPRESSION); //TODO: figure out why this doesn't work with batching
         CraftingDataPacket pk448 = new CraftingDataPacket();
         pk448.protocol = 448;
         for (Recipe recipe : this.recipes) {

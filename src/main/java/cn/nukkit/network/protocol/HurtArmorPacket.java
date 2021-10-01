@@ -12,6 +12,7 @@ public class HurtArmorPacket extends DataPacket {
 
     public int cause;
     public int damage;
+    public long armorSlots;
 
     @Override
     public void decode() {
@@ -20,10 +21,13 @@ public class HurtArmorPacket extends DataPacket {
     @Override
     public void encode() {
         this.reset();
-        if (protocol >= 407) {
+        if (protocol >= ProtocolInfo.v1_16_0) {
             this.putVarInt(this.cause);
         }
         this.putVarInt(this.damage);
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            this.putUnsignedVarLong(this.armorSlots);
+        }
     }
 
     @Override
