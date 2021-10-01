@@ -177,6 +177,10 @@ public class StartGamePacket extends DataPacket {
                 this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world width
                 this.putLInt(protocol >= ProtocolInfo.v1_16_100 ? 16 : 0); // Limited world height
                 this.putBoolean(false); // Nether type
+                if (protocol >= ProtocolInfo.v1_17_30) { // EduSharedUriResource
+                    this.putString(""); // buttonName
+                    this.putString(""); // linkUri
+                }
                 this.putBoolean(false); // Experimental Gameplay
             }
         }

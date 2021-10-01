@@ -70,12 +70,16 @@ public class EntityVillager extends EntityWalkingAnimal implements InventoryHold
 
         this.inventory = new TradeInventory(this);
 
-        CompoundTag offers = this.namedTag.getCompound("Offers");
-        if (offers != null) {
-            ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
-            for (CompoundTag nbt : nbtRecipes.getAll()) {
-                recipes.add(TradeInventoryRecipe.toNBT(nbt));
+        try {
+            CompoundTag offers = this.namedTag.getCompound("Offers");
+            if (offers != null) {
+                ListTag<CompoundTag> nbtRecipes = offers.getList("Recipes", CompoundTag.class);
+                for (CompoundTag nbt : nbtRecipes.getAll()) {
+                    recipes.add(TradeInventoryRecipe.toNBT(nbt));
+                }
             }
+        } catch (Exception ex) {
+            server.getLogger().error("Failed to load trade recipes for a villager with entity id " + this.id, ex);
         }
 
         if (!this.namedTag.contains("Profession")) {

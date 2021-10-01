@@ -401,6 +401,10 @@ public class Utils {
                 return "1.17.0";
             case ProtocolInfo.v1_17_10:
                 return "1.17.10";
+            case ProtocolInfo.v1_17_20_20:
+                return "1.17.20";
+            case ProtocolInfo.v1_17_30:
+                return "1.17.30";
             default:
                 throw new IllegalStateException("Invalid protocol: " + protocol);
         }

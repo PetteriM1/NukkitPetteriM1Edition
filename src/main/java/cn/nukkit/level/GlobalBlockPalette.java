@@ -58,9 +58,11 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId428 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId440 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId448 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId465 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy428 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy440 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy448 = new Int2IntOpenHashMap();
+    private static final Int2IntMap runtimeIdToLegacy465 = new Int2IntOpenHashMap();
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
     private static byte[] compiledTable313;
@@ -90,9 +92,11 @@ public class GlobalBlockPalette {
         legacyToRuntimeId428.defaultReturnValue(-1);
         legacyToRuntimeId440.defaultReturnValue(-1);
         legacyToRuntimeId448.defaultReturnValue(-1);
+        legacyToRuntimeId465.defaultReturnValue(-1);
         runtimeIdToLegacy428.defaultReturnValue(-1);
         runtimeIdToLegacy440.defaultReturnValue(-1);
         runtimeIdToLegacy448.defaultReturnValue(-1);
+        runtimeIdToLegacy465.defaultReturnValue(-1);
     }
 
     public static void init() {
@@ -331,6 +335,18 @@ public class GlobalBlockPalette {
             throw new AssertionError("Unable to load block palette 448", e);
         }
         loadBlockStates(tag448, legacyToRuntimeId448, runtimeIdToLegacy448);
+        // 465
+        ListTag<CompoundTag> tag465;
+        try (InputStream stream465 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_465.dat")) {
+            if (stream465 == null) {
+                throw new AssertionError("Unable to locate block state nbt 465");
+            }
+            //noinspection unchecked
+            tag465 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream465)), ByteOrder.BIG_ENDIAN, false);
+        } catch (IOException e) {
+            throw new AssertionError("Unable to load block palette 465", e);
+        }
+        loadBlockStates(tag465, legacyToRuntimeId465, runtimeIdToLegacy465);
     }
 
     private static void loadBlockStates(ListTag<CompoundTag> blockStates, Int2IntMap legacyToRuntime, Int2IntMap runtimeIdToLegacy) {
@@ -460,12 +476,23 @@ public class GlobalBlockPalette {
                 }
                 return runtimeId;
             case ProtocolInfo.v1_17_10:
+            case ProtocolInfo.v1_17_20_20:
                 runtimeId = legacyToRuntimeId448.get(legacyId);
                 if (runtimeId == -1) {
                     runtimeId = legacyToRuntimeId448.get(id << 6);
                     if (runtimeId == -1) {
                         log.info("(448) Missing block runtime id mappings for " + id + ':' + meta);
                         runtimeId = legacyToRuntimeId448.get(BlockID.INFO_UPDATE << 6);
+                    }
+                }
+                return runtimeId;
+            case ProtocolInfo.v1_17_30:
+                runtimeId = legacyToRuntimeId465.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId465.get(id << 6);
+                    if (runtimeId == -1) {
+                        log.info("(465) Missing block runtime id mappings for " + id + ':' + meta);
+                        runtimeId = legacyToRuntimeId465.get(BlockID.INFO_UPDATE << 6);
                     }
                 }
                 return runtimeId;
@@ -560,7 +587,9 @@ public class GlobalBlockPalette {
     }
 
     public static int getLegacyFullId(int protocolId, int runtimeId) {
-        if (protocolId >= ProtocolInfo.v1_17_10) {
+        if (protocolId >= ProtocolInfo.v1_17_30) {
+            return runtimeIdToLegacy465.get(runtimeId);
+        } else if (protocolId >= ProtocolInfo.v1_17_10) {
             return runtimeIdToLegacy448.get(runtimeId);
         } else if (protocolId >= ProtocolInfo.v1_17_0) {
             return runtimeIdToLegacy440.get(runtimeId);
