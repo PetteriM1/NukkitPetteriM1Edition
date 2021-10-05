@@ -2279,7 +2279,13 @@ public class Server {
             return false;
         }
 
-        String path = this.dataPath + "worlds/" + name + '/';
+        String path;
+        if (name.contains("/") || name.contains("\\")) {
+            path = name;
+        } else {
+            path = this.dataPath + "worlds/" + name + '/';
+        }
+
         if (this.getLevelByName(name) == null) {
             return LevelProviderManager.getProvider(path) != null;
         }
