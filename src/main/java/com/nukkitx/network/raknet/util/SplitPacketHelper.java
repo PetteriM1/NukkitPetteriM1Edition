@@ -15,7 +15,8 @@ public class SplitPacketHelper extends AbstractReferenceCounted {
     private final EncapsulatedPacket[] packets;
 
     public SplitPacketHelper(long expectedLength) {
-        Preconditions.checkArgument(expectedLength >= 1, "expectedLength is less than 1 (%s)", expectedLength);
+        Preconditions.checkArgument(expectedLength >= 1 && expectedLength <= 2048,
+                "expectedLength is less than 1 or greater than 2048 (%s)", expectedLength);
         this.packets = new EncapsulatedPacket[(int) expectedLength];
     }
 
