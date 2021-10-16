@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * This RakNet implementation is based on CloudburstMC/Network version develop/4f1bf8a (1.6.27-SNAPSHOT)
+ * This RakNet implementation is based on CloudburstMC/Network version develop/dbcb2ed (1.6.28-SNAPSHOT)
  */
 @ParametersAreNonnullByDefault
 public abstract class RakNet implements AutoCloseable {
