@@ -45,8 +45,8 @@ public class BugReportGenerator extends Thread {
             if (Server.getInstance().sentry != null) {
                 sentry();
             }
-        } catch (Exception ignored) {
-            Server.getInstance().getLogger().error("[BugReport] Sending a bug report failed!");
+        } catch (Exception ex) {
+            Server.getInstance().getLogger().error("[BugReport] Sending a bug report failed", ex);
         }
     }
 
@@ -69,6 +69,8 @@ public class BugReportGenerator extends Thread {
                         return;
                     }
                 }
+            } else {
+                return; // Don't send empty stack traces
             }
             Server.getInstance().sentry.getContext().addTag("plugin_error", String.valueOf(pluginError));
         }
@@ -93,7 +95,6 @@ public class BugReportGenerator extends Thread {
         Server.getInstance().sentry.getContext().addExtra("Nukkit Version", Nukkit.getBranch() + '/' + Nukkit.VERSION.substring(4));
         Server.getInstance().sentry.getContext().addExtra("Java Version", System.getProperty("java.vm.name") + " (" + System.getProperty("java.runtime.version") + ')');
         Server.getInstance().sentry.getContext().addExtra("Host OS", osMXBean.getName() + '-' + osMXBean.getArch() + " [" + osMXBean.getVersion() + ']');
-        //Server.getInstance().sentry.getContext().addExtra("Memory", getCount(osMXBean.getTotalPhysicalMemorySize(), true));
         Runtime runtime = Runtime.getRuntime();
         double usedMB = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
         double maxMB = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
@@ -114,7 +115,7 @@ public class BugReportGenerator extends Thread {
             Server.getInstance().sentry.getContext().addTag("watchdog", String.valueOf(true));
             Server.getInstance().sentry.sendMessage(message);
         } else {
-            Server.getInstance().getLogger().error("[BugReport] Sending a bug report failed!");
+            Server.getInstance().getLogger().error("[BugReport] Failed to send a bug report: content cannot be null");
         }
     }
 
