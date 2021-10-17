@@ -2125,11 +2125,11 @@ public class Server {
         if (Objects.equals(name.trim(), "")) {
             throw new LevelException("Invalid empty level name");
         }
+
         if (this.isLevelLoaded(name)) {
             return true;
         } else if (!this.isLevelGenerated(name)) {
             log.warn(this.baseLang.translateString("nukkit.level.notFound", name));
-
             return false;
         }
 
@@ -2160,10 +2160,9 @@ public class Server {
 
         level.initLevel();
 
-        this.pluginManager.callEvent(new LevelLoadEvent(level));
-
         level.setTickRate(this.baseTickRate);
 
+        this.pluginManager.callEvent(new LevelLoadEvent(level));
         return true;
     }
 
@@ -2279,8 +2278,15 @@ public class Server {
             return false;
         }
 
-        String path = this.dataPath + "worlds/" + name + '/';
         if (this.getLevelByName(name) == null) {
+            String path;
+
+            if (name.contains("/") || name.contains("\\")) {
+                path = name;
+            } else {
+                path = this.dataPath + "worlds/" + name + '/';
+            }
+
             return LevelProviderManager.getProvider(path) != null;
         }
 
