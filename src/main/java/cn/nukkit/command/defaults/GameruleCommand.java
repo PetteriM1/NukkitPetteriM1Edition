@@ -19,7 +19,7 @@ public class GameruleCommand extends VanillaCommand {
         this.setPermission("nukkit.command.gamerule");
         this.commandParameters.clear();
         this.commandParameters.put("byString", new CommandParameter[]{
-                new CommandParameter("gamerule", true , GameRule.getNames()),
+                new CommandParameter("gamerule", true , GameRule.getNamesLowerCase()),
                 new CommandParameter("value", CommandParamType.STRING, true)
         });
     }
