@@ -440,19 +440,19 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         // New creative items mapping
         registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.v1_17_0, creative440);
         registerCreativeItemsNew(ProtocolInfo.v1_17_10, ProtocolInfo.v1_17_10, creative448);
-        registerCreativeItemsNew(ProtocolInfo.v1_17_10, ProtocolInfo.v1_17_30, creative465);
+        registerCreativeItemsNew(ProtocolInfo.v1_17_30, ProtocolInfo.v1_17_30, creative465);
     }
 
-    private static void registerCreativeItemsNew(int protocolId, int blockPaletteProtocol, List<Item> creativeItems) {
+    private static void registerCreativeItemsNew(int protocol, int blockPaletteProtocol, List<Item> creativeItems) {
         JsonArray itemsArray;
-        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creativeitems" + protocolId + ".json")) {
+        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("creativeitems" + protocol + ".json")) {
             itemsArray = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonArray("items");
         } catch (Exception e) {
             throw new AssertionError("Error loading required block states!", e);
         }
 
         for (JsonElement element : itemsArray) {
-            Item item = RuntimeItems.getMapping(protocolId).parseCreativeItem(element.getAsJsonObject(), true, blockPaletteProtocol);
+            Item item = RuntimeItems.getMapping(protocol).parseCreativeItem(element.getAsJsonObject(), true, blockPaletteProtocol);
             if (item != null && !item.getName().equals(UNKNOWN_STR)) {
                 // Add only implemented items
                 creativeItems.add(item.clone());
