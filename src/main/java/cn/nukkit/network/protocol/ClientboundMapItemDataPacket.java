@@ -100,7 +100,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);
-                this.putVarInt(decorator.color.getRGB());
+                this.putUnsignedVarInt(decorator.color.getRGB());
             }
         }
 
@@ -115,14 +115,14 @@ public class ClientboundMapItemDataPacket extends DataPacket {
             if (image != null) {
                 for (int y = 0; y < width; y++) {
                     for (int x = 0; x < height; x++) {
-                        putUnsignedVarInt(Utils.toABGR(this.image.getRGB(x, y)));
+                        this.putUnsignedVarInt(Utils.toABGR(this.image.getRGB(x, y)));
                     }
                 }
 
                 image.flush();
             } else if (colors.length > 0) {
                 for (int color : colors) {
-                    putUnsignedVarInt(color);
+                    this.putUnsignedVarInt(color);
                 }
             }
         }
