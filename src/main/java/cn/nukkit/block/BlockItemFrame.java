@@ -172,4 +172,9 @@ public class BlockItemFrame extends BlockTransparentMeta {
     public double getHardness() {
         return 0.25;
     }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
 }
