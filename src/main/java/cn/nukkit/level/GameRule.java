@@ -50,9 +50,16 @@ public enum GameRule {
 
     public static String[] getNames() {
         String[] stringValues = new String[values().length];
-
         for (int i = 0; i < values().length; i++) {
             stringValues[i] = values()[i].name;
+        }
+        return stringValues;
+    }
+
+    public static String[] getNamesLowerCase() {
+        String[] stringValues = new String[values().length];
+        for (int i = 0; i < values().length; i++) {
+            stringValues[i] = values()[i].name.toLowerCase();
         }
         return stringValues;
     }
