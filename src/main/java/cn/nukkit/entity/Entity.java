@@ -300,6 +300,7 @@ public abstract class Entity extends Location implements Metadatable {
 
     public double lastYaw;
     public double lastPitch;
+    public double lastHeadYaw;
 
     public double entityCollisionReduction = 0; // Higher than 0.9 will result a fast collisions
     public AxisAlignedBB boundingBox;
@@ -1472,6 +1473,7 @@ public abstract class Entity extends Location implements Metadatable {
 
             this.lastYaw = this.yaw;
             this.lastPitch = this.pitch;
+            this.lastHeadYaw = this.headYaw;
 
             this.addMovement(this.x, this.y + this.getBaseOffset(), this.z, this.yaw, this.pitch, this.yaw);
         }
@@ -1882,7 +1884,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public Location getLocation() {
-        return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.level);
+        return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw, this.level);
     }
 
     public boolean isSubmerged() {
@@ -2174,8 +2176,12 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean setPositionAndRotation(Vector3 pos, double yaw, double pitch) {
+        return this.setPositionAndRotation(pos, yaw, pitch, yaw);
+    }
+
+    public boolean setPositionAndRotation(Vector3 pos, double yaw, double pitch, double headYaw) {
         if (this.setPosition(pos)) {
-            this.setRotation(yaw, pitch);
+            this.setRotation(yaw, pitch, headYaw);
             return true;
         }
 
@@ -2183,8 +2189,13 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public void setRotation(double yaw, double pitch) {
+        this.setRotation(yaw, pitch, yaw);
+    }
+
+    public void setRotation(double yaw, double pitch, double headYaw) {
         this.yaw = yaw;
         this.pitch = pitch;
+        this.headYaw = headYaw;
         this.scheduleUpdate();
     }
 
@@ -2320,7 +2331,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean teleport(Vector3 pos, PlayerTeleportEvent.TeleportCause cause) {
-        return this.teleport(Location.fromObject(pos, this.level, this.yaw, this.pitch), cause);
+        return this.teleport(Location.fromObject(pos, this.level, this.yaw, this.pitch, this.headYaw), cause);
     }
 
     public boolean teleport(Position pos) {
@@ -2328,7 +2339,7 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean teleport(Position pos, PlayerTeleportEvent.TeleportCause cause) {
-        return this.teleport(Location.fromObject(pos, pos.level, this.yaw, this.pitch), cause);
+        return this.teleport(Location.fromObject(pos, pos.level, this.yaw, this.pitch, this.headYaw), cause);
     }
 
     public boolean teleport(Location location) {

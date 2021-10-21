@@ -82,7 +82,7 @@ public class BugReportGenerator extends Thread {
                     plugins.append(", ");
                 }
                 if (!plugin.isEnabled()) {
-                    plugins.append("*");
+                    plugins.append('*');
                 }
                 plugins.append(plugin.getDescription().getFullName());
             }
