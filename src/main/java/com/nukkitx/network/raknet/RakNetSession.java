@@ -558,7 +558,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
 
                 datagram = new RakNetDatagram(curTime);
                 if (!datagram.tryAddPacket(packet, this.adjustedMtu)) {
-                    throw new IllegalArgumentException("Packet too large to fit in MTU (size: " + packet.getSize() + ", MTU: " + this.adjustedMtu +")");
+                    throw new IllegalArgumentException("Packet too large to fit in MTU (size: " + packet.getSize() + ", MTU: " + this.adjustedMtu + ')');
                 }
             }
         }
@@ -682,7 +682,7 @@ public abstract class RakNetSession implements SessionConnection<ByteBuf> {
 
             if (!datagram.tryAddPacket(packet, this.adjustedMtu)) {
                 throw new IllegalArgumentException("Packet too large to fit in MTU (size: " + packet.getSize() +
-                        ", MTU: " + this.adjustedMtu + ")");
+                        ", MTU: " + this.adjustedMtu + ')');
             }
             this.sendDatagram(datagram, curTime);
         }

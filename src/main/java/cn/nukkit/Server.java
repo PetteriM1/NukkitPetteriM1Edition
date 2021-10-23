@@ -1172,7 +1172,9 @@ public class Server {
     }
 
     public void sendRecipeList(Player player) {
-        if (player.protocol >= ProtocolInfo.v1_17_30) {
+        if (player.protocol >= ProtocolInfo.v1_17_40) {
+            player.dataPacket(CraftingManager.packet471);
+        } if (player.protocol >= ProtocolInfo.v1_17_30) {
             player.dataPacket(CraftingManager.packet465);
         } else if (player.protocol >= ProtocolInfo.v1_17_10) {
             player.dataPacket(CraftingManager.packet448);

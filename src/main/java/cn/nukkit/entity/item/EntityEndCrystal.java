@@ -96,7 +96,7 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
             ExplosionPrimeEvent ev = new ExplosionPrimeEvent(this, 6);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) return;
-            Explosion explode = new Explosion(this, (float) ev.getForce(), this);
+            Explosion explode = new Explosion(this.add(0, this.getHeight() / 2, 0), (float) ev.getForce(), this);
             explode.explodeA();
             explode.explodeB();
         }
