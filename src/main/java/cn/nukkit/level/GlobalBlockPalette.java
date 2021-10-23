@@ -41,6 +41,7 @@ public class GlobalBlockPalette {
     private static final AtomicInteger runtimeIdAllocator388 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator389 = new AtomicInteger(0);
     private static final AtomicInteger runtimeIdAllocator407 = new AtomicInteger(0);
+
     private static final Int2IntMap legacyToRuntimeId223 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId261 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId274 = new Int2IntOpenHashMap();
@@ -59,10 +60,14 @@ public class GlobalBlockPalette {
     private static final Int2IntMap legacyToRuntimeId440 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId448 = new Int2IntOpenHashMap();
     private static final Int2IntMap legacyToRuntimeId465 = new Int2IntOpenHashMap();
+    private static final Int2IntMap legacyToRuntimeId471 = new Int2IntOpenHashMap();
+
     private static final Int2IntMap runtimeIdToLegacy428 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy440 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy448 = new Int2IntOpenHashMap();
     private static final Int2IntMap runtimeIdToLegacy465 = new Int2IntOpenHashMap();
+    private static final Int2IntMap runtimeIdToLegacy471 = new Int2IntOpenHashMap();
+
     private static byte[] compiledTable282;
     private static byte[] compiledTable291;
     private static byte[] compiledTable313;
@@ -93,10 +98,13 @@ public class GlobalBlockPalette {
         legacyToRuntimeId440.defaultReturnValue(-1);
         legacyToRuntimeId448.defaultReturnValue(-1);
         legacyToRuntimeId465.defaultReturnValue(-1);
+        legacyToRuntimeId471.defaultReturnValue(-1);
+
         runtimeIdToLegacy428.defaultReturnValue(-1);
         runtimeIdToLegacy440.defaultReturnValue(-1);
         runtimeIdToLegacy448.defaultReturnValue(-1);
         runtimeIdToLegacy465.defaultReturnValue(-1);
+        runtimeIdToLegacy471.defaultReturnValue(-1);
     }
 
     public static void init() {
@@ -299,54 +307,25 @@ public class GlobalBlockPalette {
             int legacyId = id << 6 | data;
             legacyToRuntimeId419.put(legacyId, runtimeId);
         }
-        // 428
-        ListTag<CompoundTag> tag428;
-        try (InputStream stream428 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_428.dat")) {
-            if (stream428 == null) {
-                throw new AssertionError("Unable to locate block state nbt 428");
+        loadBlockStates(paletteFor(428), legacyToRuntimeId428, runtimeIdToLegacy428);
+        loadBlockStates(paletteFor(440), legacyToRuntimeId440, runtimeIdToLegacy440);
+        loadBlockStates(paletteFor(448), legacyToRuntimeId448, runtimeIdToLegacy448);
+        loadBlockStates(paletteFor(465), legacyToRuntimeId465, runtimeIdToLegacy465);
+        loadBlockStates(paletteFor(471), legacyToRuntimeId471, runtimeIdToLegacy471);
+    }
+
+    private static ListTag<CompoundTag> paletteFor(int protocol) {
+        ListTag<CompoundTag> tag;
+        try (InputStream stream = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_" + protocol + ".dat")) {
+            if (stream == null) {
+                throw new AssertionError("Unable to locate block state nbt " + protocol);
             }
             //noinspection unchecked
-            tag428 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream428)), ByteOrder.BIG_ENDIAN, false);
+            tag = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream)), ByteOrder.BIG_ENDIAN, false);
         } catch (IOException e) {
-            throw new AssertionError("Unable to load block palette 428", e);
+            throw new AssertionError("Unable to load block palette " + protocol, e);
         }
-        loadBlockStates(tag428, legacyToRuntimeId428, runtimeIdToLegacy428);
-        // 440
-        ListTag<CompoundTag> tag440;
-        try (InputStream stream440 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_440.dat")) {
-            if (stream440 == null) {
-                throw new AssertionError("Unable to locate block state nbt 440");
-            }
-            //noinspection unchecked
-            tag440 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream440)), ByteOrder.BIG_ENDIAN, false);
-        } catch (IOException e) {
-            throw new AssertionError("Unable to load block palette 440", e);
-        }
-        loadBlockStates(tag440, legacyToRuntimeId440, runtimeIdToLegacy440);
-        // 448
-        ListTag<CompoundTag> tag448;
-        try (InputStream stream448 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_448.dat")) {
-            if (stream448 == null) {
-                throw new AssertionError("Unable to locate block state nbt 448");
-            }
-            //noinspection unchecked
-            tag448 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream448)), ByteOrder.BIG_ENDIAN, false);
-        } catch (IOException e) {
-            throw new AssertionError("Unable to load block palette 448", e);
-        }
-        loadBlockStates(tag448, legacyToRuntimeId448, runtimeIdToLegacy448);
-        // 465
-        ListTag<CompoundTag> tag465;
-        try (InputStream stream465 = Server.class.getClassLoader().getResourceAsStream("runtime_block_states_465.dat")) {
-            if (stream465 == null) {
-                throw new AssertionError("Unable to locate block state nbt 465");
-            }
-            //noinspection unchecked
-            tag465 = (ListTag<CompoundTag>) NBTIO.readTag(new ByteArrayInputStream(ByteStreams.toByteArray(stream465)), ByteOrder.BIG_ENDIAN, false);
-        } catch (IOException e) {
-            throw new AssertionError("Unable to load block palette 465", e);
-        }
-        loadBlockStates(tag465, legacyToRuntimeId465, runtimeIdToLegacy465);
+        return tag;
     }
 
     private static void loadBlockStates(ListTag<CompoundTag> blockStates, Int2IntMap legacyToRuntime, Int2IntMap runtimeIdToLegacy) {
@@ -496,6 +475,16 @@ public class GlobalBlockPalette {
                     }
                 }
                 return runtimeId;
+            case ProtocolInfo.v1_17_40:
+                runtimeId = legacyToRuntimeId471.get(legacyId);
+                if (runtimeId == -1) {
+                    runtimeId = legacyToRuntimeId471.get(id << 6);
+                    if (runtimeId == -1) {
+                        log.info("(471) Missing block runtime id mappings for " + id + ':' + meta);
+                        runtimeId = legacyToRuntimeId471.get(BlockID.INFO_UPDATE << 6);
+                    }
+                }
+                return runtimeId;
             default:
                 throw new IllegalArgumentException("Tried to get block runtime id for unsupported protocol version: " + protocol);
         }
@@ -587,7 +576,9 @@ public class GlobalBlockPalette {
     }
 
     public static int getLegacyFullId(int protocolId, int runtimeId) {
-        if (protocolId >= ProtocolInfo.v1_17_30) {
+        if (protocolId >= ProtocolInfo.v1_17_40) {
+            return runtimeIdToLegacy471.get(runtimeId);
+        } else if (protocolId >= ProtocolInfo.v1_17_30) {
             return runtimeIdToLegacy465.get(runtimeId);
         } else if (protocolId >= ProtocolInfo.v1_17_10) {
             return runtimeIdToLegacy448.get(runtimeId);
