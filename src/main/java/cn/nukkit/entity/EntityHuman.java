@@ -236,7 +236,7 @@ public class EntityHuman extends EntityHumanType {
             List<SkinAnimation> animations = this.getSkin().getAnimations();
 
             if (!animations.isEmpty()) {
-                ListTag<CompoundTag> animationsTag = new ListTag<>("AnimationImageData");
+                ListTag<CompoundTag> animationsTag = new ListTag<>("AnimatedImageData");
 
                 for (SkinAnimation animation : animations) {
                     animationsTag.add(new CompoundTag()

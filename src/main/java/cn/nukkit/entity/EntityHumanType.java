@@ -194,10 +194,6 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
     }
 
     protected Item damageArmor(Item armor, Entity damager, float damage, boolean shield, DamageCause cause) {
-        if (armor.isUnbreakable() || armor instanceof ItemSkull) {
-            return armor;
-        }
-
         if (armor.hasEnchantments()) {
             if (damager != null && cause != DamageCause.THORNS) {
                 for (Enchantment enchantment : armor.getEnchantments()) {
@@ -211,6 +207,10 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
                     && (100 / (durability.getLevel() + 1)) <= Utils.random.nextInt(100)) {
                 return armor;
             }
+        }
+
+        if (armor.isUnbreakable() || armor instanceof ItemSkull) {
+            return armor;
         }
 
         if (shield) {
