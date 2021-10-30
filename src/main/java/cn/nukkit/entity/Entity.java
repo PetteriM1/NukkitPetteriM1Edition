@@ -64,6 +64,8 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_TYPE_LONG = 7;
     public static final int DATA_TYPE_VECTOR3F = 8;
 
+    /* Outdated: pre 1.16.210 IDs
+       Fixing currently done in Binary#writeMetadata */
     public static final int DATA_FLAGS = 0;
     public static final int DATA_HEALTH = 1; //int (minecart/boat)
     public static final int DATA_VARIANT = 2; //int
@@ -150,9 +152,11 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_NEARBY_CURED_DISCOUNT_TIMESTAMP = 116;
     public static final int DATA_HITBOX = 117;
     public static final int DATA_IS_BUOYANT = 118;
+    public static final int DATA_BASE_RUNTIME_ID = 120; //1.17.x ???
     public static final int DATA_BUOYANCY_DATA = 119;
-    public static final int DATA_FREEZING_EFFECT_STRENGTH = 120; //1.16.210+
+    public static final int DATA_FREEZING_EFFECT_STRENGTH = 120; //1.16.210+, 121 in 1.17.x
     public static final int DATA_GOAT_HORN_COUNT = 122; //1.16.210+
+    public static final int DATA_UPDATE_PROPERTIES = 124; //1.17.x ???
 
     // Flags
     public static final int DATA_FLAG_ONFIRE = 0;
@@ -249,6 +253,9 @@ public abstract class Entity extends Location implements Metadatable {
     public static final int DATA_FLAG_ADMIRING = 93;
     public static final int DATA_FLAG_CELEBRATING_SPECIAL = 94;
     public static final int DATA_FLAG_RAM_ATTACK = 96; //1.16.210+
+    public static final int DATA_FLAG_PLAYING_DEAD = 97; //1.17.x ???
+    public static final int DATA_FLAG_IN_ASCENDABLE_BLOCK = 98; //1.17.x ???
+    public static final int DATA_FLAG_OVER_DESCENDABLE_BLOCK = 99; //1.17.x ???
 
     public static final double STEP_CLIP_MULTIPLIER = 0.4;
 
@@ -1497,9 +1504,8 @@ public abstract class Entity extends Location implements Metadatable {
         pk.motionX = (float) motionX;
         pk.motionY = (float) motionY;
         pk.motionZ = (float) motionZ;
-        //Server.broadcastPacket(this.hasSpawned.values(), pk);
         for (Player p : this.hasSpawned.values()) {
-            p.batchDataPacket(pk);
+            p.batchDataPacket(pk); // Server.broadcastPacket would only use batching for >= 1.16.100
         }
     }
 

@@ -1181,6 +1181,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return false;
     }
 
+    public boolean canBePutInHelmetSlot() {
+        return false;
+    }
+
     public boolean isChestplate() {
         return false;
     }

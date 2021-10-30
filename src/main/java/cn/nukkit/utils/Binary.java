@@ -120,7 +120,10 @@ public class Binary {
 
             // HACK: Multiversion entity data
             if (protocol >= ProtocolInfo.v1_16_210) { //TODO: update entity data
-                if (id >= 60) id = id + 1;
+                if (id == 119) {// DATA_BUOYANCY_DATA
+                    if (protocol >= ProtocolInfo.v1_17_0) id = 122;
+                    else id = 121;
+                } else if (id >= 60) id = id + 1;
             } else if (protocol == ProtocolInfo.v1_11_0) {
                 if (id >= 40) id = id + 1;
             } else if (protocol <= ProtocolInfo.v1_2_10) {

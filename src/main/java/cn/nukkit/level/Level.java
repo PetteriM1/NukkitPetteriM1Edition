@@ -3744,6 +3744,26 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getLevelMetadata().removeMetadata(this, metadataKey, owningPlugin);
     }
 
+    @SuppressWarnings("unused")
+    public void addPlayerMovement(Entity entity, double x, double y, double z, double yaw, double pitch, double headYaw) {
+        MovePlayerPacket pk = new MovePlayerPacket();
+        pk.eid = entity.getId();
+        pk.x = (float) x;
+        pk.y = (float) y;
+        pk.z = (float) z;
+        pk.yaw = (float) yaw;
+        pk.headYaw = (float) headYaw;
+        pk.pitch = (float) pitch;
+        pk.onGround = entity.onGround;
+
+        if (entity.riding != null) {
+            pk.ridingEid = entity.riding.getId();
+            pk.mode = MovePlayerPacket.MODE_PITCH;
+        }
+
+        Server.broadcastPacket(entity.getViewers().values(), pk);
+    }
+
     public void addEntityMovement(Entity entity, double x, double y, double z, double yaw, double pitch, double headYaw) {
         MoveEntityAbsolutePacket pk = new MoveEntityAbsolutePacket();
         pk.eid = entity.getId();
@@ -3755,9 +3775,8 @@ public class Level implements ChunkManager, Metadatable {
         pk.pitch = (float) pitch;
         pk.onGround = entity.onGround;
 
-        //Server.broadcastPacket(entity.getViewers().values(), pk);
         for (Player p : entity.getViewers().values()) {
-            p.batchDataPacket(pk);
+            p.batchDataPacket(pk); // Server.broadcastPacket would only use batching for >= 1.16.100
         }
     }
 

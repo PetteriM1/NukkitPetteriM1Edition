@@ -126,4 +126,9 @@ abstract public class ItemArmor extends Item implements ItemDurable {
         Tag tag = this.getNamedTagEntry("Unbreakable");
         return tag instanceof ByteTag && ((ByteTag) tag).data > 0;
     }
+
+    @Override
+    public boolean canBePutInHelmetSlot() {
+        return this.isHelmet();
+    }
 }
