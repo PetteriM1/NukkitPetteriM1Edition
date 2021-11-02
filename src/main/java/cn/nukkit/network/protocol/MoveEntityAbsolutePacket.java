@@ -35,7 +35,7 @@ public class MoveEntityAbsolutePacket extends DataPacket {
             int flags = this.getByte();
             onGround = (flags & 0x01) != 0;
             teleport = (flags & 0x02) != 0;
-            forceMoveLocalEntity = (flags & 0x04) != 0;;
+            forceMoveLocalEntity = (flags & 0x04) != 0;
         }
         Vector3f v = this.getVector3f();
         this.x = v.x;

@@ -504,6 +504,14 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
         return true;
     }
 
+    public boolean isSpinAttack() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SPIN_ATTACK);
+    }
+
+    public void setSpinAttack(boolean value) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SPIN_ATTACK, value);
+    }
+
     private void checkTameableEntityDeath() {
         if (this instanceof EntityTameable) {
             if (!((EntityTameable) this).hasOwner()) {

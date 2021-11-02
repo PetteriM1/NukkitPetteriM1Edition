@@ -119,19 +119,25 @@ public class Binary {
             boolean forceEmptyData = false;
 
             // HACK: Multiversion entity data
-            if (protocol >= ProtocolInfo.v1_16_210) { //TODO: update entity data
-                if (id == 119) {// DATA_BUOYANCY_DATA
-                    if (protocol >= ProtocolInfo.v1_17_0) id = 122;
-                    else id = 121;
-                } else if (id >= 60) id = id + 1;
-            } else if (protocol == ProtocolInfo.v1_11_0) {
-                if (id >= 40) id = id + 1;
-            } else if (protocol <= ProtocolInfo.v1_2_10) {
-                if (id >= 29) id = id + 1;
-                if (id > 76) { // DATA_MAX_STRENGTH
+            if (protocol < ProtocolInfo.v1_16_210) {
+                if (id == 60) { // Remove DATA_RIDER_ROTATION_OFFSET
                     id = Entity.DATA_STRENGTH;
                     type = Entity.DATA_TYPE_INT;
                     forceEmptyData = true;
+                }
+
+                if (id >= 60) id = id - 1; // 1.16.210 --> 1.16.0
+                if (id == 121) id = 119; // DATA_BUOYANCY_DATA
+
+                if (protocol == ProtocolInfo.v1_11_0) {
+                    if (id >= 40) id = id + 1;
+                } else if (protocol <= ProtocolInfo.v1_2_10) {
+                    if (id >= 29) id = id + 1;
+                    if (id > 76) { // Remove DATA_MAX_STRENGTH and up
+                        id = Entity.DATA_STRENGTH;
+                        type = Entity.DATA_TYPE_INT;
+                        forceEmptyData = true;
+                    }
                 }
             }
 
