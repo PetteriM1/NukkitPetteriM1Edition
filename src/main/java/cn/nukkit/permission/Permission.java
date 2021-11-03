@@ -47,7 +47,7 @@ public class Permission {
 
     private String description;
 
-    private Map<String, Boolean> children;
+    private final Map<String, Boolean> children;
 
     private String defaultValue;
 

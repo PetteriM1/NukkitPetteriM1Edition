@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public class HastebinUtility {
 
-    public static final String BIN_URL = "https://hastebin.com/documents", USER_AGENT = "Mozilla/5.0";
+    public static final String BIN_URL = "https://www.toptal.com/developers/hastebin/documents", USER_AGENT = "Mozilla/5.0";
     public static final Pattern PATTERN = Pattern.compile("\\{\"key\":\"([\\S\\s]*)\"}");
 
     /**
@@ -48,7 +48,7 @@ public class HastebinUtility {
 
         Matcher matcher = PATTERN.matcher(response.toString());
         if (matcher.matches()) {
-            return "https://hastebin.com/" + matcher.group(1);
+            return "https://www.toptal.com/developers/hastebin/" + matcher.group(1);
         } else {
             throw new RuntimeException("Couldn't read response!");
         }

@@ -2,10 +2,13 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.data.IntEntityData;
 import cn.nukkit.event.entity.EntityBlockChangeEvent;
+import cn.nukkit.event.entity.EntityDamageByBlockEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.item.Item;
@@ -24,6 +27,8 @@ import cn.nukkit.network.protocol.AddEntityPacket;
 public class EntityFallingBlock extends Entity {
 
     public static final int NETWORK_ID = 66;
+
+    private double startY;
 
     @Override
     public float getWidth() {
@@ -57,7 +62,7 @@ public class EntityFallingBlock extends Entity {
 
     @Override
     public boolean canCollide() {
-        return false;
+        return blockId == BlockID.ANVIL;
     }
 
     protected int blockId;
@@ -90,6 +95,8 @@ public class EntityFallingBlock extends Entity {
         }
 
         this.fireProof = true;
+
+        this.startY = this.y;
     }
 
     @Override // Multiversion: display correct block
@@ -115,7 +122,7 @@ public class EntityFallingBlock extends Entity {
     }
 
     public boolean canCollideWith(Entity entity) {
-        return false;
+        return blockId == BlockID.ANVIL;
     }
 
     @Override
@@ -195,6 +202,13 @@ public class EntityFallingBlock extends Entity {
 
                         if (event.getTo().getId() == Item.ANVIL) {
                             getLevel().addSound(new AnvilFallSound(pos));
+
+                            Entity[] e = level.getCollidingEntities(this.getBoundingBox(), this);
+                            for (Entity entity : e) {
+                                if (entity instanceof EntityLiving) {
+                                    entity.attack(new EntityDamageByBlockEvent(event.getTo(), entity, DamageCause.CONTACT, (float) Math.min(40, Math.max(0, (startY - y) * 2))));
+                                }
+                            }
                         }
                     }
                 }

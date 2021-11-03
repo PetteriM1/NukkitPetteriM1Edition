@@ -2042,7 +2042,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.highestPosition = this.y;
                 } else {
                     if (this.checkMovement && !this.isGliding() && !server.getAllowFlight() && this.inAirTicks > 20 && !this.getAllowFlight() && !this.isSleeping() && !this.isImmobile() && !this.isSwimming() && this.riding == null && !this.hasEffect(Effect.LEVITATION) && !this.hasEffect(Effect.SLOW_FALLING)) {
-                        double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * Math.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
+                        double expectedVelocity = (-this.getGravity()) / ((double) this.getDrag()) - ((-this.getGravity()) / ((double) this.getDrag())) * FastMath.exp(-((double) this.getDrag()) * ((double) (this.inAirTicks - this.startAirTicks)));
                         double diff = (this.speed.y - expectedVelocity) * (this.speed.y - expectedVelocity);
 
                         if (this.isOnLadder()) {
@@ -2783,13 +2783,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.newPosition = newPos;
                         this.forceMovement = null;
                     }
-
-                    if (riding != null) {
-                        if (riding instanceof EntityBoat) {
-                            riding.setPositionAndRotation(this.temporalVector.setComponents(movePlayerPacket.x, movePlayerPacket.y - 1, movePlayerPacket.z), (movePlayerPacket.headYaw + 90) % 360, 0);
-                        }
+                    break;
+                case ProtocolInfo.MOVE_ENTITY_ABSOLUTE_PACKET:
+                    MoveEntityAbsolutePacket moveEntityAbsolutePacket = (MoveEntityAbsolutePacket) packet;
+                    if (!this.spawned || this.riding == null || this.riding.getId() != moveEntityAbsolutePacket.eid || !this.riding.isControlling(this)) {
+                        break;
                     }
-
+                    if (this.riding instanceof EntityBoat) {
+                        ((EntityBoat) this.riding).onInput(moveEntityAbsolutePacket.x, moveEntityAbsolutePacket.y, moveEntityAbsolutePacket.z, moveEntityAbsolutePacket.headYaw);
+                    }
                     break;
                 case ProtocolInfo.ADVENTURE_SETTINGS_PACKET:
                     AdventureSettingsPacket adventureSettingsPacket = (AdventureSettingsPacket) packet;
@@ -4037,6 +4039,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     /**
      * Sends a chat message as this player
+     *
      * @param message message to send
      * @return successful
      */
@@ -4530,8 +4533,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 case CONTACT:
                     if (cause instanceof EntityDamageByBlockEvent) {
-                        if (((EntityDamageByBlockEvent) cause).getDamager().getId() == Block.CACTUS) {
+                        int id = ((EntityDamageByBlockEvent) cause).getDamager().getId();
+                        if (id == Block.CACTUS) {
                             message = "death.attack.cactus";
+                        } else if (id == Block.ANVIL) {
+                            message = "death.attack.anvil";
                         }
                     }
                     break;
@@ -4930,12 +4936,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.mode = mode;
         pk.onGround = this.onGround;
 
+        if (this.riding != null) {
+            pk.ridingEid = this.riding.getId();
+            pk.mode = MovePlayerPacket.MODE_PITCH;
+        }
+
         this.ySize = 0;
 
         if (targets != null) {
             Server.broadcastPacket(targets, pk);
         } else {
-            pk.eid = this.id;
             this.dataPacket(pk);
         }
     }
@@ -4951,6 +4961,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         pk.yaw = (float) yaw;
         pk.mode = mode;
         pk.onGround = this.onGround;
+
+        if (this.riding != null) {
+            pk.ridingEid = this.riding.getId();
+            pk.mode = MovePlayerPacket.MODE_PITCH;
+        }
 
         this.ySize = 0;
 

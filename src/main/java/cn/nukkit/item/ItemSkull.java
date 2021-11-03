@@ -55,4 +55,9 @@ public class ItemSkull extends Item {
     public boolean isHelmet() {
         return true;
     }
+
+    @Override
+    public boolean canBePutInHelmetSlot() {
+        return true;
+    }
 }

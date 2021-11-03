@@ -18,7 +18,7 @@
         <jline.version>3.12.1</jline.version>
         <netty.version>[4.1.47.Final,4.1.999.Final]</netty.version>
     </properties>
-    
+
     <distributionManagement>
         <repository>
             <id>maven-repo</id>
@@ -161,11 +161,6 @@
             <version>${netty.version}</version>
             <scope>compile</scope>
             <classifier>osx-x86_64</classifier>
-        </dependency>
-        <dependency>
-            <groupId>net.minidev</groupId>
-            <artifactId>json-smart</artifactId>
-            <version>2.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.iq80.leveldb</groupId>

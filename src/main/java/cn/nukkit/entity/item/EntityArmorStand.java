@@ -50,7 +50,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
     }
 
     private static int getArmorSlot(ItemArmor armorItem) {
-        if (armorItem.isHelmet()) {
+        if (armorItem.canBePutInHelmetSlot()) {
             return 0;
         } else if (armorItem.isChestplate()) {
             return 1;

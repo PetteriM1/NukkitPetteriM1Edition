@@ -1,5 +1,6 @@
 package cn.nukkit.command.defaults;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -28,6 +29,7 @@ public class DebugPasteCommand extends VanillaCommand {
         }
 
         Server server = Server.getInstance();
+        sender.sendMessage("Uploading...");
         server.getScheduler().scheduleAsyncTask(new DebugPasteTask(server, sender));
         return true;
     }
@@ -58,9 +60,10 @@ public class DebugPasteCommand extends VanillaCommand {
                 b.append("links.thread_dump: ").append(threadDump).append('\n');
                 b.append("\n# Server Information\n");
 
-                b.append("version.api: ").append(server.getApiVersion()).append('\n');
-                b.append("version.nukkit: ").append("Nukkit PetteriM1 Edition ").append(server.getNukkitVersion()).append('\n');
-                b.append("version.minecraft: ").append(server.getVersion()).append('\n');
+                //b.append("version.api: ").append(server.getApiVersion()).append('\n');
+                b.append("version.nukkit: ").append(Nukkit.NUKKIT).append('\n');
+                b.append("version.build: ").append(Nukkit.getBranch()).append('/').append(Nukkit.VERSION.substring(4)).append('\n');
+                b.append("version.minecraft: ").append(ProtocolInfo.MINECRAFT_VERSION).append('\n');
                 b.append("version.protocol: ").append(ProtocolInfo.CURRENT_PROTOCOL).append('\n');
                 b.append("plugins:");
 
