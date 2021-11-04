@@ -210,7 +210,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public final Map<Long, Boolean> usedChunks = new Long2ObjectOpenHashMap<>();
 
-    protected int spawnChunkLoadCount = 0;
+    private int chunksSent = 0;
+    private boolean hasSpawnChunks;
     protected final Long2ObjectLinkedOpenHashMap<Boolean> loadQueue = new Long2ObjectLinkedOpenHashMap<>();
     protected int nextChunkOrderRun = 1;
 
@@ -289,7 +290,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     public boolean locallyInitialized;
     private boolean foodEnabled = true;
     private int failedTransactions;
-    public int ticksSinceLastRest;
+    private int timeSinceRest;
     private boolean inSoulSand;
     private boolean dimensionChangeInProgress;
 
@@ -820,6 +821,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         this.dataPacket(packet);
 
+        this.chunksSent++;
+
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
                 if (this != entity && !entity.closed && entity.isAlive()) {
@@ -848,6 +851,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else {
             this.server.batchPackets(new Player[]{this}, new DataPacket[]{pk}, true);
         }*/
+
+        this.chunksSent++;
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
@@ -906,15 +911,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        if (this.spawnChunkLoadCount != -1 && ++this.spawnChunkLoadCount >= server.spawnThreshold) {
+        if (!this.hasSpawnChunks && this.chunksSent >= server.spawnThreshold) {
+            this.hasSpawnChunks = true;
+
             if (this.protocol <= 274) {
                 this.doFirstSpawn();
             }
 
             this.sendPlayStatus(PlayStatusPacket.PLAYER_SPAWN);
-            this.spawnChunkLoadCount = -1;
 
-            // Not really needed on Nukkit PM1E but it's here for plugin compatibility
+            // Not really needed on Nukkit PM1E, but it's here for plugin compatibility
             this.server.getPluginManager().callEvent(new PlayerLocallyInitializedEvent(this));
         }
 
@@ -1271,7 +1277,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         this.level.sleepTicks = 60;
-        this.ticksSinceLastRest = 0;
+        this.timeSinceRest = 0;
 
         return true;
     }
@@ -2066,7 +2072,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (!this.isSleeping()) {
-            this.ticksSinceLastRest++;
+            this.timeSinceRest++;
         }
 
         return true;
@@ -2296,7 +2302,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             }
         }
 
-        this.ticksSinceLastRest = nbt.getInt("TimeSinceRest");
+        this.timeSinceRest = nbt.getInt("TimeSinceRest");
 
         for (Tag achievement : nbt.getCompound("Achievements").getAllTags()) {
             if (!(achievement instanceof ByteTag)) {
@@ -4382,7 +4388,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.namedTag.putInt("foodLevel", this.foodData.getLevel());
             this.namedTag.putFloat("foodSaturationLevel", this.foodData.getFoodSaturationLevel());
 
-            this.namedTag.putInt("TimeSinceRest", this.ticksSinceLastRest);
+            this.namedTag.putInt("TimeSinceRest", this.timeSinceRest);
 
             if (!this.username.isEmpty() && this.namedTag != null) {
                 if (this.server.savePlayerDataByUuid) {
@@ -4545,7 +4551,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.removeAllEffects();
             this.health = 0;
             this.scheduleUpdate();
-            this.ticksSinceLastRest = 0;
+            this.timeSinceRest = 0;
 
             if (this.getKiller() != null && this.getKiller() instanceof EntityWalkingMob && ((EntityWalkingMob) this.getKiller()).isAngryTo == this.getId()) {
                 ((EntityWalkingMob) this.getKiller()).isAngryTo = -1; // Reset golem target
@@ -5549,7 +5555,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.dataPacket(packet);
 
         // Reset sleeping timer
-        this.ticksSinceLastRest = 0;
+        this.timeSinceRest = 0;
     }
 
     /**
@@ -5898,12 +5904,22 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }*/
 
+    /**
+     * Get ticks since sleeping in the current world last time
+     *
+     * @return ticks since sleeping
+     */
     public int getTimeSinceRest() {
-        return ticksSinceLastRest;
+        return timeSinceRest;
     }
 
-    public void setTimeSinceRest(int timeSinceRest) {
-        this.ticksSinceLastRest = timeSinceRest;
+    /**
+     * Set ticks since sleeping in the current world last time
+     *
+     * @param ticks ticks since sleeping
+     */
+    public void setTimeSinceRest(int ticks) {
+        this.timeSinceRest = ticks;
     }
 
     @Override
