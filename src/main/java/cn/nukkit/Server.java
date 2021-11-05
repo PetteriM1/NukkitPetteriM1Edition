@@ -3069,6 +3069,8 @@ public class Server {
             put("call-entity-motion-event", true);
             put("update-notifications", true);
             put("bstats-metrics", true);
+            put("min-mtu", 576);
+            put("max-mtu", 1492);
         }
     }
 
