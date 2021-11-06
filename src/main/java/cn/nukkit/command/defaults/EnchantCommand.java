@@ -137,7 +137,7 @@ public class EnchantCommand extends VanillaCommand {
                 return 29;
             case "riptide":
                 return 30;
-            case "loyality":
+            case "loyalty":
                 return 31;
             case "channeling":
                 return 32;

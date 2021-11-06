@@ -71,7 +71,7 @@ public class InventoryTransaction {
 
     public void addAction(InventoryAction action) {
         if (invalid) {
-            Server.getInstance().getLogger().error("Failed to add InventoryAction for " + source.getName() + ": previous run was marked as invalid");
+            Server.getInstance().getLogger().debug("Failed to add InventoryAction for " + source.getName() + ": previous run was marked as invalid");
             return;
         }
 

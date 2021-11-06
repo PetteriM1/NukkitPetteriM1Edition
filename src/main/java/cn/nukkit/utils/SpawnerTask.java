@@ -185,7 +185,7 @@ public class SpawnerTask implements Runnable {
      * @return whether mob spawning is possible near the player
      */
     static boolean entitySpawnAllowed(Level level, int networkId, Player player) {
-        if (networkId == EntityPhantom.NETWORK_ID && (player.ticksSinceLastRest < 72000 || player.isSleeping() || player.isSpectator() || !level.getGameRules().getBoolean(GameRule.DO_INSOMNIA))) {
+        if (networkId == EntityPhantom.NETWORK_ID && (player.getTimeSinceRest() < 72000 || player.isSleeping() || player.isSpectator() || !level.getGameRules().getBoolean(GameRule.DO_INSOMNIA))) {
             return false;
         }
         int max = getMaxSpawns(networkId, level.getDimension() == Level.DIMENSION_NETHER, level.getDimension() == Level.DIMENSION_THE_END);

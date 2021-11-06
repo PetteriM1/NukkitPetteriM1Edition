@@ -1312,7 +1312,7 @@ public class Server {
         if ((this.tickCounter & 0b1111) == 0) {
             this.titleTick();
 
-            this.network.resetStatistics();
+            //this.network.resetStatistics(); // Unnecessary since addStatistics is not used in the new raknet
             this.maxTick = 20;
             this.maxUse = 0;
 
@@ -2927,8 +2927,8 @@ public class Server {
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
         this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
         this.anvilsEnabled = this.getPropertyBoolean("anvils-enabled", true);
-        this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 5);
-        this.spawnThreshold = this.getPropertyInt("spawn-threshold", 50);
+        this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 4);
+        this.spawnThreshold = this.getPropertyInt("spawn-threshold", 56);
         this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
         this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
@@ -3029,8 +3029,8 @@ public class Server {
             put("light-updates", false);
             put("clear-chunk-tick-list", true);
             put("cache-chunks", false);
-            put("spawn-threshold", 50);
-            put("chunk-sending-per-tick", 5);
+            put("spawn-threshold", 56);
+            put("chunk-sending-per-tick", 4);
             put("chunk-ticking-per-tick", 40);
             put("chunk-ticking-radius", 3);
             put("chunk-generation-queue-size", 8);
@@ -3074,6 +3074,8 @@ public class Server {
             put("call-entity-motion-event", true);
             put("update-notifications", true);
             put("bstats-metrics", true);
+            put("min-mtu", 576);
+            put("max-mtu", 1492);
             put("enable_custom_items", false);
         }
     }

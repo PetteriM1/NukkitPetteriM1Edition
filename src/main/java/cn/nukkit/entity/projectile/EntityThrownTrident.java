@@ -145,6 +145,7 @@ public class EntityThrownTrident extends EntityProjectile {
         }
         newTrident.alreadyCollided = true;
         newTrident.pickupMode = this.pickupMode;
+        newTrident.shootingEntity = this.shootingEntity;
         newTrident.setItem(this.trident);
         newTrident.spawnToAll();
     }

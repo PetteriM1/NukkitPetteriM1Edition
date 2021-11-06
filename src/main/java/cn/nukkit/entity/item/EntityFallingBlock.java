@@ -28,8 +28,6 @@ public class EntityFallingBlock extends Entity {
 
     public static final int NETWORK_ID = 66;
 
-    private double startY;
-
     @Override
     public float getWidth() {
         return 0.98f;
@@ -95,8 +93,6 @@ public class EntityFallingBlock extends Entity {
         }
 
         this.fireProof = true;
-
-        this.startY = this.y;
     }
 
     @Override // Multiversion: display correct block
@@ -205,8 +201,8 @@ public class EntityFallingBlock extends Entity {
 
                             Entity[] e = level.getCollidingEntities(this.getBoundingBox(), this);
                             for (Entity entity : e) {
-                                if (entity instanceof EntityLiving) {
-                                    entity.attack(new EntityDamageByBlockEvent(event.getTo(), entity, DamageCause.CONTACT, (float) Math.min(40, Math.max(0, (startY - y) * 2))));
+                                if (entity instanceof EntityLiving && highestPosition > y) {
+                                    entity.attack(new EntityDamageByBlockEvent(event.getTo(), entity, DamageCause.CONTACT, (float) Math.min(40, Math.max(0, (highestPosition - y) * 2))));
                                 }
                             }
                         }
@@ -245,5 +241,12 @@ public class EntityFallingBlock extends Entity {
     @Override
     public boolean canBeMovedByCurrents() {
         return false;
+    }
+
+    @Override
+    public void resetFallDistance() {
+        if (!this.closed) { // For falling anvil: do not reset fall distance before dealing damage to entities
+            this.highestPosition = this.y;
+        }
     }
 }
