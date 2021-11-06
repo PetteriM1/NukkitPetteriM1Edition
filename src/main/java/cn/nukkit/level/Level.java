@@ -2019,7 +2019,7 @@ public class Level implements ChunkManager, Metadatable {
             item = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
         }
 
-        boolean isSilkTouch = item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null;
+        boolean isSilkTouch = item.hasEnchantment(Enchantment.ID_SILK_TOUCH);
 
         if (player != null) {
             if (player.getGamemode() == Player.ADVENTURE) {
@@ -2093,8 +2093,8 @@ public class Level implements ChunkManager, Metadatable {
             dropExp = ev.getDropExp();
         } else if (!target.isBreakable(item)) {
             return null;
-        } else if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
-            drops = new Item[] {target.toItem()};
+        } else if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            drops = new Item[]{target.toItem()};
         } else {
             drops = target.getDrops(item);
         }

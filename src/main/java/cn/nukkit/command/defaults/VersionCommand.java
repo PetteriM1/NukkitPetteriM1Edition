@@ -35,9 +35,9 @@ public class VersionCommand extends VanillaCommand {
 
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-        if (!this.testPermission(sender)) {
+        /*if (!this.testPermission(sender)) {
             return true;
-        }
+        }*/
         if (args.length == 0 || !sender.hasPermission("nukkit.command.version.plugins")) {
             sender.sendMessage("§e###############################################\n§cNukkit §aPetteriM1 Edition\n§6Build: §b" + Nukkit.getBranch() + '/' + Nukkit.VERSION.substring(4) + "\n§6Multiversion: §bUp to version " + ProtocolInfo.MINECRAFT_VERSION_NETWORK + "\n§dhttps://github.com/PetteriM1/NukkitPetteriM1Edition\n§e###############################################");
 
