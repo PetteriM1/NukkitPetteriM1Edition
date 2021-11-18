@@ -3258,7 +3258,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
                     this.craftingType = CRAFTING_SMALL;
                     CommandRequestPacket commandRequestPacket = (CommandRequestPacket) packet;
-                    PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, commandRequestPacket.command);
+                    PlayerCommandPreprocessEvent playerCommandPreprocessEvent = new PlayerCommandPreprocessEvent(this, commandRequestPacket.command + ' ');
                     this.server.getPluginManager().callEvent(playerCommandPreprocessEvent);
                     if (playerCommandPreprocessEvent.isCancelled()) {
                         break;
@@ -3581,6 +3581,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 this.setBlocking(false);
                             }
 
+                            if (inventory.getHeldItemIndex() != useItemData.hotbarSlot) {
+                                inventory.equipItem(useItemData.hotbarSlot);
+                            }
+
                             switch (type) {
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_BLOCK:
                                     // Hack: Fix client spamming right clicks
@@ -3684,6 +3688,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 case InventoryTransactionPacket.USE_ITEM_ACTION_CLICK_AIR:
                                     Vector3 directionVector = this.getDirectionVector();
 
+                                    if (inventory.getHeldItemIndex() != useItemData.hotbarSlot) {
+                                        inventory.equipItem(useItemData.hotbarSlot);
+                                    }
+
                                     item = this.inventory.getItemInHand();
 
                                     if (item instanceof ItemCrossbow) {
@@ -3692,7 +3700,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                         }
                                     }
 
-                                    if (!item.equals(useItemData.itemInHand)) {
+                                    if (!item.equalsFast(useItemData.itemInHand)) {
                                         this.inventory.sendHeldItem(this);
                                         break packetswitch;
                                     }
@@ -3743,7 +3751,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                             type = useItemOnEntityData.actionType;
 
-                            if (!useItemOnEntityData.itemInHand.equalsExact(this.inventory.getItemInHand())) {
+                            if (inventory.getHeldItemIndex() != useItemOnEntityData.hotbarSlot) {
+                                inventory.equipItem(useItemOnEntityData.hotbarSlot);
+                            }
+
+                            if (!useItemOnEntityData.itemInHand.equalsFast(this.inventory.getItemInHand())) {
                                 this.inventory.sendHeldItem(this);
                             }
 
@@ -5798,11 +5810,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                 ArrayList<Integer> itemsWithMending = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
-                    if (inventory.getArmorItem(i).getEnchantment((short)Enchantment.ID_MENDING) != null) {
+                    if (inventory.getArmorItem(i).hasEnchantment(Enchantment.ID_MENDING)) {
                         itemsWithMending.add(inventory.getSize() + i);
                     }
                 }
-                if (inventory.getItemInHandFast().getEnchantment((short)Enchantment.ID_MENDING) != null) {
+                if (inventory.getItemInHandFast().hasEnchantment(Enchantment.ID_MENDING)) {
                     itemsWithMending.add(inventory.getHeldItemIndex());
                 }
                 if (!itemsWithMending.isEmpty()) {

@@ -1329,6 +1329,10 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return this.equals(other, true, true) && this.count == other.count;
     }
 
+    public final boolean equalsFast(Item other) {
+        return other != null && other.id == this.id && other.meta == this.meta;
+    }
+
     public final boolean deepEquals(Item item) {
         return equals(item, true);
     }

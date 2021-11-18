@@ -199,7 +199,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -232,7 +232,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -250,7 +250,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>3.2.4</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.github.edwgiz</groupId>
@@ -271,7 +271,7 @@
                         <filter>
                             <artifact>*:*</artifact>
                             <excludes>
-                                <exclude>META-INF/versions/9/module-info.class</exclude>
+                                <exclude>META-INF/versions/</exclude>
                             </excludes>
                         </filter>
                     </filters>
@@ -280,12 +280,13 @@
                                 implementation="com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer">
                         </transformer>
                     </transformers>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-                <version>2.2.4</version>
+                <version>2.2.6</version>
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
@@ -333,7 +334,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.3.1</version>
                 <configuration>
                     <doclint>all,-missing</doclint>
                 </configuration>
