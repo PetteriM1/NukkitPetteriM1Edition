@@ -54,6 +54,7 @@ import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scheduler.BlockUpdateScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
@@ -952,7 +953,16 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        this.processChunkRequest();
+        if (this.server.asyncChunks) {
+            this.server.getScheduler().scheduleAsyncTask(new AsyncTask() {
+                @Override
+                public void onRun() {
+                    processChunkRequest();
+                }
+            });
+        }else {
+            this.processChunkRequest();
+        }
 
         if (this.sleepTicks > 0 && --this.sleepTicks <= 0) {
             this.checkSleep();

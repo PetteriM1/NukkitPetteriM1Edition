@@ -446,6 +446,10 @@ public class Server {
      * Allow adding custom items
      */
     public boolean enableCustomItems;
+    /**
+     * Asynchronous chunk sending (Experiment)
+     */
+    public boolean asyncChunks;
 
     Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
@@ -2938,6 +2942,7 @@ public class Server {
         this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
         this.whitelistReason = this.getPropertyString("whitelist-reason", "§cServer is white-listed").replace("§n", "\n");
         this.enableCustomItems = this.getPropertyBoolean("enable_custom_items", true);
+        this.asyncChunks = this.getPropertyBoolean("async-chunks", false);
         this.c_s_spawnThreshold = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
         try {
             this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
@@ -3077,6 +3082,7 @@ public class Server {
             put("min-mtu", 576);
             put("max-mtu", 1492);
             put("enable_custom_items", false);
+            put("async-chunks", false);
         }
     }
 
