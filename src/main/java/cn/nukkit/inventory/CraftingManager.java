@@ -1,6 +1,7 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
@@ -32,7 +33,7 @@ public class CraftingManager {
     public static BatchPacket packet361;
     public static BatchPacket packet354;
     public static BatchPacket packet388;
-    public static BatchPacket packet407;
+    public static DataPacket packet407;
     public static DataPacket packet419;
     public static DataPacket packet431;
     public static DataPacket packet440;
@@ -55,6 +56,7 @@ public class CraftingManager {
     private final Map<Integer, BrewingRecipe> brewingRecipesOld = new Int2ObjectOpenHashMap<>();
     public final Map<Integer, ContainerRecipe> containerRecipes = new Int2ObjectOpenHashMap<>();
     private final Map<Integer, ContainerRecipe> containerRecipesOld = new Int2ObjectOpenHashMap<>();
+    public final Map<Integer, CampfireRecipe> campfireRecipes = new Int2ObjectOpenHashMap<>();
 
     private static int RECIPE_COUNT = 0;
     static int NEXT_NETWORK_ID = 0;
@@ -141,7 +143,7 @@ public class CraftingManager {
                     case 2:
                     case 3:
                         craftingBlock = (String) recipe.get("block");
-                        if (!"furnace".equals(craftingBlock)) {
+                        if (!"furnace".equals(craftingBlock) && !"campfire".equals(craftingBlock)) {
                             // Ignore other recipes than furnaces
                             continue;
                         }
@@ -154,7 +156,15 @@ public class CraftingManager {
                         } catch (Exception old) {
                             inputItem = Item.get(Utils.toInt(recipe.get("inputId")), recipe.containsKey("inputDamage") ? Utils.toInt(recipe.get("inputDamage")) : -1, 1);
                         }
-                        this.registerRecipe(new FurnaceRecipe(resultItem, inputItem));
+
+                        switch (craftingBlock){
+                            case "furnace":
+                                this.registerRecipe(new FurnaceRecipe(resultItem, inputItem));
+                                break;
+                            case "campfire":
+                                this.registerRecipe(new CampfireRecipe(resultItem, inputItem));
+                                break;
+                        }
                         break;
                     /*case 4:
                         this.registerRecipe(new MultiRecipe(UUID.fromString((String) recipe.get("uuid"))));
@@ -364,7 +374,7 @@ public class CraftingManager {
             pk407.addContainerRecipe(recipe);
         }
         pk407.tryEncode();
-        packet407 = pk407.compress(Deflater.BEST_COMPRESSION);
+        packet407 = pk407;// .compress(Deflater.BEST_COMPRESSION);
         // 388
         CraftingDataPacket pk388 = new CraftingDataPacket();
         pk388.protocol = 388;
@@ -478,12 +488,18 @@ public class CraftingManager {
         this.furnaceRecipes.put(getItemHash(recipe.getInput()), recipe);
     }
 
+    public void registerCampfireRecipe(CampfireRecipe recipe) {
+        Item input = recipe.getInput();
+        this.campfireRecipes.put(getItemHash(input), recipe);
+    }
+
     private static int getItemHash(Item item) {
         return getItemHash(item.getId(), item.getDamage());
     }
 
     private static int getItemHash(int id, int meta) {
-        return (id << 4) | (meta & 0xf);
+        //return (id << 4) | (meta & 0xf);
+        return (id << Block.DATA_BITS) | (meta & Block.DATA_MASK);
     }
 
     public void registerShapedRecipe(ShapedRecipe recipe) {
@@ -586,6 +602,12 @@ public class CraftingManager {
 
     public BrewingRecipe matchBrewingRecipe(Item input, Item potion) {
         return this.brewingRecipes.get(getPotionHash(input, potion));
+    }
+
+    public CampfireRecipe matchCampfireRecipe(Item input) {
+        CampfireRecipe recipe = this.campfireRecipes.get(getItemHash(input));
+        if (recipe == null) recipe = this.campfireRecipes.get(getItemHash(input.getId(), 0));
+        return recipe;
     }
 
     public ContainerRecipe matchContainerRecipe(Item input, Item potion) {

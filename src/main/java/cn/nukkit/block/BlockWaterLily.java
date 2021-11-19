@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -33,14 +34,7 @@ public class BlockWaterLily extends BlockFlowable {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x + 0.0625,
-                this.y,
-                this.z + 0.0625,
-                this.x + 0.9375,
-                this.y + 0.015625,
-                this.z + 0.9375
-        );
+        return new SimpleAxisAlignedBB(this.x + 0.0625, this.y, this.z + 0.0625, this.x + 0.9375, this.y + 0.015625, this.z + 0.9375);
     }
 
     @Override
@@ -74,5 +68,10 @@ public class BlockWaterLily extends BlockFlowable {
     @Override
     public boolean canPassThrough() {
         return false;
+    }
+
+    @Override
+    public int getFullId() {
+        return this.getId() << DATA_BITS;
     }
 }

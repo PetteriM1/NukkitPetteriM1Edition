@@ -89,7 +89,7 @@ public class EntityHorse extends EntityHorseBase {
             }
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     private static int getRandomVariant() {

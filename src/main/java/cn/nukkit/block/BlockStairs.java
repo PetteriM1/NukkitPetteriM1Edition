@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -21,7 +22,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         if ((this.getDamage() & 0x04) > 0) {
-            return new AxisAlignedBB(
+            return new SimpleAxisAlignedBB(
                     this.x,
                     this.y + 0.5,
                     this.z,
@@ -30,7 +31,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
                     this.z + 1
             );
         } else {
-            return new AxisAlignedBB(
+            return new SimpleAxisAlignedBB(
                     this.x,
                     this.y,
                     this.z,
@@ -42,6 +43,11 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
         if ((fy > 0.5 && face != BlockFace.UP) || face == BlockFace.DOWN) {
@@ -50,17 +56,6 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
         this.getLevel().setBlock(block, this, true, true);
 
         return true;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                  toItem()
-            };
-        } else {
-            return new Item[0];
-        }
     }
 
     @Override
@@ -85,7 +80,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
             f3 = 0.5;
         }
 
-        if (bb.intersectsWith(new AxisAlignedBB(
+        if (bb.intersectsWith(new SimpleAxisAlignedBB(
                 this.x,
                 this.y + f,
                 this.z,
@@ -98,7 +93,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
 
         if (side == 0) {
-            return bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new SimpleAxisAlignedBB(
                     this.x + 0.5,
                     this.y + f2,
                     this.z,
@@ -107,7 +102,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
                     this.z + 1
             ));
         } else if (side == 1) {
-            return bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new SimpleAxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z,
@@ -116,7 +111,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
                     this.z + 1
             ));
         } else if (side == 2) {
-            return bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new SimpleAxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z + 0.5,
@@ -125,7 +120,7 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
                     this.z + 1
             ));
         } else if (side == 3) {
-            return bb.intersectsWith(new AxisAlignedBB(
+            return bb.intersectsWith(new SimpleAxisAlignedBB(
                     this.x,
                     this.y + f2,
                     this.z,

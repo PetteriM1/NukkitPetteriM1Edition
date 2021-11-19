@@ -1,13 +1,14 @@
 package cn.nukkit.event.player;
 
+import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.entity.data.Skin;
 import cn.nukkit.event.HandlerList;
-import cn.nukkit.utils.LoginChainData;
+import cn.nukkit.utils.CompletableFutureCombiner;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -23,57 +24,35 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
         return handlers;
     }
 
-    private final String name;
-    private final UUID uuid;
-    private final LoginChainData chainData;
-    private Skin skin;
-    private final String address;
-    private final int port;
-
     private LoginResult loginResult = LoginResult.SUCCESS;
     private String kickMessage = "Plugin Reason";
 
     private final List<Consumer<Server>> scheduledActions = new ArrayList<>();
 
-    public PlayerAsyncPreLoginEvent(String name, UUID uuid, LoginChainData chainData, Skin skin, String address, int port) {
-        this.name = name;
-        this.uuid = uuid;
-        this.chainData = chainData;
-        this.skin = skin;
-        this.address = address;
-        this.port = port;
+    private CompletableFutureCombiner combiner;
+
+    public PlayerAsyncPreLoginEvent(Player player) {
+        this.player = player;
     }
 
     public String getName() {
-        return this.name;
+        return this.player.getName();
     }
 
     public UUID getUuid() {
-        return this.uuid;
-    }
-
-    public LoginChainData getChainData() {
-        return this.chainData;
+        return this.player.getUniqueId();
     }
 
     public String getXuid() {
-        return this.chainData.getXUID();
-    }
-
-    public Skin getSkin() {
-        return this.skin;
-    }
-
-    public void setSkin(Skin skin) {
-        this.skin = skin;
+        return this.player.getLoginChainData().getXUID();
     }
 
     public String getAddress() {
-        return this.address;
+        return this.player.getAddress();
     }
 
     public int getPort() {
-        return this.port;
+        return this.player.getPort();
     }
 
     public LoginResult getLoginResult() {
@@ -98,6 +77,17 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
 
     public List<Consumer<Server>> getScheduledActions() {
         return new ArrayList<>(scheduledActions);
+    }
+
+    public void addCompletableFuture(CompletableFuture<?> future) {
+        if (this.combiner == null) {
+            this.combiner  = new CompletableFutureCombiner();
+        }
+        this.combiner.addFuture(future);
+    }
+
+    public CompletableFutureCombiner getCombiner() {
+        return this.combiner;
     }
 
     public void allow() {

@@ -1,6 +1,7 @@
 package cn.nukkit.level;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
@@ -570,7 +571,7 @@ public class GlobalBlockPalette {
                 if (runtimeId == -1) runtimeId = legacyToRuntimeId361.get(BlockID.INFO_UPDATE << 4);
                 return runtimeId;
             default: // 388+
-                return getOrCreateRuntimeId(protocol, legacyId >> 4, legacyId & 0xf);
+                return getOrCreateRuntimeId(protocol, legacyId >> Block.DATA_BITS, legacyId & Block.DATA_MASK);
         }
     }
 

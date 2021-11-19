@@ -52,22 +52,22 @@ abstract public class ItemArmor extends Item implements ItemDurable {
         boolean equip = false;
         Item oldSlotItem = Item.get(AIR);
         if (this.isHelmet()) {
-            oldSlotItem = player.getInventory().getHelmet();
+            oldSlotItem = player.getInventory().getHelmetFast();
             if (player.getInventory().setHelmet(this)) {
                 equip = true;
             }
         } else if (this.isChestplate()) {
-            oldSlotItem = player.getInventory().getChestplate();
+            oldSlotItem = player.getInventory().getChestplateFast();
             if (player.getInventory().setChestplate(this)) {
                 equip = true;
             }
         } else if (this.isLeggings()) {
-            oldSlotItem = player.getInventory().getLeggings();
+            oldSlotItem = player.getInventory().getLeggingsFast();
             if (player.getInventory().setLeggings(this)) {
                 equip = true;
             }
         } else if (this.isBoots()) {
-            oldSlotItem = player.getInventory().getBoots();
+            oldSlotItem = player.getInventory().getBootsFast();
             if (player.getInventory().setBoots(this)) {
                 equip = true;
             }

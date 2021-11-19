@@ -26,23 +26,22 @@ public class BlockStonecutter extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         return "Stonecutter";
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getWaterloggingLevel() {
+        return 1;
     }
 }

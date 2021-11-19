@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome.type;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockDoublePlant;
 import cn.nukkit.level.generator.populator.impl.PopulatorDoublePlant;
 import cn.nukkit.level.generator.populator.impl.PopulatorGrass;
@@ -22,11 +23,11 @@ public abstract class GrassyBiome extends CoveredBiome {
 
     @Override
     public int getSurfaceId(int x, int y, int z) {
-        return 32;
+        return GRASS << Block.DATA_BITS;
     }
 
     @Override
     public int getGroundId(int x, int y, int z) {
-        return 48;
+        return DIRT << Block.DATA_BITS;
     }
 }

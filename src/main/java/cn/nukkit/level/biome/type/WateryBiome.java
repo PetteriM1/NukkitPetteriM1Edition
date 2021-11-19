@@ -1,5 +1,7 @@
 package cn.nukkit.level.biome.type;
 
+import cn.nukkit.block.Block;
+
 /**
  * @author DaPorkchop_
  * Nukkit Project
@@ -24,6 +26,6 @@ public abstract class WateryBiome extends CoveredBiome {
 
     @Override
     public int getGroundId(int x, int y, int z) {
-        return 48;
+        return DIRT << Block.DATA_BITS;
     }
 }

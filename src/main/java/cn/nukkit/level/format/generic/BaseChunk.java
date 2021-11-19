@@ -20,6 +20,8 @@ import java.util.Arrays;
 
 public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
+    public static final int CONTENT_VERSION = 1;
+
     protected ChunkSection[] sections;
 
     private static final byte[] emptyIdArray = new byte[4096];
@@ -38,7 +40,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
         }
         return chunk;
     }
-    
+
     private void removeInvalidTile(int x, int y, int z) {
         BlockEntity entity = getTile(x, y, z);
         if (entity != null && !entity.isBlockEntityValid()) {
@@ -48,7 +50,22 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public int getFullBlock(int x, int y, int z) {
-        return this.sections[y >> 4].getFullBlock(x, y & 0x0f, z);
+        return getFullBlock(x, y, z, 0);
+    }
+
+    @Override
+    public int getFullBlock(int x, int y, int z, int layer) {
+        return this.sections[y >> 4].getFullBlock(x, y & 0x0f, z, layer);
+    }
+
+    @Override
+    public int[] getBlockState(int x, int y, int z, int layer) {
+        return this.sections[y >> 4].getBlockState(x, y & 0x0f, z, layer);
+    }
+
+    @Override
+    public boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId) {
+        return this.setBlockAtLayer(x, y, z, layer, blockId, 0);
     }
 
     @Override
@@ -58,17 +75,22 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public Block getAndSetBlock(int x, int y, int z, Block block) {
+        return getAndSetBlock(x, y, z, 0, block);
+    }
+
+    @Override
+    public Block getAndSetBlock(int x, int y, int z, int layer, Block block) {
         int Y = y >> 4;
         try {
             setChanged();
-            return this.sections[Y].getAndSetBlock(x, y & 0x0f, z, block);
+            return this.sections[Y].getAndSetBlock(x, y & 0x0f, z, layer, block);
         } catch (ChunkException e) {
             try {
                 this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
-            return this.sections[Y].getAndSetBlock(x, y & 0x0f, z, block);
+            return this.sections[Y].getAndSetBlock(x, y & 0x0f, z, layer, block);
         } finally {
             removeInvalidTile(x, y, z);
         }
@@ -76,17 +98,22 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public boolean setFullBlockId(int x, int y, int z, int fullId) {
+        return this.setFullBlockId(x, y, z, 0, fullId);
+    }
+
+    @Override
+    public boolean setFullBlockId(int x, int y, int z, int layer, int fullId) {
         int Y = y >> 4;
         try {
             setChanged();
-            return this.sections[Y].setFullBlockId(x, y & 0x0f, z, fullId);
+            return this.sections[Y].setFullBlockId(x, y & 0x0f, z, layer, fullId);
         } catch (ChunkException e) {
             try {
                 this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
-            return this.sections[Y].setFullBlockId(x, y & 0x0f, z, fullId);
+            return this.sections[Y].setFullBlockId(x, y & 0x0f, z, layer, fullId);
         } finally {
             removeInvalidTile(x, y, z);
         }
@@ -94,17 +121,22 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public boolean setBlock(int x, int y, int z, int blockId, int meta) {
+        return this.setBlockAtLayer(x, y, z, 0, blockId, meta);
+    }
+
+    @Override
+    public boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId, int meta) {
         int Y = y >> 4;
         try {
             setChanged();
-            return this.sections[Y].setBlock(x, y & 0x0f, z, blockId, meta);
+            return this.sections[Y].setBlockAtLayer(x, y & 0x0f, z, layer, blockId, meta);
         } catch (ChunkException e) {
             try {
                 this.setInternalSection(Y, (ChunkSection) this.providerClass.getMethod("createChunkSection", int.class).invoke(this.providerClass, Y));
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
-            return this.sections[Y].setBlock(x, y & 0x0f, z, blockId, meta);
+            return this.sections[Y].setBlockAtLayer(x, y & 0x0f, z, layer, blockId, meta);
         } finally {
             removeInvalidTile(x, y, z);
         }
@@ -112,9 +144,14 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public void setBlockId(int x, int y, int z, int id) {
+        setBlockId(x, y, z, 0, id);
+    }
+
+    @Override
+    public void setBlockId(int x, int y, int z, int layer, int id) {
         int Y = y >> 4;
         try {
-            this.sections[Y].setBlockId(x, y & 0x0f, z, id);
+            this.sections[Y].setBlockId(x, y & 0x0f, z, layer, id);
             setChanged();
         } catch (ChunkException e) {
             try {
@@ -122,7 +159,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
-            this.sections[Y].setBlockId(x, y & 0x0f, z, id);
+            this.sections[Y].setBlockId(x, y & 0x0f, z, layer, id);
         } finally {
             removeInvalidTile(x, y, z);
         }
@@ -130,19 +167,34 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public int getBlockId(int x, int y, int z) {
-        return this.sections[y >> 4].getBlockId(x, y & 0x0f, z);
+        return getBlockId(x, y, z, 0);
+    }
+
+    @Override
+    public int getBlockId(int x, int y, int z, int layer) {
+        return this.sections[y >> 4].getBlockId(x, y & 0x0f, z, layer);
     }
 
     @Override
     public int getBlockData(int x, int y, int z) {
-        return this.sections[y >> 4].getBlockData(x, y & 0x0f, z);
+        return getBlockData(x, y, z, 0);
+    }
+
+    @Override
+    public int getBlockData(int x, int y, int z, int layer) {
+        return this.sections[y >> 4].getBlockData(x, y & 0x0f, z, layer);
     }
 
     @Override
     public void setBlockData(int x, int y, int z, int data) {
+        setBlockData(x, y, z, 0, data);
+    }
+
+    @Override
+    public void setBlockData(int x, int y, int z, int layer, int data) {
         int Y = y >> 4;
         try {
-            this.sections[Y].setBlockData(x, y & 0x0f, z, data);
+            this.sections[Y].setBlockData(x, y & 0x0f, z, layer, data);
             setChanged();
         } catch (ChunkException e) {
             try {
@@ -150,7 +202,7 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 Server.getInstance().getLogger().logException(e1);
             }
-            this.sections[Y].setBlockData(x, y & 0x0f, z, data);
+            this.sections[Y].setBlockData(x, y & 0x0f, z, layer, data);
         } finally {
             removeInvalidTile(x, y, z);
         }
@@ -210,6 +262,8 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public boolean setSection(float fY, ChunkSection section) {
+        byte[] emptyIdArray = new byte[4096];
+        byte[] emptyDataArray = new byte[2048];
         if (Arrays.equals(emptyIdArray, section.getIdArray()) && Arrays.equals(emptyDataArray, section.getDataArray())) {
             this.sections[(int) fY] = EmptyChunkSection.EMPTY[(int) fY];
         } else {
@@ -231,23 +285,23 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
 
     @Override
     public boolean load(boolean generate) throws IOException {
-        return this.provider != null && this.provider.getChunk(this.getX(), this.getZ(), true) != null;
+        return this.getProvider() != null && this.getProvider().getChunk(this.getX(), this.getZ(), true) != null;
     }
 
     @Override
-    public byte[] getBlockIdArray() {
+    public byte[] getBlockIdArray(int layer) {
         ByteBuffer buffer = ByteBuffer.allocate(65536);
         for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getIdArray());
+            buffer.put(this.sections[y].getIdArray(layer));
         }
         return buffer.array();
     }
 
     @Override
-    public byte[] getBlockDataArray() {
+    public byte[] getBlockDataArray(int layer) {
         ByteBuffer buffer = ByteBuffer.allocate(32768);
         for (int y = 0; y < SECTION_COUNT; y++) {
-            buffer.put(this.sections[y].getDataArray());
+            buffer.put(this.sections[y].getDataArray(layer));
         }
         return buffer.array();
     }
@@ -276,11 +330,6 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     }
 
     @Override
-    public int[] getBiomeColorArray() {
-        return new int[0];
-    }
-
-    @Override
     public byte[] getHeightMapArray() {
         return this.heightMap;
     }
@@ -289,4 +338,97 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     public LevelProvider getProvider() {
         return this.provider;
     }
+
+    /*private boolean walk(ChunkSection section, Updater updater) {
+        int offsetX = getX() << 4;
+        int offsetZ = getZ() << 4;
+        int offsetY = section.getY() << 4;
+        boolean updated = false;
+        for (int x = 0; x <= 0xF; x++) {
+            for (int z = 0; z <= 0xF; z++) {
+                for (int y = 0; y <= 0xF; y++) {
+                    int[] state = section.getBlockState(x, y, z, 0);
+                    updated |= updater.update(offsetX, offsetY, offsetZ, x, y, z, state[0], state[1]);
+                }
+            }
+        }
+        return updated;
+    }
+
+
+    @FunctionalInterface
+    private interface Updater {
+        boolean update(int offsetX, int offsetY, int offsetZ, int x, int y, int z, int blockId, int meta);
+    }
+
+    @RequiredArgsConstructor
+    private class WallUpdater implements Updater {
+        private final Level level;
+        private final ChunkSection section;
+
+        @Override
+        public boolean update(int offsetX, int offsetY, int offsetZ, int x, int y, int z, int blockId, int meta) {
+            if (blockId != BlockID.COBBLE_WALL) {
+                return false;
+            }
+
+            //BlockWall blockWall = (BlockWall) Block.get(blockId, meta, level, offsetX + x, offsetY + y, offsetZ + z, 0); //layer check
+            BlockWall blockWall = (BlockWall) Block.get(blockId, meta, level, offsetX + x, offsetY + y, offsetZ + z);
+            if (blockWall.autoConfigureState()) {
+                section.setBlockData(x, y, z, 0, blockWall.getDamage());
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    @RequiredArgsConstructor
+    private class StemUpdater implements Updater {
+        private final Level level;
+        private final ChunkSection section;
+        private final int stemId;
+        private final int productId;
+
+        @Override
+        public boolean update(int offsetX, int offsetY, int offsetZ, int x, int y, int z, int blockId, int meta) {
+            if (blockId != stemId) {
+                return false;
+            }
+
+            for (BlockFace blockFace : BlockFace.Plane.HORIZONTAL) {
+                int sideId = level.getBlockIdAt(
+                        offsetX + x + blockFace.getXOffset(),
+                        offsetY + y,
+                        offsetZ + z + blockFace.getZOffset()
+                );
+                if (sideId == productId) {
+                    Block blockStem = Block.get(blockId, meta, level, offsetX + x, offsetY + y, offsetZ + z, 0);
+                    ((Faceable) blockStem).setBlockFace(blockFace);
+                    section.setBlockData(x, y, z, 0, blockStem.getDamage());
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    private class GroupedUpdaters implements Updater {
+        private final Updater[] updaters;
+
+        public GroupedUpdaters(Updater... updaters) {
+            this.updaters = updaters;
+        }
+
+        @Override
+        public boolean update(int offsetX, int offsetY, int offsetZ, int x, int y, int z, int blockId, int meta) {
+            for (Updater updater : updaters) {
+                if (updater.update(offsetX, offsetY, offsetZ, x, y, z, blockId, meta)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }*/
 }

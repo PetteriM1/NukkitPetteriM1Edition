@@ -1,6 +1,7 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Player;
+import cn.nukkit.block.Block;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.level.ChunkManager;
@@ -67,7 +68,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     protected boolean isInit;
 
-    protected Map<Integer, BatchPacket> chunkPackets;
+    protected BatchPacket chunkPacket;
 
     @Override
     public BaseFullChunk clone() {
@@ -106,22 +107,20 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     public void setChunkPacket(int protocol, BatchPacket packet) {
         if (packet != null) {
             packet.trim();
-            if (chunkPackets == null) {
-                chunkPackets = new Int2ObjectOpenHashMap<>();
-            }
-            this.chunkPackets.put(protocol, packet);
         }
+        this.chunkPacket = packet;
     }
 
     public BatchPacket getChunkPacket(int protocol) {
-        if (chunkPackets == null) {
-            return null;
-        }
-        BatchPacket pk = chunkPackets.get(protocol);
+        BatchPacket pk = chunkPacket;
         if (pk != null) {
             pk.trim();
         }
-        return pk;
+        return chunkPacket;
+    }
+
+    public void backwardCompatibilityUpdate(Level level) {
+        // Does nothing here
     }
 
     public void initChunk() {
@@ -231,6 +230,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public void setBiomeId(int x, int z, byte biomeId) {
+        this.setChanged();
         this.biomes[(x << 4) | z] = biomeId;
     }
 
@@ -266,9 +266,23 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     public void recalculateHeightMap() {
         for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
-                this.setHeightMap(x, z, this.getHighestBlockAt(x, z, false));
+                recalculateHeightMapColumn(x, z);
             }
         }
+    }
+
+    @Override
+    public int recalculateHeightMapColumn(int x, int z) {
+        int max = getHighestBlockAt(x, z, false);
+        int y;
+        for (y = max; y >= 0; --y) {
+            if (Block.lightFilter[getBlockIdAt(x, y, z)] > 1 || Block.diffusesSkyLight[getBlockIdAt(x, y, z)]) {
+                break;
+            }
+        }
+
+        setHeightMap(x, z, y + 1);
+        return y + 1;
     }
 
     @Override
@@ -297,21 +311,56 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public void populateSkyLight() {
-        /*for (int z = 0; z < 16; ++z) {
-            for (int x = 0; x < 16; ++x) {
-                int top = this.getHeightMap(x, z);
-                for (int y = 255; y > top; --y) {
+        // basic light calculation
+        for (int z = 0; z < 16; ++z) {
+            for (int x = 0; x < 16; ++x) { // iterating over all columns in chunk
+                int top = this.getHeightMap(x, z) - 1; // top-most block
+
+                int y;
+
+                for (y = 255; y > top; --y) {
+                    // all the blocks above & including the top-most block in a column are exposed to sun and
+                    // thus have a skylight value of 15
                     this.setBlockSkyLight(x, y, z, 15);
                 }
-                for (int y = top; y >= 0; --y) {
-                    if (Block.solid[this.getBlockId(x, y, z)]) {
-                        break;
+
+                int nextLight = 15; // light value that will be applied starting with the next block
+                int nextDecrease = 0; // decrease that that will be applied starting with the next block
+
+                // TODO: remove nextLight & nextDecrease, use only light & decrease variables
+                for (y = top; y >= 0; --y) { // going under the top-most block
+                    nextLight -= nextDecrease;
+                    int light = nextLight; // this light value will be applied for this block. The following checks are all about the next blocks
+
+                    if (light < 0) {
+                        light = 0;
                     }
-                    this.setBlockSkyLight(x, y, z, 15);
+
+                    this.setBlockSkyLight(x, y, z, light);
+
+                    if (light == 0) { // skipping block checks, because everything under a block that has a skylight value
+                                      // of 0 also has a skylight value of 0
+                        continue;
+                    }
+
+                    // START of checks for the next block
+                    int id = this.getBlockId(x, y, z);
+
+                    if (!Block.transparent[id]) { // if we encounter an opaque block, all the blocks under it will
+                                           // have a skylight value of 0 (the block itself has a value of 15, if it's a top-most block)
+                        nextLight = 0;
+                    } else if (Block.diffusesSkyLight[id]) {
+                        nextDecrease += 1; // skylight value decreases by one for each block under a block
+                                           // that diffuses skylight. The block itself has a value of 15 (if it's a top-most block)
+                    } else {
+                        nextDecrease -= Block.lightFilter[id]; // blocks under a light filtering block will have a skylight value
+                                                            // decreased by the lightFilter value of that block. The block itself
+                                                            // has a value of 15 (if it's a top-most block)
+                    }
+                    // END of checks for the next block
                 }
-                this.setHeightMap(x, z, this.getHighestBlockAt(x, z, false));
             }
-        }*/
+        }
     }
 
     @Override
@@ -382,7 +431,8 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     public void removeBlockEntity(BlockEntity blockEntity) {
         if (this.tiles != null) {
             this.tiles.remove(blockEntity.getId());
-            this.tileList.remove(((blockEntity.getFloorZ() & 0x0f) << 12) | ((blockEntity.getFloorX() & 0x0f) << 8) | (blockEntity.getFloorY() & 0xff));
+            int index = ((blockEntity.getFloorZ() & 0x0f) << 12) | ((blockEntity.getFloorX() & 0x0f) << 8) | (blockEntity.getFloorY() & 0xff);
+            this.tileList.remove(index);
             if (this.isInit) {
                 this.setChanged();
             }
@@ -490,11 +540,6 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     }
 
     @Override
-    public int[] getBiomeColorArray() {
-        return new int[0];
-    }
-
-    @Override
     public byte[] getHeightMapArray() {
         return this.heightMap;
     }
@@ -511,7 +556,7 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     @Override
     public void setChanged() {
         this.changes++;
-        chunkPackets = null;
+        chunkPacket = null;
     }
 
     @Override
@@ -545,51 +590,94 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
 
     @Override
     public int getBlockIdAt(int x, int y, int z) {
+        return getBlockIdAt(x, y, z, 0);
+    }
+
+    @Override
+    public int getBlockIdAt(int x, int y, int z, int layer) {
         if (x >> 4 == this.x && z >> 4 == this.z) {
-            return getBlockId(x & 15, y, z & 15);
+            return getBlockId(x & 15, y, z & 15, layer);
         }
         return 0;
     }
 
     @Override
     public void setBlockFullIdAt(int x, int y, int z, int fullId) {
-        if (x >> 4 == this.x && z >> 4 == this.z) {
-            setFullBlockId(x & 15, y, z & 15, fullId);
+        setFullBlockId(x, y, z, 0, fullId);
+    }
+
+    @Override
+    public void setBlockFullIdAt(int x, int y, int z, int layer, int fullId) {
+        if (x >> 4 == getX() && z >> 4 == getZ()) {
+            setFullBlockId(x & 15, y, z & 15, layer, fullId);
+        }
+    }
+
+    @Override
+    public boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId) {
+        return setBlockAtLayer(x, y, z, layer, blockId, 0);
+    }
+
+    @Override
+    public boolean setBlockAtLayer(int x, int y, int z, int layer, int blockId, int meta) {
+        int oldId = getBlockId(x, y, z, layer);
+        int oldData = getBlockData(x, y, z, layer);
+        if (oldId != blockId || oldData != meta) {
+            setBlock(x, y, z, layer, blockId);
+            setBlockData(x, y, z, layer, meta);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
     public void setBlockIdAt(int x, int y, int z, int id) {
+        setBlockIdAt(x, y, z, 0, id);
+    }
+
+    @Override
+    public void setBlockIdAt(int x, int y, int z, int layer, int id) {
         if (x >> 4 == this.x && z >> 4 == this.z) {
-            setBlockId(x & 15, y, z & 15, id);
+            setBlockId(x & 15, y, z & 15, layer, id);
         }
     }
     
     @Override
     public void setBlockAt(int x, int y, int z, int id, int data) {
-        if (x >> 4 == this.x && z >> 4 == this.z) {
+        if (x >> 4 == getX() && z >> 4 == getZ()) {
             setBlock(x & 15, y, z & 15, id, data);
         }
     }
 
     @Override
     public int getBlockDataAt(int x, int y, int z) {
+        return getBlockDataAt(x, y, z, 0);
+    }
+
+    @Override
+    public int getBlockDataAt(int x, int y, int z, int layer) {
         if (x >> 4 == this.x && z >> 4 == this.z) {
-            return getBlockIdAt(x & 15, y, z & 15);
+            return getBlockIdAt(x & 15, y, z & 15, layer);
         }
         return 0;
     }
 
     @Override
     public void setBlockDataAt(int x, int y, int z, int data) {
+        setBlockDataAt(x, y, z, 0, data);
+    }
+
+    @Override
+    public void setBlockDataAt(int x, int y, int z, int layer, int data) {
         if (x >> 4 == this.x && z >> 4 == this.z) {
-            setBlockData(x & 15, y, z & 15, data);
+            setBlockData(x & 15, y, z & 15, layer, data);
         }
     }
 
     @Override
     public BaseFullChunk getChunk(int chunkX, int chunkZ) {
-        if (chunkX == x && chunkZ == z) return this;
+        if (chunkX == this.x && chunkZ == this.x) return this;
         return null;
     }
 
@@ -609,14 +697,11 @@ public abstract class BaseFullChunk implements FullChunk, ChunkManager {
     }
 
     public boolean compress() {
-        if (chunkPackets == null) {
-            return false;
+        BatchPacket pk = chunkPacket;
+        if (pk != null) {
+            pk.trim();
+            return true;
         }
-        for (BatchPacket pk : chunkPackets.values()) {
-            if (pk != null) {
-                pk.trim();
-            }
-        }
-        return !chunkPackets.isEmpty();
+        return false;
     }
 }

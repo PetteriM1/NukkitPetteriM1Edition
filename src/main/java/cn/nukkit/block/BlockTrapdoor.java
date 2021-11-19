@@ -10,6 +10,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
@@ -67,7 +68,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
         AxisAlignedBB bb;
         double f = 0.1875;
         if ((damage & TRAPDOOR_TOP_BIT) > 0) {
-            bb = new AxisAlignedBB(
+            bb = new SimpleAxisAlignedBB(
                     this.x,
                     this.y + 1 - f,
                     this.z,
@@ -76,7 +77,7 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
                     this.z + 1
             );
         } else {
-            bb = new AxisAlignedBB(
+            bb = new SimpleAxisAlignedBB(
                     this.x,
                     this.y,
                     this.z,
@@ -127,6 +128,11 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
             }
         }
         return bb;
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
     }
 
     @Override

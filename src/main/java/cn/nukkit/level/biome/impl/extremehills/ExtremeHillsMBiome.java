@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome.impl.extremehills;
 
+import cn.nukkit.block.Block;
 import cn.nukkit.level.generator.noise.nukkit.f.SimplexF;
 import cn.nukkit.math.NukkitRandom;
 
@@ -32,7 +33,7 @@ public class ExtremeHillsMBiome extends ExtremeHillsPlusBiome {
 
     @Override
     public int getSurfaceId(int x, int y, int z) {
-        return gravelNoise.noise2D(x, z, true) < -0.75f ? 208 : super.getSurfaceId(x, y, z);
+        return gravelNoise.noise2D(x, z, true) < -0.75f ? GRAVEL << Block.DATA_BITS : super.getSurfaceId(x, y, z);
     }
 
     @Override

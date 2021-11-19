@@ -114,4 +114,8 @@ public interface LevelProvider {
     GameRules getGamerules();
 
     void setGameRules(GameRules rules);
+
+    default int getMaximumLayer() {
+        return 0;
+    }
 }

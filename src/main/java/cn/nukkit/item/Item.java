@@ -38,8 +38,10 @@ import java.util.regex.Pattern;
  */
 public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
+    public static final Item[] EMPTY_ARRAY = new Item[0];
+
     protected static final String UNKNOWN_STR = "Unknown";
-    public static Class[] list = null;
+    public static Class<?>[] list = null;
 
     protected Block block = null;
     protected final int id;
@@ -63,7 +65,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     }
 
     public Item(int id, Integer meta, int count, String name) {
-        this.id = id & 0xffff;
+        //this.id = id & 0xffff;
+        this.id = id;
         if (meta != null && meta >= 0) {
             this.meta = meta & 0xffff;
         } else {
@@ -317,6 +320,11 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             list[WARPED_FUNGUS_ON_A_STICK] = ItemWarpedFungusOnAStick.class; //757
             list[RECORD_PIGSTEP] = ItemRecordPigstep.class; //759
             list[SPYGLASS] = ItemSpyglass.class; //772
+
+            if (Server.getInstance().minimumProtocol >= ProtocolInfo.v1_13_0){
+                list[KELP] = ItemKelp.class; //335
+                list[CAMPFIRE] = ItemCampfire.class; //720
+            }
 
             for (int i = 0; i < 256; ++i) {
                 if (Block.list[i] != null) {
@@ -676,7 +684,13 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     public static Item get(int id, Integer meta, int count, byte[] tags) {
         try {
-            Class<?> c = list[id];
+            Class<?> c = null;
+            if (id < 0) {
+                int blockId = 255 - id;
+                c = Block.list[blockId];
+            } else {
+                c = list[id];
+            }
             Item item;
 
             if (c == null) {
@@ -707,17 +721,24 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         int id = 0;
         int meta = 0;
 
-        Pattern integerPattern = Pattern.compile("^[1-9]\\d*$");
+        Pattern integerPattern = Pattern.compile("^[-1-9]\\d*$");
         if (integerPattern.matcher(b[0]).matches()) {
             id = Integer.parseInt(b[0]);
         } else {
             try {
-                id = Item.class.getField(b[0].toUpperCase()).getInt(null);
-            } catch (Exception ignore) {
+                id = BlockID.class.getField(b[0].toUpperCase()).getInt(null);
+                if (id > 255) {
+                    id = 255 - id;
+                }
+            }catch (Exception ignore) {
+                try {
+                    id = ItemID.class.getField(b[0].toUpperCase()).getInt(null);
+                } catch (Exception ignore1) {
+                }
             }
         }
 
-        id = id & 0xFFFF;
+        //id = id & 0xFFFF;
         if (b.length != 1) meta = Integer.parseInt(b[1]) & 0xFFFF;
 
         return get(id, meta);

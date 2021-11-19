@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockBricksRedNether extends BlockNetherBrick {
@@ -22,8 +23,13 @@ public class BlockBricksRedNether extends BlockNetherBrick {
                     Item.get(Item.RED_NETHER_BRICK, 0, 1)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
     }
 
     @Override

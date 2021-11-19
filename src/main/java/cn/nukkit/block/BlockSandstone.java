@@ -51,17 +51,6 @@ public class BlockSandstone extends BlockSolidMeta {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(this, this.getDamage() & 0x03);
     }
@@ -69,6 +58,11 @@ public class BlockSandstone extends BlockSolidMeta {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
     }
 
     @Override

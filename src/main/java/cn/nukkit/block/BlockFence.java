@@ -4,6 +4,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -35,6 +36,11 @@ public class BlockFence extends BlockTransparentMeta {
     @Override
     public double getHardness() {
         return 2;
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
     }
 
     @Override
@@ -71,7 +77,7 @@ public class BlockFence extends BlockTransparentMeta {
         double s = south ? 1 : 0.625;
         double w = west ? 0 : 0.375;
         double e = east ? 1 : 0.625;
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x + w,
                 this.y,
                 this.z + n,

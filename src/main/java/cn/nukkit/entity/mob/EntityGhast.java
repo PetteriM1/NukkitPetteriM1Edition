@@ -105,7 +105,7 @@ public class EntityGhast extends EntityFlyingMob {
 
         drops.add(Item.get(Item.GHAST_TEAR, 0, Utils.rand(0, 1)));
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

@@ -297,7 +297,7 @@ public class EntityBoat extends EntityVehicle {
     }
 
     public double getWaterLevel() {
-        double maxY = this.boundingBox.minY + getBaseOffset();
+        double maxY = this.boundingBox.getMaxY() + getBaseOffset();
         AxisAlignedBB.BBConsumer<Double> consumer = new AxisAlignedBB.BBConsumer<Double>() {
 
             private double diffY = Double.MAX_VALUE;

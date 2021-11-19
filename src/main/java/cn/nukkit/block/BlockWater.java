@@ -12,7 +12,7 @@ import cn.nukkit.utils.Utils;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * @author MagicDroidX
+ * author: MagicDroidX
  * Nukkit Project
  */
 public class BlockWater extends BlockLiquid {
@@ -56,7 +56,7 @@ public class BlockWater extends BlockLiquid {
 
     @Override
     public BlockLiquid getBlock(int meta) {
-        return (BlockLiquid) Block.get(WATER, meta);
+        return (BlockLiquid) Block.get(BlockID.WATER, meta);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BlockWater extends BlockLiquid {
             entity.extinguish();
         }
     }
-    
+
     @Override
     public int tickRate() {
         return 5;
@@ -91,5 +91,10 @@ public class BlockWater extends BlockLiquid {
             return Level.BLOCK_UPDATE_RANDOM;
         }
         return super.onUpdate(type);
+    }
+
+    @Override
+    public boolean usesWaterLogging() {
+        return true;
     }
 }

@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Sound;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -24,14 +25,7 @@ public class BlockGrassPath extends BlockGrass {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x,
-                this.y,
-                this.z,
-                this.x + 1,
-                this.y + 1, // the actual bounding box is a normal cube
-                this.z + 1
-        );
+        return new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 1, this.z + 1);
     }
 
     @Override

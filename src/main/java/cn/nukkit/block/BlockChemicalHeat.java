@@ -35,6 +35,6 @@ public class BlockChemicalHeat extends BlockSolid {
                     this.toItem()
             };
         }
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 }

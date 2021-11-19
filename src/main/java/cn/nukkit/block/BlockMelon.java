@@ -66,7 +66,12 @@ public class BlockMelon extends BlockSolid {
     }
 
     @Override
-    public boolean breakWhenPushed() {
+    public boolean breaksWhenMoved() {
         return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
     }
 }

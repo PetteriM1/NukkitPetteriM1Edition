@@ -72,14 +72,7 @@ public class BlockEndPortal extends BlockFlowable {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x,
-                this.y,
-                this.z,
-                this.x + 1,
-                this.y + 1,
-                this.z + 1
-        );
+        return this;
     }
 
     @Override

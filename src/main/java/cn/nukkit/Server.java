@@ -439,6 +439,10 @@ public class Server {
      */
     public boolean callEntityMotionEv;
     /**
+     * Whatever allow spawner drops.
+     */
+    public boolean dropSpawners;
+    /**
      * Check for new releases automatically.
      */
     public boolean updateChecks;
@@ -994,6 +998,8 @@ public class Server {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
             }
+
+            this.batchingHelper.shutdown();
 
             if (nameLookup != null) {
                 this.getLogger().debug("Closing name lookup DB...");
@@ -2820,6 +2826,10 @@ public class Server {
         BlockEntity.registerBlockEntity(BlockEntity.DISPENSER, BlockEntityDispenser.class);
         BlockEntity.registerBlockEntity(BlockEntity.MOB_SPAWNER, BlockEntitySpawner.class);
         BlockEntity.registerBlockEntity(BlockEntity.MUSIC, BlockEntityMusic.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CAMPFIRE, BlockEntityCampfire.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BELL, BlockEntityBell.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BARREL, BlockEntityBarrel.class);
+        BlockEntity.registerBlockEntity(BlockEntity.MOVING_BLOCK, BlockEntityMovingBlock.class);
     }
 
     /**
@@ -2926,6 +2936,7 @@ public class Server {
         this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 30);
         this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
         this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
+        this.dropSpawners = this.getPropertyBoolean("drop-spawners", true);
         this.spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
         this.spawnMonsters = this.getPropertyBoolean("spawn-mobs", true);
         this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
@@ -2938,7 +2949,7 @@ public class Server {
         this.personaSkins = this.getPropertyBoolean("persona-skins", true);
         this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
         this.callEntityMotionEv = this.getPropertyBoolean("call-entity-motion-event", true);
-        this.updateChecks = this.getPropertyBoolean("update-notifications", true);
+        this.updateChecks = this.getPropertyBoolean("update-notifications", false);
         this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
         this.whitelistReason = this.getPropertyString("whitelist-reason", "§cServer is white-listed").replace("§n", "\n");
         this.enableCustomItems = this.getPropertyBoolean("enable_custom_items", true);
@@ -2986,6 +2997,7 @@ public class Server {
             put("announce-player-achievements", false);
             put("spawn-protection", 10);
             put("max-players", 50);
+            put("drop-spawners", true);
             put("spawn-animals", true);
             put("spawn-mobs", true);
             put("gamemode", 0);

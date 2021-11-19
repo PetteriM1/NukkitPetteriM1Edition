@@ -38,6 +38,11 @@ public class BlockStairsBrick extends BlockStairs {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         return "Brick Stairs";
     }

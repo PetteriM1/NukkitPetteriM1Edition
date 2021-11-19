@@ -3,6 +3,7 @@ package cn.nukkit.block;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 
 /**
  * @author MagicDroidX
@@ -42,6 +43,11 @@ public class BlockWall extends BlockTransparentMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         if (this.getDamage() == 0x01) {
             return "Mossy Cobblestone Wall";
@@ -71,7 +77,7 @@ public class BlockWall extends BlockTransparentMeta {
             s = 0.6875;
         }
 
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x + w,
                 this.y,
                 this.z + n,
@@ -79,6 +85,11 @@ public class BlockWall extends BlockTransparentMeta {
                 this.y + 1.5,
                 this.z + s
         );
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
     }
 
     public boolean canConnect(Block block) {

@@ -10,6 +10,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 import java.util.Random;
@@ -69,6 +70,16 @@ public class BlockVine extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public void onEntityCollide(Entity entity) {
         entity.resetFallDistance();
         entity.onGround = true;
@@ -123,7 +134,7 @@ public class BlockVine extends BlockTransparentMeta {
             f3 = 0;
             f6 = 1;
         }
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x + f1,
                 this.y + f2,
                 this.z + f3,
@@ -131,6 +142,16 @@ public class BlockVine extends BlockTransparentMeta {
                 this.y + f5,
                 this.z + f6
         );
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return true;
     }
 
     @Override
@@ -151,7 +172,7 @@ public class BlockVine extends BlockTransparentMeta {
                     toItem()
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

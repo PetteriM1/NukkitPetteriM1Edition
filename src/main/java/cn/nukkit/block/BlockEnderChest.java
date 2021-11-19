@@ -11,6 +11,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.nbt.tag.Tag;
@@ -51,6 +52,11 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public String getName() {
         return "Chest";
     }
@@ -71,8 +77,13 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x + 0.0625,
                 this.y,
                 this.z + 0.0625,
@@ -150,7 +161,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
+        if (item.isPickaxe() && item.getTier() >= getToolTier()) {
             if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
                 return new Item[]{this.toItem()};
             }
@@ -158,7 +169,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
                     Item.get(Item.OBSIDIAN, 0, 8)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 
@@ -173,6 +184,11 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
 
     @Override
     public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePulled() {
         return false;
     }
 

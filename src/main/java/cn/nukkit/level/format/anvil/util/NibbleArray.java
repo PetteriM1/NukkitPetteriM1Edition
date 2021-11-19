@@ -3,14 +3,12 @@ package cn.nukkit.level.format.anvil.util;
 
 import com.google.common.base.Preconditions;
 
-import java.util.Arrays;
-
 public class NibbleArray implements Cloneable {
 
     private final byte[] data;
 
     public NibbleArray(int length) {
-        data = new byte[(length >> 1)];
+        data = new byte[length / 2];
     }
 
     public NibbleArray(byte[] array) {
@@ -18,8 +16,8 @@ public class NibbleArray implements Cloneable {
     }
 
     public byte get(int index) {
-        if (index >= data.length << 1) throw new IndexOutOfBoundsException();
-        byte val = data[index >> 1];
+        Preconditions.checkElementIndex(index, data.length << 1);
+        byte val = data[index / 2];
         if ((index & 1) == 0) {
             return (byte) (val & 0x0f);
         } else {
@@ -34,7 +32,7 @@ public class NibbleArray implements Cloneable {
             throw new IndexOutOfBoundsException();
         }
         value &= 0xf;
-        int half = index >> 1;
+        int half = index / 2;
         byte previous = data[half];
         if ((index & 1) == 0) {
             data[half] = (byte) (previous & 0xf0 | value);
@@ -59,7 +57,9 @@ public class NibbleArray implements Cloneable {
     public void fill(byte value) {
         Preconditions.checkArgument(value >= 0 && value < 16, "Nibbles must have a value between 0 and 15.");
         value &= 0xf;
-        Arrays.fill(data, (byte) ((value << 4) | value));
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte) ((value << 4) | value);
+        }
     }
 
     public void copyFrom(byte[] bytes) {

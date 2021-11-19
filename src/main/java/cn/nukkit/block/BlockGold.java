@@ -26,6 +26,11 @@ public class BlockGold extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
+    }
+
+    @Override
     public double getHardness() {
         return 3;
     }

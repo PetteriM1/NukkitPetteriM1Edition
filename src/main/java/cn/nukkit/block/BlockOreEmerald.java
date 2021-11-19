@@ -28,6 +28,11 @@ public class BlockOreEmerald extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
+    }
+
+    @Override
     public double getHardness() {
         return 3;
     }
@@ -39,11 +44,10 @@ public class BlockOreEmerald extends BlockSolid {
 
     @Override
     public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_IRON) {
+        if (item.isPickaxe() && item.getTier() >= this.getToolTier()) {
             if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
                 return new Item[]{this.toItem()};
             }
-
             int count = 1;
             Enchantment fortune = item.getEnchantment(Enchantment.ID_FORTUNE_DIGGING);
             if (fortune != null && fortune.getLevel() >= 1) {
@@ -60,7 +64,7 @@ public class BlockOreEmerald extends BlockSolid {
                     new ItemEmerald(0, count)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

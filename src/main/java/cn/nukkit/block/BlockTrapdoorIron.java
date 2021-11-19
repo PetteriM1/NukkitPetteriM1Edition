@@ -44,6 +44,11 @@ public class BlockTrapdoorIron extends BlockTrapdoor {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public BlockColor getColor() {
         return BlockColor.IRON_BLOCK_COLOR;
     }

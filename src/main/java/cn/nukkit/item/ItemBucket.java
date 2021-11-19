@@ -14,6 +14,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.UpdateBlockPacket;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -92,17 +93,26 @@ public class ItemBucket extends Item {
         Block targetBlock = Block.get(getDamageByTarget(this.meta));
 
         if (targetBlock instanceof BlockAir) {
+            if (!(target instanceof BlockLiquid) || target.getDamage() != 0) {
+                target = target.getLevelBlockAtLayer(1);
+            }
+            if (!(target instanceof BlockLiquid) || target.getDamage() != 0) {
+                target = block;
+            }
+            if (!(target instanceof BlockLiquid) || target.getDamage() != 0) {
+                target = block.getLevelBlockAtLayer(1);
+            }
             if (target instanceof BlockLiquid && target.getDamage() == 0) {
                 Item result = Item.get(BUCKET, getDamageByTarget(target.getId()), 1);
                 PlayerBucketFillEvent ev;
                 player.getServer().getPluginManager().callEvent(ev = new PlayerBucketFillEvent(player, block, face, this, result));
                 if (!ev.isCancelled()) {
-                    player.getLevel().setBlock(target, Block.get(BlockID.AIR), true, true);
+                    player.getLevel().setBlock(target, target.layer, Block.get(BlockID.AIR), true, true);
 
                     // When water is removed ensure any adjacent still water is
                     // replaced with water that can flow.
                     for (BlockFace side : Plane.HORIZONTAL) {
-                        Block b = target.getSide(side);
+                        Block b = target.getSideAtLayer(0, side);
                         if (b.getId() == STILL_WATER) {
                             level.setBlock(b, Block.get(BlockID.WATER));
                         }
@@ -136,7 +146,30 @@ public class ItemBucket extends Item {
             }
         } else if (targetBlock instanceof BlockLiquid) {
             Item result = Item.get(BUCKET, 0, 1);
+            boolean usesWaterlogging = ((BlockLiquid) targetBlock).usesWaterLogging();
+            Block placementBlock;
+            if (usesWaterlogging) {
+                if (block.getId() == BlockID.BAMBOO) {
+                    placementBlock = block;
+                } else if (target.getWaterloggingLevel() > 0) {
+                    placementBlock = target.getLevelBlockAtLayer(1);
+                } else if (block.getWaterloggingLevel() > 0) {
+                    placementBlock = block.getLevelBlockAtLayer(1);
+                } else {
+                    placementBlock = block;
+                }
+            } else {
+                placementBlock = block;
+            }
+
             PlayerBucketEmptyEvent ev = new PlayerBucketEmptyEvent(player, block, face, this, result);
+            boolean canBeFlowedInto = placementBlock.canBeFlowedInto() || placementBlock.getId() == BlockID.BAMBOO;
+            if (usesWaterlogging) {
+                ev.setCancelled(placementBlock.getWaterloggingLevel() <= 0 && !canBeFlowedInto);
+            } else {
+                ev.setCancelled(!canBeFlowedInto);
+            }
+
             if (!block.canBeFlowedInto()) {
                 ev.setCancelled(true);
             }
@@ -150,7 +183,7 @@ public class ItemBucket extends Item {
             player.getServer().getPluginManager().callEvent(ev);
 
             if (!ev.isCancelled()) {
-                player.getLevel().setBlock(block, targetBlock, true, true);
+                player.getLevel().setBlock(placementBlock, placementBlock.layer, targetBlock, true, true);
                 if (player.isSurvival()) {
                     if (this.getCount() - 1 <= 0) {
                         player.getInventory().setItemInHand(ev.getItem());
@@ -202,6 +235,7 @@ public class ItemBucket extends Item {
                 player.getLevel().addSound(new FizzSound(target, 2.6F + (ThreadLocalRandom.current().nextFloat() - ThreadLocalRandom.current().nextFloat()) * 0.8F));
                 player.getLevel().addParticle(new ExplodeParticle(target.add(0.5, 1, 0.5)));
             } else {
+                player.getLevel().sendBlocks(new Player[] {player}, new Block[] {block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_ALL_PRIORITY, 1); //TODO: maybe not here
                 player.getInventory().sendContents(player);
             }
         }

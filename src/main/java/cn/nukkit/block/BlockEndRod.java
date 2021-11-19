@@ -6,6 +6,7 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -56,14 +57,17 @@ public class BlockEndRod extends BlockTransparentMeta implements Faceable {
     }
 
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x + 0.4,
-                this.y,
-                this.z + 0.4,
-                this.x + 0.6,
-                this.y + 1,
-                this.z + 0.6
-        );
+        return new SimpleAxisAlignedBB(this.x + 0.4, this.y, this.z + 0.4, this.x + 0.6, this.y + 1, this.z + 0.6);
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
     }
 
     @Override

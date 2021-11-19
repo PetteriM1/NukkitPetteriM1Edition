@@ -133,7 +133,7 @@ public class EntitySpider extends EntityWalkingMob implements EntityArthropod {
             drops.add(Item.get(Item.SPIDER_EYE, 0, 1));
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

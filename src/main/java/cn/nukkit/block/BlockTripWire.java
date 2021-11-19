@@ -7,6 +7,7 @@ import cn.nukkit.item.ItemString;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 
 /**
  * @author CreeperFace
@@ -169,6 +170,16 @@ public class BlockTripWire extends BlockFlowable {
 
     @Override
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.5, this.z + 1);
+        return new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.5, this.z + 1);
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 2;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
     }
 }

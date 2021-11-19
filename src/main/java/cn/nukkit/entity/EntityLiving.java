@@ -397,7 +397,7 @@ public abstract class EntityLiving extends Entity implements EntityDamageable {
     }
 
     public Item[] getDrops() {
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     public Block[] getLineOfSight(int maxDistance) {

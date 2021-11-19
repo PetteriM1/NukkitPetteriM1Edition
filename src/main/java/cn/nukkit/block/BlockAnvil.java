@@ -45,7 +45,7 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
 
     @Override
     public int getFullId() {
-        return (2320) + getDamage();
+        return (getId() << DATA_BITS) + getDamage();
     }
 
     @Override
@@ -56,6 +56,11 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
     @Override
     public boolean canBeActivated() {
         return Server.getInstance().anvilsEnabled;
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
     }
 
     @Override
@@ -132,7 +137,12 @@ public class BlockAnvil extends BlockFallableMeta implements Faceable {
                     this.toItem()
             };
         }
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
     }
 
     @Override

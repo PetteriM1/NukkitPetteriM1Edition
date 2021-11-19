@@ -44,7 +44,8 @@ public final class BitArray256 {
         if (localBitIndexStart <= 64 - bitsPerEntry) {
             return (int)(this.data[longIndexStart] >>> localBitIndexStart & ((1 << bitsPerEntry) - 1));
         } else {
-            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << (64 - localBitIndexStart)) & ((1 << bitsPerEntry) - 1));
+            int localShift = 64 - localBitIndexStart;
+            return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << localShift) & ((1 << bitsPerEntry) - 1));
         }
     }
 

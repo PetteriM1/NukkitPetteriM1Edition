@@ -2,6 +2,7 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockLava;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.block.BlockLiquid;
 import cn.nukkit.entity.Entity;
@@ -16,10 +17,12 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.GlobalBlockPalette;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.sound.AnvilFallSound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddEntityPacket;
+import sun.security.krb5.internal.crypto.Des;
 
 /**
  * @author MagicDroidX
@@ -65,6 +68,7 @@ public class EntityFallingBlock extends Entity {
 
     protected int blockId;
     protected int damage;
+    protected boolean breakOnLava;
 
     public EntityFallingBlock(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
@@ -74,21 +78,23 @@ public class EntityFallingBlock extends Entity {
     protected void initEntity() {
         super.initEntity();
 
-        if (namedTag != null) {
-            if (namedTag.contains("TileID")) {
-                blockId = namedTag.getInt("TileID");
-            } else if (namedTag.contains("Tile")) {
-                blockId = namedTag.getInt("Tile");
-                namedTag.putInt("TileID", blockId);
+        if (this.namedTag != null) {
+            if (this.namedTag.contains("TileID")) {
+                this.blockId = this.namedTag.getInt("TileID");
+            } else if (this.namedTag.contains("Tile")) {
+                this.blockId = this.namedTag.getInt("Tile");
+                this.namedTag.putInt("TileID", blockId);
             }
 
-            if (namedTag.contains("Data")) {
-                damage = namedTag.getByte("Data");
+            if (this.namedTag.contains("Data")) {
+                damage = this.namedTag.getByte("Data");
             }
+
+            this.breakOnLava = this.namedTag.getBoolean("BreakOnLava");
         }
 
-        if (blockId == 0) {
-            close();
+        if (this.blockId == 0) {
+            this.close();
             return;
         }
 
@@ -128,7 +134,7 @@ public class EntityFallingBlock extends Entity {
 
     @Override
     public boolean onUpdate(int currentTick) {
-        if (closed) {
+        if (this.closed) {
             return false;
         }
 
@@ -141,24 +147,32 @@ public class EntityFallingBlock extends Entity {
 
         lastUpdate = currentTick;
 
-        boolean hasUpdate = entityBaseTick(tickDiff);
+        boolean hasUpdate = this.entityBaseTick(tickDiff);
 
-        if (isAlive()) {
-            motionY -= getGravity();
+        if (this.isAlive()) {
+            motionY -= this.getGravity();
 
-            move(motionX, motionY, motionZ);
+            this.move(motionX, motionY, motionZ);
 
-            float friction = 1 - getDrag();
+            float friction = 1 - this.getDrag();
 
             motionX *= friction;
-            motionY *= 1 - getDrag();
+            motionY *= 1 - this.getDrag();
             motionZ *= friction;
 
             Vector3 pos = new Vector3(x - 0.5, y, z - 0.5).round();
+            if (breakOnLava && level.getBlock(pos.subtract(0, 1, 0)) instanceof BlockLava) {
+                this.close();
+                if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.level.dropItem(this, Block.get(this.getBlock(), this.getDamage()).toItem());
+                }
+                level.addParticle(new DestroyBlockParticle(pos, Block.get(this.getBlock(), this.getDamage())));
+                return true;
+            }
 
-            if (onGround) {
-                close();
-                Block block = level.getBlock(pos);
+            if (this.onGround) {
+                this.close();
+                Block block = this.level.getBlock(pos);
                 Block floorBlock = this.level.getBlock(pos);
                 if (this.getBlock() == Block.SNOW_LAYER && floorBlock.getId() == Block.SNOW_LAYER && (floorBlock.getDamage() & 0x7) != 0x7) {
                     int mergedHeight = (floorBlock.getDamage() & 0x7) + 1 + (this.getDamage() & 0x7) + 1;
@@ -187,17 +201,17 @@ public class EntityFallingBlock extends Entity {
                     }
                 } else if ((block.isTransparent() && !block.canBeReplaced() || this.getBlock() == Block.SNOW_LAYER && block instanceof BlockLiquid)) {
                     if (this.getBlock() != Block.SNOW_LAYER ? this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS) : this.level.getGameRules().getBoolean(GameRule.DO_TILE_DROPS)) {
-                        getLevel().dropItem(this, Item.get(this.blockId, this.damage, 1));
+                        this.level.dropItem(this, Block.get(this.getBlock(), this.getDamage()).toItem());
                     }
                 } else {
                     EntityBlockChangeEvent event = new EntityBlockChangeEvent(this, block, Block.get(blockId, damage));
-                    server.getPluginManager().callEvent(event);
+                    this.server.getPluginManager().callEvent(event);
                     if (!event.isCancelled()) {
-                        getLevel().setBlock(pos, event.getTo(), true, true);
-                        getLevel().scheduleUpdate(getLevel().getBlock(pos), 1);
+                        this.level.setBlock(pos, event.getTo(), true, true);
+                        this.level.scheduleUpdate(this.level.getBlock(pos), 1);
 
                         if (event.getTo().getId() == Item.ANVIL) {
-                            getLevel().addSound(new AnvilFallSound(pos));
+                            this.level.addSound(new AnvilFallSound(pos));
 
                             Entity[] e = level.getCollidingEntities(this.getBoundingBox(), this);
                             for (Entity entity : e) {
@@ -211,12 +225,12 @@ public class EntityFallingBlock extends Entity {
                 hasUpdate = true;
             }
 
-            updateMovement();
+            this.updateMovement();
         }
 
         if (this.timing != null) this.timing.stopTiming();
 
-        return hasUpdate || !onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
+        return hasUpdate || !this.onGround || Math.abs(motionX) > 0.00001 || Math.abs(motionY) > 0.00001 || Math.abs(motionZ) > 0.00001;
     }
 
     public int getBlock() {

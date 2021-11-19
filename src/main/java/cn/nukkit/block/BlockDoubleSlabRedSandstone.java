@@ -39,6 +39,11 @@ public class BlockDoubleSlabRedSandstone extends BlockSolidMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public String getName() {
         String[] names = new String[]{
                 "Red Sandstone",

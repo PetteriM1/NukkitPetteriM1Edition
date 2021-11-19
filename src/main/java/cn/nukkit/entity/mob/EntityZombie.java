@@ -158,7 +158,7 @@ public class EntityZombie extends EntityWalkingMob implements EntitySmite {
             }
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

@@ -8,6 +8,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 
@@ -46,6 +47,11 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean canBeActivated() {
         return true;
     }
@@ -62,23 +68,9 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
         }
         int i = this.getDamage() & 0x03;
         if (i == 2 || i == 0) {
-            return new AxisAlignedBB(
-                    x,
-                    y,
-                    z + 0.375,
-                    x + 1,
-                    y + 1.5,
-                    z + 0.625
-            );
+            return new SimpleAxisAlignedBB(x, y, z + 0.375, x + 1, y + 1.5, z + 0.625);
         } else {
-            return new AxisAlignedBB(
-                    x + 0.375,
-                    y,
-                    z,
-                    x + 0.625,
-                    y + 1.5,
-                    z + 1
-            );
+            return new SimpleAxisAlignedBB( x + 0.375, y, z, x + 0.625, y + 1.5, z + 1);
         }
     }
 

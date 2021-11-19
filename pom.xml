@@ -208,6 +208,7 @@
                             <Main-Class>cn.nukkit.Nukkit</Main-Class>
                         </manifestEntries>
                     </archive>
+                    <finalName>nukkit</finalName>
                 </configuration>
             </plugin>
             <plugin>

@@ -46,7 +46,8 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
 
     public RakNetInterface(Server server) {
         this.server = server;
-        this.raknet = new RakNetServer(new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort()), Runtime.getRuntime().availableProcessors());
+        InetSocketAddress bindAddress = new InetSocketAddress(Strings.isNullOrEmpty(this.server.getIp()) ? "0.0.0.0" : this.server.getIp(), this.server.getPort());
+        this.raknet = new RakNetServer(bindAddress, Runtime.getRuntime().availableProcessors());
         this.raknet.bind().join();
         this.raknet.setListener(this);
     }
@@ -200,7 +201,7 @@ public class RakNetInterface implements RakNetServerListener, AdvancedSourceInte
         ByteBuf byteBuf = PooledByteBufAllocator.DEFAULT.directBuffer(1 + buffer.length);
         byteBuf.writeByte(0xfe);
         byteBuf.writeBytes(buffer);
-        //byteBuf.readerIndex(0);
+        // byteBuf.readerIndex(0);
 
         session.send(byteBuf, immediate ? RakNetPriority.IMMEDIATE : RakNetPriority.MEDIUM, packet.reliability, packet.getChannel());
         return null;

@@ -16,7 +16,8 @@ public final class BitArray4096 {
         this.bitsPerEntry = bitsPerEntry;
         this.maxSeqLocIndex = 64 - bitsPerEntry;
         maxEntryValue = (1 << bitsPerEntry) - 1;
-        this.data = new long[(this.bitsPerEntry << 12) >> 6];
+        int longLen = (this.bitsPerEntry << 12) >> 6;
+        this.data = new long[longLen];
     }
 
     public final void setAt(int index, int value) {

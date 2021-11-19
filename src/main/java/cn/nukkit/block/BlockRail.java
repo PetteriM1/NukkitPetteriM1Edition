@@ -8,6 +8,7 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
 import cn.nukkit.utils.Rail;
@@ -79,13 +80,7 @@ public class BlockRail extends BlockFlowable implements Faceable {
 
     @Override
     public AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x,
-                this.y,
-                this.z,
-                this.x + 1,
-                this.y + 0.125D,
-                this.z + 1);
+        return new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.125D, this.z + 1);
     }
 
     @Override
@@ -216,6 +211,16 @@ public class BlockRail extends BlockFlowable implements Faceable {
 
     public boolean canPowered() {
         return this.canBePowered;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        return true;
     }
 
     public Orientation getOrientation() {

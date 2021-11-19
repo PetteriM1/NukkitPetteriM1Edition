@@ -25,13 +25,18 @@ public class BlockGlassPane extends BlockThin {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public double getHardness() {
         return 0.3;
     }
 
     @Override
     public Item[] getDrops(Item item) {
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     @Override

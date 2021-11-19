@@ -5,6 +5,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 
 /**
  * @author MagicDroidX
@@ -22,23 +23,9 @@ public abstract class BlockSlab extends BlockTransparentMeta {
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         if ((this.getDamage() & 0x08) > 0) {
-            return new AxisAlignedBB(
-                    this.x,
-                    this.y + 0.5,
-                    this.z,
-                    this.x + 1,
-                    this.y + 1,
-                    this.z + 1
-            );
+            return new SimpleAxisAlignedBB(this.x, this.y + 0.5, this.z, this.x + 1, this.y + 1, this.z + 1);
         } else {
-            return new AxisAlignedBB(
-                    this.x,
-                    this.y,
-                    this.z,
-                    this.x + 1,
-                    this.y + 0.5,
-                    this.z + 1
-            );
+            return new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 0.5, this.z + 1);
         }
     }
 
@@ -50,6 +37,11 @@ public abstract class BlockSlab extends BlockTransparentMeta {
     @Override
     public double getResistance() {
         return getToolType() < ItemTool.TYPE_AXE ? 30 : 15;
+    }
+
+    @Override
+    public int getWaterloggingLevel() {
+        return 1;
     }
 
     @Override

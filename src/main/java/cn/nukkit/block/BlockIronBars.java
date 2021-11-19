@@ -27,6 +27,11 @@ public class BlockIronBars extends BlockThin {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public double getResistance() {
         return 10;
     }
@@ -37,19 +42,13 @@ public class BlockIronBars extends BlockThin {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(this, 0);
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    this.toItem()
-            };
-        } else {
-            return new Item[0];
-        }
+    public Item toItem() {
+        return new ItemBlock(this, 0);
     }
 
     @Override

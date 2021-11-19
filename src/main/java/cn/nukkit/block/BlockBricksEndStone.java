@@ -22,6 +22,11 @@ public class BlockBricksEndStone extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public double getHardness() {
         return 0.8;
     }
@@ -38,7 +43,7 @@ public class BlockBricksEndStone extends BlockSolid {
                     Item.get(Item.END_BRICKS, 0, 1)
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

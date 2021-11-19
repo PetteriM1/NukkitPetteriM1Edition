@@ -33,4 +33,14 @@ public class BlockObsidianGlowing extends BlockObsidian {
     public boolean onBreak(Item item) {
         return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
     }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        return false;
+    }
 }

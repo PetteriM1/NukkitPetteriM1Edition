@@ -96,7 +96,7 @@ public class EntityIronGolem extends EntityWalkingMob {
             drops.add(Item.get(Item.POPPY, 0, 1));
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

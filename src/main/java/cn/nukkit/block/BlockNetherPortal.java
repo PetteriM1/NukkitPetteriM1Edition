@@ -97,14 +97,7 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x,
-                this.y,
-                this.z,
-                this.x + 1,
-                this.y + 1,
-                this.z + 1
-        );
+        return this;
     }
 
     public static boolean trySpawnPortal(Level level, Vector3 pos) {

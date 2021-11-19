@@ -10,6 +10,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.sound.DoorSound;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.Faceable;
 
 /**
@@ -35,7 +36,22 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
         return false;
     }
 
@@ -61,7 +77,7 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         double f = 0.1875;
         int damage = this.getFullDamage();
 
-        AxisAlignedBB bb = new AxisAlignedBB(
+        AxisAlignedBB bb = new SimpleAxisAlignedBB(
                 this.x,
                 this.y,
                 this.z,

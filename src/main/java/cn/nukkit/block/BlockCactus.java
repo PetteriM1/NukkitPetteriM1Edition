@@ -11,6 +11,7 @@ import cn.nukkit.item.ItemCactus;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockColor;
 
@@ -43,25 +44,33 @@ public class BlockCactus extends BlockTransparentMeta {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public boolean hasEntityCollision() {
         return true;
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
-                this.x + 0.0625,
-                this.y + 0.0625,
-                this.z + 0.0625,
-                this.x + 0.9375,
-                this.y + 0.9375,
-                this.z + 0.9375
-        );
+        return new SimpleAxisAlignedBB(this.x + 0.0625, this.y + 0.0625, this.z + 0.0625, this.x + 0.9375, this.y + 0.9375, this.z + 0.9375);
     }
 
     @Override
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return new AxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 1, this.z + 1);
+        return new SimpleAxisAlignedBB(this.x, this.y, this.z, this.x + 1, this.y + 1, this.z + 1);
     }
 
     @Override

@@ -163,6 +163,7 @@ public class Chunk extends BaseChunk {
                 block.x = entryNBT.getInt("x");
                 block.y = entryNBT.getInt("y");
                 block.z = entryNBT.getInt("z");
+                block.layer = 0;
 
                 this.provider.getLevel().scheduleUpdate(block, block, entryNBT.getInt("t"), entryNBT.getInt("p"), false);
             }
@@ -207,6 +208,11 @@ public class Chunk extends BaseChunk {
             this.terrainGenerated = value;
             setChanged();
         }
+    }
+
+    @Override
+    public int[] getBiomeColorArray() {
+        return new int[0];
     }
 
     public CompoundTag getNBT() {
@@ -270,22 +276,17 @@ public class Chunk extends BaseChunk {
         nbt.putInt("zPos", this.getZ());
 
         nbt.putByteArray("Biomes", this.getBiomeIdArray());
-        /*int[] heightInts = new int[256]; // Unused?
+        int[] heightInts = new int[256];
         byte[] heightBytes = this.getHeightMapArray();
         for (int i = 0; i < heightInts.length; i++) {
             heightInts[i] = heightBytes[i] & 0xFF;
-        }*/
+        }
 
         for (cn.nukkit.level.format.ChunkSection section : this.getSections()) {
             if (section instanceof EmptyChunkSection) {
                 continue;
             }
-            CompoundTag s = new CompoundTag();
-            s.putByte("Y", section.getY());
-            s.putByteArray("Blocks", section.getIdArray());
-            s.putByteArray("Data", section.getDataArray());
-            s.putByteArray("BlockLight", section.getLightArray());
-            s.putByteArray("SkyLight", section.getSkyLightArray());
+            CompoundTag s = section.toNBT();
             nbt.getList("Sections", CompoundTag.class).add(s);
         }
 
@@ -362,12 +363,7 @@ public class Chunk extends BaseChunk {
             if (section instanceof EmptyChunkSection) {
                 continue;
             }
-            CompoundTag s = new CompoundTag();
-            s.putByte("Y", (section.getY()));
-            s.putByteArray("Blocks", section.getIdArray());
-            s.putByteArray("Data", section.getDataArray());
-            s.putByteArray("BlockLight", section.getLightArray());
-            s.putByteArray("SkyLight", section.getSkyLightArray());
+            CompoundTag s = section.toNBT();
             sectionList.add(s);
         }
         nbt.putList(sectionList);

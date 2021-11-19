@@ -1,6 +1,7 @@
 package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.blockentity.BlockEntityPistonArm;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHanging;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
@@ -8,6 +9,10 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.ItemPainting;
 import cn.nukkit.level.GameRule;
 import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AddPaintingPacket;
 import cn.nukkit.network.protocol.DataPacket;
@@ -27,6 +32,10 @@ public class EntityPainting extends EntityHanging {
 
     private Motive motive;
 
+    private float width;
+    private float length;
+    private float height;
+
     public EntityPainting(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
@@ -41,9 +50,52 @@ public class EntityPainting extends EntityHanging {
     }
 
     @Override
+    public float getWidth() {
+        return this.width;
+    }
+
+    @Override
+    public float getLength() {
+        return this.length;
+    }
+
+    @Override
+    public float getHeight() {
+        return this.height;
+    }
+
+    @Override
     protected void initEntity() {
-        super.initEntity();
         this.motive = getMotive(this.namedTag.getString("Motive"));
+        if (this.motive == null) {
+            this.width = 0;
+            this.height = 0;
+            this.length = 0;
+        } else {
+            BlockFace face = getHorizontalFacing();
+
+            Vector3 size = new Vector3(this.motive.width, this.motive.height, this.motive.width).multiply(0.5);
+
+            if (face.getAxis() == BlockFace.Axis.Z) {
+                size.z = 0.5;
+            } else {
+                size.x = 0.5;
+            }
+
+            this.width = (float) size.x;
+            this.length = (float) size.z;
+            this.height = (float) size.y;
+
+            this.boundingBox = new SimpleAxisAlignedBB(
+                    this.x - size.x,
+                    this.y - size.y,
+                    this.z - size.z,
+                    this.x + size.x,
+                    this.y + size.y,
+                    this.z + size.z
+            );
+        }
+        super.initEntity();
     }
 
     @Override
@@ -79,6 +131,15 @@ public class EntityPainting extends EntityHanging {
     public void saveNBT() {
         super.saveNBT();
         this.namedTag.putString("Motive", this.motive.title);
+    }
+
+    @Override
+    public void onPushByPiston(BlockEntityPistonArm piston, BlockFace moveDirection) {
+        if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+            this.level.dropItem(this, new ItemPainting());
+        }
+
+        this.close();
     }
 
     public Motive getArt() {

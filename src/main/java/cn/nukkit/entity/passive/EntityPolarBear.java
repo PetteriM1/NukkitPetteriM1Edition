@@ -126,7 +126,7 @@ public class EntityPolarBear extends EntityWalkingMob {
             drops.add(Item.get(Item.RAW_SALMON, 0, Utils.rand(0, 2)));
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

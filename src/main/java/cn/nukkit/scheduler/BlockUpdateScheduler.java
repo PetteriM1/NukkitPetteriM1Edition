@@ -3,6 +3,7 @@ package cn.nukkit.scheduler;
 import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.BlockUpdateEntry;
 import com.google.common.collect.Maps;
@@ -52,8 +53,8 @@ public class BlockUpdateScheduler {
             Set<BlockUpdateEntry> updates = pendingUpdates = queuedUpdates.remove(tick);
             if (updates != null) {
                 for (BlockUpdateEntry entry : updates) {
-                    if (level.isAreaLoaded(new AxisAlignedBB(entry.pos, entry.pos))) {
-                        Block block = level.getBlock(entry.pos);
+                    if (level.isAreaLoaded(new SimpleAxisAlignedBB(entry.pos, entry.pos))) {
+                        Block block = level.getBlock(entry.pos, entry.block.layer);
 
                         if (Block.equals(block, entry.block, false)) {
                             block.onUpdate(Level.BLOCK_UPDATE_SCHEDULED);
@@ -76,7 +77,7 @@ public class BlockUpdateScheduler {
             for (BlockUpdateEntry update : tickSet) {
                 Vector3 pos = update.pos;
 
-                if (pos.getX() >= boundingBox.minX && pos.getX() < boundingBox.maxX && pos.getZ() >= boundingBox.minZ && pos.getZ() < boundingBox.maxZ) {
+                if (pos.getX() >= boundingBox.getMinX() && pos.getX() < boundingBox.getMaxX() && pos.getZ() >= boundingBox.getMinZ() && pos.getZ() < boundingBox.getMaxZ()) {
                     if (set == null) {
                         set = new LinkedHashSet<>();
                     }

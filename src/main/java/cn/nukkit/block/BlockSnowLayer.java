@@ -9,6 +9,7 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.utils.BlockColor;
 
 /**
@@ -109,7 +110,7 @@ public class BlockSnowLayer extends BlockFallableMeta {
             drop.setCount(height < 3 ? 1 : height < 5 ? 2 : height == 7 ? 4 : 3);
             return new Item[]{drop};
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 
@@ -173,7 +174,7 @@ public class BlockSnowLayer extends BlockFallableMeta {
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
-        return new AxisAlignedBB(
+        return new SimpleAxisAlignedBB(
                 this.x,
                 this.y,
                 this.z,

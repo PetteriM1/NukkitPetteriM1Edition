@@ -44,6 +44,6 @@ public class PopulatorSugarcane extends PopulatorSurfaceBlock {
 
     @Override
     protected int getBlockId(int x, int z, NukkitRandom random, FullChunk chunk) {
-        return 1329;
+        return (SUGARCANE_BLOCK << Block.DATA_BITS) | 1;
     }
 }

@@ -10,6 +10,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.math.SimpleAxisAlignedBB;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -49,7 +50,7 @@ public class ItemEndCrystal extends Item {
             return false;
         }
 
-        Entity[] entities = level.getCollidingEntities(new AxisAlignedBB(target.x, target.y, target.z, target.x + 1, target.y + 2, target.z + 1));
+        Entity[] entities = level.getCollidingEntities(new SimpleAxisAlignedBB(target.x, target.y, target.z, target.x + 1, target.y + 2, target.z + 1));
         if (entities.length != 0) {
             return false;
         }

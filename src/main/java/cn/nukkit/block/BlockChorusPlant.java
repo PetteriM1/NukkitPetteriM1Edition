@@ -33,6 +33,16 @@ public class BlockChorusPlant extends BlockTransparent {
     }
 
     @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         Block down = block.down();
         if (!(down instanceof BlockEndStone) &&
@@ -76,7 +86,7 @@ public class BlockChorusPlant extends BlockTransparent {
         if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
             return new Item[]{this.toItem()};
         }
-        return Utils.rand() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : new Item[0];
+        return Utils.rand() ? new Item[]{Item.get(ItemID.CHORUS_FRUIT, 0, 1)} : Item.EMPTY_ARRAY;
     }
 
     @Override

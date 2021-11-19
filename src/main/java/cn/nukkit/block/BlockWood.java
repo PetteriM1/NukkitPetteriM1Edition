@@ -86,6 +86,47 @@ public class BlockWood extends BlockSolidMeta {
     }
 
     @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    protected int getStrippedId() {
+        int damage = getDamage();
+        if ((damage & 0b1100) == 0b1100) { // Only bark
+            return WOOD_BARK;
+        }
+
+        int[] strippedIds = new int[] {
+                STRIPPED_OAK_LOG,
+                STRIPPED_SPRUCE_LOG,
+                STRIPPED_BIRCH_LOG,
+                STRIPPED_JUNGLE_LOG
+        };
+        return strippedIds[damage & 0x03];
+    }
+
+    protected int getStrippedDamage() {
+        int damage = getDamage();
+        if ((damage & 0b1100) == 0b1100) { // Only bark
+            return damage & 0x03 | 0x8;
+        }
+
+        return damage >> 2;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.isAxe()) {
+            Block strippedBlock = Block.get(this.getStrippedId(), 0);
+            strippedBlock.setDamage(this.getStrippedDamage());
+            item.useOn(this);
+            this.level.setBlock(this, strippedBlock, true, true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
     }

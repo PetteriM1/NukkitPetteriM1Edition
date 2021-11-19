@@ -3,6 +3,7 @@ package cn.nukkit.entity;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.*;
+import cn.nukkit.blockentity.BlockEntityPistonArm;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.entity.item.EntityVehicle;
 import cn.nukkit.entity.mob.EntityCreeper;
@@ -21,6 +22,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.metadata.Metadatable;
+import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
@@ -38,6 +40,8 @@ import co.aikar.timings.TimingsHistory;
 import com.google.common.collect.Iterables;
 import org.apache.commons.math3.util.FastMath;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -297,6 +301,23 @@ public abstract class Entity extends Location implements Metadatable {
     private static final Map<String, Class<? extends Entity>> knownEntities = new HashMap<>();
     private static final Map<String, String> shortNames = new HashMap<>();
 
+    private static final Map<Integer, String> entityRuntimeMappingOld = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping407 = new HashMap<>();
+    private static final Map<Integer, String> entityRuntimeMapping440 = new HashMap<>();
+
+    private static final Map<Integer, CompoundTag> entityIdentifiersMap = new HashMap<>();
+    private static final Map<Integer, byte[]> entityIdentifiersCache = new HashMap<>();
+
+    static {
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMappingOld, ProtocolInfo.v1_2_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping407, ProtocolInfo.v1_16_0);
+        AddEntityPacket.setupLegacyIdentifiers(entityRuntimeMapping440, ProtocolInfo.v1_17_0);
+        initEntityIdentifiers(ProtocolInfo.v1_2_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT313));
+        initEntityIdentifiers(ProtocolInfo.v1_10_0, Base64.getDecoder().decode(AvailableEntityIdentifiersPacket.NBT340));
+        initEntityIdentifiers(ProtocolInfo.v1_16_100, AvailableEntityIdentifiersPacket.NBT419);
+        initEntityIdentifiers(ProtocolInfo.v1_17_0, AvailableEntityIdentifiersPacket.NBT440);
+    }
+
     public final Map<Integer, Player> hasSpawned = new ConcurrentHashMap<>();
 
     protected final Map<Integer, Effect> effects = new ConcurrentHashMap<>();
@@ -346,6 +367,7 @@ public abstract class Entity extends Location implements Metadatable {
     public AxisAlignedBB boundingBox;
     public boolean onGround;
     public int deadTicks = 0;
+    public boolean positionChanged;
     public int age = 0;
     public int ticksLived = 0;
     protected int airTicks = 0;
@@ -516,7 +538,7 @@ public abstract class Entity extends Location implements Metadatable {
         this.setLevel(chunk.getProvider().getLevel());
         this.server = chunk.getProvider().getLevel().getServer();
 
-        this.boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+        this.boundingBox = new SimpleAxisAlignedBB(0, 0, 0, 0, 0, 0);
 
         ListTag<DoubleTag> posList = this.namedTag.getList("Pos", DoubleTag.class);
         ListTag<FloatTag> rotationList = this.namedTag.getList("Rotation", FloatTag.class);
@@ -927,6 +949,73 @@ public abstract class Entity extends Location implements Metadatable {
         knownEntities.put(name, clazz);
         shortNames.put(clazz.getSimpleName(), name);
         return true;
+    }
+
+    public static Map<Integer, String> getEntityRuntimeMapping() {
+        return getEntityRuntimeMapping(ProtocolInfo.CURRENT_PROTOCOL);
+    }
+
+    public static Map<Integer, String> getEntityRuntimeMapping(int protocolId) {
+        return Collections.unmodifiableMap(getEntityRuntimeMappingInternal(protocolId));
+    }
+
+    protected static Map<Integer, String> getEntityRuntimeMappingInternal(int protocolId) {
+        if (protocolId >= ProtocolInfo.v1_17_0) {
+            return entityRuntimeMapping440;
+        } else if (protocolId >= ProtocolInfo.v1_16_0) {
+            return entityRuntimeMapping407;
+        }
+        return entityRuntimeMappingOld;
+    }
+
+    private static void initEntityIdentifiers(int protocolId, byte[] bytes) {
+        try {
+            CompoundTag identifiers = (CompoundTag) NBTIO.readNetwork(new ByteArrayInputStream(bytes));
+            entityIdentifiersMap.put(protocolId, identifiers);
+            entityIdentifiersCache.put(protocolId, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to init entityIdentifiers", e);
+        }
+    }
+
+    private static int correctEntityIdentifiersProtocol(int protocolId) {
+        if (protocolId >= ProtocolInfo.v1_17_0) {
+            return ProtocolInfo.v1_17_0;
+        } else if (protocolId >= ProtocolInfo.v1_16_100) {
+            return ProtocolInfo.v1_16_100;
+        } else if (protocolId >= ProtocolInfo.v1_10_0) {
+            return ProtocolInfo.v1_10_0;
+        }
+        return ProtocolInfo.v1_2_0;
+    }
+
+    public static void registerEntityIdentifier(String identifier, int entityId, CompoundTag nbtEntry, int protocolId) {
+        Map<Integer, String> runtimeMapping = getEntityRuntimeMappingInternal(protocolId);
+        runtimeMapping.put(entityId, identifier);
+
+        int protocol = correctEntityIdentifiersProtocol(protocolId);
+        CompoundTag nbt = entityIdentifiersMap.get(protocol);
+        ListTag<CompoundTag> identifiers = nbt.getList("idlist", CompoundTag.class);
+        identifiers.add(nbtEntry);
+        nbt.putList(identifiers);
+        updateEntityIdentifiersCache(protocol);
+    }
+
+    public static CompoundTag getEntityIdentifiers(int protocolId) {
+        return entityIdentifiersMap.get(correctEntityIdentifiersProtocol(protocolId));
+    }
+
+    private static void updateEntityIdentifiersCache(int protocolId) {
+        try {
+            CompoundTag nbt = entityIdentifiersMap.get(protocolId);
+            entityIdentifiersCache.put(protocolId, NBTIO.writeNetwork(nbt));
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to update entityIdentifiers cache", e);
+        }
+    }
+
+    public static byte[] getEntityIdentifiersCache(int protocolId) {
+        return entityIdentifiersCache.get(correctEntityIdentifiersProtocol(protocolId));
     }
 
     public static CompoundTag getDefaultNBT(Vector3 pos) {
@@ -1516,6 +1605,9 @@ public abstract class Entity extends Location implements Metadatable {
             this.lastHeadYaw = this.headYaw;
 
             this.addMovement(this.x, this.y + this.getBaseOffset(), this.z, this.yaw, this.pitch, this.yaw);
+            this.positionChanged = true;
+        }else {
+            this.positionChanged = false;
         }
 
         if (diffMotion > 0.0025 || (diffMotion > 0.0001 && this.getMotion().lengthSquared() <= 0.0001)) { //0.05 ** 2
@@ -1726,6 +1818,10 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public boolean canBePushed() {
+        return true;
+    }
+
     public BlockFace getDirection() {
         double rotation = this.yaw % 360;
         if (rotation < 0) {
@@ -1869,6 +1965,15 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public void onPushByPiston(BlockEntityPistonArm piston, BlockFace moveDirection) {
+        if (this.closed){
+            return;
+        }
+
+        float diff = Math.abs(piston.progress - piston.lastProgress);
+        this.move(diff * moveDirection.getXOffset(), diff * moveDirection.getYOffset(), diff * moveDirection.getZOffset());
+    }
+
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
         return onInteract(player, item);
     }
@@ -1990,15 +2095,15 @@ public abstract class Entity extends Location implements Metadatable {
             this.boundingBox = newBB;
         }
 
-        this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;
-        this.y = this.boundingBox.minY - this.ySize;
-        this.z = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2;
+        this.x = (this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2;
+        this.y = this.boundingBox.getMinY() - this.ySize;
+        this.z = (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) / 2;
 
         this.checkChunks();
 
         if (!this.onGround || dy != 0) {
             AxisAlignedBB bb = this.boundingBox.growNoUp(0.1, 0.1, 0.1);
-            bb.minY -= 0.75;
+            bb.setMinY(bb.getMinY() - 0.75);
 
             this.onGround = this.level.hasCollisionBlocks(bb);
         }
@@ -2019,7 +2124,7 @@ public abstract class Entity extends Location implements Metadatable {
 
         if (this.keepMovement) {
             this.boundingBox.offset(dx, dy, dz);
-            this.setPosition(this.temporalVector.setComponents((this.boundingBox.minX + this.boundingBox.maxX) / 2, this.boundingBox.minY, (this.boundingBox.minZ + this.boundingBox.maxZ) / 2));
+            this.setPosition(this.temporalVector.setComponents((this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2, this.boundingBox.getMinY(), (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) / 2));
             this.onGround = this.isPlayer;
             return true;
         } else {
@@ -2104,9 +2209,9 @@ public abstract class Entity extends Location implements Metadatable {
                 }
             }
 
-            this.x = (this.boundingBox.minX + this.boundingBox.maxX) / 2;
-            this.y = this.boundingBox.minY - this.ySize;
-            this.z = (this.boundingBox.minZ + this.boundingBox.maxZ) / 2;
+            this.x = (this.boundingBox.getMinX() + this.boundingBox.getMaxX()) / 2;
+            this.y = this.boundingBox.getMinY() - this.ySize;
+            this.z = (this.boundingBox.getMinZ() + this.boundingBox.getMaxZ()) / 2;
 
             this.checkChunks();
 
@@ -2139,12 +2244,12 @@ public abstract class Entity extends Location implements Metadatable {
 
     public List<Block> getBlocksAround() {
         if (this.blocksAround == null) {
-            int minX = NukkitMath.floorDouble(this.boundingBox.minX);
-            int minY = NukkitMath.floorDouble(this.boundingBox.minY);
-            int minZ = NukkitMath.floorDouble(this.boundingBox.minZ);
-            int maxX = NukkitMath.ceilDouble(this.boundingBox.maxX);
-            int maxY = NukkitMath.ceilDouble(this.boundingBox.maxY);
-            int maxZ = NukkitMath.ceilDouble(this.boundingBox.maxZ);
+            int minX = NukkitMath.floorDouble(this.boundingBox.getMinX());
+            int minY = NukkitMath.floorDouble(this.boundingBox.getMinY());
+            int minZ = NukkitMath.floorDouble(this.boundingBox.getMinZ());
+            int maxX = NukkitMath.ceilDouble(this.boundingBox.getMaxX());
+            int maxY = NukkitMath.ceilDouble(this.boundingBox.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(this.boundingBox.getMaxZ());
 
             this.blocksAround = new ArrayList<>();
 
@@ -2196,6 +2301,7 @@ public abstract class Entity extends Location implements Metadatable {
             }
 
             block.onEntityCollide(this);
+            block.getLevelBlockAtLayer(1).onEntityCollide(this);
             block.addVelocityToEntity(this, vector);
         }
 
@@ -2664,8 +2770,8 @@ public abstract class Entity extends Location implements Metadatable {
     }
 
     public boolean isOnLadder() {
-        int b = this.level.getBlockIdAt(chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ());
-        return b == Block.LADDER || b == Block.VINES || b == Block.COBWEB;
+        int blockId = this.level.getBlockIdAt(chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ());
+        return blockId == Block.LADDER || blockId == Block.VINES || blockId == Block.COBWEB || blockId == Block.SCAFFOLDING;
     }
 
     public float getMountedYOffset() {

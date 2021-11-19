@@ -103,7 +103,7 @@ public class EntityCow extends EntityWalkingAnimal {
             }
         }
 
-        return drops.toArray(new Item[0]);
+        return drops.toArray(Item.EMPTY_ARRAY);
     }
 
     @Override

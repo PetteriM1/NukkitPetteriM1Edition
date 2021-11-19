@@ -26,6 +26,11 @@ public class BlockIron extends BlockSolid {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_STONE;
+    }
+
+    @Override
     public double getHardness() {
         return 5;
     }
@@ -33,17 +38,6 @@ public class BlockIron extends BlockSolid {
     @Override
     public double getResistance() {
         return 10;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_STONE) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
     }
 
     @Override

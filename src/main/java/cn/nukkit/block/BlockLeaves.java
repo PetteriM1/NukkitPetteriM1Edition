@@ -66,6 +66,21 @@ public class BlockLeaves extends BlockTransparentMeta {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public int getBurnAbility() {
         return 60;
     }
@@ -109,7 +124,7 @@ public class BlockLeaves extends BlockTransparentMeta {
                 }
             }
         }
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     @Override

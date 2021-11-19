@@ -81,8 +81,9 @@ public final class BiomePalette {
 
                 palette.add(value);
 
+                int oldBits = MathHelper.log2(palette.length() - 2);
                 int newBits = MathHelper.log2(palette.length() - 1);
-                if (MathHelper.log2(palette.length() - 2) != newBits) {
+                if (oldBits != newBits) {
                     encodedData = new BitArray256(newBits);
                 }
 

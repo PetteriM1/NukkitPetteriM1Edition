@@ -23,10 +23,7 @@ import cn.nukkit.event.block.WaterFrostEvent;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageCause;
 import cn.nukkit.event.entity.EntityDamageEvent.DamageModifier;
-import cn.nukkit.event.inventory.InventoryCloseEvent;
-import cn.nukkit.event.inventory.InventoryPickupArrowEvent;
-import cn.nukkit.event.inventory.InventoryPickupItemEvent;
-import cn.nukkit.event.inventory.InventoryPickupTridentEvent;
+import cn.nukkit.event.inventory.*;
 import cn.nukkit.event.player.*;
 import cn.nukkit.event.player.PlayerAsyncPreLoginEvent.LoginResult;
 import cn.nukkit.event.player.PlayerInteractEvent.Action;
@@ -672,7 +669,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.setLevel(this.server.getDefaultLevel());
         this.viewDistance = this.server.getViewDistance();
         this.chunkRadius = viewDistance;
-        this.boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+        this.boundingBox = new SimpleAxisAlignedBB(0, 0, 0, 0, 0, 0);
     }
 
     @Override
@@ -1477,7 +1474,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         } else if (this.protocol < 407) {
             InventoryContentPacket inventoryContentPacket = new InventoryContentPacket();
             inventoryContentPacket.inventoryId = InventoryContentPacket.SPECIAL_CREATIVE;
-            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(new Item[0]);
+            inventoryContentPacket.slots = Item.getCreativeItems(this.protocol).toArray(Item.EMPTY_ARRAY);
             this.dataPacket(inventoryContentPacket);
         }
 
@@ -1538,12 +1535,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 List<Item> drops = new ArrayList<>(this.inventory.getContents().values());
                 drops.addAll(this.offhandInventory.getContents().values());
                 drops.addAll(this.playerUIInventory.getContents().values());
-                return drops.toArray(new Item[0]);
+                return drops.toArray(Item.EMPTY_ARRAY);
             }
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
 
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     @Override
@@ -1552,19 +1549,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             boolean onGround = false;
 
             AxisAlignedBB bb = this.boundingBox.clone();
-            bb.maxY = bb.minY + 0.5;
-            bb.minY -= 1;
+            bb.setMaxY(bb.getMinY() + 0.5);
+            bb.setMinY(bb.getMinY() - 1);
 
             AxisAlignedBB realBB = this.boundingBox.clone();
-            realBB.maxY = realBB.minY + 0.1;
-            realBB.minY -= 0.2;
+            realBB.setMaxY(realBB.getMinY() + 0.1);
+            realBB.setMinY(realBB.getMinY() - 0.2);
 
-            int minX = NukkitMath.floorDouble(bb.minX);
-            int minY = NukkitMath.floorDouble(bb.minY);
-            int minZ = NukkitMath.floorDouble(bb.minZ);
-            int maxX = NukkitMath.ceilDouble(bb.maxX);
-            int maxY = NukkitMath.ceilDouble(bb.maxY);
-            int maxZ = NukkitMath.ceilDouble(bb.maxZ);
+            int minX = NukkitMath.floorDouble(bb.getMinX());
+            int minY = NukkitMath.floorDouble(bb.getMinY());
+            int minZ = NukkitMath.floorDouble(bb.getMinZ());
+            int maxX = NukkitMath.ceilDouble(bb.getMaxX());
+            int maxY = NukkitMath.ceilDouble(bb.getMaxY());
+            int maxZ = NukkitMath.ceilDouble(bb.getMaxZ());
 
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
@@ -1589,18 +1586,31 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     protected void checkBlockCollision() {
         boolean portal = false;
         boolean endPortal = false;
+        boolean scaffolding = false;
 
         for (Block block : this.getCollisionBlocks()) {
-            if (block.getId() == Block.NETHER_PORTAL) {
-                portal = true;
-                continue;
-            } else if (block.getId() == Block.END_PORTAL) {
-                endPortal = true;
-                continue;
+            switch (block.getId()){
+                case Block.NETHER_PORTAL:
+                    portal = true;
+                    continue;
+                case Block.END_PORTAL:
+                    endPortal = true;
+                    continue;
+                case Block.SCAFFOLDING:
+                    scaffolding = true;
+                    break;
             }
 
             block.onEntityCollide(this);
+            block.getLevelBlockAtLayer(1).onEntityCollide(this);
         }
+
+        this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_IN_SCAFFOLDING, scaffolding);
+
+        AxisAlignedBB scanBoundingBox = this.boundingBox.getOffsetBoundingBox(0, -0.125, 0);
+        scanBoundingBox.setMaxY(this.boundingBox.getMinY());
+        Block[] scaffoldingUnder = this.level.getCollisionBlocks(scanBoundingBox, true, true, b-> b.getId() == BlockID.SCAFFOLDING);
+        this.setDataFlag(DATA_FLAGS_EXTENDED, DATA_FLAG_OVER_SCAFFOLDING, scaffoldingUnder.length > 0);
 
         if (endPortal) {
             inEndPortalTicks++;
@@ -1822,7 +1832,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.collisionBlocks = null;
                     }
                     if (this.server.getMobAiEnabled() && this.age % 20 == 0) {
-                        AxisAlignedBB aab = new AxisAlignedBB(
+                        AxisAlignedBB aab = new SimpleAxisAlignedBB(
                                 this.getX() - 0.6f,
                                 this.getY() + 1.45f,
                                 this.getZ() - 0.6f,
@@ -2386,7 +2396,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     protected void completeLoginSequence() {
         if (this.loggedIn) {
-            this.server.getLogger().warning("(BUG) Tried to call completeLoginSequence but player is already logged in");
+            this.server.getLogger().debug("(BUG) Tried to call completeLoginSequence but player is already logged in");
             return;
         }
 
@@ -2630,36 +2640,24 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    Player playerInstance = this;
                     this.verified = true;
 
-                    this.preLoginEventTask = new AsyncTask() {
-                        private PlayerAsyncPreLoginEvent event;
-
-                        @Override
-                        public void onRun() {
-                            this.event = new PlayerAsyncPreLoginEvent(username, uuid, loginChainData, skin, playerInstance.getAddress(), playerInstance.getPort());
-                            server.getPluginManager().callEvent(this.event);
+                    Consumer<PlayerAsyncPreLoginEvent> callback = event -> {
+                        if (this.closed) {
+                            return;
                         }
 
-                        @Override
-                        public void onCompletion(Server server) {
-                            if (playerInstance.closed) {
-                                return;
-                            }
-
-                            if (this.event.getLoginResult() == LoginResult.KICK) {
-                                playerInstance.close(this.event.getKickMessage(), this.event.getKickMessage());
-                            } else if (playerInstance.shouldLogin) {
-                                playerInstance.setSkin(this.event.getSkin());
-                                playerInstance.completeLoginSequence();
-                                for (Consumer<Server> action : this.event.getScheduledActions()) {
-                                    action.accept(server);
-                                }
+                        if (event.getLoginResult() == LoginResult.KICK) {
+                            this.close(event.getKickMessage(), event.getKickMessage());
+                        } else if (this.shouldLogin) {
+                            this.completeLoginSequence();
+                            for (Consumer<Server> action : event.getScheduledActions()) {
+                                action.accept(server);
                             }
                         }
                     };
 
+                    this.preLoginEventTask = new PreLoginTask(new PlayerAsyncPreLoginEvent(this), this, callback);
                     this.server.getScheduler().scheduleAsyncTask(this.preLoginEventTask);
                     this.processLogin();
                     break;
@@ -2890,7 +2888,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                 break;
                             }
                             if (!this.isCreative()) {
-                                double breakTime = Math.ceil(target.getBreakTime(this.inventory.getItemInHandFast(), this) * 20);
+                                double breakTime = Math.ceil(target.calculateBreakTime(this.inventory.getItemInHandFast(), this) * 20);
                                 if (breakTime > 0) {
                                     LevelEventPacket pk = new LevelEventPacket();
                                     pk.evid = LevelEventPacket.EVENT_BLOCK_START_BREAK;
@@ -3628,7 +3626,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     Block target = this.level.getBlock(blockVector.asVector3());
                                     block = target.getSide(face);
 
-                                    this.level.sendBlocks(this, new Block[]{target, block}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target, block}, UpdateBlockPacket.FLAG_NOGRAPHIC);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1), block.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
 
                                     if (target instanceof BlockDoor) {
                                         BlockDoor door = (BlockDoor) target;
@@ -3640,8 +3639,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                                             if (part.getId() == target.getId()) {
                                                 target = part;
-
-                                                this.level.sendBlocks(this, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                                this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_NOGRAPHIC);
+                                                this.level.sendBlocks(new Player[]{this}, new Block[]{target.getLevelBlockAtLayer(1)}, UpdateBlockPacket.FLAG_NOGRAPHIC, 1);
                                             }
                                         }
                                     }
@@ -3676,7 +3675,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                                     target = this.level.getBlock(blockVector.asVector3());
                                     BlockEntity blockEntity = this.level.getBlockEntity(blockVector.asVector3());
 
-                                    this.level.sendBlocks(this, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
+                                    this.level.sendBlocks(new Player[]{this}, new Block[]{target}, UpdateBlockPacket.FLAG_ALL_PRIORITY);
 
                                     inventory.sendHeldItem(this);
 
@@ -5406,7 +5405,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void resetCraftingGridType() {
         if (this.craftingGrid != null) {
-            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(new Item[0]));
+            Item[] drops = this.inventory.addItem(this.craftingGrid.getContents().values().toArray(Item.EMPTY_ARRAY));
 
             if (drops.length > 0) {
                 for (Item drop : drops) {
@@ -5987,6 +5986,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      */
     public void setTimeSinceRest(int ticks) {
         this.timeSinceRest = ticks;
+    }
+
+    public boolean shouldLogin() {
+        return this.shouldLogin;
     }
 
     @Override

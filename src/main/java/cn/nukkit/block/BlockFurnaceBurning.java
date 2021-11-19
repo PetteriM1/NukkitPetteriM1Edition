@@ -62,6 +62,11 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public int getLightLevel() {
         return 13;
     }
@@ -139,7 +144,7 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
                     this.toItem()
             };
         } else {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
         }
     }
 

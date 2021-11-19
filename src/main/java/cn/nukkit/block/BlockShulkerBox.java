@@ -58,6 +58,21 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
+    public boolean breaksWhenMoved() {
+        return true;
+    }
+
+    @Override
+    public boolean sticksToPiston() {
+        return false;
+    }
+
+    @Override
     public Item toItem() {
         ItemBlock item = new ItemBlock(this, this.getDamage(), 1);
 
@@ -151,5 +166,10 @@ public class BlockShulkerBox extends BlockTransparentMeta {
 
     public DyeColor getDyeColor() {
         return DyeColor.getByWoolData(this.getDamage());
+    }
+
+    @Override
+    public int getFullId() {
+        return (this.getId() << DATA_BITS) + this.getDamage();
     }
 }

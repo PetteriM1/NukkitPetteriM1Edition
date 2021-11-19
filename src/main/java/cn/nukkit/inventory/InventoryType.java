@@ -11,6 +11,7 @@ public enum InventoryType {
     DOUBLE_CHEST(54, "Double Chest", 0), //27 + 27 CONTAINER
     PLAYER(40, "Player", -1), //36 CONTAINER, 4 ARMOR
     FURNACE(3, "Furnace", 2), //1 INPUT/OUTPUT, 1 FUEL
+    CAMPFIRE(4, "Campfire", -1),
     CRAFTING(5, "Crafting", 1), //4 CRAFTING SLOTS, 1 RESULT
     WORKBENCH(10, "Crafting", 1), //9 CRAFTING SLOTS, 1 RESULT
     BREWING_STAND(5, "Brewing", 4), //1 INPUT, 3 POTION, 1 FUEL
@@ -27,7 +28,8 @@ public enum InventoryType {
     MINECART_CHEST(27, "Minecart with Chest", 0), //27 CONTAINER
     MINECART_HOPPER(5, "Minecart with Hopper", 8), //5 CONTAINER
     OFFHAND(1, "Offhand", -1), //1 CONTAINER
-    TRADING(3, "Villager Trade", 15); //3 CONTAINER
+    TRADING(3, "Villager Trade", 15), //3 CONTAINER
+    BARREL(27, "Barrel", 0);
 
     private final int size;
     private final String title;

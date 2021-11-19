@@ -79,7 +79,7 @@ public class EntityHusk extends EntityWalkingMob implements EntitySmite {
 
     @Override
     public Item[] getDrops() {
-        return this.isBaby() ? new Item[0] : new Item[]{Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 2))};
+        return this.isBaby() ? Item.EMPTY_ARRAY : new Item[]{Item.get(Item.ROTTEN_FLESH, 0, Utils.rand(0, 2))};
     }
 
     @Override

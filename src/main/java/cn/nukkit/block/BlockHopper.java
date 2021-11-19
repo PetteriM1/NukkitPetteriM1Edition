@@ -42,6 +42,11 @@ public class BlockHopper extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getWaterloggingLevel() {
+        return 1;
+    }
+
+    @Override
     public double getResistance() {
         return 24;
     }
@@ -142,12 +147,17 @@ public class BlockHopper extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
         if (item.getTier() >= ItemTool.TIER_WOODEN) {
             return new Item[]{toItem()};
         }
 
-        return new Item[0];
+        return Item.EMPTY_ARRAY;
     }
 
     @Override

@@ -26,11 +26,21 @@ public class BlockPistonExtension extends BlockTransparent {
 
     @Override
     public Item[] getDrops(Item item) {
-            return new Item[0];
+            return Item.EMPTY_ARRAY;
     }
 
     @Override
     public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePulled() {
         return false;
     }
 }
