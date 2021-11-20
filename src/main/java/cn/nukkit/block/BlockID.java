@@ -407,4 +407,6 @@ public interface BlockID {
     int WARPED_DOOR_BLOCK = 500;
     int CRIMSON_TRAPDOOR = 501;
     int WARPED_TRAPDOOR = 502;
+
+    int NETHER_GOLD_ORE = 543;
 }
