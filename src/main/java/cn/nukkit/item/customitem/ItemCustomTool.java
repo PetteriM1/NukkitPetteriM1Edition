@@ -57,8 +57,8 @@ public abstract class ItemCustomTool extends ItemCustom implements ItemDurable {
     }
 
     @Override
-    public CompoundTag getComponentsData() {
-        CompoundTag data = super.getComponentsData();
+    public CompoundTag getComponentsData(int protocol) {
+        CompoundTag data = super.getComponentsData(protocol);
 
         data.getCompound("components")
                 .putCompound("minecraft:durability",

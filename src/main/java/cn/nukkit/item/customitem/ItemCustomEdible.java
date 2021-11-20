@@ -34,8 +34,8 @@ public abstract class ItemCustomEdible extends ItemCustom {
     }
 
     @Override
-    public CompoundTag getComponentsData() {
-        CompoundTag data = super.getComponentsData();
+    public CompoundTag getComponentsData(int protocol) {
+        CompoundTag data = super.getComponentsData(protocol);
 
         data.getCompound("components").putCompound("minecraft:food",
                 new CompoundTag()

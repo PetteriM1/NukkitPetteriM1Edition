@@ -1,7 +1,9 @@
 package cn.nukkit.item.customitem;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,16 +46,28 @@ public abstract class ItemCustom extends Item {
     }
 
     public CompoundTag getComponentsData() {
+        Server.mvw("ItemCustom#getComponentsData()");
+        return this.getComponentsData(ProtocolInfo.CURRENT_PROTOCOL);
+
+    }
+
+    public CompoundTag getComponentsData(int protocol) {
         CompoundTag data = new CompoundTag();
         data.putCompound("components", new CompoundTag()
                 .putCompound("item_properties", new CompoundTag()
                         .putBoolean("allow_off_hand", this.allowOffHand())
                         .putBoolean("hand_equipped", this.isTool())
                         .putInt("creative_category", this.getCreativeCategory())
-                        .putInt("max_stack_size", this.getMaxStackSize()))
-                .putCompound("minecraft:icon", new CompoundTag()
-                        .putString("texture", this.getTextureName() != null ? this.getTextureName() : this.name))
-        );
+                        .putInt("max_stack_size", this.getMaxStackSize())));
+        if (protocol >= ProtocolInfo.v1_17_30) {
+            data.getCompound("components").getCompound("item_properties")
+                    .putCompound("minecraft:icon", new CompoundTag()
+                            .putString("texture", this.getTextureName() != null ? this.getTextureName() : this.name));
+        }else {
+            data.getCompound("components")
+                    .putCompound("minecraft:icon", new CompoundTag()
+                            .putString("texture", this.getTextureName() != null ? this.getTextureName() : this.name));
+        }
         return data;
     }
 
