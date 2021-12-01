@@ -169,7 +169,7 @@ public class StartGamePacket extends DataPacket {
                 if (protocol >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
                     if (protocol >= 388) {
-                        this.putString(Utils.getVersionByProtocol(protocol));
+                        this.putString(protocol >= ProtocolInfo.v1_18_0 ? Utils.getVersionByProtocol(ProtocolInfo.v1_17_40) : Utils.getVersionByProtocol(protocol));
                     }
                 }
             }
@@ -219,6 +219,9 @@ public class StartGamePacket extends DataPacket {
                 this.putBoolean(false); // isInventoryServerAuthoritative
                 if (protocol >= ProtocolInfo.v1_16_230_50) {
                     this.putString(""); // serverEngine
+                    if (protocol >= ProtocolInfo.v1_18_0) {
+                        this.putLLong(0L); // BlockRegistryChecksum
+                    }
                 }
             }
         }
