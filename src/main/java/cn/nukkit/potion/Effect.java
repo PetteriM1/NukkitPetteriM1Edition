@@ -268,7 +268,7 @@ public class Effect implements Cloneable {
                     player.setMovementSpeed(player.getMovementSpeed() / (1 - 0.15f * (oldEffect.amplifier + 1)), false);
                 }
                 player.setMovementSpeed(player.getMovementSpeed() * (1 - 0.15f * (this.amplifier + 1)));*/
-                player.setMovementSpeed(0.1f * (1 - 0.15f * (this.amplifier + 1)));
+                player.setMovementSpeed(Math.max(0, 0.1f * (1 - 0.15f * (this.amplifier + 1))));
             }
         }
 
