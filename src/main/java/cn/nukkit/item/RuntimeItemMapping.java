@@ -142,7 +142,7 @@ public class RuntimeItemMapping {
         for (RuntimeEntry entry : this.legacy2Runtime.values()) {
             if (entry.isCustomItem()) {
                 if (Server.getInstance().enableCustomItems && protocolId >= ProtocolInfo.v1_16_100) {
-                    paletteBuffer.putString("customitem:" + entry.getIdentifier());
+                    paletteBuffer.putString(("customitem:" + entry.getIdentifier()).toLowerCase());
                     paletteBuffer.putLShort(entry.getRuntimeId());
                     paletteBuffer.putBoolean(true); // Component item
                 }
