@@ -137,7 +137,7 @@ public class DummyBossBar {
     /**
      * @param color the boss bar color
      */
-    public void setColor(BossBarColor  color) {
+    public void setColor(BossBarColor color) {
         if (this.color == null || !this.color.equals(color)) {
             this.color = color;
             this.sendSetBossBarTexture();
