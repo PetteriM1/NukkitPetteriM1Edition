@@ -4070,8 +4070,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             message = TextFormat.clean(message, true);
         }
 
+        int maxMsgLength = this.protocol >= ProtocolInfo.v1_18_0 ? 512 : 255;
+
         for (String msg : message.split("\n")) {
-            if (!msg.trim().isEmpty() && msg.length() <= 255) {
+            if (!msg.trim().isEmpty() && msg.length() <= maxMsgLength) {
                 PlayerChatEvent chatEvent = new PlayerChatEvent(this, msg);
                 this.server.getPluginManager().callEvent(chatEvent);
                 if (!chatEvent.isCancelled()) {
