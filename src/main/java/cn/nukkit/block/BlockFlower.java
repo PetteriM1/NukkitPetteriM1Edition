@@ -27,6 +27,10 @@ public class BlockFlower extends BlockFlowable {
     public static final int CORNFLOWER = 9;
     public static final int LILY_OF_THE_VALLEY = 10;
 
+    //兼容nkx插件
+    public static final int TYPE_CORNFLOWER = CORNFLOWER;
+    public static final int TYPE_LILY_OF_THE_VALLEY = LILY_OF_THE_VALLEY;
+
     private static final String[] names = new String[]{
             "Poppy",
             "Blue Orchid",
