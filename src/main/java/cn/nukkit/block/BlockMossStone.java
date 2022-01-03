@@ -11,7 +11,7 @@ public class BlockMossStone extends BlockSolid {
 
     @Override
     public String getName() {
-        return "Moss Stone";
+        return "Mossy Cobblestone";
     }
 
     @Override
