@@ -86,10 +86,10 @@ public class BlockColor  {
     private final int alpha;
 
     public BlockColor(int red, int green, int blue, int alpha) {
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.alpha = alpha;
+        this.red = red & 0xff;
+        this.green = green & 0xff;
+        this.blue = blue & 0xff;
+        this.alpha = alpha & 0xff;
     }
 
     public BlockColor(int red, int green, int blue) {
@@ -97,10 +97,14 @@ public class BlockColor  {
     }
 
     public BlockColor(int rgb) {
+        this(rgb, false);
+    }
+
+    public BlockColor(int rgb, boolean hasAlpha) {
         this.red = (rgb >> 16) & 0xff;
         this.green = (rgb >> 8) & 0xff;
         this.blue = rgb & 0xff;
-        this.alpha = 0xff;
+        this.alpha = hasAlpha ? (rgb >> 24) & 0xff : 0xff;
     }
 
     public BlockColor(String colorStr) {
@@ -143,6 +147,10 @@ public class BlockColor  {
 
     public int getRGB() {
         return (this.red << 16 | this.green << 8 | this.blue) & 0xffffff;
+    }
+
+    public int getARGB() {
+        return this.alpha << 24 | this.red << 16 | this.green << 8 | this.blue;
     }
 
     /**

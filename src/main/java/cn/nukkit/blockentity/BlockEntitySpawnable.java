@@ -54,6 +54,11 @@ public abstract class BlockEntitySpawnable extends BlockEntity {
         if (!this.closed) {
             this.level.addChunkPacket(this.chunk.getX(), this.chunk.getZ(), this.createSpawnPacket());
         }
+        for (Player player : this.getLevel().getChunkPlayers(this.chunk.getX(), this.chunk.getZ()).values()) {
+            if (player.spawned) {
+                this.spawnTo(player);
+            }
+        }
     }
 
     /**
