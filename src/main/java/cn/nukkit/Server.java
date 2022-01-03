@@ -718,10 +718,10 @@ public class Server {
 
                 boolean isMaster = Nukkit.getBranch().equals("master");
                 if (!this.getNukkitVersion().equals(latest) && !this.getNukkitVersion().equals("git-null") && isMaster) {
-                    this.getLogger().info("\u00A7c[Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
-                    this.getLogger().info("\u00A7c[Update] \u00A7eYou can download the latest build from https://github.com/PetteriM1/NukkitPetteriM1Edition/releases");
+                    this.getLogger().info("\u00A7c[Nukkit-PM1E-MOT][Update] \u00A7eThere is a new build of Nukkit PetteriM1 Edition available! Current: " + this.getNukkitVersion() + " Latest: " + latest);
+                    this.getLogger().info("\u00A7c[Nukkit-PM1E-MOT][Update] \u00A7eYou can download the latest build from https://github.com/MemoriesOfTime/NukkitPetteriM1Edition/wiki/download");
                 } else if (!isMaster) {
-                    this.getLogger().warning("\u00A7eYou are running a dev build! Do not use in production! Branch: " + Nukkit.getBranch());
+                    this.getLogger().warning("\u00A7c[Nukkit-PM1E-MOT] \u00A7eYou are running a dev build! Do not use in production! Branch: " + Nukkit.getBranch());
                 }
 
                 this.getLogger().debug("Update check done");
