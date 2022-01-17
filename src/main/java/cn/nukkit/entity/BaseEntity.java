@@ -267,11 +267,11 @@ public abstract class BaseEntity extends EntityCreature implements EntityAgeable
 
     @Override
     public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (item.getId() == Item.NAME_TAG) {
+        if (item.getId() == Item.NAME_TAG && !player.isAdventure()) {
             if (item.hasCustomName() && !(this instanceof EntityEnderDragon)) {
                 this.setNameTag(item.getCustomName());
                 this.setNameTagVisible(true);
-                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+                //player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
                 return true;
             }
         }
