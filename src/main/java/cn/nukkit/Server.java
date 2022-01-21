@@ -492,10 +492,11 @@ public class Server {
 
         this.loadSettings();
 
-        if (this.getPropertyBoolean("automatic-bug-report", true)) {
+        //Useless for MOT branches
+        /*if (this.getPropertyBoolean("automatic-bug-report", false)) {
             ExceptionHandler.registerExceptionHandler();
             this.sentry = SentryClientFactory.sentryClient("https://0e094ce5464f4663a0b521d61f4bfe54@o381665.ingest.sentry.io/5209314");
-        }
+        }*/
 
         if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
             new File(dataPath + "players/").mkdirs();
