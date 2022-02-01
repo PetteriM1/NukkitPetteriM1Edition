@@ -164,6 +164,11 @@ public class Vector3 implements Cloneable {
         return new Vector3(this.x + face.getXOffset() * step, this.y + face.getYOffset() * step, this.z + face.getZOffset() * step);
     }
 
+    // Get as a Vector3 for better performance. Do not override in Block!
+    public Vector3 getSideVec(BlockFace face) {
+        return new Vector3(this.getX() + face.getXOffset(), this.getY() + face.getYOffset(), this.getZ() + face.getZOffset());
+    }
+
     public Vector3 up() {
         return up(1);
     }
