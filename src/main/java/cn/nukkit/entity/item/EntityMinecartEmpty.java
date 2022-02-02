@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.entity.passive.EntityWaterAnimal;
+import cn.nukkit.event.entity.EntityDamageByBlockEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.MinecartType;
@@ -38,10 +40,10 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
 
     @Override
     protected void activate(int x, int y, int z, boolean flag) {
-        if (flag) {
-            if (this.riding != null) {
-                mountEntity(riding);
-            }
+        if (flag && this.getHealth() > 15
+                && this.attack(new EntityDamageByBlockEvent(this.level.getBlock(x, y, z), this, EntityDamageEvent.DamageCause.CONTACT, 1))
+                && !this.passengers.isEmpty()) {
+            this.dismountEntity(this.getPassenger());
         }
     }
 
