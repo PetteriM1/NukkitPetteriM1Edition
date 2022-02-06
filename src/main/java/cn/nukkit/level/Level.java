@@ -31,6 +31,7 @@ import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
@@ -3337,7 +3338,8 @@ public class Level implements ChunkManager, Metadatable {
             for (Player player : queue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
                     if (matchMVChunkProtocol(protocol, player.protocol)) {
-                        player.sendChunk(x, z, subChunkCount, payload);
+                        int count = subChunkCount + (protocol >= ProtocolInfo.v1_18_0 && this.getDimension() == 0 ? Anvil.LOWER_PADDING_SIZE : 0);
+                        player.sendChunk(x, z, count, payload);
                     }
                 }
             }
