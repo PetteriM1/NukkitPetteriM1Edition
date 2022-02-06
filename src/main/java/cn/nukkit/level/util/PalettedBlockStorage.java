@@ -28,14 +28,21 @@ public class PalettedBlockStorage {
     }
 
     public PalettedBlockStorage(BitArrayVersion version, int protocol) {
+        this(version, protocol, false);
+    }
+
+    public PalettedBlockStorage(BitArrayVersion version, int protocol, boolean isBiomePalette) {
         this.bitArray = version.createPalette();
         this.palette = new IntArrayList(16);
 
         // Air is at the start of every palette.
-        if (protocol >= ProtocolInfo.v1_16_100) {
-            this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0));
-        } else {
-            this.palette.add(0);
+        // Except biome palette !!!
+        if (!isBiomePalette) {
+            if (protocol >= ProtocolInfo.v1_16_100) {
+                this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0));
+            } else {
+                this.palette.add(0);
+            }
         }
     }
 

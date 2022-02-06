@@ -71,6 +71,8 @@ public class StartGamePacket extends DataPacket {
     public boolean isUsingMsaGamertagsOnly = false;
     public boolean isFromWorldTemplate = false;
     public boolean isWorldTemplateOptionLocked = false;
+    public boolean isOnlySpawningV1Villagers = false;
+    public String vanillaVersion = Utils.getVersionByProtocol(protocol);
     public String levelId = "";
     public String worldName;
     public String premiumWorldTemplateId = "";
@@ -79,7 +81,6 @@ public class StartGamePacket extends DataPacket {
     public long currentTick;
     public int enchantmentSeed;
     public String multiplayerCorrelationId = "";
-    public boolean isOnlySpawningV1Villagers = false;
 
     @Override
     public void decode() {
@@ -169,7 +170,7 @@ public class StartGamePacket extends DataPacket {
                 if (protocol >= 361) {
                     this.putBoolean(this.isOnlySpawningV1Villagers);
                     if (protocol >= 388) {
-                        this.putString(protocol >= ProtocolInfo.v1_18_0 ? Utils.getVersionByProtocol(ProtocolInfo.v1_17_40) : Utils.getVersionByProtocol(protocol));
+                        this.putString(this.vanillaVersion);
                     }
                 }
             }
