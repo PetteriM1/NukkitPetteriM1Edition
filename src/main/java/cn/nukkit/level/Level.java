@@ -31,6 +31,7 @@ import cn.nukkit.level.format.Chunk;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.LevelProvider;
+import cn.nukkit.level.format.anvil.Anvil;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.EmptyChunkSection;
@@ -3337,7 +3338,8 @@ public class Level implements ChunkManager, Metadatable {
             for (Player player : queue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
                     if (matchMVChunkProtocol(protocol, player.protocol)) {
-                        player.sendChunk(x, z, subChunkCount, payload);
+                        int count = subChunkCount + (protocol >= ProtocolInfo.v1_18_0 && this.getDimension() == 0 ? Anvil.LOWER_PADDING_SIZE : 0);
+                        player.sendChunk(x, z, count, payload);
                     }
                 }
             }
@@ -4436,9 +4438,11 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_17_40) {
+        if (protocol >= ProtocolInfo.v1_18_0) {
+            return ProtocolInfo.v1_18_0;
+        } else if (protocol >= ProtocolInfo.v1_17_40) {
             return ProtocolInfo.v1_17_40;
-        } if (protocol >= ProtocolInfo.v1_17_30) {
+        } else if (protocol >= ProtocolInfo.v1_17_30) {
             return ProtocolInfo.v1_17_30;
         } else if (protocol >= ProtocolInfo.v1_17_10) {
             return ProtocolInfo.v1_17_10;
@@ -4479,6 +4483,7 @@ public class Level implements ChunkManager, Metadatable {
             if (player >= ProtocolInfo.v1_17_10) if (player < ProtocolInfo.v1_17_30) return true;
         if (chunk == ProtocolInfo.v1_17_30) if (player == ProtocolInfo.v1_17_30) return true;
         if (chunk == ProtocolInfo.v1_17_40) if (player >= ProtocolInfo.v1_17_40) return true;
+        if (chunk == ProtocolInfo.v1_18_0) if (player >= ProtocolInfo.v1_18_0) return true;
         return false; // Remember to update when block palette changes
     }
 

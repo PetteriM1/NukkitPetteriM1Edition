@@ -8,6 +8,8 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
 import cn.nukkit.level.format.generic.BaseRegionLoader;
 import cn.nukkit.level.generator.Generator;
+import cn.nukkit.level.util.BitArrayVersion;
+import cn.nukkit.level.util.PalettedBlockStorage;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ProtocolInfo;
@@ -33,7 +35,8 @@ import java.util.regex.Pattern;
  */
 public class Anvil extends BaseLevelProvider {
 
-    static private final byte[] PAD_256 = new byte[256];
+    public static final int LOWER_PADDING_SIZE = 4;
+    private static final byte[] PAD_256 = new byte[256];
 
     public Anvil(Level level, String path) throws IOException {
         super(level, path);
@@ -159,6 +162,14 @@ public class Anvil extends BaseLevelProvider {
                 stream.putByte((byte) subChunkCount);
             }
 
+            //1.18.0开始主世界支持384世界高度，给主世界垫64层空气
+            if (protocolId >= ProtocolInfo.v1_18_0 && super.level.getDimension() == 0) {
+                for (int i = 0; i < LOWER_PADDING_SIZE; i++) {
+                    stream.putByte((byte) ChunkSection.STREAM_STORAGE_VERSION);
+                    stream.putByte((byte) 0);
+                }
+            }
+
             for (int i = 0; i < subChunkCount; i++) {
                 if (protocolId < ProtocolInfo.v1_13_0) {
                     stream.putByte((byte) 0);
@@ -173,15 +184,38 @@ public class Anvil extends BaseLevelProvider {
                 }
                 stream.put(PAD_256);
             }
-            stream.put(chunk.getBiomeIdArray());
+            if (protocolId >= ProtocolInfo.v1_18_0) {
+                final byte[] biomeData = serializeBiome(protocolId, chunk);
+                for (int i = 0; i < 25; i++) {
+                    stream.put(biomeData);
+                }
+            }else {
+                stream.put(chunk.getBiomeIdArray());
+            }
             stream.putByte((byte) 0);// Border blocks
             if (protocolId < ProtocolInfo.v1_16_100) {
                 stream.putVarInt(0);// There is no extra data anymore but idk when it was removed
+            }else if (protocolId >= ProtocolInfo.v1_18_0) {
+                stream.putUnsignedVarInt(0); // 一个不知道作用的8字节，貌似全写0就可以
             }
             stream.put(blockEntities);
 
             this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, subChunkCount, stream.getBuffer());
         }
+    }
+
+    private byte[] serializeBiome(int protocol, Chunk chunk) {
+        final BinaryStream stream = new BinaryStream();
+        final PalettedBlockStorage blockStorage = new PalettedBlockStorage(BitArrayVersion.V2, protocol, true);
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = 0; y < 16; y++) {
+                    blockStorage.setBlock((x << 8) | (z << 4) | y, chunk.getBiomeId(x, z));
+                }
+            }
+        }
+        blockStorage.writeTo(protocol, stream);
+        return stream.getBuffer();
     }
 
     private int lastPosition = 0;
