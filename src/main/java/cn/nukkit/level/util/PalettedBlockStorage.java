@@ -32,12 +32,14 @@ public class PalettedBlockStorage {
     }
 
     public PalettedBlockStorage(BitArrayVersion version, int protocol, boolean isBiomePalette) {
-        this.bitArray = version.createPalette();
+        this.bitArray = version.createPalette(SIZE);
         this.palette = new IntArrayList(16);
 
         // Air is at the start of every palette.
         // Except biome palette !!!
-        if (!isBiomePalette) {
+        if (isBiomePalette) {
+            this.palette.clear();
+        }else {
             if (protocol >= ProtocolInfo.v1_16_100) {
                 this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0));
             } else {

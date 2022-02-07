@@ -72,7 +72,7 @@ public class StartGamePacket extends DataPacket {
     public boolean isFromWorldTemplate = false;
     public boolean isWorldTemplateOptionLocked = false;
     public boolean isOnlySpawningV1Villagers = false;
-    public String vanillaVersion = Utils.getVersionByProtocol(protocol);
+    public String vanillaVersion = Utils.getVersionByProtocol(ProtocolInfo.CURRENT_PROTOCOL);
     public String levelId = "";
     public String worldName;
     public String premiumWorldTemplateId = "";
