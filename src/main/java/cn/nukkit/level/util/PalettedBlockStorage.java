@@ -37,9 +37,7 @@ public class PalettedBlockStorage {
 
         // Air is at the start of every palette.
         // Except biome palette !!!
-        if (isBiomePalette) {
-            this.palette.clear();
-        }else {
+        if (!isBiomePalette) {
             if (protocol >= ProtocolInfo.v1_16_100) {
                 this.palette.add(GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0));
             } else {
