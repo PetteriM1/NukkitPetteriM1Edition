@@ -3198,6 +3198,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    AnimatePacket animatePacket = (AnimatePacket) packet;
+
+                    // prevent client send illegal packet to server and broadcast to other client and make other client crash
+                    if(animatePacket.action == null // illegal action id
+                            || animatePacket.action == AnimatePacket.Action.WAKE_UP // these actions are only for server to client
+                            || animatePacket.action == AnimatePacket.Action.CRITICAL_HIT
+                            || animatePacket.action == AnimatePacket.Action.MAGIC_CRITICAL_HIT) {
+                        break; // maybe we should cancel the event here? but if client send too many packets, server will lag
+                    }
+
                     PlayerAnimationEvent animationEvent = new PlayerAnimationEvent(this, ((AnimatePacket) packet).action);
                     this.server.getPluginManager().callEvent(animationEvent);
                     if (animationEvent.isCancelled()) {
@@ -3215,7 +3225,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             break;
                     }
 
-                    AnimatePacket animatePacket = new AnimatePacket();
                     animatePacket.eid = this.getId();
                     animatePacket.action = animationEvent.getAnimationType();
                     Server.broadcastPacket(this.getViewers().values(), animatePacket);
