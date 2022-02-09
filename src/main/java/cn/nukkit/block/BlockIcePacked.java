@@ -48,4 +48,14 @@ public class BlockIcePacked extends BlockIce {
     public int getLightLevel() {
         return 4;
     }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public boolean isTransparent() {
+        return false;
+    }
 }
