@@ -8,6 +8,7 @@ import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.level.GameRule;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.BlockColor;
 
@@ -63,7 +64,7 @@ public class BlockMagma extends BlockSolid {
                 if (inv == null || inv.getBootsFast().hasEnchantment(Enchantment.ID_FROST_WALKER)) {
                     return;
                 }
-                if (!p.isCreative() && !p.isSpectator() && !p.isSneaking()) {
+                if (!p.isCreative() && !p.isSpectator() && !p.isSneaking() && p.level.gameRules.getBoolean(GameRule.FIRE_DAMAGE)) {
                     entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.MAGMA, 1));
                 }
             } else {
