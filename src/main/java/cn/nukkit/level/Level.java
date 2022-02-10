@@ -3338,8 +3338,7 @@ public class Level implements ChunkManager, Metadatable {
             for (Player player : queue.get(index).values()) {
                 if (player.isConnected() && player.usedChunks.containsKey(index)) {
                     if (matchMVChunkProtocol(protocol, player.protocol)) {
-                        int count = subChunkCount + (protocol >= ProtocolInfo.v1_18_0 && this.getDimension() == 0 ? Anvil.LOWER_PADDING_SIZE : 0);
-                        player.sendChunk(x, z, count, payload);
+                        player.sendChunk(x, z, subChunkCount, payload);
                     }
                 }
             }
@@ -4438,7 +4437,9 @@ public class Level implements ChunkManager, Metadatable {
     }
 
     private int getChunkProtocol(int protocol) {
-        if (protocol >= ProtocolInfo.v1_18_0) {
+        if (protocol >= ProtocolInfo.v1_18_10) { //调色板修改
+            return ProtocolInfo.v1_18_10;
+        } else if (protocol >= ProtocolInfo.v1_18_0) { //世界高度改变
             return ProtocolInfo.v1_18_0;
         } else if (protocol >= ProtocolInfo.v1_17_40) {
             return ProtocolInfo.v1_17_40;
@@ -4484,6 +4485,7 @@ public class Level implements ChunkManager, Metadatable {
         if (chunk == ProtocolInfo.v1_17_30) if (player == ProtocolInfo.v1_17_30) return true;
         if (chunk == ProtocolInfo.v1_17_40) if (player >= ProtocolInfo.v1_17_40) return true;
         if (chunk == ProtocolInfo.v1_18_0) if (player >= ProtocolInfo.v1_18_0) return true;
+        if (chunk == ProtocolInfo.v1_18_10) if (player >= ProtocolInfo.v1_18_10) return true;
         return false; // Remember to update when block palette changes
     }
 

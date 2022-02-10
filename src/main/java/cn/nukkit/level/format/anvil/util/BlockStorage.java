@@ -2,6 +2,8 @@ package cn.nukkit.level.format.anvil.util;
 
 import cn.nukkit.block.Block;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.level.util.PalettedBlockStorage;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -400,6 +402,14 @@ public class BlockStorage {
     }
 
     public void writeTo(int protocol, BinaryStream stream) {
+        /*if (protocol > ProtocolInfo.v1_18_0) {
+            PalettedBlockStorage storage = PalettedBlockStorage.createFromBlockPalette();
+            for (int i = 0; i < SECTION_SIZE; i++) {
+                storage.setBlock(i, GlobalBlockPalette.getOrCreateRuntimeId(blockIds[i] & 0xff, blockData.get(i)));
+            }
+            storage.writeTo(protocol, stream);
+            return;
+        }*/
         int[] ids = this.getBlockIdsExtended();
         int[] data = this.getBlockDataExtended();
         int[] blockStates = new int[ids.length];

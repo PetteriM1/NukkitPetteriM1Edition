@@ -349,6 +349,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
     private static final List<Item> creative448 = new ObjectArrayList<>();
     private static final List<Item> creative465 = new ObjectArrayList<>();
     private static final List<Item> creative471 = new ObjectArrayList<>();
+    private static final List<Item> creative486 = new ObjectArrayList<>();
 
     @SuppressWarnings("unchecked")
     private static void initCreativeItems() {
@@ -443,7 +444,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         registerCreativeItemsNew(ProtocolInfo.v1_17_0, ProtocolInfo.v1_17_0, creative440);
         registerCreativeItemsNew(ProtocolInfo.v1_17_10, ProtocolInfo.v1_17_10, creative448);
         registerCreativeItemsNew(ProtocolInfo.v1_17_30, ProtocolInfo.v1_17_30, creative465);
-        registerCreativeItemsNew(ProtocolInfo.v1_17_30, ProtocolInfo.v1_17_40, creative471); //TODO
+        registerCreativeItemsNew(ProtocolInfo.v1_17_30, ProtocolInfo.v1_17_40, creative471);
+        registerCreativeItemsNew(ProtocolInfo.v1_18_10, ProtocolInfo.v1_18_10, creative486);
     }
 
     private static void registerCreativeItemsNew(int protocol, int blockPaletteProtocol, List<Item> creativeItems) {
@@ -477,6 +479,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         Item.creative448.clear();
         Item.creative465.clear();
         Item.creative471.clear();
+        Item.creative486.clear();
     }
 
     public static ArrayList<Item> getCreativeItems() {
@@ -541,6 +544,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             case v1_17_40:
             case v1_18_0:
                 return new ArrayList<>(Item.creative471);
+            case v1_18_10:
+                return new ArrayList<>(Item.creative486);
             default:
                 throw new IllegalArgumentException("Tried to get creative items for unsupported protocol version: " + protocol);
         }
@@ -589,6 +594,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                 break;
             case v1_17_40:
                 Item.creative471.add(item.clone());
+                break;
+            case v1_18_10:
+                Item.creative486.add(item.clone());
                 break;
             default:
                 throw new IllegalArgumentException("Tried to register creative items for unsupported protocol version: " + protocol);
@@ -640,18 +648,21 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         list[id] = c;
 
         ItemCustom item = (ItemCustom) get(id);
-        if (RuntimeItems.getMapping(v1_16_100).registeredCustomItem(item)) {
+        if (RuntimeItems.getMapping(v1_16_100).registerCustomItem(item)) {
             addCreativeItem(v1_16_0, item);
         }
-        if (RuntimeItems.getMapping(v1_17_0).registeredCustomItem(item)) {
+        if (RuntimeItems.getMapping(v1_17_0).registerCustomItem(item)) {
             addCreativeItem(v1_17_0, item);
         }
-        if (RuntimeItems.getMapping(v1_17_10).registeredCustomItem(item)) {
+        if (RuntimeItems.getMapping(v1_17_10).registerCustomItem(item)) {
             addCreativeItem(v1_17_10, item);
             addCreativeItem(v1_17_30, item);
             addCreativeItem(v1_17_40, item);
         }
-        RuntimeItems.getMapping(v1_18_0).registeredCustomItem(item);
+        RuntimeItems.getMapping(v1_18_0).registerCustomItem(item);
+        if (RuntimeItems.getMapping(v1_18_10).registerCustomItem(item)) {
+            addCreativeItem(v1_18_10, item);
+        }
         return true;
     }
 
@@ -664,7 +675,9 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             ItemCustom item = (ItemCustom) get(id);
             return RuntimeItems.getMapping(v1_16_100).deleteCustomItem(item) &&
                     RuntimeItems.getMapping(v1_17_0).deleteCustomItem(item) &&
-                    RuntimeItems.getMapping(v1_17_10).deleteCustomItem(item);
+                    RuntimeItems.getMapping(v1_17_10).deleteCustomItem(item) &&
+                    RuntimeItems.getMapping(v1_18_0).deleteCustomItem(item) &&
+                    RuntimeItems.getMapping(v1_18_10).deleteCustomItem(item);
         }else {
             return false;
         }

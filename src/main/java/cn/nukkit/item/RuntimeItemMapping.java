@@ -90,7 +90,7 @@ public class RuntimeItemMapping {
         this.generatePalette();
     }
 
-    synchronized boolean registeredCustomItem(ItemCustom itemCustom) {
+    synchronized boolean registerCustomItem(ItemCustom itemCustom) {
         if (!Server.getInstance().enableCustomItems || this.customItems.contains(itemCustom.getId())) {
             return false;
         }

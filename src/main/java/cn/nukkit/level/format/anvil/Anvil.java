@@ -3,6 +3,7 @@ package cn.nukkit.level.format.anvil;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntitySpawnable;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.biome.Biome;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.level.format.generic.BaseLevelProvider;
@@ -35,8 +36,8 @@ import java.util.regex.Pattern;
  */
 public class Anvil extends BaseLevelProvider {
 
-    public static final int LOWER_PADDING_SIZE = 4;
     private static final byte[] PAD_256 = new byte[256];
+    public static final int EXTENDED_NEGATIVE_SUB_CHUNKS = 4;
 
     public Anvil(Level level, String path) throws IOException {
         super(level, path);
@@ -162,11 +163,12 @@ public class Anvil extends BaseLevelProvider {
                 stream.putByte((byte) subChunkCount);
             }
 
-            //1.18.0开始主世界支持384世界高度，给主世界垫64层空气
+            //1.18.0开始主世界支持384世界高度
             if (protocolId >= ProtocolInfo.v1_18_0 && super.level.getDimension() == 0) {
-                for (int i = 0; i < LOWER_PADDING_SIZE; i++) {
-                    stream.putByte((byte) ChunkSection.STREAM_STORAGE_VERSION);
-                    stream.putByte((byte) 0);
+                // Build up 4 SubChunks for the extended negative height
+                for (int i = 0; i < EXTENDED_NEGATIVE_SUB_CHUNKS; i++) {
+                    stream.putByte((byte) 8); // SubChunk version
+                    stream.putByte((byte) 0); // 0 layers
                 }
             }
 
@@ -185,28 +187,53 @@ public class Anvil extends BaseLevelProvider {
                 stream.put(PAD_256);
             }
             if (protocolId >= ProtocolInfo.v1_18_0) {
-                final byte[] biomeData = serializeBiome(protocolId, chunk);
-                for (int i = 0; i < 25; i++) {
-                    stream.put(biomeData);
-                }
+                // In 1.18 3D biome palettes were introduced. However, current world format
+                // used internally doesn't support them, so we need to convert from legacy 2D
+                //TODO fix
+                //stream.put(this.convert2DBiomesTo3D(protocolId, chunk));
+                stream.put(this.serializeBiome(protocolId, chunk));
             }else {
                 stream.put(chunk.getBiomeIdArray());
             }
             stream.putByte((byte) 0);// Border blocks
             if (protocolId < ProtocolInfo.v1_16_100) {
                 stream.putVarInt(0);// There is no extra data anymore but idk when it was removed
-            }else if (protocolId >= ProtocolInfo.v1_18_0) {
-                stream.putUnsignedVarInt(0); // 一个不知道作用的8字节，貌似全写0就可以
             }
             stream.put(blockEntities);
 
-            this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, subChunkCount, stream.getBuffer());
+            int count = subChunkCount;
+            if (protocolId >= ProtocolInfo.v1_18_0) {
+                count += EXTENDED_NEGATIVE_SUB_CHUNKS;
+            }
+            this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, count, stream.getBuffer());
         }
     }
 
-    private byte[] serializeBiome(int protocol, Chunk chunk) {
+    private byte[] convert2DBiomesTo3D(int protocolId, BaseFullChunk chunk) {
+        PalettedBlockStorage palette = PalettedBlockStorage.createWithDefaultState(Biome.getBiomeIdOrCorrect(protocolId, chunk.getBiomeId(0, 0)));
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int biomeId = Biome.getBiomeIdOrCorrect(protocolId, chunk.getBiomeId(x, z));
+                for (int y = 0; y < 16; y++) {
+                    palette.setBlock(x, y, z, biomeId);
+                }
+            }
+        }
+
+        BinaryStream stream = ThreadCache.binaryStream.get().reset();
+        palette.writeTo(protocolId, stream);
+        byte[] bytes = stream.getBuffer();
+        stream.reset();
+
+        for (int i = 0; i < 25; i++) {
+            stream.put(bytes);
+        }
+        return stream.getBuffer();
+    }
+
+    private byte[] serializeBiome(int protocolId, Chunk chunk) {
         final BinaryStream stream = new BinaryStream();
-        final PalettedBlockStorage blockStorage = new PalettedBlockStorage(BitArrayVersion.V2, protocol, true);
+        final PalettedBlockStorage blockStorage = PalettedBlockStorage.createWithDefaultState(Biome.getBiomeIdOrCorrect(protocolId, chunk.getBiomeId(0, 0)));
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 for (int y = 0; y < 16; y++) {
@@ -214,9 +241,10 @@ public class Anvil extends BaseLevelProvider {
                 }
             }
         }
-        blockStorage.writeTo(protocol, stream);
+        blockStorage.writeTo(protocolId, stream);
         return stream.getBuffer();
     }
+
 
     private int lastPosition = 0;
 
