@@ -110,8 +110,8 @@ public class EntityHuman extends EntityHumanType {
                 if (skinTag.contains("ModelId")) {
                     newSkin.setSkinId(skinTag.getString("ModelId"));
                 }
-                if (skinTag.contains("PlayFabID")) {
-                    newSkin.setPlayFabId(skinTag.getString("PlayFabID"));
+                if (skinTag.contains("PlayFabId")) {
+                    newSkin.setPlayFabId(skinTag.getString("PlayFabId"));
                 }
                 if (skinTag.contains("Data")) {
                     byte[] data = skinTag.getByteArray("Data");
@@ -141,7 +141,9 @@ public class EntityHuman extends EntityHumanType {
                 if (skinTag.contains("GeometryData")) {
                     newSkin.setGeometryData(new String(skinTag.getByteArray("GeometryData"), StandardCharsets.UTF_8));
                 }
-                if (skinTag.contains("AnimationData")) {
+                if (skinTag.contains("SkinAnimationData")) {
+                    newSkin.setAnimationData(new String(skinTag.getByteArray("SkinAnimationData"), StandardCharsets.UTF_8));
+                } else if (skinTag.contains("AnimationData")) { // backwards compatible
                     newSkin.setAnimationData(new String(skinTag.getByteArray("AnimationData"), StandardCharsets.UTF_8));
                 }
                 if (skinTag.contains("PremiumSkin")) {
@@ -225,7 +227,7 @@ public class EntityHuman extends EntityHumanType {
                     .putInt("CapeImageHeight", this.getSkin().getCapeData().height)
                     .putByteArray("SkinResourcePatch", this.getSkin().getSkinResourcePatch().getBytes(StandardCharsets.UTF_8))
                     .putByteArray("GeometryData", this.skin.getGeometryData().getBytes(StandardCharsets.UTF_8))
-                    .putByteArray("AnimationData", this.getSkin().getAnimationData().getBytes(StandardCharsets.UTF_8))
+                    .putByteArray("SkinAnimationData", this.getSkin().getAnimationData().getBytes(StandardCharsets.UTF_8))
                     .putBoolean("PremiumSkin", this.getSkin().isPremium())
                     .putBoolean("PersonaSkin", this.getSkin().isPersona())
                     .putBoolean("CapeOnClassicSkin", this.getSkin().isCapeOnClassic())
@@ -276,7 +278,7 @@ public class EntityHuman extends EntityHumanType {
             }
 
             if (!this.getSkin().getPlayFabId().isEmpty()) {
-                skinTag.putString("PlayFabID", this.getSkin().getPlayFabId());
+                skinTag.putString("PlayFabId", this.getSkin().getPlayFabId());
             }
 
             this.namedTag.putCompound("Skin", skinTag);
