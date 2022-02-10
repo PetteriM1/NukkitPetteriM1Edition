@@ -138,7 +138,14 @@ public class RuntimeItemMapping {
 
     private void generatePalette() {
         BinaryStream paletteBuffer = new BinaryStream();
-        paletteBuffer.putUnsignedVarInt(this.legacy2Runtime.size());
+        int size = 0;
+        for (RuntimeEntry entry : this.legacy2Runtime.values()) {
+            if (entry.isCustomItem() && (!Server.getInstance().enableCustomItems || protocolId < ProtocolInfo.v1_16_100)) {
+                break;
+            }
+            size++;
+        }
+        paletteBuffer.putUnsignedVarInt(size);
         for (RuntimeEntry entry : this.legacy2Runtime.values()) {
             if (entry.isCustomItem()) {
                 if (Server.getInstance().enableCustomItems && protocolId >= ProtocolInfo.v1_16_100) {
