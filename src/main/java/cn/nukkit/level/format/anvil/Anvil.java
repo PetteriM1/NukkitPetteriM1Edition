@@ -172,10 +172,12 @@ public class Anvil extends BaseLevelProvider {
 
                 stream = ThreadCache.binaryStream.get().reset();
 
-                // Build up 4 SubChunks for the extended negative height
-                for (int i = 0; i < EXTENDED_NEGATIVE_SUB_CHUNKS; i++) {
-                    stream.putByte((byte) 8); // SubChunk version
-                    stream.putByte((byte) 0); // 0 layers
+                if (this.level.getDimension() == 0) {
+                    // Build up 4 SubChunks for the extended negative height
+                    for (int i = 0; i < EXTENDED_NEGATIVE_SUB_CHUNKS; i++) {
+                        stream.putByte((byte) 8); // SubChunk version
+                        stream.putByte((byte) 0); // 0 layers
+                    }
                 }
             }
 
@@ -205,7 +207,7 @@ public class Anvil extends BaseLevelProvider {
             stream.put(blockEntities);
 
             int count = subChunkCount;
-            if (protocolId >= ProtocolInfo.v1_18_0) {
+            if (protocolId >= ProtocolInfo.v1_18_0 && this.level.getDimension() == 0) {
                 count += EXTENDED_NEGATIVE_SUB_CHUNKS;
             }
             this.getLevel().chunkRequestCallback(protocolId, timestamp, x, z, count, stream.getBuffer());
