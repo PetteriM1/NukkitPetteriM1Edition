@@ -5,7 +5,7 @@
     <name>Nukkit PetteriM1 Edition</name>
     <groupId>cn.nukkit</groupId>
     <artifactId>Nukkit</artifactId>
-    <version>PM1E-SNAPSHOT</version>
+    <version>PM1E-MOT-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

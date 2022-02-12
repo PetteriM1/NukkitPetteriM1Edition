@@ -164,7 +164,14 @@ public class Anvil extends BaseLevelProvider {
             }
 
             //1.18.0开始主世界支持384世界高度
-            if (protocolId >= ProtocolInfo.v1_18_0 && super.level.getDimension() == 0) {
+            byte[] biomePalettes = null;
+            if (protocolId >= ProtocolInfo.v1_18_0) {
+                // In 1.18 3D biome palettes were introduced. However, current world format
+                // used internally doesn't support them, so we need to convert from legacy 2D
+                biomePalettes = this.convert2DBiomesTo3D(protocolId, chunk);
+
+                stream = ThreadCache.binaryStream.get().reset();
+
                 // Build up 4 SubChunks for the extended negative height
                 for (int i = 0; i < EXTENDED_NEGATIVE_SUB_CHUNKS; i++) {
                     stream.putByte((byte) 8); // SubChunk version
@@ -187,11 +194,7 @@ public class Anvil extends BaseLevelProvider {
                 stream.put(PAD_256);
             }
             if (protocolId >= ProtocolInfo.v1_18_0) {
-                // In 1.18 3D biome palettes were introduced. However, current world format
-                // used internally doesn't support them, so we need to convert from legacy 2D
-                //TODO fix
-                //stream.put(this.convert2DBiomesTo3D(protocolId, chunk));
-                stream.put(this.serializeBiome(protocolId, chunk));
+                stream.put(biomePalettes);
             }else {
                 stream.put(chunk.getBiomeIdArray());
             }
@@ -230,21 +233,6 @@ public class Anvil extends BaseLevelProvider {
         }
         return stream.getBuffer();
     }
-
-    private byte[] serializeBiome(int protocolId, Chunk chunk) {
-        final BinaryStream stream = new BinaryStream();
-        final PalettedBlockStorage blockStorage = PalettedBlockStorage.createWithDefaultState(Biome.getBiomeIdOrCorrect(protocolId, chunk.getBiomeId(0, 0)));
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < 16; y++) {
-                    blockStorage.setBlock((x << 8) | (z << 4) | y, chunk.getBiomeId(x, z));
-                }
-            }
-        }
-        blockStorage.writeTo(protocolId, stream);
-        return stream.getBuffer();
-    }
-
 
     private int lastPosition = 0;
 
