@@ -1,0 +1,149 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package cn.nukkit.entity.item;
+
+import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityHanging;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.item.Item;
+import cn.nukkit.level.GameRule;
+import cn.nukkit.level.format.FullChunk;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.AddPaintingPacket;
+import cn.nukkit.network.protocol.DataPacket;
+import java.util.HashMap;
+import java.util.Map;
+
+public class EntityPainting
+extends EntityHanging {
+    public static final int NETWORK_ID = 83;
+    public static final Motive[] motives = Motive.values();
+    private Motive k;
+
+    public EntityPainting(FullChunk fullChunk, CompoundTag compoundTag) {
+        super(fullChunk, compoundTag);
+    }
+
+    public static Motive getMotive(String string) {
+        return Motive.b.getOrDefault(string, Motive.KEBAB);
+    }
+
+    @Override
+    public int getNetworkId() {
+        return 83;
+    }
+
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+        this.k = EntityPainting.getMotive(this.namedTag.getString("Motive"));
+    }
+
+    @Override
+    public DataPacket createAddEntityPacket() {
+        AddPaintingPacket addPaintingPacket = new AddPaintingPacket();
+        addPaintingPacket.entityUniqueId = this.getId();
+        addPaintingPacket.entityRuntimeId = this.getId();
+        addPaintingPacket.x = (float)this.x;
+        addPaintingPacket.y = (float)this.y;
+        addPaintingPacket.z = (float)this.z;
+        addPaintingPacket.direction = this.getDirection().getHorizontalIndex();
+        addPaintingPacket.title = this.namedTag.getString("Motive");
+        return addPaintingPacket;
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent entityDamageEvent) {
+        if (super.attack(entityDamageEvent)) {
+            Entity entity;
+            if (entityDamageEvent instanceof EntityDamageByEntityEvent && (entity = ((EntityDamageByEntityEvent)entityDamageEvent).getDamager()) instanceof Player && ((Player)entity).isSurvival() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                this.level.dropItem(this, Item.get(321));
+            }
+            this.close();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putString("Motive", this.k.title);
+    }
+
+    public Motive getArt() {
+        return this.getMotive();
+    }
+
+    public Motive getMotive() {
+        return (Motive)((Object)Motive.b.get(this.namedTag.getString("Motive")));
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk fullChunk) {
+        if (fullChunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive() && this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                this.level.dropItem(this, Item.get(321));
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    protected boolean isSurfaceValid() {
+        return true;
+    }
+
+    public static enum Motive {
+        KEBAB("Kebab", 1, 1),
+        AZTEC("Aztec", 1, 1),
+        ALBAN("Alban", 1, 1),
+        AZTEC2("Aztec2", 1, 1),
+        BOMB("Bomb", 1, 1),
+        PLANT("Plant", 1, 1),
+        WASTELAND("Wasteland", 1, 1),
+        WANDERER("Wanderer", 1, 2),
+        GRAHAM("Graham", 1, 2),
+        POOL("Pool", 2, 1),
+        COURBET("Courbet", 2, 1),
+        SUNSET("Sunset", 2, 1),
+        SEA("Sea", 2, 1),
+        CREEBET("Creebet", 2, 1),
+        MATCH("Match", 2, 2),
+        BUST("Bust", 2, 2),
+        STAGE("Stage", 2, 2),
+        VOID("Void", 2, 2),
+        SKULL_AND_ROSES("SkullAndRoses", 2, 2),
+        WITHER("Wither", 2, 2),
+        FIGHTERS("Fighters", 4, 2),
+        SKELETON("Skeleton", 4, 3),
+        DONKEY_KONG("DonkeyKong", 4, 3),
+        POINTER("Pointer", 4, 4),
+        PIG_SCENE("Pigscene", 4, 4),
+        BURNING_SKULL("BurningSkull", 4, 4);
+
+        public final String title;
+        public final int width;
+        public final int height;
+        private static final Map<String, Motive> b;
+
+        private Motive(String string2, int n2, int n3) {
+            this.title = string2;
+            this.width = n2;
+            this.height = n3;
+        }
+
+        static {
+            b = new HashMap<String, Motive>();
+            for (Motive motive : Motive.values()) {
+                b.put(motive.title, motive);
+            }
+        }
+    }
+}
+
