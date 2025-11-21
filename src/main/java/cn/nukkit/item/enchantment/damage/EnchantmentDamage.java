@@ -21,13 +21,13 @@ public abstract class EnchantmentDamage extends Enchantment {
     }
 
     @Override
-    public boolean checkCompatibility(Enchantment enchantment) {
-        return !(enchantment instanceof EnchantmentDamage);
+    public boolean canEnchant(Item item) {
+        return item.isAxe() || super.canEnchant(item);
     }
 
     @Override
-    public boolean canEnchant(Item item) {
-        return item.isAxe() || super.canEnchant(item);
+    public boolean checkCompatibility(Enchantment enchantment) {
+        return !(enchantment instanceof EnchantmentDamage);
     }
 
     @Override

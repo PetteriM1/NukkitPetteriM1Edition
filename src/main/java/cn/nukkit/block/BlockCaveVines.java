@@ -10,6 +10,8 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -26,23 +28,18 @@ public class BlockCaveVines extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Cave Vines";
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
-    public int getId() {
-        return CAVE_VINES;
+    public boolean canBeClimbed() {
+        return true;
     }
 
     @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
+    public boolean canPassThrough() {
+        return true;
     }
 
     @Override
@@ -52,37 +49,78 @@ public class BlockCaveVines extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!this.canPlaceOn(block.down(), target)) {
-            return false;
-        }
-
-        Block support = block.up();
-        if (isCaveVine(support)) {
-            this.setVineAge(Math.min(this.getMaxAge(), ((BlockCaveVines) support).getVineAge() + 1));
-        } else {
-            this.setVineAge(0);
-        }
-        return this.getLevel().setBlock(this, this, true, true);
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.VINES;
     }
 
     @Override
-    public int onUpdate(int type) {
-        switch (type) {
-            case Level.BLOCK_UPDATE_NORMAL:
-                Block up = this.up();
-                if (!isCaveVine(up) && !up.isSolid()) {
-                    this.getLevel().scheduleUpdate(this, 1);
-                }
-                break;
-            case Level.BLOCK_UPDATE_SCHEDULED:
-                this.getLevel().useBreakOn(this, null, null, true);
-                break;
-            case Level.BLOCK_UPDATE_RANDOM:
-                this.tryGrow();
-                break;
+    public Item[] getDrops(Item item) {
+        if (!this.hasBerries()) {
+            return new Item[0];
         }
-        return type;
+        return new Item[]{Item.get(ItemID.GLOW_BERRIES, 0, 1)};
+    }
+
+    @Override
+    public double getHardness() {
+        return 0;
+    }
+
+    @Override
+    public int getId() {
+        return CAVE_VINES;
+    }
+
+    public int getMaxAge() {
+        return 25;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Cave Vines";
+    }
+
+    public BlockCaveVines getStateWithBerries(Position position) {
+        if (this.getDamage() == 0) {
+            return (BlockCaveVines) Block.get(CAVE_VINES_HEAD_WITH_BERRIES, 0, position);
+        }
+        return (BlockCaveVines) Block.get(CAVE_VINES_HEAD_WITH_BERRIES, this.getDamage(), position);
+    }
+
+    public BlockCaveVines getStateWithoutBerries(Position position) {
+        return (BlockCaveVines) Block.get(CAVE_VINES, this.getDamage(), position);
+    }
+
+    public int getVineAge() {
+        return this.getDamage();
+    }
+
+    public void setVineAge(int age) {
+        this.setDamage(age);
+    }
+
+    public boolean hasBerries() {
+        return false;
+    }
+
+    public static boolean isCaveVine(Block block) {
+        switch (block.getId()) {
+            case CAVE_VINES:
+            case CAVE_VINES_BODY_WITH_BERRIES:
+            case CAVE_VINES_HEAD_WITH_BERRIES:
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
     }
 
     @Override
@@ -114,21 +152,42 @@ public class BlockCaveVines extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public int onUpdate(int type) {
+        switch (type) {
+            case Level.BLOCK_UPDATE_NORMAL:
+                Block up = this.up();
+                if (!isCaveVine(up) && !up.isSolid()) {
+                    this.getLevel().scheduleUpdate(this, 1);
+                }
+                break;
+            case Level.BLOCK_UPDATE_SCHEDULED:
+                this.getLevel().useBreakOn(this, null, null, true);
+                break;
+            case Level.BLOCK_UPDATE_RANDOM:
+                this.tryGrow();
+                break;
+        }
+        return type;
     }
 
-    private boolean tryPickupBerries() {
-        if (!this.hasBerries()) {
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!this.canPlaceOn(block.down(), target)) {
             return false;
         }
 
-        BlockCaveVines blockCaveVines = this.getStateWithoutBerries(this);
-        this.getLevel().setBlock(this, blockCaveVines, false, true);
+        Block support = block.up();
+        if (isCaveVine(support)) {
+            this.setVineAge(Math.min(this.getMaxAge(), ((BlockCaveVines) support).getVineAge() + 1));
+        } else {
+            this.setVineAge(0);
+        }
+        return this.getLevel().setBlock(this, this, true, true);
+    }
 
-        Item item = Item.get(ItemID.GLOW_BERRIES, 0, 1);
-        this.getLevel().dropItem(this.add(0.5, 0.5, 0.5), item);
-        return true;
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId()), 0, 1);
     }
 
     private boolean tryGrow() {
@@ -169,63 +228,16 @@ public class BlockCaveVines extends BlockTransparentMeta {
         return true;
     }
 
-    public BlockCaveVines getStateWithBerries(Position position) {
-        if (this.getDamage() == 0) {
-            return (BlockCaveVines) Block.get(CAVE_VINES_HEAD_WITH_BERRIES, 0, position);
-        }
-        return (BlockCaveVines) Block.get(CAVE_VINES_HEAD_WITH_BERRIES, this.getDamage(), position);
-    }
-
-    public BlockCaveVines getStateWithoutBerries(Position position) {
-        return (BlockCaveVines) Block.get(CAVE_VINES, this.getDamage(), position);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
+    private boolean tryPickupBerries() {
         if (!this.hasBerries()) {
-            return new Item[0];
+            return false;
         }
-        return new Item[]{ Item.get(ItemID.GLOW_BERRIES, 0, 1) };
-    }
 
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
+        BlockCaveVines blockCaveVines = this.getStateWithoutBerries(this);
+        this.getLevel().setBlock(this, blockCaveVines, false, true);
 
-    public void setVineAge(int age) {
-        this.setDamage(age);
-    }
-
-    public int getVineAge() {
-        return this.getDamage();
-    }
-
-    public int getMaxAge() {
-        return 25;
-    }
-
-    public boolean hasBerries() {
-        return false;
-    }
-
-    @Override
-    public boolean canBeClimbed() {
-        return true;
-    }
-
-    public static boolean isCaveVine(Block block) {
-        switch (block.getId()) {
-            case CAVE_VINES:
-            case CAVE_VINES_BODY_WITH_BERRIES:
-            case CAVE_VINES_HEAD_WITH_BERRIES:
-                return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean canPassThrough() {
+        Item item = Item.get(ItemID.GLOW_BERRIES, 0, 1);
+        this.getLevel().dropItem(this.add(0.5, 0.5, 0.5), item);
         return true;
     }
 }

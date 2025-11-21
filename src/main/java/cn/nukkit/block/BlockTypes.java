@@ -685,6 +685,20 @@ public class BlockTypes {
     public static final BlockType STRIPPED_MANGROVE_WOOD = register("minecraft:stripped_mangrove_wood", BlockID.STRIPPED_MANGROVE_WOOD);
     public static final BlockType MANGROVE_DOUBLE_SLAB = register("minecraft:mangrove_double_slab", BlockID.MANGROVE_DOUBLE_SLAB);
 
+    @Data
+    private static class BlockTypeImpl implements BlockType {
+        private final String identifier;
+        private final int legacyId;
+    }
+
+    public static BlockType get(String identifier) {
+        return identifiers.get(identifier);
+    }
+
+    public static BlockType getFromLegacy(int legacyId) {
+        return types.get(legacyId);
+    }
+
     private static BlockType register(String identifier, int legacyId) {
         return register(new BlockTypeImpl(identifier, legacyId));
     }
@@ -696,19 +710,5 @@ public class BlockTypes {
         }*/
         identifiers.putIfAbsent(blockType.getIdentifier(), blockType); // TODO: using identifiers.put() would be better
         return old == null ? blockType : old;
-    }
-
-    public static BlockType getFromLegacy(int legacyId) {
-        return types.get(legacyId);
-    }
-
-    public static BlockType get(String identifier) {
-        return identifiers.get(identifier);
-    }
-
-    @Data
-    private static class BlockTypeImpl implements BlockType {
-        private final String identifier;
-        private final int legacyId;
     }
 }

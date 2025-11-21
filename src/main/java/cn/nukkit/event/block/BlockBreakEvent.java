@@ -10,35 +10,28 @@ import cn.nukkit.math.Vector3;
 
 /**
  * Event for Block being broken.
+ *
  * @author MagicDroidX
  */
 public class BlockBreakEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected final Player player;
-
     protected final Item item;
     protected final BlockFace face;
-
     protected boolean instaBreak;
     protected Item[] blockDrops;
     protected int blockXP;
-
     protected boolean fastBreak;
-
     protected Vector3 dropPosition;
 
     /**
      * This event is called when a block is broken.
+     *
      * @param player Player who broke the block.
-     * @param block Block that was broken.
-     * @param item Item used to break the block.
-     * @param drops Items dropped by the block.
+     * @param block  Block that was broken.
+     * @param item   Item used to break the block.
+     * @param drops  Items dropped by the block.
      */
     public BlockBreakEvent(Player player, Block block, Item item, Item[] drops) {
         this(player, block, item, drops, false, false);
@@ -63,20 +56,20 @@ public class BlockBreakEvent extends BlockEvent implements Cancellable {
         this.blockXP = block.getDropExp();
     }
 
-    public Player getPlayer() {
-        return player;
+    public int getDropExp() {
+        return this.blockXP;
     }
 
-    public BlockFace getFace() {
-        return face;
+    public void setDropExp(int xp) {
+        this.blockXP = xp;
     }
 
-    public Item getItem() {
-        return item;
+    public Vector3 getDropPosition() {
+        return this.dropPosition;
     }
 
-    public boolean getInstaBreak() {
-        return this.instaBreak;
+    public void setDropPosition(Vector3 dropPosition) {
+        this.dropPosition = dropPosition;
     }
 
     public Item[] getDrops() {
@@ -91,27 +84,31 @@ public class BlockBreakEvent extends BlockEvent implements Cancellable {
         this.blockDrops = drops;
     }
 
-    public int getDropExp() {
-        return this.blockXP;
+    public BlockFace getFace() {
+        return face;
     }
 
-    public void setDropExp(int xp) {
-        this.blockXP = xp;
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public boolean getInstaBreak() {
+        return this.instaBreak;
     }
 
     public void setInstaBreak(boolean instaBreak) {
         this.instaBreak = instaBreak;
     }
 
+    public Item getItem() {
+        return item;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
     public boolean isFastBreak() {
         return this.fastBreak;
-    }
-
-    public void setDropPosition(Vector3 dropPosition) {
-        this.dropPosition = dropPosition;
-    }
-
-    public Vector3 getDropPosition() {
-        return this.dropPosition;
     }
 }

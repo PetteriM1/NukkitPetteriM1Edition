@@ -11,12 +11,12 @@ public class BlockButtonSpruce extends BlockButtonWooden {
     }
 
     @Override
-    public String getName() {
-        return "Spruce Button";
+    public int getId() {
+        return SPRUCE_BUTTON;
     }
 
     @Override
-    public int getId() {
-        return SPRUCE_BUTTON;
+    public String getName() {
+        return "Spruce Button";
     }
 }

@@ -25,11 +25,6 @@ public class CommandBlockUpdatePacket extends DataPacket {
     public boolean executingOnFirstTick;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.isBlock = this.getBoolean();
         if (this.isBlock) {
@@ -46,10 +41,14 @@ public class CommandBlockUpdatePacket extends DataPacket {
         this.command = this.getString();
         this.lastOutput = this.getString();
         this.name = this.getString();
-        this.filteredName = this.getString();
+        if (protocol >= ProtocolInfo.v1_21_60) {
+            this.filteredName = this.getString();
+        }
         this.shouldTrackOutput = this.getBoolean();
-        this.tickDelay = this.getLInt();
-        this.executingOnFirstTick = this.getBoolean();
+        if (protocol >= ProtocolInfo.v1_21_60) {
+            this.tickDelay = this.getLInt();
+            this.executingOnFirstTick = this.getBoolean();
+        }
     }
 
     @Override
@@ -67,9 +66,18 @@ public class CommandBlockUpdatePacket extends DataPacket {
         this.putString(this.command);
         this.putString(this.lastOutput);
         this.putString(this.name);
-        this.putString(this.filteredName);
+        if (protocol >= ProtocolInfo.v1_21_60) {
+            this.putString(this.filteredName);
+        }
         this.putBoolean(this.shouldTrackOutput);
-        this.putLInt(this.tickDelay);
-        this.putBoolean(this.executingOnFirstTick);
+        if (protocol >= ProtocolInfo.v1_21_60) {
+            this.putLInt(this.tickDelay);
+            this.putBoolean(this.executingOnFirstTick);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

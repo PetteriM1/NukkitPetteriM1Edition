@@ -12,16 +12,6 @@ public class FrozenRiverBiome extends RiverBiome {
     }
 
     @Override
-    public String getName() {
-        return "Frozen River";
-    }
-
-    @Override
-    public boolean isFreezing() {
-        return true;
-    }
-
-    @Override
     public boolean canRain() {
         return false;
     }
@@ -29,5 +19,15 @@ public class FrozenRiverBiome extends RiverBiome {
     @Override
     public int getCoverId(int x, int z) {
         return SNOW_LAYER << Block.DATA_BITS;
+    }
+
+    @Override
+    public String getName() {
+        return "Frozen River";
+    }
+
+    @Override
+    public boolean isFreezing() {
+        return true;
     }
 }

@@ -11,11 +11,6 @@ public class BlockSoulTorch extends BlockTorch {
     }
 
     @Override
-    public String getName() {
-        return "Soul Torch";
-    }
-
-    @Override
     public int getId() {
         return SOUL_TORCH;
     }
@@ -23,5 +18,10 @@ public class BlockSoulTorch extends BlockTorch {
     @Override
     public int getLightLevel() {
         return 10;
+    }
+
+    @Override
+    public String getName() {
+        return "Soul Torch";
     }
 }

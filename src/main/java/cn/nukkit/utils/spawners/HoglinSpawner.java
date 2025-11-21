@@ -1,0 +1,44 @@
+package cn.nukkit.utils.spawners;
+
+import cn.nukkit.Player;
+import cn.nukkit.block.Block;
+import cn.nukkit.entity.BaseEntity;
+import cn.nukkit.entity.mob.EntityHoglin;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
+import cn.nukkit.level.biome.EnumBiome;
+import cn.nukkit.utils.AbstractEntitySpawner;
+import cn.nukkit.utils.SpawnerTask;
+import cn.nukkit.utils.Utils;
+
+public class HoglinSpawner extends AbstractEntitySpawner {
+
+    public HoglinSpawner(SpawnerTask spawnTask) {
+        super(spawnTask);
+    }
+
+    @Override
+    public final int getEntityNetworkId() {
+        return EntityHoglin.NETWORK_ID;
+    }
+
+    @Override
+    public void spawn(Player player, Position pos, Level level) {
+        if (Utils.rand(1, 5) != 1) {
+            return;
+        }
+        int biome = level.getBiomeId((int) pos.x, (int) pos.z);
+        if (biome == EnumBiome.CRIMSON_FOREST.id) {
+            int blockId = level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z);
+            if (blockId != Block.BLOCK_NETHER_WART_BLOCK) {
+                for (int i = 0; i < 4; i++) {
+                    BaseEntity entity = this.spawnTask.createEntity("Hoglin", pos.add(0.5, 1, 0.5));
+                    if (entity == null) return;
+                    if (Utils.rand(1, 20) == 1) {
+                        entity.setBaby(true);
+                    }
+                }
+            }
+        }
+    }
+}

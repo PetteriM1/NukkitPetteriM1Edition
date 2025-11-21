@@ -25,7 +25,7 @@ import cn.nukkit.plugin.Plugin;
  *         }
  *     }
  *     </pre>
- *
+ * <p>
  * 如果要让Nukkit能够延时或循环执行这个任务，请使用{@link ServerScheduler}。<br>
  * If you want Nukkit to execute this task with delay or repeat, use {@link ServerScheduler}.
  *

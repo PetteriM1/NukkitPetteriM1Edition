@@ -22,13 +22,8 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Cake Block";
-    }
-
-    @Override
-    public int getId() {
-        return CAKE_BLOCK;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -37,23 +32,27 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    public int getComparatorInputOverride() {
+        return (7 - this.getDamage()) << 1;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
     public double getHardness() {
         return 0.5;
     }
 
     @Override
-    public double getResistance() {
-        return 0.5;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + ((1 + (getDamage() << 1)) >> 4);
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.0625;
+    public int getId() {
+        return CAKE_BLOCK;
     }
 
     @Override
@@ -72,35 +71,32 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (down().getId() != Block.AIR) {
-            this.getLevel().setBlock(this, this, true, true);
-            return true;
-        }
-        return false;
+    public double getMinX() {
+        return this.x + ((1 + (getDamage() << 1)) >> 4);
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (down().getId() == Block.AIR) {
-                getLevel().setBlock(this, Block.get(BlockID.AIR), true);
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-
-        return 0;
+    public double getMinZ() {
+        return this.z + 0.0625;
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public String getName() {
+        return "Cake Block";
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.CAKE);
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
     }
 
     @Override
@@ -120,25 +116,29 @@ public class BlockCake extends BlockTransparentMeta {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (down().getId() == Block.AIR) {
+                getLevel().setBlock(this, Block.get(BlockID.AIR), true);
 
-    public int getComparatorInputOverride() {
-        return (7 - this.getDamage()) << 1;
-    }
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
 
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+        return 0;
     }
 
     @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (down().getId() != Block.AIR) {
+            this.getLevel().setBlock(this, this, true, true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.CAKE);
     }
 }

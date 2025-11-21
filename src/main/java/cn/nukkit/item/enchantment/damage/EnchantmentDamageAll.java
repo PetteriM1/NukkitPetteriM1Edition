@@ -13,8 +13,8 @@ public class EnchantmentDamageAll extends EnchantmentDamage {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 1 + (level - 1) * 11;
+    public double getDamageBonus(Entity entity) {
+        return this.getLevel() * 1.25;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class EnchantmentDamageAll extends EnchantmentDamage {
     }
 
     @Override
-    public double getDamageBonus(Entity entity) {
-        return this.getLevel() * 1.25;
+    public int getMinEnchantAbility(int level) {
+        return 1 + (level - 1) * 11;
     }
 }

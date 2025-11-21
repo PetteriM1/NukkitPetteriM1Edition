@@ -12,10 +12,6 @@ public enum DimensionEnum {
         this.dimensionData = dimensionData;
     }
 
-    public DimensionData getDimensionData() {
-        return this.dimensionData;
-    }
-
     public static DimensionData getDataFromId(int dimension) {
         for (DimensionEnum value : values()) {
             if (value.getDimensionData().getDimensionId() == dimension) {
@@ -23,5 +19,9 @@ public enum DimensionEnum {
             }
         }
         return null;
+    }
+
+    public DimensionData getDimensionData() {
+        return this.dimensionData;
     }
 }

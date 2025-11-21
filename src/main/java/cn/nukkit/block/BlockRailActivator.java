@@ -21,37 +21,24 @@ public class BlockRailActivator extends BlockRail {
         canBePowered = true;
     }
 
-    @Override
-    public String getName() {
-        return "Activator Rail";
-    }
+    protected boolean canPowered(int x, int y, int z, Rail.Orientation state, int power, boolean relative) {
+        Block block = level.getBlock(x, y, z);
 
-    @Override
-    public int getId() {
-        return ACTIVATOR_RAIL;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE || type == Level.BLOCK_UPDATE_SCHEDULED) {
-            if (super.onUpdate(type) == Level.BLOCK_UPDATE_NORMAL) {
-                return 0; // Already broken
-            }
-
-            boolean isPowered = level.isBlockPowered(this)
-                    || checkSurrounding(this, true, 0)
-                    || checkSurrounding(this, false, 0);
-
-            if (isActive() != isPowered) {
-                setActive(isPowered);
-                level.updateAround(getSideVec(BlockFace.DOWN));
-                if (getOrientation().isAscending()) {
-                    level.updateAround(getSideVec(BlockFace.UP));
-                }
-            }
-            return type;
+        if (!(block instanceof BlockRailActivator)) {
+            return false;
         }
-        return 0;
+
+        Rail.Orientation base = ((BlockRailActivator) block).getOrientation();
+
+        return (state != Rail.Orientation.STRAIGHT_EAST_WEST
+                || base != Rail.Orientation.STRAIGHT_NORTH_SOUTH
+                && base != Rail.Orientation.ASCENDING_NORTH
+                && base != Rail.Orientation.ASCENDING_SOUTH)
+                && (state != Rail.Orientation.STRAIGHT_NORTH_SOUTH
+                || base != Rail.Orientation.STRAIGHT_EAST_WEST
+                && base != Rail.Orientation.ASCENDING_EAST
+                && base != Rail.Orientation.ASCENDING_WEST)
+                && (level.isBlockPowered(block) || checkSurrounding(block, relative, power + 1));
     }
 
     /**
@@ -145,31 +132,6 @@ public class BlockRailActivator extends BlockRail {
                 || onStraight && canPowered(dx, dy - 1, dz, base, power, relative);
     }
 
-    protected boolean canPowered(int x, int y, int z, Rail.Orientation state, int power, boolean relative) {
-        Block block = level.getBlock(x, y, z);
-
-        if (!(block instanceof BlockRailActivator)) {
-            return false;
-        }
-
-        Rail.Orientation base = ((BlockRailActivator) block).getOrientation();
-
-        return (state != Rail.Orientation.STRAIGHT_EAST_WEST
-                || base != Rail.Orientation.STRAIGHT_NORTH_SOUTH
-                && base != Rail.Orientation.ASCENDING_NORTH
-                && base != Rail.Orientation.ASCENDING_SOUTH)
-                && (state != Rail.Orientation.STRAIGHT_NORTH_SOUTH
-                || base != Rail.Orientation.STRAIGHT_EAST_WEST
-                && base != Rail.Orientation.ASCENDING_EAST
-                && base != Rail.Orientation.ASCENDING_WEST)
-                && (level.isBlockPowered(block) || checkSurrounding(block, relative, power + 1));
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{
@@ -180,5 +142,43 @@ public class BlockRailActivator extends BlockRail {
     @Override
     public double getHardness() {
         return 0.5; // 0.7
+    }
+
+    @Override
+    public int getId() {
+        return ACTIVATOR_RAIL;
+    }
+
+    @Override
+    public String getName() {
+        return "Activator Rail";
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE || type == Level.BLOCK_UPDATE_SCHEDULED) {
+            if (super.onUpdate(type) == Level.BLOCK_UPDATE_NORMAL) {
+                return 0; // Already broken
+            }
+
+            boolean isPowered = level.isBlockPowered(this)
+                    || checkSurrounding(this, true, 0)
+                    || checkSurrounding(this, false, 0);
+
+            if (isActive() != isPowered) {
+                setActive(isPowered);
+                level.updateAround(getSideVec(BlockFace.DOWN));
+                if (getOrientation().isAscending()) {
+                    level.updateAround(getSideVec(BlockFace.UP));
+                }
+            }
+            return type;
+        }
+        return 0;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

@@ -1,6 +1,8 @@
 package cn.nukkit.utils;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
+import cn.nukkit.utils.bugreport.BugReportGenerator;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
@@ -30,11 +32,46 @@ public class Watchdog extends Thread {
     }
 
     /**
+     * Dump thread stack trace
+     *
+     * @param thread thread to dump
+     * @param logger logger
+     * @param log    bug report generator input
+     */
+    private static void dumpThread(ThreadInfo thread, Logger logger, StringBuilder log) {
+        print("Thread: " + thread.getThreadName(), logger, log);
+        print("\tPID: " + thread.getThreadId() + " | Suspended: " + thread.isSuspended() + " | Native: " + thread.isInNative() + " | State: " + thread.getThreadState(), logger, log);
+
+        if (thread.getLockedMonitors().length != 0) {
+            print("\tThread is waiting on monitor(s):", logger, log);
+            for (MonitorInfo monitor : thread.getLockedMonitors()) {
+                print("\t\tLocked on:" + monitor.getLockedStackFrame(), logger, log);
+            }
+        }
+
+        print("\tStack:", logger, null);
+        for (StackTraceElement stack : thread.getStackTrace()) {
+            print("\t\t" + stack, logger, log);
+        }
+    }
+
+    /**
      * Disable Watchdog
      */
     public void kill() {
         this.running = false;
         this.interrupt();
+    }
+
+    /**
+     * Print a line to log
+     *
+     * @param logger logger
+     * @param log    bug report generator input
+     */
+    private static void print(String text, Logger logger, StringBuilder log) {
+        logger.emergency(text);
+        if (log != null) log.append(text).append('\n');
     }
 
     @Override
@@ -46,27 +83,37 @@ public class Watchdog extends Thread {
                 if (diff > this.time) {
                     if (this.server.isRunning()) {
                         MainLogger logger = this.server.getLogger();
+                        StringBuilder reporter = new StringBuilder();
                         long lastResponse = Math.round(diff / 1000d);
 
-                        logger.emergency("--------- Server stopped responding ---------");
-                        logger.emergency("Last response " + lastResponse + " seconds ago");
-                        logger.emergency("---------------- Main thread ----------------");
+                        print("--------- Server stopped responding ---------", logger, reporter);
+                        print("Last response " + lastResponse + " seconds ago", logger, null);
+                        print("---------------- Main thread ----------------", logger, null);
 
                         ThreadInfo mainThread = ManagementFactory.getThreadMXBean().getThreadInfo(this.server.getPrimaryThread().getId(), Integer.MAX_VALUE);
-                        dumpThread(mainThread, logger);
+                        dumpThread(mainThread, logger, reporter);
 
-                        logger.emergency("---------------- All threads ----------------");
+                        print("---------------- All threads ----------------", logger, reporter);
                         ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
                         for (int i = 0; i < threads.length; i++) {
-                            if (i != 0) logger.emergency("------------------------------");
-                            dumpThread(threads[i], logger);
+                            if (i != 0) print("------------------------------", logger, reporter);
+                            dumpThread(threads[i], logger, reporter);
                         }
-                        logger.emergency("---------------------------------------------");
+                        print("---------------------------------------------", logger, null);
 
                         if ("TIMED_WAITING".equals(mainThread.getThreadState().toString())) {
                             logger.warning("Make sure your plugins are not calling sleep() on main thread and that your terminal doesn't suspend server process when not focused");
                         }
 
+                        try {
+                            new BugReportGenerator(reporter.toString(), lastResponse).start();
+                            Thread.sleep(1000); // Wait for the report to be sent
+                        } catch (Exception ex) {
+                            if (Nukkit.DEBUG > 1) {
+                                logger.debug("Exception in Watchdog", ex);
+                            }
+                            // Fail safe
+                        }
                         this.server.forceShutdown("§cServer stopped responding");
                     } else if (diff > time << 1) {
                         System.out.println("\nTook too long to stop, server was killed forcefully!\n");
@@ -84,29 +131,6 @@ public class Watchdog extends Thread {
                 }
                 return;
             }
-        }
-    }
-
-    /**
-     * Dump thread stack trace
-     *
-     * @param thread thread to dump
-     * @param logger logger
-     */
-    private static void dumpThread(ThreadInfo thread, Logger logger) {
-        logger.emergency("Thread: " + thread.getThreadName());
-        logger.emergency("\tPID: " + thread.getThreadId() + " | Suspended: " + thread.isSuspended() + " | Native: " + thread.isInNative() + " | State: " + thread.getThreadState());
-
-        if (thread.getLockedMonitors().length != 0) {
-            logger.emergency("\tThread is waiting on monitor(s):");
-            for (MonitorInfo monitor : thread.getLockedMonitors()) {
-                logger.emergency("\t\tLocked on:" + monitor.getLockedStackFrame());
-            }
-        }
-
-        logger.emergency("\tStack:");
-        for (StackTraceElement stack : thread.getStackTrace()) {
-            logger.emergency("\t\t" + stack);
         }
     }
 }

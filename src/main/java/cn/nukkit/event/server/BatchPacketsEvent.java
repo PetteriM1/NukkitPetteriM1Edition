@@ -8,25 +8,23 @@ import cn.nukkit.network.protocol.DataPacket;
 public class BatchPacketsEvent extends ServerEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Player[] players;
     private final DataPacket[] packets;
-
     public BatchPacketsEvent(Player[] players, DataPacket[] packets, boolean forceSync) {
         this.players = players;
         this.packets = packets;
     }
 
-    public Player[] getPlayers() {
-        return players;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public DataPacket[] getPackets() {
         return packets;
+    }
+
+    public Player[] getPlayers() {
+        return players;
     }
 
     @Deprecated

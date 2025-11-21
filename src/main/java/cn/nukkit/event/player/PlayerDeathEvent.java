@@ -13,16 +13,10 @@ import cn.nukkit.lang.TextContainer;
 public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private TextContainer deathMessage;
     private boolean keepInventory = false;
     private boolean keepExperience = false;
     private int experience;
-
     public PlayerDeathEvent(Player player, Item[] drops, TextContainer deathMessage, int experience) {
         super(player, drops);
         this.deathMessage = deathMessage;
@@ -31,11 +25,6 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
 
     public PlayerDeathEvent(Player player, Item[] drops, String deathMessage, int experience) {
         this(player, drops, new TextContainer(deathMessage), experience);
-    }
-
-    @Override
-    public Player getEntity() {
-        return (Player) super.getEntity();
     }
 
     public TextContainer getDeathMessage() {
@@ -50,12 +39,21 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
         this.deathMessage = new TextContainer(deathMessage);
     }
 
-    public boolean getKeepInventory() {
-        return keepInventory;
+    @Override
+    public Player getEntity() {
+        return (Player) super.getEntity();
     }
 
-    public void setKeepInventory(boolean keepInventory) {
-        this.keepInventory = keepInventory;
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public boolean getKeepExperience() {
@@ -66,11 +64,11 @@ public class PlayerDeathEvent extends EntityDeathEvent implements Cancellable {
         this.keepExperience = keepExperience;
     }
 
-    public int getExperience() {
-        return experience;
+    public boolean getKeepInventory() {
+        return keepInventory;
     }
 
-    public void setExperience(int experience) {
-        this.experience = experience;
+    public void setKeepInventory(boolean keepInventory) {
+        this.keepInventory = keepInventory;
     }
 }

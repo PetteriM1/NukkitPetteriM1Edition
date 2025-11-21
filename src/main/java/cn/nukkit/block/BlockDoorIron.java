@@ -20,28 +20,13 @@ public class BlockDoorIron extends BlockDoor {
     }
 
     @Override
-    public String getName() {
-        return "Iron Door Block";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public int getId() {
-        return IRON_DOOR_BLOCK;
-    }
-
-    @Override
-    public double getHardness() {
-        return 5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 25;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
     }
 
     @Override
@@ -56,13 +41,28 @@ public class BlockDoorIron extends BlockDoor {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.IRON_DOOR);
+    public double getHardness() {
+        return 5;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
+    public int getId() {
+        return IRON_DOOR_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Iron Door Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 25;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class BlockDoorIron extends BlockDoor {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public Item toItem() {
+        return Item.get(Item.IRON_DOOR);
     }
 }

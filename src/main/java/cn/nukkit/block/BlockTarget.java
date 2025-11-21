@@ -10,7 +10,9 @@ import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.SimpleAxisAlignedBB;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTarget extends BlockSolid {
 
@@ -19,23 +21,8 @@ public class BlockTarget extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Target";
-    }
-
-    @Override
-    public int getId() {
-        return TARGET;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 5;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.HAY_BALE;
     }
 
     @Override
@@ -44,13 +31,8 @@ public class BlockTarget extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.5;
+    public int getBurnChance() {
+        return 5;
     }
 
     @Override
@@ -64,8 +46,33 @@ public class BlockTarget extends BlockSolid {
     }
 
     @Override
-    public boolean isPowerSource() {
-        return true;
+    public double getHardness() {
+        return 0.5;
+    }
+
+    @Override
+    public int getId() {
+        return TARGET;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Target";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 
     @Override
@@ -81,6 +88,11 @@ public class BlockTarget extends BlockSolid {
 
     @Override
     public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public boolean isPowerSource() {
         return true;
     }
 

@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDeepslateCobbled extends BlockSolid {
 
@@ -8,8 +10,18 @@ public class BlockDeepslateCobbled extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Cobbled Deepslate";
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
+    }
+
+    @Override
+    public double getHardness() {
+        return 3.5;
     }
 
     @Override
@@ -18,8 +30,13 @@ public class BlockDeepslateCobbled extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 3.5;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Cobbled Deepslate";
     }
 
     @Override
@@ -30,11 +47,5 @@ public class BlockDeepslateCobbled extends BlockSolid {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

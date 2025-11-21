@@ -12,12 +12,12 @@ public class EntityVillager extends EntityVillagerV1 {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Villager";
     }
 
     @Override
-    public String getName() {
-        return this.hasCustomName() ? this.getNameTag() : "Villager";
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 }

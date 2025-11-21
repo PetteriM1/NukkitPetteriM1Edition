@@ -22,26 +22,18 @@ public abstract class BlockSlab extends BlockTransparentMeta {
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        if (this.hasTopBit()) {
-            return new SimpleAxisAlignedBB(
-                    this.x,
-                    this.y + 0.5,
-                    this.z,
-                    this.x + 1,
-                    this.y + 1,
-                    this.z + 1
-            );
-        } else {
-            return new SimpleAxisAlignedBB(
-                    this.x,
-                    this.y,
-                    this.z,
-                    this.x + 1,
-                    this.y + 0.5,
-                    this.z + 1
-            );
-        }
+    public double getHardness() {
+        return 2; //3
+    }
+
+    @Override
+    public String getName() {
+        return (this.hasTopBit() ? "Upper " : "") + this.getSlabName() + " Slab";
+    }
+
+    @Override
+    public double getResistance() {
+        return getToolType() < ItemTool.TYPE_AXE ? 30 : 15;
     }
 
     public String getSlabName() {
@@ -49,18 +41,12 @@ public abstract class BlockSlab extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return (this.hasTopBit()? "Upper " : "") + this.getSlabName() + " Slab";
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return getToolType() < ItemTool.TYPE_AXE ? 30 : 15;
+    public boolean hasTopBit() {
+        return (this.getDamage() & 0x08) > 0;
     }
 
     @Override
@@ -113,8 +99,27 @@ public abstract class BlockSlab extends BlockTransparentMeta {
         return true;
     }
 
-    public boolean hasTopBit() {
-        return (this.getDamage() & 0x08) > 0;
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        if (this.hasTopBit()) {
+            return new SimpleAxisAlignedBB(
+                    this.x,
+                    this.y + 0.5,
+                    this.z,
+                    this.x + 1,
+                    this.y + 1,
+                    this.z + 1
+            );
+        } else {
+            return new SimpleAxisAlignedBB(
+                    this.x,
+                    this.y,
+                    this.z,
+                    this.x + 1,
+                    this.y + 0.5,
+                    this.z + 1
+            );
+        }
     }
 
     public void setTopBit(boolean topBit) {
@@ -129,10 +134,5 @@ public abstract class BlockSlab extends BlockTransparentMeta {
     public Item toItem() {
         int damage = this.getDamage() & 0x07;
         return new ItemBlock(Block.get(this.getId(), damage), damage);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

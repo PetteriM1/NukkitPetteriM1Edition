@@ -25,61 +25,7 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
     public EntityVehicle(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
-
-    public int getRollingAmplitude() {
-        return hurtTime;
-    }
-
-    public void setRollingAmplitude(int time) {
-        this.hurtTime = time;
-        this.setDataProperty(new IntEntityData(DATA_HURT_TIME, time));
-    }
-
-    public int getRollingDirection() {
-        return hurtDirection;
-    }
-
-    public void setRollingDirection(int direction) {
-        this.hurtDirection = direction;
-        this.setDataProperty(new IntEntityData(DATA_HURT_DIRECTION, direction));
-    }
-
-    public int getDamage() {
-        return damage;
-    }
-
-    public void setDamage(int damage) {
-        this.damage = damage;
-        this.setDataProperty(new IntEntityData(DATA_HEALTH, damage)); // false data name (should be DATA_DAMAGE_TAKEN)
-    }
-
-    @Override
-    public String getInteractButtonText() {
-        return "action.interact.mount";
-    }
-
-    @Override
-    public boolean canDoInteraction() {
-        return passengers.isEmpty();
-    }
-
-    @Override
-    public boolean entityBaseTick(int tickDiff) {
-        if (getRollingAmplitude() > 0) {
-            setRollingAmplitude(getRollingAmplitude() - 1);
-        }
-
-        return super.entityBaseTick(tickDiff);
-    }
-
     protected boolean rollingDirection = true;
-
-    protected boolean performHurtAnimation() {
-        setRollingAmplitude(9);
-        setRollingDirection(rollingDirection ? 1 : -1);
-        rollingDirection = !rollingDirection;
-        return true;
-    }
 
     @Override
     public boolean attack(EntityDamageEvent source) {
@@ -110,5 +56,58 @@ public abstract class EntityVehicle extends Entity implements EntityRideable, En
         }
 
         return super.attack(source);
+    }
+
+    @Override
+    public boolean canDoInteraction() {
+        return passengers.isEmpty();
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getRollingAmplitude() > 0) {
+            setRollingAmplitude(getRollingAmplitude() - 1);
+        }
+
+        return super.entityBaseTick(tickDiff);
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+        this.setDataProperty(new IntEntityData(DATA_HEALTH, damage)); // false data name (should be DATA_DAMAGE_TAKEN)
+    }
+
+    @Override
+    public String getInteractButtonText() {
+        return "action.interact.mount";
+    }
+
+    public int getRollingAmplitude() {
+        return hurtTime;
+    }
+
+    public void setRollingAmplitude(int time) {
+        this.hurtTime = time;
+        this.setDataProperty(new IntEntityData(DATA_HURT_TIME, time));
+    }
+
+    public int getRollingDirection() {
+        return hurtDirection;
+    }
+
+    public void setRollingDirection(int direction) {
+        this.hurtDirection = direction;
+        this.setDataProperty(new IntEntityData(DATA_HURT_DIRECTION, direction));
+    }
+
+    protected boolean performHurtAnimation() {
+        setRollingAmplitude(9);
+        setRollingDirection(rollingDirection ? 1 : -1);
+        rollingDirection = !rollingDirection;
+        return true;
     }
 }

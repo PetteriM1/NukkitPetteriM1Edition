@@ -9,11 +9,6 @@ public abstract class BlockMeta extends Block {
     }
 
     @Override
-    public int getFullId() {
-        return (getId() << DATA_BITS) + getDamage();
-    }
-
-    @Override
     public final int getDamage() {
         return this.meta;
     }
@@ -21,5 +16,10 @@ public abstract class BlockMeta extends Block {
     @Override
     public void setDamage(int meta) {
         this.meta = meta;
+    }
+
+    @Override
+    public int getFullId() {
+        return (getId() << DATA_BITS) + getDamage();
     }
 }

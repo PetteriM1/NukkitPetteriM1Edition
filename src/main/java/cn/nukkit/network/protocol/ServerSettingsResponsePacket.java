@@ -11,11 +11,6 @@ public class ServerSettingsResponsePacket extends DataPacket {
     public String data;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -25,5 +20,10 @@ public class ServerSettingsResponsePacket extends DataPacket {
         this.reset();
         this.putVarInt(this.formId);
         this.putString(this.data);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

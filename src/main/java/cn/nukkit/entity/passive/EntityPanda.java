@@ -13,8 +13,13 @@ public class EntityPanda extends EntityWalkingAnimal {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public float getHeight() {
+        return 1.25f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 
     @Override
@@ -23,23 +28,18 @@ public class EntityPanda extends EntityWalkingAnimal {
     }
 
     @Override
-    public float getWidth() {
-        return 1.125f;
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 
     @Override
-    public float getHeight() {
-        return 1.25f;
+    public float getWidth() {
+        return 1.125f;
     }
 
     @Override
     public void initEntity() {
         this.setMaxHealth(20);
         super.initEntity();
-    }
-
-    @Override
-    public int getKillExperience() {
-        return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
 }

@@ -12,43 +12,18 @@ import cn.nukkit.utils.BlockColor;
 public class BlockObsidianGlowing extends BlockSolid {
 
     @Override
-    public int getId() {
-        return GLOWING_OBSIDIAN;
+    public boolean canBePushed() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Glowing Obsidian";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public int getLightLevel() {
-        return 12;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(GLOWING_OBSIDIAN));
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 12; //?
-    }
-
-    @Override
-    public double getResistance() {
-        return 6000;
+    public BlockColor getColor() {
+        return BlockColor.OBSIDIAN_BLOCK_COLOR;
     }
 
     @Override
@@ -63,17 +38,42 @@ public class BlockObsidianGlowing extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.OBSIDIAN_BLOCK_COLOR;
+    public double getHardness() {
+        return 12; //?
     }
 
     @Override
-    public boolean canBePushed() {
-        return false;
+    public int getId() {
+        return GLOWING_OBSIDIAN;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getLightLevel() {
+        return 12;
+    }
+
+    @Override
+    public String getName() {
+        return "Glowing Obsidian";
+    }
+
+    @Override
+    public double getResistance() {
+        return 6000;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(GLOWING_OBSIDIAN));
     }
 }

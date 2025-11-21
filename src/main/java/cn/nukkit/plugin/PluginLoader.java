@@ -14,46 +14,22 @@ import java.util.regex.Pattern;
 public interface PluginLoader {
 
     /**
-     * 通过文件名字的字符串，来加载和初始化一个插件。<br>
-     * Loads and initializes a plugin by its file name.
-     * <p>
-     * 这个方法应该设置好插件的相关属性。比如，插件所在的服务器对象，插件的加载器对象，插件的描述对象，插件的数据文件夹。<br>
-     * Properties for loaded plugin should be set in this method. Such as, the {@code Server} object for which this
-     * plugin is running in, the {@code PluginLoader} object for its loader, and the {@code File} object for its
-     * data folder.
-     * <p>
-     * 如果插件加载失败，这个方法应该返回{@code null}，或者抛出异常。<br>
-     * If the plugin loader does not load this plugin successfully, a {@code null} should be returned,
-     * or an exception should be thrown.
+     * 停用一个插件。<br>
+     * Disables a plugin.
      *
-     * @param filename 这个插件的文件名字字符串。<br>A string of its file name.
-     * @return 加载完毕的插件的 {@code Plugin}对象。<br>The loaded plugin as a {@code Plugin} object.
-     * @throws java.lang.Exception 插件加载失败所抛出的异常。<br>Thrown when an error occurred.
-     * @see #loadPlugin(File)
-     * @see cn.nukkit.plugin.PluginBase#init(PluginLoader, cn.nukkit.Server, PluginDescription, File, File)
+     * @param plugin 要被停用的插件。<br>The plugin to disable.
+     * @see #enablePlugin
      */
-    Plugin loadPlugin(String filename) throws Exception;
+    void disablePlugin(Plugin plugin);
 
     /**
-     * 通过插件的 {@code File}对象，来加载和初始化一个插件。<br>
-     * Loads and initializes a plugin by a {@code File} object describes the file.
-     * <p>
-     * 这个方法应该设置好插件的相关属性。比如，插件所在的服务器对象，插件的加载器对象，插件的描述对象，插件的数据文件夹。<br>
-     * Properties for loaded plugin should be set in this method. Such as, the {@code Server} object for which this
-     * plugin is running in, the {@code PluginLoader} object for its loader, and the {@code File} object for its
-     * data folder.
-     * <p>
-     * 如果插件加载失败，这个方法应该返回{@code null}，或者抛出异常。<br>
-     * If the plugin loader does not load this plugin successfully, a {@code null} should be returned,
-     * or an exception should be thrown.
+     * 启用一个插件。<br>
+     * Enables a plugin.
      *
-     * @param file 这个插件的文件的 {@code File}对象。<br>A {@code File} object for this plugin.
-     * @return 加载完毕的插件的 {@code Plugin}对象。<br>The loaded plugin as a {@code Plugin} object.
-     * @throws java.lang.Exception 插件加载失败所抛出的异常。<br>Thrown when an error occurred.
-     * @see #loadPlugin(String)
-     * @see cn.nukkit.plugin.PluginBase#init(PluginLoader, cn.nukkit.Server, PluginDescription, File, File)
+     * @param plugin 要被启用的插件。<br>The plugin to enable.
+     * @see #disablePlugin
      */
-    Plugin loadPlugin(File file) throws Exception;
+    void enablePlugin(Plugin plugin);
 
     /**
      * 通过插件文件名的字符串，来获得描述这个插件的 {@code PluginDescription}对象。<br>
@@ -108,20 +84,44 @@ public interface PluginLoader {
     Pattern[] getPluginFilters();
 
     /**
-     * 启用一个插件。<br>
-     * Enables a plugin.
+     * 通过插件的 {@code File}对象，来加载和初始化一个插件。<br>
+     * Loads and initializes a plugin by a {@code File} object describes the file.
+     * <p>
+     * 这个方法应该设置好插件的相关属性。比如，插件所在的服务器对象，插件的加载器对象，插件的描述对象，插件的数据文件夹。<br>
+     * Properties for loaded plugin should be set in this method. Such as, the {@code Server} object for which this
+     * plugin is running in, the {@code PluginLoader} object for its loader, and the {@code File} object for its
+     * data folder.
+     * <p>
+     * 如果插件加载失败，这个方法应该返回{@code null}，或者抛出异常。<br>
+     * If the plugin loader does not load this plugin successfully, a {@code null} should be returned,
+     * or an exception should be thrown.
      *
-     * @param plugin 要被启用的插件。<br>The plugin to enable.
-     * @see #disablePlugin
+     * @param file 这个插件的文件的 {@code File}对象。<br>A {@code File} object for this plugin.
+     * @return 加载完毕的插件的 {@code Plugin}对象。<br>The loaded plugin as a {@code Plugin} object.
+     * @throws java.lang.Exception 插件加载失败所抛出的异常。<br>Thrown when an error occurred.
+     * @see #loadPlugin(String)
+     * @see cn.nukkit.plugin.PluginBase#init(PluginLoader, cn.nukkit.Server, PluginDescription, File, File)
      */
-    void enablePlugin(Plugin plugin);
+    Plugin loadPlugin(File file) throws Exception;
 
     /**
-     * 停用一个插件。<br>
-     * Disables a plugin.
+     * 通过文件名字的字符串，来加载和初始化一个插件。<br>
+     * Loads and initializes a plugin by its file name.
+     * <p>
+     * 这个方法应该设置好插件的相关属性。比如，插件所在的服务器对象，插件的加载器对象，插件的描述对象，插件的数据文件夹。<br>
+     * Properties for loaded plugin should be set in this method. Such as, the {@code Server} object for which this
+     * plugin is running in, the {@code PluginLoader} object for its loader, and the {@code File} object for its
+     * data folder.
+     * <p>
+     * 如果插件加载失败，这个方法应该返回{@code null}，或者抛出异常。<br>
+     * If the plugin loader does not load this plugin successfully, a {@code null} should be returned,
+     * or an exception should be thrown.
      *
-     * @param plugin 要被停用的插件。<br>The plugin to disable.
-     * @see #enablePlugin
+     * @param filename 这个插件的文件名字字符串。<br>A string of its file name.
+     * @return 加载完毕的插件的 {@code Plugin}对象。<br>The loaded plugin as a {@code Plugin} object.
+     * @throws java.lang.Exception 插件加载失败所抛出的异常。<br>Thrown when an error occurred.
+     * @see #loadPlugin(File)
+     * @see cn.nukkit.plugin.PluginBase#init(PluginLoader, cn.nukkit.Server, PluginDescription, File, File)
      */
-    void disablePlugin(Plugin plugin);
+    Plugin loadPlugin(String filename) throws Exception;
 }

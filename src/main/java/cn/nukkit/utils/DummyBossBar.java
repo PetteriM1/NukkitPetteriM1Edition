@@ -1,6 +1,7 @@
 package cn.nukkit.utils;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.EntityMetadata;
@@ -10,6 +11,7 @@ import cn.nukkit.network.protocol.*;
 /**
  * DummyBossBar
  * ===============
+ *
  * @author boybook
  * Nukkit Project
  * ===============
@@ -47,13 +49,23 @@ public class DummyBossBar {
             this.bossBarId = Entity.entityCount++;
         }
 
-        public Builder text(String text) {
-            this.text = text;
+        public DummyBossBar build() {
+            return new DummyBossBar(this);
+        }
+
+        /**
+         * For legacy plugin support! Do not use!
+         */
+        public Builder color(BlockColor color) {
+            Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.Builder.color(BlockColor)");
             return this;
         }
 
-        public Builder length(float length) {
-            if (length >= 0 && length <= 100) this.length = length;
+        /**
+         * For legacy plugin support! Do not use!
+         */
+        public Builder color(int red, int green, int blue) {
+            Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.Builder.color(int,int,int)");
             return this;
         }
 
@@ -62,18 +74,53 @@ public class DummyBossBar {
             return this;
         }
 
-        public DummyBossBar build() {
-            return new DummyBossBar(this);
+        public Builder length(float length) {
+            if (length >= 0 && length <= 100) this.length = length;
+            return this;
+        }
+
+        public Builder text(String text) {
+            this.text = text;
+            return this;
         }
     }
 
     /**
-     * Get boss bar owner
-     *
-     * @return player
+     * Create boss bar entity and send its data
      */
-    public Player getPlayer() {
-        return player;
+    public void create() {
+        createBossEntity();
+        sendAttributes();
+        sendShowBossBar();
+        sendSetBossBarLength();
+        if (color != null) this.sendSetBossBarTexture();
+    }
+
+    private void createBossEntity() {
+        AddEntityPacket pkAdd = new AddEntityPacket();
+        pkAdd.type = EntityCreeper.NETWORK_ID;
+        pkAdd.entityUniqueId = bossBarId;
+        pkAdd.entityRuntimeId = bossBarId;
+        pkAdd.x = (float) player.x;
+        pkAdd.y = (float) -10; // Below the bedrock
+        pkAdd.z = (float) player.z;
+        pkAdd.speedX = 0;
+        pkAdd.speedY = 0;
+        pkAdd.speedZ = 0;
+        pkAdd.metadata = new EntityMetadata()
+                // Default Metadata tags
+                .putLong(Entity.DATA_FLAGS, 0)
+                .putShort(Entity.DATA_AIR, 400)
+                .putShort(Entity.DATA_MAX_AIR, 400)
+                .putLong(Entity.DATA_LEAD_HOLDER_EID, -1)
+                .putString(Entity.DATA_NAMETAG, text) // Set the entity name
+                .putFloat(Entity.DATA_SCALE, 0); // And make it invisible
+        player.dataPacket(pkAdd);
+    }
+
+    public void destroy() {
+        sendHideBossBar();
+        removeBossEntity();
     }
 
     /**
@@ -86,25 +133,31 @@ public class DummyBossBar {
     }
 
     /**
-     * Get boss bar text
+     * Get boss bar color
      *
-     * @return current text
+     * @return current color of the boss bar
      */
-    public String getText() {
-        return text;
+    public BossBarColor getColor() {
+        return this.color;
     }
 
     /**
-     * Set the boss bar text and send it to player if changed
+     * Set boss bar color. Requires client version 1.18 or newer.
      *
-     * @param text new text
+     * @param color the boss bar color
      */
-    public void setText(String text) {
-        if (!this.text.equals(text)) {
-            this.text = text;
-            this.updateBossEntityNameTag();
-            this.sendSetBossBarTitle();
+    public void setColor(BossBarColor color) {
+        if (this.color == null || !this.color.equals(color)) {
+            this.color = color;
+            this.sendSetBossBarTexture();
         }
+    }
+
+    /**
+     * For legacy plugin support! Do not use!
+     */
+    public void setColor(BlockColor color) {
+        Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.setColor(BlockColor)");
     }
 
     /**
@@ -130,44 +183,49 @@ public class DummyBossBar {
     }
 
     /**
-     * Set boss bar color. Requires client version 1.18 or newer.
-     * @param color the boss bar color
+     * Get boss bar owner
+     *
+     * @return player
      */
-    public void setColor(BossBarColor color) {
-        if (this.color == null || !this.color.equals(color)) {
-            this.color = color;
-            this.sendSetBossBarTexture();
-        }
+    public Player getPlayer() {
+        return player;
     }
 
     /**
-     * Get boss bar color
-     * @return current color of the boss bar
+     * Get boss bar text
+     *
+     * @return current text
      */
-    public BossBarColor getColor() {
-        return this.color;
+    public String getText() {
+        return text;
     }
 
-    private void createBossEntity() {
-        AddEntityPacket pkAdd = new AddEntityPacket();
-        pkAdd.type = EntityCreeper.NETWORK_ID;
-        pkAdd.entityUniqueId = bossBarId;
-        pkAdd.entityRuntimeId = bossBarId;
-        pkAdd.x = (float) player.x;
-        pkAdd.y = (float) -10; // Below the bedrock
-        pkAdd.z = (float) player.z;
-        pkAdd.speedX = 0;
-        pkAdd.speedY = 0;
-        pkAdd.speedZ = 0;
-        pkAdd.metadata = new EntityMetadata()
-                // Default Metadata tags
-                .putLong(Entity.DATA_FLAGS, 0)
-                .putShort(Entity.DATA_AIR, 400)
-                .putShort(Entity.DATA_MAX_AIR, 400)
-                .putLong(Entity.DATA_LEAD_HOLDER_EID, -1)
-                .putString(Entity.DATA_NAMETAG, text) // Set the entity name
-                .putFloat(Entity.DATA_SCALE, 0); // And make it invisible
-        player.dataPacket(pkAdd);
+    /**
+     * Set the boss bar text and send it to player if changed
+     *
+     * @param text new text
+     */
+    public void setText(String text) {
+        if (!this.text.equals(text)) {
+            this.text = text;
+            this.updateBossEntityNameTag();
+            this.sendSetBossBarTitle();
+        }
+    }
+
+    private void removeBossEntity() {
+        RemoveEntityPacket pkRemove = new RemoveEntityPacket();
+        pkRemove.eid = bossBarId;
+        player.dataPacket(pkRemove);
+    }
+
+    /**
+     * Once the player has teleported, resend Show BossBar
+     */
+    public void reshow() {
+        updateBossEntityPosition();
+        sendShowBossBar();
+        sendSetBossBarLength();
     }
 
     private void sendAttributes() {
@@ -180,20 +238,21 @@ public class DummyBossBar {
         player.dataPacket(pkAttributes);
     }
 
-    private void sendShowBossBar() {
-        BossEventPacket pkBoss = new BossEventPacket();
-        pkBoss.bossEid = bossBarId;
-        pkBoss.type = BossEventPacket.TYPE_SHOW;
-        pkBoss.title = text;
-        pkBoss.healthPercent = this.length / 100;
-        player.dataPacket(pkBoss);
-    }
-
     private void sendHideBossBar() {
         BossEventPacket pkBoss = new BossEventPacket();
         pkBoss.bossEid = bossBarId;
         pkBoss.type = BossEventPacket.TYPE_HIDE;
         player.dataPacket(pkBoss);
+    }
+
+    private void sendSetBossBarLength() {
+        if (player.protocol >= 361) { // Again, what the hell is this and where is the documentation?
+            BossEventPacket pkBoss = new BossEventPacket();
+            pkBoss.bossEid = bossBarId;
+            pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;
+            pkBoss.healthPercent = this.length / 100;
+            player.dataPacket(pkBoss);
+        }
     }
 
     private void sendSetBossBarTexture() {
@@ -209,16 +268,31 @@ public class DummyBossBar {
         pkBoss.bossEid = bossBarId;
         pkBoss.type = BossEventPacket.TYPE_TITLE;
         pkBoss.title = text;
-        pkBoss.healthPercent = this.length / 100;
+        pkBoss.healthPercent = player.protocol >= 361 ? this.length / 100 : this.length;
         player.dataPacket(pkBoss);
     }
 
-    private void sendSetBossBarLength() {
+    private void sendShowBossBar() {
         BossEventPacket pkBoss = new BossEventPacket();
         pkBoss.bossEid = bossBarId;
-        pkBoss.type = BossEventPacket.TYPE_HEALTH_PERCENT;
-        pkBoss.healthPercent = this.length / 100;
+        pkBoss.type = BossEventPacket.TYPE_SHOW;
+        pkBoss.title = text;
+        pkBoss.healthPercent = player.protocol >= 361 ? this.length / 100 : this.length;
         player.dataPacket(pkBoss);
+    }
+
+    /**
+     * For legacy plugin support! Do not use!
+     */
+    public void setColor(int red, int green, int blue) {
+        Server.getInstance().getLogger().warning("Unsupported API usage: DummyBossBar.setColor(int,int,int)");
+    }
+
+    private void updateBossEntityNameTag() {
+        SetEntityDataPacket pk = new SetEntityDataPacket();
+        pk.eid = this.bossBarId;
+        pk.metadata = new EntityMetadata().putString(Entity.DATA_NAMETAG, this.text);
+        player.dataPacket(pk);
     }
 
     /**
@@ -235,43 +309,5 @@ public class DummyBossBar {
         pk.yaw = 0;
         pk.pitch = 0;
         player.dataPacket(pk);
-    }
-
-    private void updateBossEntityNameTag() {
-        SetEntityDataPacket pk = new SetEntityDataPacket();
-        pk.eid = this.bossBarId;
-        pk.metadata = new EntityMetadata().putString(Entity.DATA_NAMETAG, this.text);
-        player.dataPacket(pk);
-    }
-
-    private void removeBossEntity() {
-        RemoveEntityPacket pkRemove = new RemoveEntityPacket();
-        pkRemove.eid = bossBarId;
-        player.dataPacket(pkRemove);
-    }
-
-    /**
-     * Create boss bar entity and send its data
-     */
-    public void create() {
-        createBossEntity();
-        sendAttributes();
-        sendShowBossBar();
-        sendSetBossBarLength();
-        if (color != null) this.sendSetBossBarTexture();
-    }
-
-    /**
-     * Once the player has teleported, resend Show BossBar
-     */
-    public void reshow() {
-        updateBossEntityPosition();
-        sendShowBossBar();
-        sendSetBossBarLength();
-    }
-
-    public void destroy() {
-        sendHideBossBar();
-        removeBossEntity();
     }
 }

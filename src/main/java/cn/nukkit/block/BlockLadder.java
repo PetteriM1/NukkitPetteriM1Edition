@@ -33,46 +33,15 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
 
         this.calculateOffsets();
     }
-
-    @Override
-    public String getName() {
-        return "Ladder";
-    }
-
-    @Override
-    public int getId() {
-        return LADDER;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public boolean canBeClimbed() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.4;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2;
-    }
-
     private double offMinX;
     private double offMinZ;
     private double offMaxX;
     private double offMaxZ;
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
 
     private void calculateOffsets() {
         double f = 0.1875;
@@ -112,51 +81,13 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getMinX() {
-        return this.x + offMinX;
+    public boolean canBeClimbed() {
+        return true;
     }
 
     @Override
-    public double getMinZ() {
-        return this.z + offMinZ;
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + offMaxX;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + offMaxZ;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!target.isTransparent()) {
-            if (face.getIndex() >= 2 && face.getIndex() <= 5) {
-                this.setDamage(face.getIndex());
-                this.getLevel().setBlock(this, this, true, true);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!this.getSide(BlockFace.fromIndex(FACES[this.getDamage()])).isSolid()) {
-                this.getLevel().useBreakOn(this);
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     @Override
@@ -172,13 +103,48 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    public double getHardness() {
+        return 0.4;
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        entity.resetFallDistance();
+    public int getId() {
+        return LADDER;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + offMaxX;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + offMaxZ;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + offMinX;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + offMinZ;
+    }
+
+    @Override
+    public String getName() {
+        return "Ladder";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
@@ -187,7 +153,40 @@ public class BlockLadder extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean breakWhenPushed() {
+    public boolean hasEntityCollision() {
         return true;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        entity.resetFallDistance();
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!this.getSide(BlockFace.fromIndex(FACES[this.getDamage()])).isSolid()) {
+                this.getLevel().useBreakOn(this);
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!target.isTransparent()) {
+            if (face.getIndex() >= 2 && face.getIndex() <= 5) {
+                this.setDamage(face.getIndex());
+                this.getLevel().setBlock(this, this, true, true);
+                return true;
+            }
+        }
+        return false;
     }
 }

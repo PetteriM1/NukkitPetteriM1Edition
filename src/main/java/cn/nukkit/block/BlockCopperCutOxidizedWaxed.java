@@ -7,13 +7,13 @@ public class BlockCopperCutOxidizedWaxed extends BlockCopperCutOxidized {
     }
 
     @Override
-    public String getName() {
-        return "Waxed Oxidized Cut Copper";
+    public int getId() {
+        return WAXED_OXIDIZED_CUT_COPPER;
     }
 
     @Override
-    public int getId() {
-        return WAXED_OXIDIZED_CUT_COPPER;
+    public String getName() {
+        return "Waxed Oxidized Cut Copper";
     }
 
     @Override

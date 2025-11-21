@@ -10,23 +10,8 @@ public class BlockCopperCut extends BlockCopperBase {
     }
 
     @Override
-    public String getName() {
-        return "Cut Copper";
-    }
-
-    @Override
-    public int getId() {
-        return CUT_COPPER;
-    }
-
-    @Override
     public BlockColor getColor() {
         return BlockColor.ORANGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public OxidizationLevel getOxidizationLevel() {
-        return OxidizationLevel.UNAFFECTED;
     }
 
     @Override
@@ -47,5 +32,20 @@ public class BlockCopperCut extends BlockCopperBase {
             default:
                 return this.getId();
         }
+    }
+
+    @Override
+    public int getId() {
+        return CUT_COPPER;
+    }
+
+    @Override
+    public String getName() {
+        return "Cut Copper";
+    }
+
+    @Override
+    public OxidizationLevel getOxidizationLevel() {
+        return OxidizationLevel.UNAFFECTED;
     }
 }

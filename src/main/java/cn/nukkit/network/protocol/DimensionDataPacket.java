@@ -13,11 +13,6 @@ public class DimensionDataPacket extends DataPacket {
     public List<DimensionDefinition> definitions;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -32,5 +27,10 @@ public class DimensionDataPacket extends DataPacket {
             this.putVarInt(definition.getMinimumHeight());
             this.putVarInt(definition.getGeneratorType());
         }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

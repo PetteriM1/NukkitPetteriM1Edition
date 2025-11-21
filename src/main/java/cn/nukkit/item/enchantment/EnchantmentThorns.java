@@ -19,21 +19,6 @@ public class EnchantmentThorns extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 10 + (level - 1) * 20;
-    }
-
-    @Override
-    public int getMaxEnchantAbility(int level) {
-        return super.getMinEnchantAbility(level) + 50;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 3;
-    }
-
-    @Override
     public void doPostAttack(Entity attacker, Entity entity) {
         if (!(entity instanceof EntityHumanType) || attacker == entity) {
             return;
@@ -57,11 +42,26 @@ public class EnchantmentThorns extends Enchantment {
         }
     }
 
-    private static boolean shouldHit(ThreadLocalRandom random, int level) {
-        return level > 0 && random.nextFloat() < 0.15 * level;
-    }
-
     private static int getDamage(ThreadLocalRandom random, int level) {
         return level > 10 ? level - 10 : random.nextInt(1, 5);
+    }
+
+    @Override
+    public int getMaxEnchantAbility(int level) {
+        return super.getMinEnchantAbility(level) + 50;
+    }
+
+    @Override
+    public int getMaxLevel() {
+        return 3;
+    }
+
+    @Override
+    public int getMinEnchantAbility(int level) {
+        return 10 + (level - 1) * 20;
+    }
+
+    private static boolean shouldHit(ThreadLocalRandom random, int level) {
+        return level > 0 && random.nextFloat() < 0.15 * level;
     }
 }

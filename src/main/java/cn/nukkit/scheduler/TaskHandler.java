@@ -29,44 +29,19 @@ public class TaskHandler {
         this.taskId = taskId;
     }
 
-    public boolean isCancelled() {
-        return this.cancelled;
-    }
-
-    public int getNextRunTick() {
-        return this.nextRunTick;
-    }
-
-    public void setNextRunTick(int nextRunTick) {
-        this.nextRunTick = nextRunTick;
-    }
-
-    public int getTaskId() {
-        return this.taskId;
-    }
-
-    public Runnable getTask() {
-        return this.task;
+    public void cancel() {
+        if (!this.cancelled && this.task instanceof Task) {
+            ((Task) this.task).onCancel();
+        }
+        this.cancelled = true;
     }
 
     public int getDelay() {
         return this.delay;
     }
 
-    public boolean isDelayed() {
-        return this.delay > 0;
-    }
-
-    public boolean isRepeating() {
-        return this.period > 0;
-    }
-
-    public int getPeriod() {
-        return this.period;
-    }
-
-    public Plugin getPlugin() {
-        return plugin;
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public int getLastRunTick() {
@@ -77,14 +52,50 @@ public class TaskHandler {
         this.lastRunTick = lastRunTick;
     }
 
-    public void cancel() {
-        if (!this.cancelled && this.task instanceof Task) {
-            ((Task) this.task).onCancel();
-        }
-        this.cancelled = true;
+    public int getNextRunTick() {
+        return this.nextRunTick;
     }
 
-    @Deprecated
+    public void setNextRunTick(int nextRunTick) {
+        this.nextRunTick = nextRunTick;
+    }
+
+    public int getPeriod() {
+        return this.period;
+    }
+
+    public void setPeriod(int period) {
+        this.period = period;
+    }
+
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
+    public Runnable getTask() {
+        return this.task;
+    }
+
+    public int getTaskId() {
+        return this.taskId;
+    }
+
+    public boolean isAsynchronous() {
+        return asynchronous;
+    }
+
+    public boolean isCancelled() {
+        return this.cancelled;
+    }
+
+    public boolean isDelayed() {
+        return this.delay > 0;
+    }
+
+    public boolean isRepeating() {
+        return this.period > 0;
+    }
+
     public void remove() {
         this.cancelled = true;
     }
@@ -96,17 +107,5 @@ public class TaskHandler {
         } catch (RuntimeException ex) {
             Server.getInstance().getLogger().critical("Exception while invoking run", ex);
         }
-    }
-
-    public boolean isAsynchronous() {
-        return asynchronous;
-    }
-
-    public void setDelay(int delay) {
-        this.delay = delay;
-    }
-
-    public void setPeriod(int period) {
-        this.period = period;
     }
 }

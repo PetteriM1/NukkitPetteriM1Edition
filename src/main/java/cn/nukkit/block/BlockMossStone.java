@@ -10,28 +10,8 @@ import cn.nukkit.item.ItemTool;
 public class BlockMossStone extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Mossy Cobblestone";
-    }
-
-    @Override
-    public int getId() {
-        return MOSS_STONE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 10;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -46,7 +26,27 @@ public class BlockMossStone extends BlockSolid {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return MOSS_STONE;
+    }
+
+    @Override
+    public String getName() {
+        return "Mossy Cobblestone";
+    }
+
+    @Override
+    public double getResistance() {
+        return 10;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

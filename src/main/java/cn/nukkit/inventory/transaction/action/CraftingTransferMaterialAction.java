@@ -15,6 +15,16 @@ public class CraftingTransferMaterialAction extends InventoryAction {
     }
 
     @Override
+    public boolean execute(Player source) {
+        return true;
+    }
+
+    @Override
+    public boolean isValid(Player source) {
+        return true;
+    }
+
+    @Override
     public void onAddToTransaction(InventoryTransaction transaction) {
         if (transaction instanceof CraftingTransaction) {
             if (this.sourceItem.isNull()) {
@@ -30,20 +40,10 @@ public class CraftingTransferMaterialAction extends InventoryAction {
     }
 
     @Override
-    public boolean isValid(Player source) {
-        return true;
-    }
-
-    @Override
-    public boolean execute(Player source) {
-        return true;
+    public void onExecuteFail(Player source) {
     }
 
     @Override
     public void onExecuteSuccess(Player $source) {
-    }
-
-    @Override
-    public void onExecuteFail(Player source) {
     }
 }

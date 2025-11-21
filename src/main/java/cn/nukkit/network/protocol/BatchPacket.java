@@ -11,8 +11,12 @@ public class BatchPacket extends DataPacket {
     public byte[] payload;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public BatchPacket clone() {
+        BatchPacket packet = (BatchPacket) super.clone();
+        if (this.payload != null) {
+            packet.payload = this.payload.clone();
+        }
+        return packet;
     }
 
     @Override
@@ -25,16 +29,12 @@ public class BatchPacket extends DataPacket {
         this.encodeUnsupported();
     }
 
-    public void trim() {
-        setBuffer(null);
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 
-    @Override
-    public BatchPacket clone() {
-        BatchPacket packet = (BatchPacket) super.clone();
-        if (this.payload != null) {
-            packet.payload = this.payload.clone();
-        }
-        return packet;
+    public void trim() {
+        setBuffer(null);
     }
 }

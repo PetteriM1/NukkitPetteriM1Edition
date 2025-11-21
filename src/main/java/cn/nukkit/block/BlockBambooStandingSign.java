@@ -2,6 +2,8 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockBambooStandingSign extends BlockSignPost {
 
@@ -14,8 +16,8 @@ public class BlockBambooStandingSign extends BlockSignPost {
     }
 
     @Override
-    public String getName() {
-        return "Bamboo Sign Post";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SIGN_POST;
     }
 
     @Override
@@ -24,8 +26,13 @@ public class BlockBambooStandingSign extends BlockSignPost {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.BAMBOO_SIGN);
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Bamboo Sign Post";
     }
 
     @Override
@@ -36,5 +43,10 @@ public class BlockBambooStandingSign extends BlockSignPost {
     @Override
     protected int getWallId() {
         return BAMBOO_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.BAMBOO_SIGN);
     }
 }

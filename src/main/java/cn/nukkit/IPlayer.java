@@ -18,11 +18,18 @@ import java.util.UUID;
 public interface IPlayer extends ServerOperator, Metadatable {
 
     /**
-     * Returns if this player is online.
+     * Returns the time this player first played in this server.
      *
-     * @return 这个玩家是否在线。<br>If this player is online.
+     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
      */
-    boolean isOnline();
+    Long getFirstPlayed();
+
+    /**
+     * Returns the time this player last joined in this server.
+     *
+     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
+     */
+    Long getLastPlayed();
 
     /**
      * Returns the name of this player.
@@ -34,8 +41,33 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @return 这个玩家的名称。<br>The name of this player.
      */
     String getName();
-    
+
+    /**
+     * Returns a {@code Player} object for this interface.
+     *
+     * @return 这个接口的 {@code Player}对象。<br>a {@code Player} object for this interface.
+     * @see cn.nukkit.Server#getPlayerExact
+     */
+    Player getPlayer();
+
+    /**
+     * Returns the server carrying this player.
+     *
+     * @return 玩家所在的服务器。<br>the server carrying this player.
+     */
+    Server getServer();
+
     UUID getUniqueId();
+
+    /**
+     * Returns if this player has played in this server before.
+     * <p>
+     * If you want to know if this player is the first time playing in this server, you can use:<br>
+     * <pre>if (!player.hasPlayerBefore()) {...}</pre>
+     *
+     * @return 这个玩家以前是不是玩过游戏。<br>If this player has played in this server before.
+     */
+    boolean hasPlayedBefore();
 
     /**
      * Returns if this player is banned.
@@ -55,6 +87,13 @@ public interface IPlayer extends ServerOperator, Metadatable {
     void setBanned(boolean value);
 
     /**
+     * Returns if this player is online.
+     *
+     * @return 这个玩家是否在线。<br>If this player is online.
+     */
+    boolean isOnline();
+
+    /**
      * Returns if this player is pardoned by whitelist.
      *
      * @return 这个玩家是否已加入白名单。<br>If this player is pardoned by whitelist.
@@ -72,43 +111,4 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @see cn.nukkit.Server#removeWhitelist
      */
     void setWhitelisted(boolean value);
-
-    /**
-     * Returns a {@code Player} object for this interface.
-     *
-     * @return 这个接口的 {@code Player}对象。<br>a {@code Player} object for this interface.
-     * @see cn.nukkit.Server#getPlayerExact
-     */
-    Player getPlayer();
-
-    /**
-     * Returns the server carrying this player.
-     *
-     * @return 玩家所在的服务器。<br>the server carrying this player.
-     */
-    Server getServer();
-
-    /**
-     * Returns the time this player first played in this server.
-     *
-     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
-     */
-    Long getFirstPlayed();
-
-    /**
-     * Returns the time this player last joined in this server.
-     *
-     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
-     */
-    Long getLastPlayed();
-
-    /**
-     * Returns if this player has played in this server before.
-     * <p>
-     * If you want to know if this player is the first time playing in this server, you can use:<br>
-     * <pre>if (!player.hasPlayerBefore()) {...}</pre>
-     *
-     * @return 这个玩家以前是不是玩过游戏。<br>If this player has played in this server before.
-     */
-    boolean hasPlayedBefore();
 }

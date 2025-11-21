@@ -10,8 +10,8 @@ public class BlockCopperExposed extends BlockCopper {
     }
 
     @Override
-    public String getName() {
-        return "Exposed Copper";
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -20,8 +20,8 @@ public class BlockCopperExposed extends BlockCopper {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
+    public String getName() {
+        return "Exposed Copper";
     }
 
     @Override

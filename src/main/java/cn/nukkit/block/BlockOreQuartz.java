@@ -15,13 +15,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreQuartz extends BlockOre {
 
     @Override
-    public String getName() {
-        return "Quartz Ore";
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
-    public int getId() {
-        return QUARTZ_ORE;
+    public int getDropExp() {
+        return Utils.rand(1, 5);
     }
 
     @Override
@@ -52,17 +52,17 @@ public class BlockOreQuartz extends BlockOre {
     }
 
     @Override
+    public int getId() {
+        return QUARTZ_ORE;
+    }
+
+    @Override
+    public String getName() {
+        return "Quartz Ore";
+    }
+
+    @Override
     protected int getRawMaterial() {
         return ItemID.QUARTZ;
-    }
-
-    @Override
-    public int getDropExp() {
-        return Utils.rand(1, 5);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 }

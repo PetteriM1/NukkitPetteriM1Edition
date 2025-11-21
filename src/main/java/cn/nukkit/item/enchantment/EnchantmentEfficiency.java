@@ -13,8 +13,8 @@ public class EnchantmentEfficiency extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 1 + (level - 1) * 10;
+    public boolean canEnchant(Item item) {
+        return item.isShears() || super.canEnchant(item);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class EnchantmentEfficiency extends Enchantment {
     }
 
     @Override
-    public boolean canEnchant(Item item) {
-        return item.isShears() || super.canEnchant(item);
+    public int getMinEnchantAbility(int level) {
+        return 1 + (level - 1) * 10;
     }
 }

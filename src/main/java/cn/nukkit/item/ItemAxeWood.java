@@ -19,13 +19,13 @@ public class ItemAxeWood extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_WOODEN;
+    public int getAttackDamage() {
+        return 3;
     }
 
     @Override
-    public boolean isAxe() {
-        return true;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_WOODEN;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemAxeWood extends ItemTool {
     }
 
     @Override
-    public int getAttackDamage() {
-        return 3;
+    public boolean isAxe() {
+        return true;
     }
 }

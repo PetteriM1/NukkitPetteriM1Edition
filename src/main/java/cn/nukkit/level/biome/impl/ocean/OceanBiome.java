@@ -44,13 +44,13 @@ public class OceanBiome extends WateryBiome {
     }
 
     @Override
-    public String getName() {
-        return "Ocean";
+    public int getGroundId(int x, int y, int z) {
+        return Block.GRAVEL << Block.DATA_BITS;
     }
 
     @Override
-    public int getGroundId(int x, int y, int z) {
-        return Block.GRAVEL << Block.DATA_BITS;
+    public String getName() {
+        return "Ocean";
     }
 
     @Override

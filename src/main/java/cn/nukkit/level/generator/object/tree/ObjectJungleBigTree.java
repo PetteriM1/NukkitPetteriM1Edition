@@ -12,6 +12,12 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
         super(baseHeightIn, extraRandomHeight, woodMetadata, leavesMetadata);
     }
 
+    private void createCrown(ChunkManager level, Vector3 pos, int i1) {
+        for (int j = -2; j <= 0; ++j) {
+            this.growLeavesLayerStrict(level, pos.up(j), i1 + 1 - j);
+        }
+    }
+
     public boolean generate(ChunkManager level, NukkitRandom rand, Vector3 position) {
         int height = this.getHeight(rand);
 
@@ -94,12 +100,6 @@ public class ObjectJungleBigTree extends HugeTreesGenerator {
     private void placeVine(ChunkManager level, NukkitRandom random, Vector3 pos, int meta) {
         if (random.nextBoundedInt(3) > 0 && level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == 0) {
             this.setBlockAndNotifyAdequately(level, pos, Block.get(BlockID.VINES, meta));
-        }
-    }
-
-    private void createCrown(ChunkManager level, Vector3 pos, int i1) {
-        for (int j = -2; j <= 0; ++j) {
-            this.growLeavesLayerStrict(level, pos.up(j), i1 + 1 - j);
         }
     }
 }

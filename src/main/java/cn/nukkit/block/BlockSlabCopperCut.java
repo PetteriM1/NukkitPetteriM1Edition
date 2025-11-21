@@ -5,7 +5,7 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockSlabCopperCut extends BlockSlabCopperBase {
-    
+
     public BlockSlabCopperCut() {
         this(0);
     }
@@ -16,26 +16,6 @@ public class BlockSlabCopperCut extends BlockSlabCopperBase {
 
     protected BlockSlabCopperCut(int meta, int doubleSlab) {
         super(meta, doubleSlab);
-    }
-
-    @Override
-    public int getId() {
-        return CUT_COPPER_SLAB;
-    }
-
-    @Override
-    public String getSlabName() {
-        String name = "";
-        if (this.isWaxed()) {
-            name += "Waxed ";
-        }
-
-        OxidizationLevel oxidizationLevel = this.getOxidizationLevel();
-        if (oxidizationLevel != OxidizationLevel.UNAFFECTED) {
-            String oxidationName = oxidizationLevel.name();
-            name += oxidationName.charAt(0) + oxidationName.substring(1).toLowerCase(Locale.ROOT);
-        }
-        return name + " Cut Copper";
     }
 
     @Override
@@ -58,7 +38,27 @@ public class BlockSlabCopperCut extends BlockSlabCopperBase {
     }
 
     @Override
+    public int getId() {
+        return CUT_COPPER_SLAB;
+    }
+
+    @Override
     public OxidizationLevel getOxidizationLevel() {
         return OxidizationLevel.UNAFFECTED;
+    }
+
+    @Override
+    public String getSlabName() {
+        String name = "";
+        if (this.isWaxed()) {
+            name += "Waxed ";
+        }
+
+        OxidizationLevel oxidizationLevel = this.getOxidizationLevel();
+        if (oxidizationLevel != OxidizationLevel.UNAFFECTED) {
+            String oxidationName = oxidizationLevel.name();
+            name += oxidationName.charAt(0) + oxidationName.substring(1).toLowerCase(Locale.ROOT);
+        }
+        return name + " Cut Copper";
     }
 }

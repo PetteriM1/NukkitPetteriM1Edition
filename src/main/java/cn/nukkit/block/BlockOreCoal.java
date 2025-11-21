@@ -14,13 +14,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreCoal extends BlockOre {
 
     @Override
-    public int getId() {
-        return COAL_ORE;
-    }
-
-    @Override
-    public String getName() {
-        return "Coal Ore";
+    public int getDropExp() {
+        return Utils.rand(0, 2);
     }
 
     @Override
@@ -51,12 +46,17 @@ public class BlockOreCoal extends BlockOre {
     }
 
     @Override
-    protected int getRawMaterial() {
-        return ItemID.COAL;
+    public int getId() {
+        return COAL_ORE;
     }
 
     @Override
-    public int getDropExp() {
-        return Utils.rand(0, 2);
+    public String getName() {
+        return "Coal Ore";
+    }
+
+    @Override
+    protected int getRawMaterial() {
+        return ItemID.COAL;
     }
 }

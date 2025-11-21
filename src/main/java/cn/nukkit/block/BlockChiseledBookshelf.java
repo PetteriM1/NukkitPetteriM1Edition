@@ -4,7 +4,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockChiseledBookshelf extends BlockSolidMeta {
 
@@ -17,28 +19,23 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Chiseled Bookshelf";
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
     }
 
     @Override
-    public int getId() {
-        return CHISELED_BOOKSHELF;
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
-    public double getHardness() {
-        return 1.5;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.BOOKSHELF;
     }
 
     @Override
-    public double getResistance() {
-        return 7.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
+    public int getBurnAbility() {
+        return 20;
     }
 
     @Override
@@ -47,8 +44,8 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 20;
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
     }
 
     @Override
@@ -60,17 +57,32 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+    public double getHardness() {
+        return 1.5;
     }
 
     @Override
-    public boolean canSilkTouch() {
-        return true;
+    public int getId() {
+        return CHISELED_BOOKSHELF;
     }
 
     @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Chiseled Bookshelf";
+    }
+
+    @Override
+    public double getResistance() {
+        return 7.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 }

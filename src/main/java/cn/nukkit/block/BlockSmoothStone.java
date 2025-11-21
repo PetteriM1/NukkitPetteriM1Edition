@@ -5,8 +5,13 @@ import cn.nukkit.item.ItemTool;
 public class BlockSmoothStone extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Smooth Stone";
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.5; // 2
     }
 
     @Override
@@ -15,8 +20,8 @@ public class BlockSmoothStone extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 2;
+    public String getName() {
+        return "Smooth Stone";
     }
 
     @Override
@@ -27,10 +32,5 @@ public class BlockSmoothStone extends BlockSolid {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

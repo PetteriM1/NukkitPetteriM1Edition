@@ -17,13 +17,23 @@ public class BlockStairsCobblestone extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return COBBLESTONE_STAIRS;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
     public double getHardness() {
         return 2;
+    }
+
+    @Override
+    public int getId() {
+        return COBBLESTONE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Cobblestone Stairs";
     }
 
     @Override
@@ -34,15 +44,5 @@ public class BlockStairsCobblestone extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Cobblestone Stairs";
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

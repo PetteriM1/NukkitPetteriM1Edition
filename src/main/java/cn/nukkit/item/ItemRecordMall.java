@@ -18,12 +18,12 @@ public class ItemRecordMall extends ItemRecord {
     }
 
     @Override
-    public String getSoundId() {
-        return "record.mall";
+    public String getDiscName() {
+        return "C418 - mall";
     }
 
     @Override
-    public String getDiscName() {
-        return "C418 - mall";
+    public String getSoundId() {
+        return "record.mall";
     }
 }

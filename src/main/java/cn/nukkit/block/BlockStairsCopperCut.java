@@ -5,35 +5,14 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import java.util.Locale;
 
 public class BlockStairsCopperCut extends BlockStairsCopperBase {
-    
+
     public BlockStairsCopperCut() {
         this(0);
     }
-    
+
     public BlockStairsCopperCut(int meta) {
         super(meta);
     }
-
-    @Override
-    public String getName() {
-        String name = "";
-        if (this.isWaxed()) {
-            name += "Waxed ";
-        }
-
-        OxidizationLevel oxidizationLevel = this.getOxidizationLevel();
-        if (oxidizationLevel != OxidizationLevel.UNAFFECTED) {
-            String oxidationName = oxidizationLevel.name();
-            name += oxidationName.charAt(0) + oxidationName.substring(1).toLowerCase(Locale.ROOT);
-        }
-        return name + " Cut Copper Stairs";
-    }
-
-    @Override
-    public int getId() {
-        return CUT_COPPER_STAIRS;
-    }
-
 
     @Override
     protected int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel) {
@@ -52,6 +31,26 @@ public class BlockStairsCopperCut extends BlockStairsCopperBase {
             default:
                 return this.getId();
         }
+    }
+
+    @Override
+    public int getId() {
+        return CUT_COPPER_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        String name = "";
+        if (this.isWaxed()) {
+            name += "Waxed ";
+        }
+
+        OxidizationLevel oxidizationLevel = this.getOxidizationLevel();
+        if (oxidizationLevel != OxidizationLevel.UNAFFECTED) {
+            String oxidationName = oxidizationLevel.name();
+            name += oxidationName.charAt(0) + oxidationName.substring(1).toLowerCase(Locale.ROOT);
+        }
+        return name + " Cut Copper Stairs";
     }
 
     @Override

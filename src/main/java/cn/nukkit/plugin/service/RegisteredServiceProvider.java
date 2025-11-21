@@ -16,36 +16,8 @@ public class RegisteredServiceProvider<T> implements Comparable<RegisteredServic
         this.priority = priority;
     }
 
-    /**
-     * Return the provided service.
-     *
-     * @return the provided service
-     */
-    public Class<T> getService() {
-        return this.service;
-    }
-
-    /**
-     * Return the plugin provide this service.
-     *
-     * @return the plugin provide this service, or {@code null}
-     * only if this service provided by server
-     */
-    public Plugin getPlugin() {
-        return plugin;
-    }
-
-    /**
-     * Return the service provider.
-     *
-     * @return the service provider
-     */
-    public T getProvider() {
-        return provider;
-    }
-
-    public ServicePriority getPriority() {
-        return priority;
+    public int compareTo(RegisteredServiceProvider<T> other) {
+        return other.priority.ordinal() - priority.ordinal();
     }
 
     @Override
@@ -58,12 +30,40 @@ public class RegisteredServiceProvider<T> implements Comparable<RegisteredServic
         return provider == that.provider || provider.equals(that.provider);
     }
 
+    /**
+     * Return the plugin provide this service.
+     *
+     * @return the plugin provide this service, or {@code null}
+     * only if this service provided by server
+     */
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
+    public ServicePriority getPriority() {
+        return priority;
+    }
+
+    /**
+     * Return the service provider.
+     *
+     * @return the service provider
+     */
+    public T getProvider() {
+        return provider;
+    }
+
+    /**
+     * Return the provided service.
+     *
+     * @return the provided service
+     */
+    public Class<T> getService() {
+        return this.service;
+    }
+
     @Override
     public int hashCode() {
         return provider.hashCode();
-    }
-
-    public int compareTo(RegisteredServiceProvider<T> other) {
-        return other.priority.ordinal() - priority.ordinal();
     }
 }

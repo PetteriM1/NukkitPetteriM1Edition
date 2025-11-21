@@ -14,19 +14,28 @@ public class LecternUpdatePacket extends DataPacket {
     public boolean dropBook;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
-        this.page = this.getByte();
-        this.totalPages = this.getByte();
-        this.blockPosition = this.getBlockVector3();
+        if (protocol < 354) {
+            this.page = this.getByte();
+            this.blockPosition = this.getBlockVector3();
+            this.dropBook = this.getBoolean();
+        } else {
+            this.page = this.getByte();
+            this.totalPages = this.getByte();
+            this.blockPosition = this.getBlockVector3();
+            if (protocol < ProtocolInfo.v1_20_70) {
+                this.dropBook = this.getBoolean();
+            }
+        }
     }
 
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

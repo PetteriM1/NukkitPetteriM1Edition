@@ -12,6 +12,13 @@ public class BlockStateUpdaterVanilla implements BlockStateUpdater {
 
     public static final BlockStateUpdater INSTANCE = new BlockStateUpdaterVanilla();
 
+    private void addProperty(CompoundTagUpdaterContext ctx, String identifier, String propertyName, Object value) {
+        ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
+                .match("name", identifier)
+                .visit("states")
+                .tryAdd(propertyName, value);
+    }
+
     @Override
     public void registerUpdaters(CompoundTagUpdaterContext ctx) {
         ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
@@ -28,13 +35,6 @@ public class BlockStateUpdaterVanilla implements BlockStateUpdater {
         this.removeConnections(ctx, "minecraft:cobblestone_wall");
     }
 
-    private void replaceState(CompoundTagUpdaterContext ctx, String identifier, String propertyName, Object value) {
-        ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
-                .match("name", identifier)
-                .visit("states")
-                .edit(propertyName, helper -> helper.replaceWith(propertyName, value));
-    }
-
     private void removeConnections(CompoundTagUpdaterContext ctx, String identifier) {
         ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
                 .match("name", identifier)
@@ -46,10 +46,10 @@ public class BlockStateUpdaterVanilla implements BlockStateUpdater {
                 .edit("wall_post_bit", helper -> helper.replaceWith("wall_post_bit", (byte) 0));
     }
 
-    private void addProperty(CompoundTagUpdaterContext ctx, String identifier, String propertyName, Object value) {
+    private void replaceState(CompoundTagUpdaterContext ctx, String identifier, String propertyName, Object value) {
         ctx.addUpdater(STATE_MAYOR_VERSION, STATE_MINOR_VERSION, STATE_PATCH_VERSION, true)
                 .match("name", identifier)
                 .visit("states")
-                .tryAdd(propertyName, value);
+                .edit(propertyName, helper -> helper.replaceWith(propertyName, value));
     }
 }

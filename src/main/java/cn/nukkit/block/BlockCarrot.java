@@ -17,16 +17,6 @@ public class BlockCarrot extends BlockCrops {
     }
 
     @Override
-    public String getName() {
-        return "Carrot Block";
-    }
-
-    @Override
-    public int getId() {
-        return CARROT_BLOCK;
-    }
-
-    @Override
     public Item[] getDrops(Item item) {
         if (getDamage() >= 0x07) {
             return new Item[]{
@@ -36,6 +26,16 @@ public class BlockCarrot extends BlockCrops {
         return new Item[]{
                 Item.get(Item.CARROT)
         };
+    }
+
+    @Override
+    public int getId() {
+        return CARROT_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Carrot Block";
     }
 
     @Override

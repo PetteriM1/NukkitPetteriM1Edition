@@ -18,21 +18,6 @@ public class BlockPotato extends BlockCrops {
     }
 
     @Override
-    public String getName() {
-        return "Potato Block";
-    }
-
-    @Override
-    public int getId() {
-        return POTATO_BLOCK;
-    }
-
-    @Override
-    public Item toItem() {
-        return Item.get(Item.POTATO);
-    }
-
-    @Override
     public Item[] getDrops(Item item) {
         if (getDamage() >= 0x07) {
             if (ThreadLocalRandom.current().nextInt(100) < 2) {
@@ -50,5 +35,20 @@ public class BlockPotato extends BlockCrops {
                     Item.get(Item.POTATO)
             };
         }
+    }
+
+    @Override
+    public int getId() {
+        return POTATO_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Potato Block";
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.POTATO);
     }
 }

@@ -3,8 +3,8 @@ package cn.nukkit.block;
 public class BlockBlackstonePolished extends BlockBlackstone {
 
     @Override
-    public String getName() {
-        return "Polished Blackstone";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -13,7 +13,7 @@ public class BlockBlackstonePolished extends BlockBlackstone {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public String getName() {
+        return "Polished Blackstone";
     }
 }

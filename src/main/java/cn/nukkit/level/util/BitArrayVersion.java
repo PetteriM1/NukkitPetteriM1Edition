@@ -26,15 +26,6 @@ public enum BitArrayVersion {
         this.next = next;
     }
 
-    public static BitArrayVersion get(int version, boolean read) {
-        for (BitArrayVersion ver : VALUES) {
-            if ((!read && ver.entriesPerWord <= version) || (read && ver.bits == version)) {
-                return ver;
-            }
-        }
-        throw new IllegalArgumentException("Invalid palette version: " + version);
-    }
-
     public BitArray createPalette() {
         return this.createPalette(4096);
     }
@@ -46,22 +37,6 @@ public enum BitArrayVersion {
         return this.createPalette(size, new int[this.getWordsForSize(size)]);
     }
 
-    public byte getId() {
-        return bits;
-    }
-
-    public int getWordsForSize(int size) {
-        return (size / entriesPerWord) + (size % entriesPerWord == 0 ? 0 : 1);
-    }
-
-    public int getMaxEntryValue() {
-        return maxEntryValue;
-    }
-
-    public BitArrayVersion next() {
-        return next;
-    }
-
     public BitArray createPalette(int size, int[] words) {
         if (this == V3 || this == V5 || this == V6) {
             // Padded palettes aren't able to use bitwise operations due to their padding.
@@ -71,5 +46,30 @@ public enum BitArrayVersion {
         } else {
             return new Pow2BitArray(this, size, words);
         }
+    }
+
+    public static BitArrayVersion get(int version, boolean read) {
+        for (BitArrayVersion ver : VALUES) {
+            if ((!read && ver.entriesPerWord <= version) || (read && ver.bits == version)) {
+                return ver;
+            }
+        }
+        throw new IllegalArgumentException("Invalid palette version: " + version);
+    }
+
+    public byte getId() {
+        return bits;
+    }
+
+    public int getMaxEntryValue() {
+        return maxEntryValue;
+    }
+
+    public int getWordsForSize(int size) {
+        return (size / entriesPerWord) + (size % entriesPerWord == 0 ? 0 : 1);
+    }
+
+    public BitArrayVersion next() {
+        return next;
     }
 }

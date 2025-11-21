@@ -10,8 +10,8 @@ public class BlockCopper extends BlockCopperBase {
     }
 
     @Override
-    public String getName() {
-        return "Block of Copper";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
@@ -20,8 +20,8 @@ public class BlockCopper extends BlockCopperBase {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
+    public String getName() {
+        return "Block of Copper";
     }
 
     @Override

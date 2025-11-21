@@ -9,7 +9,8 @@ public class SingletonBitArray implements BitArray {
     }
 
     @Override
-    public void set(int index, int value) {
+    public SingletonBitArray copy() {
+        return new SingletonBitArray();
     }
 
     @Override
@@ -18,8 +19,8 @@ public class SingletonBitArray implements BitArray {
     }
 
     @Override
-    public int size() {
-        return 1;
+    public BitArrayVersion getVersion() {
+        return BitArrayVersion.V0;
     }
 
     @Override
@@ -28,12 +29,11 @@ public class SingletonBitArray implements BitArray {
     }
 
     @Override
-    public BitArrayVersion getVersion() {
-        return BitArrayVersion.V0;
+    public void set(int index, int value) {
     }
 
     @Override
-    public SingletonBitArray copy() {
-        return new SingletonBitArray();
+    public int size() {
+        return 1;
     }
 }

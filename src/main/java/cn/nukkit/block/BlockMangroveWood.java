@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveWood extends BlockWood {
 
@@ -16,8 +18,8 @@ public class BlockMangroveWood extends BlockWood {
     }
 
     @Override
-    public String getName() {
-        return "Mangrove Wood";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.WOOD;
     }
 
     @Override
@@ -26,8 +28,13 @@ public class BlockMangroveWood extends BlockWood {
     }
 
     @Override
-    protected int getStrippedId() {
-        return STRIPPED_MANGROVE_WOOD;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mangrove Wood";
     }
 
     @Override
@@ -36,13 +43,18 @@ public class BlockMangroveWood extends BlockWood {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    protected int getStrippedId() {
+        return STRIPPED_MANGROVE_WOOD;
     }
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         //this.setPillarAxis(face.getAxis());
         return this.getLevel().setBlock(block, this, true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

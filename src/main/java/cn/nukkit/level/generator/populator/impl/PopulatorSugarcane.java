@@ -17,6 +17,11 @@ import cn.nukkit.math.NukkitRandom;
  */
 public class PopulatorSugarcane extends PopulatorSurfaceBlock {
 
+    @Override
+    protected boolean canStay(int x, int y, int z, FullChunk chunk) {
+        return EnsureCover.ensureCover(x, y, z, chunk) && EnsureGrassBelow.ensureGrassOrSandBelow(x, y, z, chunk) && findWater(x, y - 1, z, chunk);
+    }
+
     private boolean findWater(int x, int y, int z, FullChunk chunk) {
         int cx = x & 0xF;
         int cz = z & 0xF;
@@ -28,11 +33,6 @@ public class PopulatorSugarcane extends PopulatorSurfaceBlock {
         if (b == Block.WATER || b == Block.STILL_WATER) return true;
         b = chunk.getBlockId(NukkitMath.clamp(cx + BlockFace.WEST.getXOffset(), 0, 15), y, NukkitMath.clamp(cz + BlockFace.WEST.getZOffset(), 0, 15));
         return b == Block.WATER || b == Block.STILL_WATER;
-    }
-
-    @Override
-    protected boolean canStay(int x, int y, int z, FullChunk chunk) {
-        return EnsureCover.ensureCover(x, y, z, chunk) && EnsureGrassBelow.ensureGrassOrSandBelow(x, y, z, chunk) && findWater(x, y - 1, z, chunk);
     }
 
     @Override

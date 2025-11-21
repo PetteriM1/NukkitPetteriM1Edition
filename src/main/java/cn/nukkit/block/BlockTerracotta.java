@@ -29,28 +29,8 @@ public class BlockTerracotta extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return TERRACOTTA;
-    }
-
-    @Override
-    public String getName() {
-        return "Terracotta";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.25;
-    }
-
-    @Override
-    public double getResistance() {
-        return 7;
+    public BlockColor getColor() {
+        return TerracottaColor.getByTerracottaData(getDamage()).getColor();
     }
 
     @Override
@@ -64,12 +44,32 @@ public class BlockTerracotta extends BlockSolidMeta {
         }
     }
 
-    @Override
-    public BlockColor getColor() {
-        return TerracottaColor.getByTerracottaData(getDamage()).getColor();
-    }
-
     public TerracottaColor getDyeColor() {
         return TerracottaColor.getByTerracottaData(getDamage());
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.25;
+    }
+
+    @Override
+    public int getId() {
+        return TERRACOTTA;
+    }
+
+    @Override
+    public String getName() {
+        return "Terracotta";
+    }
+
+    @Override
+    public double getResistance() {
+        return 7;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

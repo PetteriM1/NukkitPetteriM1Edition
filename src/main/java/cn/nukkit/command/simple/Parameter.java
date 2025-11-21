@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 public @interface Parameter {
     String name();
 
-    CommandParamType type() default CommandParamType.RAWTEXT;
-
     boolean optional() default false;
+
+    CommandParamType type() default CommandParamType.RAWTEXT;
 }

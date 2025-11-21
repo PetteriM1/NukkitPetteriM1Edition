@@ -51,24 +51,54 @@ public class EntityThrownTrident extends EntityProjectile {
 
     private static final BlockVector3 defaultStuckToBlockPos = new BlockVector3(0, 0, 0);
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        super(chunk, nbt, shootingEntity);
+    }
+
+    private boolean canReturnToShooter() {
+        if (this.loyaltyLevel <= 0) {
+            return false;
+        }
+
+        if (this.getCollisionPos().equals(defaultCollisionPos) && this.getStuckToBlockPos().equals(defaultStuckToBlockPos)) {
+            return false;
+        }
+
+        Entity shooter = this.shootingEntity;
+        if (shooter != null) {
+            return shooter instanceof Player && shooter.isAlive() && !shooter.isClosed() && shooter.getLevel().getId() == this.getLevel().getId() && !(((Player) shooter).isSpectator());
+        }
+        return false;
     }
 
     @Override
-    public float getWidth() {
-        return 0.25f;
+    protected double getBaseDamage() {
+        return 8;
+    }
+
+    public Vector3 getCollisionPos() {
+        return collisionPos;
+    }
+
+    public void setCollisionPos(Vector3 collisionPos) {
+        this.collisionPos = collisionPos;
     }
 
     @Override
-    public float getLength() {
-        return 0.25f;
+    public float getDrag() {
+        return 0.01f;
     }
 
-    @Override
-    public float getHeight() {
-        return 0.35f;
+    public int getFavoredSlot() {
+        return favoredSlot;
+    }
+
+    public void setFavoredSlot(int favoredSlot) {
+        this.favoredSlot = favoredSlot;
     }
 
     @Override
@@ -77,16 +107,50 @@ public class EntityThrownTrident extends EntityProjectile {
     }
 
     @Override
-    public float getDrag() {
-        return 0.01f;
+    public float getHeight() {
+        return 0.35f;
     }
 
-    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
+    public Item getItem() {
+        return this.trident != null ? this.trident.clone() : Item.get(0);
     }
 
-    public EntityThrownTrident(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        super(chunk, nbt, shootingEntity);
+    public void setItem(Item item) {
+        this.trident = item.clone();
+        this.loyaltyLevel = this.trident.getEnchantmentLevel(Enchantment.ID_TRIDENT_LOYALTY);
+        this.hasChanneling = this.trident.hasEnchantment(Enchantment.ID_TRIDENT_CHANNELING);
+        this.impalingLevel = this.trident.getEnchantmentLevel(Enchantment.ID_TRIDENT_IMPALING);
+    }
+
+    @Override
+    public float getLength() {
+        return 0.25f;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    public int getPickupMode() {
+        return this.pickupMode;
+    }
+
+    public void setPickupMode(int pickupMode) {
+        this.pickupMode = pickupMode;
+    }
+
+    public BlockVector3 getStuckToBlockPos() {
+        return stuckToBlockPos;
+    }
+
+    public void setStuckToBlockPos(BlockVector3 stuckToBlockPos) {
+        this.stuckToBlockPos = stuckToBlockPos;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.25f;
     }
 
     @Override
@@ -132,73 +196,6 @@ public class EntityThrownTrident extends EntityProjectile {
         } else {
             this.player = true;
         }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        this.namedTag.put("Trident", NBTIO.putItemHelper(this.trident));
-        this.namedTag.putByte("pickup", this.pickupMode);
-        this.namedTag.putList(new ListTag<DoubleTag>("CollisionPos")
-                .add(new DoubleTag("0", this.collisionPos.x))
-                .add(new DoubleTag("1", this.collisionPos.y))
-                .add(new DoubleTag("2", this.collisionPos.z))
-        );
-        this.namedTag.putList(new ListTag<IntTag>("StuckToBlockPos")
-                .add(new IntTag("0", this.stuckToBlockPos.x))
-                .add(new IntTag("1", this.stuckToBlockPos.y))
-                .add(new IntTag("2", this.stuckToBlockPos.z))
-        );
-        this.namedTag.putInt("favoredSlot", this.favoredSlot);
-        this.namedTag.putBoolean("player", this.player);
-    }
-
-    public Item getItem() {
-        return this.trident != null ? this.trident.clone() : Item.get(0);
-    }
-
-    public void setItem(Item item) {
-        this.trident = item.clone();
-        this.loyaltyLevel = this.trident.getEnchantmentLevel(Enchantment.ID_TRIDENT_LOYALTY);
-        this.hasChanneling = this.trident.hasEnchantment(Enchantment.ID_TRIDENT_CHANNELING);
-        this.impalingLevel = this.trident.getEnchantmentLevel(Enchantment.ID_TRIDENT_IMPALING);
-    }
-
-    @Override
-    protected double getBaseDamage() {
-        return 8;
-    }
-
-    @Override
-    public boolean onUpdate(int currentTick) {
-        if (this.closed) {
-            return false;
-        }
-
-        if (this.age > 1200 && this.pickupMode < 1) { // On Bedrock tridents shouldn't despawn
-            this.close();
-            return false;
-        }
-
-        boolean hasUpdate = super.onUpdate(currentTick);
-
-        if (this.noClip) {
-            if (this.canReturnToShooter()) {
-                Entity shooter = this.shootingEntity;
-                Vector3 vector3 = new Vector3(shooter.x - this.x, shooter.y + shooter.getEyeHeight() - this.y, shooter.z - this.z);
-                this.setPosition(new Vector3(this.x, this.y + vector3.y * 0.015 * ((double) loyaltyLevel), this.z));
-                this.setMotion(this.getMotion().multiply(0.95).add(vector3.multiply(loyaltyLevel * 0.05)));
-                hasUpdate = true;
-            } else {
-                if (!this.closed && level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-                    this.level.dropItem(this, this.trident);
-                }
-                this.close();
-            }
-        }
-
-        return hasUpdate;
     }
 
     @Override
@@ -269,36 +266,55 @@ public class EntityThrownTrident extends EntityProjectile {
         }
     }
 
-    public Vector3 getCollisionPos() {
-        return collisionPos;
+    @Override
+    public boolean onUpdate(int currentTick) {
+        if (this.closed) {
+            return false;
+        }
+
+        if (this.age > 1200 && this.pickupMode < 1) { // On Bedrock tridents shouldn't despawn
+            this.close();
+            return false;
+        }
+
+        boolean hasUpdate = super.onUpdate(currentTick);
+
+        if (this.noClip) {
+            if (this.canReturnToShooter()) {
+                Entity shooter = this.shootingEntity;
+                Vector3 vector3 = new Vector3(shooter.x - this.x, shooter.y + shooter.getEyeHeight() - this.y, shooter.z - this.z);
+                this.setPosition(new Vector3(this.x, this.y + vector3.y * 0.015 * ((double) loyaltyLevel), this.z));
+                this.setMotion(this.getMotion().multiply(0.95).add(vector3.multiply(loyaltyLevel * 0.05)));
+                hasUpdate = true;
+            } else {
+                if (!this.closed && level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.level.dropItem(this, this.trident);
+                }
+                this.close();
+            }
+        }
+
+        return hasUpdate;
     }
 
-    public void setCollisionPos(Vector3 collisionPos) {
-        this.collisionPos = collisionPos;
-    }
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
 
-    public BlockVector3 getStuckToBlockPos() {
-        return stuckToBlockPos;
-    }
-
-    public void setStuckToBlockPos(BlockVector3 stuckToBlockPos) {
-        this.stuckToBlockPos = stuckToBlockPos;
-    }
-
-    public int getFavoredSlot() {
-        return favoredSlot;
-    }
-
-    public void setFavoredSlot(int favoredSlot) {
-        this.favoredSlot = favoredSlot;
-    }
-
-    public boolean shotByPlayer() {
-        return player;
-    }
-
-    public void setShotByPlayer(boolean player) {
-        this.player = player;
+        this.namedTag.put("Trident", NBTIO.putItemHelper(this.trident));
+        this.namedTag.putByte("pickup", this.pickupMode);
+        this.namedTag.putList(new ListTag<DoubleTag>("CollisionPos")
+                .add(new DoubleTag("0", this.collisionPos.x))
+                .add(new DoubleTag("1", this.collisionPos.y))
+                .add(new DoubleTag("2", this.collisionPos.z))
+        );
+        this.namedTag.putList(new ListTag<IntTag>("StuckToBlockPos")
+                .add(new IntTag("0", this.stuckToBlockPos.x))
+                .add(new IntTag("1", this.stuckToBlockPos.y))
+                .add(new IntTag("2", this.stuckToBlockPos.z))
+        );
+        this.namedTag.putInt("favoredSlot", this.favoredSlot);
+        this.namedTag.putBoolean("player", this.player);
     }
 
     public void setRope(boolean tridentRope) {
@@ -310,27 +326,11 @@ public class EntityThrownTrident extends EntityProjectile {
         this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOW_TRIDENT_ROPE, tridentRope);
     }
 
-    private boolean canReturnToShooter() {
-        if (this.loyaltyLevel <= 0) {
-            return false;
-        }
-
-        if (this.getCollisionPos().equals(defaultCollisionPos) && this.getStuckToBlockPos().equals(defaultStuckToBlockPos)) {
-            return false;
-        }
-
-        Entity shooter = this.shootingEntity;
-        if (shooter != null) {
-            return shooter instanceof Player && shooter.isAlive() && !shooter.isClosed() && shooter.getLevel().getId() == this.getLevel().getId() && !(((Player) shooter).isSpectator());
-        }
-        return false;
+    public void setShotByPlayer(boolean player) {
+        this.player = player;
     }
 
-    public int getPickupMode() {
-        return this.pickupMode;
-    }
-
-    public void setPickupMode(int pickupMode) {
-        this.pickupMode = pickupMode;
+    public boolean shotByPlayer() {
+        return player;
     }
 }

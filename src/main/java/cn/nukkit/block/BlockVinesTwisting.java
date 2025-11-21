@@ -14,8 +14,13 @@ public class BlockVinesTwisting extends BlockVinesNether {
     }
 
     @Override
-    public String getName() {
-        return "Twisting Vines";
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
+    }
+
+    @Override
+    public BlockFace getGrowthDirection() {
+        return BlockFace.UP;
     }
 
     @Override
@@ -24,8 +29,13 @@ public class BlockVinesTwisting extends BlockVinesNether {
     }
 
     @Override
-    public BlockFace getGrowthDirection() {
-        return BlockFace.UP;
+    public int getMaxVineAge() {
+        return 25;
+    }
+
+    @Override
+    public String getName() {
+        return "Twisting Vines";
     }
 
     @Override
@@ -36,15 +46,5 @@ public class BlockVinesTwisting extends BlockVinesNether {
     @Override
     public void setVineAge(int vineAge) {
         this.setDamage(vineAge & 0x19);
-    }
-
-    @Override
-    public int getMaxVineAge() {
-        return 25;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
     }
 }

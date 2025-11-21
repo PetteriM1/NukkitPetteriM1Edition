@@ -13,6 +13,11 @@ public abstract class BlockFlowable extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
     public boolean canBeFlowedInto() {
         return true;
     }
@@ -40,10 +45,5 @@ public abstract class BlockFlowable extends BlockTransparentMeta {
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return null;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

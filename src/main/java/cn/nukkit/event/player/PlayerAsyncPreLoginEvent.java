@@ -18,21 +18,14 @@ import java.util.function.Consumer;
 public class PlayerAsyncPreLoginEvent extends PlayerEvent {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final String name;
     private final UUID uuid;
     private final LoginChainData chainData;
     private Skin skin;
     private final String address;
     private final int port;
-
     private LoginResult loginResult = LoginResult.SUCCESS;
     private String kickMessage = "Plugin Reason";
-
     private final List<Consumer<Server>> scheduledActions = new ArrayList<>();
 
     public PlayerAsyncPreLoginEvent(String name, UUID uuid, LoginChainData chainData, Skin skin, String address, int port) {
@@ -44,60 +37,9 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
         this.port = port;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    public UUID getUuid() {
-        return this.uuid;
-    }
-
-    public LoginChainData getChainData() {
-        return this.chainData;
-    }
-
-    public String getXuid() {
-        return this.chainData.getXUID();
-    }
-
-    public Skin getSkin() {
-        return this.skin;
-    }
-
-    public void setSkin(Skin skin) {
-        this.skin = skin;
-    }
-
-    public String getAddress() {
-        return this.address;
-    }
-
-    public int getPort() {
-        return this.port;
-    }
-
-    public LoginResult getLoginResult() {
-        return loginResult;
-    }
-
-    public void setLoginResult(LoginResult loginResult) {
-        this.loginResult = loginResult;
-    }
-
-    public String getKickMessage() {
-        return kickMessage;
-    }
-
-    public void setKickMessage(String kickMessage) {
-        this.kickMessage = kickMessage;
-    }
-
-    public void scheduleSyncAction(Consumer<Server> action) {
-        this.scheduledActions.add(action);
-    }
-
-    public List<Consumer<Server>> getScheduledActions() {
-        return new ArrayList<>(scheduledActions);
+    public enum LoginResult {
+        SUCCESS,
+        KICK
     }
 
     public void allow() {
@@ -109,8 +51,63 @@ public class PlayerAsyncPreLoginEvent extends PlayerEvent {
         this.kickMessage = message;
     }
 
-    public enum LoginResult {
-        SUCCESS,
-        KICK
+    public String getAddress() {
+        return this.address;
+    }
+
+    public LoginChainData getChainData() {
+        return this.chainData;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public String getKickMessage() {
+        return kickMessage;
+    }
+
+    public void setKickMessage(String kickMessage) {
+        this.kickMessage = kickMessage;
+    }
+
+    public LoginResult getLoginResult() {
+        return loginResult;
+    }
+
+    public void setLoginResult(LoginResult loginResult) {
+        this.loginResult = loginResult;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getPort() {
+        return this.port;
+    }
+
+    public List<Consumer<Server>> getScheduledActions() {
+        return new ArrayList<>(scheduledActions);
+    }
+
+    public Skin getSkin() {
+        return this.skin;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
+    }
+
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public String getXuid() {
+        return this.chainData.getXUID();
+    }
+
+    public void scheduleSyncAction(Consumer<Server> action) {
+        this.scheduledActions.add(action);
     }
 }

@@ -15,7 +15,7 @@ public class BlockCoral extends BlockTransparentMeta {
     public static final int TYPE_FIRE = 3;
     public static final int TYPE_HORN = 4;
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Tube Coral",
             "Brain Coral",
             "Bubble Coral",
@@ -40,12 +40,31 @@ public class BlockCoral extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        int variant = this.getDamage();
-        if (variant >= NAMES.length) {
-            return NAMES[0];
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BLUE_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
+            return super.getDrops(item);
+        } else {
+            return new Item[0];
         }
-        return NAMES[variant];
+    }
+
+    public double getHardness() {
+        return 0;
     }
 
     @Override
@@ -53,8 +72,13 @@ public class BlockCoral extends BlockTransparentMeta {
         return CORAL;
     }
 
-    public double getHardness() {
-        return 0;
+    @Override
+    public String getName() {
+        int variant = this.getDamage();
+        if (variant >= names.length) {
+            return names[0];
+        }
+        return names[variant];
     }
 
     public double getResistance() {
@@ -64,11 +88,6 @@ public class BlockCoral extends BlockTransparentMeta {
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.FLOW_INTO_BLOCK;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
     }
 
     @Override
@@ -97,24 +116,5 @@ public class BlockCoral extends BlockTransparentMeta {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
-            return super.getDrops(item);
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLUE_BLOCK_COLOR;
     }
 }

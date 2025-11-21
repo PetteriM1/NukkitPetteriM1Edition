@@ -18,8 +18,8 @@ public class BlockFurnace extends BlockFurnaceBurning implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Furnace";
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class BlockFurnace extends BlockFurnaceBurning implements Faceable {
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    public String getName() {
+        return "Furnace";
     }
 }

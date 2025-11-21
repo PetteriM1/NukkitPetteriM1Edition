@@ -9,12 +9,12 @@ public class LukewarmOceanBiome extends OceanBiome {
     }
 
     @Override
-    public String getName() {
-        return "Lukewarm Ocean";
+    public int getGroundId(int x, int y, int z) {
+        return Block.SAND << Block.DATA_BITS;
     }
 
     @Override
-    public int getGroundId(int x, int y, int z) {
-        return Block.SAND << Block.DATA_BITS;
+    public String getName() {
+        return "Lukewarm Ocean";
     }
 }

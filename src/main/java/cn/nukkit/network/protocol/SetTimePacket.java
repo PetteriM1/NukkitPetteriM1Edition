@@ -14,11 +14,6 @@ public class SetTimePacket extends DataPacket {
     public int time;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -27,5 +22,10 @@ public class SetTimePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putVarInt(this.time);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

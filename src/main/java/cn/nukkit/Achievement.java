@@ -1,5 +1,6 @@
 package cn.nukkit;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.HashMap;
@@ -54,6 +55,33 @@ public class Achievement {
             put("overpowered", new Achievement("Overpowered", "buildBetterPickaxe"));
         }
     };
+    public final String message;
+    public final String[] requires;
+
+    /**
+     * @param message  achievement name displayed in achievement get message
+     * @param requires save IDs of achievements player must complete before this achievement can be completed
+     */
+    public Achievement(String message, String... requires) {
+        this.message = message;
+        this.requires = requires;
+    }
+
+    /**
+     * Register an achievement
+     *
+     * @param name        save id
+     * @param achievement achievement
+     * @return true if successful, false if save id is already in use
+     */
+    public static boolean add(String name, Achievement achievement) {
+        if (achievements.containsKey(name)) {
+            return false;
+        }
+
+        achievements.put(name, achievement);
+        return true;
+    }
 
     /**
      * Broadcasts achievement get message if player does not have the achievement yet. Returns true if broadcast.
@@ -70,38 +98,11 @@ public class Achievement {
         } else {
             player.sendMessage(translation);
         }
-        return true;
-    }
 
-    /**
-     * Register an achievement
-     * @param name save id
-     * @param achievement achievement
-     * @return true if successful, false if save id is already in use
-     */
-    public static boolean add(String name, Achievement achievement) {
-        if (achievements.containsKey(name)) {
-            return false;
+        if (player.protocol >= ProtocolInfo.v1_19_0_31) {
+            player.sendToast(TextFormat.YELLOW + "Achievement get!" + TextFormat.WHITE, achievements.get(achievementId).message);
         }
-
-        achievements.put(name, achievement);
         return true;
-    }
-
-    public final String message;
-    public final String[] requires;
-
-    /**
-     * @param message achievement name displayed in achievement get message
-     * @param requires save IDs of achievements player must complete before this achievement can be completed
-     */
-    public Achievement(String message, String... requires) {
-        this.message = message;
-        this.requires = requires;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     /**
@@ -115,5 +116,13 @@ public class Achievement {
         } else {
             player.sendMessage(translation);
         }
+
+        if (player.protocol >= ProtocolInfo.v1_19_0_31) {
+            player.sendToast(TextFormat.YELLOW + "Achievement get!" + TextFormat.WHITE, this.message);
+        }
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

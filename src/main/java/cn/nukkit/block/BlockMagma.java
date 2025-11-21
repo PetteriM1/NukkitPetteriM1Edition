@@ -18,33 +18,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockMagma extends BlockSolid {
 
     @Override
-    public int getId() {
-        return MAGMA;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Magma Block";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.5;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 3;
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -56,6 +36,41 @@ public class BlockMagma extends BlockSolid {
         } else {
             return new Item[0];
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
+    }
+
+    @Override
+    public int getId() {
+        return MAGMA;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 3;
+    }
+
+    @Override
+    public String getName() {
+        return "Magma Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
     }
 
     @Override
@@ -74,21 +89,6 @@ public class BlockMagma extends BlockSolid {
                 entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.MAGMA, 1));
             }
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-    
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
     }
 
     @Override

@@ -6,9 +6,8 @@ import org.iq80.leveldb.DB;
 import org.iq80.leveldb.WriteBatch;
 
 public class ChunkSerializers {
-    /*private static final IntObjectMap<ChunkSerializer> SERIALIZERS = new IntObjectHashMap<>();
 
-    static {
+    /*static {
         // SERIALIZERS.put(0, ChunkSerializerV1.INSTANCE);
         // SERIALIZERS.put(1, ChunkSerializerV1.INSTANCE);
         // SERIALIZERS.put(2, ChunkSerializerV1.INSTANCE);
@@ -37,6 +36,10 @@ public class ChunkSerializers {
         SERIALIZERS.put(40, ChunkSerializerV3.INSTANCE); // v1_18_30
     }*/
 
+    public static void deserializeChunk(DB db, ChunkBuilder chunkBuilder, int version) {
+        getChunkSerializer(version).deserialize(db, chunkBuilder);
+    }
+
     private static ChunkSerializer getChunkSerializer(int version) {
         if (version < 3) {
             throw new IllegalArgumentException("Invalid chunk serializer version " + version + "! Serializers down to 1.0.0 (version 3) are supported");
@@ -49,9 +52,5 @@ public class ChunkSerializers {
 
     public static void serializeChunk(WriteBatch db, LevelDBChunk chunk, int version) {
         getChunkSerializer(version).serialize(db, chunk);
-    }
-
-    public static void deserializeChunk(DB db, ChunkBuilder chunkBuilder, int version) {
-        getChunkSerializer(version).deserialize(db, chunkBuilder);
     }
 }

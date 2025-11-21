@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockStairsMangrove extends BlockStairsWood {
 
@@ -13,8 +15,13 @@ public class BlockStairsMangrove extends BlockStairsWood {
     }
 
     @Override
-    public String getName() {
-        return "Mangrove Stairs";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.OAK_WOOD_STAIRS;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +30,12 @@ public class BlockStairsMangrove extends BlockStairsWood {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mangrove Stairs";
     }
 }

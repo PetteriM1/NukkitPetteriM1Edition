@@ -18,7 +18,7 @@ public class BlockQuartz extends BlockSolidMeta {
     public static final int QUARTZ_PILLAR = 2;
     public static final int QUARTZ_SMOOTH = 3;
 
-    private static final short[] FACES = {
+    private static final short[] faces = {
             0,
             0,
             0b1000,
@@ -34,23 +34,7 @@ public class BlockQuartz extends BlockSolidMeta {
     public BlockQuartz(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return QUARTZ_BLOCK;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.8;
-    }
-
-    @Override
-    public double getResistance() {
-        return 4;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Block of Quartz",
             "Chiseled Quartz Block",
             "Quartz Pillar Block",
@@ -58,18 +42,13 @@ public class BlockQuartz extends BlockSolidMeta {
     };
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.getDamage() != QUARTZ_NORMAL) {
-            this.setDamage(((this.getDamage() & 0x03) | FACES[face.getIndex()]));
-        }
-        this.getLevel().setBlock(block, this, true, true);
-
-        return true;
+    public BlockColor getColor() {
+        return BlockColor.QUARTZ_BLOCK_COLOR;
     }
 
     @Override
@@ -84,8 +63,23 @@ public class BlockQuartz extends BlockSolidMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(this, this.getDamage() & 0x03, 1);
+    public double getHardness() {
+        return 0.8;
+    }
+
+    @Override
+    public int getId() {
+        return QUARTZ_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x03];
+    }
+
+    @Override
+    public double getResistance() {
+        return 4;
     }
 
     @Override
@@ -94,12 +88,17 @@ public class BlockQuartz extends BlockSolidMeta {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.QUARTZ_BLOCK_COLOR;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.getDamage() != QUARTZ_NORMAL) {
+            this.setDamage(((this.getDamage() & 0x03) | faces[face.getIndex()]));
+        }
+        this.getLevel().setBlock(block, this, true, true);
+
+        return true;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public Item toItem() {
+        return new ItemBlock(this, this.getDamage() & 0x03, 1);
     }
 }

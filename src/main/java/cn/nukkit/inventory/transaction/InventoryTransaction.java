@@ -5,11 +5,13 @@ import cn.nukkit.Server;
 import cn.nukkit.event.inventory.InventoryClickEvent;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
 import cn.nukkit.inventory.Inventory;
+import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 import java.util.*;
 
@@ -19,6 +21,7 @@ import java.util.*;
 public class InventoryTransaction {
 
     protected boolean invalid;
+
     protected boolean hasExecuted;
 
     protected Player source;
@@ -37,54 +40,25 @@ public class InventoryTransaction {
         }
     }
 
-    protected void init(Player source, List<InventoryAction> actions) {
-        //creationTime = System.currentTimeMillis();
-        this.source = source;
-
-        for (InventoryAction action : actions) {
-            this.addAction(action);
-        }
-    }
-
-    public Player getSource() {
-        return source;
-    }
-
-    public long getCreationTime() {
-        return 0; // unused
-    }
-
-    public Set<Inventory> getInventories() {
-        return inventories;
-    }
-
-    public List<InventoryAction> getActionList() {
-        return actions;
-    }
-
-    public Set<InventoryAction> getActions() {
-        return new HashSet<>(actions);
-    }
-
     public void addAction(InventoryAction action) {
-        if (invalid) {
+        if (this.invalid) {
             Server.getInstance().getLogger().debug("Failed to add InventoryAction for " + source.getName() + ": previous run was marked as invalid");
             return;
         }
 
         if (action instanceof SlotChangeAction) {
-            SlotChangeAction slotChangeAction = (SlotChangeAction)action;
+            SlotChangeAction slotChangeAction = (SlotChangeAction) action;
 
             Item targetItem = slotChangeAction.getTargetItemUnsafe();
             Item sourceItem = slotChangeAction.getSourceItemUnsafe();
             if (targetItem.getCount() > targetItem.getMaxStackSize() || sourceItem.getCount() > sourceItem.getMaxStackSize()) {
-                invalid = true;
+                this.invalid = true;
                 Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": illegal item stack size");
                 return;
             }
 
             if (!slotChangeAction.getInventory().allowedToAdd(targetItem)) {
-                invalid = true;
+                this.invalid = true;
                 Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": " + slotChangeAction.getInventory().getName() + " inventory doesn't allow item " + targetItem.getId());
                 return;
             }
@@ -93,7 +67,7 @@ public class InventoryTransaction {
                 int slot = slotChangeAction.getSlot();
                 if (slot == 36 || slot == 37 || slot == 38 || slot == 39) {
                     if (sourceItem.hasEnchantment(Enchantment.ID_BINDING_CURSE)) {
-                        invalid = true;
+                        this.invalid = true;
                         Server.getInstance().getLogger().debug("Failed to add SlotChangeAction for " + source.getName() + ": armor has binding curse");
                         return;
                     }
@@ -140,72 +114,6 @@ public class InventoryTransaction {
         this.inventories.add(inventory);
     }
 
-    protected boolean matchItems(boolean clientAuthTrim, boolean clientAuthLapis) {
-        List<Item> haveItems = new ArrayList<>();
-        List<Item> needItems = new ArrayList<>();
-
-        for (InventoryAction action : this.actions) {
-            if (action.getTargetItemUnsafe().getId() != Item.AIR) {
-                needItems.add(action.getTargetItem());
-            }
-
-            if (clientAuthTrim && action instanceof SlotChangeAction) {
-                ((SlotChangeAction) action).setSmithingClientAuth(true);
-            }
-
-            if (!action.isValid(this.source)) {
-                invalid = true;
-                return false;
-            }
-
-            if (action.getSourceItemUnsafe().getId() != Item.AIR) {
-                haveItems.add(action.getSourceItem());
-            }
-        }
-
-        for (Item needItem : new ArrayList<>(needItems)) {
-            for (Item haveItem : new ArrayList<>(haveItems)) {
-                if (needItem.equals(haveItem)) {
-                    int amount = Math.min(haveItem.getCount(), needItem.getCount());
-                    needItem.setCount(needItem.getCount() - amount);
-                    haveItem.setCount(haveItem.getCount() - amount);
-                    if (haveItem.getCount() == 0) {
-                        haveItems.remove(haveItem);
-                    }
-                    if (needItem.getCount() == 0) {
-                        needItems.remove(needItem);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (clientAuthLapis) {
-            haveItems.removeIf(item -> item.getId() == Item.DYE && item.getDamage() == ItemDye.LAPIS_LAZULI);
-        }
-
-        if (clientAuthTrim) {
-            needItems.removeIf(item -> (item.getId() == Item.NETHERITE_UPGRADE_SMITHING_TEMPLATE || (item.getId() >= Item.COAST_ARMOR_TRIM_SMITHING_TEMPLATE &&
-                    item.getId() <= Item.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE)) && item.getDamage() == 0 && item.getCount() <= 1);
-        }
-
-        return needItems.isEmpty() && haveItems.isEmpty();
-    }
-
-    protected void sendInventories() {
-        for (InventoryAction action : this.actions) {
-            if (action instanceof SlotChangeAction) {
-                SlotChangeAction sca = (SlotChangeAction) action;
-                sca.getInventory().sendSlot(sca.getSlot(), this.source);
-            }
-        }
-    }
-
-    public boolean canExecute() {
-        return matchItems(false, false) && !this.invalid && !this.actions.isEmpty();
-
-    }
-
     protected boolean callExecuteEvent() {
         InventoryTransactionEvent ev = new InventoryTransactionEvent(this);
         this.source.getServer().getPluginManager().callEvent(ev);
@@ -247,13 +155,21 @@ public class InventoryTransaction {
         return !ev.isCancelled();
     }
 
+    public boolean canExecute() {
+        return matchItems(false, false) && !this.invalid && !this.actions.isEmpty();
+    }
+
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return false;
+    }
+
     public boolean execute() {
-        if (invalid || this.hasExecuted() || !this.canExecute()) {
+        if (this.invalid || this.hasExecuted() || !this.canExecute()) {
             this.sendInventories();
             return false;
         }
 
-        if (!callExecuteEvent()) {
+        if (!this.callExecuteEvent()) {
             this.sendInventories();
             return true;
         }
@@ -277,11 +193,107 @@ public class InventoryTransaction {
         return true;
     }
 
+    public List<InventoryAction> getActionList() {
+        return actions;
+    }
+
+    public Set<InventoryAction> getActions() {
+        return new HashSet<>(actions);
+    }
+
+    @Deprecated
+    public long getCreationTime() {
+        return 0; // unused
+    }
+
+    public Set<Inventory> getInventories() {
+        return inventories;
+    }
+
+    public Player getSource() {
+        return source;
+    }
+
     public boolean hasExecuted() {
         return this.hasExecuted;
     }
 
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return false;
+    protected void init(Player source, List<InventoryAction> actions) {
+        //creationTime = System.currentTimeMillis();
+        this.source = source;
+
+        for (InventoryAction action : actions) {
+            this.addAction(action);
+        }
+    }
+
+    protected boolean matchItems(boolean clientAuthTrim, boolean clientAuthLapis) {
+        List<Item> haveItems = new ArrayList<>();
+        List<Item> needItems = new ArrayList<>();
+
+        for (InventoryAction action : this.actions) {
+            if (action.getTargetItemUnsafe().getId() != Item.AIR) {
+                needItems.add(action.getTargetItem());
+            }
+
+            if (clientAuthTrim && action instanceof SlotChangeAction) {
+                ((SlotChangeAction) action).setSmithingClientAuth(true);
+            }
+
+            if (!action.isValid(this.source)) {
+                this.invalid = true;
+                return false;
+            }
+
+            if (action.getSourceItemUnsafe().getId() != Item.AIR) {
+                haveItems.add(action.getSourceItem());
+            }
+        }
+
+        for (Item needItem : new ArrayList<>(needItems)) {
+            for (Item haveItem : new ArrayList<>(haveItems)) {
+                if (needItem.equals(haveItem)) {
+                    int amount = Math.min(haveItem.getCount(), needItem.getCount());
+                    needItem.setCount(needItem.getCount() - amount);
+                    haveItem.setCount(haveItem.getCount() - amount);
+                    if (haveItem.getCount() == 0) {
+                        haveItems.remove(haveItem);
+                    }
+                    if (needItem.getCount() == 0) {
+                        needItems.remove(needItem);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (clientAuthLapis) {
+            haveItems.removeIf(item -> item.getId() == Item.DYE && item.getDamage() == ItemDye.LAPIS_LAZULI);
+        }
+
+        if (clientAuthTrim) {
+            needItems.removeIf(item -> (item.getId() == Item.NETHERITE_UPGRADE_SMITHING_TEMPLATE || (item.getId() >= Item.COAST_ARMOR_TRIM_SMITHING_TEMPLATE &&
+                    item.getId() <= Item.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE)) && item.getDamage() == 0 && item.getCount() <= 1);
+        }
+
+        return needItems.isEmpty() && haveItems.isEmpty();
+    }
+
+    protected void sendInventories() {
+        if (this.getSource().protocol >= ProtocolInfo.v1_16_0) {
+            for (InventoryAction action : this.actions) {
+                if (action instanceof SlotChangeAction) {
+                    SlotChangeAction sca = (SlotChangeAction) action;
+                    sca.getInventory().sendSlot(sca.getSlot(), this.source);
+                }
+            }
+        } else {
+            for (Inventory inventory : this.inventories) {
+                inventory.sendContents(this.source);
+                if (inventory instanceof PlayerInventory) {
+                    ((PlayerInventory) inventory).sendArmorContents(this.source);
+                }
+            }
+        }
     }
 }

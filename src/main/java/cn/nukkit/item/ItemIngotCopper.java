@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemIngotCopper extends Item implements ItemTrimMaterial {
 
     public ItemIngotCopper() {
@@ -17,5 +19,10 @@ public class ItemIngotCopper extends Item implements ItemTrimMaterial {
     @Override
     public ItemTrimMaterial.Type getMaterial() {
         return ItemTrimMaterial.Type.COPPER;
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_17_0;
     }
 }

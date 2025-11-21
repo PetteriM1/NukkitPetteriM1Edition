@@ -41,9 +41,25 @@ public class ClientboundMapItemDataPacket extends DataPacket {
     public static final int DECORATIONS_UPDATE = 0x04;
     public static final int ENTITIES_UPDATE = 0x08;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public static class MapDecorator {
+        public byte rotation;
+        public byte icon;
+        public byte offsetX;
+        public byte offsetZ;
+        public String label;
+        public Color color;
+    }
+
+    public static class MapTrackedObject {
+        public static final int TYPE_ENTITY = 0;
+        public static final int TYPE_BLOCK = 1;
+
+        public int type;
+        public long entityUniqueId;
+
+        public int x;
+        public int y;
+        public int z;
     }
 
     @Override
@@ -70,8 +86,13 @@ public class ClientboundMapItemDataPacket extends DataPacket {
 
         this.putUnsignedVarInt(update);
         this.putByte(this.dimensionId);
-        this.putBoolean(this.isLocked);
-        this.putSignedBlockPosition(origin);
+        if (protocol >= 354) {
+            this.putBoolean(this.isLocked);
+
+            if (protocol >= ProtocolInfo.v1_19_20) {
+                this.putSignedBlockPosition(origin);
+            }
+        }
 
         if ((update & ENTITIES_UPDATE) != 0) {
             this.putUnsignedVarInt(eids.length);
@@ -104,7 +125,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
                 this.putByte(decorator.offsetX);
                 this.putByte(decorator.offsetZ);
                 this.putString(decorator.label);
-                this.putUnsignedVarInt(decorator.color.getRGB());
+                this.putUnsignedVarInt(decorator.color.getRGB()); //toABGR?
             }
         }
 
@@ -132,24 +153,8 @@ public class ClientboundMapItemDataPacket extends DataPacket {
         }
     }
 
-    public static class MapDecorator {
-        public byte rotation;
-        public byte icon;
-        public byte offsetX;
-        public byte offsetZ;
-        public String label;
-        public Color color;
-    }
-
-    public static class MapTrackedObject {
-        public static final int TYPE_ENTITY = 0;
-        public static final int TYPE_BLOCK = 1;
-
-        public int type;
-        public long entityUniqueId;
-
-        public int x;
-        public int y;
-        public int z;
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

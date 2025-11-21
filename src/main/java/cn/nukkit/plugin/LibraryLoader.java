@@ -22,24 +22,8 @@ public class LibraryLoader {
         }
     }
 
-    public static void load(String library) {
-        String[] split = library.split(":");
-        if (split.length != 3) {
-            throw new IllegalArgumentException(library);
-        }
-        load(new Library() {
-            public String getGroupId() {
-                return split[0];
-            }
-
-            public String getArtifactId() {
-                return split[1];
-            }
-
-            public String getVersion() {
-                return split[2];
-            }
-        });
+    public static File getBaseFolder() {
+        return BASE_FOLDER;
     }
 
     public static void load(Library library) {
@@ -78,7 +62,23 @@ public class LibraryLoader {
         LOGGER.info("Load library " + fileName + " done!");
     }
 
-    public static File getBaseFolder() {
-        return BASE_FOLDER;
+    public static void load(String library) {
+        String[] split = library.split(":");
+        if (split.length != 3) {
+            throw new IllegalArgumentException(library);
+        }
+        load(new Library() {
+            public String getArtifactId() {
+                return split[1];
+            }
+
+            public String getGroupId() {
+                return split[0];
+            }
+
+            public String getVersion() {
+                return split[2];
+            }
+        });
     }
 }

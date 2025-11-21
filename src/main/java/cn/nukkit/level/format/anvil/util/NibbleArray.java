@@ -17,13 +17,53 @@ public class NibbleArray implements Cloneable {
         data = array;
     }
 
+    public NibbleArray copy() {
+        return new NibbleArray(getData().clone());
+    }
+
+    public void copyFrom(NibbleArray array) {
+        Preconditions.checkNotNull(array, "array");
+        copyFrom(array.data);
+    }
+
+    public void copyFrom(byte[] bytes) {
+        Preconditions.checkNotNull(bytes, "bytes");
+        Preconditions.checkArgument(bytes.length == data.length, "length of provided byte array is %s but expected %s", bytes.length,
+                data.length);
+        System.arraycopy(bytes, 0, data, 0, data.length);
+    }
+
+    public void fill(byte value) {
+        Preconditions.checkArgument(value >= 0 && value < 16, "Nibbles must have a value between 0 and 15.");
+        value &= 0xf;
+        Arrays.fill(data, (byte) ((value << 4) | value));
+    }
+
     public byte get(int index) {
-        if (index >= data.length << 1) throw new IndexOutOfBoundsException("index=" + index + ", data.length=" + data.length);
+        if (index >= data.length << 1)
+            throw new IndexOutOfBoundsException("index=" + index + ", data.length=" + data.length);
         byte val = data[index >> 1];
         if ((index & 1) == 0) {
             return (byte) (val & 0x0f);
         } else {
             return (byte) ((val & 0xf0) >>> 4);
+        }
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void remove(int index) {
+        if (index >= data.length << 1 || index < 0) {
+            throw new IndexOutOfBoundsException("index=" + index + ", data.length=" + data.length);
+        }
+        int half = index >> 1;
+        byte previous = data[half];
+        if ((index & 1) == 0) {
+            data[half] = (byte) (previous & 0xf0);
+        } else {
+            data[half] = (byte) (previous & 0x0f);
         }
     }
 
@@ -41,44 +81,5 @@ public class NibbleArray implements Cloneable {
         } else {
             data[half] = (byte) (previous & 0x0f | value << 4);
         }
-    }
-
-    public void remove(int index) {
-        if (index >= data.length << 1 || index < 0) {
-            throw new IndexOutOfBoundsException("index=" + index + ", data.length=" + data.length);
-        }
-        int half = index >> 1;
-        byte previous = data[half];
-        if ((index & 1) == 0) {
-            data[half] = (byte) (previous & 0xf0);
-        } else {
-            data[half] = (byte) (previous & 0x0f);
-        }
-    }
-
-    public void fill(byte value) {
-        Preconditions.checkArgument(value >= 0 && value < 16, "Nibbles must have a value between 0 and 15.");
-        value &= 0xf;
-        Arrays.fill(data, (byte) ((value << 4) | value));
-    }
-
-    public void copyFrom(byte[] bytes) {
-        Preconditions.checkNotNull(bytes, "bytes");
-        Preconditions.checkArgument(bytes.length == data.length, "length of provided byte array is %s but expected %s", bytes.length,
-                data.length);
-        System.arraycopy(bytes, 0, data, 0, data.length);
-    }
-
-    public void copyFrom(NibbleArray array) {
-        Preconditions.checkNotNull(array, "array");
-        copyFrom(array.data);
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public NibbleArray copy() {
-        return new NibbleArray(getData().clone());
     }
 }

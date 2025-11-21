@@ -17,6 +17,11 @@ public class BlockStairsBirch extends BlockStairsWood {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return BIRCH_WOOD_STAIRS;
     }
@@ -24,10 +29,5 @@ public class BlockStairsBirch extends BlockStairsWood {
     @Override
     public String getName() {
         return "Birch Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
     }
 }

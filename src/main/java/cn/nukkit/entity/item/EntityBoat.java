@@ -19,6 +19,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.math.*;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.AnimatePacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 
 import java.util.ArrayList;
@@ -51,48 +52,48 @@ public class EntityBoat extends EntityVehicle {
     }
 
     @Override
-    protected void initEntity() {
-        this.setMaxHealth(40);
-        super.initEntity();
-
-        this.setHealth(40);
-
-        if (this.namedTag.contains("Variant")) {
-            this.woodID = this.namedTag.getInt("Variant");
+    public void applyEntityCollision(Entity entity) {
+        if (entity instanceof Player && entity.riding != this) {
+            ((Player) entity).resetInAirTicks(); // Hack: Don't kick players standing on a boat for flying
         }
-        this.dataProperties.putInt(DATA_VARIANT, this.woodID);
-        this.dataProperties.putBoolean(DATA_IS_BUOYANT, true);
-        this.dataProperties.putString(DATA_BUOYANCY_DATA, "{\"apply_gravity\":true,\"base_buoyancy\":1.0,\"big_wave_probability\":0.02999999932944775,\"big_wave_speed\":10.0,\"drag_down_on_buoyancy_removed\":0.0,\"liquid_blocks\":[\"minecraft:water\",\"minecraft:flowing_water\"],\"simulate_waves\":true}");
-    }
 
-    @Override
-    public float getHeight() {
-        return 0.455f;
-    }
+        if (this.passengers.size() < 2) {
+            if (!(entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || this.isPassenger(entity))) {
+                this.mountEntity(entity);
+            }
+        }
 
-    @Override
-    public float getWidth() {
-        return 1.4f;
-    }
+        if (this.riding == null && entity.riding != this && !entity.passengers.contains(this)) {
+            if (!entity.boundingBox.intersectsWith(this.boundingBox.grow(0.20000000298023224, -0.1, 0.20000000298023224))
+                    || entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR) {
+                return;
+            }
 
-    @Override
-    protected float getDrag() {
-        return 0.1f;
-    }
+            double diffX = entity.x - this.x;
+            double diffZ = entity.z - this.z;
 
-    @Override
-    protected float getGravity() {
-        return 0.04f;
-    }
+            double direction = NukkitMath.getDirection(diffX, diffZ);
 
-    @Override
-    public float getBaseOffset() {
-        return 0.375f;
-    }
+            if (direction >= 0.009999999776482582D) {
+                direction = Math.sqrt(direction);
+                diffX /= direction;
+                diffZ /= direction;
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+                double d3 = Math.min(1 / direction, 1);
+
+                diffX *= d3;
+                diffZ *= d3;
+                diffX *= 0.05000000074505806;
+                diffZ *= 0.05000000074505806;
+                diffX *= 1 + entityCollisionReduction;
+                diffZ *= 1 + entityCollisionReduction;
+
+                if (this.riding == null) {
+                    motionX -= diffX;
+                    motionZ -= diffZ;
+                }
+            }
+        }
     }
 
     @Override
@@ -113,6 +114,11 @@ public class EntityBoat extends EntityVehicle {
     }
 
     @Override
+    public boolean canPassThrough() {
+        return false;
+    }
+
+    @Override
     public void close() {
         super.close();
 
@@ -122,6 +128,25 @@ public class EntityBoat extends EntityVehicle {
                 passenger.riding = null; // Make sure it's really removed even if a plugin tries to cancel it
             }
         }
+    }
+
+    @Override
+    public boolean dismountEntity(Entity entity, boolean sendLinks) {
+        boolean r = super.dismountEntity(entity, sendLinks);
+
+        if (r) {
+            updatePassengers();
+            if (entity instanceof Player) {
+                entity.setDataPropertyAndSendOnlyToSelf(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0));
+            } else {
+                entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0), true);
+            }
+        }
+        return r;
+    }
+
+    protected void dropItem() {
+        this.level.dropItem(this, Item.get(Item.BOAT, this.woodID));
     }
 
     @Override
@@ -167,7 +192,9 @@ public class EntityBoat extends EntityVehicle {
         Location from = new Location(lastX, lastY, lastZ, lastYaw, lastPitch, level);
         Location to = new Location(this.x, this.y, this.z, this.yaw, this.pitch, level);
 
-        this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        if (!this.getServer().suomiCraftPEMode()) {
+            this.getServer().getPluginManager().callEvent(new VehicleUpdateEvent(this));
+        }
 
         if (!from.equals(to)) {
             this.getServer().getPluginManager().callEvent(new VehicleMoveEvent(this, from, to));
@@ -189,6 +216,200 @@ public class EntityBoat extends EntityVehicle {
 
         // We call super here after movement code so block collision checks use up to date position
         return super.entityBaseTick(tickDiff) || hasUpdate || !this.onGround || Math.abs(this.motionX) > 0.00001 || Math.abs(this.motionY) > 0.00001 || Math.abs(this.motionZ) > 0.00001;
+    }
+
+    @Override
+    public float getBaseOffset() {
+        return 0.375f;
+    }
+
+    @Override
+    protected float getDrag() {
+        return 0.1f;
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0.04f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.455f;
+    }
+
+    @Override
+    public String getInteractButtonText() {
+        return !this.isFull() ? "action.interact.ride.boat" : "";
+    }
+
+    @Override
+    public Vector3f getMountedOffset(Entity entity) {
+        return entity instanceof Player ? RIDER_PLAYER_OFFSET : RIDER_OFFSET;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    public int getVariant() {
+        return this.woodID;
+    }
+
+    public void setVariant(int variant) {
+        this.woodID = variant;
+        this.dataProperties.putInt(DATA_VARIANT, variant);
+    }
+
+    public double getWaterLevel() {
+        double maxY = this.boundingBox.getMinY() + getBaseOffset();
+        AxisAlignedBB.BBConsumer<Double> consumer = new SimpleAxisAlignedBB.BBConsumer<Double>() {
+
+            private double diffY = Double.MAX_VALUE;
+
+            @Override
+            public void accept(int x, int y, int z) {
+                Block block = EntityBoat.this.level.getBlock(EntityBoat.this.temporalVector.setComponents(x, y, z));
+                if (block instanceof BlockWater) {
+                    diffY = Math.min(maxY - block.getMaxY(), diffY);
+                }
+            }
+
+            @Override
+            public Double get() {
+                return diffY;
+            }
+        };
+
+        this.boundingBox.forEach(consumer);
+
+        return consumer.get();
+    }
+
+    @Override
+    public float getWidth() {
+        return 1.4f;
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                if (this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+                    this.dropItem();
+                }
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    protected void initEntity() {
+        this.setMaxHealth(40);
+        super.initEntity();
+
+        this.setHealth(40);
+
+        if (this.namedTag.contains("Variant")) {
+            this.woodID = this.namedTag.getInt("Variant");
+        }
+        this.dataProperties.putInt(DATA_VARIANT, this.woodID);
+        this.dataProperties.putBoolean(DATA_IS_BUOYANT, true);
+        this.dataProperties.putString(DATA_BUOYANCY_DATA, "{\"apply_gravity\":true,\"base_buoyancy\":1.0,\"big_wave_probability\":0.02999999932944775,\"big_wave_speed\":10.0,\"drag_down_on_buoyancy_removed\":0.0,\"liquid_blocks\":[\"minecraft:water\",\"minecraft:flowing_water\"],\"simulate_waves\":true}");
+    }
+
+    @Override
+    public boolean isControlling(Entity entity) {
+        return entity instanceof Player && this.passengers.indexOf(entity) == RIDER_INDEX;
+    }
+
+    public boolean isFull() {
+        return this.passengers.size() >= 2;
+    }
+
+    @Override
+    public void kill() {
+        if (!this.isAlive()) {
+            return;
+        }
+
+        super.kill();
+
+        if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
+            if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+                Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
+                if (damager instanceof Player && ((Player) damager).isCreative()) {
+                    return;
+                }
+            }
+            this.dropItem();
+        }
+    }
+
+    @Override
+    public boolean mountEntity(Entity entity, byte mode) {
+        boolean player = !this.passengers.isEmpty() && this.passengers.get(RIDER_INDEX) instanceof Player;
+        mode = SetEntityLinkPacket.TYPE_PASSENGER;
+
+        if (!player && (entity instanceof Player || this.passengers.isEmpty())) {
+            mode = SetEntityLinkPacket.TYPE_RIDE;
+        }
+
+        boolean r = super.mountEntity(entity, mode);
+
+        if (r) {
+            updatePassengers(true);
+
+            entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1), !(entity instanceof Player));
+            if (entity instanceof Player) {
+                entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90), false);
+                if (((Player) entity).protocol < ProtocolInfo.v1_21_130_28) {
+                    entity.setDataProperty(new FloatEntityData(DATA_RIDER_MIN_ROTATION, 1), false);
+                }
+                if (((Player) entity).protocol >= ProtocolInfo.v1_16_210) {
+                    entity.setDataProperty(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90), false);
+                }
+                entity.sendData(((Player) entity));
+            }
+        }
+
+        return r;
+    }
+
+    public void onInput(double x, double y, double z, double yaw) {
+        this.setPositionAndRotation(this.temporalVector.setComponents(x, y - this.getBaseOffset(), z), yaw % 360, 0);
+    }
+
+    @Override
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (this.isFull() || getWaterLevel() < -SINKING_DEPTH) {
+            return false;
+        }
+
+        this.mountEntity(player);
+        return super.onInteract(player, item, clickedPos);
+    }
+
+    public void onPaddle(AnimatePacket.Action animation, float value) {
+        int propertyId = animation == AnimatePacket.Action.ROW_RIGHT ? DATA_PADDLE_TIME_RIGHT : DATA_PADDLE_TIME_LEFT;
+
+        if (getDataPropertyFloat(propertyId) != value) {
+            this.setDataProperty(new FloatEntityData(propertyId, value));
+        }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putInt("Variant", this.woodID);
+    }
+
+    @Override
+    protected void updatePassengerPosition(Entity passenger) {
+        updatePassengers();
     }
 
     public void updatePassengers() {
@@ -249,201 +470,5 @@ public class EntityBoat extends EntityVehicle {
                 super.updatePassengerPosition(passenger);
             }
         }
-    }
-
-    public double getWaterLevel() {
-        double maxY = this.boundingBox.getMinY() + getBaseOffset();
-        AxisAlignedBB.BBConsumer<Double> consumer = new SimpleAxisAlignedBB.BBConsumer<Double>() {
-
-            private double diffY = Double.MAX_VALUE;
-
-            @Override
-            public void accept(int x, int y, int z) {
-                Block block = EntityBoat.this.level.getBlock(EntityBoat.this.temporalVector.setComponents(x, y, z));
-                if (block instanceof BlockWater) {
-                    diffY = Math.min(maxY - block.getMaxY(), diffY);
-                }
-            }
-
-            @Override
-            public Double get() {
-                return diffY;
-            }
-        };
-
-        this.boundingBox.forEach(consumer);
-
-        return consumer.get();
-    }
-
-    @Override
-    public boolean mountEntity(Entity entity, byte mode) {
-        boolean player = !this.passengers.isEmpty() && this.passengers.get(RIDER_INDEX) instanceof Player;
-        mode = SetEntityLinkPacket.TYPE_PASSENGER;
-
-        if (!player && (entity instanceof Player || this.passengers.isEmpty())) {
-            mode = SetEntityLinkPacket.TYPE_RIDE;
-        }
-
-        boolean r = super.mountEntity(entity, mode);
-
-        if (r) {
-            updatePassengers(true);
-
-            entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 1), !(entity instanceof Player));
-            if (entity instanceof Player) {
-                entity.setDataProperty(new FloatEntityData(DATA_RIDER_MAX_ROTATION, 90), false);
-                entity.setDataProperty(new FloatEntityData(DATA_RIDER_MIN_ROTATION, 1), false);
-                entity.setDataProperty(new FloatEntityData(DATA_RIDER_ROTATION_OFFSET, -90), false);
-                entity.sendData(((Player) entity));
-            }
-        }
-
-        return r;
-    }
-
-    @Override
-    protected void updatePassengerPosition(Entity passenger) {
-        updatePassengers();
-    }
-
-    @Override
-    public boolean dismountEntity(Entity entity, boolean sendLinks) {
-        boolean r = super.dismountEntity(entity, sendLinks);
-
-        if (r) {
-            updatePassengers();
-            entity.setDataProperty(new ByteEntityData(DATA_RIDER_ROTATION_LOCKED, 0), true);
-        }
-        return r;
-    }
-
-    @Override
-    public boolean isControlling(Entity entity) {
-        return entity instanceof Player && this.passengers.indexOf(entity) == RIDER_INDEX;
-    }
-
-    @Override
-    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (this.isFull() || getWaterLevel() < -SINKING_DEPTH) {
-            return false;
-        }
-
-        this.mountEntity(player);
-        return super.onInteract(player, item, clickedPos);
-    }
-
-    @Override
-    public Vector3f getMountedOffset(Entity entity) {
-        return entity instanceof Player ? RIDER_PLAYER_OFFSET : RIDER_OFFSET;
-    }
-
-    public void onPaddle(AnimatePacket.Action animation, float value) {
-        int propertyId = animation == AnimatePacket.Action.ROW_RIGHT ? DATA_PADDLE_TIME_RIGHT : DATA_PADDLE_TIME_LEFT;
-
-        if (getDataPropertyFloat(propertyId) != value) {
-            this.setDataProperty(new FloatEntityData(propertyId, value));
-        }
-    }
-
-    @Override
-    public void applyEntityCollision(Entity entity) {
-        if (entity instanceof Player && entity.riding != this) {
-            ((Player) entity).resetInAirTicks(); // Hack: Don't kick players standing on a boat for flying
-        }
-
-        if (this.passengers.size() < 2) {
-            if (!(entity.riding != null || !(entity instanceof EntityLiving) || entity instanceof Player || entity instanceof EntityWaterAnimal || this.isPassenger(entity))) {
-                this.mountEntity(entity);
-            }
-        }
-
-        if (this.riding == null && entity.riding != this && !entity.passengers.contains(this)) {
-            if (!entity.boundingBox.intersectsWith(this.boundingBox.grow(0.20000000298023224, -0.1, 0.20000000298023224))
-                    || entity instanceof Player && ((Player) entity).getGamemode() == Player.SPECTATOR) {
-                return;
-            }
-
-            double diffX = entity.x - this.x;
-            double diffZ = entity.z - this.z;
-
-            double direction = NukkitMath.getDirection(diffX, diffZ);
-
-            if (direction >= 0.009999999776482582D) {
-                direction = Math.sqrt(direction);
-                diffX /= direction;
-                diffZ /= direction;
-
-                double d3 = Math.min(1 / direction, 1);
-
-                diffX *= d3;
-                diffZ *= d3;
-                diffX *= 0.05000000074505806;
-                diffZ *= 0.05000000074505806;
-                diffX *= 1 + entityCollisionReduction;
-                diffZ *= 1 + entityCollisionReduction;
-
-                if (this.riding == null) {
-                    motionX -= diffX;
-                    motionZ -= diffZ;
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return false;
-    }
-
-    @Override
-    public void kill() {
-        if (!this.isAlive()) {
-            return;
-        }
-
-        super.kill();
-
-        if (level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS)) {
-            if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-                Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
-                if (damager instanceof Player && ((Player) damager).isCreative()) {
-                    return;
-                }
-            }
-            this.dropItem();
-        }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putInt("Variant", this.woodID);
-    }
-
-    public int getVariant() {
-        return this.woodID;
-    }
-
-    public void setVariant(int variant) {
-        this.woodID = variant;
-        this.dataProperties.putInt(DATA_VARIANT, variant);
-    }
-
-    public void onInput(double x, double y, double z, double yaw) {
-        this.setPositionAndRotation(this.temporalVector.setComponents(x, y - this.getBaseOffset(), z), yaw % 360, 0);
-    }
-
-    public boolean isFull() {
-        return this.passengers.size() >= 2;
-    }
-
-    @Override
-    public String getInteractButtonText() {
-        return !this.isFull() ? "action.interact.ride.boat" : "";
-    }
-
-    protected void dropItem() {
-        this.level.dropItem(this, Item.get(Item.BOAT, this.woodID));
     }
 }

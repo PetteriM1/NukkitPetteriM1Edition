@@ -24,35 +24,6 @@ public class SmithingInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.SMITHING_TABLE, 51, position);
     }
 
-    public Item getResult() {
-        Item trimOutput = this.getTrimOutputItem();
-        if (trimOutput != null) {
-            return trimOutput;
-        }
-
-        SmithingRecipe recipe = Server.getInstance().getCraftingManager().matchSmithingRecipe(Arrays.asList(getEquipment(), getIngredient(), getTemplate()));
-        if (recipe == null) {
-            return Item.get(0);
-        }
-
-        return recipe.getFinalResult(getEquipment(), getTemplate());
-    }
-
-    private Item getTrimOutputItem() {
-        Item ingredient = getIngredient();
-        Item template = getTemplate();
-
-        if (ingredient instanceof ItemTrimMaterial && template instanceof ItemTrimPattern) {
-            Item input = getEquipment();
-
-            if (input instanceof ItemArmor) {
-                return ((ItemArmor) input).setArmorTrim(((ItemTrimPattern) template).getPattern(), ((ItemTrimMaterial) ingredient).getMaterial());
-            }
-        }
-
-        return null;
-    }
-
     public Item getEquipment() {
         return getItem(EQUIPMENT);
     }
@@ -69,12 +40,41 @@ public class SmithingInventory extends FakeBlockUIComponent {
         setItem(INGREDIENT, ingredient);
     }
 
+    public Item getResult() {
+        Item trimOutput = this.getTrimOutputItem();
+        if (trimOutput != null) {
+            return trimOutput;
+        }
+
+        SmithingRecipe recipe = Server.getInstance().getCraftingManager().matchSmithingRecipe(Arrays.asList(getEquipment(), getIngredient(), getTemplate()));
+        if (recipe == null) {
+            return Item.get(0);
+        }
+
+        return recipe.getFinalResult(getEquipment(), getTemplate());
+    }
+
     public Item getTemplate() {
         return getItem(TEMPLATE);
     }
 
     public void setTemplate(Item template) {
         setItem(TEMPLATE, template);
+    }
+
+    private Item getTrimOutputItem() {
+        Item ingredient = getIngredient();
+        Item template = getTemplate();
+
+        if (ingredient instanceof ItemTrimMaterial && template instanceof ItemTrimPattern) {
+            Item input = getEquipment();
+
+            if (input instanceof ItemArmor) {
+                return ((ItemArmor) input).setArmorTrim(((ItemTrimPattern) template).getPattern(), ((ItemTrimMaterial) ingredient).getMaterial());
+            }
+        }
+
+        return null;
     }
 
     @Override

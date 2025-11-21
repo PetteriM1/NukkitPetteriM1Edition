@@ -21,38 +21,18 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Cobweb";
-    }
-
-    @Override
-    public int getId() {
-        return COBWEB;
-    }
-
-    @Override
-    public double getHardness() {
-        return 4;
-    }
-
-    @Override
-    public double getResistance() {
-        return 20;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SWORD;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
+    public boolean breakWhenPushed() {
         return true;
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        entity.resetFallDistance();
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.CLOTH_BLOCK_COLOR;
     }
 
     @Override
@@ -71,18 +51,28 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CLOTH_BLOCK_COLOR;
+    public double getHardness() {
+        return 4;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return COBWEB;
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return this;
+    public String getName() {
+        return "Cobweb";
+    }
+
+    @Override
+    public double getResistance() {
+        return 20;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SWORD;
     }
 
     @Override
@@ -91,7 +81,17 @@ public class BlockCobweb extends BlockFlowable {
     }
 
     @Override
-    public boolean breakWhenPushed() {
+    public boolean hasEntityCollision() {
         return true;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        entity.resetFallDistance();
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return this;
     }
 }

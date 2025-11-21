@@ -12,13 +12,13 @@ public class ObjectJungleTree extends ObjectTree {
     private int treeHeight = 8;
 
     @Override
-    public int getType() {
-        return BlockWood.JUNGLE;
+    public int getTreeHeight() {
+        return this.treeHeight;
     }
 
     @Override
-    public int getTreeHeight() {
-        return this.treeHeight;
+    public int getType() {
+        return BlockWood.JUNGLE;
     }
 
     @Override

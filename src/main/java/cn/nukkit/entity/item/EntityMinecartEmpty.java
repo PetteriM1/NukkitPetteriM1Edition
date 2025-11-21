@@ -22,24 +22,9 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
     private static final Vector3f RIDER_OFFSET = new Vector3f(0f, -0.35f);
     private static final Vector3f RIDER_PLAYER_OFFSET = new Vector3f(0f, 0.525f);
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
     public EntityMinecartEmpty(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         setName("Minecart");
-    }
-
-    @Override
-    public MinecartType getType() {
-        return MinecartType.valueOf(0);
-    }
-    
-    @Override
-    public boolean isRideable() {
-        return true;
     }
 
     @Override
@@ -70,5 +55,20 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
     @Override
     public Vector3f getMountedOffset(Entity entity) {
         return entity instanceof Player ? RIDER_PLAYER_OFFSET : RIDER_OFFSET;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public MinecartType getType() {
+        return MinecartType.valueOf(0);
+    }
+
+    @Override
+    public boolean isRideable() {
+        return true;
     }
 }

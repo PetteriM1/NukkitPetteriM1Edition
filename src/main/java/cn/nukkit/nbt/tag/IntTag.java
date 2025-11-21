@@ -9,16 +9,6 @@ public class IntTag extends NumberTag<Integer> {
 
     public int data;
 
-    @Override
-    public Integer getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Integer data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public IntTag(String name) {
         super(name);
     }
@@ -26,31 +16,6 @@ public class IntTag extends NumberTag<Integer> {
     public IntTag(String name, int data) {
         super(name);
         this.data = data;
-    }
-
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeInt(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readInt();
-    }
-
-    @Override
-    public Integer parseValue() {
-        return this.data;
-    }
-
-    @Override
-    public byte getId() {
-        return TAG_Int;
-    }
-
-    @Override
-    public String toString() {
-        return "IntTag " + this.getName() + "(data: " + data + ')';
     }
 
     @Override
@@ -65,5 +30,40 @@ public class IntTag extends NumberTag<Integer> {
             return data == o.data;
         }
         return false;
+    }
+
+    @Override
+    public Integer getData() {
+        return data;
+    }
+
+    @Override
+    public void setData(Integer data) {
+        this.data = data == null ? 0 : data;
+    }
+
+    @Override
+    public byte getId() {
+        return TAG_Int;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readInt();
+    }
+
+    @Override
+    public Integer parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "IntTag " + this.getName() + "(data: " + data + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeInt(data);
     }
 }

@@ -15,13 +15,13 @@ public class BlockDandelion extends BlockFlower {
     }
 
     @Override
-    public String getName() {
-        return "Dandelion";
+    public int getId() {
+        return DANDELION;
     }
 
     @Override
-    public int getId() {
-        return DANDELION;
+    public String getName() {
+        return "Dandelion";
     }
 
     @Override

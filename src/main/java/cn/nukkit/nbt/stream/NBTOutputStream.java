@@ -33,6 +33,11 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
         this.network = network;
     }
 
+    @Override
+    public void close() throws IOException {
+        this.stream.close();
+    }
+
     public ByteOrder getEndianness() {
         return endianness;
     }
@@ -67,11 +72,8 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
     }
 
     @Override
-    public void writeShort(int v) throws IOException {
-        if (endianness == ByteOrder.LITTLE_ENDIAN) {
-            v = Integer.reverseBytes(v) >> 16;
-        }
-        this.stream.writeShort(v);
+    public void writeBytes(String s) throws IOException {
+        this.stream.writeBytes(s);
     }
 
     @Override
@@ -80,6 +82,29 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
             v = Character.reverseBytes((char) v);
         }
         this.stream.writeChar(v);
+    }
+
+    @Override
+    public void writeChars(String s) throws IOException {
+        this.stream.writeChars(s);
+    }
+
+    @Override
+    public void writeDouble(double v) throws IOException {
+        long l = Double.doubleToLongBits(v);
+        if (endianness == ByteOrder.LITTLE_ENDIAN) {
+            l = Long.reverseBytes(l);
+        }
+        this.stream.writeLong(l);
+    }
+
+    @Override
+    public void writeFloat(float v) throws IOException {
+        int i = Float.floatToIntBits(v);
+        if (endianness == ByteOrder.LITTLE_ENDIAN) {
+            i = Integer.reverseBytes(i);
+        }
+        this.stream.writeInt(i);
     }
 
     @Override
@@ -107,31 +132,11 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
     }
 
     @Override
-    public void writeFloat(float v) throws IOException {
-        int i = Float.floatToIntBits(v);
+    public void writeShort(int v) throws IOException {
         if (endianness == ByteOrder.LITTLE_ENDIAN) {
-            i = Integer.reverseBytes(i);
+            v = Integer.reverseBytes(v) >> 16;
         }
-        this.stream.writeInt(i);
-    }
-
-    @Override
-    public void writeDouble(double v) throws IOException {
-        long l = Double.doubleToLongBits(v);
-        if (endianness == ByteOrder.LITTLE_ENDIAN) {
-            l = Long.reverseBytes(l);
-        }
-        this.stream.writeLong(l);
-    }
-
-    @Override
-    public void writeBytes(String s) throws IOException {
-        this.stream.writeBytes(s);
-    }
-
-    @Override
-    public void writeChars(String s) throws IOException {
-        this.stream.writeChars(s);
+        this.stream.writeShort(v);
     }
 
     @Override
@@ -143,10 +148,5 @@ public class NBTOutputStream implements DataOutput, AutoCloseable {
             this.writeShort(bytes.length);
         }
         this.stream.write(bytes);
-    }
-
-    @Override
-    public void close() throws IOException {
-        this.stream.close();
     }
 }

@@ -10,6 +10,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public abstract class ItemChestBoat extends Item {
 
@@ -20,6 +21,18 @@ public abstract class ItemChestBoat extends Item {
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 1;
+    }
+
+    protected abstract int getVariant();
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_19_0_29;
     }
 
     @Override
@@ -47,12 +60,5 @@ public abstract class ItemChestBoat extends Item {
 
         boat.spawnToAll();
         return true;
-    }
-
-    protected abstract int getVariant();
-
-    @Override
-    public int getMaxStackSize() {
-        return 1;
     }
 }

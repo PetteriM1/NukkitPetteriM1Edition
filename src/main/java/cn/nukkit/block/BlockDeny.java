@@ -5,8 +5,13 @@ import cn.nukkit.item.Item;
 public class BlockDeny extends BlockSolid {
 
     @Override
-    public int getId() {
-        return DENY;
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -15,8 +20,8 @@ public class BlockDeny extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 18000000;
+    public int getId() {
+        return DENY;
     }
 
     @Override
@@ -25,17 +30,12 @@ public class BlockDeny extends BlockSolid {
     }
 
     @Override
+    public double getResistance() {
+        return 18000000;
+    }
+
+    @Override
     public boolean isBreakable(Item item) {
-        return false;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
         return false;
     }
 }

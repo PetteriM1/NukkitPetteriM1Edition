@@ -1,6 +1,7 @@
 package cn.nukkit.item;
 
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class ItemPotionLingering extends ProjectileItem {
 
@@ -17,13 +18,18 @@ public class ItemPotionLingering extends ProjectileItem {
     }
 
     @Override
-    public int getMaxStackSize() {
-        return 1;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    protected void correctNBT(CompoundTag nbt) {
+        nbt.putInt("PotionId", this.meta);
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 1;
     }
 
     @Override
@@ -37,7 +43,14 @@ public class ItemPotionLingering extends ProjectileItem {
     }
 
     @Override
-    protected void correctNBT(CompoundTag nbt) {
-        nbt.putInt("PotionId", this.meta);
+    public boolean isSupportedOn(int protocol) {
+        int damage = this.getDamage();
+        if (damage < 42) {
+            return true;
+        }
+        if (damage == 42) {
+            return protocol >= ProtocolInfo.v1_16_0;
+        }
+        return protocol >= ProtocolInfo.v1_21_0; // lingering potion has different version changelog than others?
     }
 }

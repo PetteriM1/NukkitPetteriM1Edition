@@ -12,33 +12,11 @@ import cn.nukkit.utils.Zlib;
  */
 public abstract class DataPacket extends BinaryStream implements Cloneable {
 
+    public int protocol = Integer.MAX_VALUE;
     public volatile boolean isEncoded = false;
 
-    public abstract byte pid();
-
-    public abstract void decode();
-
-    public abstract void encode();
-
-    public final void tryEncode() {
-        if (!this.isEncoded) {
-            this.isEncoded = true;
-            this.encode();
-        }
-    }
-
-    @Override
-    public DataPacket reset() {
-        super.reset();
-
-        byte packetId = this.pid();
-        if (packetId < 0 && packetId >= -56) { // Hack: (byte) 200+ --> (int) 300+
-            this.putUnsignedVarInt(packetId + 356);
-        } else {
-            this.putUnsignedVarInt(packetId & 0xff);
-        }
-
-        return this;
+    static int CONST(@SuppressWarnings("SameParameterValue") int i) {
+        return i;
     }
 
     public DataPacket clean() {
@@ -52,7 +30,7 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
     public DataPacket clone() {
         try {
             DataPacket packet = (DataPacket) super.clone();
-            packet.setBuffer(this.getBuffer()); // prevent reflecting same buffer instance
+            packet.setBuffer(this.count < 0 ? null : this.getBuffer()); // prevent reflecting same buffer instance
             packet.offset = this.offset;
             packet.count = this.count;
             return packet;
@@ -73,10 +51,12 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         try {
             byte[] bytes = stream.getBuffer();
             BatchPacket batched = new BatchPacket();
-            if (Server.getInstance().useSnappy) {
+            if (Server.getInstance().useSnappy && protocol >= ProtocolInfo.v1_19_30_23) {
                 batched.payload = SnappyCompression.compress(bytes);
-            } else {
+            } else if (protocol >= ProtocolInfo.v1_16_0) {
                 batched.payload = Zlib.deflateRaw(bytes, level);
+            } else {
+                batched.payload = Zlib.deflatePre16Packet(bytes, level);
             }
             return batched;
         } catch (Exception e) {
@@ -84,16 +64,47 @@ public abstract class DataPacket extends BinaryStream implements Cloneable {
         }
     }
 
+    public abstract void decode();
+
     void decodeUnsupported() {
         if (Nukkit.DEBUG > 1) {
             Server.getInstance().getLogger().debug("Warning: decode() not implemented for " + this.getClass().getName());
         }
     }
 
+    public abstract void encode();
+
     void encodeUnsupported() {
         if (Nukkit.DEBUG > 1) {
             Server.getInstance().getLogger().debug("Warning: encode() not implemented for " + this.getClass().getName());
             Thread.dumpStack();
+        }
+    }
+
+    public abstract byte pid();
+
+    @Override
+    public DataPacket reset() {
+        super.reset();
+        if (protocol == Integer.MAX_VALUE && Server.getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+            Server.getInstance().getLogger().warning("DataPacket#reset() called before protocol was set. This can crash multiversion clients.", new Throwable(""));
+        }
+        byte packetId = this.pid();
+        if (protocol <= 274) {
+            this.putByte(packetId);
+            this.putShort(0);
+        } else if (packetId < 0 && packetId >= -56) { // Hack: (byte) 200+ --> (int) 300+
+            this.putUnsignedVarInt(packetId + 356);
+        } else {
+            this.putUnsignedVarInt(packetId & 0xff);
+        }
+        return this;
+    }
+
+    public final void tryEncode() {
+        if (!this.isEncoded) {
+            this.isEncoded = true;
+            this.encode();
         }
     }
 }

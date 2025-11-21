@@ -6,28 +6,8 @@ import cn.nukkit.item.ItemTool;
 public class BlockNetherReactor extends BlockSolid {
 
     @Override
-    public int getId() {
-        return NETHER_REACTOR;
-    }
-
-    @Override
-    public String getName() {
-        return "Nether Reactor Core";
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -38,7 +18,27 @@ public class BlockNetherReactor extends BlockSolid {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public int getId() {
+        return NETHER_REACTOR;
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Reactor Core";
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

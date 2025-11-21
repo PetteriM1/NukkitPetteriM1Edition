@@ -14,22 +14,6 @@ import cn.nukkit.level.generator.Normal;
  */
 public abstract class CoveredBiome extends Biome {
 
-    public int getCoverId(int x, int z) {
-        return 0;
-    }
-
-    public int getSurfaceDepth(int x, int y, int z) {
-        return 1;
-    }
-
-    public abstract int getSurfaceId(int x, int y, int z);
-
-    public int getGroundDepth(int x, int y, int z) {
-        return 4;
-    }
-
-    public abstract int getGroundId(int x, int y, int z);
-
     public void doCover(int x, int z, FullChunk chunk) {
         final int fullX = (chunk.getX() << 4) | x;
         final int fullZ = (chunk.getZ() << 4) | z;
@@ -73,4 +57,20 @@ public abstract class CoveredBiome extends Biome {
             }
         }
     }
+
+    public int getCoverId(int x, int z) {
+        return 0;
+    }
+
+    public int getGroundDepth(int x, int y, int z) {
+        return 4;
+    }
+
+    public abstract int getGroundId(int x, int y, int z);
+
+    public int getSurfaceDepth(int x, int y, int z) {
+        return 1;
+    }
+
+    public abstract int getSurfaceId(int x, int y, int z);
 }

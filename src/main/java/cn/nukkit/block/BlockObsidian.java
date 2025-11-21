@@ -11,28 +11,18 @@ import cn.nukkit.utils.BlockColor;
 public class BlockObsidian extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Obsidian";
+    public boolean canBePushed() {
+        return false;
     }
 
     @Override
-    public int getId() {
-        return OBSIDIAN;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 35;
-    }
-
-    @Override
-    public double getResistance() {
-        return 6000;
+    public BlockColor getColor() {
+        return BlockColor.OBSIDIAN_BLOCK_COLOR;
     }
 
     @Override
@@ -44,6 +34,31 @@ public class BlockObsidian extends BlockSolid {
         } else {
             return new Item[0];
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 50; //35
+    }
+
+    @Override
+    public int getId() {
+        return OBSIDIAN;
+    }
+
+    @Override
+    public String getName() {
+        return "Obsidian";
+    }
+
+    @Override
+    public double getResistance() {
+        return 6000;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -60,20 +75,5 @@ public class BlockObsidian extends BlockSolid {
             }
         }
         return super.onBreak(item);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.OBSIDIAN_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

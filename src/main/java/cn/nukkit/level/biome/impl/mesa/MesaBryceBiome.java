@@ -6,13 +6,13 @@ package cn.nukkit.level.biome.impl.mesa;
 public class MesaBryceBiome extends MesaBiome {
 
     @Override
-    public String getName() {
-        return "Mesa (Bryce)";
+    protected float getMoundFrequency() {
+        return 0.0625f;
     }
 
     @Override
-    protected float getMoundFrequency() {
-        return 0.0625f;
+    public String getName() {
+        return "Mesa (Bryce)";
     }
 
     @Override

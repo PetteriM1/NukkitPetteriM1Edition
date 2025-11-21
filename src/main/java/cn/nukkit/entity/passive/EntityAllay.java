@@ -12,6 +12,21 @@ public class EntityAllay extends EntityFlyingAnimal {
     }
 
     @Override
+    public boolean canDespawn() {
+        return false;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.6f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 0;
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
@@ -22,18 +37,8 @@ public class EntityAllay extends EntityFlyingAnimal {
     }
 
     @Override
-    public float getHeight() {
-        return 0.6f;
-    }
-
-    @Override
     public void initEntity() {
         this.setMaxHealth(20);
         super.initEntity();
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 0;
     }
 }

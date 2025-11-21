@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 
 interface ChunkSectionSerializer {
 
-    void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection);
-
     StateBlockStorage[] deserialize(ByteBuf buf, ChunkBuilder builder);
+
+    void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection);
 }

@@ -10,6 +10,8 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.ChunkException;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.io.File;
@@ -30,28 +32,36 @@ public class Anvil extends BaseLevelProvider {
     public Anvil(Level level, String path) throws IOException {
         super(level, path);
     }
+    private int lastPosition = 0;
 
     @SuppressWarnings("unused")
-    public static String getProviderName() {
-        return "anvil";
+    public static ChunkSection createChunkSection(int y) {
+        return new ChunkSection(y);
     }
 
-    @SuppressWarnings("unused")
-    public static boolean usesChunkSection() {
-        return true;
-    }
-
-    public static boolean isValid(String path) {
-        boolean isValid = (new File(path + "/level.dat").exists()) && new File(path + "/region/").isDirectory();
-        if (isValid) {
-            for (File file : new File(path + "/region/").listFiles((dir, name) -> Pattern.matches("^.+\\.mc[r|a]$", name))) {
-                if (!file.getName().endsWith(".mca")) {
-                    isValid = false;
-                    break;
+    @Override
+    public void doGarbageCollection(long time) {
+        long start = System.currentTimeMillis();
+        int maxIterations = size();
+        if (lastPosition > maxIterations) lastPosition = 0;
+        int i;
+        synchronized (chunks) {
+            ObjectIterator<BaseFullChunk> iter = chunks.values().iterator();
+            if (lastPosition != 0) iter.skip(lastPosition);
+            for (i = 0; i < maxIterations; i++) {
+                if (!iter.hasNext()) {
+                    iter = chunks.values().iterator();
+                }
+                if (!iter.hasNext()) break;
+                BaseFullChunk chunk = iter.next();
+                if (chunk == null) continue;
+                if (chunk.isGenerated() && chunk.isPopulated() && chunk instanceof Chunk) {
+                    chunk.compress();
+                    if (System.currentTimeMillis() - start >= time) break;
                 }
             }
         }
-        return isValid;
+        lastPosition += i;
     }
 
     public static void generate(String path, String name, long seed, Class<? extends Generator> generator) throws IOException {
@@ -94,43 +104,22 @@ public class Anvil extends BaseLevelProvider {
         return Chunk.getEmptyChunk(chunkX, chunkZ, this);
     }
 
-    @Override
-    public void requestChunkTask(int x, int z) throws ChunkException {
-        Chunk chunk = (Chunk) this.getChunk(x, z, false);
-        if (chunk == null) {
-            throw new ChunkException("Invalid chunk set (" + x + ", " + z + ')');
-        }
-
-        long timestamp = chunk.getChanges();
-
-        level.asyncChunk(chunk.cloneForChunkSending(), timestamp, x, z);
+    @SuppressWarnings("unused")
+    public static String getProviderName() {
+        return "anvil";
     }
 
-    private int lastPosition = 0;
-
-    @Override
-    public void doGarbageCollection(long time) {
-        long start = System.currentTimeMillis();
-        int maxIterations = size();
-        if (lastPosition > maxIterations) lastPosition = 0;
-        int i;
-        synchronized (chunks) {
-            ObjectIterator<BaseFullChunk> iter = chunks.values().iterator();
-            if (lastPosition != 0) iter.skip(lastPosition);
-            for (i = 0; i < maxIterations; i++) {
-                if (!iter.hasNext()) {
-                    iter = chunks.values().iterator();
-                }
-                if (!iter.hasNext()) break;
-                BaseFullChunk chunk = iter.next();
-                if (chunk == null) continue;
-                if (chunk.isGenerated() && chunk.isPopulated() && chunk instanceof Chunk) {
-                    chunk.compress();
-                    if (System.currentTimeMillis() - start >= time) break;
+    public static boolean isValid(String path) {
+        boolean isValid = (new File(path + "/level.dat").exists()) && new File(path + "/region/").isDirectory();
+        if (isValid) {
+            for (File file : new File(path + "/region/").listFiles((dir, name) -> Pattern.matches("^.+\\.mc[r|a]$", name))) {
+                if (!file.getName().endsWith(".mca")) {
+                    isValid = false;
+                    break;
                 }
             }
         }
-        lastPosition += i;
+        return isValid;
     }
 
     @Override
@@ -143,6 +132,7 @@ public class Anvil extends BaseLevelProvider {
             chunk = region.readChunk(chunkX - (regionX << 5), chunkZ - (regionZ << 5));
         } catch (IOException ex) {
             Server.getInstance().getLogger().error("Failed to read chunk " + chunkX + ", " + chunkZ, ex);
+            ExceptionHandler.handleSilently(ex);
         }
 
         if (chunk == null) {
@@ -154,6 +144,39 @@ public class Anvil extends BaseLevelProvider {
             putChunk(index, chunk);
         }
         return chunk;
+    }
+
+    protected synchronized BaseRegionLoader loadRegion(int x, int z) {
+        BaseRegionLoader tmp = lastRegion.get();
+        if (tmp != null && x == tmp.getX() && z == tmp.getZ()) {
+            return tmp;
+        }
+        long index = Level.chunkHash(x, z);
+        synchronized (regions) {
+            BaseRegionLoader region = this.regions.get(index);
+            if (region == null) {
+                try {
+                    region = new RegionLoader(this, x, z);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                this.regions.put(index, region);
+            }
+            lastRegion.set(region);
+            return region;
+        }
+    }
+
+    @Override
+    public void requestChunkTask(IntSet protocols, int x, int z) throws ChunkException {
+        Chunk chunk = (Chunk) this.getChunk(x, z, false);
+        if (chunk == null) {
+            throw new ChunkException("Invalid chunk set (" + x + ", " + z + ')');
+        }
+
+        long timestamp = chunk.getChanges();
+
+        level.asyncChunk(protocols, chunk.cloneForChunkSending(), timestamp, x, z);
     }
 
     @Override
@@ -186,28 +209,7 @@ public class Anvil extends BaseLevelProvider {
     }
 
     @SuppressWarnings("unused")
-    public static ChunkSection createChunkSection(int y) {
-        return new ChunkSection(y);
-    }
-
-    protected synchronized BaseRegionLoader loadRegion(int x, int z) {
-        BaseRegionLoader tmp = lastRegion.get();
-        if (tmp != null && x == tmp.getX() && z == tmp.getZ()) {
-            return tmp;
-        }
-        long index = Level.chunkHash(x, z);
-        synchronized (regions) {
-            BaseRegionLoader region = this.regions.get(index);
-            if (region == null) {
-                try {
-                    region = new RegionLoader(this, x, z);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                this.regions.put(index, region);
-            }
-            lastRegion.set(region);
-            return region;
-        }
+    public static boolean usesChunkSection() {
+        return true;
     }
 }

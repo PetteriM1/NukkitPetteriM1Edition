@@ -11,12 +11,12 @@ public class BlockStairsMossyCobblestone extends BlockStairsCobblestone {
     }
 
     @Override
-    public String getName() {
-        return "Mossy Cobblestone Stairs";
+    public int getId() {
+        return MOSSY_COBBLESTONE_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return MOSSY_COBBLESTONE_STAIRS;
+    public String getName() {
+        return "Mossy Cobblestone Stairs";
     }
 }

@@ -15,8 +15,8 @@ public class BlockPumpkinLit extends BlockPumpkin {
     }
 
     @Override
-    public String getName() {
-        return "Jack o'Lantern";
+    public boolean canBeActivated() {
+        return false;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class BlockPumpkinLit extends BlockPumpkin {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return false;
+    public String getName() {
+        return "Jack o'Lantern";
     }
 }

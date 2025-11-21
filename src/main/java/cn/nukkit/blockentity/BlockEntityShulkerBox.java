@@ -24,6 +24,84 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
     }
 
     @Override
+    public void close() {
+        if (!this.closed && this.inventory != null) {
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
+            }
+        }
+
+        super.close();
+    }
+
+    @Override
+    public BaseInventory getInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        return this.inventory;
+    }
+
+    @Override
+    public Item getItem(int index) {
+        int i = this.getSlotIndex(index);
+        if (i < 0) {
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+        } else {
+            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+            return NBTIO.getItemHelper(data);
+        }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Shulker Box";
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
+    }
+
+    @Override
+    public int getSize() {
+        return 27;
+    }
+
+    protected int getSlotIndex(int index) {
+        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getByte("Slot") == index) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = getDefaultCompound(this, SHULKER_BOX)
+                .putByte("facing", this.namedTag.getByte("facing"));
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
+    @Override
     protected void initBlockEntity() {
         if (!this.namedTag.contains("facing")) {
             this.namedTag.putByte("facing", 0);
@@ -49,14 +127,9 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
     }
 
     @Override
-    public void close() {
-        if (!this.closed && this.inventory != null) {
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-        }
-
-        super.close();
+    public boolean isBlockEntityValid() {
+        int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
+        return blockID == Block.SHULKER_BOX || blockID == Block.UNDYED_SHULKER_BOX;
     }
 
     @Override
@@ -68,39 +141,6 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
             for (int index = 0; index < this.getSize(); index++) {
                 this.setItem(index, this.inventory.getItem(index));
             }
-        }
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
-        return blockID == Block.SHULKER_BOX || blockID == Block.UNDYED_SHULKER_BOX;
-    }
-
-    @Override
-    public int getSize() {
-        return 27;
-    }
-
-    protected int getSlotIndex(int index) {
-        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getByte("Slot") == index) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return NBTIO.getItemHelper(data);
         }
     }
 
@@ -119,45 +159,5 @@ public class BlockEntityShulkerBox extends BlockEntitySpawnable implements Inven
         } else {
             (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
         }
-    }
-
-    @Override
-    public BaseInventory getInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        return this.inventory;
-    }
-
-    @Override
-    public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Shulker Box";
-    }
-
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
-    }
-
-    @Override
-    public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            this.namedTag.remove("CustomName");
-            return;
-        }
-
-        this.namedTag.putString("CustomName", name);
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = getDefaultCompound(this, SHULKER_BOX)
-                .putByte("facing", this.namedTag.getByte("facing"));
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
-
-        return c;
     }
 }

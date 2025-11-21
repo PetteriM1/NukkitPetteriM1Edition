@@ -19,16 +19,6 @@ public class ItemHelmetLeather extends ItemColorArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_LEATHER;
-    }
-
-    @Override
-    public boolean isHelmet() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 1;
     }
@@ -36,5 +26,15 @@ public class ItemHelmetLeather extends ItemColorArmor {
     @Override
     public int getMaxDurability() {
         return 56;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_LEATHER;
+    }
+
+    @Override
+    public boolean isHelmet() {
+        return true;
     }
 }

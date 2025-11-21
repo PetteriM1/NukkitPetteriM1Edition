@@ -29,56 +29,8 @@ public class BlockRedstoneWire extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Redstone Wire";
-    }
-
-    @Override
-    public int getId() {
-        return REDSTONE_WIRE;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (block instanceof BlockWater || block.level.isBlockWaterloggedAt(block.getChunk(), (int) block.x, (int) block.y, (int) block.z)) {
-            return false;
-        }
-
-        if (!canStayOnFullSolid(block.down())) {
-            return false;
-        }
-
-        this.getLevel().setBlock(block, this, true, false);
-        this.calculateCurrentChanges(true);
-
-        for (BlockFace blockFace : Plane.VERTICAL) {
-            this.level.updateAroundRedstone(this.getSideVec(blockFace), blockFace.getOpposite());
-        }
-
-        for (BlockFace blockFace : Plane.VERTICAL) {
-            this.updateAround(this.getSideVec(blockFace), blockFace.getOpposite());
-        }
-
-        for (BlockFace blockFace : Plane.HORIZONTAL) {
-            Vector3 v = this.getSideVec(blockFace);
-
-            if (this.level.getBlock(v).isNormalBlock()) {
-                this.updateAround(v.getSideVec(BlockFace.UP), BlockFace.DOWN);
-            } else {
-                this.updateAround(v.getSideVec(BlockFace.DOWN), BlockFace.UP);
-            }
-        }
+    public boolean breakWhenPushed() {
         return true;
-    }
-
-    private void updateAround(Vector3 pos, BlockFace face) {
-        if (this.level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.REDSTONE_WIRE) {
-            this.level.updateAroundRedstone(pos, face);
-
-            for (BlockFace side : BlockFace.values()) {
-                this.level.updateAroundRedstone(pos.getSideVec(side), side.getOpposite());
-            }
-        }
     }
 
     private void calculateCurrentChanges(boolean force) {
@@ -145,6 +97,61 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
     }
 
+    public boolean canBePlacedOn(Vector3 v) {
+        return canStayOnFullSolid(this.level.getBlock(v));
+    }
+
+    protected static boolean canConnectTo(Block block, BlockFace side) {
+        if (block.getId() == Block.REDSTONE_WIRE) {
+            return true;
+        } else if (BlockRedstoneDiode.isDiode(block)) {
+            BlockFace face = ((BlockRedstoneDiode) block).getFacing();
+            return face == side || face.getOpposite() == side;
+        } else {
+            return block.isPowerSource() && side != null;
+        }
+    }
+
+    protected static boolean canConnectUpwardsTo(Block block) {
+        return canConnectTo(block, null);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return REDSTONE_WIRE;
+    }
+
+    private int getIndirectPower() {
+        int power = 0;
+
+        for (BlockFace face : BlockFace.values()) {
+            int blockPower = this.getIndirectPower(this.getSideVec(face), face);
+
+            if (blockPower >= 15) {
+                return 15;
+            }
+
+            if (blockPower > power) {
+                power = blockPower;
+            }
+        }
+
+        return power;
+    }
+
+    private int getIndirectPower(Vector3 pos, BlockFace face) {
+        Block block = this.level.getBlock(pos);
+        if (block.getId() == Block.REDSTONE_WIRE) {
+            return 0;
+        }
+        return block.isNormalBlock() ? getStrongPower(pos.getSideVec(face), face) : block.getWeakPower(face);
+    }
+
     private int getMaxCurrentStrength(Vector3 pos, int maxStrength) {
         if (this.level.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()) != REDSTONE_WIRE) {
             return maxStrength;
@@ -155,71 +162,22 @@ public class BlockRedstoneWire extends BlockFlowable {
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-
-        this.level.updateAroundRedstone(this, null);
-
-        for (BlockFace blockFace : BlockFace.values()) {
-            this.level.updateAroundRedstone(this.getSideVec(blockFace), null);
-        }
-
-        for (BlockFace blockFace : Plane.HORIZONTAL) {
-            Vector3 v = this.getSideVec(blockFace);
-
-            if (this.level.getBlock(v).isNormalBlock()) {
-                this.updateAround(v.getSideVec(BlockFace.UP), BlockFace.DOWN);
-            } else {
-                this.updateAround(v.getSideVec(BlockFace.DOWN), BlockFace.UP);
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public Item toItem() {
-        return Item.get(Item.REDSTONE_DUST);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type != Level.BLOCK_UPDATE_NORMAL && type != Level.BLOCK_UPDATE_REDSTONE) {
-            return 0;
-        }
-
-        if (type == Level.BLOCK_UPDATE_NORMAL && !canStayOnFullSolid(this.down())) {
-            this.getLevel().useBreakOn(this);
-            return Level.BLOCK_UPDATE_NORMAL;
-        }
-
-        // Redstone event
-        RedstoneUpdateEvent ev = new RedstoneUpdateEvent(this);
-        getLevel().getServer().getPluginManager().callEvent(ev);
-        if (ev.isCancelled()) {
-            return 0;
-        }
-
-        // Make sure the block still exists to prevent item duplication
-        if (this.level.getBlockIdAt((int) this.x, (int) this.y, (int) this.z) != this.getId()) {
-            return 0;
-        }
-
-        this.calculateCurrentChanges(false);
-
-        return Level.BLOCK_UPDATE_REDSTONE;
-    }
-
-    public boolean canBePlacedOn(Vector3 v) {
-        return canStayOnFullSolid(this.level.getBlock(v));
+    public String getName() {
+        return "Redstone Wire";
     }
 
     public int getStrongPower(BlockFace side) {
         return !this.canProvidePower ? 0 : getWeakPower(side);
+    }
+
+    private int getStrongPower(Vector3 pos, BlockFace direction) {
+        Block block = this.level.getBlock(pos);
+
+        if (block.getId() == Block.REDSTONE_WIRE) {
+            return 0;
+        }
+
+        return block.getStrongPower(direction);
     }
 
     public int getWeakPower(BlockFace side) {
@@ -252,6 +210,11 @@ public class BlockRedstoneWire extends BlockFlowable {
         }
     }
 
+    @Override
+    public boolean isPowerSource() {
+        return this.canProvidePower;
+    }
+
     private boolean isPowerSourceAt(BlockFace side) {
         Block sideBlock = this.getSide(side);
         boolean sideBlockIsNormal = sideBlock.isNormalBlock();
@@ -259,64 +222,101 @@ public class BlockRedstoneWire extends BlockFlowable {
                 (canConnectTo(sideBlock, side) || (!sideBlockIsNormal && canConnectUpwardsTo(sideBlock.down())));
     }
 
-    protected static boolean canConnectUpwardsTo(Block block) {
-        return canConnectTo(block, null);
-    }
-
-    protected static boolean canConnectTo(Block block, BlockFace side) {
-        if (block.getId() == Block.REDSTONE_WIRE) {
-            return true;
-        } else if (BlockRedstoneDiode.isDiode(block)) {
-            BlockFace face = ((BlockRedstoneDiode) block).getFacing();
-            return face == side || face.getOpposite() == side;
-        } else {
-            return block.isPowerSource() && side != null;
-        }
-    }
-
     @Override
-    public boolean isPowerSource() {
-        return this.canProvidePower;
-    }
+    public boolean onBreak(Item item) {
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
 
-    private int getIndirectPower() {
-        int power = 0;
+        this.level.updateAroundRedstone(this, null);
 
-        for (BlockFace face : BlockFace.values()) {
-            int blockPower = this.getIndirectPower(this.getSideVec(face), face);
+        for (BlockFace blockFace : BlockFace.values()) {
+            this.level.updateAroundRedstone(this.getSideVec(blockFace), null);
+        }
 
-            if (blockPower >= 15) {
-                return 15;
-            }
+        for (BlockFace blockFace : Plane.HORIZONTAL) {
+            Vector3 v = this.getSideVec(blockFace);
 
-            if (blockPower > power) {
-                power = blockPower;
+            if (this.level.getBlock(v).isNormalBlock()) {
+                this.updateAround(v.getSideVec(BlockFace.UP), BlockFace.DOWN);
+            } else {
+                this.updateAround(v.getSideVec(BlockFace.DOWN), BlockFace.UP);
             }
         }
-
-        return power;
-    }
-
-    private int getIndirectPower(Vector3 pos, BlockFace face) {
-        Block block = this.level.getBlock(pos);
-        if (block.getId() == Block.REDSTONE_WIRE) {
-            return 0;
-        }
-        return block.isNormalBlock() ? getStrongPower(pos.getSideVec(face), face) : block.getWeakPower(face);
-    }
-
-    private int getStrongPower(Vector3 pos, BlockFace direction) {
-        Block block = this.level.getBlock(pos);
-
-        if (block.getId() == Block.REDSTONE_WIRE) {
-            return 0;
-        }
-
-        return block.getStrongPower(direction);
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
         return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type != Level.BLOCK_UPDATE_NORMAL && type != Level.BLOCK_UPDATE_REDSTONE) {
+            return 0;
+        }
+
+        if (type == Level.BLOCK_UPDATE_NORMAL && !canStayOnFullSolid(this.down())) {
+            this.getLevel().useBreakOn(this);
+            return Level.BLOCK_UPDATE_NORMAL;
+        }
+
+        // Redstone event
+        RedstoneUpdateEvent ev = new RedstoneUpdateEvent(this);
+        getLevel().getServer().getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return 0;
+        }
+
+        // Make sure the block still exists to prevent item duplication
+        if (this.level.getBlockIdAt((int) this.x, (int) this.y, (int) this.z) != this.getId()) {
+            return 0;
+        }
+
+        this.calculateCurrentChanges(false);
+
+        return Level.BLOCK_UPDATE_REDSTONE;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (block instanceof BlockWater || block.level.isBlockWaterloggedAt(block.getChunk(), (int) block.x, (int) block.y, (int) block.z)) {
+            return false;
+        }
+
+        if (!canStayOnFullSolid(block.down())) {
+            return false;
+        }
+
+        this.getLevel().setBlock(block, this, true, false);
+        this.calculateCurrentChanges(true);
+
+        for (BlockFace blockFace : Plane.VERTICAL) {
+            this.level.updateAroundRedstone(this.getSideVec(blockFace), blockFace.getOpposite());
+        }
+
+        for (BlockFace blockFace : Plane.VERTICAL) {
+            this.updateAround(this.getSideVec(blockFace), blockFace.getOpposite());
+        }
+
+        for (BlockFace blockFace : Plane.HORIZONTAL) {
+            Vector3 v = this.getSideVec(blockFace);
+
+            if (this.level.getBlock(v).isNormalBlock()) {
+                this.updateAround(v.getSideVec(BlockFace.UP), BlockFace.DOWN);
+            } else {
+                this.updateAround(v.getSideVec(BlockFace.DOWN), BlockFace.UP);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.REDSTONE_DUST);
+    }
+
+    private void updateAround(Vector3 pos, BlockFace face) {
+        if (this.level.getBlockIdAt((int) pos.x, (int) pos.y, (int) pos.z) == Block.REDSTONE_WIRE) {
+            this.level.updateAroundRedstone(pos, face);
+
+            for (BlockFace side : BlockFace.values()) {
+                this.level.updateAroundRedstone(pos.getSideVec(side), side.getOpposite());
+            }
+        }
     }
 }

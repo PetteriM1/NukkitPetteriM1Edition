@@ -15,17 +15,17 @@ public class ItemShield extends ItemTool {
     }
 
     @Override
+    public boolean allowOffhand() {
+        return true;
+    }
+
+    @Override
     public int getMaxDurability() {
         return 337;
     }
 
     @Override
     public boolean noDamageOnAttack() {
-        return true;
-    }
-
-    @Override
-    public boolean allowOffhand() {
         return true;
     }
 }

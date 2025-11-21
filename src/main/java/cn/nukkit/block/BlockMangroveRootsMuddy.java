@@ -5,27 +5,13 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveRootsMuddy extends BlockMangroveRoots {
 
     @Override
-    public String getName() {
-        return "Muddy Mangrove Roots";
-    }
-
-    @Override
-    public int getId() {
-        return MUDDY_MANGROVE_ROOTS;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 0;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DIRT;
     }
 
     @Override
@@ -34,19 +20,30 @@ public class BlockMangroveRootsMuddy extends BlockMangroveRoots {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public int getBurnChance() {
+        return 0;
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.NO_WATERLOGGING;
+    public int getId() {
+        return MUDDY_MANGROVE_ROOTS;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        return this.getLevel().setBlock(block, this, true, true);
+    public String getName() {
+        return "Muddy Mangrove Roots";
+    }
+
+    public BlockFace.Axis getPillarAxis() {
+        switch (this.getDamage() % 3) {
+            case 2:
+                return BlockFace.Axis.Z;
+            case 1:
+                return BlockFace.Axis.X;
+            case 0:
+            default:
+                return BlockFace.Axis.Y;
+        }
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -63,15 +60,24 @@ public class BlockMangroveRootsMuddy extends BlockMangroveRoots {
         }
     }
 
-    public BlockFace.Axis getPillarAxis() {
-        switch (this.getDamage() % 3) {
-            case 2:
-                return BlockFace.Axis.Z;
-            case 1:
-                return BlockFace.Axis.X;
-            case 0:
-            default:
-                return BlockFace.Axis.Y;
-        }
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.NO_WATERLOGGING;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        return this.getLevel().setBlock(block, this, true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

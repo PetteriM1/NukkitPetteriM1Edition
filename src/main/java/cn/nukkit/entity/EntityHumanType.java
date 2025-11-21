@@ -32,12 +32,130 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
     }
 
     @Override
-    public PlayerInventory getInventory() {
-        return inventory;
+    public boolean attack(EntityDamageEvent source) {
+        if (closed || !this.isAlive()) {
+            return false;
+        }
+
+        if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.CUSTOM && source.getCause() != DamageCause.HUNGER) {
+            int armorPoints = 0;
+            int epf = 0;
+
+            for (Item armor : inventory.getArmorContents()) {
+                armorPoints += armor.getArmorPoints();
+                epf += calculateEnchantmentProtectionFactor(armor, source);
+            }
+
+            //float originalDamage = source.getDamage();
+            //float r = (source.getDamage(EntityDamageEvent.DamageModifier.ARMOR) - (originalDamage - originalDamage * (1 - Math.max(armorPoints / 5, armorPoints - originalDamage / 2) / 25)));
+            //originalDamage += r;
+            //epf = Math.min(20, epf);
+            //source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
+            //source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
+
+            if (source.canBeReducedByArmor()) {
+                source.setDamage(-source.getFinalDamage() * armorPoints * 0.04f, EntityDamageEvent.DamageModifier.ARMOR);
+            }
+
+            source.setDamage(-source.getFinalDamage() * Math.min(NukkitMath.ceilFloat(Math.min(epf, 25) * ((float) ThreadLocalRandom.current().nextInt(50, 100) / 100)), 20) * 0.04f,
+                    EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
+
+            //source.setDamage(-Math.min(this.getAbsorption(), source.getFinalDamage()), EntityDamageEvent.DamageModifier.ABSORPTION);
+
+            if (super.attack(source)) {
+                Entity damager = null;
+                if (source instanceof EntityDamageByEntityEvent) {
+                    damager = ((EntityDamageByEntityEvent) source).getDamager();
+                }
+
+                if (source.getCause() != DamageCause.VOID &&
+                        source.getCause() != DamageCause.MAGIC &&
+                        source.getCause() != DamageCause.HUNGER &&
+                        source.getCause() != DamageCause.DROWNING &&
+                        source.getCause() != DamageCause.SUFFOCATION &&
+                        source.getCause() != DamageCause.SUICIDE &&
+                        source.getCause() != DamageCause.FIRE_TICK &&
+                        source.getCause() != DamageCause.FALL) { // No armor damage
+
+                    for (int slot = 0; slot < 4; slot++) {
+                        Item armor = damageArmor(this.inventory.getArmorItem(slot), damager, source.getDamage(), false, source.getCause());
+                        inventory.setArmorItem(slot, armor, armor.getId() != BlockID.AIR);
+                    }
+                } else if (damager != null && source.getCause() != DamageCause.THORNS) { // Do post attack only
+                    for (int slot = 0; slot < 4; slot++) {
+                        Item armor = this.inventory.getArmorItem(slot);
+                        for (Enchantment enchantment : armor.getEnchantments()) {
+                            enchantment.doPostAttack(damager, this);
+                        }
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return super.attack(source);
+        }
+    }
+
+    protected double calculateEnchantmentProtectionFactor(Item item, EntityDamageEvent source) {
+        double epf = 0;
+
+        for (Enchantment ench : item.getEnchantments()) {
+            epf += ench.getProtectionFactor(source);
+        }
+
+        return epf;
+    }
+
+    protected Item damageArmor(Item armor, Entity damager, float damage, boolean shield, DamageCause cause) {
+        if (armor.isUnbreakable() || armor instanceof ItemSkull || armor.getId() == (255 - Item.CARVED_PUMPKIN)) {
+            return armor;
+        }
+
+        if (damager != null && cause != DamageCause.THORNS) {
+            for (Enchantment enchantment : armor.getEnchantments()) {
+                enchantment.doPostAttack(damager, this);
+            }
+        }
+
+        Enchantment durability = armor.getEnchantment(Enchantment.ID_DURABILITY);
+        if (durability != null
+                && durability.getLevel() > 0
+                && (100 / (durability.getLevel() + 1)) <= ThreadLocalRandom.current().nextInt(100)) {
+            return armor;
+        }
+
+        if (shield) {
+            armor.setDamage(armor.getDamage() + (damage >= 4.0f ? ((int) damage) : 1));
+        } else {
+            armor.setDamage(armor.getDamage() + Math.max((int) (damage / 4), 1));
+        }
+
+        if (armor.getDamage() >= armor.getMaxDurability()) {
+            return Item.get(BlockID.AIR, 0, 0);
+        }
+
+        return armor;
+    }
+
+    @Override
+    public Item[] getDrops() {
+        if (this.inventory != null) {
+            List<Item> drops = new ArrayList<>(this.inventory.getContents().values());
+            drops.addAll(this.offhandInventory.getContents().values());
+            return drops.toArray(new Item[0]);
+        }
+        return new Item[0];
     }
 
     public PlayerEnderChestInventory getEnderChestInventory() {
         return enderChestInventory;
+    }
+
+    @Override
+    public PlayerInventory getInventory() {
+        return inventory;
     }
 
     public PlayerOffhandInventory getOffhandInventory() {
@@ -131,125 +249,6 @@ public abstract class EntityHumanType extends EntityCreature implements Inventor
                 }
             }
         }
-    }
-
-    @Override
-    public Item[] getDrops() {
-        if (this.inventory != null) {
-            List<Item> drops = new ArrayList<>(this.inventory.getContents().values());
-            drops.addAll(this.offhandInventory.getContents().values());
-            return drops.toArray(new Item[0]);
-        }
-        return new Item[0];
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        if (closed || !this.isAlive()) {
-            return false;
-        }
-
-        if (source.getCause() != DamageCause.VOID && source.getCause() != DamageCause.CUSTOM && source.getCause() != DamageCause.HUNGER) {
-            int armorPoints = 0;
-            int epf = 0;
-
-            for (Item armor : inventory.getArmorContents()) {
-                armorPoints += armor.getArmorPoints();
-                epf += calculateEnchantmentProtectionFactor(armor, source);
-            }
-
-            //float originalDamage = source.getDamage();
-            //float r = (source.getDamage(EntityDamageEvent.DamageModifier.ARMOR) - (originalDamage - originalDamage * (1 - Math.max(armorPoints / 5, armorPoints - originalDamage / 2) / 25)));
-            //originalDamage += r;
-            //epf = Math.min(20, epf);
-            //source.setDamage(r, EntityDamageEvent.DamageModifier.ARMOR);
-            //source.setDamage(source.getDamage(EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS) - (originalDamage - originalDamage * (1 - epf / 25f)), EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
-
-            if (source.canBeReducedByArmor()) {
-                source.setDamage(-source.getFinalDamage() * armorPoints * 0.04f, EntityDamageEvent.DamageModifier.ARMOR);
-            }
-
-            source.setDamage(-source.getFinalDamage() * Math.min(NukkitMath.ceilFloat(Math.min(epf, 25) * ((float) ThreadLocalRandom.current().nextInt(50, 100) / 100)), 20) * 0.04f,
-                    EntityDamageEvent.DamageModifier.ARMOR_ENCHANTMENTS);
-
-            //source.setDamage(-Math.min(this.getAbsorption(), source.getFinalDamage()), EntityDamageEvent.DamageModifier.ABSORPTION);
-
-            if (super.attack(source)) {
-                Entity damager = null;
-                if (source instanceof EntityDamageByEntityEvent) {
-                    damager = ((EntityDamageByEntityEvent) source).getDamager();
-                }
-
-                if (source.getCause() != DamageCause.VOID &&
-                        source.getCause() != DamageCause.MAGIC &&
-                        source.getCause() != DamageCause.HUNGER &&
-                        source.getCause() != DamageCause.DROWNING &&
-                        source.getCause() != DamageCause.SUFFOCATION &&
-                        source.getCause() != DamageCause.SUICIDE &&
-                        source.getCause() != DamageCause.FIRE_TICK &&
-                        source.getCause() != DamageCause.FALL) { // No armor damage
-
-                    for (int slot = 0; slot < 4; slot++) {
-                        Item armor = damageArmor(this.inventory.getArmorItem(slot), damager, source.getDamage(), false, source.getCause());
-                        inventory.setArmorItem(slot, armor, armor.getId() != BlockID.AIR);
-                    }
-                } else if (damager != null && source.getCause() != DamageCause.THORNS) { // Do post attack only
-                    for (int slot = 0; slot < 4; slot++) {
-                        Item armor = this.inventory.getArmorItem(slot);
-                        for (Enchantment enchantment : armor.getEnchantments()) {
-                            enchantment.doPostAttack(damager, this);
-                        }
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return super.attack(source);
-        }
-    }
-
-    protected Item damageArmor(Item armor, Entity damager, float damage, boolean shield, DamageCause cause) {
-        if (armor.isUnbreakable() || armor instanceof ItemSkull || armor.getId() == (255 - BlockID.CARVED_PUMPKIN)) {
-            return armor;
-        }
-
-        if (damager != null && cause != DamageCause.THORNS) {
-            for (Enchantment enchantment : armor.getEnchantments()) {
-                enchantment.doPostAttack(damager, this);
-            }
-        }
-
-        Enchantment durability = armor.getEnchantment(Enchantment.ID_DURABILITY);
-        if (durability != null
-                && durability.getLevel() > 0
-                && (100 / (durability.getLevel() + 1)) <= ThreadLocalRandom.current().nextInt(100)) {
-            return armor;
-        }
-
-        if (shield) {
-            armor.setDamage(armor.getDamage() + (damage >= 4.0f ? ((int) damage) : 1));
-        } else {
-            armor.setDamage(armor.getDamage() + Math.max((int) (damage / 4), 1));
-        }
-
-        if (armor.getDamage() >= armor.getMaxDurability()) {
-            return Item.get(BlockID.AIR, 0, 0);
-        }
-
-        return armor;
-    }
-
-
-    protected double calculateEnchantmentProtectionFactor(Item item, EntityDamageEvent source) {
-        double epf  = 0;
-
-        for (Enchantment ench : item.getEnchantments()) {
-            epf  += ench.getProtectionFactor(source);
-        }
-
-        return epf ;
     }
 
     @Override

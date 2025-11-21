@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockSnifferEgg extends BlockTransparentMeta {
 
     public BlockSnifferEgg() {
@@ -11,8 +14,13 @@ public class BlockSnifferEgg extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Sniffer Egg";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DRAGON_EGG;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
     }
 
     @Override
@@ -21,13 +29,18 @@ public class BlockSnifferEgg extends BlockTransparentMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 2.5;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
     }
 
     @Override
-    public double getHardness() {
-        return 0.5;
+    public String getName() {
+        return "Sniffer Egg";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
     }
 
     @Override

@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDecoratedPot extends BlockTransparentMeta {
 
@@ -14,20 +16,11 @@ public class BlockDecoratedPot extends BlockTransparentMeta {
     public BlockDecoratedPot(int meta) {
         super(meta);
     }
+    private static final short[] FACES = {2, 3, 0, 1};
 
     @Override
-    public String getName() {
-        return "Decorated Pot";
-    }
-
-    @Override
-    public int getId() {
-        return DECORATED_POT;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 
     @Override
@@ -36,8 +29,18 @@ public class BlockDecoratedPot extends BlockTransparentMeta {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    public int getId() {
+        return DECORATED_POT;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 0.95;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 0.95;
     }
 
     @Override
@@ -51,16 +54,24 @@ public class BlockDecoratedPot extends BlockTransparentMeta {
     }
 
     @Override
-    public double getMaxX() {
-        return this.x + 0.95;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
     }
 
     @Override
-    public double getMaxZ() {
-        return this.z + 0.95;
+    public String getName() {
+        return "Decorated Pot";
     }
 
-    private static final short[] FACES = {2, 3, 0, 1};
+    @Override
+    public double getResistance() {
+        return 0;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {

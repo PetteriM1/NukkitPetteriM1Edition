@@ -16,13 +16,33 @@ public class BlockSlabWarped extends BlockSlab {
     }
 
     @Override
-    public String getSlabName() {
-        return "Warped";
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{this.toItem()};
     }
 
     @Override
     public int getId() {
         return WARPED_SLAB;
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public String getSlabName() {
+        return "Warped";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
@@ -36,27 +56,7 @@ public class BlockSlabWarped extends BlockSlab {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{ this.toItem() };
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
     }
 }

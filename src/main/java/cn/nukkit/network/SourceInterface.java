@@ -13,37 +13,34 @@ import java.net.InetSocketAddress;
  */
 public interface SourceInterface {
 
-    @Deprecated
+    void close(Player player);
+
+    void close(Player player, String reason);
+
+    void emergencyShutdown();
+
+    int getNetworkLatency(Player player);
+
+    NetworkPlayerSession getSession(InetSocketAddress address);
+
+    boolean process();
+
     default Integer putPacket(Player player, DataPacket packet) {
         player.getNetworkSession().sendPacket(packet);
         return null;
     }
 
-    @Deprecated
     default Integer putPacket(Player player, DataPacket packet, boolean needACK) {
         player.getNetworkSession().sendPacket(packet);
         return null;
     }
 
-    @Deprecated
     default Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         player.getNetworkSession().sendPacket(packet);
         return null;
     }
 
-    NetworkPlayerSession getSession(InetSocketAddress address);
-
-    int getNetworkLatency(Player player);
-
-    void close(Player player);
-
-    void close(Player player, String reason);
-
     void setName(String name);
 
-    boolean process();
-
     void shutdown();
-
-    void emergencyShutdown();
 }

@@ -29,8 +29,12 @@ public class SetSpawnPositionPacket extends DataPacket {
         this.reset();
         this.putVarInt(this.spawnType);
         this.putBlockVector3(this.x, this.y, this.z);
-        this.putVarInt(this.dimension);
-        this.putBlockVector3(this.x, this.y, this.z);
+        if (protocol >= 407) {
+            this.putVarInt(this.dimension);
+            this.putBlockVector3(this.x, this.y, this.z);
+        } else {
+            this.putBoolean(false);
+        }
     }
 
     @Override

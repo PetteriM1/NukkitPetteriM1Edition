@@ -17,12 +17,12 @@ public class FurnaceRecipe implements Recipe {
         this.ingredient = ingredient.clone();
     }
 
-    public void setInput(Item item) {
-        this.ingredient = item.clone();
-    }
-
     public Item getInput() {
         return this.ingredient.clone();
+    }
+
+    public void setInput(Item item) {
+        this.ingredient = item.clone();
     }
 
     @Override
@@ -31,12 +31,12 @@ public class FurnaceRecipe implements Recipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerFurnaceRecipe(this);
+    public RecipeType getType() {
+        return this.ingredient.hasMeta() ? RecipeType.FURNACE_DATA : RecipeType.FURNACE;
     }
 
     @Override
-    public RecipeType getType() {
-        return this.ingredient.hasMeta() ? RecipeType.FURNACE_DATA : RecipeType.FURNACE;
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerFurnaceRecipe(this);
     }
 }

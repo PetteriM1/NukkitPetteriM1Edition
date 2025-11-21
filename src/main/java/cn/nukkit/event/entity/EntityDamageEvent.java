@@ -20,17 +20,10 @@ import java.util.Map;
 public class EntityDamageEvent extends EntityEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private int attackCooldown = 10;
     private final DamageCause cause;
-
     private final Map<DamageModifier, Float> modifiers;
     private final Map<DamageModifier, Float> originals;
-
     @Getter
     @Setter
     private Item weapon;
@@ -52,82 +45,6 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
         if (entity.hasEffect(Effect.DAMAGE_RESISTANCE)) {
             this.setDamage((float) -(this.getDamage(DamageModifier.BASE) * 0.20 * (entity.getEffect(Effect.DAMAGE_RESISTANCE).getAmplifier() + 1)), DamageModifier.RESISTANCE);
         }
-    }
-
-    public DamageCause getCause() {
-        return cause;
-    }
-
-    public float getOriginalDamage() {
-        return this.getOriginalDamage(DamageModifier.BASE);
-    }
-
-    public float getOriginalDamage(DamageModifier type) {
-        Float original = this.originals.get(type);
-        if (original != null) {
-            return original;
-        }
-
-        return 0;
-    }
-
-    public float getDamage() {
-        return this.getDamage(DamageModifier.BASE);
-    }
-
-    public float getDamage(DamageModifier type) {
-        Float modifier = this.modifiers.get(type);
-        if (modifier != null) {
-            return modifier;
-        }
-
-        return 0;
-    }
-
-    public void setDamage(float damage) {
-        this.setDamage(damage, DamageModifier.BASE);
-    }
-
-    public void setDamage(float damage, DamageModifier type) {
-        this.modifiers.put(type, damage);
-    }
-
-    public boolean isApplicable(DamageModifier type) {
-        return this.modifiers.containsKey(type);
-    }
-
-    public float getFinalDamage() {
-        float damage = 0;
-        for (Float d : this.modifiers.values()) {
-            if (d != null) {
-                damage += d;
-            }
-        }
-
-        return Math.max(damage, 0);
-    }
-
-    public int getAttackCooldown() {
-        return this.attackCooldown;
-    }
-
-    public void setAttackCooldown(int attackCooldown) {
-        this.attackCooldown = attackCooldown;
-    }
-
-    public boolean canBeReducedByArmor() {
-        switch (this.cause) {
-            case FIRE_TICK:
-            case SUFFOCATION:
-            case DROWNING:
-            case HUNGER:
-            case FALL:
-            case VOID:
-            case MAGIC:
-            case SUICIDE:
-                return false;
-        }
-        return true;
     }
 
     public enum DamageModifier {
@@ -250,5 +167,85 @@ public class EntityDamageEvent extends EntityEvent implements Cancellable {
             super(DamageModifier.class);
             put(DamageModifier.BASE, damage);
         }
+    }
+
+    public boolean canBeReducedByArmor() {
+        switch (this.cause) {
+            case FIRE_TICK:
+            case SUFFOCATION:
+            case DROWNING:
+            case HUNGER:
+            case FALL:
+            case VOID:
+            case MAGIC:
+            case SUICIDE:
+                return false;
+        }
+        return true;
+    }
+
+    public int getAttackCooldown() {
+        return this.attackCooldown;
+    }
+
+    public void setAttackCooldown(int attackCooldown) {
+        this.attackCooldown = attackCooldown;
+    }
+
+    public DamageCause getCause() {
+        return cause;
+    }
+
+    public float getDamage() {
+        return this.getDamage(DamageModifier.BASE);
+    }
+
+    public void setDamage(float damage) {
+        this.setDamage(damage, DamageModifier.BASE);
+    }
+
+    public float getDamage(DamageModifier type) {
+        Float modifier = this.modifiers.get(type);
+        if (modifier != null) {
+            return modifier;
+        }
+
+        return 0;
+    }
+
+    public float getFinalDamage() {
+        float damage = 0;
+        for (Float d : this.modifiers.values()) {
+            if (d != null) {
+                damage += d;
+            }
+        }
+
+        return Math.max(damage, 0);
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public float getOriginalDamage() {
+        return this.getOriginalDamage(DamageModifier.BASE);
+    }
+
+    public float getOriginalDamage(DamageModifier type) {
+        Float original = this.originals.get(type);
+        if (original != null) {
+            return original;
+        }
+
+        return 0;
+    }
+
+    public boolean isApplicable(DamageModifier type) {
+        return this.modifiers.containsKey(type);
+    }
+
+    public void setDamage(float damage, DamageModifier type) {
+        this.modifiers.put(type, damage);
     }
 }

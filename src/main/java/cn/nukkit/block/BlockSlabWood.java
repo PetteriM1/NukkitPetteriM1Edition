@@ -23,7 +23,7 @@ public class BlockSlabWood extends BlockSlab {
         super(meta, doubleSlab);
     }
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak",
             "Spruce",
             "Birch",
@@ -35,41 +35,13 @@ public class BlockSlabWood extends BlockSlab {
     };
 
     @Override
-    public String getName() {
-        return (((this.getDamage() & 0x08) == 0x08) ? "Upper " : "") + NAMES[this.getDamage() & 0x07] + " Slab";
-    }
-
-    @Override
-    public int getId() {
-        return WOOD_SLAB;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 5;
-    }
-
-    @Override
     public int getBurnAbility() {
         return 20;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                toItem()
-        };
-    }
-
-    @Override
-    public Item toItem() {
-        int damage = this.getDamage() & 0x07;
-        return new ItemBlock(Block.get(this.getId(), damage), damage);
+    public int getBurnChance() {
+        return 5;
     }
 
     @Override
@@ -89,5 +61,33 @@ public class BlockSlabWood extends BlockSlab {
             case 5: //DARK OAK
                 return BlockColor.BROWN_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                toItem()
+        };
+    }
+
+    @Override
+    public int getId() {
+        return WOOD_SLAB;
+    }
+
+    @Override
+    public String getName() {
+        return (((this.getDamage() & 0x08) == 0x08) ? "Upper " : "") + names[this.getDamage() & 0x07] + " Slab";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public Item toItem() {
+        int damage = this.getDamage() & 0x07;
+        return new ItemBlock(Block.get(this.getId(), damage), damage);
     }
 }

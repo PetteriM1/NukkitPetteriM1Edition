@@ -25,7 +25,7 @@ public class IntBlockProperty extends BlockProperty<Integer> {
     public IntBlockProperty(String name, boolean exportedToItem, int maxValue) {
         this(name, exportedToItem, maxValue, 0);
     }
-    
+
     public IntBlockProperty(String name, boolean exportedToItem, int maxValue, int minValue, int bitSize, String persistenceName) {
         super(name, exportedToItem, persistenceName, bitSize);
         int delta = maxValue - minValue;
@@ -37,27 +37,29 @@ public class IntBlockProperty extends BlockProperty<Integer> {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
-    
-    @Override
-    public int getMetaForValue(Integer value) {
-        if (value == null) {
-            return 0;
-        }
-        return this.getMetaForValue(value.intValue());
-    }
-    
-    public int getMetaForValue(int value) {
-        try {
-            this.validateDirectly(value);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidBlockPropertyValueException(this, null, value, e);
-        }
-        return value - minValue;
+
+    public int clamp(int value) {
+        return NukkitMath.clamp(value, this.getMinValue(), this.getMaxValue());
     }
 
     @Override
-    public Integer getValueForMeta(int meta) {
-        return this.getIntValueForMeta(meta);
+    public IntBlockProperty copy() {
+        return new IntBlockProperty(this.getName(), this.isExportedToItem(), this.getMaxValue(), this.getMinValue(), this.getBitSize(), this.getPersistenceName());
+    }
+
+    @Override
+    public IntBlockProperty exportingToItems(boolean exportedToItem) {
+        return new IntBlockProperty(this.getName(), exportedToItem, this.getMaxValue(), this.getMinValue(), this.getBitSize(), this.getPersistenceName());
+    }
+
+    @Override
+    public int getDefaultIntValue() {
+        return this.minValue;
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+        return this.minValue;
     }
 
     @Override
@@ -69,7 +71,66 @@ public class IntBlockProperty extends BlockProperty<Integer> {
         }
         return minValue + meta;
     }
-    
+
+    public int getMaxValue() {
+        return this.maxValue;
+    }
+
+    @Override
+    public int getMetaForPersistenceValue(String persistenceValue) {
+        try {
+            return this.getMetaForValue(Integer.parseInt(persistenceValue));
+        } catch (NumberFormatException | InvalidBlockPropertyValueException e) {
+            throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue, e);
+        }
+    }
+
+    @Override
+    public int getMetaForValue(Integer value) {
+        if (value == null) {
+            return 0;
+        }
+        return this.getMetaForValue(value.intValue());
+    }
+
+    public int getMetaForValue(int value) {
+        try {
+            this.validateDirectly(value);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidBlockPropertyValueException(this, null, value, e);
+        }
+        return value - minValue;
+    }
+
+    public int getMinValue() {
+        return this.minValue;
+    }
+
+    @Override
+    public Serializable getPersistenceValueForMeta(int meta) {
+        return this.getIntValueForMeta(meta);
+    }
+
+    @Override
+    public Class<Integer> getValueClass() {
+        return Integer.class;
+    }
+
+    @Override
+    public Integer getValueForMeta(int meta) {
+        return this.getIntValueForMeta(meta);
+    }
+
+    @Override
+    public boolean isDefaultIntValue(int value) {
+        return this.minValue == value;
+    }
+
+    @Override
+    public boolean isDefaultValue(Integer value) {
+        return value == null || this.minValue == value;
+    }
+
     @Override
     protected void validateDirectly(Integer value) {
         if (value == null) {
@@ -83,72 +144,9 @@ public class IntBlockProperty extends BlockProperty<Integer> {
         Preconditions.checkArgument(maxValue >= newValue, "New value (%s) must be less or equals to %s", newValue, maxValue);
     }
 
-    
     @Override
     protected void validateMetaDirectly(int meta) {
         int max = maxValue - minValue;
         Preconditions.checkArgument(0 <= meta && meta <= max, "The meta %s is outside the range of 0 .. ", meta, max);
-    }
-
-    @Override
-    public Serializable getPersistenceValueForMeta(int meta) {
-        return this.getIntValueForMeta(meta);
-    }
-
-    @Override
-    public int getMetaForPersistenceValue(String persistenceValue) {
-        try {
-            return this.getMetaForValue(Integer.parseInt(persistenceValue));
-        } catch (NumberFormatException | InvalidBlockPropertyValueException e) {
-            throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue, e);
-        }
-    }
-
-    public int clamp(int value) {
-        return NukkitMath.clamp(value, this.getMinValue(), this.getMaxValue());
-    }
-
-    
-    public int getMaxValue() {
-        return this.maxValue;
-    }
-
-    public int getMinValue() {
-        return this.minValue;
-    }
-
-    @Override
-    public Integer getDefaultValue() {
-        return this.minValue;
-    }
-    
-    @Override
-    public boolean isDefaultIntValue(int value) {
-        return this.minValue == value;
-    }
-    
-    @Override
-    public int getDefaultIntValue() {
-        return this.minValue;
-    }
-
-    @Override
-    public boolean isDefaultValue(Integer value) {
-        return value == null || this.minValue == value;
-    }
-    
-    @Override
-    public Class<Integer> getValueClass() {
-        return Integer.class;
-    }
-
-    @Override
-    public IntBlockProperty exportingToItems(boolean exportedToItem) {
-        return new IntBlockProperty(this.getName(), exportedToItem, this.getMaxValue(), this.getMinValue(), this.getBitSize(), this.getPersistenceName());
-    }
-
-    @Override
-    public IntBlockProperty copy() {
-        return new IntBlockProperty(this.getName(), this.isExportedToItem(), this.getMaxValue(), this.getMinValue(), this.getBitSize(), this.getPersistenceName());
     }
 }

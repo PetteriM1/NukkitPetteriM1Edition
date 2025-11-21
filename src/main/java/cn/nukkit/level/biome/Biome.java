@@ -6,13 +6,14 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.generator.populator.type.Populator;
 import cn.nukkit.math.NukkitRandom;
 import cn.nukkit.utils.Utils;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author MagicDroidX
@@ -22,7 +23,7 @@ public abstract class Biome implements BlockID {
 
     public static final Biome[] biomes = new Biome[256];
     public static final List<Biome> unorderedBiomes = new ObjectArrayList<>();
-    private static final Int2ObjectMap<String> runtimeId2Identifier = new Int2ObjectOpenHashMap<>();
+    private static final QuickLookupTable runtimeId2Identifier = new QuickLookupTable();
 
     private final ArrayList<Populator> populators = new ArrayList<>();
     private int id;
@@ -31,27 +32,71 @@ public abstract class Biome implements BlockID {
 
     static {
         JsonObject json = Utils.loadJsonResource("biome_id_map.json").getAsJsonObject();
-        for (String identifier : json.keySet()) {
-            int biomeId = json.get(identifier).getAsInt();
-            runtimeId2Identifier.put(biomeId, identifier);
+        for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+            int biomeId = entry.getValue().getAsInt();
+            runtimeId2Identifier.put(biomeId, entry.getKey());
         }
     }
 
-    public static String getBiomeNameFromId(int biomeId) {
-        return runtimeId2Identifier.get(biomeId);
-    }
+    private static class QuickLookupTable {
 
-    public static int getBiomeIdOrCorrect(int biomeId) {
-        if (runtimeId2Identifier.containsKey(biomeId)) {
-            return biomeId;
+        private String[] array = new String[256];
+
+        private String get(int k) {
+            if (k < 0 || array == null || k >= array.length) {
+                return null;
+            }
+
+            return array[k];
         }
-        return EnumBiome.OCEAN.id;
+
+        private void put(int k, String v) {
+            if (k < 0) {
+                throw new IllegalArgumentException();
+            }
+
+            if (array.length <= k) {
+                array = Arrays.copyOf(array, k + 1);
+            }
+
+            array[k] = v;
+        }
     }
 
-    protected static void register(int id, Biome biome) {
-        biome.setId(id);
-        biomes[id] = biome;
-        unorderedBiomes.add(biome);
+    public void addPopulator(Populator populator) {
+        this.populators.add(populator);
+    }
+
+    public boolean canRain() {
+        return true;
+    }
+
+    public void clearPopulators() {
+        this.populators.clear();
+    }
+
+    /**
+     * Whether or not overhangs should generate in this biome (places where solid blocks generate over air)
+     * <p>
+     * This should probably be used with a custom max elevation or things can look stupid
+     *
+     * @return overhang
+     */
+    public boolean doesOverhang() {
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return hashCode() == obj.hashCode();
+    }
+
+    public float getBaseHeight() {
+        return baseHeight;
+    }
+
+    public void setBaseHeight(float baseHeight) {
+        this.baseHeight = baseHeight;
     }
 
     public static Biome getBiome(int id) {
@@ -74,23 +119,34 @@ public abstract class Biome implements BlockID {
         return null;
     }
 
-    public void clearPopulators() {
-        this.populators.clear();
-    }
-
-    public void addPopulator(Populator populator) {
-        this.populators.add(populator);
-    }
-
-    public void populateChunk(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
-        FullChunk chunk = level.getChunk(chunkX, chunkZ);
-        for (Populator populator : populators) {
-            populator.populate(level, chunkX, chunkZ, random, chunk);
+    public static int getBiomeIdOrCorrect(int biomeId) {
+        if (runtimeId2Identifier.get(biomeId) == null) {
+            return EnumBiome.OCEAN.id;
         }
+        return biomeId;
     }
 
-    public ArrayList<Populator> getPopulators() {
-        return populators;
+    public static String getBiomeNameFromId(int biomeId) {
+        return runtimeId2Identifier.get(biomeId);
+    }
+
+    /**
+     * How much offset should be added to the min/max heights at this position
+     *
+     * @param x x
+     * @param z z
+     * @return height offset
+     */
+    public int getHeightOffset(int x, int z) {
+        return 0;
+    }
+
+    public float getHeightVariation() {
+        return heightVariation;
+    }
+
+    public void setHeightVariation(float heightVariation) {
+        this.heightVariation = heightVariation;
     }
 
     public int getId() {
@@ -103,30 +159,13 @@ public abstract class Biome implements BlockID {
 
     public abstract String getName();
 
-    public void setBaseHeight(float baseHeight) {
-        this.baseHeight = baseHeight;
-    }
-
-    public void setHeightVariation(float heightVariation)   {
-        this.heightVariation = heightVariation;
-    }
-
-    public float getBaseHeight() {
-        return baseHeight;
-    }
-
-    public float getHeightVariation() {
-        return heightVariation;
+    public ArrayList<Populator> getPopulators() {
+        return populators;
     }
 
     @Override
     public int hashCode() {
         return id;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return hashCode() == obj.hashCode();
     }
 
     /**
@@ -138,29 +177,16 @@ public abstract class Biome implements BlockID {
         return false;
     }
 
-    /**
-     * Whether or not overhangs should generate in this biome (places where solid blocks generate over air)
-     * <p>
-     * This should probably be used with a custom max elevation or things can look stupid
-     *
-     * @return overhang
-     */
-    public boolean doesOverhang()   {
-        return false;
+    public void populateChunk(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random) {
+        FullChunk chunk = level.getChunk(chunkX, chunkZ);
+        for (Populator populator : populators) {
+            populator.populate(level, chunkX, chunkZ, random, chunk);
+        }
     }
 
-    /**
-     * How much offset should be added to the min/max heights at this position
-     *
-     * @param x x
-     * @param z z
-     * @return height offset
-     */
-    public int getHeightOffset(int x, int z)    {
-        return 0;
-    }
-
-    public boolean canRain() {
-        return true;
+    protected static void register(int id, Biome biome) {
+        biome.setId(id);
+        biomes[id] = biome;
+        unorderedBiomes.add(biome);
     }
 }

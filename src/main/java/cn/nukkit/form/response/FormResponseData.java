@@ -10,11 +10,11 @@ public class FormResponseData {
         this.elementContent = content;
     }
 
-    public int getElementID() {
-        return elementID;
-    }
-
     public String getElementContent() {
         return elementContent;
+    }
+
+    public int getElementID() {
+        return elementID;
     }
 }

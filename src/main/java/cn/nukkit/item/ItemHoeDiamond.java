@@ -24,12 +24,12 @@ public class ItemHoeDiamond extends ItemTool {
     }
 
     @Override
-    public boolean isHoe() {
-        return true;
+    public int getTier() {
+        return ItemTool.TIER_DIAMOND;
     }
 
     @Override
-    public int getTier() {
-        return ItemTool.TIER_DIAMOND;
+    public boolean isHoe() {
+        return true;
     }
 }

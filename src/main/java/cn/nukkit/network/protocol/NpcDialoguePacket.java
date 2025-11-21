@@ -18,8 +18,8 @@ public class NpcDialoguePacket extends DataPacket {
     public String actionJson;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public void decode() {
+        // Noop
     }
 
     @Override
@@ -34,7 +34,7 @@ public class NpcDialoguePacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
-        // Noop
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

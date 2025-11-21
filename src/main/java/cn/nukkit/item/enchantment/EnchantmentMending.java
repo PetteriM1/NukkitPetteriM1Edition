@@ -10,8 +10,8 @@ public class EnchantmentMending extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 25 * level;
+    public boolean checkCompatibility(Enchantment enchantment) {
+        return super.checkCompatibility(enchantment) && enchantment.id != ID_BOW_INFINITY;
     }
 
     @Override
@@ -20,12 +20,12 @@ public class EnchantmentMending extends Enchantment {
     }
 
     @Override
-    public boolean isTreasure() {
-        return true;
+    public int getMinEnchantAbility(int level) {
+        return 25 * level;
     }
 
     @Override
-    public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != ID_BOW_INFINITY;
+    public boolean isTreasure() {
+        return true;
     }
 }

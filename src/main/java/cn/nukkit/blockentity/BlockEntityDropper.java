@@ -22,35 +22,39 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
         super(chunk, nbt);
     }
 
-    private void initInventory() {
-        if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
-            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
-        }
-        ListTag<CompoundTag> list = (ListTag<CompoundTag>) this.namedTag.getList("Items");
-
-        this.inventory = new DropperInventory(this);
-
-        for (CompoundTag compound : list.getAll()) {
-            Item item = NBTIO.getItemHelper(compound);
-            if (item.getId() != 0 && item.getCount() > 0) {
-                this.inventory.slots.put(compound.getByte("Slot"), item);
+    @Override
+    public void close() {
+        if (!this.closed && this.inventory != null) {
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
             }
         }
+
+        super.close();
     }
 
     @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.DROPPER;
+    public DropperInventory getInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        return this.inventory;
+    }
+
+    @Override
+    public Item getItem(int index) {
+        int i = this.getSlotIndex(index);
+        if (i < 0) {
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+        } else {
+            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+            return NBTIO.getItemHelper(data);
+        }
     }
 
     @Override
     public String getName() {
         return this.hasName() ? this.namedTag.getString("CustomName") : "Dropper";
-    }
-
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
     }
 
     @Override
@@ -80,13 +84,66 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return NBTIO.getItemHelper(data);
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.DROPPER)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
+    private void initInventory() {
+        if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
+            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
+        }
+        ListTag<CompoundTag> list = (ListTag<CompoundTag>) this.namedTag.getList("Items");
+
+        this.inventory = new DropperInventory(this);
+
+        for (CompoundTag compound : list.getAll()) {
+            Item item = NBTIO.getItemHelper(compound);
+            if (item.getId() != 0 && item.getCount() > 0) {
+                this.inventory.slots.put(compound.getByte("Slot"), item);
+            }
+        }
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.DROPPER;
+    }
+
+    @Override
+    public void onBreak() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        for (Item content : inventory.getContents().values()) {
+            level.dropItem(this, content);
+        }
+        inventory.clearAll();
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        if (this.inventory != null) {
+            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
+            for (int index = 0; index < this.getSize(); index++) {
+                this.setItem(index, this.inventory.getItem(index));
+            }
         }
     }
 
@@ -105,62 +162,5 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
         } else {
             (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
         }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        if (this.inventory != null) {
-            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
-            for (int index = 0; index < this.getSize(); index++) {
-                this.setItem(index, this.inventory.getItem(index));
-            }
-        }
-    }
-
-    @Override
-    public DropperInventory getInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        return this.inventory;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.DROPPER)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
-
-        return c;
-    }
-
-    @Override
-    public void close() {
-        if (!this.closed && this.inventory != null) {
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-        }
-
-        super.close();
-    }
-
-    @Override
-    public void onBreak() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        for (Item content : inventory.getContents().values()) {
-            level.dropItem(this, content);
-        }
-        inventory.clearAll();
     }
 }

@@ -13,6 +13,23 @@ public abstract class BlockDoubleSlabCopperBase extends BlockDoubleSlabBase impl
     }
 
     @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
+    }
+
+    protected abstract int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel);
+
+    @Override
     public double getHardness() {
         return 3;
     }
@@ -23,8 +40,8 @@ public abstract class BlockDoubleSlabCopperBase extends BlockDoubleSlabBase impl
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
+        return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
     }
 
     @Override
@@ -33,7 +50,12 @@ public abstract class BlockDoubleSlabCopperBase extends BlockDoubleSlabBase impl
     }
 
     @Override
-    public boolean canHarvestWithHand() {
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean isWaxed() {
         return false;
     }
 
@@ -46,21 +68,6 @@ public abstract class BlockDoubleSlabCopperBase extends BlockDoubleSlabBase impl
     @Override
     public int onUpdate(int type) {
         return Oxidizable.super.onUpdate(type);
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
-        return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
     }
 
     @Override
@@ -78,11 +85,4 @@ public abstract class BlockDoubleSlabCopperBase extends BlockDoubleSlabBase impl
         }
         return this.level.setBlock(this, Block.get(getCopperId(waxed, getOxidizationLevel())));
     }
-
-    @Override
-    public boolean isWaxed() {
-        return false;
-    }
-
-    protected abstract int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel);
 }

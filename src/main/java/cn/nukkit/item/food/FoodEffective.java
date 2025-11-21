@@ -22,15 +22,15 @@ public class FoodEffective extends Food {
         this.setRestoreSaturation(restoreSaturation);
     }
 
-    public FoodEffective addEffect(Effect effect) {
-        return addChanceEffect(1F, effect);
-    }
-
     public FoodEffective addChanceEffect(float chance, Effect effect) {
         if (chance > 1f) chance = 1f;
         if (chance < 0f) chance = 0f;
         effects.put(effect, chance);
         return this;
+    }
+
+    public FoodEffective addEffect(Effect effect) {
+        return addChanceEffect(1F, effect);
     }
 
     @Override

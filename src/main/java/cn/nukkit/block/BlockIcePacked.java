@@ -10,23 +10,8 @@ import cn.nukkit.item.enchantment.Enchantment;
 public class BlockIcePacked extends BlockIce {
 
     @Override
-    public int getId() {
-        return PACKED_ICE;
-    }
-
-    @Override
-    public String getName() {
-        return "Packed Ice";
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -40,17 +25,32 @@ public class BlockIcePacked extends BlockIce {
     }
 
     @Override
-    public int onUpdate(int type) {
-        return 0;
+    public double getHardness() {
+        return 0.1; //0.5
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return PACKED_ICE;
+    }
+
+    @Override
+    public String getName() {
+        return "Packed Ice";
     }
 
     @Override
     public boolean isTransparent() {
         return false;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        return 0;
     }
 }

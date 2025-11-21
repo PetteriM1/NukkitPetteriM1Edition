@@ -18,33 +18,8 @@ public class BlockConduit extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Conduit";
-    }
-
-    @Override
-    public int getId() {
-        return CONDUIT;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 15;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean alwaysDropsOnExplosion() {
+        return true;
     }
 
     @Override
@@ -53,13 +28,43 @@ public class BlockConduit extends BlockTransparentMeta {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
+    public BlockColor getColor() {
+        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 
     @Override
-    public boolean alwaysDropsOnExplosion() {
-        return true;
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public int getId() {
+        return CONDUIT;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 15;
+    }
+
+    @Override
+    public String getName() {
+        return "Conduit";
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     @Override
@@ -69,10 +74,5 @@ public class BlockConduit extends BlockTransparentMeta {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 }

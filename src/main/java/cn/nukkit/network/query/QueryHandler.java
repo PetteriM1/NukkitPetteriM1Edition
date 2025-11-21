@@ -33,38 +33,14 @@ public class QueryHandler {
     public QueryHandler() {
         this.server = Server.getInstance();
 
-        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.server.query.start"));
-        String ip = this.server.getIp();
-        String addr = (!ip.isEmpty()) ? ip : "0.0.0.0";
-        int port = this.server.getPort();
-        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.server.query.info", String.valueOf(port)));
-
         this.regenerateToken();
         this.lastToken = this.token;
         this.regenerateInfo();
-        this.server.getLogger().info(this.server.getLanguage().translateString("nukkit.server.query.running", new String[]{addr, String.valueOf(port)}));
-    }
-
-    public void regenerateInfo() {
-        QueryRegenerateEvent ev = this.server.getQueryInformation();
-        this.longData = ev.getLongQuery();
-        this.shortData = ev.getShortQuery();
-        this.timeout = System.currentTimeMillis() + ev.getTimeout();
-    }
-
-    public void regenerateToken() {
-        this.lastToken = this.token;
-        byte[] token = new byte[16];
-        for (int i = 0; i < 16; i++) {
-            token[i] = (byte) ThreadLocalRandom.current().nextInt(255);
-        }
-        this.token = token;
     }
 
     public static byte[] getTokenString(String token, InetAddress address) {
         return getTokenString(token.getBytes(StandardCharsets.UTF_8), address);
     }
-
 
     public static byte[] getTokenString(byte[] token, InetAddress address) {
         try {
@@ -116,5 +92,21 @@ public class QueryHandler {
                 this.server.getNetwork().sendPacket(address, reply);
                 break;
         }
+    }
+
+    public void regenerateInfo() {
+        QueryRegenerateEvent ev = this.server.getQueryInformation();
+        this.longData = ev.getLongQuery();
+        this.shortData = ev.getShortQuery();
+        this.timeout = System.currentTimeMillis() + ev.getTimeout();
+    }
+
+    public void regenerateToken() {
+        this.lastToken = this.token;
+        byte[] token = new byte[16];
+        for (int i = 0; i < 16; i++) {
+            token[i] = (byte) ThreadLocalRandom.current().nextInt(255);
+        }
+        this.token = token;
     }
 }

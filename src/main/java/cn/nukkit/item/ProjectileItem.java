@@ -23,6 +23,9 @@ public abstract class ProjectileItem extends Item {
         super(id, meta, count, name);
     }
 
+    protected void correctNBT(CompoundTag nbt) {
+    }
+
     abstract public String getProjectileEntityType();
 
     abstract public float getThrowForce();
@@ -86,8 +89,5 @@ public abstract class ProjectileItem extends Item {
         }
 
         return true;
-    }
-
-    protected void correctNBT(CompoundTag nbt) {
     }
 }

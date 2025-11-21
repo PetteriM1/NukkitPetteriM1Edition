@@ -1,18 +1,21 @@
 package cn.nukkit.blockentity;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockSignPost;
 import cn.nukkit.event.block.SignChangeEvent;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * @author MagicDroidX
@@ -24,6 +27,34 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
     public BlockEntitySign(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+    private static final Pattern FILTER = Pattern.compile("[\\uE000-\\uE0EA]");
+    private static final Pattern SC_SC = Pattern.compile("script>", Pattern.LITERAL);
+
+    public BlockColor getColor() {
+        return new BlockColor(this.namedTag.getInt("SignTextColor"), true);
+    }
+
+    public void setColor(BlockColor color) {
+        this.namedTag.putInt("SignTextColor", color.getARGB());
+        setDirty();
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.SIGN)
+                .putString("Text", this.namedTag.getString("Text"))
+                .putInt("SignTextColor", this.getColor().getARGB())
+                .putBoolean("IgnoreLighting", this.isGlowing())
+                .putBoolean("TextIgnoreLegacyBugResolved", true)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+    }
+
+    public String[] getText() {
+        return text;
     }
 
     @Override
@@ -72,14 +103,36 @@ public class BlockEntitySign extends BlockEntitySpawnable {
     }
 
     @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.remove("Creator");
+    public boolean isBlockEntityValid() {
+        return getLevelBlock() instanceof BlockSignPost;
+    }
+
+    public boolean isGlowing() {
+        return this.namedTag.getBoolean("IgnoreLighting");
+    }
+
+    public void setGlowing(boolean glowing) {
+        this.namedTag.putBoolean("IgnoreLighting", glowing);
+        setDirty();
+    }
+
+    private static void sanitizeText(String[] lines) {
+        for (int i = 0; i < lines.length; i++) {
+            // Don't allow excessive text per line
+            if (lines[i] != null) {
+                if (Server.getInstance().suomiCraftPEMode()) {
+                    lines[i] = SC_SC.matcher(FILTER.matcher(lines[i].substring(0, Math.min(100, lines[i].length()))).replaceAll("?")).replaceAll("?");
+                } else {
+                    lines[i] = lines[i].substring(0, Math.min(200, lines[i].length()));
+                }
+            }
+        }
     }
 
     @Override
-    public boolean isBlockEntityValid() {
-        return getLevelBlock() instanceof BlockSignPost;
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.remove("Creator");
     }
 
     public boolean setText(String... lines) {
@@ -97,28 +150,6 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         return true;
     }
 
-    public String[] getText() {
-        return text;
-    }
-
-    public BlockColor getColor() {
-        return new BlockColor(this.namedTag.getInt("SignTextColor"), true);
-    }
-
-    public void setColor(BlockColor color) {
-        this.namedTag.putInt("SignTextColor", color.getARGB());
-        setDirty();
-    }
-
-    public boolean isGlowing() {
-        return this.namedTag.getBoolean("IgnoreLighting");
-    }
-
-    public void setGlowing(boolean glowing) {
-        this.namedTag.putBoolean("IgnoreLighting", glowing);
-        setDirty();
-    }
-
     @Override
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {
         if (!nbt.getString("id").equals(BlockEntity.SIGN)) {
@@ -126,7 +157,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         }
         String[] lines = new String[4];
         Arrays.fill(lines, "");
-        String receivedText = nbt.getCompound("FrontText").getString("Text");
+        String receivedText = player.protocol >= ProtocolInfo.v1_19_80 ? nbt.getCompound("FrontText").getString("Text") : nbt.getString("Text");
         String[] splitLines = receivedText.split("\n", 4);
         System.arraycopy(splitLines, 0, lines, 0, splitLines.length);
 
@@ -152,27 +183,5 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         }
 
         return false;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.SIGN)
-                .putString("Text", this.namedTag.getString("Text"))
-                .putInt("SignTextColor", this.getColor().getARGB())
-                .putBoolean("IgnoreLighting", this.isGlowing())
-                .putBoolean("TextIgnoreLegacyBugResolved", true)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-    }
-
-    private static void sanitizeText(String[] lines) {
-        for (int i = 0; i < lines.length; i++) {
-            // Don't allow excessive text per line
-            if (lines[i] != null) {
-                lines[i] = lines[i].substring(0, Math.min(200, lines[i].length()));
-            }
-        }
     }
 }

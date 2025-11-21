@@ -10,6 +10,16 @@ public class BlockWarpedFungus extends BlockFungus {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
+    }
+
+    @Override
+    protected int getGround() {
+        return WARPED_NYLIUM;
+    }
+
+    @Override
     public int getId() {
         return WARPED_FUNGUS;
     }
@@ -22,15 +32,5 @@ public class BlockWarpedFungus extends BlockFungus {
     @Override
     protected ObjectNetherTree getTree() {
         return new ObjectWarpedTree();
-    }
-
-    @Override
-    protected int getGround() {
-        return WARPED_NYLIUM;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
     }
 }

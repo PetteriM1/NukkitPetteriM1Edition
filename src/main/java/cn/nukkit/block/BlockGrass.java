@@ -2,6 +2,7 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.block.properties.BlockNotImplemented;
 import cn.nukkit.event.block.BlockSpreadEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -29,8 +30,26 @@ public class BlockGrass extends BlockDirt {
     }
 
     @Override
-    public int getId() {
-        return GRASS;
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.GRASS_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+        return new Item[]{new ItemBlock(Block.get(BlockID.DIRT))};
+    }
+
+    @Override
+    public int getFullId() {
+        return this.getId() << Block.DATA_BITS;
     }
 
     @Override
@@ -39,13 +58,18 @@ public class BlockGrass extends BlockDirt {
     }
 
     @Override
-    public double getResistance() {
-        return 3;
+    public int getId() {
+        return GRASS;
     }
 
     @Override
     public String getName() {
         return "Grass Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
     }
 
     @Override
@@ -88,7 +112,7 @@ public class BlockGrass extends BlockDirt {
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_RANDOM) {
             Block up = this.up();
-            if (up instanceof BlockUnknown) {
+            if (up instanceof BlockUnknown || up instanceof BlockNotImplemented) {
                 return 0;
             }
 
@@ -120,29 +144,6 @@ public class BlockGrass extends BlockDirt {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GRASS_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public int getFullId() {
-        return this.getId() << Block.DATA_BITS;
-    }
-
-    @Override
     public void setDamage(int meta) {
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-            return new Item[]{this.toItem()};
-        }
-        return new Item[]{new ItemBlock(Block.get(BlockID.DIRT))};
     }
 }

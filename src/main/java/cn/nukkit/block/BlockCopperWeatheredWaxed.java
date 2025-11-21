@@ -7,13 +7,13 @@ public class BlockCopperWeatheredWaxed extends BlockCopperWeathered {
     }
 
     @Override
-    public String getName() {
-        return "Waxed Weathered Copper";
+    public int getId() {
+        return WAXED_WEATHERED_COPPER;
     }
 
     @Override
-    public int getId() {
-        return WAXED_WEATHERED_COPPER;
+    public String getName() {
+        return "Waxed Weathered Copper";
     }
 
     @Override

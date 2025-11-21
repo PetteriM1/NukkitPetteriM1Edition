@@ -9,6 +9,16 @@ import cn.nukkit.utils.Utils;
 public class ObjectCherryTree extends ObjectTree {
 
     @Override
+    public int getLeafBlock() {
+        return BlockID.CHERRY_LEAVES;
+    }
+
+    @Override
+    public int getTrunkBlock() {
+        return BlockID.CHERRY_LOG;
+    }
+
+    @Override
     protected boolean overridable(int id) {
         switch (id) {
             case BlockID.AIR:
@@ -21,14 +31,10 @@ public class ObjectCherryTree extends ObjectTree {
         }
     }
 
-    @Override
-    public int getTrunkBlock() {
-        return BlockID.CHERRY_LOG;
-    }
-
-    @Override
-    public int getLeafBlock() {
-        return BlockID.CHERRY_LEAVES;
+    private void placeLogAt(ChunkManager level, int x, int y, int z) {
+        if (overridable(level.getBlockIdAt(x, y, z))) {
+            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
+        }
     }
 
     @Override
@@ -124,11 +130,5 @@ public class ObjectCherryTree extends ObjectTree {
         }
 
         level.setBlockAt(x, i2, z, this.getLeafBlock(), this.getType());
-    }
-
-    private void placeLogAt(ChunkManager level, int x, int y, int z) {
-        if (overridable(level.getBlockIdAt(x, y, z))) {
-            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
-        }
     }
 }

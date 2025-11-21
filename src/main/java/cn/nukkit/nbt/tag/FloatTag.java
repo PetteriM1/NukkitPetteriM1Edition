@@ -9,16 +9,6 @@ public class FloatTag extends NumberTag<Float> {
 
     public float data;
 
-    @Override
-    public Float getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Float data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public FloatTag(String name) {
         super(name);
     }
@@ -26,31 +16,6 @@ public class FloatTag extends NumberTag<Float> {
     public FloatTag(String name, float data) {
         super(name);
         this.data = data;
-    }
-
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeFloat(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readFloat();
-    }
-
-    @Override
-    public Float parseValue() {
-        return this.data;
-    }
-
-    @Override
-    public byte getId() {
-        return TAG_Float;
-    }
-
-    @Override
-    public String toString() {
-        return "FloatTag " + this.getName() + " (data: " + data + ')';
     }
 
     @Override
@@ -65,5 +30,40 @@ public class FloatTag extends NumberTag<Float> {
             return data == o.data;
         }
         return false;
+    }
+
+    @Override
+    public Float getData() {
+        return data;
+    }
+
+    @Override
+    public void setData(Float data) {
+        this.data = data == null ? 0 : data;
+    }
+
+    @Override
+    public byte getId() {
+        return TAG_Float;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readFloat();
+    }
+
+    @Override
+    public Float parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "FloatTag " + this.getName() + " (data: " + data + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeFloat(data);
     }
 }

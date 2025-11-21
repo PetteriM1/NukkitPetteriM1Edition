@@ -76,6 +76,163 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         super(chunk, nbt);
     }
 
+    protected void checkFuel(Item fuel) {
+        FurnaceBurnEvent ev = new FurnaceBurnEvent(this, fuel, fuel.getFuelTime() == null ? 0 : fuel.getFuelTime());
+
+        this.server.getPluginManager().callEvent(ev);
+
+        if (ev.isCancelled()) {
+            return;
+        }
+
+        maxTime = ev.getBurnTime();
+        burnTime = ev.getBurnTime();
+        burnDuration = 0;
+
+        Block block = this.level.getBlock(this.chunk, (int) x, (int) y, (int) z, true);
+        if (block.getId() == Item.FURNACE) {
+            this.getLevel().setBlock(this, Block.get(BlockID.BURNING_FURNACE, block.getDamage()), true);
+        } else if (block.getId() == Item.SMOKER) {
+            this.getLevel().setBlock(this, Block.get(BlockID.LIT_SMOKER, block.getDamage()), true);
+        } else if (block.getId() == Item.BLAST_FURNACE) {
+            this.getLevel().setBlock(this, Block.get(BlockID.LIT_BLAST_FURNACE, block.getDamage()), true);
+        }
+
+        if (burnTime > 0 && ev.isBurning()) {
+            fuel.setCount(fuel.getCount() - 1);
+            if (fuel.getCount() == 0) {
+                if (fuel.getId() == Item.BUCKET && fuel.getDamage() == 10) {
+                    fuel.setDamage(0);
+                    fuel.setCount(1);
+                } else {
+                    fuel = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+                }
+            }
+            this.inventory.setFuel(fuel);
+        }
+    }
+
+    @Override
+    public void close() {
+        if (!closed) {
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
+            }
+
+            super.close();
+        }
+    }
+
+    public int getBurnDuration() {
+        return burnDuration;
+    }
+
+    public void setBurnDuration(int burnDuration) {
+        this.burnDuration = burnDuration;
+    }
+
+    public int getBurnTime() {
+        return burnTime;
+    }
+
+    public void setBurnTime(int burnTime) {
+        this.burnTime = burnTime;
+    }
+
+    public int getCookTime() {
+        return cookTime;
+    }
+
+    public void setCookTime(int cookTime) {
+        this.cookTime = cookTime;
+    }
+
+    public double getExperience() {
+        return this.experience;
+    }
+
+    public void setExperience(double experience) {
+        this.experience = experience;
+    }
+
+    @Override
+    public FurnaceInventory getInventory() {
+        return inventory;
+    }
+
+    @Override
+    public Item getItem(int index) {
+        int i = this.getSlotIndex(index);
+        if (i < 0) {
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+        } else {
+            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+            return NBTIO.getItemHelper(data);
+        }
+    }
+
+    public int getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(int maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Furnace";
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
+    }
+
+    @Override
+    public int getSize() {
+        return 3;
+    }
+
+    protected int getSlotIndex(int index) {
+        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getByte("Slot") == index) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.FURNACE)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putShort("BurnDuration", burnDuration)
+                .putShort("BurnTime", burnTime)
+                .putShort("CookTime", cookTime);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
     @Override
     protected void initBlockEntity() {
         if (this instanceof BlockEntityBlastFurnace) {
@@ -142,34 +299,9 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Furnace";
-    }
-
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
-    }
-
-    @Override
-    public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            this.namedTag.remove("CustomName");
-            return;
-        }
-
-        this.namedTag.putString("CustomName", name);
-    }
-
-    @Override
-    public void close() {
-        if (!closed) {
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-
-            super.close();
-        }
+    public boolean isBlockEntityValid() {
+        int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
+        return blockID == Block.FURNACE || blockID == Block.BURNING_FURNACE;
     }
 
     @Override
@@ -178,112 +310,6 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
             level.dropItem(this, content);
         }
         inventory.clearAll();
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putList(new ListTag<CompoundTag>("Items"));
-        for (int index = 0; index < this.getSize(); index++) {
-            this.setItem(index, this.inventory.getItem(index));
-        }
-
-        this.namedTag.putShort("CookTime", cookTime);
-        this.namedTag.putShort("BurnTime", burnTime);
-        this.namedTag.putShort("BurnDuration", burnDuration);
-        this.namedTag.putShort("MaxTime", maxTime);
-        this.namedTag.putDouble("Experience", experience);
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
-        return blockID == Block.FURNACE || blockID == Block.BURNING_FURNACE;
-    }
-
-    @Override
-    public int getSize() {
-        return 3;
-    }
-
-    protected int getSlotIndex(int index) {
-        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getByte("Slot") == index) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return NBTIO.getItemHelper(data);
-        }
-    }
-
-    @Override
-    public void setItem(int index, Item item) {
-        int i = this.getSlotIndex(index);
-
-        CompoundTag d = NBTIO.putItemHelper(item, index);
-
-        if (item.getId() == Item.AIR || item.getCount() <= 0) {
-            if (i >= 0) {
-                this.namedTag.getList("Items").getAll().remove(i);
-            }
-        } else if (i < 0) {
-            (this.namedTag.getList("Items", CompoundTag.class)).add(d);
-        } else {
-            (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
-        }
-    }
-
-    @Override
-    public FurnaceInventory getInventory() {
-        return inventory;
-    }
-
-    protected void checkFuel(Item fuel) {
-        FurnaceBurnEvent ev = new FurnaceBurnEvent(this, fuel, fuel.getFuelTime() == null ? 0 : fuel.getFuelTime());
-
-        this.server.getPluginManager().callEvent(ev);
-
-        if (ev.isCancelled()) {
-            return;
-        }
-
-        maxTime = ev.getBurnTime();
-        burnTime = ev.getBurnTime();
-        burnDuration = 0;
-
-        Block block = this.level.getBlock(this.chunk, (int) x, (int) y, (int) z, true);
-        if (block.getId() == Item.FURNACE) {
-            this.getLevel().setBlock(this, Block.get(BlockID.BURNING_FURNACE, block.getDamage()), true);
-        } else if (block.getId() == Item.SMOKER) {
-            this.getLevel().setBlock(this, Block.get(BlockID.LIT_SMOKER, block.getDamage()), true);
-        } else if (block.getId() == Item.BLAST_FURNACE) {
-            this.getLevel().setBlock(this, Block.get(BlockID.LIT_BLAST_FURNACE, block.getDamage()), true);
-        }
-
-        if (burnTime > 0 && ev.isBurning()) {
-            fuel.setCount(fuel.getCount() - 1);
-            if (fuel.getCount() == 0) {
-                if (fuel.getId() == Item.BUCKET && fuel.getDamage() == 10) {
-                    fuel.setDamage(0);
-                    fuel.setCount(1);
-                } else {
-                    fuel = new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-                }
-            }
-            this.inventory.setFuel(fuel);
-        }
     }
 
     @Override
@@ -355,6 +381,29 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
         return ret;
     }
 
+    public void releaseExperience() {
+        int experience = NukkitMath.floorDouble(this.experience);
+        if (experience >= 1) {
+            this.experience = 0;
+            this.level.dropExpOrb(this, experience);
+        }
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putList(new ListTag<CompoundTag>("Items"));
+        for (int index = 0; index < this.getSize(); index++) {
+            this.setItem(index, this.inventory.getItem(index));
+        }
+
+        this.namedTag.putShort("CookTime", cookTime);
+        this.namedTag.putShort("BurnTime", burnTime);
+        this.namedTag.putShort("BurnDuration", burnDuration);
+        this.namedTag.putShort("MaxTime", maxTime);
+        this.namedTag.putDouble("Experience", experience);
+    }
+
     protected void sendPacket() {
         for (Player player : this.inventory.getViewers()) {
             int windowId = player.getWindowId(this.inventory);
@@ -375,68 +424,19 @@ public class BlockEntityFurnace extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.FURNACE)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putShort("BurnDuration", burnDuration)
-                .putShort("BurnTime", burnTime)
-                .putShort("CookTime", cookTime);
+    public void setItem(int index, Item item) {
+        int i = this.getSlotIndex(index);
 
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
+        CompoundTag d = NBTIO.putItemHelper(item, index);
 
-        return c;
-    }
-
-    public int getBurnTime() {
-        return burnTime;
-    }
-
-    public void setBurnTime(int burnTime) {
-        this.burnTime = burnTime;
-    }
-
-    public int getBurnDuration() {
-        return burnDuration;
-    }
-
-    public void setBurnDuration(int burnDuration) {
-        this.burnDuration = burnDuration;
-    }
-
-    public int getCookTime() {
-        return cookTime;
-    }
-
-    public void setCookTime(int cookTime) {
-        this.cookTime = cookTime;
-    }
-
-    public int getMaxTime() {
-        return maxTime;
-    }
-
-    public void setMaxTime(int maxTime) {
-        this.maxTime = maxTime;
-    }
-
-    public double getExperience() {
-        return this.experience;
-    }
-
-    public void setExperience(double experience) {
-        this.experience = experience;
-    }
-
-    public void releaseExperience() {
-        int experience = NukkitMath.floorDouble(this.experience);
-        if (experience >= 1) {
-            this.experience = 0;
-            this.level.dropExpOrb(this, experience);
+        if (item.getId() == Item.AIR || item.getCount() <= 0) {
+            if (i >= 0) {
+                this.namedTag.getList("Items").getAll().remove(i);
+            }
+        } else if (i < 0) {
+            (this.namedTag.getList("Items", CompoundTag.class)).add(d);
+        } else {
+            (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
         }
     }
 }

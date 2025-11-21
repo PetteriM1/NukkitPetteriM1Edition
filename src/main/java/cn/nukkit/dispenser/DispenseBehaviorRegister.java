@@ -1,5 +1,6 @@
 package cn.nukkit.dispenser;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockID;
 import cn.nukkit.item.ItemID;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -13,16 +14,8 @@ public final class DispenseBehaviorRegister {
     private static final Int2ObjectMap<DispenseBehavior> behaviors = new Int2ObjectOpenHashMap<>();
     private static final DispenseBehavior defaultBehavior = new DefaultDispenseBehavior();
 
-    public static void registerBehavior(int itemId, DispenseBehavior behavior) {
-        behaviors.put(itemId, behavior);
-    }
-
     public static DispenseBehavior getBehavior(int id) {
         return behaviors.getOrDefault(id, defaultBehavior);
-    }
-
-    public static void removeDispenseBehavior(int id) {
-        behaviors.remove(id);
     }
 
     public static void init() {
@@ -33,11 +26,12 @@ public final class DispenseBehaviorRegister {
         registerBehavior(ItemID.FLINT_AND_STEEL, new FlintAndSteelDispenseBehavior());
         registerBehavior(BlockID.SHULKER_BOX, new ShulkerBoxDispenseBehavior());
         registerBehavior(BlockID.UNDYED_SHULKER_BOX, new UndyedShulkerBoxDispenseBehavior());
-        registerBehavior(ItemID.SPAWN_EGG, new SpawnEggDispenseBehavior());
+        if (Server.getInstance().spawnEggsEnabled) registerBehavior(ItemID.SPAWN_EGG, new SpawnEggDispenseBehavior());
         registerBehavior(BlockID.TNT, new TNTDispenseBehavior());
         registerBehavior(ItemID.FIRE_CHARGE, new FireChargeDispenseBehavior());
         registerBehavior(ItemID.SHEARS, new ShearsDispenseBehaviour());
         registerBehavior(ItemID.POTION, new PotionDispenseBehaviour());
+        registerBehavior(ItemID.GLASS_BOTTLE, new GlassBottleDispenseBehaviour());
         registerBehavior(ItemID.ARROW, new ProjectileDispenseBehavior("Arrow") {
             @Override
             protected double getMotion() {
@@ -105,5 +99,13 @@ public final class DispenseBehaviorRegister {
         registerBehavior(ItemID.MINECART_WITH_CHEST, new MinecartDispenseBehavior());
         registerBehavior(ItemID.MINECART_WITH_HOPPER, new MinecartDispenseBehavior());
         registerBehavior(ItemID.MINECART_WITH_TNT, new MinecartDispenseBehavior());
+    }
+
+    public static void registerBehavior(int itemId, DispenseBehavior behavior) {
+        behaviors.put(itemId, behavior);
+    }
+
+    public static void removeDispenseBehavior(int id) {
+        behaviors.remove(id);
     }
 }

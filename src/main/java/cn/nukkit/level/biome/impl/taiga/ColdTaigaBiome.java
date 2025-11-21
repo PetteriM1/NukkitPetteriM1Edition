@@ -15,8 +15,8 @@ public class ColdTaigaBiome extends TaigaBiome {
     }
 
     @Override
-    public String getName() {
-        return "Cold Taiga";
+    public boolean canRain() {
+        return false;
     }
 
     @Override
@@ -25,12 +25,12 @@ public class ColdTaigaBiome extends TaigaBiome {
     }
 
     @Override
-    public boolean isFreezing() {
-        return true;
+    public String getName() {
+        return "Cold Taiga";
     }
 
     @Override
-    public boolean canRain() {
-        return false;
+    public boolean isFreezing() {
+        return true;
     }
 }

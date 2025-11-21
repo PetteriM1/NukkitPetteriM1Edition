@@ -22,6 +22,87 @@ public class BlockEntityBarrel extends BlockEntitySpawnable implements Inventory
         super(chunk, nbt);
     }
 
+    @Override
+    public void close() {
+        if (!this.closed && this.inventory != null) {
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
+            }
+        }
+
+        super.close();
+    }
+
+    @Override
+    public BarrelInventory getInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        return this.inventory;
+    }
+
+    @Override
+    public Item getItem(int index) {
+        int i = this.getSlotIndex(index);
+        if (i < 0) {
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+        } else {
+            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+            return NBTIO.getItemHelper(data);
+        }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Barrel";
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
+    }
+
+    @Override
+    public int getSize() {
+        return 27;
+    }
+
+    protected int getSlotIndex(int index) {
+        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getByte("Slot") == index) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.BARREL)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
     private void initInventory() {
         if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
             this.namedTag.putList(new ListTag<CompoundTag>("Items"));
@@ -39,14 +120,8 @@ public class BlockEntityBarrel extends BlockEntitySpawnable implements Inventory
     }
 
     @Override
-    public void close() {
-        if (!this.closed && this.inventory != null) {
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-        }
-
-        super.close();
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == BlockID.BARREL;
     }
 
     @Override
@@ -73,38 +148,6 @@ public class BlockEntityBarrel extends BlockEntitySpawnable implements Inventory
     }
 
     @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == BlockID.BARREL;
-    }
-
-    @Override
-    public int getSize() {
-        return 27;
-    }
-
-    protected int getSlotIndex(int index) {
-        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getByte("Slot") == index) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return NBTIO.getItemHelper(data);
-        }
-    }
-
-    @Override
     public void setItem(int index, Item item) {
         int i = this.getSlotIndex(index);
 
@@ -122,48 +165,5 @@ public class BlockEntityBarrel extends BlockEntitySpawnable implements Inventory
             // If it is more than i, then it is an update on a inventorySlot, so we are going to overwrite the item in the list
             (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
         }
-    }
-
-    @Override
-    public BarrelInventory getInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        return this.inventory;
-    }
-
-    @Override
-    public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Barrel";
-    }
-
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
-    }
-
-    @Override
-    public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            this.namedTag.remove("CustomName");
-            return;
-        }
-
-        this.namedTag.putString("CustomName", name);
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.BARREL)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
-
-        return c;
     }
 }

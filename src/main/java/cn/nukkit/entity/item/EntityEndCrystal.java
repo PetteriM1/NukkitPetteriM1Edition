@@ -18,46 +18,8 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     private boolean detonated = false;
     private String nameTag;
 
-    @Override
-    public float getLength() {
-        return 2f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 2f;
-    }
-
-    @Override
-    public float getWidth() {
-        return 2f;
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
     public EntityEndCrystal(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    protected void initEntity() {
-        super.initEntity();
-
-        if (this.namedTag.contains("ShowBottom")) {
-            this.setShowBase(this.namedTag.getBoolean("ShowBottom"));
-        }
-
-        this.fireProof = true;
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        this.namedTag.putBoolean("ShowBottom", this.showBase());
     }
 
     @Override
@@ -88,18 +50,10 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
         return true;
     }
 
-    public boolean showBase() {
-        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE);
-    }
-
-    public void setShowBase(boolean value) {
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE, value);
-    }
-
     @Override
     public void explode() {
         this.close();
-        if (!this.detonated && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)) {
+        if (!this.detonated && ((level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.TNT_EXPLODES)) || (!this.level.getServer().suomiCraftPEMode() && this.level.getGameRules().getBoolean(GameRule.MOB_GRIEFING)))) {
             EntityExplosionPrimeEvent ev = new EntityExplosionPrimeEvent(this, 6);
             this.server.getPluginManager().callEvent(ev);
             if (ev.isCancelled()) {
@@ -124,8 +78,23 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
+    public float getHeight() {
+        return 2f;
+    }
+
+    @Override
+    public float getLength() {
+        return 2f;
+    }
+
+    @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "End Crystal";
+    }
+
+    @Override
+    public String getNameTag() {
+        return this.nameTag == null ? "" : this.nameTag;
     }
 
     @Override
@@ -137,13 +106,43 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        return 2f;
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasCustomName() {
         return this.nameTag != null;
     }
 
     @Override
-    public String getNameTag() {
-        return this.nameTag == null ? "" : this.nameTag;
+    public boolean ignoredAsSaveReason() {
+        return true;
+    }
+
+    @Override
+    protected void initEntity() {
+        super.initEntity();
+
+        if (this.namedTag.contains("ShowBottom")) {
+            this.setShowBase(this.namedTag.getBoolean("ShowBottom"));
+        }
+
+        this.fireProof = true;
     }
 
     @Override // Minimal
@@ -167,7 +166,17 @@ public class EntityEndCrystal extends Entity implements EntityExplosive {
     }
 
     @Override
-    public boolean ignoredAsSaveReason() {
-        return true;
+    public void saveNBT() {
+        super.saveNBT();
+
+        this.namedTag.putBoolean("ShowBottom", this.showBase());
+    }
+
+    public void setShowBase(boolean value) {
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE, value);
+    }
+
+    public boolean showBase() {
+        return this.getDataFlag(DATA_FLAGS, DATA_FLAG_SHOWBASE);
     }
 }

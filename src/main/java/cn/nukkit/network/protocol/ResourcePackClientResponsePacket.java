@@ -17,6 +17,18 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     public byte responseStatus;
     public Entry[] packEntries;
 
+    @ToString
+    public static class Entry {
+
+        public final UUID uuid;
+        public final String version;
+
+        public Entry(UUID uuid, String version) {
+            this.uuid = uuid;
+            this.version = version;
+        }
+    }
+
     @Override
     public void decode() {
         this.responseStatus = (byte) this.getByte();
@@ -40,17 +52,5 @@ public class ResourcePackClientResponsePacket extends DataPacket {
     @Override
     public byte pid() {
         return NETWORK_ID;
-    }
-
-    @ToString
-    public static class Entry {
-
-        public final UUID uuid;
-        public final String version;
-
-        public Entry(UUID uuid, String version) {
-            this.uuid = uuid;
-            this.version = version;
-        }
     }
 }

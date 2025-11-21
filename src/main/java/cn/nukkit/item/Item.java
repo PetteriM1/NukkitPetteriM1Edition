@@ -5,6 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
 import cn.nukkit.block.BlockID;
+import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.inventory.Fuel;
 import cn.nukkit.item.RuntimeItemMapping.RuntimeEntry;
@@ -25,6 +26,7 @@ import cn.nukkit.utils.material.MaterialType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Data;
 
 import java.io.IOException;
@@ -53,6 +55,8 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
 
     private PersistentItemDataContainer persistentContainer;
 
+    private static final Int2ObjectOpenHashMap<String> ITEM_NAMES = new Int2ObjectOpenHashMap<>();
+
     public Item(int id) {
         this(id, 0, 1, UNKNOWN_STR);
     }
@@ -73,15 +77,923 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
             this.hasMeta = false;
         }
         this.count = count;
-        this.name = name;
+        //this.name = name;
+
+        if (name != null) {
+            int nameKey = (((short) this.id) << 16) | (((this instanceof ItemDurable ? 0 : this.meta) & 0x7fff) << 1);
+            if (!ITEM_NAMES.containsKey(nameKey)) {
+                ITEM_NAMES.put(nameKey, name);
+            }
+        }
+    }
+    private static final CreativeItems CREATIVE_ITEMS = new CreativeItems();
+    private static boolean initialized;
+    private static List<ItemDefinition> toBeAdded;
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("^[-1-9]\\d*$");
+
+    public static class CreativeItems {
+
+        private final List<CreativeItemGroup> groups = new ArrayList<>();
+        private final Map<Item, CreativeItemGroup> contents = new LinkedHashMap<>();
+
+        public void add(Item item) {
+            add(item, ItemDefinition.CreativeCategory.ITEMS, ""); // TODO: vanilla items back to correct categories & groups
+        }
+
+        public void add(Item item, CreativeItemGroup group) {
+            if (group == null) {
+                throw new IllegalArgumentException("group == null");
+            }
+
+            contents.put(item, group);
+        }
+
+        public void add(Item item, ItemDefinition.CreativeCategory category, String group) {
+            CreativeItemGroup creativeGroup = null;
+
+            for (CreativeItemGroup existing : groups) {
+                if (existing.category == category && existing.name.equals(group)) {
+                    creativeGroup = existing;
+                    break;
+                }
+            }
+
+            if (creativeGroup == null) {
+                creativeGroup = new CreativeItemGroup(groups.size(), category, group, item);
+                groups.add(creativeGroup);
+            }
+
+            contents.put(item, creativeGroup);
+        }
+
+        public void addGroup(CreativeItemGroup creativeGroup) {
+            groups.add(creativeGroup);
+        }
+
+        public void clear() {
+            groups.clear();
+            contents.clear();
+        }
+
+        public Map<Item, CreativeItemGroup> getContents() {
+            return getContents(ProtocolInfo.CURRENT_PROTOCOL);
+        }
+
+        public Map<Item, CreativeItemGroup> getContents(int protocol) {
+            if (protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                Map<Item, CreativeItemGroup> map = new LinkedHashMap<>();
+                for (Map.Entry<Item, CreativeItemGroup> e : contents.entrySet()) {
+                    if (e.getKey().isSupportedOn(protocol)) {
+                        map.put(e.getKey(), e.getValue());
+                    }
+                }
+                return map;
+            }
+            return contents;
+        }
+
+        // TODO: For updates versions check Item & Icon compatibility, re-id groups
+
+        public List<CreativeItemGroup> getGroups() {
+            return groups;
+        }
+
+        public Collection<Item> getItems() {
+            return contents.keySet();
+        }
+
+        public Collection<Item> getItems(int protocol) {
+            if (protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+                ArrayList<Item> list = new ArrayList<>();
+                for (Item i : contents.keySet()) {
+                    if (i.isSupportedOn(protocol)) {
+                        list.add(i);
+                    }
+                }
+                return list;
+            }
+            return contents.keySet();
+        }
+    }
+
+    @Data
+    public static class CreativeItemGroup {
+        private final int groupId;
+        private final ItemDefinition.CreativeCategory category;
+        private final String name;
+        private final Item icon;
+    }
+
+    public static void addCreativeItem(Item item) {
+        CREATIVE_ITEMS.add(item.clone());
+    }
+
+    public static void addCustomCreativeItem(ItemDefinition definition) {
+        if (initialized) {
+            throw new IllegalStateException();
+        }
+
+        if (toBeAdded == null) {
+            toBeAdded = new ArrayList<>();
+        }
+
+        toBeAdded.add(definition);
+    }
+
+    public void addEnchantment(Enchantment... enchantments) {
+        CompoundTag tag;
+        if (!this.hasCompoundTag()) {
+            tag = new CompoundTag();
+        } else {
+            tag = this.getNamedTag();
+        }
+
+        ListTag<CompoundTag> ench;
+        if (!tag.contains("ench")) {
+            ench = new ListTag<>("ench");
+            tag.putList(ench);
+        } else {
+            ench = tag.getList("ench", CompoundTag.class);
+        }
+
+        for (Enchantment enchantment : enchantments) {
+            boolean found = false;
+
+            for (int k = 0; k < ench.size(); k++) {
+                CompoundTag entry = ench.get(k);
+                if (entry.getShort("id") == enchantment.getId()) {
+                    ench.add(k, new CompoundTag()
+                            .putShort("id", enchantment.getId())
+                            .putShort("lvl", enchantment.getLevel())
+                    );
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                ench.add(new CompoundTag()
+                        .putShort("id", enchantment.getId())
+                        .putShort("lvl", enchantment.getLevel())
+                );
+            }
+        }
+
+        this.setNamedTag(tag);
+    }
+
+    /**
+     * Whether item can be placed in player offhand inventory
+     */
+    public boolean allowOffhand() {
+        return this.id == AIR;
+    }
+
+    public boolean canBeActivated() {
+        return false;
+    }
+
+    final public boolean canBePlaced() {
+        return ((this.block != null) && this.block.canBePlaced());
+    }
+
+    public boolean canBePutInHelmetSlot() {
+        return false;
+    }
+
+    public static void clearCreativeItems() {
+        CREATIVE_ITEMS.clear();
+    }
+
+    public Item clearCustomBlockData() {
+        if (!this.hasCompoundTag()) {
+            return this;
+        }
+        CompoundTag tag = this.getNamedTag();
+
+        if (tag.contains("BlockEntityTag") && tag.get("BlockEntityTag") instanceof CompoundTag) {
+            tag.remove("BlockEntityTag");
+            this.setNamedTag(tag);
+        }
+
+        return this;
+    }
+
+    public Item clearCustomName() {
+        if (!this.hasCompoundTag()) {
+            return this;
+        }
+
+        CompoundTag tag = this.getNamedTag();
+
+        if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
+            tag.getCompound("display").remove("Name");
+            if (tag.getCompound("display").isEmpty()) {
+                tag.remove("display");
+            }
+
+            this.setNamedTag(tag);
+        }
+
+        return this;
+    }
+
+    public Item clearNamedTag() {
+        return this.setCompoundTag(new byte[0]);
+    }
+
+    @Override
+    public Item clone() {
+        try {
+            Item item = (Item) super.clone();
+            item.tags = this.tags.clone();
+            return item;
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns a new item instance with count decreased by amount or air if new count is less or equal to 0
+     */
+    public final Item decrement(int amount) {
+        return increment(-amount);
+    }
+
+    @Deprecated
+    public final boolean deepEquals(Item item) {
+        return equals(item, true);
+    }
+
+    @Deprecated
+    public final boolean deepEquals(Item item, boolean checkDamage) {
+        return equals(item, checkDamage, true);
+    }
+
+    @Deprecated
+    public final boolean deepEquals(Item item, boolean checkDamage, boolean checkCompound) {
+        return equals(item, checkDamage, checkCompound);
+    }
+
+    @Override
+    public final boolean equals(Object item) {
+        return item instanceof Item && this.equals((Item) item, true);
+    }
+
+    public final boolean equals(Item item, boolean checkDamage) {
+        return equals(item, checkDamage, true);
+    }
+
+    public final boolean equals(Item item, boolean checkDamage, boolean checkCompound) {
+        if (this.id == item.id && (!checkDamage || this.meta == item.meta)) {
+            if (checkCompound) {
+                if (Arrays.equals(this.getCompoundTag(), item.getCompoundTag())) {
+                    return true;
+                } else if (this.hasCompoundTag() && item.hasCompoundTag()) {
+                    return this.getNamedTag().equals(item.getNamedTag());
+                }
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether the specified item stack has the same ID, damage, NBT and count as this item stack.
+     *
+     * @param other item
+     * @return equal
+     */
+    public final boolean equalsExact(Item other) {
+        return this.equals(other, true, true) && this.count == other.count;
+    }
+
+    public static Item fromJson(Map<String, Object> data) {
+        String nbt = (String) data.get("nbt_b64");
+        byte[] nbtBytes;
+        if (nbt != null) {
+            nbtBytes = Base64.getDecoder().decode(nbt);
+        } else { // Support old format for backwards compatibility
+            nbt = (String) data.getOrDefault("nbt_hex", null);
+            if (nbt == null) {
+                nbtBytes = new byte[0];
+            } else {
+                nbtBytes = Utils.parseHexBinary(nbt);
+            }
+        }
+
+        return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbtBytes);
+    }
+
+    public static Item fromString(String str) {
+        String[] b = str.trim().replace(' ', '_').replace("minecraft:", "").split(":");
+
+        int id = 0;
+        int meta = 0;
+
+        String idStr = b[0];
+        if (INTEGER_PATTERN.matcher(idStr).matches()) {
+            id = Integer.parseInt(idStr);
+        } else {
+            String idStrUp = idStr.toUpperCase(Locale.ROOT);
+            try {
+                id = BlockID.class.getField(idStrUp).getInt(null);
+                if (id > 255) {
+                    id = 255 - id;
+                }
+            } catch (Exception ignore) {
+                try {
+                    id = ItemID.class.getField(idStrUp).getInt(null);
+                } catch (Exception ignore1) {
+                }
+            }
+        }
+
+        if (b.length != 1) {
+            try {
+                meta = Integer.parseInt(b[1]) & 0xFFFF;
+            } catch (NumberFormatException customItem) {
+                return Item.get(AIR);
+            }
+        }
+
+        return get(id, meta);
+    }
+
+    public static Item[] fromStringMultiple(String str) {
+        String[] b = str.split(",");
+        Item[] items = new Item[b.length - 1];
+        for (int i = 0; i < b.length; i++) {
+            items[i] = fromString(b[i]);
+        }
+        return items;
+    }
+
+    public static Item get(MaterialType type) {
+        return get(type, 0);
+    }
+
+    public static Item get(MaterialType type, Integer meta) {
+        return get(type, meta, 1);
+    }
+
+    public static Item get(MaterialType type, Integer meta, int count) {
+        int legacyId = type.getLegacyId();
+        if (type instanceof BlockType && legacyId > 255) {
+            legacyId = 255 - legacyId;
+        }
+        return get(legacyId, meta, count);
+    }
+
+    public static Item get(int id) {
+        return get(id, 0);
+    }
+
+    public static Item get(int id, Integer meta) {
+        return get(id, meta, 1);
+    }
+
+    public static Item get(int id, Integer meta, int count) {
+        return get(id, meta, count, new byte[0]);
+    }
+
+    public static Item get(int id, Integer meta, int count, byte[] tags) {
+        try {
+            Class<?> c;
+            if (id < 0) {
+                int blockId = 255 - id;
+                if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+                    c = CustomBlockManager.get().getClassType(blockId);
+                } else {
+                    c = Block.list[blockId];
+                }
+            } else {
+                c = list[id];
+            }
+            Item item;
+
+            if (c == null) {
+                item = new Item(id, meta, count);
+            } else if (id < 256 && id != 166) {
+                if (meta >= 0) {
+                    item = new ItemBlock(Block.get(id, meta), meta, count);
+                } else {
+                    item = new ItemBlock(Block.get(id), meta, count);
+                }
+            } else {
+                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
+            }
+
+            if (tags.length != 0) {
+                item.setCompoundTag(tags);
+            }
+
+            return item.initItem();
+        } catch (Exception e) {
+            return new Item(id, meta, count).setCompoundTag(tags).initItem();
+        }
+    }
+
+    public static Item get(int id, Integer meta, int count, Tag tags) {
+        try {
+            Class<?> c;
+            if (id < 0) {
+                int blockId = 255 - id;
+                if (blockId >= CustomBlockManager.LOWEST_CUSTOM_BLOCK_ID) {
+                    c = CustomBlockManager.get().getClassType(blockId);
+                } else {
+                    c = Block.list[blockId];
+                }
+            } else {
+                c = list[id];
+            }
+            Item item;
+
+            if (c == null) {
+                item = new Item(id, meta, count);
+            } else if (id < 256 && id != 166) {
+                if (meta >= 0) {
+                    item = new ItemBlock(Block.get(id, meta), meta, count);
+                } else {
+                    item = new ItemBlock(Block.get(id), meta, count);
+                }
+            } else {
+                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
+            }
+
+            if (tags instanceof CompoundTag) {
+                item.setCompoundTag((CompoundTag) tags);
+            }
+
+            return item.initItem();
+        } catch (Exception e) {
+            Item item = new Item(id, meta, count);
+            if (tags instanceof CompoundTag) {
+                item.setCompoundTag((CompoundTag) tags);
+            }
+            return item.initItem();
+        }
+    }
+
+    public int getArmorPoints() {
+        return 0;
+    }
+
+    public int getAttackDamage() {
+        return 1;
+    }
+
+    public Block getBlock() {
+        if (this.block != null) {
+            return this.block.clone();
+        } else {
+            return Block.get(BlockID.AIR);
+        }
+    }
+
+    public int getBlockId() {
+        return block == null ? 0 : block.getId();
+    }
+
+    public Block getBlockUnsafe() {
+        return this.block;
+    }
+
+    public byte[] getCompoundTag() {
+        return tags;
+    }
+
+    public Item setCompoundTag(CompoundTag tag) {
+        this.setNamedTag(tag);
+        return this;
+    }
+
+    public Item setCompoundTag(byte[] tags) {
+        this.tags = tags;
+        this.cachedNBT = null;
+        return this;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    @Deprecated
+    public static Item getCreativeItem(int index) {
+        ArrayList<Item> items = getCreativeItems();
+        return (index >= 0 && index < items.size()) ? items.get(index) : null;
+    }
+
+    @Deprecated
+    public static int getCreativeItemIndex(Item item) {
+        ArrayList<Item> items = getCreativeItems();
+        for (int i = 0; i < items.size(); i++) {
+            if (item.equals(items.get(i), !item.isTool())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static ArrayList<Item> getCreativeItems() {
+        return new ArrayList<>(CREATIVE_ITEMS.getItems());
+    }
+
+    public static ArrayList<Item> getCreativeItems(int protocol) {
+        return new ArrayList<>(CREATIVE_ITEMS.getItems(protocol));
+    }
+
+    public static CreativeItems getCreativeItemsAndGroups() {
+        return CREATIVE_ITEMS;
+    }
+
+    public CompoundTag getCustomBlockData() {
+        if (!this.hasCompoundTag()) {
+            return null;
+        }
+
+        CompoundTag tag = this.getNamedTag();
+
+        if (tag.contains("BlockEntityTag")) {
+            Tag bet = tag.get("BlockEntityTag");
+            if (bet instanceof CompoundTag) {
+                return (CompoundTag) bet;
+            }
+        }
+
+        return null;
+    }
+
+    public Item setCustomBlockData(CompoundTag compoundTag) {
+        CompoundTag tags = compoundTag.copy();
+        tags.setName("BlockEntityTag");
+
+        CompoundTag tag;
+        if (!this.hasCompoundTag()) {
+            tag = new CompoundTag();
+        } else {
+            tag = this.getNamedTag();
+        }
+
+        tag.putCompound("BlockEntityTag", tags);
+        this.setNamedTag(tag);
+
+        return this;
+    }
+
+    public String getCustomName() {
+        if (!this.hasCompoundTag()) {
+            return "";
+        }
+
+        CompoundTag tag = this.getNamedTag();
+        if (tag.contains("display")) {
+            Tag tag1 = tag.get("display");
+            if (tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag) {
+                return ((CompoundTag) tag1).getString("Name");
+            }
+        }
+
+        return "";
+    }
+
+    public Item setCustomName(String name) {
+        if (name == null || name.isEmpty()) {
+            this.clearCustomName();
+            return this;
+        }
+
+        if (name.length() > 100) {
+            name = name.substring(0, 100);
+        }
+
+        CompoundTag tag;
+        if (!this.hasCompoundTag()) {
+            tag = new CompoundTag();
+        } else {
+            tag = this.getNamedTag();
+        }
+        if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
+            tag.getCompound("display").putString("Name", name);
+        } else {
+            tag.putCompound("display", new CompoundTag("display")
+                    .putString("Name", name)
+            );
+        }
+        this.setNamedTag(tag);
+        return this;
+    }
+
+    public int getDamage() {
+        return meta == 0xffff ? 0 : meta;
+    }
+
+    public void setDamage(Integer meta) {
+        if (meta != null) {
+            this.meta = meta & 0xffff;
+        } else {
+            this.hasMeta = false;
+        }
+    }
+
+    public int getEnchantAbility() {
+        return 0;
+    }
+
+    public Enchantment getEnchantment(int id) {
+        return getEnchantment((short) (id & 0xffff));
+    }
+
+    public Enchantment getEnchantment(short id) {
+        if (!this.hasEnchantments()) {
+            return null;
+        }
+
+        for (CompoundTag entry : this.getNamedTag().getList("ench", CompoundTag.class).getAll()) {
+            if (entry.getShort("id") == id) {
+                Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
+                if (e != null) {
+                    e.setLevel(entry.getShort("lvl"));
+                    return e;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public int getEnchantmentLevel(int id) {
+        Enchantment e = this.getEnchantment(id);
+        return e == null ? 0 : e.getLevel();
+    }
+
+    public Enchantment[] getEnchantments() {
+        if (!this.hasEnchantments()) {
+            return new Enchantment[0];
+        }
+
+        List<Enchantment> enchantments = new ArrayList<>();
+
+        ListTag<CompoundTag> ench = this.getNamedTag().getList("ench", CompoundTag.class);
+        for (CompoundTag entry : ench.getAll()) {
+            Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
+            if (e != null) {
+                e.setLevel(entry.getShort("lvl"));
+                enchantments.add(e);
+            }
+        }
+
+        return enchantments.toArray(new Enchantment[0]);
+    }
+
+    final public Short getFuelTime() {
+        if (!Fuel.duration.containsKey(id)) {
+            return null;
+        }
+        if (this.id != BUCKET || this.meta == 10) {
+            return Fuel.duration.get(this.id);
+        }
+        return null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public MaterialType getItemType() {
+        if (this.materialType == null) {
+            this.materialType = ItemTypes.getFromLegacy(this.id);
+        }
+        return this.materialType;
+    }
+
+    public String[] getLore() {
+        Tag tag = this.getNamedTagEntry("display");
+        ArrayList<String> lines = new ArrayList<>();
+
+        if (tag instanceof CompoundTag) {
+            CompoundTag nbt = (CompoundTag) tag;
+            ListTag<StringTag> lore = nbt.getList("Lore", StringTag.class);
+
+            if (lore.size() > 0) {
+                for (StringTag stringTag : lore.getAll()) {
+                    lines.add(stringTag.data);
+                }
+            }
+        }
+
+        return lines.toArray(new String[0]);
+    }
+
+    public Item setLore(String... lines) {
+        CompoundTag tag;
+        if (!this.hasCompoundTag()) {
+            tag = new CompoundTag();
+        } else {
+            tag = this.getNamedTag();
+        }
+        ListTag<StringTag> lore = new ListTag<>("Lore");
+
+        for (String line : lines) {
+            lore.add(new StringTag("", line));
+        }
+
+        if (!tag.contains("display")) {
+            tag.putCompound("display", new CompoundTag("display").putList(lore));
+        } else {
+            tag.getCompound("display").putList(lore);
+        }
+
+        this.setNamedTag(tag);
+        return this;
+    }
+
+    public int getMaxDurability() {
+        return -1;
+    }
+
+    public int getMaxStackSize() {
+        return 64;
+    }
+
+    public String getName() {
+        return this.hasCustomName() ? this.getCustomName() : ITEM_NAMES.get((((short) this.id) << 16) | (((this instanceof ItemDurable ? 0 : this.meta) & 0x7fff) << 1)); // this.name
+    }
+
+    public CompoundTag getNamedTag() {
+        if (!this.hasCompoundTag()) {
+            return null;
+        }
+
+        if (this.cachedNBT == null) {
+            this.cachedNBT = parseCompoundTag(this.tags);
+        }
+
+        this.cachedNBT.setName("");
+
+        return this.cachedNBT;
+    }
+
+    public Item setNamedTag(CompoundTag tag) {
+        if (tag.isEmpty()) {
+            return this.clearNamedTag();
+        }
+        tag.setName(null);
+
+        this.cachedNBT = tag;
+        this.tags = writeCompoundTag(tag);
+
+        return this;
+    }
+
+    public Tag getNamedTagEntry(String name) {
+        CompoundTag tag = this.getNamedTag();
+        if (tag != null) {
+            return tag.get(name);
+        }
+
+        return null;
+    }
+
+    public final int getNetworkId() {
+        Server.mvw("Item#getNetworkId()");
+        return this.getNetworkId(CURRENT_PROTOCOL);
+    }
+
+    public final int getNetworkId(int protocolId) {
+        if (protocolId < v1_16_100) {
+            return getId();
+        }
+        return this.getRuntimeEntry(protocolId).getRuntimeId();
+    }
+
+    public PersistentItemDataContainer getPersistentDataContainer() {
+        if (this.persistentContainer == null) {
+            this.persistentContainer = new PersistentDataContainerItemWrapper(this);
+        }
+        return this.persistentContainer;
+    }
+
+    public int getRepairCost() {
+        if (this.hasCompoundTag()) {
+            CompoundTag tag = this.getNamedTag();
+            if (tag.contains("RepairCost")) {
+                Tag repairCost = tag.get("RepairCost");
+                if (repairCost instanceof IntTag) {
+                    return ((IntTag) repairCost).data;
+                }
+            }
+        }
+        return 0;
+    }
+
+    public Item setRepairCost(int cost) {
+        if (cost <= 0 && this.hasCompoundTag()) {
+            return this.setNamedTag(this.getNamedTag().remove("RepairCost"));
+        }
+
+        CompoundTag tag;
+        if (!this.hasCompoundTag()) {
+            tag = new CompoundTag();
+        } else {
+            tag = this.getNamedTag();
+        }
+        return this.setNamedTag(tag.putInt("RepairCost", cost));
+    }
+
+    public final RuntimeEntry getRuntimeEntry() {
+        Server.mvw("Item#getRuntimeEntry()");
+        return this.getRuntimeEntry(CURRENT_PROTOCOL);
+    }
+
+    public final RuntimeEntry getRuntimeEntry(int protocolId) {
+        return RuntimeItems.getMapping(protocolId).toRuntime(this.getId(), this.getDamage());
+    }
+
+    public int getTier() {
+        return 0;
+    }
+
+    public int getToughness() {
+        return 0;
+    }
+
+    public boolean hasCompoundTag() {
+        return this.tags != null && this.tags.length > 0;
+    }
+
+    public boolean hasCustomBlockData() {
+        if (Server.getInstance().suomiCraftPEMode() || !this.hasCompoundTag()) {
+            return false;
+        }
+
+        CompoundTag tag = this.getNamedTag();
+        return tag.contains("BlockEntityTag") && tag.get("BlockEntityTag") instanceof CompoundTag;
+
+    }
+
+    public boolean hasCustomName() {
+        if (!this.hasCompoundTag()) {
+            return false;
+        }
+
+        CompoundTag tag = this.getNamedTag();
+        if (tag.contains("display")) {
+            Tag tag1 = tag.get("display");
+            return tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag;
+        }
+
+        return false;
+    }
+
+    public boolean hasEnchantment(int id) {
+        Enchantment e = this.getEnchantment(id);
+        return e != null && e.getLevel() > 0;
+    }
+
+    public boolean hasEnchantment(short id) {
+        return this.getEnchantment(id) != null;
+    }
+
+    public boolean hasEnchantments() {
+        if (!this.hasCompoundTag()) {
+            return false;
+        }
+
+        CompoundTag tag = this.getNamedTag();
+
+        if (tag.contains("ench")) {
+            Tag enchTag = tag.get("ench");
+            return enchTag instanceof ListTag;
+        }
+
+        return false;
     }
 
     public boolean hasMeta() {
         return hasMeta;
     }
 
-    public boolean canBeActivated() {
-        return false;
+    public boolean hasPersistentDataContainer() {
+        return this.hasCompoundTag() && !this.getPersistentDataContainer().isEmpty();
+    }
+
+    /**
+     * Returns a new item instance with count increased by amount or air if new count is less or equal to 0
+     */
+    public final Item increment(int amount) {
+        if (this.count + amount <= 0) {
+            return get(0);
+        }
+        Item cloned = this.clone();
+        cloned.count += amount;
+        return cloned;
     }
 
     public static void init() {
@@ -393,23 +1305,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         clearCreativeItems();
     }
 
-    private static final CreativeItems CREATIVE_ITEMS = new CreativeItems();
-
-    private static boolean initialized;
-    private static List<ItemDefinition> toBeAdded;
-
-    public static void addCustomCreativeItem(ItemDefinition definition) {
-        if (initialized) {
-            throw new IllegalStateException();
-        }
-
-        if (toBeAdded == null) {
-            toBeAdded = new ArrayList<>();
-        }
-
-        toBeAdded.add(definition);
-    }
-
     public static void initCreativeItems() {
         Server.getInstance().getLogger().debug("Loading creative items...");
         if (initialized) {
@@ -417,48 +1312,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
         initialized = true;
 
-        JsonObject root = Utils.loadJsonResource("creative_items.json").getAsJsonObject();
-
-        JsonArray itemsArray = root.getAsJsonArray("items");
-        if (itemsArray.isEmpty()) {
-            throw new IllegalStateException("Empty items");
-        }
-
-        RuntimeItemMapping mapping = RuntimeItems.getMapping();
-
-        JsonArray groupsArray = root.getAsJsonArray("groups");
-        if (groupsArray.isEmpty()) {
-            throw new IllegalStateException("Empty groups");
-        }
-
-        int creativeGroupId = 0;
-
-        for (JsonElement obj : groupsArray.asList()) {
-            JsonObject groupRoot = obj.getAsJsonObject();
-
-            Item icon = mapping.parseCreativeItem(groupRoot.get("icon").getAsJsonObject(), true);
-            if (icon == null) {
-                icon = Item.get(AIR);
-            }
-
-            CreativeItemGroup creativeGroup = new CreativeItemGroup(creativeGroupId++,
-                    ItemDefinition.CreativeCategory.valueOf(groupRoot.get("category").getAsString().toUpperCase(Locale.ROOT)),
-                    groupRoot.get("name").getAsString(),
-                    icon);
-
-            CREATIVE_ITEMS.addGroup(creativeGroup);
-        }
-
-        for (JsonElement element : itemsArray) {
-            JsonObject creativeItem = element.getAsJsonObject();
-            Item item = mapping.parseCreativeItem(creativeItem, true);
-
-            // Add only implemented items
-            if (item != null && !item.getName().equals(UNKNOWN_STR)) {
-                CreativeItemGroup creativeGroup = CREATIVE_ITEMS.getGroups().get(creativeItem.get("groupId").getAsInt());
-                CREATIVE_ITEMS.add(item, creativeGroup);
-            }
-        }
+        registerCreativeItems(v1_21_130_28);
 
         // Custom items are registered before initCreativeItems, but we need groups ready before adding them here
         if (toBeAdded != null) {
@@ -469,7 +1323,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
                         throw new IllegalStateException("Implementation of " + definition.getIdentifier() + " does not implement CustomItem");
                     }
 
-                    Item.CREATIVE_ITEMS.add(item, definition.getCreativeCategory(), definition.getCreativeGroup() == null ? "" : definition.getCreativeGroup());
+                    CREATIVE_ITEMS.add(item, definition.getCreativeCategory(), definition.getCreativeGroup() == null ? "" : definition.getCreativeGroup());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -479,669 +1333,16 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         }
     }
 
-    public static void clearCreativeItems() {
-        Item.CREATIVE_ITEMS.clear();
-    }
-
-    public static CreativeItems getCreativeItemsAndGroups() {
-        return CREATIVE_ITEMS;
-    }
-
-    public static ArrayList<Item> getCreativeItems() {
-        return new ArrayList<>(Item.CREATIVE_ITEMS.getItems());
-    }
-
-    public static void addCreativeItem(Item item) {
-        Item.CREATIVE_ITEMS.add(item.clone());
-    }
-
-    public static void removeCreativeItem(Item item) {
-        Item.CREATIVE_ITEMS.getContents().remove(item);
-    }
-
-    public static boolean isCreativeItem(Item item) {
-        for (Item aCreative : Item.CREATIVE_ITEMS.getItems()) {
-            if (item.equals(aCreative, !item.isTool())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Deprecated
-    public static Item getCreativeItem(int index) {
-        List<Item> items = getCreativeItems();
-        return (index >= 0 && index < items.size()) ? items.get(index) : null;
-    }
-
-    @Deprecated
-    public static int getCreativeItemIndex(Item item) {
-        List<Item> items = getCreativeItems();
-        for (int i = 0; i < items.size(); i++) {
-            if (item.equals(items.get(i), !item.isTool())) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public static Item get(MaterialType type) {
-        return get(type, 0);
-    }
-
-    public static Item get(MaterialType type, Integer meta) {
-        return get(type, meta, 1);
-    }
-
-    public static Item get(MaterialType type, Integer meta, int count) {
-        int legacyId = type.getLegacyId();
-        if (type instanceof BlockType && legacyId > 255) {
-            legacyId = 255 - legacyId;
-        }
-        return get(legacyId, meta, count);
-    }
-
-    public static Item get(int id) {
-        return get(id, 0);
-    }
-
-    public static Item get(int id, Integer meta) {
-        return get(id, meta, 1);
-    }
-
-    public static Item get(int id, Integer meta, int count) {
-        return get(id, meta, count, new byte[0]);
-    }
-
-    public static Item get(int id, Integer meta, int count, byte[] tags) {
-        try {
-            Class<?> c;
-            if (id < 0) {
-                int blockId = 255 - id;
-                c = Block.list[blockId];
-            } else {
-                c = list[id];
-            }
-            Item item;
-
-            if (c == null) {
-                item = new Item(id, meta, count);
-            } else if (id < 256 && id != 166) {
-                if (meta >= 0) {
-                    item = new ItemBlock(Block.get(id, meta), meta, count);
-                } else {
-                    item = new ItemBlock(Block.get(id), meta, count);
-                }
-            } else {
-                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
-            }
-
-            if (tags.length != 0) {
-                item.setCompoundTag(tags);
-            }
-
-            return item.initItem();
-        } catch (Exception e) {
-            return new Item(id, meta, count).setCompoundTag(tags).initItem();
-        }
-    }
-
-    public static Item get(int id, Integer meta, int count, Tag tags) {
-        try {
-            Class<?> c;
-            if (id < 0) {
-                int blockId = 255 - id;
-                c = Block.list[blockId];
-            } else {
-                c = list[id];
-            }
-            Item item;
-
-            if (c == null) {
-                item = new Item(id, meta, count);
-            } else if (id < 256 && id != 166) {
-                if (meta >= 0) {
-                    item = new ItemBlock(Block.get(id, meta), meta, count);
-                } else {
-                    item = new ItemBlock(Block.get(id), meta, count);
-                }
-            } else {
-                item = ((Item) c.getConstructor(Integer.class, int.class).newInstance(meta, count));
-            }
-
-            if (tags instanceof CompoundTag) {
-                item.setCompoundTag((CompoundTag) tags);
-            }
-
-            return item.initItem();
-        } catch (Exception e) {
-            Item item = new Item(id, meta, count);
-            if (tags instanceof CompoundTag) {
-                item.setCompoundTag((CompoundTag) tags);
-            }
-            return item.initItem();
-        }
-    }
-
-    private static final Pattern INTEGER_PATTERN = Pattern.compile("^[-1-9]\\d*$");
-
-    public static Item fromString(String str) {
-        String[] b = str.trim().replace(' ', '_').replace("minecraft:", "").split(":");
-
-        int id = 0;
-        int meta = 0;
-
-        String idStr = b[0];
-        if (INTEGER_PATTERN.matcher(idStr).matches()) {
-            id = Integer.parseInt(idStr);
-        } else {
-            String idStrUp = idStr.toUpperCase(Locale.ROOT);
-            try {
-                id = BlockID.class.getField(idStrUp).getInt(null);
-                if (id > 255) {
-                    id = 255 - id;
-                }
-            } catch (Exception ignore) {
-                try {
-                    id = ItemID.class.getField(idStrUp).getInt(null);
-                } catch (Exception ignore1) {
-                }
-            }
-        }
-
-        if (b.length != 1) {
-            try {
-                meta = Integer.parseInt(b[1]) & 0xFFFF;
-            } catch (NumberFormatException customItem) {
-                return Item.get(AIR);
-            }
-        }
-
-        return get(id, meta);
-    }
-
-    public static Item fromJson(Map<String, Object> data) {
-        String nbt = (String) data.get("nbt_b64");
-        byte[] nbtBytes;
-        if (nbt != null) {
-            nbtBytes = Base64.getDecoder().decode(nbt);
-        } else { // Support old format for backwards compatibility
-            nbt = (String) data.getOrDefault("nbt_hex", null);
-            if (nbt == null) {
-                nbtBytes = new byte[0];
-            } else {
-                nbtBytes = Utils.parseHexBinary(nbt);
-            }
-        }
-
-        return get(Utils.toInt(data.get("id")), Utils.toInt(data.getOrDefault("damage", 0)), Utils.toInt(data.getOrDefault("count", 1)), nbtBytes);
-    }
-
-    public static Item[] fromStringMultiple(String str) {
-        String[] b = str.split(",");
-        Item[] items = new Item[b.length - 1];
-        for (int i = 0; i < b.length; i++) {
-            items[i] = fromString(b[i]);
-        }
-        return items;
-    }
-
-    public Item setCompoundTag(CompoundTag tag) {
-        this.setNamedTag(tag);
+    /**
+     * This code runs when the item is initialized and can be overridden to for example check the item for missing nbt
+     *
+     * @return current item
+     */
+    public Item initItem() {
         return this;
     }
 
-    public Item setCompoundTag(byte[] tags) {
-        this.tags = tags;
-        this.cachedNBT = null;
-        return this;
-    }
-
-    public byte[] getCompoundTag() {
-        return tags;
-    }
-
-    public boolean hasCompoundTag() {
-        return this.tags != null && this.tags.length > 0;
-    }
-
-    public boolean hasCustomBlockData() {
-        if (!this.hasCompoundTag()) {
-            return false;
-        }
-
-        CompoundTag tag = this.getNamedTag();
-        return tag.contains("BlockEntityTag") && tag.get("BlockEntityTag") instanceof CompoundTag;
-
-    }
-
-    public Item clearCustomBlockData() {
-        if (!this.hasCompoundTag()) {
-            return this;
-        }
-        CompoundTag tag = this.getNamedTag();
-
-        if (tag.contains("BlockEntityTag") && tag.get("BlockEntityTag") instanceof CompoundTag) {
-            tag.remove("BlockEntityTag");
-            this.setNamedTag(tag);
-        }
-
-        return this;
-    }
-
-    public Item setCustomBlockData(CompoundTag compoundTag) {
-        CompoundTag tags = compoundTag.copy();
-        tags.setName("BlockEntityTag");
-
-        CompoundTag tag;
-        if (!this.hasCompoundTag()) {
-            tag = new CompoundTag();
-        } else {
-            tag = this.getNamedTag();
-        }
-
-        tag.putCompound("BlockEntityTag", tags);
-        this.setNamedTag(tag);
-
-        return this;
-    }
-
-    public CompoundTag getCustomBlockData() {
-        if (!this.hasCompoundTag()) {
-            return null;
-        }
-
-        CompoundTag tag = this.getNamedTag();
-
-        if (tag.contains("BlockEntityTag")) {
-            Tag bet = tag.get("BlockEntityTag");
-            if (bet instanceof CompoundTag) {
-                return (CompoundTag) bet;
-            }
-        }
-
-        return null;
-    }
-
-    public boolean hasEnchantments() {
-        if (!this.hasCompoundTag()) {
-            return false;
-        }
-
-        CompoundTag tag = this.getNamedTag();
-
-        if (tag.contains("ench")) {
-            Tag enchTag = tag.get("ench");
-            return enchTag instanceof ListTag;
-        }
-
-        return false;
-    }
-
-    public Enchantment getEnchantment(int id) {
-        return getEnchantment((short) (id & 0xffff));
-    }
-
-    public Enchantment getEnchantment(short id) {
-        if (!this.hasEnchantments()) {
-            return null;
-        }
-
-        for (CompoundTag entry : this.getNamedTag().getList("ench", CompoundTag.class).getAll()) {
-            if (entry.getShort("id") == id) {
-                Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
-                if (e != null) {
-                    e.setLevel(entry.getShort("lvl"));
-                    return e;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public void addEnchantment(Enchantment... enchantments) {
-        CompoundTag tag;
-        if (!this.hasCompoundTag()) {
-            tag = new CompoundTag();
-        } else {
-            tag = this.getNamedTag();
-        }
-
-        ListTag<CompoundTag> ench;
-        if (!tag.contains("ench")) {
-            ench = new ListTag<>("ench");
-            tag.putList(ench);
-        } else {
-            ench = tag.getList("ench", CompoundTag.class);
-        }
-
-        for (Enchantment enchantment : enchantments) {
-            boolean found = false;
-
-            for (int k = 0; k < ench.size(); k++) {
-                CompoundTag entry = ench.get(k);
-                if (entry.getShort("id") == enchantment.getId()) {
-                    ench.add(k, new CompoundTag()
-                            .putShort("id", enchantment.getId())
-                            .putShort("lvl", enchantment.getLevel())
-                    );
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                ench.add(new CompoundTag()
-                        .putShort("id", enchantment.getId())
-                        .putShort("lvl", enchantment.getLevel())
-                );
-            }
-        }
-
-        this.setNamedTag(tag);
-    }
-
-    public Enchantment[] getEnchantments() {
-        if (!this.hasEnchantments()) {
-            return new Enchantment[0];
-        }
-
-        List<Enchantment> enchantments = new ArrayList<>();
-
-        ListTag<CompoundTag> ench = this.getNamedTag().getList("ench", CompoundTag.class);
-        for (CompoundTag entry : ench.getAll()) {
-            Enchantment e = Enchantment.getEnchantment(entry.getShort("id"));
-            if (e != null) {
-                e.setLevel(entry.getShort("lvl"));
-                enchantments.add(e);
-            }
-        }
-
-        return enchantments.toArray(new Enchantment[0]);
-    }
-
-    public boolean hasEnchantment(int id) {
-        Enchantment e = this.getEnchantment(id);
-        return e != null && e.getLevel() > 0;
-    }
-
-    public boolean hasEnchantment(short id) {
-        return this.getEnchantment(id) != null;
-    }
-
-    public int getEnchantmentLevel(int id) {
-        Enchantment e = this.getEnchantment(id);
-        return e == null ? 0 : e.getLevel();
-    }
-
-    public boolean hasCustomName() {
-        if (!this.hasCompoundTag()) {
-            return false;
-        }
-
-        CompoundTag tag = this.getNamedTag();
-        if (tag.contains("display")) {
-            Tag tag1 = tag.get("display");
-            return tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag;
-        }
-
-        return false;
-    }
-
-    public String getCustomName() {
-        if (!this.hasCompoundTag()) {
-            return "";
-        }
-
-        CompoundTag tag = this.getNamedTag();
-        if (tag.contains("display")) {
-            Tag tag1 = tag.get("display");
-            if (tag1 instanceof CompoundTag && ((CompoundTag) tag1).contains("Name") && ((CompoundTag) tag1).get("Name") instanceof StringTag) {
-                return ((CompoundTag) tag1).getString("Name");
-            }
-        }
-
-        return "";
-    }
-
-    public Item setCustomName(String name) {
-        if (name == null || name.isEmpty()) {
-            this.clearCustomName();
-            return this;
-        }
-
-        if (name.length() > 100) {
-            name = name.substring(0, 100);
-        }
-
-        CompoundTag tag;
-        if (!this.hasCompoundTag()) {
-            tag = new CompoundTag();
-        } else {
-            tag = this.getNamedTag();
-        }
-        if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
-            tag.getCompound("display").putString("Name", name);
-        } else {
-            tag.putCompound("display", new CompoundTag("display")
-                    .putString("Name", name)
-            );
-        }
-        this.setNamedTag(tag);
-        return this;
-    }
-
-    public Item clearCustomName() {
-        if (!this.hasCompoundTag()) {
-            return this;
-        }
-
-        CompoundTag tag = this.getNamedTag();
-
-        if (tag.contains("display") && tag.get("display") instanceof CompoundTag) {
-            tag.getCompound("display").remove("Name");
-            if (tag.getCompound("display").isEmpty()) {
-                tag.remove("display");
-            }
-
-            this.setNamedTag(tag);
-        }
-
-        return this;
-    }
-
-    public String[] getLore() {
-        Tag tag = this.getNamedTagEntry("display");
-        ArrayList<String> lines = new ArrayList<>();
-
-        if (tag instanceof CompoundTag) {
-            CompoundTag nbt = (CompoundTag) tag;
-            ListTag<StringTag> lore = nbt.getList("Lore", StringTag.class);
-
-            if (lore.size() > 0) {
-                for (StringTag stringTag : lore.getAll()) {
-                    lines.add(stringTag.data);
-                }
-            }
-        }
-
-        return lines.toArray(new String[0]);
-    }
-
-    public Item setLore(String... lines) {
-        CompoundTag tag;
-        if (!this.hasCompoundTag()) {
-            tag = new CompoundTag();
-        } else {
-            tag = this.getNamedTag();
-        }
-        ListTag<StringTag> lore = new ListTag<>("Lore");
-
-        for (String line : lines) {
-            lore.add(new StringTag("", line));
-        }
-
-        if (!tag.contains("display")) {
-            tag.putCompound("display", new CompoundTag("display").putList(lore));
-        } else {
-            tag.getCompound("display").putList(lore);
-        }
-
-        this.setNamedTag(tag);
-        return this;
-    }
-
-    public Tag getNamedTagEntry(String name) {
-        CompoundTag tag = this.getNamedTag();
-        if (tag != null) {
-            return tag.get(name);
-        }
-
-        return null;
-    }
-
-    public CompoundTag getNamedTag() {
-        if (!this.hasCompoundTag()) {
-            return null;
-        }
-
-        if (this.cachedNBT == null) {
-            this.cachedNBT = parseCompoundTag(this.tags);
-        }
-
-        this.cachedNBT.setName("");
-
-        return this.cachedNBT;
-    }
-
-    public Item setNamedTag(CompoundTag tag) {
-        if (tag.isEmpty()) {
-            return this.clearNamedTag();
-        }
-        tag.setName(null);
-
-        this.cachedNBT = tag;
-        this.tags = writeCompoundTag(tag);
-
-        return this;
-    }
-
-    public Item clearNamedTag() {
-        return this.setCompoundTag(new byte[0]);
-    }
-
-    public static CompoundTag parseCompoundTag(byte[] tag) {
-        try {
-            return NBTIO.read(tag, ByteOrder.LITTLE_ENDIAN);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public byte[] writeCompoundTag(CompoundTag tag) {
-        try {
-            tag.setName("");
-            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public boolean isNull() {
-        return this.count <= 0 || this.id == AIR;
-    }
-
-    public String getName() {
-        return this.hasCustomName() ? this.getCustomName() : this.name;
-    }
-
-    final public boolean canBePlaced() {
-        return ((this.block != null) && this.block.canBePlaced());
-    }
-
-    public Block getBlock() {
-        if (this.block != null) {
-            return this.block.clone();
-        } else {
-            return Block.get(BlockID.AIR);
-        }
-    }
-
-    public Block getBlockUnsafe() {
-        return this.block;
-    }
-
-    public int getBlockId() {
-        return block == null ? 0 : block.getId();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public MaterialType getItemType() {
-        if (this.materialType == null) {
-            this.materialType = ItemTypes.getFromLegacy(this.id);
-        }
-        return this.materialType;
-    }
-
-    public int getDamage() {
-        return meta == 0xffff ? 0 : meta;
-    }
-
-    public void setDamage(Integer meta) {
-        if (meta != null) {
-            this.meta = meta & 0xffff;
-        } else {
-            this.hasMeta = false;
-        }
-    }
-
-    public int getMaxStackSize() {
-        return 64;
-    }
-
-    final public Short getFuelTime() {
-        if (!Fuel.duration.containsKey(id)) {
-            return null;
-        }
-        if (this.id != BUCKET || this.meta == 10) {
-            return Fuel.duration.get(this.id);
-        }
-        return null;
-    }
-
-    public boolean useOn(Entity entity) {
-        return false;
-    }
-
-    public boolean useOn(Block block) {
-        return false;
-    }
-
-    public boolean isTool() {
-        return false;
-    }
-
-    public int getMaxDurability() {
-        return -1;
-    }
-
-    public int getTier() {
-        return 0;
-    }
-
-    public boolean isPickaxe() {
+    public boolean isArmor() {
         return false;
     }
 
@@ -1149,31 +1350,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return false;
     }
 
-    public boolean isSword() {
-        return false;
-    }
-
-    public boolean isShovel() {
-        return false;
-    }
-
-    public boolean isHoe() {
-        return false;
-    }
-
-    public boolean isShears() {
-        return false;
-    }
-
-    public boolean isArmor() {
-        return false;
-    }
-
-    public boolean isHelmet() {
-        return false;
-    }
-
-    public boolean canBePutInHelmetSlot() {
+    public boolean isBoots() {
         return false;
     }
 
@@ -1181,32 +1358,68 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return false;
     }
 
+    public static boolean isCreativeItem(Item item) {
+        for (Item aCreative : CREATIVE_ITEMS.getItems()) { // No copy
+            if (item.equals(aCreative, !item.isTool())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isHelmet() {
+        return false;
+    }
+
+    public boolean isHoe() {
+        return false;
+    }
+
     public boolean isLeggings() {
         return false;
     }
 
-    public boolean isBoots() {
+    public boolean isNull() {
+        return this.count <= 0 || this.id == AIR;
+    }
+
+    public boolean isPickaxe() {
         return false;
     }
 
-    public int getEnchantAbility() {
-        return 0;
+    public boolean isShears() {
+        return false;
     }
 
-    public int getAttackDamage() {
-        return 1;
+    public boolean isShovel() {
+        return false;
     }
 
-    public int getArmorPoints() {
-        return 0;
+    /**
+     * Check whether the item is supported on certain protocol version.
+     * Unsupported items will display as update game blocks for players on those versions.
+     *
+     * @param protocol protocol version
+     * @return item is supported on that version
+     */
+    public boolean isSupportedOn(int protocol) {
+        return (this.id >= 0 && this.id <= 255) || RuntimeItems.getMapping(protocol).isSupported(this.getId(), this.getDamage());
     }
 
-    public int getToughness() {
-        return 0;
+    public boolean isSword() {
+        return false;
+    }
+
+    public boolean isTool() {
+        return false;
     }
 
     public boolean isUnbreakable() {
         if (!(this instanceof ItemDurable)) {
+            return false;
+        }
+
+        if (Server.getInstance().ignoreUnbreakableItems) {
             return false;
         }
 
@@ -1226,28 +1439,6 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return this;
     }
 
-    public Item setUnbreakable() {
-        return this.setUnbreakable(true);
-    }
-
-    public boolean onUse(Player player, int ticksUsed) {
-        return false;
-    }
-
-    public boolean onRelease(Player player, int ticksUsed) {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        String out = "Item " + this.name + " (" + this.id + ':' + (!this.hasMeta ? "?" : this.meta) + ")x" + this.count;
-        CompoundTag tag;
-        if (Nukkit.DEBUG > 1 && (tag = this.getNamedTag()) != null) {
-            out += '\n' + tag.toString();
-        }
-        return out;
-    }
-
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
         return false;
     }
@@ -1256,7 +1447,7 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
      * Called when a player uses the item on air, for example throwing a projectile.
      * Returns whether the item was changed, for example count decrease or durability change.
      *
-     * @param player player
+     * @param player          player
      * @param directionVector direction
      * @return item changed
      */
@@ -1264,209 +1455,99 @@ public class Item implements Cloneable, BlockID, ItemID, ProtocolInfo {
         return false;
     }
 
-    @Override
-    public final boolean equals(Object item) {
-        return item instanceof Item && this.equals((Item) item, true);
-    }
-
-    public final boolean equals(Item item, boolean checkDamage) {
-        return equals(item, checkDamage, true);
-    }
-
-    public final boolean equals(Item item, boolean checkDamage, boolean checkCompound) {
-        if (this.id == item.id && (!checkDamage || this.meta == item.meta)) {
-            if (checkCompound) {
-                if (Arrays.equals(this.getCompoundTag(), item.getCompoundTag())) {
-                    return true;
-                } else if (this.hasCompoundTag() && item.hasCompoundTag()) {
-                    return this.getNamedTag().equals(item.getNamedTag());
-                }
-            } else {
-                return true;
-            }
-        }
-
+    public boolean onRelease(Player player, int ticksUsed) {
         return false;
     }
 
-    /**
-     * Returns whether the specified item stack has the same ID, damage, NBT and count as this item stack.
-     *
-     * @param other item
-     * @return equal
-     */
-    public final boolean equalsExact(Item other) {
-        return this.equals(other, true, true) && this.count == other.count;
+    public boolean onUse(Player player, int ticksUsed) {
+        return false;
     }
 
-    @Deprecated
-    public final boolean deepEquals(Item item) {
-        return equals(item, true);
+    public static CompoundTag parseCompoundTag(byte[] tag) {
+        try {
+            return NBTIO.read(tag, ByteOrder.LITTLE_ENDIAN);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Deprecated
-    public final boolean deepEquals(Item item, boolean checkDamage) {
-        return equals(item, checkDamage, true);
-    }
+    private static void registerCreativeItems(int protocol) {
+        JsonObject root = Utils.loadJsonResource("creative_items.json").getAsJsonObject();
 
-    @Deprecated
-    public final boolean deepEquals(Item item, boolean checkDamage, boolean checkCompound) {
-        return equals(item, checkDamage, checkCompound);
-    }
+        JsonArray itemsArray = root.getAsJsonArray("items");
+        if (itemsArray.isEmpty()) {
+            throw new IllegalStateException("Empty items");
+        }
 
-    public int getRepairCost() {
-        if (this.hasCompoundTag()) {
-            CompoundTag tag = this.getNamedTag();
-            if (tag.contains("RepairCost")) {
-                Tag repairCost = tag.get("RepairCost");
-                if (repairCost instanceof IntTag) {
-                    return ((IntTag) repairCost).data;
-                }
+        RuntimeItemMapping mapping = RuntimeItems.getMapping(protocol);
+
+        JsonArray groupsArray = root.getAsJsonArray("groups");
+        if (groupsArray.isEmpty()) {
+            throw new IllegalStateException("Empty groups");
+        }
+
+        int creativeGroupId = 0;
+
+        for (JsonElement obj : groupsArray.asList()) {
+            JsonObject groupRoot = obj.getAsJsonObject();
+
+            Item icon = mapping.parseCreativeItem(groupRoot.get("icon").getAsJsonObject(), true, protocol);
+            if (icon == null) {
+                icon = Item.get(AIR);
+            }
+
+            CreativeItemGroup creativeGroup = new CreativeItemGroup(creativeGroupId++,
+                    ItemDefinition.CreativeCategory.valueOf(groupRoot.get("category").getAsString().toUpperCase(Locale.ROOT)),
+                    groupRoot.get("name").getAsString(),
+                    icon);
+
+            CREATIVE_ITEMS.addGroup(creativeGroup);
+        }
+
+        for (JsonElement element : itemsArray) {
+            JsonObject creativeItem = element.getAsJsonObject();
+            Item item = mapping.parseCreativeItem(creativeItem, true, protocol);
+
+            // Add only implemented items
+            if (item != null && !item.getName().equals(UNKNOWN_STR)) {
+                CreativeItemGroup creativeGroup = CREATIVE_ITEMS.getGroups().get(creativeItem.get("groupId").getAsInt());
+                CREATIVE_ITEMS.add(item, creativeGroup);
             }
         }
-        return 0;
     }
 
-    public Item setRepairCost(int cost) {
-        if (cost <= 0 && this.hasCompoundTag()) {
-            return this.setNamedTag(this.getNamedTag().remove("RepairCost"));
-        }
+    public static void removeCreativeItem(Item item) {
+        CREATIVE_ITEMS.getContents().remove(item);
+    }
 
-        CompoundTag tag;
-        if (!this.hasCompoundTag()) {
-            tag = new CompoundTag();
-        } else {
-            tag = this.getNamedTag();
-        }
-        return this.setNamedTag(tag.putInt("RepairCost", cost));
+    public Item setUnbreakable() {
+        return this.setUnbreakable(true);
     }
 
     @Override
-    public Item clone() {
+    public String toString() {
+        String out = "Item " + ITEM_NAMES.get((((short) this.id) << 16) | (((this instanceof ItemDurable ? 0 : this.meta) & 0x7fff) << 1)) + " (" + this.id + ':' + (!this.hasMeta ? "?" : this.meta) + ")x" + this.count;
+        CompoundTag tag;
+        if (Nukkit.DEBUG > 1 && (tag = this.getNamedTag()) != null) {
+            out += '\n' + tag.toString();
+        }
+        return out;
+    }
+
+    public boolean useOn(Entity entity) {
+        return false;
+    }
+
+    public boolean useOn(Block block) {
+        return false;
+    }
+
+    public byte[] writeCompoundTag(CompoundTag tag) {
         try {
-            Item item = (Item) super.clone();
-            item.tags = this.tags.clone();
-            return item;
-        } catch (CloneNotSupportedException e) {
-            return null;
+            tag.setName("");
+            return NBTIO.write(tag, ByteOrder.LITTLE_ENDIAN);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    public final RuntimeEntry getRuntimeEntry() {
-        return RuntimeItems.getMapping().toRuntime(this.getId(), this.getDamage());
-    }
-
-    public final int getNetworkId() {
-        return this.getRuntimeEntry().getRuntimeId();
-    }
-
-    /**
-     * This code runs when the item is initialized and can be overridden to for example check the item for missing nbt
-     * @return current item
-     */
-    public Item initItem() {
-        return this;
-    }
-
-    public PersistentItemDataContainer getPersistentDataContainer() {
-        if (this.persistentContainer == null) {
-            this.persistentContainer = new PersistentDataContainerItemWrapper(this);
-        }
-        return this.persistentContainer;
-    }
-
-    public boolean hasPersistentDataContainer() {
-        return this.hasCompoundTag() && !this.getPersistentDataContainer().isEmpty();
-    }
-
-    /**
-     * Returns a new item instance with count decreased by amount or air if new count is less or equal to 0
-     */
-    public final Item decrement(int amount) {
-        return increment(-amount);
-    }
-
-    /**
-     * Returns a new item instance with count increased by amount or air if new count is less or equal to 0
-     */
-    public final Item increment(int amount) {
-        if (this.count + amount <= 0) {
-            return get(0);
-        }
-        Item cloned = this.clone();
-        cloned.count += amount;
-        return cloned;
-    }
-
-    /**
-     * Whether item can be placed in player offhand inventory
-     */
-    public boolean allowOffhand() {
-        return this.id == AIR;
-    }
-
-    public static class CreativeItems {
-
-        private final List<CreativeItemGroup> groups = new ArrayList<>();
-        private final Map<Item, CreativeItemGroup> contents = new LinkedHashMap<>();
-
-        public void clear() {
-            groups.clear();
-            contents.clear();
-        }
-
-        public void add(Item item) {
-            add(item, ItemDefinition.CreativeCategory.ITEMS, ""); // TODO: vanilla items back to correct categories & groups
-        }
-
-        public void add(Item item, CreativeItemGroup group) {
-            if (group == null) {
-                throw new IllegalArgumentException("group == null");
-            }
-
-            contents.put(item, group);
-        }
-
-        public void add(Item item, ItemDefinition.CreativeCategory category, String group) {
-            CreativeItemGroup creativeGroup = null;
-
-            for (CreativeItemGroup existing : groups) {
-                if (existing.category == category && existing.name.equals(group)) {
-                    creativeGroup = existing;
-                    break;
-                }
-            }
-
-            if (creativeGroup == null) {
-                creativeGroup = new CreativeItemGroup(groups.size(), category, group, item);
-                groups.add(creativeGroup);
-            }
-
-            contents.put(item, creativeGroup);
-        }
-
-        public void addGroup(CreativeItemGroup creativeGroup) {
-            groups.add(creativeGroup);
-        }
-
-        public Collection<Item> getItems() {
-            return contents.keySet();
-        }
-
-        public List<CreativeItemGroup> getGroups() {
-            return groups;
-        }
-
-        public Map<Item, CreativeItemGroup> getContents() {
-            return contents;
-        }
-    }
-
-    @Data
-    public static class CreativeItemGroup {
-        private final int groupId;
-        private final ItemDefinition.CreativeCategory category;
-        private final String name;
-        private final Item icon;
     }
 }

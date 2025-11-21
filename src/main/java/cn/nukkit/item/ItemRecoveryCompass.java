@@ -1,5 +1,7 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class ItemRecoveryCompass extends Item {
 
     public ItemRecoveryCompass() {
@@ -12,5 +14,10 @@ public class ItemRecoveryCompass extends Item {
 
     public ItemRecoveryCompass(Integer meta, int count) {
         super(RECOVERY_COMPASS, meta, count, "Recovery Compass");
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_19_0_29;
     }
 }

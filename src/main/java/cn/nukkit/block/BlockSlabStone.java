@@ -30,13 +30,7 @@ public class BlockSlabStone extends BlockSlab {
     public BlockSlabStone(int meta, int doubleSlab) {
         super(meta, doubleSlab);
     }
-
-    @Override
-    public int getId() {
-        return STONE_SLAB;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Stone",
             "Sandstone",
             "Oak",
@@ -48,30 +42,8 @@ public class BlockSlabStone extends BlockSlab {
     };
 
     @Override
-    public String getName() {
-        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + NAMES[this.getDamage() & 0x07] + " Slab";
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public Item toItem() {
-        int damage = this.getDamage() & 0x07;
-        return new ItemBlock(Block.get(this.getId(), damage), damage);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -95,7 +67,34 @@ public class BlockSlabStone extends BlockSlab {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
+    public int getId() {
+        return STONE_SLAB;
+    }
+
+    @Override
+    public String getName() {
+        return ((this.getDamage() & 0x08) > 0 ? "Upper " : "") + names[this.getDamage() & 0x07] + " Slab";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public Item toItem() {
+        int damage = this.getDamage() & 0x07;
+        return new ItemBlock(Block.get(this.getId(), damage), damage);
     }
 }

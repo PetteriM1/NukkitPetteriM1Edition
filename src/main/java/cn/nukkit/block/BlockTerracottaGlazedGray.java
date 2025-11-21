@@ -15,6 +15,10 @@ public class BlockTerracottaGlazedGray extends BlockTerracottaGlazed {
         super(meta);
     }
 
+    public DyeColor getDyeColor() {
+        return DyeColor.GRAY;
+    }
+
     @Override
     public int getId() {
         return GRAY_GLAZED_TERRACOTTA;
@@ -23,9 +27,5 @@ public class BlockTerracottaGlazedGray extends BlockTerracottaGlazed {
     @Override
     public String getName() {
         return "Gray Glazed Terracotta";
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.GRAY;
     }
 }

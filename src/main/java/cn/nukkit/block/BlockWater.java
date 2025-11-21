@@ -34,6 +34,16 @@ public class BlockWater extends BlockLiquid {
     }
 
     @Override
+    public BlockLiquid getBlock(int meta) {
+        return (BlockLiquid) Block.get(WATER, meta);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WATER_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return WATER;
     }
@@ -44,35 +54,12 @@ public class BlockWater extends BlockLiquid {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        boolean ret = this.getLevel().setBlock(this, this, true, true);
-        this.getLevel().scheduleUpdate(this, this.tickRate());
-
-        return ret;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WATER_BLOCK_COLOR;
-    }
-
-    @Override
-    public BlockLiquid getBlock(int meta) {
-        return (BlockLiquid) Block.get(WATER, meta);
-    }
-
-    @Override
     public void onEntityCollide(Entity entity) {
         super.onEntityCollide(entity);
 
         if (entity.fireTicks > 0) {
             entity.extinguish();
         }
-    }
-
-    @Override
-    public int tickRate() {
-        return 5;
     }
 
     @Override
@@ -94,6 +81,19 @@ public class BlockWater extends BlockLiquid {
             return Level.BLOCK_UPDATE_RANDOM;
         }
         return super.onUpdate(type);
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        boolean ret = this.getLevel().setBlock(this, this, true, true);
+        this.getLevel().scheduleUpdate(this, this.tickRate());
+
+        return ret;
+    }
+
+    @Override
+    public int tickRate() {
+        return 5;
     }
 
     @Override

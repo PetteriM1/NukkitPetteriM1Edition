@@ -23,38 +23,13 @@ public class BlockWool extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return getDyeColor().getName() + " Wool";
-    }
-
-    @Override
-    public int getId() {
-        return WOOL;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHEARS;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.8;
-    }
-
-    @Override
-    public double getResistance() {
-        return 4;
+    public int getBurnAbility() {
+        return 60;
     }
 
     @Override
     public int getBurnChance() {
         return 30;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 60;
     }
 
     @Override
@@ -64,5 +39,30 @@ public class BlockWool extends BlockSolidMeta {
 
     public DyeColor getDyeColor() {
         return DyeColor.getByWoolData(getDamage());
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.8;
+    }
+
+    @Override
+    public int getId() {
+        return WOOL;
+    }
+
+    @Override
+    public String getName() {
+        return getDyeColor().getName() + " Wool";
+    }
+
+    @Override
+    public double getResistance() {
+        return 4;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHEARS;
     }
 }

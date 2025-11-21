@@ -9,14 +9,14 @@ public abstract class ItemRecord extends Item {
         super(id, meta, count, "Music Disc");
     }
 
+    public String getDiscName() {
+        return "Unknown";
+    }
+
     @Override
     public int getMaxStackSize() {
         return 1;
     }
 
     public abstract String getSoundId();
-
-    public String getDiscName() {
-        return "Unknown";
-    }
 }

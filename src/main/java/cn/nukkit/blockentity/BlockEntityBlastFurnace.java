@@ -21,6 +21,12 @@ public class BlockEntityBlastFurnace extends BlockEntityFurnace {
     public BlockEntityBlastFurnace(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    private static final IntSet CAN_SMELT_EXCLUDING_TOOLS_AND_ARMOR = new IntOpenHashSet(new int[]{
+            Item.IRON_ORE, Item.GOLD_ORE, Item.DIAMOND_ORE, Item.LAPIS_ORE, Item.REDSTONE_ORE, Item.COAL_ORE, Item.EMERALD_ORE, Item.QUARTZ_ORE,
+            255 - Block.NETHER_GOLD_ORE, 255 - Block.ANCIENT_DEBRIS, Item.RAW_COPPER, Item.RAW_IRON, Item.RAW_GOLD,
+            255 - Block.DEEPSLATE_COAL_ORE, 255 - Block.DEEPSLATE_IRON_ORE, 255 - Block.DEEPSLATE_GOLD_ORE, 255 - Block.DEEPSLATE_LAPIS_ORE,
+            255 - Block.DEEPSLATE_EMERALD_ORE, 255 - Block.DEEPSLATE_COPPER_ORE, 255 - Block.DEEPSLATE_REDSTONE_ORE, 255 - Block.DEEPSLATE_DIAMOND_ORE
+    });
 
     @Override
     public String getName() {
@@ -28,17 +34,28 @@ public class BlockEntityBlastFurnace extends BlockEntityFurnace {
     }
 
     @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.BLAST_FURNACE)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putShort("BurnDuration", burnDuration)
+                .putShort("BurnTime", burnTime)
+                .putShort("CookTime", cookTime);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
     public boolean isBlockEntityValid() {
         int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
         return blockID == Block.BLAST_FURNACE || blockID == Block.LIT_BLAST_FURNACE;
     }
-
-    private static final IntSet CAN_SMELT_EXCLUDING_TOOLS_AND_ARMOR = new IntOpenHashSet(new int[]{
-            Item.IRON_ORE, Item.GOLD_ORE, Item.DIAMOND_ORE, Item.LAPIS_ORE, Item.REDSTONE_ORE, Item.COAL_ORE, Item.EMERALD_ORE, Item.QUARTZ_ORE,
-            255 - Block.NETHER_GOLD_ORE, 255 - Block.ANCIENT_DEBRIS, Item.RAW_COPPER, Item.RAW_IRON, Item.RAW_GOLD,
-            255 - Block.DEEPSLATE_COAL_ORE, 255 - Block.DEEPSLATE_IRON_ORE, 255 - Block.DEEPSLATE_GOLD_ORE, 255 - Block.DEEPSLATE_LAPIS_ORE,
-            255 - Block.DEEPSLATE_EMERALD_ORE, 255 - Block.DEEPSLATE_COPPER_ORE, 255 - Block.DEEPSLATE_REDSTONE_ORE, 255 - Block.DEEPSLATE_DIAMOND_ORE
-    });
 
     @Override
     public boolean onUpdate() {
@@ -127,23 +144,5 @@ public class BlockEntityBlastFurnace extends BlockEntityFurnace {
         sendPacket();
 
         return ret;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.BLAST_FURNACE)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putShort("BurnDuration", burnDuration)
-                .putShort("BurnTime", burnTime)
-                .putShort("CookTime", cookTime);
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
-
-        return c;
     }
 }

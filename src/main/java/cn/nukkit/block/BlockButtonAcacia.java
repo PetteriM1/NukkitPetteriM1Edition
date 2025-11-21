@@ -11,12 +11,12 @@ public class BlockButtonAcacia extends BlockButtonWooden {
     }
 
     @Override
-    public String getName() {
-        return "Acacia Button";
+    public int getId() {
+        return ACACIA_BUTTON;
     }
 
     @Override
-    public int getId() {
-        return ACACIA_BUTTON;
+    public String getName() {
+        return "Acacia Button";
     }
 }

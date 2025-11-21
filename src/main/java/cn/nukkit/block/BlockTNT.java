@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.item.EntityPrimedTNT;
 import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.projectile.EntityBlazeFireBall;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
@@ -23,28 +24,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockTNT extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "TNT";
-    }
-
-    @Override
-    public int getId() {
-        return TNT;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0;
-    }
-
-    @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public int getBurnAbility() {
+        return 100;
     }
 
     @Override
@@ -53,8 +39,70 @@ public class BlockTNT extends BlockSolid {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 100;
+    public BlockColor getColor() {
+        return BlockColor.TNT_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0;
+    }
+
+    @Override
+    public int getId() {
+        return TNT;
+    }
+
+    @Override
+    public String getName() {
+        return "TNT";
+    }
+
+    @Override
+    public double getResistance() {
+        return 0;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == Item.FLINT_STEEL) {
+            item.useOn(this);
+            this.prime(80, player);
+            return true;
+        } else if (item.getId() == Item.FIRE_CHARGE) {
+            if (!player.isCreative()) item.count--;
+            this.level.addSound(this, Sound.MOB_GHAST_FIREBALL);
+            this.prime(80, player);
+            return true;
+        } else if (item.hasEnchantment(Enchantment.ID_FIRE_ASPECT)) {
+            item.useOn(this);
+            this.prime(80, player);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        if (entity instanceof EntityBlazeFireBall || (entity instanceof EntityArrow && entity.isOnFire())) {
+            entity.close();
+            this.prime();
+        }
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && this.level.isBlockPowered(this)) {
+            this.prime();
+        }
+
+        return 0;
     }
 
     public void prime() {
@@ -84,52 +132,5 @@ public class BlockTNT extends BlockSolid {
 
         Entity.createEntity(EntityPrimedTNT.NETWORK_ID,
                 this.getLevel().getChunk(this.getChunkX(), this.getChunkZ()), nbt, source).spawnToAll();
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if ((type == Level.BLOCK_UPDATE_NORMAL || type == Level.BLOCK_UPDATE_REDSTONE) && this.level.isBlockPowered(this)) {
-            this.prime();
-        }
-
-        return 0;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.FLINT_STEEL) {
-            item.useOn(this);
-            this.prime(80, player);
-            return true;
-        } else if (item.getId() == Item.FIRE_CHARGE) {
-            if (!player.isCreative()) item.count--;
-            this.level.addSound(this, Sound.MOB_GHAST_FIREBALL);
-            this.prime(80, player);
-            return true;
-        } else if (item.hasEnchantment(Enchantment.ID_FIRE_ASPECT)) {
-            item.useOn(this);
-            this.prime(80, player);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.TNT_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public void onEntityCollide(Entity entity) {
-        if (entity instanceof EntityArrow && entity.isOnFire()) {
-            entity.close();
-            this.prime();
-        }
     }
 }

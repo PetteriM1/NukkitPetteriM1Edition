@@ -23,14 +23,13 @@ public class CreativeInventoryAction extends InventoryAction {
     }
 
     /**
-     * Checks that the player is in creative, and (if creating an item) that the item exists in the creative inventory.
+     * No need to do anything extra here: this type just provides a place for items to disappear or appear from.
      *
-     * @param source player
-     * @return valid
+     * @param source playere
+     * @return successfully executed
      */
-    public boolean isValid(Player source) {
-        return source.isCreative() &&
-                (this.actionType == TYPE_DELETE_ITEM || Item.isCreativeItem(this.sourceItem));
+    public boolean execute(Player source) {
+        return true;
     }
 
     /**
@@ -43,18 +42,19 @@ public class CreativeInventoryAction extends InventoryAction {
     }
 
     /**
-     * No need to do anything extra here: this type just provides a place for items to disappear or appear from.
+     * Checks that the player is in creative, and (if creating an item) that the item exists in the creative inventory.
      *
-     * @param source playere
-     * @return successfully executed
+     * @param source player
+     * @return valid
      */
-    public boolean execute(Player source) {
-        return true;
-    }
-
-    public void onExecuteSuccess(Player source) {
+    public boolean isValid(Player source) {
+        return source.isCreative() &&
+                (this.actionType == TYPE_DELETE_ITEM || Item.isCreativeItem(this.sourceItem));
     }
 
     public void onExecuteFail(Player source) {
+    }
+
+    public void onExecuteSuccess(Player source) {
     }
 }

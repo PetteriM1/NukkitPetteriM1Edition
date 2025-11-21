@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 public class ElementToggle extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "toggle"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "toggle";
     private String text;
     @SerializedName("default")
     private boolean defaultValue;
@@ -30,14 +30,6 @@ public class ElementToggle extends Element {
         this.text = text;
     }
 
-    public boolean isDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(boolean defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
     @Nullable
     public String getTooltip() {
         return tooltip;
@@ -45,5 +37,13 @@ public class ElementToggle extends Element {
 
     public void setTooltip(String tooltip) {
         this.tooltip = tooltip;
+    }
+
+    public boolean isDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(boolean defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }

@@ -39,25 +39,6 @@ public class PopulationTask extends AsyncTask {
         }
     }
 
-
-    @Override
-    public void onRun() {
-        syncGen(0);
-    }
-
-    private void syncGen(int i) {
-        if (i == chunks.length) {
-            generationTask();
-        } else {
-            BaseFullChunk chunk = chunks[i];
-            if (chunk != null) {
-                synchronized (chunk) {
-                    syncGen(i + 1);
-                }
-            }
-        }
-    }
-
     private void generationTask() {
         this.state = false;
         Generator generator = level.getGenerator();
@@ -96,8 +77,8 @@ public class PopulationTask extends AsyncTask {
 
                         if (ck == null) {
                             //try {
-                                //this.chunks[index] = (BaseFullChunk) centerChunk.getClass().getMethod("getEmptyChunk", int.class, int.class).invoke(null, centerChunk.getX() + x, centerChunk.getZ() + z);
-                                this.chunks[index] = level.getProvider().getEmptyChunk(centerChunk.getX() + x, centerChunk.getZ() + z);
+                            //this.chunks[index] = (BaseFullChunk) centerChunk.getClass().getMethod("getEmptyChunk", int.class, int.class).invoke(null, centerChunk.getX() + x, centerChunk.getZ() + z);
+                            this.chunks[index] = level.getProvider().getEmptyChunk(centerChunk.getX() + x, centerChunk.getZ() + z);
                             //} catch (Exception e) {
                             //    throw new RuntimeException(e);
                             //}
@@ -181,6 +162,24 @@ public class PopulationTask extends AsyncTask {
             }
 
             level.generateChunkCallback(centerChunk.getX(), centerChunk.getZ(), centerChunk, isPopulated);
+        }
+    }
+
+    @Override
+    public void onRun() {
+        syncGen(0);
+    }
+
+    private void syncGen(int i) {
+        if (i == chunks.length) {
+            generationTask();
+        } else {
+            BaseFullChunk chunk = chunks[i];
+            if (chunk != null) {
+                synchronized (chunk) {
+                    syncGen(i + 1);
+                }
+            }
         }
     }
 }

@@ -9,8 +9,8 @@ public class EnchantmentCrossbowMultishot extends EnchantmentCrossbow {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 20;
+    public boolean checkCompatibility(Enchantment enchantment) {
+        return super.checkCompatibility(enchantment) && enchantment.id != ID_CROSSBOW_PIERCING;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class EnchantmentCrossbowMultishot extends EnchantmentCrossbow {
     }
 
     @Override
-    public boolean checkCompatibility(Enchantment enchantment) {
-        return super.checkCompatibility(enchantment) && enchantment.id != ID_CROSSBOW_PIERCING;
+    public int getMinEnchantAbility(int level) {
+        return 20;
     }
 }

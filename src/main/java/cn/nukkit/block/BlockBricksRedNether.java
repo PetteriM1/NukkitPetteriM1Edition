@@ -6,13 +6,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockBricksRedNether extends BlockNetherBrick {
 
     @Override
-    public String getName() {
-        return "Red Nether Bricks";
-    }
-
-    @Override
-    public int getId() {
-        return RED_NETHER_BRICK;
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -27,7 +22,12 @@ public class BlockBricksRedNether extends BlockNetherBrick {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
+    public int getId() {
+        return RED_NETHER_BRICK;
+    }
+
+    @Override
+    public String getName() {
+        return "Red Nether Bricks";
     }
 }

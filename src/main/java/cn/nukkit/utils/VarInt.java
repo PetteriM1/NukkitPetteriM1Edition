@@ -19,6 +19,22 @@ public final class VarInt {
     }
 
     /**
+     * @param v Unsigned encoded int
+     * @return Signed decoded int
+     */
+    public static int decodeZigZag32(long v) {
+        return (int) (v >> 1) ^ -(int) (v & 1);
+    }
+
+    /**
+     * @param v Signed encoded long
+     * @return Unsigned decoded long
+     */
+    public static long decodeZigZag64(long v) {
+        return (v >>> 1) ^ -(v & 1);
+    }
+
+    /**
      * @param v Signed int
      * @return Unsigned encoded int
      */
@@ -28,27 +44,11 @@ public final class VarInt {
     }
 
     /**
-     * @param v Unsigned encoded int
-     * @return Signed decoded int
-     */
-    public static int decodeZigZag32(long v) {
-        return (int) (v >> 1) ^ -(int) (v & 1);
-    }
-
-    /**
      * @param v Signed long
      * @return Unsigned encoded long
      */
     public static long encodeZigZag64(long v) {
         return (v << 1) ^ (v >> 63);
-    }
-
-    /**
-     * @param v Signed encoded long
-     * @return Unsigned decoded long
-     */
-    public static long decodeZigZag64(long v) {
-        return (v >>> 1) ^ -(v & 1);
     }
 
     private static long read(BinaryStream stream, int maxSize) {
@@ -81,22 +81,6 @@ public final class VarInt {
 
     /**
      * @param stream BinaryStream
-     * @return Signed int
-     */
-    public static int readVarInt(BinaryStream stream) {
-        return decodeZigZag32(readUnsignedVarInt(stream));
-    }
-
-    /**
-     * @param stream InputStream
-     * @return Signed int
-     */
-    public static int readVarInt(InputStream stream) throws IOException {
-        return decodeZigZag32(readUnsignedVarInt(stream));
-    }
-
-    /**
-     * @param stream BinaryStream
      * @return Unsigned int
      */
     public static long readUnsignedVarInt(BinaryStream stream) {
@@ -113,22 +97,6 @@ public final class VarInt {
 
     /**
      * @param stream BinaryStream
-     * @return Signed long
-     */
-    public static long readVarLong(BinaryStream stream) {
-        return decodeZigZag64(readUnsignedVarLong(stream));
-    }
-
-    /**
-     * @param stream InputStream
-     * @return Signed long
-     */
-    public static long readVarLong(InputStream stream) throws IOException {
-        return decodeZigZag64(readUnsignedVarLong(stream));
-    }
-
-    /**
-     * @param stream BinaryStream
      * @return Unsigned long
      */
     public static long readUnsignedVarLong(BinaryStream stream) {
@@ -141,6 +109,38 @@ public final class VarInt {
      */
     public static long readUnsignedVarLong(InputStream stream) throws IOException {
         return read(stream, 10);
+    }
+
+    /**
+     * @param stream BinaryStream
+     * @return Signed int
+     */
+    public static int readVarInt(BinaryStream stream) {
+        return decodeZigZag32(readUnsignedVarInt(stream));
+    }
+
+    /**
+     * @param stream InputStream
+     * @return Signed int
+     */
+    public static int readVarInt(InputStream stream) throws IOException {
+        return decodeZigZag32(readUnsignedVarInt(stream));
+    }
+
+    /**
+     * @param stream BinaryStream
+     * @return Signed long
+     */
+    public static long readVarLong(BinaryStream stream) {
+        return decodeZigZag64(readUnsignedVarLong(stream));
+    }
+
+    /**
+     * @param stream InputStream
+     * @return Signed long
+     */
+    public static long readVarLong(InputStream stream) throws IOException {
+        return decodeZigZag64(readUnsignedVarLong(stream));
     }
 
     private static void write(BinaryStream stream, long value) {
@@ -169,22 +169,6 @@ public final class VarInt {
 
     /**
      * @param stream BinaryStream
-     * @param value  Signed int
-     */
-    public static void writeVarInt(BinaryStream stream, int value) {
-        writeUnsignedVarInt(stream, encodeZigZag32(value));
-    }
-
-    /**
-     * @param stream OutputStream
-     * @param value  Signed int
-     */
-    public static void writeVarInt(OutputStream stream, int value) throws IOException {
-        writeUnsignedVarInt(stream, encodeZigZag32(value));
-    }
-
-    /**
-     * @param stream BinaryStream
      * @param value  Unsigned int
      */
     public static void writeUnsignedVarInt(BinaryStream stream, long value) {
@@ -201,22 +185,6 @@ public final class VarInt {
 
     /**
      * @param stream BinaryStream
-     * @param value  Signed long
-     */
-    public static void writeVarLong(BinaryStream stream, long value) {
-        writeUnsignedVarLong(stream, encodeZigZag64(value));
-    }
-
-    /**
-     * @param stream OutputStream
-     * @param value  Signed long
-     */
-    public static void writeVarLong(OutputStream stream, long value) throws IOException {
-        writeUnsignedVarLong(stream, encodeZigZag64(value));
-    }
-
-    /**
-     * @param stream BinaryStream
      * @param value  Unsigned long
      */
     public static void writeUnsignedVarLong(BinaryStream stream, long value) {
@@ -229,5 +197,37 @@ public final class VarInt {
      */
     public static void writeUnsignedVarLong(OutputStream stream, long value) throws IOException {
         write(stream, value);
+    }
+
+    /**
+     * @param stream BinaryStream
+     * @param value  Signed int
+     */
+    public static void writeVarInt(BinaryStream stream, int value) {
+        writeUnsignedVarInt(stream, encodeZigZag32(value));
+    }
+
+    /**
+     * @param stream OutputStream
+     * @param value  Signed int
+     */
+    public static void writeVarInt(OutputStream stream, int value) throws IOException {
+        writeUnsignedVarInt(stream, encodeZigZag32(value));
+    }
+
+    /**
+     * @param stream BinaryStream
+     * @param value  Signed long
+     */
+    public static void writeVarLong(BinaryStream stream, long value) {
+        writeUnsignedVarLong(stream, encodeZigZag64(value));
+    }
+
+    /**
+     * @param stream OutputStream
+     * @param value  Signed long
+     */
+    public static void writeVarLong(OutputStream stream, long value) throws IOException {
+        writeUnsignedVarLong(stream, encodeZigZag64(value));
     }
 }

@@ -143,32 +143,6 @@ public enum TextFormat {
     }
 
     /**
-     * Gets the TextFormat represented by the specified format code.
-     *
-     * @param code Code to check
-     * @return Associative  with the given code,
-     * or null if it doesn't exist
-     */
-    public static TextFormat getByChar(char code) {
-        return BY_CHAR.get(code);
-    }
-
-    /**
-     * Gets the TextFormat represented by the specified format code.
-     *
-     * @param code Code to check
-     * @return Associative  with the given code,
-     * or null if it doesn't exist
-     */
-    public static TextFormat getByChar(String code) {
-        if (code == null || code.length() <= 1) {
-            return null;
-        }
-
-        return BY_CHAR.get(code.charAt(0));
-    }
-
-    /**
      * Cleans the given message of all format codes.
      *
      * @param input String to clean.
@@ -181,7 +155,7 @@ public enum TextFormat {
     /**
      * Cleans the given message of all format codes.
      *
-     * @param input String to clean.
+     * @param input     String to clean.
      * @param recursive Do recursively.
      * @return A copy of the input string, without any formatting.
      */
@@ -234,6 +208,41 @@ public enum TextFormat {
     }
 
     /**
+     * Gets the TextFormat represented by the specified format code.
+     *
+     * @param code Code to check
+     * @return Associative  with the given code,
+     * or null if it doesn't exist
+     */
+    public static TextFormat getByChar(char code) {
+        return BY_CHAR.get(code);
+    }
+
+    /**
+     * Gets the TextFormat represented by the specified format code.
+     *
+     * @param code Code to check
+     * @return Associative  with the given code,
+     * or null if it doesn't exist
+     */
+    public static TextFormat getByChar(String code) {
+        if (code == null || code.length() <= 1) {
+            return null;
+        }
+
+        return BY_CHAR.get(code.charAt(0));
+    }
+
+    /**
+     * Gets the char value associated with this color
+     *
+     * @return A char value of this color code
+     */
+    public char getChar() {
+        return code;
+    }
+
+    /**
      * Gets the chat color used at the end of the given input string.
      *
      * @param input Input string to retrieve the colors from.
@@ -249,7 +258,7 @@ public enum TextFormat {
                 TextFormat color = getByChar(input.charAt(index + 1));
 
                 if (color != null) {
-                    result.insert(0, color.toString());
+                    result.insert(0, color);
 
                     // Once we find a color or reset we can stop searching
                     if (color.isColor() || color.equals(RESET)) {
@@ -263,17 +272,10 @@ public enum TextFormat {
     }
 
     /**
-     * Gets the char value associated with this color
-     *
-     * @return A char value of this color code
+     * Checks if this code is a color code as opposed to a format code.
      */
-    public char getChar() {
-        return code;
-    }
-
-    @Override
-    public String toString() {
-        return toString;
+    public boolean isColor() {
+        return !isFormat && this != RESET;
     }
 
     /**
@@ -283,10 +285,8 @@ public enum TextFormat {
         return isFormat;
     }
 
-    /**
-     * Checks if this code is a color code as opposed to a format code.
-     */
-    public boolean isColor() {
-        return !isFormat && this != RESET;
+    @Override
+    public String toString() {
+        return toString;
     }
 }

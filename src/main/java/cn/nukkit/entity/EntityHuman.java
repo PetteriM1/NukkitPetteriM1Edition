@@ -11,7 +11,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.StringTag;
 import cn.nukkit.network.protocol.AddPlayerPacket;
-import cn.nukkit.network.protocol.MobArmorEquipmentPacket;
 import cn.nukkit.network.protocol.PlayerListPacket;
 import cn.nukkit.network.protocol.SetEntityLinkPacket;
 import cn.nukkit.utils.*;
@@ -38,29 +37,26 @@ public class EntityHuman extends EntityHumanType {
 
     protected Skin skin;
 
-    @Override
-    public float getWidth() {
-        return 0.6f;
+    public EntityHuman(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
     }
 
     @Override
-    public float getLength() {
-        return 0.6f;
+    public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
+        this.level.addPlayerMovement(this, x, y, z, yaw, pitch, headYaw);
     }
 
     @Override
-    public float getHeight() {
-        return isSwimming() || isGliding() || isCrawling() ? 0.6f : isSneaking() ? 1.5f : 1.8f;
-    }
+    public void close() {
+        if (!this.closed) {
+            if (inventory != null && (!(this instanceof Player) || ((Player) this).loggedIn)) {
+                for (Player viewer : this.inventory.getViewers()) {
+                    viewer.removeWindow(this.inventory);
+                }
+            }
 
-    @Override
-    protected double getStepHeight() {
-        return 0.6;
-    }
-
-    @Override
-    public float getEyeHeight() {
-        return isSwimming() || isGliding() || isCrawling() ? 0.42f : isSneaking() ? 1.26f : 1.62f;
+            super.close();
+        }
     }
 
     @Override
@@ -69,28 +65,54 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
+    public float getEyeHeight() {
+        return isSwimming() || isGliding() || isCrawling() ? 0.42f : isShortSneaking() ? 1.26f : 1.62f;
+    }
+
+    @Override
+    public float getHeight() {
+        return isSwimming() || isGliding() || isCrawling() ? 0.6f : isShortSneaking() ? 1.5f : 1.8f;
+    }
+
+    @Override
+    public float getLength() {
+        return 0.6f;
+    }
+
+    @Override
+    public String getName() {
+        return this.getNameTag();
+    }
+
+    @Override
     public int getNetworkId() {
         return -1;
-    }
-
-    public EntityHuman(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
-    }
-
-    public Skin getSkin() {
-        return skin;
-    }
-
-    public UUID getUniqueId() {
-        return uuid;
     }
 
     public byte[] getRawUniqueId() {
         return rawUUID;
     }
 
+    public Skin getSkin() {
+        return skin;
+    }
+
     public void setSkin(Skin skin) {
         this.skin = skin;
+    }
+
+    @Override
+    protected double getStepHeight() {
+        return 0.6;
+    }
+
+    public UUID getUniqueId() {
+        return uuid;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.6f;
     }
 
     @Override
@@ -204,8 +226,17 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
-    public String getName() {
-        return this.getNameTag();
+    protected void onBlock(Entity damager, EntityDamageBlockedEvent event, EntityDamageEvent source) {
+        super.onBlock(damager, event, source);
+        Item shieldOffhand = getOffhandInventory().getItem(0);
+        if (shieldOffhand.getId() == ItemID.SHIELD) {
+            getOffhandInventory().setItem(0, damageArmor(shieldOffhand, damager, source.getDamage(), true, null));
+        } else {
+            Item shield = getInventory().getItemInHand();
+            if (shield.getId() == ItemID.SHIELD) {
+                getInventory().setItemInHand(damageArmor(shield, damager, source.getDamage(), true, null));
+            }
+        }
     }
 
     @Override
@@ -280,16 +311,11 @@ public class EntityHuman extends EntityHumanType {
     }
 
     @Override
-    public void addMovement(double x, double y, double z, double yaw, double pitch, double headYaw) {
-        this.level.addPlayerMovement(this, x, y, z, yaw, pitch, headYaw);
-    }
-
-    @Override
     public void spawnTo(Player player) {
         if (this != player && !this.hasSpawned.containsKey(player.getLoaderId())) {
             this.hasSpawned.put(player.getLoaderId(), player);
 
-            if (!this.getSkin().isValid()) {
+            if (!this.getSkin().isValid(this.server.doNotLimitSkinGeometry)) {
                 throw new IllegalStateException(this.getClass().getSimpleName() + " must have a valid skin set");
             }
 
@@ -321,13 +347,7 @@ public class EntityHuman extends EntityHumanType {
             if (this instanceof Player) {
                 this.inventory.sendArmorContents(player);
             } else {
-                Item[] armor = this.inventory.getArmorContents();
-                if (armor[0].getId() != 0 || armor[1].getId() != 0 || armor[2].getId() != 0 || armor[3].getId() != 0) {
-                    MobArmorEquipmentPacket pk2 = new MobArmorEquipmentPacket();
-                    pk2.eid = this.getId();
-                    pk2.slots = armor;
-                    player.dataPacket(pk2);
-                }
+                this.inventory.sendArmorContentsIfNotAr(player);
             }
             this.offhandInventory.sendContents(player);
 
@@ -342,33 +362,6 @@ public class EntityHuman extends EntityHumanType {
 
             if (!(this instanceof Player)) {
                 this.server.removePlayerListData(this.uuid, player);
-            }
-        }
-    }
-
-    @Override
-    public void close() {
-        if (!this.closed) {
-            if (inventory != null && (!(this instanceof Player) || ((Player) this).loggedIn)) {
-                for (Player viewer : this.inventory.getViewers()) {
-                    viewer.removeWindow(this.inventory);
-                }
-            }
-
-            super.close();
-        }
-    }
-
-    @Override
-    protected void onBlock(Entity damager, EntityDamageBlockedEvent event, EntityDamageEvent source) {
-        super.onBlock(damager, event, source);
-        Item shieldOffhand = getOffhandInventory().getItem(0);
-        if (shieldOffhand.getId() == ItemID.SHIELD) {
-            getOffhandInventory().setItem(0, damageArmor(shieldOffhand, damager, source.getDamage(), true, null));
-        } else {
-            Item shield = getInventory().getItemInHand();
-            if (shield.getId() == ItemID.SHIELD) {
-                getInventory().setItemInHand(damageArmor(shield, damager, source.getDamage(), true, null));
             }
         }
     }

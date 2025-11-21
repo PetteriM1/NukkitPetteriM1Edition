@@ -18,13 +18,8 @@ public class SoulSandValleyBiome extends CoveredBiome {
     }
 
     @Override
-    public String getName() {
-        return "Soul Sand Valley";
-    }
-
-    @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return Block.SOUL_SAND << Block.DATA_BITS;
+    public boolean canRain() {
+        return false;
     }
 
     @Override
@@ -33,7 +28,12 @@ public class SoulSandValleyBiome extends CoveredBiome {
     }
 
     @Override
-    public boolean canRain() {
-        return false;
+    public String getName() {
+        return "Soul Sand Valley";
+    }
+
+    @Override
+    public int getSurfaceId(int x, int y, int z) {
+        return Block.SOUL_SAND << Block.DATA_BITS;
     }
 }

@@ -19,6 +19,9 @@ public class BlockEntitySmoker extends BlockEntityFurnace {
     public BlockEntitySmoker(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
     }
+    private static final IntSet CAN_SMELT = new IntOpenHashSet(new int[]{
+            Item.RAW_PORKCHOP, Item.RAW_BEEF, Item.RAW_RABBIT, Item.RAW_FISH, Item.RAW_CHICKEN, Item.RAW_MUTTON, Item.RAW_SALMON, Item.POTATO
+    });
 
     @Override
     public String getName() {
@@ -26,14 +29,28 @@ public class BlockEntitySmoker extends BlockEntityFurnace {
     }
 
     @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.SMOKER)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putShort("BurnDuration", burnDuration)
+                .putShort("BurnTime", burnTime)
+                .putShort("CookTime", cookTime);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
     public boolean isBlockEntityValid() {
         int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
         return blockID == Block.SMOKER || blockID == Block.LIT_SMOKER;
     }
-
-    private static final IntSet CAN_SMELT = new IntOpenHashSet(new int[]{
-            Item.RAW_PORKCHOP, Item.RAW_BEEF, Item.RAW_RABBIT, Item.RAW_FISH, Item.RAW_CHICKEN, Item.RAW_MUTTON, Item.RAW_SALMON, Item.POTATO
-    });
 
     @Override
     public boolean onUpdate() {
@@ -122,23 +139,5 @@ public class BlockEntitySmoker extends BlockEntityFurnace {
         sendPacket();
 
         return ret;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.SMOKER)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putShort("BurnDuration", burnDuration)
-                .putShort("BurnTime", burnTime)
-                .putShort("CookTime", cookTime);
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
-        }
-
-        return c;
     }
 }

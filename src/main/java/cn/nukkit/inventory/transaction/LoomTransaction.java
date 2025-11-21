@@ -29,6 +29,19 @@ public class LoomTransaction extends InventoryTransaction {
     }
 
     @Override
+    protected boolean callExecuteEvent() {
+        LoomInventory inventory = (LoomInventory) getSource().getWindowById(Player.LOOM_WINDOW_ID);
+        LoomItemEvent event = new LoomItemEvent(inventory, this.outputItem, this.source);
+        this.source.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            this.sendInventories();
+            source.setNeedSendInventory(true);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean canExecute() {
         if (!super.canExecute()) {
             return false;
@@ -72,16 +85,8 @@ public class LoomTransaction extends InventoryTransaction {
     }
 
     @Override
-    protected boolean callExecuteEvent() {
-        LoomInventory inventory = (LoomInventory) getSource().getWindowById(Player.LOOM_WINDOW_ID);
-        LoomItemEvent event = new LoomItemEvent(inventory, this.outputItem, this.source);
-        this.source.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            this.sendInventories();
-            source.setNeedSendInventory(true);
-            return false;
-        }
-        return true;
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return isIn(actions);
     }
 
     public Item getOutputItem() {
@@ -93,10 +98,5 @@ public class LoomTransaction extends InventoryTransaction {
             if (action instanceof LoomItemAction) return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return isIn(actions);
     }
 }

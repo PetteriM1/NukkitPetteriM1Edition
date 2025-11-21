@@ -10,28 +10,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockGlassPane extends BlockThin {
 
     @Override
-    public String getName() {
-        return "Glass Pane";
-    }
-
-    @Override
-    public int getId() {
-        return GLASS_PANE;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.5;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.3;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
@@ -40,8 +20,28 @@ public class BlockGlassPane extends BlockThin {
     }
 
     @Override
-    public boolean canSilkTouch() {
-        return true;
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.3;
+    }
+
+    @Override
+    public int getId() {
+        return GLASS_PANE;
+    }
+
+    @Override
+    public String getName() {
+        return "Glass Pane";
+    }
+
+    @Override
+    public double getResistance() {
+        return 1.5;
     }
 
     @Override

@@ -24,26 +24,6 @@ public class ConsoleCommandSender implements CommandSender {
     }
 
     @Override
-    public boolean isPermissionSet(String name) {
-        return this.perm.isPermissionSet(name);
-    }
-
-    @Override
-    public boolean isPermissionSet(Permission permission) {
-        return this.perm.isPermissionSet(permission);
-    }
-
-    @Override
-    public boolean hasPermission(String name) {
-        return this.perm.hasPermission(name);
-    }
-
-    @Override
-    public boolean hasPermission(Permission permission) {
-        return this.perm.hasPermission(permission);
-    }
-
-    @Override
     public PermissionAttachment addAttachment(Plugin plugin) {
         return this.perm.addAttachment(plugin);
     }
@@ -59,8 +39,51 @@ public class ConsoleCommandSender implements CommandSender {
     }
 
     @Override
-    public void removeAttachment(PermissionAttachment attachment) {
-        this.perm.removeAttachment(attachment);
+    public Map<String, PermissionAttachmentInfo> getEffectivePermissions() {
+        return this.perm.getEffectivePermissions();
+    }
+
+    @Override
+    public String getName() {
+        return "CONSOLE";
+    }
+
+    @Override
+    public Server getServer() {
+        return Server.getInstance();
+    }
+
+    @Override
+    public boolean hasPermission(String name) {
+        return this.perm.hasPermission(name);
+    }
+
+    @Override
+    public boolean hasPermission(Permission permission) {
+        return this.perm.hasPermission(permission);
+    }
+
+    @Override
+    public boolean isOp() {
+        return true;
+    }
+
+    @Override
+    public void setOp(boolean value) {
+    }
+
+    @Override
+    public boolean isPermissionSet(String name) {
+        return this.perm.isPermissionSet(name);
+    }
+
+    @Override
+    public boolean isPermissionSet(Permission permission) {
+        return this.perm.isPermissionSet(permission);
+    }
+
+    public boolean isPlayer() {
+        return false;
     }
 
     @Override
@@ -69,17 +92,8 @@ public class ConsoleCommandSender implements CommandSender {
     }
 
     @Override
-    public Map<String, PermissionAttachmentInfo> getEffectivePermissions() {
-        return this.perm.getEffectivePermissions();
-    }
-
-    public boolean isPlayer() {
-        return false;
-    }
-
-    @Override
-    public Server getServer() {
-        return Server.getInstance();
+    public void removeAttachment(PermissionAttachment attachment) {
+        this.perm.removeAttachment(attachment);
     }
 
     @Override
@@ -93,19 +107,5 @@ public class ConsoleCommandSender implements CommandSender {
     @Override
     public void sendMessage(TextContainer message) {
         this.sendMessage(this.getServer().getLanguage().translate(message));
-    }
-
-    @Override
-    public String getName() {
-        return "CONSOLE";
-    }
-
-    @Override
-    public boolean isOp() {
-        return true;
-    }
-
-    @Override
-    public void setOp(boolean value) {
     }
 }
