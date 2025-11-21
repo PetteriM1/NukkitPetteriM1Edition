@@ -22,23 +22,13 @@ public class BlockHugeMushroomRed extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Red Mushroom Block";
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
-    public int getId() {
-        return RED_MUSHROOM_BLOCK;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.2;
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
@@ -50,13 +40,23 @@ public class BlockHugeMushroomRed extends BlockSolidMeta {
     }
 
     @Override
-    public boolean canSilkTouch() {
-        return true;
+    public double getHardness() {
+        return 0.2;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
+    public int getId() {
+        return RED_MUSHROOM_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Red Mushroom Block";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override

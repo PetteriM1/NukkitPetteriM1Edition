@@ -10,12 +10,6 @@ import lombok.ToString;
 public class ContainerOpenPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.CONTAINER_OPEN_PACKET;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public int windowId;
     public int type;
     public int x;
@@ -35,5 +29,10 @@ public class ContainerOpenPacket extends DataPacket {
         this.putByte((byte) this.type);
         this.putBlockVector3(this.x, this.y, this.z);
         this.putEntityUniqueId(this.entityId);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -25,8 +25,37 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean alwaysDropsOnExplosion() {
+        return true;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return this.getDyeColor().getColor();
+    }
+
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(this.getDamage());
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.6;
     }
 
     @Override
@@ -40,18 +69,61 @@ public class BlockShulkerBox extends BlockTransparentMeta {
     }
 
     @Override
-    public double getHardness() {
-        return 0.6;
-    }
-
-    @Override
     public double getResistance() {
-        return 2;
+        return 10;
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityShulkerBox)) {
+                return false;
+            }
+
+            BlockEntityShulkerBox box = (BlockEntityShulkerBox) t;
+            Block block = this.getSide(BlockFace.fromIndex(box.namedTag.getByte("facing")));
+            if (!(block instanceof BlockAir) && !(block instanceof BlockLiquid) && !(block instanceof BlockFlowable)) {
+                return true;
+            }
+
+            player.addWindow(box.getInventory());
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.getLevel().setBlock(this, this, true, true);
+
+        CompoundTag nbt = BlockEntity.getDefaultCompound(this, BlockEntity.SHULKER_BOX)
+                .putByte("facing", face.getIndex());
+
+        if (item.hasCustomName()) {
+            nbt.putString("CustomName", item.getCustomName());
+        }
+
+        CompoundTag t = item.getNamedTag();
+
+        if (t != null) {
+            if (t.contains("Items")) {
+                nbt.putList(t.getList("Items"));
+            }
+        }
+
+        BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, this.getChunk(), nbt);
+        return true;
     }
 
     @Override
@@ -91,77 +163,5 @@ public class BlockShulkerBox extends BlockTransparentMeta {
         }
 
         return item;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.getLevel().setBlock(this, this, true, true);
-
-        CompoundTag nbt = BlockEntity.getDefaultCompound(this, BlockEntity.SHULKER_BOX)
-                .putByte("facing", face.getIndex());
-
-        if (item.hasCustomName()) {
-            nbt.putString("CustomName", item.getCustomName());
-        }
-
-        CompoundTag t = item.getNamedTag();
-
-        if (t != null) {
-            if (t.contains("Items")) {
-                nbt.putList(t.getList("Items"));
-            }
-        }
-
-        BlockEntity.createBlockEntity(BlockEntity.SHULKER_BOX, this.getChunk(), nbt);
-        return true;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityShulkerBox)) {
-                return false;
-            }
-
-            BlockEntityShulkerBox box = (BlockEntityShulkerBox) t;
-            Block block = this.getSide(BlockFace.fromIndex(box.namedTag.getByte("facing")));
-            if (!(block instanceof BlockAir) && !(block instanceof BlockLiquid) && !(block instanceof BlockFlowable)) {
-                return true;
-            }
-
-            player.addWindow(box.getInventory());
-        }
-
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return this.getDyeColor().getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(this.getDamage());
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean alwaysDropsOnExplosion() {
-        return true;
     }
 }

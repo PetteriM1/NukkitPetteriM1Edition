@@ -10,42 +10,12 @@ import cn.nukkit.utils.BlockColor;
 public class BlockEndGateway extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "End Gateway";
-    }
-
-    @Override
-    public int getId() {
-        return END_GATEWAY;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
+    public boolean canBePushed() {
         return false;
     }
 
     @Override
-    public double getHardness() {
-        return -1;
-    }
-
-    @Override
-    public double getResistance() {
-        return 18000000;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 15;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
+    public boolean canPassThrough() {
         return true;
     }
 
@@ -55,17 +25,47 @@ public class BlockEndGateway extends BlockSolid {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(BlockID.AIR));
+    public double getHardness() {
+        return -1;
     }
 
     @Override
-    public boolean canBePushed() {
+    public int getId() {
+        return END_GATEWAY;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 15;
+    }
+
+    @Override
+    public String getName() {
+        return "End Gateway";
+    }
+
+    @Override
+    public double getResistance() {
+        return 18000000;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public boolean isBreakable(Item item) {
         return false;
     }
 
     @Override
     public boolean isSolid() {
         return false;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(BlockID.AIR));
     }
 }

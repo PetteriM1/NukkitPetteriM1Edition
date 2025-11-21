@@ -31,16 +31,11 @@ public class CommandRequestPacket extends DataPacket {
     public boolean internal;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.command = this.getString();
 
         CommandOriginData.Origin type = CommandOriginData.Origin.values()[this.getVarInt()];
-        UUID uuid = this.getUUID();
+        UUID uuid = protocol > ProtocolInfo.v1_2_0 ? this.getUUID() : null;
         String requestId = this.getString();
         Long varLong = null;
         if (type == CommandOriginData.Origin.DEV_CONSOLE || type == CommandOriginData.Origin.TEST) {
@@ -48,11 +43,18 @@ public class CommandRequestPacket extends DataPacket {
         }
         this.data = new CommandOriginData(type, uuid, requestId, varLong);
         this.internal = this.getBoolean();
-        this.getVarInt(); // version
+        if (protocol >= ProtocolInfo.v1_19_60) {
+            this.getVarInt(); // version
+        }
     }
 
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

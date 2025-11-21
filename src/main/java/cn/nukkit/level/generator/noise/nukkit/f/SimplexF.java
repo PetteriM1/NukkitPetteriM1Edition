@@ -34,8 +34,8 @@ public class SimplexF extends PerlinF {
         F2 = 0.5f * (SQRT_3 - 1f);
         G2 = (3f - SQRT_3) / 6f;
         G22 = G2 * 2.0f - 1f;
-        F3 = 1.0f / 3.0f;
-        G3 = 1.0f / 6.0f;
+        F3 = 0.33333334f;
+        G3 = 0.16666667f;
         F4 = (SQRT_5 - 1.0f) / 4.0f;
         G4 = (5.0f - SQRT_5) / 20.0f;
         G42 = G4 * 2.0f;
@@ -51,8 +51,8 @@ public class SimplexF extends PerlinF {
         F2 = 0.5f * (SQRT_3 - 1f);
         G2 = (3f - SQRT_3) / 6f;
         G22 = G2 * 2.0f - 1f;
-        F3 = 1.0f / 3.0f;
-        G3 = 1.0f / 6.0f;
+        F3 = 0.33333334f;
+        G3 = 0.16666667f;
         F4 = (SQRT_5 - 1.0f) / 4.0f;
         G4 = (5.0f - SQRT_5) / 20.0f;
         G42 = G4 * 2.0f;
@@ -71,6 +71,73 @@ public class SimplexF extends PerlinF {
 
     protected static float dot4D(int[] g, float x, float y, float z, float w) {
         return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
+    }
+
+    @Override
+    public float getNoise2D(float x, float y) {
+        x += this.offsetX;
+        y += this.offsetY;
+
+        // Skew the input space to determine which simplex cell we're in
+        float s = (x + y) * F2; // Hairy factor for 2D
+        int i = (int) (x + s);
+        int j = (int) (y + s);
+        float t = (i + j) * G2;
+        // Unskew the cell origin back to (x,y) space
+        float x0 = x - (i - t); // The x,y distances from the cell origin
+        float y0 = y - (j - t);
+
+        // For the 2D case, the simplex shape is an equilateral triangle.
+        int i1 = 0;
+        int j1 = 0;
+        // Determine which simplex we are in.
+        if (x0 > y0) {
+            i1 = 1;
+            j1 = 0;
+        } // lower triangle, XY order: (0,0).(1,0).(1,1)
+        else {
+            i1 = 0;
+            j1 = 1;
+        }
+        // upper triangle, YX order: (0,0).(0,1).(1,1)
+
+        // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
+        // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
+        // c = (3-sqrt(3))/6
+
+        float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
+        float y1 = y0 - j1 + G2;
+        float x2 = x0 + G22; // Offsets for last corner in (x,y) unskewed coords
+        float y2 = y0 + G22;
+
+        // Work out the hashed gradient indices of the three simplex corners
+        int ii = i & 255;
+        int jj = j & 255;
+
+        float n = 0;
+
+        // Calculate the contribution from the three corners
+        float t0 = 0.5f - x0 * x0 - y0 * y0;
+        if (t0 > 0) {
+            int[] gi0 = grad3[this.perm[ii + this.perm[jj]] % 12];
+            n += t0 * t0 * t0 * t0 * (gi0[0] * x0 + gi0[1] * y0); // (x,y) of grad3 used for 2D gradient
+        }
+
+        float t1 = 0.5f - x1 * x1 - y1 * y1;
+        if (t1 > 0) {
+            int[] gi1 = grad3[this.perm[ii + i1 + this.perm[jj + j1]] % 12];
+            n += t1 * t1 * t1 * t1 * (gi1[0] * x1 + gi1[1] * y1);
+        }
+
+        float t2 = 0.5f - x2 * x2 - y2 * y2;
+        if (t2 > 0) {
+            int[] gi2 = grad3[this.perm[ii + 1 + this.perm[jj + 1]] % 12];
+            n += t2 * t2 * t2 * t2 * (gi2[0] * x2 + gi2[1] * y2);
+        }
+
+        // Add contributions from each corner to get the noise value.
+        // The result is scaled to return values in the interval [-1,1].
+        return 70.0f * n;
     }
 
     @Override
@@ -202,72 +269,5 @@ public class SimplexF extends PerlinF {
         // Add contributions from each corner to get the noise value.
         // The result is scaled to stay just inside [-1,1]
         return 32.0f * n;
-    }
-
-    @Override
-    public float getNoise2D(float x, float y) {
-        x += this.offsetX;
-        y += this.offsetY;
-
-        // Skew the input space to determine which simplex cell we're in
-        float s = (x + y) * F2; // Hairy factor for 2D
-        int i = (int) (x + s);
-        int j = (int) (y + s);
-        float t = (i + j) * G2;
-        // Unskew the cell origin back to (x,y) space
-        float x0 = x - (i - t); // The x,y distances from the cell origin
-        float y0 = y - (j - t);
-
-        // For the 2D case, the simplex shape is an equilateral triangle.
-        int i1 = 0;
-        int j1 = 0;
-        // Determine which simplex we are in.
-        if (x0 > y0) {
-            i1 = 1;
-            j1 = 0;
-        } // lower triangle, XY order: (0,0).(1,0).(1,1)
-        else {
-            i1 = 0;
-            j1 = 1;
-        }
-        // upper triangle, YX order: (0,0).(0,1).(1,1)
-
-        // A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
-        // a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
-        // c = (3-sqrt(3))/6
-
-        float x1 = x0 - i1 + G2; // Offsets for middle corner in (x,y) unskewed coords
-        float y1 = y0 - j1 + G2;
-        float x2 = x0 + G22; // Offsets for last corner in (x,y) unskewed coords
-        float y2 = y0 + G22;
-
-        // Work out the hashed gradient indices of the three simplex corners
-        int ii = i & 255;
-        int jj = j & 255;
-
-        float n = 0;
-
-        // Calculate the contribution from the three corners
-        float t0 = 0.5f - x0 * x0 - y0 * y0;
-        if (t0 > 0) {
-            int[] gi0 = grad3[this.perm[ii + this.perm[jj]] % 12];
-            n += t0 * t0 * t0 * t0 * (gi0[0] * x0 + gi0[1] * y0); // (x,y) of grad3 used for 2D gradient
-        }
-
-        float t1 = 0.5f - x1 * x1 - y1 * y1;
-        if (t1 > 0) {
-            int[] gi1 = grad3[this.perm[ii + i1 + this.perm[jj + j1]] % 12];
-            n += t1 * t1 * t1 * t1 * (gi1[0] * x1 + gi1[1] * y1);
-        }
-
-        float t2 = 0.5f - x2 * x2 - y2 * y2;
-        if (t2 > 0) {
-            int[] gi2 = grad3[this.perm[ii + 1 + this.perm[jj + 1]] % 12];
-            n += t2 * t2 * t2 * t2 * (gi2[0] * x2 + gi2[1] * y2);
-        }
-
-        // Add contributions from each corner to get the noise value.
-        // The result is scaled to return values in the interval [-1,1].
-        return 70.0f * n;
     }
 }

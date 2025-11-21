@@ -9,12 +9,12 @@ public class EndBiome extends Biome {
     }
 
     @Override
-    public String getName() {
-        return "The End";
+    public boolean canRain() {
+        return false;
     }
 
     @Override
-    public boolean canRain() {
-        return false;
+    public String getName() {
+        return "The End";
     }
 }

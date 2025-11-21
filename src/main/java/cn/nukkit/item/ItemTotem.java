@@ -1,7 +1,7 @@
 package cn.nukkit.item;
 
 public class ItemTotem extends Item {
-    
+
     public ItemTotem(Integer meta) {
         this(meta, 1);
     }
@@ -11,12 +11,12 @@ public class ItemTotem extends Item {
     }
 
     @Override
-    public int getMaxStackSize() {
-        return 1;
+    public boolean allowOffhand() {
+        return true;
     }
 
     @Override
-    public boolean allowOffhand() {
-        return true;
+    public int getMaxStackSize() {
+        return 1;
     }
 }

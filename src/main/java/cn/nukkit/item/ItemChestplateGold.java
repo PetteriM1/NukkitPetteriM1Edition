@@ -19,16 +19,6 @@ public class ItemChestplateGold extends ItemArmor {
     }
 
     @Override
-    public int getTier() {
-        return ItemArmor.TIER_GOLD;
-    }
-
-    @Override
-    public boolean isChestplate() {
-        return true;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 5;
     }
@@ -36,5 +26,15 @@ public class ItemChestplateGold extends ItemArmor {
     @Override
     public int getMaxDurability() {
         return 113;
+    }
+
+    @Override
+    public int getTier() {
+        return ItemArmor.TIER_GOLD;
+    }
+
+    @Override
+    public boolean isChestplate() {
+        return true;
     }
 }

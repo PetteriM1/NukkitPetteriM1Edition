@@ -18,6 +18,20 @@ public class BlockBeetroot extends BlockCrops {
     }
 
     @Override
+    public Item[] getDrops(Item item) {
+        if (this.getDamage() >= 0x07) {
+            return new Item[]{
+                    Item.get(Item.BEETROOT, 0, 1),
+                    Item.get(Item.BEETROOT_SEEDS, 0, ThreadLocalRandom.current().nextInt(0, 4))
+            };
+        } else {
+            return new Item[]{
+                    Item.get(Item.BEETROOT_SEEDS, 0, 1)
+            };
+        }
+    }
+
+    @Override
     public int getId() {
         return BEETROOT_BLOCK;
     }
@@ -30,19 +44,5 @@ public class BlockBeetroot extends BlockCrops {
     @Override
     public Item toItem() {
         return Item.get(Item.BEETROOT_SEEDS);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (this.getDamage() >= 0x07) {
-            return new Item[]{
-                    Item.get(Item.BEETROOT, 0, 1),
-                    Item.get(Item.BEETROOT_SEEDS, 0, ThreadLocalRandom.current().nextInt(0, 4))
-            };
-        } else {
-            return new Item[]{
-                    Item.get(Item.BEETROOT_SEEDS, 0, 1)
-            };
-        }
     }
 }

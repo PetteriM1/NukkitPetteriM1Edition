@@ -17,11 +17,11 @@ public enum InputMode {
         this.ordinal = ordinal;
     }
 
-    public int getOrdinal() {
-        return ordinal;
-    }
-
     public static InputMode fromOrdinal(int ordinal) {
         return VALUES[ordinal];
+    }
+
+    public int getOrdinal() {
+        return ordinal;
     }
 }

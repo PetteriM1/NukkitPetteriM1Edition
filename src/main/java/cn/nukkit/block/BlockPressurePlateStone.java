@@ -23,28 +23,21 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
     }
 
     @Override
-    public String getName() {
-        return "Stone Pressure Plate";
+    protected int computeRedstoneStrength() {
+        AxisAlignedBB bb = getCollisionBoundingBox();
+
+        for (Entity entity : this.level.getCollidingEntities(bb)) {
+            if (entity instanceof EntityLiving && entity.doesTriggerPressurePlate()) {
+                return 15;
+            }
+        }
+
+        return 0;
     }
 
     @Override
-    public int getId() {
-        return STONE_PRESSURE_PLATE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5D;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2.5D;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.STONE_BLOCK_COLOR;
     }
 
     @Override
@@ -59,20 +52,27 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.STONE_BLOCK_COLOR;
+    public double getHardness() {
+        return 0.5D;
     }
 
     @Override
-    protected int computeRedstoneStrength() {
-        AxisAlignedBB bb = getCollisionBoundingBox();
+    public int getId() {
+        return STONE_PRESSURE_PLATE;
+    }
 
-        for (Entity entity : this.level.getCollidingEntities(bb)) {
-            if (entity instanceof EntityLiving && entity.doesTriggerPressurePlate()) {
-                return 15;
-            }
-        }
+    @Override
+    public String getName() {
+        return "Stone Pressure Plate";
+    }
 
-        return 0;
+    @Override
+    public double getResistance() {
+        return 2.5D;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

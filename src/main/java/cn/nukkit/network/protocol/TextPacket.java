@@ -6,12 +6,6 @@ import lombok.ToString;
 public class TextPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.TEXT_PACKET;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public static final byte TYPE_RAW = 0;
     public static final byte TYPE_CHAT = 1;
     public static final byte TYPE_TRANSLATION = 2;
@@ -23,7 +17,6 @@ public class TextPacket extends DataPacket {
     public static final byte TYPE_ANNOUNCEMENT = 8;
     public static final byte TYPE_OBJECT = 9;
     public static final byte TYPE_OBJECT_WHISPER = 10;
-
     public byte type;
     public String source = "";
     public String message = "";
@@ -42,6 +35,10 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.source = this.getString();
+                if (protocol > 201 && protocol <= 282) {
+                    this.getString();
+                    this.getVarInt();
+                }
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
@@ -60,9 +57,13 @@ public class TextPacket extends DataPacket {
                     this.parameters[i] = this.getString();
                 }
         }
-        this.xboxUserId = this.getString();
-        this.platformChatId = this.getString();
-        this.filteredMessage = this.getString();
+        if (protocol >= 223) {
+            this.xboxUserId = this.getString();
+            this.platformChatId = this.getString();
+            if (protocol >= ProtocolInfo.v1_21_0) {
+                this.filteredMessage = this.getString();
+            }
+        }
     }
 
     @Override
@@ -75,6 +76,10 @@ public class TextPacket extends DataPacket {
             case TYPE_WHISPER:
             case TYPE_ANNOUNCEMENT:
                 this.putString(this.source);
+                if (protocol > 201 && protocol <= 282) {
+                    this.putString("");
+                    this.putVarInt(0);
+                }
             case TYPE_RAW:
             case TYPE_TIP:
             case TYPE_SYSTEM:
@@ -92,8 +97,17 @@ public class TextPacket extends DataPacket {
                     this.putString(parameter);
                 }
         }
-        this.putString(this.xboxUserId);
-        this.putString(this.platformChatId);
-        this.putString(this.filteredMessage);
+        if (protocol >= 223) {
+            this.putString(this.xboxUserId);
+            this.putString(this.platformChatId);
+            if (protocol >= ProtocolInfo.v1_21_0) {
+                this.putString(this.filteredMessage);
+            }
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

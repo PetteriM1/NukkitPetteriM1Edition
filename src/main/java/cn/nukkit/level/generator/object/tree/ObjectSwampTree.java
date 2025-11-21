@@ -21,6 +21,20 @@ public class ObjectSwampTree extends TreeGenerator {
      */
     private final Block metaLeaves = Block.get(BlockID.LEAVES, BlockLeaves.OAK);
 
+    private void addHangingVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
+        this.addVine(worldIn, pos, meta);
+        int i = 4;
+
+        for (pos = pos.down(); i > 0 && worldIn.getBlockIdAt(pos.x, pos.y, pos.z) == Block.AIR; --i) {
+            this.addVine(worldIn, pos, meta);
+            pos = pos.down();
+        }
+    }
+
+    private void addVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
+        this.setBlockAndNotifyAdequately(worldIn, pos, Block.get(BlockID.VINE, meta));
+    }
+
     @Override
     public boolean generate(ChunkManager worldIn, NukkitRandom rand, Vector3 vectorPosition) {
         BlockVector3 position = new BlockVector3(vectorPosition.getFloorX(), vectorPosition.getFloorY(), vectorPosition.getFloorZ());
@@ -140,20 +154,6 @@ public class ObjectSwampTree extends TreeGenerator {
             }
         } else {
             return false;
-        }
-    }
-
-    private void addVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
-        this.setBlockAndNotifyAdequately(worldIn, pos, Block.get(BlockID.VINE, meta));
-    }
-
-    private void addHangingVine(ChunkManager worldIn, BlockVector3 pos, int meta) {
-        this.addVine(worldIn, pos, meta);
-        int i = 4;
-
-        for (pos = pos.down(); i > 0 && worldIn.getBlockIdAt(pos.x, pos.y, pos.z) == Block.AIR; --i) {
-            this.addVine(worldIn, pos, meta);
-            pos = pos.down();
         }
     }
 }

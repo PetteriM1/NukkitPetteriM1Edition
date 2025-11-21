@@ -11,28 +11,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockGold extends BlockSolid {
 
     @Override
-    public int getId() {
-        return GOLD_BLOCK;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Block of Gold";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 30;
+    public BlockColor getColor() {
+        return BlockColor.GOLD_BLOCK_COLOR;
     }
 
     @Override
@@ -47,12 +32,27 @@ public class BlockGold extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GOLD_BLOCK_COLOR;
+    public double getHardness() {
+        return 3;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return GOLD_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Block of Gold";
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

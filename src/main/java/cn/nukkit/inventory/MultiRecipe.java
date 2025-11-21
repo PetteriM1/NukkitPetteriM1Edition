@@ -15,14 +15,17 @@ public class MultiRecipe implements Recipe {
         this.networkId = ++CraftingManager.NEXT_NETWORK_ID;
     }
 
-    @Override
-    public Item getResult() {
-        throw new UnsupportedOperationException();
+    public UUID getId() {
+        return this.id;
+    }
+
+    public int getNetworkId() {
+        return this.networkId;
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerMultiRecipe(this);
+    public Item getResult() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -30,11 +33,8 @@ public class MultiRecipe implements Recipe {
         return RecipeType.MULTI;
     }
 
-    public UUID getId() {
-        return this.id;
-    }
-
-    public int getNetworkId() {
-        return this.networkId;
+    @Override
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerMultiRecipe(this);
     }
 }

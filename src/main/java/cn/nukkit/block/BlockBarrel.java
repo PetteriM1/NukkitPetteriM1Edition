@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityBarrel;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityPiglin;
 import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -28,13 +30,122 @@ public class BlockBarrel extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Barrel";
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        int index = getDamage() & 0x7;
+        return BlockFace.fromIndex(index);
+    }
+
+    public void setBlockFace(BlockFace face) {
+        this.setDamage((this.getDamage() & 0x8) | (face.getIndex() & 0x7));
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityBarrel) {
+            return ContainerInventory.calculateRedstone(((BlockEntityBarrel) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
+    }
+
+    @Override
+    public double getHardness() {
+        return 2.5;
     }
 
     @Override
     public int getId() {
         return BARREL;
+    }
+
+    @Override
+    public String getName() {
+        return "Barrel";
+    }
+
+    @Override
+    public double getResistance() {
+        return 12.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    public boolean isOpen() {
+        return (this.getDamage() & 0x8) == 0x8;
+    }
+
+    public void setOpen(boolean open) {
+        this.setDamage((this.getDamage() & 0x7) | (open ? 0x8 : 0x0));
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        BlockEntity blockEntity = level.getBlockEntity(this);
+        if (!(blockEntity instanceof BlockEntityBarrel)) {
+            return false;
+        }
+
+        BlockEntityBarrel barrel = (BlockEntityBarrel) blockEntity;
+
+        if (barrel.namedTag.contains("Lock") && barrel.namedTag.get("Lock") instanceof StringTag) {
+            if (!barrel.namedTag.getString("Lock").equals(item.getCustomName())) {
+                return true;
+            }
+        }
+
+        player.addWindow(barrel.getInventory());
+
+        for (Entity e : this.getChunk().getEntities().values()) {
+            if (e instanceof EntityPiglin) {
+                ((EntityPiglin) e).setAngry(600);
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item, Player player) {
+        boolean broken = this.onBreak(item);
+
+        if (broken && player != null) {
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
+        }
+
+        return broken;
     }
 
     @Override
@@ -77,95 +188,7 @@ public class BlockBarrel extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player == null) {
-            return false;
-        }
-
-        BlockEntity blockEntity = level.getBlockEntity(this);
-        if (!(blockEntity instanceof BlockEntityBarrel)) {
-            return false;
-        }
-
-        BlockEntityBarrel barrel = (BlockEntityBarrel) blockEntity;
-
-        if (barrel.namedTag.contains("Lock") && barrel.namedTag.get("Lock") instanceof StringTag) {
-            if (!barrel.namedTag.getString("Lock").equals(item.getCustomName())) {
-                return true;
-            }
-        }
-
-        player.addWindow(barrel.getInventory());
-
-        return true;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 12.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(BARREL));
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        int index = getDamage() & 0x7;
-        return BlockFace.fromIndex(index);
-    }
-
-    public void setBlockFace(BlockFace face) {
-        this.setDamage((this.getDamage() & 0x8) | (face.getIndex() & 0x7));
-    }
-
-    public boolean isOpen() {
-        return (this.getDamage() & 0x8) == 0x8;
-    }
-
-    public void setOpen(boolean open) {
-        this.setDamage((this.getDamage() & 0x7) | (open? 0x8 : 0x0));
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public int getComparatorInputOverride() {
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (blockEntity instanceof BlockEntityBarrel) {
-            return ContainerInventory.calculateRedstone(((BlockEntityBarrel) blockEntity).getInventory());
-        }
-
-        return super.getComparatorInputOverride();
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
     }
 }

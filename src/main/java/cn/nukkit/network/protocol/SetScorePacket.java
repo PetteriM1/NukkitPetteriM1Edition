@@ -15,9 +15,68 @@ public class SetScorePacket extends DataPacket {
     public Action action;
     public final List<ScoreInfo> infos = new ObjectArrayList<>();
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public enum Action {
+        SET,
+        REMOVE
+    }
+
+    @Getter
+    @EqualsAndHashCode
+    @ToString
+    public static class ScoreInfo {
+
+        private final long scoreboardId;
+        private final String objectiveId;
+        private final int score;
+        private final ScorerType type;
+        private final String name;
+        private final long entityId;
+
+        /**
+         * Score info for fake player
+         *
+         * @param scoreboardId scoreboard id
+         * @param objectiveId  objective id
+         * @param score        score
+         * @param name         line text
+         */
+        public ScoreInfo(long scoreboardId, String objectiveId, int score, String name) {
+            this.scoreboardId = scoreboardId;
+            this.objectiveId = objectiveId;
+            this.score = score;
+            this.type = ScorerType.FAKE;
+            this.name = name;
+            this.entityId = -1;
+        }
+
+        /**
+         * Score info for player/entity
+         *
+         * @param scoreboardId scoreboard id
+         * @param objectiveId  objective id
+         * @param type         entity type; PLAYER or ENTITY
+         * @param score        score
+         * @param entityId     entity id
+         */
+        public ScoreInfo(long scoreboardId, String objectiveId, int score, ScorerType type, long entityId) {
+            if (type != ScorerType.PLAYER && type != ScorerType.ENTITY) {
+                throw new IllegalArgumentException("Scorer type must be either PLAYER or ENTITY");
+            }
+
+            this.scoreboardId = scoreboardId;
+            this.objectiveId = objectiveId;
+            this.score = score;
+            this.type = type;
+            this.name = null;
+            this.entityId = entityId;
+        }
+
+        public enum ScorerType {
+            INVALID,
+            PLAYER,
+            ENTITY,
+            FAKE
+        }
     }
 
     @Override
@@ -54,65 +113,8 @@ public class SetScorePacket extends DataPacket {
         }
     }
 
-    public enum Action {
-        SET,
-        REMOVE
-    }
-
-    @Getter
-    @EqualsAndHashCode
-    @ToString
-    public static class ScoreInfo {
-
-        private final long scoreboardId;
-        private final String objectiveId;
-        private final int score;
-        private final ScorerType type;
-        private final String name;
-        private final long entityId;
-
-        /**
-         * Score info for fake player
-         * @param scoreboardId scoreboard id
-         * @param objectiveId objective id
-         * @param score score
-         * @param name line text
-         */
-        public ScoreInfo(long scoreboardId, String objectiveId, int score, String name) {
-            this.scoreboardId = scoreboardId;
-            this.objectiveId = objectiveId;
-            this.score = score;
-            this.type = ScorerType.FAKE;
-            this.name = name;
-            this.entityId = -1;
-        }
-
-        /**
-         * Score info for player/entity
-         * @param scoreboardId scoreboard id
-         * @param objectiveId objective id
-         * @param type entity type; PLAYER or ENTITY
-         * @param score score
-         * @param entityId entity id
-         */
-        public ScoreInfo(long scoreboardId, String objectiveId, int score, ScorerType type, long entityId) {
-            if (type != ScorerType.PLAYER && type != ScorerType.ENTITY) {
-                throw new IllegalArgumentException("Scorer type must be either PLAYER or ENTITY");
-            }
-
-            this.scoreboardId = scoreboardId;
-            this.objectiveId = objectiveId;
-            this.score = score;
-            this.type = type;
-            this.name = null;
-            this.entityId = entityId;
-        }
-
-        public enum ScorerType {
-            INVALID,
-            PLAYER,
-            ENTITY,
-            FAKE
-        }
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

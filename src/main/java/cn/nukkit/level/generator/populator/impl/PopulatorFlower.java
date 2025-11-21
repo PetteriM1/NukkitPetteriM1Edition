@@ -28,6 +28,16 @@ public class PopulatorFlower extends PopulatorSurfaceBlock {
         this.flowerTypes.add(c);
     }
 
+    @Override
+    protected boolean canStay(int x, int y, int z, FullChunk chunk) {
+        return EnsureCover.ensureCover(x, y, z, chunk) && EnsureGrassBelow.ensureGrassBelow(x, y, z, chunk);
+    }
+
+    @Override
+    protected int getBlockId(int x, int z, NukkitRandom random, FullChunk chunk) {
+        return 0;
+    }
+
     public List<int[]> getTypes() {
         return this.flowerTypes;
     }
@@ -41,15 +51,5 @@ public class PopulatorFlower extends PopulatorSurfaceBlock {
                 chunk.setFullBlockId(x, y + 1, z, (type[0] << Block.DATA_BITS) | (8 | type[1]));
             }
         }
-    }
-
-    @Override
-    protected boolean canStay(int x, int y, int z, FullChunk chunk) {
-        return EnsureCover.ensureCover(x, y, z, chunk) && EnsureGrassBelow.ensureGrassBelow(x, y, z, chunk);
-    }
-
-    @Override
-    protected int getBlockId(int x, int z, NukkitRandom random, FullChunk chunk) {
-        return 0;
     }
 }

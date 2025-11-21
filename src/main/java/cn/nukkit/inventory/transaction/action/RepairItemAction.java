@@ -14,18 +14,17 @@ public class RepairItemAction extends InventoryAction {
     }
 
     @Override
-    public boolean isValid(Player source) {
-        return source.getWindowById(Player.ANVIL_WINDOW_ID) instanceof AnvilInventory;
-    }
-
-    @Override
     public boolean execute(Player source) {
         return true;
     }
 
-    @Override
-    public void onExecuteSuccess(Player source) {
+    public int getType() {
+        return this.type;
+    }
 
+    @Override
+    public boolean isValid(Player source) {
+        return source.getWindowById(Player.ANVIL_WINDOW_ID) instanceof AnvilInventory;
     }
 
     @Override
@@ -33,7 +32,8 @@ public class RepairItemAction extends InventoryAction {
 
     }
 
-    public int getType() {
-        return this.type;
+    @Override
+    public void onExecuteSuccess(Player source) {
+
     }
 }

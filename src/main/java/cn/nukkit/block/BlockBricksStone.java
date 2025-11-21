@@ -21,23 +21,7 @@ public class BlockBricksStone extends BlockSolidMeta {
     public BlockBricksStone(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return STONE_BRICKS;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 30;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Stone Bricks",
             "Mossy Stone Bricks",
             "Cracked Stone Bricks",
@@ -45,8 +29,8 @@ public class BlockBricksStone extends BlockSolidMeta {
     };
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x03];
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -61,12 +45,27 @@ public class BlockBricksStone extends BlockSolidMeta {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public double getHardness() {
+        return 1.5;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return STONE_BRICKS;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x03];
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

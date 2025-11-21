@@ -7,13 +7,13 @@ public class EnchantmentBindingCurse extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 25;
+    public int getMaxEnchantAbility(int level) {
+        return 30;
     }
 
     @Override
-    public int getMaxEnchantAbility(int level) {
-        return 30;
+    public int getMinEnchantAbility(int level) {
+        return 25;
     }
 
     @Override

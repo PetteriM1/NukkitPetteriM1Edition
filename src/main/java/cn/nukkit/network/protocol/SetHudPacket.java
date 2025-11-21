@@ -15,11 +15,6 @@ public class SetHudPacket extends DataPacket {
     public boolean visible;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -28,9 +23,21 @@ public class SetHudPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putUnsignedVarInt(this.elements.size());
-        for (HudElement element : this.elements) {
-            this.putVarInt(element.ordinal());
+        if (protocol >= ProtocolInfo.v1_21_70_24) {
+            for (HudElement element : this.elements) {
+                this.putVarInt(element.ordinal());
+            }
+            this.putVarInt(this.visible ? 1 : 0);
+        } else {
+            for (HudElement element : this.elements) {
+                this.putUnsignedVarInt(element.ordinal());
+            }
+            this.putBoolean(this.visible);
         }
-        this.putVarInt(this.visible ? 1 : 0);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

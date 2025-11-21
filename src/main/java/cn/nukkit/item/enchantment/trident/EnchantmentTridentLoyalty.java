@@ -9,12 +9,12 @@ public class EnchantmentTridentLoyalty extends EnchantmentTrident {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 7 * level + 5;
+    public int getMaxLevel() {
+        return 3;
     }
 
     @Override
-    public int getMaxLevel() {
-        return 3;
+    public int getMinEnchantAbility(int level) {
+        return 7 * level + 5;
     }
 }

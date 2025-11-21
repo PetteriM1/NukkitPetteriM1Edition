@@ -13,6 +13,16 @@ public class BlockInfestedDeepslate extends BlockDeepslate {
     }
 
     @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0;
+    }
+
+    @Override
     public int getId() {
         return INFESTED_DEEPSLATE;
     }
@@ -23,17 +33,7 @@ public class BlockInfestedDeepslate extends BlockDeepslate {
     }
 
     @Override
-    public double getHardness() {
-        return 0;
-    }
-
-    @Override
     public double getResistance() {
-        return 0.75;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+        return 3.75;
     }
 }

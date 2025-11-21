@@ -5,11 +5,14 @@ import cn.nukkit.Server;
 import cn.nukkit.command.PluginCommand;
 import cn.nukkit.command.SimpleCommandMap;
 import cn.nukkit.event.*;
+import cn.nukkit.event.server.BatchPacketsEvent;
+import cn.nukkit.event.server.DataPacketSendEvent;
 import cn.nukkit.permission.Permissible;
 import cn.nukkit.permission.Permission;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.PluginException;
 import cn.nukkit.utils.Utils;
+import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.lmbda.LambdaType;
@@ -28,7 +31,8 @@ import java.util.regex.Pattern;
  */
 public class PluginManager {
     private static final MethodHandles.Lookup CALLER = MethodHandles.lookup();
-    private static final LambdaType<BiConsumer<Listener, Event>> EVENT_EXECUTOR_TYPE = LambdaType.of(new TypeToken<BiConsumer<Listener, Event>>(){}.getType());
+    private static final LambdaType<BiConsumer<Listener, Event>> EVENT_EXECUTOR_TYPE = LambdaType.of(new TypeToken<BiConsumer<Listener, Event>>() {
+    }.getType());
 
     private final Server server;
 
@@ -55,26 +59,196 @@ public class PluginManager {
         this.commandMap = commandMap;
     }
 
+    public boolean addPermission(Permission permission) {
+        if (!this.permissions.containsKey(permission.getName())) {
+            this.permissions.put(permission.getName(), permission);
+            this.calculatePermissionDefault(permission);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void calculatePermissionDefault(Permission permission) {
+        if (permission.getDefault().equals(Permission.DEFAULT_OP) || permission.getDefault().equals(Permission.DEFAULT_TRUE)) {
+            this.defaultPermsOp.put(permission.getName(), permission);
+            this.dirtyPermissibles(true);
+        }
+
+        if (permission.getDefault().equals(Permission.DEFAULT_NOT_OP) || permission.getDefault().equals(Permission.DEFAULT_TRUE)) {
+            this.defaultPerms.put(permission.getName(), permission);
+            this.dirtyPermissibles(false);
+        }
+    }
+
+    public void callEvent(Event event) {
+        try {
+            RegisteredListener[] listeners = this.getEventListeners(event.getClass()).getRegisteredListeners();
+            if (listeners == null) {
+                return;
+            }
+
+            for (RegisteredListener registration : listeners) {
+                if (!registration.getPlugin().isEnabled()) {
+                    continue;
+                }
+
+                try {
+                    registration.callEvent(event);
+                } catch (Exception e) {
+                    this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.eventError", event.getEventName(), registration.getPlugin().getDescription().getFullName(), e.getMessage(), registration.getListener().getClass().getName()));
+                    this.server.getLogger().logException(e);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            this.server.getLogger().logException(e);
+        }
+    }
+
+    public void clearPlugins() {
+        this.disablePlugins();
+        this.plugins.clear();
+        this.fileAssociations.clear();
+        this.permissions.clear();
+        this.defaultPerms.clear();
+        this.defaultPermsOp.clear();
+    }
+
+    private void dirtyPermissibles(boolean op) {
+        for (Permissible p : this.getDefaultPermSubscriptions(op)) {
+            p.recalculatePermissions();
+        }
+    }
+
+    public void disablePlugin(Plugin plugin) {
+        if (plugin.isEnabled()) {
+            try {
+                plugin.getPluginLoader().disablePlugin(plugin);
+            } catch (Exception e) {
+                MainLogger logger = this.server.getLogger();
+                if (logger != null) {
+                    logger.logException(e);
+                }
+            }
+
+            this.server.getScheduler().cancelTask(plugin);
+            HandlerList.unregisterAll(plugin);
+            for (Permission permission : plugin.getDescription().getPermissions()) {
+                this.removePermission(permission);
+            }
+        }
+    }
+
+    public void disablePlugins() {
+        ListIterator<Plugin> plugins = new ArrayList<>(this.plugins.values()).listIterator(this.plugins.size());
+
+        while (plugins.hasPrevious()) {
+            this.disablePlugin(plugins.previous());
+        }
+    }
+
+    public void enablePlugin(Plugin plugin) {
+        if (!plugin.isEnabled()) {
+            try {
+                for (Permission permission : plugin.getDescription().getPermissions()) {
+                    this.addPermission(permission);
+                }
+                plugin.getPluginLoader().enablePlugin(plugin);
+            } catch (Throwable e) {
+                MainLogger logger = this.server.getLogger();
+                if (logger != null) {
+                    logger.logException(new RuntimeException(e));
+                }
+                this.disablePlugin(plugin);
+            }
+        }
+    }
+
+    public Set<Permissible> getDefaultPermSubscriptions(boolean op) {
+        if (op) {
+            return new HashSet<>(this.defSubsOp);
+        } else {
+            return new HashSet<>(this.defSubs);
+        }
+    }
+
+    public Map<String, Permission> getDefaultPermissions(boolean op) {
+        if (op) {
+            return this.defaultPermsOp;
+        } else {
+            return this.defaultPerms;
+        }
+    }
+
+    private HandlerList getEventListeners(Class<? extends Event> type) throws IllegalAccessException {
+        HandlerList handlerList = HandlerList.getCachedHandlerList(type);
+        if (handlerList != null) {
+            return handlerList;
+        }
+
+        try {
+            Method method = getRegistrationClass(type).getDeclaredMethod("getHandlers");
+            method.setAccessible(true);
+            handlerList = (HandlerList) method.invoke(null);
+        } catch (NullPointerException e) {
+            if (Nukkit.DEBUG > 1) {
+                Server.getInstance().getLogger().debug("Static getHandlers method in " + type.getName() + " was not found. Creating HandlerList dynamically.");
+            }
+        } catch (Exception e) {
+            throw new IllegalAccessException(Utils.getExceptionMessage(e));
+        }
+
+        if (handlerList == null) { // do not require user to create static HandlerList anymore
+            HandlerList.putCachedHandlerList(type, handlerList = new HandlerList());
+        }
+        return handlerList;
+    }
+
+    public Permission getPermission(String name) {
+        return this.permissions.get(name);
+    }
+
+    public Set<Permissible> getPermissionSubscriptions(String permission) {
+        if (this.permSubs.containsKey(permission)) {
+            return new HashSet<>(this.permSubs.get(permission));
+        }
+        return new HashSet<>();
+    }
+
+    public Map<String, Permission> getPermissions() {
+        return permissions;
+    }
+
     public Plugin getPlugin(String name) {
         return this.plugins.get(name);
     }
 
-    public boolean registerInterface(Class<? extends PluginLoader> loaderClass) {
-        if (loaderClass != null) {
-            try {
-                Constructor constructor = loaderClass.getDeclaredConstructor(Server.class);
-                constructor.setAccessible(true);
-                this.fileAssociations.put(loaderClass.getName(), (PluginLoader) constructor.newInstance(this.server));
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
     public Map<String, Plugin> getPlugins() {
         return plugins;
+    }
+
+    private Class<? extends Event> getRegistrationClass(Class<? extends Event> clazz) throws IllegalAccessException {
+        try {
+            clazz.getDeclaredMethod("getHandlers");
+            return clazz;
+        } catch (NoSuchMethodException e) {
+            if (clazz.getSuperclass() != null
+                    && clazz.getSuperclass() != Event.class
+                    && Event.class.isAssignableFrom(clazz.getSuperclass())) {
+                return getRegistrationClass(clazz.getSuperclass().asSubclass(Event.class));
+            } else {
+                throw new IllegalAccessException("Unable to find handler list for event " + clazz.getName() + ". Static getHandlers method required!");
+            }
+        }
+    }
+
+    public boolean isPluginEnabled(Plugin plugin) {
+        if (plugin != null && this.plugins.containsKey(plugin.getDescription().getName())) {
+            return plugin.isEnabled();
+        } else {
+            return false;
+        }
     }
 
     public Plugin loadPlugin(String path) {
@@ -110,6 +284,10 @@ public class PluginManager {
                             }
                         } catch (Exception e) {
                             Server.getInstance().getLogger().critical("Could not load plugin", e);
+
+                            if (!e.getMessage().contains("main class not found")) {
+                                ExceptionHandler.handleSilently(e);
+                            }
                             return null;
                         }
                     }
@@ -173,41 +351,6 @@ public class PluginManager {
                             if (plugins.containsKey(name) || this.getPlugin(name) != null) {
                                 this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.duplicateError", name));
                                 continue;
-                            }
-
-                            boolean compatible = false;
-
-                            for (String version : description.getCompatibleAPIs()) {
-
-                                try {
-                                    //Check the format: majorVersion.minorVersion.patch
-                                    if (!Pattern.matches("^[0-9]+\\.[0-9]+\\.[0-9]+$", version)) {
-                                        throw new IllegalArgumentException();
-                                    }
-                                } catch (NullPointerException | IllegalArgumentException e) {
-                                    this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "Wrong API format"}));
-                                    continue;
-                                }
-
-                                String[] versionArray = version.split("\\.");
-                                String[] apiVersion = this.server.getApiVersion().split("\\.");
-
-                                //Completely different API version
-                                if (!Objects.equals(Integer.valueOf(versionArray[0]), Integer.valueOf(apiVersion[0]))) {
-                                    continue;
-                                }
-
-                                //If the plugin requires new API features, being backwards compatible
-                                if (Integer.parseInt(versionArray[1]) > Integer.parseInt(apiVersion[1])) {
-                                    continue;
-                                }
-
-                                compatible = true;
-                                break;
-                            }
-
-                            if (!compatible) {
-                                this.server.getLogger().error(this.server.getLanguage().translateString("nukkit.plugin.loadError", new String[]{name, "%nukkit.plugin.incompatibleAPI"}));
                             }
 
                             plugins.put(name, file);
@@ -307,139 +450,6 @@ public class PluginManager {
         }
     }
 
-    public Permission getPermission(String name) {
-        return this.permissions.get(name);
-    }
-
-    public boolean addPermission(Permission permission) {
-        if (!this.permissions.containsKey(permission.getName())) {
-            this.permissions.put(permission.getName(), permission);
-            this.calculatePermissionDefault(permission);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public void removePermission(String name) {
-        this.permissions.remove(name);
-    }
-
-    public void removePermission(Permission permission) {
-        this.removePermission(permission.getName());
-    }
-
-    public Map<String, Permission> getDefaultPermissions(boolean op) {
-        if (op) {
-            return this.defaultPermsOp;
-        } else {
-            return this.defaultPerms;
-        }
-    }
-
-    public void recalculatePermissionDefaults(Permission permission) {
-        if (this.permissions.containsKey(permission.getName())) {
-            this.defaultPermsOp.remove(permission.getName());
-            this.defaultPerms.remove(permission.getName());
-            this.calculatePermissionDefault(permission);
-        }
-    }
-
-    private void calculatePermissionDefault(Permission permission) {
-        if (permission.getDefault().equals(Permission.DEFAULT_OP) || permission.getDefault().equals(Permission.DEFAULT_TRUE)) {
-            this.defaultPermsOp.put(permission.getName(), permission);
-            this.dirtyPermissibles(true);
-        }
-
-        if (permission.getDefault().equals(Permission.DEFAULT_NOT_OP) || permission.getDefault().equals(Permission.DEFAULT_TRUE)) {
-            this.defaultPerms.put(permission.getName(), permission);
-            this.dirtyPermissibles(false);
-        }
-    }
-
-    private void dirtyPermissibles(boolean op) {
-        for (Permissible p : this.getDefaultPermSubscriptions(op)) {
-            p.recalculatePermissions();
-        }
-    }
-
-    public void subscribeToPermission(String permission, Permissible permissible) {
-        if (!this.permSubs.containsKey(permission)) {
-            this.permSubs.put(permission, ConcurrentHashMap.newKeySet());
-        }
-        this.permSubs.get(permission).add(permissible);
-    }
-
-    public void unsubscribeFromPermission(String permission, Permissible permissible) {
-        if (this.permSubs.containsKey(permission)) {
-            this.permSubs.get(permission).remove(permissible);
-            if (this.permSubs.get(permission).isEmpty()) {
-                this.permSubs.remove(permission);
-            }
-        }
-    }
-
-    public Set<Permissible> getPermissionSubscriptions(String permission) {
-        if (this.permSubs.containsKey(permission)) {
-            return new HashSet<>(this.permSubs.get(permission));
-        }
-        return new HashSet<>();
-    }
-
-    public void subscribeToDefaultPerms(boolean op, Permissible permissible) {
-        if (op) {
-            this.defSubsOp.add(permissible);
-        } else {
-            this.defSubs.add(permissible);
-        }
-    }
-
-    public void unsubscribeFromDefaultPerms(boolean op, Permissible permissible) {
-        if (op) {
-            this.defSubsOp.remove(permissible);
-        } else {
-            this.defSubs.remove(permissible);
-        }
-    }
-
-    public Set<Permissible> getDefaultPermSubscriptions(boolean op) {
-        if (op) {
-            return new HashSet<>(this.defSubsOp);
-        } else {
-            return new HashSet<>(this.defSubs);
-        }
-    }
-
-    public Map<String, Permission> getPermissions() {
-        return permissions;
-    }
-
-    public boolean isPluginEnabled(Plugin plugin) {
-        if (plugin != null && this.plugins.containsKey(plugin.getDescription().getName())) {
-            return plugin.isEnabled();
-        } else {
-            return false;
-        }
-    }
-
-    public void enablePlugin(Plugin plugin) {
-        if (!plugin.isEnabled()) {
-            try {
-                for (Permission permission : plugin.getDescription().getPermissions()) {
-                    this.addPermission(permission);
-                }
-                plugin.getPluginLoader().enablePlugin(plugin);
-            } catch (Throwable e) {
-                MainLogger logger = this.server.getLogger();
-                if (logger != null) {
-                    logger.logException(new RuntimeException(e));
-                }
-                this.disablePlugin(plugin);
-            }
-        }
-    }
-
     @SuppressWarnings("unchecked")
     protected List<PluginCommand> parseYamlCommands(Plugin plugin) {
         List<PluginCommand> pluginCmds = new ArrayList<>();
@@ -493,63 +503,35 @@ public class PluginManager {
         return pluginCmds;
     }
 
-    public void disablePlugins() {
-        ListIterator<Plugin> plugins = new ArrayList<>(this.plugins.values()).listIterator(this.plugins.size());
-
-        while (plugins.hasPrevious()) {
-            this.disablePlugin(plugins.previous());
+    public void recalculatePermissionDefaults(Permission permission) {
+        if (this.permissions.containsKey(permission.getName())) {
+            this.defaultPermsOp.remove(permission.getName());
+            this.defaultPerms.remove(permission.getName());
+            this.calculatePermissionDefault(permission);
         }
     }
 
-    public void disablePlugin(Plugin plugin) {
-        if (plugin.isEnabled()) {
-            try {
-                plugin.getPluginLoader().disablePlugin(plugin);
-            } catch (Exception e) {
-                MainLogger logger = this.server.getLogger();
-                if (logger != null) {
-                    logger.logException(e);
-                }
-            }
+    public void registerEvent(Class<? extends Event> event, Listener listener, EventPriority priority, EventExecutor executor, Plugin plugin) throws PluginException {
+        this.registerEvent(event, listener, priority, executor, plugin, false);
+    }
 
-            this.server.getScheduler().cancelTask(plugin);
-            HandlerList.unregisterAll(plugin);
-            for (Permission permission : plugin.getDescription().getPermissions()) {
-                this.removePermission(permission);
-            }
+    public void registerEvent(Class<? extends Event> event, Listener listener, EventPriority priority, EventExecutor executor, Plugin plugin, boolean ignoreCancelled) throws PluginException {
+        if (!plugin.isEnabled()) {
+            throw new PluginException("Plugin attempted to register " + event + " while not enabled");
         }
-    }
 
-    public void clearPlugins() {
-        this.disablePlugins();
-        this.plugins.clear();
-        this.fileAssociations.clear();
-        this.permissions.clear();
-        this.defaultPerms.clear();
-        this.defaultPermsOp.clear();
-    }
+        if (event == BatchPacketsEvent.class) {
+            server.callBatchPkEvent = true;
+        }
 
-    public void callEvent(Event event) {
+        if (event == DataPacketSendEvent.class) {
+            server.callDataPkSendEvent = true;
+        }
+
         try {
-            RegisteredListener[] listeners = this.getEventListeners(event.getClass()).getRegisteredListeners();
-            if (listeners == null) {
-                return;
-            }
-
-            for (RegisteredListener registration : listeners) {
-                if (!registration.getPlugin().isEnabled()) {
-                    continue;
-                }
-
-                try {
-                    registration.callEvent(event);
-                } catch (Exception e) {
-                    this.server.getLogger().critical(this.server.getLanguage().translateString("nukkit.plugin.eventError", event.getEventName(), registration.getPlugin().getDescription().getFullName(), e.getMessage(), registration.getListener().getClass().getName()));
-                    this.server.getLogger().logException(e);
-                }
-            }
+            this.getEventListeners(event).register(new RegisteredListener(listener, executor, priority, plugin, ignoreCancelled));
         } catch (IllegalAccessException e) {
-            this.server.getLogger().logException(e);
+            Server.getInstance().getLogger().logException(e);
         }
     }
 
@@ -604,57 +586,56 @@ public class PluginManager {
         }
     }
 
-    public void registerEvent(Class<? extends Event> event, Listener listener, EventPriority priority, EventExecutor executor, Plugin plugin) throws PluginException {
-        this.registerEvent(event, listener, priority, executor, plugin, false);
-    }
-
-    public void registerEvent(Class<? extends Event> event, Listener listener, EventPriority priority, EventExecutor executor, Plugin plugin, boolean ignoreCancelled) throws PluginException {
-        if (!plugin.isEnabled()) {
-            throw new PluginException("Plugin attempted to register " + event + " while not enabled");
-        }
-
-        try {
-            this.getEventListeners(event).register(new RegisteredListener(listener, executor, priority, plugin, ignoreCancelled));
-        } catch (IllegalAccessException e) {
-            Server.getInstance().getLogger().logException(e);
-        }
-    }
-
-    private HandlerList getEventListeners(Class<? extends Event> type) throws IllegalAccessException {
-        HandlerList handlerList = HandlerList.getCachedHandlerList(type);
-        if (handlerList != null) {
-            return handlerList;
-        }
-
-        try {
-            Method method = getRegistrationClass(type).getDeclaredMethod("getHandlers");
-            method.setAccessible(true);
-            handlerList = (HandlerList) method.invoke(null);
-        } catch (NullPointerException e) {
-            if (Nukkit.DEBUG > 1) {
-                Server.getInstance().getLogger().debug("Static getHandlers method in " + type.getName() + " was not found. Creating HandlerList dynamically.");
+    public boolean registerInterface(Class<? extends PluginLoader> loaderClass) {
+        if (loaderClass != null) {
+            try {
+                Constructor constructor = loaderClass.getDeclaredConstructor(Server.class);
+                constructor.setAccessible(true);
+                this.fileAssociations.put(loaderClass.getName(), (PluginLoader) constructor.newInstance(this.server));
+                return true;
+            } catch (Exception e) {
+                return false;
             }
-        } catch (Exception e) {
-            throw new IllegalAccessException(Utils.getExceptionMessage(e));
         }
-
-        if (handlerList == null) { // do not require user to create static HandlerList anymore
-            HandlerList.putCachedHandlerList(type, handlerList = new HandlerList());
-        }
-        return handlerList;
+        return false;
     }
 
-    private Class<? extends Event> getRegistrationClass(Class<? extends Event> clazz) throws IllegalAccessException {
-        try {
-            clazz.getDeclaredMethod("getHandlers");
-            return clazz;
-        } catch (NoSuchMethodException e) {
-            if (clazz.getSuperclass() != null
-                    && clazz.getSuperclass() != Event.class
-                    && Event.class.isAssignableFrom(clazz.getSuperclass())) {
-                return getRegistrationClass(clazz.getSuperclass().asSubclass(Event.class));
-            } else {
-                throw new IllegalAccessException("Unable to find handler list for event " + clazz.getName() + ". Static getHandlers method required!");
+    public void removePermission(String name) {
+        this.permissions.remove(name);
+    }
+
+    public void removePermission(Permission permission) {
+        this.removePermission(permission.getName());
+    }
+
+    public void subscribeToDefaultPerms(boolean op, Permissible permissible) {
+        if (op) {
+            this.defSubsOp.add(permissible);
+        } else {
+            this.defSubs.add(permissible);
+        }
+    }
+
+    public void subscribeToPermission(String permission, Permissible permissible) {
+        if (!this.permSubs.containsKey(permission)) {
+            this.permSubs.put(permission, ConcurrentHashMap.newKeySet());
+        }
+        this.permSubs.get(permission).add(permissible);
+    }
+
+    public void unsubscribeFromDefaultPerms(boolean op, Permissible permissible) {
+        if (op) {
+            this.defSubsOp.remove(permissible);
+        } else {
+            this.defSubs.remove(permissible);
+        }
+    }
+
+    public void unsubscribeFromPermission(String permission, Permissible permissible) {
+        if (this.permSubs.containsKey(permission)) {
+            this.permSubs.get(permission).remove(permissible);
+            if (this.permSubs.get(permission).isEmpty()) {
+                this.permSubs.remove(permission);
             }
         }
     }

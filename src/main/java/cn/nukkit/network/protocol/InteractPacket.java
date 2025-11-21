@@ -22,7 +22,7 @@ public class InteractPacket extends DataPacket {
     public void decode() {
         this.action = this.getByte();
         this.target = this.getEntityRuntimeId();
-        if (this.action == ACTION_MOUSEOVER || this.action == ACTION_VEHICLE_EXIT) {
+        if (this.action == ACTION_MOUSEOVER || (protocol >= ProtocolInfo.v1_13_0 && this.action == ACTION_VEHICLE_EXIT)) {
             this.x = this.getFloat();
             this.y = this.getFloat();
             this.z = this.getFloat();

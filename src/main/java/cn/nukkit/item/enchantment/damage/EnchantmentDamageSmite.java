@@ -14,8 +14,12 @@ public class EnchantmentDamageSmite extends EnchantmentDamage {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 5 + ((level - 1) << 3);
+    public double getDamageBonus(Entity entity) {
+        if (entity instanceof EntitySmite) {
+            return getLevel() * 2.5;
+        }
+
+        return 0;
     }
 
     @Override
@@ -24,11 +28,7 @@ public class EnchantmentDamageSmite extends EnchantmentDamage {
     }
 
     @Override
-    public double getDamageBonus(Entity entity) {
-        if (entity instanceof EntitySmite) {
-            return getLevel() * 2.5;
-        }
-
-        return 0;
+    public int getMinEnchantAbility(int level) {
+        return 5 + ((level - 1) << 3);
     }
 }

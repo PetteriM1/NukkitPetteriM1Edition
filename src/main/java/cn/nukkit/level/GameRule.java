@@ -50,13 +50,8 @@ public enum GameRule {
         this.name = name;
     }
 
-    public static Optional<GameRule> parseString(String gameRuleString) {
-        for (GameRule gameRule: values()) {
-            if (gameRule.name.equalsIgnoreCase(gameRuleString)) {
-                return Optional.of(gameRule);
-            }
-        }
-        return Optional.empty();
+    public String getName() {
+        return name;
     }
 
     public static String[] getNames() {
@@ -75,7 +70,12 @@ public enum GameRule {
         return stringValues;
     }
 
-    public String getName() {
-        return name;
+    public static Optional<GameRule> parseString(String gameRuleString) {
+        for (GameRule gameRule : values()) {
+            if (gameRule.name.equalsIgnoreCase(gameRuleString)) {
+                return Optional.of(gameRule);
+            }
+        }
+        return Optional.empty();
     }
 }

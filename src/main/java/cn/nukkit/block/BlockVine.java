@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.block.BlockGrowEvent;
 import cn.nukkit.event.block.BlockSpreadEvent;
@@ -30,37 +31,7 @@ public class BlockVine extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Vines";
-    }
-
-    @Override
-    public int getId() {
-        return VINE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public boolean canBeReplaced() {
+    public boolean breakWhenPushed() {
         return true;
     }
 
@@ -70,78 +41,46 @@ public class BlockVine extends BlockTransparentMeta {
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        entity.resetFallDistance();
+    public boolean canBeFlowedInto() {
+        return true;
     }
 
     @Override
-    public boolean isSolid() {
-        return false;
+    public boolean canBeReplaced() {
+        return true;
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        double f1 = 1;
-        double f2 = 1;
-        double f3 = 1;
-        double f4 = 0;
-        double f5 = 0;
-        double f6 = 0;
-        boolean flag = this.getDamage() > 0;
-        if ((this.getDamage() & 0x02) > 0) {
-            f4 = Math.max(f4, 0.0625);
-            f1 = 0;
-            f2 = 0;
-            f5 = 1;
-            f3 = 0;
-            f6 = 1;
-            flag = true;
-        }
-        if ((this.getDamage() & 0x08) > 0) {
-            f1 = Math.min(f1, 0.9375);
-            f4 = 1;
-            f2 = 0;
-            f5 = 1;
-            f3 = 0;
-            f6 = 1;
-            flag = true;
-        }
-        if ((this.getDamage() & 0x01) > 0) {
-            f3 = Math.min(f3, 0.9375);
-            f6 = 1;
-            f1 = 0;
-            f4 = 1;
-            f2 = 0;
-            f5 = 1;
-            flag = true;
-        }
-        if (!flag && this.up().isSolid()) {
-            f2 = Math.min(f2, 0.9375);
-            f5 = 1;
-            f1 = 0;
-            f4 = 1;
-            f3 = 0;
-            f6 = 1;
-        }
-        return new SimpleAxisAlignedBB(
-                this.x + f1,
-                this.y + f2,
-                this.z + f3,
-                this.x + f4,
-                this.y + f5,
-                this.z + f6
-        );
+    public boolean canPassThrough() {
+        return true;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (block.getId() != VINE && target.isSolid() && face.getHorizontalIndex() != -1) {
-            this.setDamage(getMetaFromFace(face.getOpposite()));
-            this.getLevel().setBlock(this, this, true, true);
-            return true;
-        }
+    public boolean canSilkTouch() {
+        return true;
+    }
 
-        return false;
+    private boolean canSpread() {
+        int blockX = this.getFloorX();
+        int blockY = this.getFloorY();
+        int blockZ = this.getFloorZ();
+
+        int count = 0;
+        for (int x = blockX - 4; x <= blockX + 4; x++) {
+            for (int z = blockZ - 4; z <= blockZ + 4; z++) {
+                for (int y = blockY - 1; y <= blockY + 1; y++) {
+                    if (this.level.getBlockIdAt(x, y, z) == VINE) {
+                        if (++count >= 5) return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
@@ -156,8 +95,57 @@ public class BlockVine extends BlockTransparentMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public double getHardness() {
+        return 0.2;
+    }
+
+    @Override
+    public int getId() {
+        return VINE;
+    }
+
+    private static int getMetaFromFace(BlockFace face) {
+        switch (face) {
+            case SOUTH:
+            default:
+                return 0x01;
+            case WEST:
+                return 0x02;
+            case NORTH:
+                return 0x04;
+            case EAST:
+                return 0x08;
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "Vines";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        entity.resetFallDistance();
     }
 
     @Override
@@ -242,22 +230,15 @@ public class BlockVine extends BlockTransparentMeta {
         return 0;
     }
 
-    private boolean canSpread() {
-        int blockX = this.getFloorX();
-        int blockY = this.getFloorY();
-        int blockZ = this.getFloorZ();
-
-        int count = 0;
-        for (int x = blockX - 4; x <= blockX + 4; x++) {
-            for (int z = blockZ - 4; z <= blockZ + 4; z++) {
-                for (int y = blockY - 1; y <= blockY + 1; y++) {
-                    if (this.level.getBlockIdAt(x, y, z) == VINE) {
-                        if (++count >= 5) return false;
-                    }
-                }
-            }
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (block.getId() != VINE && target.isSolid() && face.getHorizontalIndex() != -1) {
+            this.setDamage(getMetaFromFace(face.getOpposite()));
+            this.getLevel().setBlock(this, this, true, true);
+            return true;
         }
-        return true;
+
+        return false;
     }
 
     private void putVine(Block block, int meta, Block source) {
@@ -290,47 +271,66 @@ public class BlockVine extends BlockTransparentMeta {
         }
     }
 
-    private static int getMetaFromFace(BlockFace face) {
-        switch (face) {
-            case SOUTH:
-            default:
-                return 0x01;
-            case WEST:
-                return 0x02;
-            case NORTH:
-                return 0x04;
-            case EAST:
-                return 0x08;
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return this; // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
         }
+
+        double f1 = 1;
+        double f2 = 1;
+        double f3 = 1;
+        double f4 = 0;
+        double f5 = 0;
+        double f6 = 0;
+        boolean flag = this.getDamage() > 0;
+        if ((this.getDamage() & 0x02) > 0) {
+            f4 = Math.max(f4, 0.0625);
+            f1 = 0;
+            f2 = 0;
+            f5 = 1;
+            f3 = 0;
+            f6 = 1;
+            flag = true;
+        }
+        if ((this.getDamage() & 0x08) > 0) {
+            f1 = Math.min(f1, 0.9375);
+            f4 = 1;
+            f2 = 0;
+            f5 = 1;
+            f3 = 0;
+            f6 = 1;
+            flag = true;
+        }
+        if ((this.getDamage() & 0x01) > 0) {
+            f3 = Math.min(f3, 0.9375);
+            f6 = 1;
+            f1 = 0;
+            f4 = 1;
+            f2 = 0;
+            f5 = 1;
+            flag = true;
+        }
+        if (!flag && this.up().isSolid()) {
+            f2 = Math.min(f2, 0.9375);
+            f5 = 1;
+            f1 = 0;
+            f4 = 1;
+            f3 = 0;
+            f6 = 1;
+        }
+        return new SimpleAxisAlignedBB(
+                this.x + f1,
+                this.y + f2,
+                this.z + f3,
+                this.x + f4,
+                this.y + f5,
+                this.z + f6
+        );
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

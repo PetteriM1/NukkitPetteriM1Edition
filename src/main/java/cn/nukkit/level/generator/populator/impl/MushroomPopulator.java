@@ -24,16 +24,6 @@ public class MushroomPopulator extends PopulatorCount {
     }
 
     @Override
-    public void populateCount(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        int x = (chunkX << 4) | random.nextBoundedInt(16);
-        int z = (chunkZ << 4) | random.nextBoundedInt(16);
-        int y = this.getHighestWorkableBlock(level, x, z, chunk);
-        if (y != -1) {
-            new BigMushroom(type).generate(level, random, new Vector3(x, y, z));
-        }
-    }
-
-    @Override
     protected int getHighestWorkableBlock(ChunkManager level, int x, int z, FullChunk chunk) {
         int y;
         x &= 0xF;
@@ -48,5 +38,15 @@ public class MushroomPopulator extends PopulatorCount {
         }
 
         return ++y;
+    }
+
+    @Override
+    public void populateCount(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
+        int x = (chunkX << 4) | random.nextBoundedInt(16);
+        int z = (chunkZ << 4) | random.nextBoundedInt(16);
+        int y = this.getHighestWorkableBlock(level, x, z, chunk);
+        if (y != -1) {
+            new BigMushroom(type).generate(level, random, new Vector3(x, y, z));
+        }
     }
 }

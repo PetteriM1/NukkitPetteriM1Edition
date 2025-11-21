@@ -19,34 +19,6 @@ public class BannerPattern {
     }
 
     /**
-     * Get banner pattern color
-     *
-     * @return color as DyeColor
-     */
-    public DyeColor getColor() {
-        return this.color;
-    }
-
-    /**
-     * Get banner pattern type
-     *
-     * @return type as BannerPattern.Type
-     */
-    public Type getType() {
-        return this.type;
-    }
-
-    /**
-     * Read banner pattern from CompoundTag
-     *
-     * @param compoundTag CompoundTag in
-     * @return BannerPattern out
-     */
-    public static BannerPattern fromCompoundTag(CompoundTag compoundTag) {
-        return new BannerPattern(Type.getByName(compoundTag.contains("Pattern") ? compoundTag.getString("Pattern") : ""), compoundTag.contains("Color") ? DyeColor.getByDyeData(compoundTag.getInt("Color")) : DyeColor.BLACK);
-    }
-
-    /**
      * Banner pattern type enum
      */
     public enum Type {
@@ -97,10 +69,6 @@ public class BannerPattern {
             this.name = name;
         }
 
-        public String getName() {
-            return this.name;
-        }
-
         static {
             for (Type type : values()) {
                 BY_NAME.put(type.getName(), type);
@@ -110,5 +78,37 @@ public class BannerPattern {
         public static Type getByName(String name) {
             return BY_NAME.get(name);
         }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
+    /**
+     * Read banner pattern from CompoundTag
+     *
+     * @param compoundTag CompoundTag in
+     * @return BannerPattern out
+     */
+    public static BannerPattern fromCompoundTag(CompoundTag compoundTag) {
+        return new BannerPattern(Type.getByName(compoundTag.contains("Pattern") ? compoundTag.getString("Pattern") : ""), compoundTag.contains("Color") ? DyeColor.getByDyeData(compoundTag.getInt("Color")) : DyeColor.BLACK);
+    }
+
+    /**
+     * Get banner pattern color
+     *
+     * @return color as DyeColor
+     */
+    public DyeColor getColor() {
+        return this.color;
+    }
+
+    /**
+     * Get banner pattern type
+     *
+     * @return type as BannerPattern.Type
+     */
+    public Type getType() {
+        return this.type;
     }
 }

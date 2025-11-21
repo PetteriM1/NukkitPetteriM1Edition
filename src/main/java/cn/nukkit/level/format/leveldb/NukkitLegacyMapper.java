@@ -10,7 +10,22 @@ import org.cloudburstmc.nbt.NbtUtils;
 import java.io.InputStream;
 import java.util.List;
 
+import static cn.nukkit.level.format.leveldb.LevelDBConstants.*;
+
 public class NukkitLegacyMapper implements LegacyStateMapper {
+
+    @Override
+    public int legacyToRuntime(int legacyId, int meta) {
+        return GlobalBlockPalette.getOrCreateRuntimeId(PALETTE_VERSION, legacyId, meta);
+    }
+
+    public static List<NbtMap> loadBlockPalette() {
+        try (InputStream stream = NukkitLegacyMapper.class.getClassLoader().getResourceAsStream("block_palette_" + PALETTE_VERSION + ".nbt")) {
+            return ((NbtMap) NbtUtils.createGZIPReader(stream).readTag()).getList("blocks", NbtType.COMPOUND);
+        } catch (Exception e) {
+            throw new AssertionError("Error while loading leveldb block palette  " + PALETTE_VERSION, e);
+        }
+    }
 
     public static void registerStates(BlockStateMapping mapping) {
         List<NbtMap> states = loadBlockPalette();
@@ -29,33 +44,20 @@ public class NukkitLegacyMapper implements LegacyStateMapper {
         }
     }
 
-    public static List<NbtMap> loadBlockPalette() {
-        try (InputStream stream = NukkitLegacyMapper.class.getClassLoader().getResourceAsStream("block_palette_" + LevelDBConstants.PALETTE_VERSION + ".nbt")) {
-            return ((NbtMap) NbtUtils.createGZIPReader(stream).readTag()).getList("blocks", NbtType.COMPOUND);
-        } catch (Exception e) {
-            throw new AssertionError("Error while loading leveldb block palette", e);
-        }
-    }
-
-    @Override
-    public int legacyToRuntime(int legacyId, int meta) {
-        return GlobalBlockPalette.getLeveldbBlockPalette().getRuntimeId(legacyId, meta);
-    }
-
     @Override
     public int runtimeToFullId(int runtimeId) {
-        return GlobalBlockPalette.getLeveldbBlockPalette().getLegacyFullId(runtimeId);
-    }
-
-    @Override
-    public int runtimeToLegacyId(int runtimeId) {
-        int fullId = this.runtimeToFullId(runtimeId);
-        return fullId == -1 ? -1 : fullId >> Block.DATA_BITS;
+        return GlobalBlockPalette.getLegacyFullId(PALETTE_VERSION, runtimeId);
     }
 
     @Override
     public int runtimeToLegacyData(int runtimeId) {
         int fullId = this.runtimeToFullId(runtimeId);
         return fullId == -1 ? -1 : (fullId & Block.DATA_MASK);
+    }
+
+    @Override
+    public int runtimeToLegacyId(int runtimeId) {
+        int fullId = this.runtimeToFullId(runtimeId);
+        return fullId == -1 ? -1 : fullId >> Block.DATA_BITS;
     }
 }

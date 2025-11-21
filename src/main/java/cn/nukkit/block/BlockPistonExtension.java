@@ -5,6 +5,21 @@ import cn.nukkit.item.Item;
 public class BlockPistonExtension extends BlockTransparent {
 
     @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.1;
+    }
+
+    @Override
     public int getId() {
         return PISTON_EXTENSION;
     }
@@ -15,22 +30,7 @@ public class BlockPistonExtension extends BlockTransparent {
     }
 
     @Override
-    public double getHardness() {
-        return 0.1;
-    }
-
-    @Override
     public double getResistance() {
-        return 0.1;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-            return new Item[0];
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
+        return 2.5;
     }
 }

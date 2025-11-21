@@ -22,28 +22,20 @@ public class BlockWeightedPressurePlateHeavy extends BlockPressurePlateBase {
     }
 
     @Override
-    public int getId() {
-        return HEAVY_WEIGHTED_PRESSURE_PLATE;
+    protected int computeRedstoneStrength() {
+        int count = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
+
+        if (count > 0) {
+            float f = (float) Math.min(this.getMaxWeight(), count) / (float) this.getMaxWeight();
+            return Math.max(1, NukkitMath.ceilFloat(f * 15.0F));
+        } else {
+            return 0;
+        }
     }
 
     @Override
-    public String getName() {
-        return "Weighted Pressure Plate (Heavy)";
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5D;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2.5D;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
     }
 
     @Override
@@ -58,28 +50,36 @@ public class BlockWeightedPressurePlateHeavy extends BlockPressurePlateBase {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public double getHardness() {
+        return 0.5D;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    protected int computeRedstoneStrength() {
-        int count = Math.min(this.level.getCollidingEntities(getCollisionBoundingBox()).length, this.getMaxWeight());
-
-        if (count > 0) {
-            float f = (float) Math.min(this.getMaxWeight(), count) / (float) this.getMaxWeight();
-            return Math.max(1, NukkitMath.ceilFloat(f * 15.0F));
-        } else {
-            return 0;
-        }
+    public int getId() {
+        return HEAVY_WEIGHTED_PRESSURE_PLATE;
     }
 
     public int getMaxWeight() {
         return 150;
+    }
+
+    @Override
+    public String getName() {
+        return "Weighted Pressure Plate (Heavy)";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5D;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

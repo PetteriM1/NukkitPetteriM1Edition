@@ -9,8 +9,8 @@ public class BlockCrimsonNylium extends BlockNylium {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Nylium";
+    public BlockColor getColor() {
+        return BlockColor.CRIMSON_NYLIUM_BLOCK_COLOR;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class BlockCrimsonNylium extends BlockNylium {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CRIMSON_NYLIUM_BLOCK_COLOR;
+    public String getName() {
+        return "Crimson Nylium";
     }
 }

@@ -10,37 +10,9 @@ import cn.nukkit.utils.BinaryStream;
  */
 public interface ChunkSection {
 
-    int getY();
+    ChunkSection copy();
 
-    default int getBlockId(int x, int y, int z) {
-        return this.getBlockId(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getBlockId(int x, int y, int z, BlockLayer layer);
-
-    default void setBlockId(int x, int y, int z, int id) {
-        this.setBlockId(x, y, z, Block.LAYER_NORMAL, id);
-    }
-
-    void setBlockId(int x, int y, int z, BlockLayer layer, int id);
-
-    default int getBlockData(int x, int y, int z) {
-        return this.getBlockData(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getBlockData(int x, int y, int z, BlockLayer layer);
-
-    default void setBlockData(int x, int y, int z, int data) {
-        this.setBlockData(x, y, z, Block.LAYER_NORMAL, data);
-    }
-
-    void setBlockData(int x, int y, int z, BlockLayer layer, int data);
-
-    default int getFullBlock(int x, int y, int z) {
-        return this.getFullBlock(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getFullBlock(int x, int y, int z, BlockLayer layer);
+    ChunkSection copyForChunkSending();
 
     default Block getAndSetBlock(int x, int y, int z, Block block) {
         return this.getAndSetBlock(x, y, z, Block.LAYER_NORMAL, block);
@@ -48,11 +20,46 @@ public interface ChunkSection {
 
     Block getAndSetBlock(int x, int y, int z, BlockLayer layer, Block block);
 
-    default boolean setFullBlockId(int x, int y, int z, int fullId) {
-        return this.setFullBlockId(x, y, z, Block.LAYER_NORMAL, fullId);
+    default int getBlockData(int x, int y, int z) {
+        return this.getBlockData(x, y, z, Block.LAYER_NORMAL);
     }
 
-    boolean setFullBlockId(int x, int y, int z, BlockLayer layer, int fullId);
+    int getBlockData(int x, int y, int z, BlockLayer layer);
+
+    default int getBlockId(int x, int y, int z) {
+        return this.getBlockId(x, y, z, Block.LAYER_NORMAL);
+    }
+
+    int getBlockId(int x, int y, int z, BlockLayer layer);
+
+    int getBlockLight(int x, int y, int z);
+
+    int getBlockSkyLight(int x, int y, int z);
+
+    // for < 1.13 chunk format
+    byte[] getBytes(boolean obfuscated);
+
+    byte[] getDataArray();
+
+    default int getFullBlock(int x, int y, int z) {
+        return this.getFullBlock(x, y, z, Block.LAYER_NORMAL);
+    }
+
+    int getFullBlock(int x, int y, int z, BlockLayer layer);
+
+    byte[] getIdArray();
+
+    // get block IDs for chunk save
+    // ver 1 = id < 256, ver 2 = id < 512
+    byte[] getIdArray(int ver);
+
+    byte[] getLightArray();
+
+    byte[] getSkyLightArray();
+
+    int getY();
+
+    boolean isEmpty();
 
     boolean setBlock(int x, int y, int z, int blockId);
 
@@ -62,29 +69,28 @@ public interface ChunkSection {
 
     boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int blockId, int meta);
 
-    int getBlockSkyLight(int x, int y, int z);
+    default void setBlockData(int x, int y, int z, int data) {
+        this.setBlockData(x, y, z, Block.LAYER_NORMAL, data);
+    }
 
-    void setBlockSkyLight(int x, int y, int z, int level);
+    void setBlockData(int x, int y, int z, BlockLayer layer, int data);
 
-    int getBlockLight(int x, int y, int z);
+    default void setBlockId(int x, int y, int z, int id) {
+        this.setBlockId(x, y, z, Block.LAYER_NORMAL, id);
+    }
+
+    void setBlockId(int x, int y, int z, BlockLayer layer, int id);
 
     void setBlockLight(int x, int y, int z, int level);
 
-    byte[] getIdArray();
+    void setBlockSkyLight(int x, int y, int z, int level);
 
-    byte[] getDataArray();
-
-    byte[] getSkyLightArray();
-
-    byte[] getLightArray();
-
-    boolean isEmpty();
-
-    void writeTo(BinaryStream stream);
-
-    ChunkSection copy();
-
-    default ChunkSection copyForChunkSending() {
-        return copy();
+    default boolean setFullBlockId(int x, int y, int z, int fullId) {
+        return this.setFullBlockId(x, y, z, Block.LAYER_NORMAL, fullId);
     }
+
+    boolean setFullBlockId(int x, int y, int z, BlockLayer layer, int fullId);
+
+    // for >= 1.13 chunk format
+    void writeTo(int protocol, BinaryStream stream, boolean obfuscated);
 }

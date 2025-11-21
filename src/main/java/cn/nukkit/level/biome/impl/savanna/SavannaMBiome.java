@@ -17,8 +17,8 @@ public class SavannaMBiome extends SavannaBiome {
     }
 
     @Override
-    public String getName() {
-        return "Savanna M";
+    public boolean canRain() {
+        return true;
     }
 
     //@Override
@@ -37,7 +37,7 @@ public class SavannaMBiome extends SavannaBiome {
     }
 
     @Override
-    public boolean canRain() {
-        return true;
+    public String getName() {
+        return "Savanna M";
     }
 }

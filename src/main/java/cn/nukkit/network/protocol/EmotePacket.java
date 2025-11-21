@@ -18,17 +18,16 @@ public class EmotePacket extends DataPacket {
     public long emoteTicks;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.runtimeId = this.getEntityRuntimeId();
         this.emoteID = this.getString();
-        this.emoteTicks = this.getUnsignedVarInt();
-        this.xuid = this.getString();
-        this.platformId = this.getString();
+        if (protocol >= ProtocolInfo.v1_20_0_23) {
+            if (protocol >= ProtocolInfo.v1_21_30) {
+                this.emoteTicks = this.getUnsignedVarInt();
+            }
+            this.xuid = this.getString();
+            this.platformId = this.getString();
+        }
         this.flags = (byte) this.getByte();
     }
 
@@ -37,9 +36,18 @@ public class EmotePacket extends DataPacket {
         this.reset();
         this.putEntityRuntimeId(this.runtimeId);
         this.putString(this.emoteID);
-        this.putUnsignedVarInt(this.emoteTicks);
-        this.putString(this.xuid);
-        this.putString(this.platformId);
+        if (protocol >= ProtocolInfo.v1_20_0_23) {
+            if (protocol >= ProtocolInfo.v1_21_30) {
+                this.putUnsignedVarInt(this.emoteTicks);
+            }
+            this.putString(this.xuid);
+            this.putString(this.platformId);
+        }
         this.putByte(flags);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

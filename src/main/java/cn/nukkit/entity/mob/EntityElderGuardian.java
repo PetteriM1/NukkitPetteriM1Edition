@@ -2,10 +2,15 @@ package cn.nukkit.entity.mob;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.BlockSponge;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityPotionEffectEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.network.protocol.LevelEventPacket;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
@@ -20,26 +25,32 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public void attackEntity(Entity player) {
     }
 
     @Override
-    public float getWidth() {
-        return 1.9975f;
+    public boolean canDespawn() {
+        return false;
     }
 
     @Override
-    public float getHeight() {
-        return 1.9975f;
-    }
+    public boolean entityBaseTick(int tickDiff) {
+        if (!this.closed && this.ticksLived % 1200 == 0 && this.isAlive()) {
+            for (Player p : this.level.getPlayersList()) {
+                if (p.getGamemode() % 2 == 0 && p.distanceSquared(this) < 2500 && !p.hasEffect(Effect.MINING_FATIGUE)) { // 50 blocks
+                    p.addEffect(Effect.getEffect(Effect.MINING_FATIGUE).setAmplifier(2).setDuration(6000), EntityPotionEffectEvent.Cause.ELDER_GUARDIAN);
 
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(80);
-        super.initEntity();
-
-        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ELDER, true);
+                    // Send only to players who get the effect
+                    LevelEventPacket pk = new LevelEventPacket();
+                    pk.evid = LevelEventPacket.EVENT_GUARDIAN_CURSE;
+                    pk.x = (float) this.x;
+                    pk.y = (float) this.y;
+                    pk.z = (float) this.z;
+                    p.dataPacket(pk);
+                }
+            }
+        }
+        return super.entityBaseTick(tickDiff);
     }
 
     @Override
@@ -60,6 +71,11 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     }
 
     @Override
+    public float getHeight() {
+        return 1.9975f;
+    }
+
+    @Override
     public int getKillExperience() {
         return 10;
     }
@@ -67,5 +83,29 @@ public class EntityElderGuardian extends EntitySwimmingMob {
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Elder Guardian";
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        return 1.9975f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(80);
+        super.initEntity();
+
+        this.setDataFlag(DATA_FLAGS, DATA_FLAG_ELDER, true);
+        this.setDamage(new int[]{0, 5, 8, 12});
+    }
+
+    @Override
+    public boolean targetOption(EntityCreature creature, double distance) {
+        return false;
     }
 }

@@ -16,6 +16,32 @@ public class PersistentDataContainerItemWrapper implements PersistentItemDataCon
     }
 
     @Override
+    public void clearStorage() {
+        if (this.item.hasCompoundTag()) {
+            CompoundTag compoundTag = this.item.getNamedTag();
+            compoundTag.remove(STORAGE_TAG);
+            this.item.setCompoundTag(compoundTag);
+        }
+        this.storage = null;
+    }
+
+    @Override
+    public boolean convertsToBlock() {
+        return this.convertsToBlock;
+    }
+
+    private CompoundTag getInternalStorage() {
+        if (this.storage != null) {
+            return this.storage;
+        }
+
+        if (this.item.hasCompoundTag() && this.item.getNamedTag().contains(STORAGE_TAG)) {
+            return this.storage = this.item.getNamedTag().getCompound(STORAGE_TAG);
+        }
+        return null;
+    }
+
+    @Override
     public CompoundTag getReadStorage() {
         CompoundTag storage = this.getInternalStorage();
         if (storage == null) {
@@ -34,17 +60,6 @@ public class PersistentDataContainerItemWrapper implements PersistentItemDataCon
         return storage;
     }
 
-    private CompoundTag getInternalStorage() {
-        if (this.storage != null) {
-            return this.storage;
-        }
-
-        if (this.item.hasCompoundTag() && this.item.getNamedTag().contains(STORAGE_TAG)) {
-            return this.storage = this.item.getNamedTag().getCompound(STORAGE_TAG);
-        }
-        return null;
-    }
-
     @Override
     public void setStorage(CompoundTag storage) {
         CompoundTag compoundTag = this.item.hasCompoundTag() ? this.item.getNamedTag() : new CompoundTag();
@@ -54,31 +69,16 @@ public class PersistentDataContainerItemWrapper implements PersistentItemDataCon
     }
 
     @Override
+    public void setConvertsToBlock(boolean convertsToBlock) {
+        this.convertsToBlock = convertsToBlock;
+    }
+
+    @Override
     public void write() {
         if (this.getReadStorage().isEmpty()) {
             this.clearStorage();
         } else {
             this.setStorage(this.getStorage());
         }
-    }
-
-    @Override
-    public void setConvertsToBlock(boolean convertsToBlock) {
-        this.convertsToBlock = convertsToBlock;
-    }
-
-    @Override
-    public boolean convertsToBlock() {
-        return this.convertsToBlock;
-    }
-
-    @Override
-    public void clearStorage() {
-        if (this.item.hasCompoundTag()) {
-            CompoundTag compoundTag = this.item.getNamedTag();
-            compoundTag.remove(STORAGE_TAG);
-            this.item.setCompoundTag(compoundTag);
-        }
-        this.storage = null;
     }
 }

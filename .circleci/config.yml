@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+    
+    working_directory: ~/NukkitPetteriM1Edition
+
+    docker:
+      - image: cimg/openjdk:8.0
+
+    steps:
+
+      - checkout
+
+      - run: mvn clean package
+
+      - store_artifacts:
+          path: target/Nukkit-PM1E.jar

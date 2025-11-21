@@ -12,11 +12,6 @@ public abstract class BlockFroglight extends BlockSolidMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 0.3;
-    }
-
-    @Override
     public double getHardness() {
         return 0.3;
     }
@@ -26,15 +21,16 @@ public abstract class BlockFroglight extends BlockSolidMeta {
         return 15;
     }
 
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        return this.getLevel().setBlock(block, this, true, true);
+    public BlockFace.Axis getPillarAxis() {
+        switch (this.getDamage() % 3) {
+            case 2:
+                return BlockFace.Axis.Z;
+            case 1:
+                return BlockFace.Axis.X;
+            case 0:
+            default:
+                return BlockFace.Axis.Y;
+        }
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -51,15 +47,19 @@ public abstract class BlockFroglight extends BlockSolidMeta {
         }
     }
 
-    public BlockFace.Axis getPillarAxis() {
-        switch (this.getDamage() % 3) {
-            case 2:
-                return BlockFace.Axis.Z;
-            case 1:
-                return BlockFace.Axis.X;
-            case 0:
-            default:
-                return BlockFace.Axis.Y;
-        }
+    @Override
+    public double getResistance() {
+        return 1.5;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        return this.getLevel().setBlock(block, this, true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

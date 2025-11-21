@@ -19,16 +19,6 @@ public class ItemLeggingsDiamond extends ItemArmor {
     }
 
     @Override
-    public boolean isLeggings() {
-        return true;
-    }
-
-    @Override
-    public int getTier() {
-        return ItemArmor.TIER_DIAMOND;
-    }
-
-    @Override
     public int getArmorPoints() {
         return 6;
     }
@@ -39,7 +29,17 @@ public class ItemLeggingsDiamond extends ItemArmor {
     }
 
     @Override
+    public int getTier() {
+        return ItemArmor.TIER_DIAMOND;
+    }
+
+    @Override
     public int getToughness() {
         return 2;
+    }
+
+    @Override
+    public boolean isLeggings() {
+        return true;
     }
 }

@@ -14,6 +14,31 @@ public class BlockBeeNest extends BlockBeehive {
     }
 
     @Override
+    public int getBurnAbility() {
+        return 60;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 30;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.YELLOW_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.3;
+    }
+
+    @Override
     public int getId() {
         return BEE_NEST;
     }
@@ -24,32 +49,7 @@ public class BlockBeeNest extends BlockBeehive {
     }
 
     @Override
-    public int getBurnChance() {
-        return 30;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 60;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.3;
-    }
-
-    @Override
     public double getResistance() {
-        return 0.3;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.YELLOW_BLOCK_COLOR;
+        return 1.5;
     }
 }

@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTuff extends BlockSolid {
 
@@ -10,33 +12,13 @@ public class BlockTuff extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Tuff";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public int getId() {
-        return TUFF;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 6;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_WOODEN;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 
     @Override
@@ -45,7 +27,37 @@ public class BlockTuff extends BlockSolid {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getHardness() {
+        return 1.5;
+    }
+
+    @Override
+    public int getId() {
+        return TUFF;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Tuff";
+    }
+
+    @Override
+    public double getResistance() {
+        return 6;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_WOODEN;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

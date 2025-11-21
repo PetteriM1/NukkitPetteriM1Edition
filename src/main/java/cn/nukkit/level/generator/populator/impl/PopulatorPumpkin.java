@@ -9,18 +9,6 @@ import cn.nukkit.utils.Utils;
 
 public class PopulatorPumpkin extends Populator {
 
-    @Override
-    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        if (Utils.rand(0, 10) == 5) {
-            int x = random.nextRange(0, 15);
-            int z = random.nextRange(0, 15);
-            int y = getHighestWorkableBlock(chunk, x, z);
-            if (y != -1 && canPumpkinStay(chunk, x, y, z)) {
-                chunk.setBlock(x, y, z, Block.PUMPKIN);
-            }
-        }
-    }
-
     private static boolean canPumpkinStay(FullChunk chunk, int x, int y, int z) {
         int b = chunk.getBlockId(x, y, z);
         return (b == Block.AIR) && chunk.getBlockId(x, y - 1, z) == Block.GRASS;
@@ -35,5 +23,17 @@ public class PopulatorPumpkin extends Populator {
             }
         }
         return y == 0 ? -1 : y;
+    }
+
+    @Override
+    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
+        if (Utils.rand(0, 10) == 5) {
+            int x = random.nextRange(0, 15);
+            int z = random.nextRange(0, 15);
+            int y = getHighestWorkableBlock(chunk, x, z);
+            if (y != -1 && canPumpkinStay(chunk, x, y, z)) {
+                chunk.setBlock(x, y, z, Block.PUMPKIN);
+            }
+        }
     }
 }

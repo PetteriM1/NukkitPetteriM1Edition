@@ -12,11 +12,6 @@ import cn.nukkit.level.Level;
 public class BlockOreRedstoneGlowing extends BlockOreRedstone {
 
     @Override
-    public String getName() {
-        return "Glowing Redstone Ore";
-    }
-
-    @Override
     public int getId() {
         return GLOWING_REDSTONE_ORE;
     }
@@ -27,8 +22,8 @@ public class BlockOreRedstoneGlowing extends BlockOreRedstone {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(REDSTONE_ORE));
+    public String getName() {
+        return "Glowing Redstone Ore";
     }
 
     @Override
@@ -44,5 +39,10 @@ public class BlockOreRedstoneGlowing extends BlockOreRedstone {
         }
 
         return 0;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(REDSTONE_ORE));
     }
 }

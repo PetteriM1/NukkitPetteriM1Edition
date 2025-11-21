@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCherryPlanks extends BlockPlanks {
 
@@ -9,7 +11,17 @@ public class BlockCherryPlanks extends BlockPlanks {
     }
 
     public BlockCherryPlanks(int meta) {
-         super(0);
+        super(0);
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.PLANKS;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WHITE_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -18,12 +30,12 @@ public class BlockCherryPlanks extends BlockPlanks {
     }
 
     @Override
-    public String getName() {
-        return "Cherry Planks";
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WHITE_TERRACOTA_BLOCK_COLOR;
+    public String getName() {
+        return "Cherry Planks";
     }
 }

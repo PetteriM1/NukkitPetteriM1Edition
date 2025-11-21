@@ -1,6 +1,14 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntitySilverfish;
+import cn.nukkit.entity.mob.EntityWither;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.utils.Utils;
 
 public class BlockMonsterEgg extends BlockSolidMeta {
 
@@ -29,18 +37,18 @@ public class BlockMonsterEgg extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return MONSTER_EGG;
+    public Item[] getDrops(Item item) {
+        return new Item[0];
     }
 
     @Override
     public double getHardness() {
-        return 1;
+        return 0.75; //1
     }
 
     @Override
-    public double getResistance() {
-        return 0.75;
+    public int getId() {
+        return MONSTER_EGG;
     }
 
     @Override
@@ -49,7 +57,27 @@ public class BlockMonsterEgg extends BlockSolidMeta {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public double getResistance() {
+        return 3.75;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        if (Server.getInstance().mobsFromBlocks) {
+            if (Utils.rand(1, 5) == 1 && !item.hasEnchantment(Enchantment.ID_SILK_TOUCH) && this.getLevel().getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 12) {
+                CreatureSpawnEvent ev = new CreatureSpawnEvent(EntityWither.NETWORK_ID, this.add(0.5, 0, 0.5), CreatureSpawnEvent.SpawnReason.SILVERFISH_BLOCK);
+                Server.getInstance().getPluginManager().callEvent(ev);
+
+                if (!ev.isCancelled()) {
+                    EntitySilverfish entity = (EntitySilverfish) Entity.createEntity("Silverfish", ev.getPosition());
+                    entity.spawnToAll();
+                    EntityEventPacket pk = new EntityEventPacket();
+                    pk.eid = entity.getId();
+                    pk.event = EntityEventPacket.SILVERFISH_SPAWN_ANIMATION;
+                    entity.getLevel().addChunkPacket(entity.getChunkX(), entity.getChunkZ(), pk);
+                }
+            }
+        }
+        return this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
     }
 }

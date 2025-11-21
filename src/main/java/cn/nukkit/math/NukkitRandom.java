@@ -23,22 +23,12 @@ public class NukkitRandom {
         this.setSeed(seeds);
     }
 
-    public void setSeed(long seeds) {
-        CRC32 crc32 = new CRC32();
-        ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN);
-        buffer.putInt((int) seeds);
-        crc32.update(buffer.array());
-        this.seed = crc32.getValue();
+    public boolean nextBoolean() {
+        return (this.nextSignedInt() & 0x01) == 0;
     }
 
-    public int nextSignedInt() {
-        int t = (((int) ((this.seed * 65535) + 31337) >> 8) + 1337);
-        this.seed ^= t;
-        return t;
-    }
-
-    public int nextInt() {
-        return this.nextSignedInt() & 0x7fffffff;
+    public int nextBoundedInt(int bound) {
+        return bound == 0 ? 0 : this.nextInt() % bound;
     }
 
     public double nextDouble() {
@@ -49,16 +39,8 @@ public class NukkitRandom {
         return (float) this.nextInt() / 0x7fffffff;
     }
 
-    public float nextSignedFloat() {
-        return (float) this.nextInt() / 0x7fffffff;
-    }
-
-    public double nextSignedDouble() {
-        return (double) this.nextSignedInt() / 0x7fffffff;
-    }
-
-    public boolean nextBoolean() {
-        return (this.nextSignedInt() & 0x01) == 0;
+    public int nextInt() {
+        return this.nextSignedInt() & 0x7fffffff;
     }
 
     public int nextRange() {
@@ -73,7 +55,25 @@ public class NukkitRandom {
         return start + (this.nextInt() % (end + 1 - start));
     }
 
-    public int nextBoundedInt(int bound) {
-        return bound == 0 ? 0 : this.nextInt() % bound;
+    public double nextSignedDouble() {
+        return (double) this.nextSignedInt() / 0x7fffffff;
+    }
+
+    public float nextSignedFloat() {
+        return (float) this.nextInt() / 0x7fffffff;
+    }
+
+    public int nextSignedInt() {
+        int t = (((int) ((this.seed * 65535) + 31337) >> 8) + 1337);
+        this.seed ^= t;
+        return t;
+    }
+
+    public void setSeed(long seeds) {
+        CRC32 crc32 = new CRC32();
+        ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN);
+        buffer.putInt((int) seeds);
+        crc32.update(buffer.array());
+        this.seed = crc32.getValue();
     }
 }

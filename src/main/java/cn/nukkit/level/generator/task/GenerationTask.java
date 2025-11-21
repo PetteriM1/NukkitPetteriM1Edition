@@ -24,6 +24,23 @@ public class GenerationTask extends AsyncTask {
     }
 
     @Override
+    public void onCompletion(Server server) {
+        if (level != null) {
+            if (!this.state) {
+                return;
+            }
+
+            BaseFullChunk chunk = this.chunk;
+
+            if (chunk == null) {
+                return;
+            }
+
+            level.generateChunkCallback(chunk.getX(), chunk.getZ(), chunk);
+        }
+    }
+
+    @Override
     public void onRun() {
         this.state = false;
         Generator generator = level.getGenerator();
@@ -67,23 +84,6 @@ public class GenerationTask extends AsyncTask {
             } finally {
                 manager.cleanChunks(level.getSeed());
             }
-        }
-    }
-
-    @Override
-    public void onCompletion(Server server) {
-        if (level != null) {
-            if (!this.state) {
-                return;
-            }
-
-            BaseFullChunk chunk = this.chunk;
-
-            if (chunk == null) {
-                return;
-            }
-
-            level.generateChunkCallback(chunk.getX(), chunk.getZ(), chunk);
         }
     }
 }

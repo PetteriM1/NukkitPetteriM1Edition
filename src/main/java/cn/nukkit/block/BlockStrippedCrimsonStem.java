@@ -13,18 +13,8 @@ public class BlockStrippedCrimsonStem extends BlockStemStripped {
     }
 
     @Override
-    public String getName() {
-        return "Stripped Crimson Stem";
-    }
-
-    @Override
-    public int getId() {
-        return STRIPPED_CRIMSON_STEM;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CRIMSON_STEM_BLOCK_COLOR;
+    public int getBurnAbility() {
+        return 0;
     }
 
     @Override
@@ -33,7 +23,17 @@ public class BlockStrippedCrimsonStem extends BlockStemStripped {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 0;
+    public BlockColor getColor() {
+        return BlockColor.CRIMSON_STEM_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return STRIPPED_CRIMSON_STEM;
+    }
+
+    @Override
+    public String getName() {
+        return "Stripped Crimson Stem";
     }
 }

@@ -14,21 +14,18 @@ public class PersistentDataContainerBlockEntity extends BlockEntity implements P
     }
 
     @Override
-    public boolean onUpdate() {
-        if (!this.isBlockEntityValid()) {
-            this.close();
-        }
-        return false;
+    public boolean canSaveToStorage() {
+        return !this.isEmpty();
     }
 
     @Override
-    public boolean isBlockEntityValid() {
-        return this.level.getBlockIdAt(this.chunk, (int) this.x, (int) this.y, (int) this.z) != BlockID.AIR;
+    public boolean equals(Object obj) {
+        return obj instanceof PersistentDataContainerBlockEntity && super.equals(obj);
     }
 
     @Override
-    public boolean isValid() {
-        return super.isValid() && this.isBlockEntityValid();
+    public PersistentDataContainer getPersistentDataContainer() {
+        return this;
     }
 
     @Override
@@ -49,18 +46,21 @@ public class PersistentDataContainerBlockEntity extends BlockEntity implements P
     }
 
     @Override
-    public PersistentDataContainer getPersistentDataContainer() {
-        return this;
+    public boolean isBlockEntityValid() {
+        return this.level.getBlockIdAt(this.chunk, (int) this.x, (int) this.y, (int) this.z) != BlockID.AIR;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return obj instanceof PersistentDataContainerBlockEntity && super.equals(obj);
+    public boolean isValid() {
+        return super.isValid() && this.isBlockEntityValid();
     }
 
     @Override
-    public boolean canSaveToStorage() {
-        return !this.isEmpty();
+    public boolean onUpdate() {
+        if (!this.isBlockEntityValid()) {
+            this.close();
+        }
+        return false;
     }
 
     @Override

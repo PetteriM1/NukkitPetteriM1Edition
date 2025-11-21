@@ -15,11 +15,6 @@ public class EmoteListPacket extends DataPacket {
     public final List<UUID> pieceIds = new ObjectArrayList<>();
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.runtimeId = this.getEntityRuntimeId();
         int size = (int) this.getUnsignedVarInt();
@@ -40,5 +35,10 @@ public class EmoteListPacket extends DataPacket {
         for (UUID id : pieceIds) {
             this.putUUID(id);
         }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

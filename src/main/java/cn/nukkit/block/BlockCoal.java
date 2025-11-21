@@ -11,28 +11,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockCoal extends BlockSolid {
 
     @Override
-    public int getId() {
-        return COAL_BLOCK;
-    }
-
-    @Override
-    public double getHardness() {
-        return 5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 30;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 5;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -41,8 +21,13 @@ public class BlockCoal extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Block of Coal";
+    public int getBurnChance() {
+        return 5;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override
@@ -57,12 +42,27 @@ public class BlockCoal extends BlockSolid {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getHardness() {
+        return 5;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public int getId() {
+        return COAL_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Block of Coal";
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

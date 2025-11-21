@@ -16,19 +16,19 @@ public class ElementButton implements SimpleElement {
         if (!image.getData().isEmpty() && !image.getType().isEmpty()) this.image = image;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+    public void addImage(ElementButtonImageData image) {
+        if (!image.getData().isEmpty() && !image.getType().isEmpty()) this.image = image;
     }
 
     public ElementButtonImageData getImage() {
         return image;
     }
 
-    public void addImage(ElementButtonImageData image) {
-        if (!image.getData().isEmpty() && !image.getType().isEmpty()) this.image = image;
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

@@ -37,8 +37,9 @@ public class PrepareEncryptionTask extends AsyncTask {
             this.encryptionKey = EncryptionUtils.getSecretKey(serverKeyPair.getPrivate(), EncryptionUtils.generateKey(player.getLoginChainData().getIdentityPublicKey()), token);
             this.handshakeJwt = EncryptionUtils.createHandshakeJwt(serverKeyPair, token).serialize();
 
-            this.encryptionCipher = EncryptionUtils.createCipher(true, true, this.encryptionKey);
-            this.decryptionCipher = EncryptionUtils.createCipher(true, false, this.encryptionKey);
+            boolean useGcm = player.protocol > 428;
+            this.encryptionCipher = EncryptionUtils.createCipher(useGcm, true, this.encryptionKey);
+            this.decryptionCipher = EncryptionUtils.createCipher(useGcm, false, this.encryptionKey);
         } catch (Exception ex) {
             player.getServer().getLogger().error("Exception in PrepareEncryptionTask", ex);
         }

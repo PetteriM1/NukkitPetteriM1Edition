@@ -21,7 +21,7 @@ public class ClearCommand extends VanillaCommand {
         super(name, "%nukkit.command.clear.description", "%nukkit.command.clear.usage");
         this.setPermission("nukkit.command.clear");
         this.commandParameters.clear();
-        this.commandParameters.put("default", new CommandParameter[]{});
+        this.commandParameters.put("default", new CommandParameter[0]);
         this.commandParameters.put("target", new CommandParameter[]{
                 CommandParameter.newType("player", CommandParamType.TARGET),
         });
@@ -40,7 +40,7 @@ public class ClearCommand extends VanillaCommand {
 
         Collection<Player> targets;
         if (args[0].equals("@a")) {
-            targets = Server.getInstance().getOnlinePlayers().values();
+            targets = Server.getInstance().getOnlinePlayersList();
         } else {
             Player target = sender.getServer().getPlayerExact(args[0].replace("@s", sender.getName()));
             if (target != null) {

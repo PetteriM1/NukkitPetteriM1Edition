@@ -15,12 +15,12 @@ public class EnchantmentEntry {
         this.randomName = randomName;
     }
 
-    public Enchantment[] getEnchantments() {
-        return enchantments;
-    }
-
     public int getCost() {
         return cost;
+    }
+
+    public Enchantment[] getEnchantments() {
+        return enchantments;
     }
 
     public String getRandomName() {

@@ -9,28 +9,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockSeaLantern extends BlockTransparent {
 
     @Override
-    public String getName() {
-        return "Sea Lantern";
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
-    public int getId() {
-        return SEA_LANTERN;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.5;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.3;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 15;
+    public BlockColor getColor() {
+        return BlockColor.QUARTZ_BLOCK_COLOR;
     }
 
     @Override
@@ -44,12 +29,27 @@ public class BlockSeaLantern extends BlockTransparent {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.QUARTZ_BLOCK_COLOR;
+    public double getHardness() {
+        return 0.3;
     }
-    
+
     @Override
-    public boolean canSilkTouch() {
-        return true;
+    public int getId() {
+        return SEA_LANTERN;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 15;
+    }
+
+    @Override
+    public String getName() {
+        return "Sea Lantern";
+    }
+
+    @Override
+    public double getResistance() {
+        return 1.5;
     }
 }

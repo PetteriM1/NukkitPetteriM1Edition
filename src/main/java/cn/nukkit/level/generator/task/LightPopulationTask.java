@@ -20,20 +20,6 @@ public class LightPopulationTask extends AsyncTask {
     }
 
     @Override
-    public void onRun() {
-        BaseFullChunk chunk = this.chunk.clone();
-        if (chunk == null) {
-            return;
-        }
-
-        chunk.recalculateHeightMap();
-        chunk.populateSkyLight();
-        chunk.setLightPopulated();
-
-        this.chunk = chunk.clone();
-    }
-
-    @Override
     public void onCompletion(Server server) {
         Level level = server.getLevel(this.levelId);
 
@@ -45,5 +31,19 @@ public class LightPopulationTask extends AsyncTask {
 
             level.generateChunkCallback(chunk.getX(), chunk.getZ(), chunk);
         }
+    }
+
+    @Override
+    public void onRun() {
+        BaseFullChunk chunk = this.chunk.clone();
+        if (chunk == null) {
+            return;
+        }
+
+        chunk.recalculateHeightMap();
+        chunk.populateSkyLight();
+        chunk.setLightPopulated();
+
+        this.chunk = chunk.clone();
     }
 }

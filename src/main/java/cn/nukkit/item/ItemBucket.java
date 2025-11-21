@@ -1,6 +1,7 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.*;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.entity.EntityPotionEffectEvent;
@@ -14,6 +15,7 @@ import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.BlockFace.Plane;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 
 /**
@@ -32,6 +34,54 @@ public class ItemBucket extends Item {
 
     public ItemBucket(Integer meta, int count) {
         super(BUCKET, meta, count, getName(meta));
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return this.getDamage() != 1; // Not milk
+    }
+
+    public static int getBlockByDamage(int target) {
+        switch (target) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 8:
+            case 12:
+            case 13:
+                return WATER;
+            case 10:
+                return LAVA;
+            case 11:
+                return POWDER_SNOW;
+            default:
+                return AIR;
+        }
+    }
+
+    public static int getDamageByTarget(int target) {
+        switch (target) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 8:
+            case 9: // still water
+            case 12:
+            case 13:
+                return WATER;
+            case 10:
+            case 11: // still lava
+                return LAVA;
+            default:
+                return AIR;
+        }
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return this.meta == 0 ? 16 : 1;
     }
 
     protected static String getName(int meta) {
@@ -61,52 +111,16 @@ public class ItemBucket extends Item {
         }
     }
 
-    public static int getDamageByTarget(int target) {
-        switch (target) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 8:
-            case 9: // still water
-            case 12:
-            case 13:
-                return WATER;
-            case 10:
-            case 11: // still lava
-                return LAVA;
-            default:
-                return AIR;
-        }
-    }
-
-    public static int getBlockByDamage(int target) {
-        switch (target) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 8:
-            case 12:
-            case 13:
-                return WATER;
-            case 10:
-                return LAVA;
-            case 11:
-                return POWDER_SNOW;
-            default:
-                return AIR;
-        }
-    }
-
     @Override
-    public int getMaxStackSize() {
-        return this.meta == 0 ? 16 : 1;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return this.getDamage() != 1; // Not milk
+    public boolean isSupportedOn(int protocol) {
+        int damage = this.getDamage();
+        if (damage <= 10) {
+            return true;
+        }
+        if (damage == 11 || damage == 12) { // powder snow or axolotl
+            return protocol >= ProtocolInfo.v1_17_0;
+        }
+        return protocol >= ProtocolInfo.v1_19_0; // tadpole
     }
 
     @Override
@@ -250,7 +264,7 @@ public class ItemBucket extends Item {
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_BUCKET_EMPTY_WATER);
                 }
 
-                if (ev.isMobSpawningAllowed()) {
+                if (Server.getInstance().mobsFromBlocks && ev.isMobSpawningAllowed()) {
                     switch (this.getDamage()) {
                         case 2:
                             Entity e2 = Entity.createEntity("Cod", block.add(0.5, 0, 0.5));
@@ -288,7 +302,7 @@ public class ItemBucket extends Item {
                 player.getLevel().addLevelSoundEvent(target, LevelSoundEventPacket.SOUND_FIZZ);
                 player.getLevel().addParticle(new ExplodeParticle(target.add(0.5, 1, 0.5)));
             } else {
-                player.getLevel().sendBlocks(new Player[] {player}, new Block[] {block.getLevelBlock(Block.LAYER_WATERLOGGED)}, UpdateBlockPacket.FLAG_ALL_PRIORITY, BlockLayer.WATERLOGGED);
+                player.getLevel().sendBlocks(new Player[]{player}, new Block[]{block.getLevelBlock(Block.LAYER_WATERLOGGED)}, UpdateBlockPacket.FLAG_ALL_PRIORITY, BlockLayer.WATERLOGGED);
                 player.setNeedSendInventory(true);
             }
         } else if (targetBlock instanceof BlockPowderSnow) {

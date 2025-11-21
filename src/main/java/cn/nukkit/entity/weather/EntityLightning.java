@@ -26,13 +26,24 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
     public int state;
     public int liveTime;
 
+    public EntityLightning(FullChunk chunk, CompoundTag nbt) {
+        super(chunk, nbt);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent source) {
+        source.setDamage(0);
+        return super.attack(source);
+    }
+
+    @Override
+    public boolean canSaveToStorage() {
+        return false;
+    }
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
-    }
-
-    public EntityLightning(FullChunk chunk, CompoundTag nbt) {
-        super(chunk, nbt);
     }
 
     @Override
@@ -71,12 +82,6 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
 
     public void setEffect(boolean e) {
         this.isEffect = e;
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        source.setDamage(0);
-        return super.attack(source);
     }
 
     @Override
@@ -139,10 +144,5 @@ public class EntityLightning extends Entity implements EntityLightningStrike {
         }
 
         return true;
-    }
-
-    @Override
-    public boolean canSaveToStorage() {
-        return false;
     }
 }

@@ -12,6 +12,29 @@ import cn.nukkit.utils.Utils;
 public class BlockChorusPlant extends BlockTransparent {
 
     @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+            return new Item[]{this.toItem()};
+        }
+        return Utils.rand() ? new Item[]{Item.get(Item.CHORUS_FRUIT, 0, 1)} : new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.4;
+    }
+
+    @Override
     public int getId() {
         return CHORUS_PLANT;
     }
@@ -22,21 +45,8 @@ public class BlockChorusPlant extends BlockTransparent {
     }
 
     @Override
-    public double getHardness() {
-        return 0.4;
-    }
-
-    @Override
     public double getResistance() {
-        return 0.4;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!isSupportValid()) {
-            return false;
-        }
-        return super.place(item, block, target, face, fx, fy, fz, player);
+        return 2;
     }
 
     @Override
@@ -84,20 +94,10 @@ public class BlockChorusPlant extends BlockTransparent {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-            return new Item[]{this.toItem()};
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!isSupportValid()) {
+            return false;
         }
-        return Utils.rand() ? new Item[]{Item.get(Item.CHORUS_FRUIT, 0, 1)} : new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+        return super.place(item, block, target, face, fx, fy, fz, player);
     }
 }

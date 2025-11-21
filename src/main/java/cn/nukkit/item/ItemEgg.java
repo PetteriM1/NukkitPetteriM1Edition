@@ -19,6 +19,11 @@ public class ItemEgg extends ProjectileItem {
     }
 
     @Override
+    public int getMaxStackSize() {
+        return 16;
+    }
+
+    @Override
     public String getProjectileEntityType() {
         return "Egg";
     }
@@ -26,10 +31,5 @@ public class ItemEgg extends ProjectileItem {
     @Override
     public float getThrowForce() {
         return 1.5f;
-    }
-    
-    @Override
-    public int getMaxStackSize() {
-        return 16;
     }
 }

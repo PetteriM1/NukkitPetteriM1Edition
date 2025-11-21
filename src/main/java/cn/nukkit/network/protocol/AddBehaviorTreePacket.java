@@ -10,11 +10,6 @@ public class AddBehaviorTreePacket extends DataPacket {
     public String behaviorTreeJson;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.behaviorTreeJson = this.getString();
     }
@@ -23,5 +18,10 @@ public class AddBehaviorTreePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putString(behaviorTreeJson);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -14,49 +14,10 @@ import cn.nukkit.utils.Faceable;
  */
 public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
 
-    private static final short[] FACES = {2, 1, 3, 0};
+    private static final short[] faces = {2, 1, 3, 0};
 
     protected BlockStairs(int meta) {
         super(meta);
-    }
-
-    @Override
-    public double getMinY() {
-        // TODO: this seems wrong
-        return this.y + (this.getDamage() & 0x04) > 0 ? 0.5 : 0;
-    }
-
-    @Override
-    public double getMaxY() {
-        // TODO: this seems wrong
-        return this.y + (this.getDamage() & 0x04) > 0 ? 1 : 0.5;
-    }
-
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(FACES[player != null ? player.getDirection().getHorizontalIndex() : 0]);
-        if ((fy > 0.5 && face != BlockFace.UP) || face == BlockFace.DOWN) {
-            this.setDamage(this.getDamage() | 0x04); //Upside-down stairs
-        }
-        this.getLevel().setBlock(this, this, true, true);
-        return true;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                  toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 
     @Override
@@ -133,7 +94,45 @@ public abstract class BlockStairs extends BlockSolidMeta implements Faceable {
     }
 
     @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
+    public double getMaxY() {
+        // TODO: this seems wrong
+        return this.y + (this.getDamage() & 0x04) > 0 ? 1 : 0.5;
+    }
+
+    @Override
+    public double getMinY() {
+        // TODO: this seems wrong
+        return this.y + (this.getDamage() & 0x04) > 0 ? 0.5 : 0;
+    }
+
+    @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(faces[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        if ((fy > 0.5 && face != BlockFace.UP) || face == BlockFace.DOWN) {
+            this.setDamage(this.getDamage() | 0x04); //Upside-down stairs
+        }
+        this.getLevel().setBlock(this, this, true, true);
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

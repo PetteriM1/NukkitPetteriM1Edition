@@ -5,6 +5,7 @@ import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.FastByteArrayOutputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.ClientboundMapItemDataPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.MainLogger;
 import cn.nukkit.utils.ThreadCache;
 
@@ -36,85 +37,20 @@ public class ItemMap extends Item {
         super(MAP, meta, count, "Map");
     }
 
-    public void setImage(File file) throws IOException {
-        setImage(ImageIO.read(file));
-    }
-
-    public void setImage(BufferedImage image) {
-        try {
-            if (this.getMapId() == 0) {
-                Server.getInstance().getLogger().debug("Uninitialized map", new Throwable(""));
-                this.initItem();
-            }
-
-            if (image.getHeight() != 128 || image.getWidth() != 128) {
-                this.image = new BufferedImage(128, 128, image.getType());
-                Graphics2D g = this.image.createGraphics();
-                g.drawImage(image, 0, 0, 128, 128, null);
-                g.dispose();
-            } else {
-                this.image = image;
-            }
-
-            FastByteArrayOutputStream baos = ThreadCache.fbaos.get().reset();
-            ImageIO.write(this.image, "png", baos);
-
-            this.setNamedTag(this.getNamedTag().putByteArray("Colors", baos.toByteArray()));
-        } catch (IOException e) {
-            MainLogger.getLogger().logException(e);
-        }
-    }
-
-    protected BufferedImage loadImageFromNBT() {
-        try {
-            CompoundTag tag = this.getNamedTag();
-            if (tag == null) return null;
-            byte[] data = tag.getByteArray("Colors");
-            image = ImageIO.read(new ByteArrayInputStream(data));
-            return image;
-        } catch (IOException e) {
-            MainLogger.getLogger().logException(e);
-        }
-
-        return null;
-    }
-
-    public long getMapId() {
-        CompoundTag tag = this.getNamedTag();
-        if (tag == null) return 0;
-        return tag.getLong("map_uuid");
-    }
-
-    @Deprecated
-    public void sendImage(Player p) {
-        this.trySendImage(p);
-    }
-
-    public boolean trySendImage(Player p) {
-        // Don't load the image from NBT if it has been done before
-        BufferedImage image = this.image != null ? this.image : loadImageFromNBT();
-        if (image == null) {
-            return false;
-        }
-
-        ClientboundMapItemDataPacket pk = new ClientboundMapItemDataPacket();
-        pk.mapId = getMapId();
-        pk.update = ClientboundMapItemDataPacket.TEXTURE_UPDATE;
-        pk.scale = 0;
-        pk.width = 128;
-        pk.height = 128;
-        pk.offsetX = 0;
-        pk.offsetZ = 0;
-        pk.image = image;
-        pk.eids = new long[]{pk.mapId};
-
-        p.dataPacket(pk);
+    @Override
+    public boolean allowOffhand() {
         return true;
     }
 
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    public long getMapId() {
+        CompoundTag tag = this.getNamedTag();
+        if (tag == null) return 0;
+        return tag.getLong("map_uuid");
     }
 
     @Override
@@ -144,8 +80,80 @@ public class ItemMap extends Item {
         return super.initItem();
     }
 
-    @Override
-    public boolean allowOffhand() {
+    protected BufferedImage loadImageFromNBT() {
+        try {
+            CompoundTag tag = this.getNamedTag();
+            if (tag == null) return null;
+            byte[] data = tag.getByteArray("Colors");
+            image = ImageIO.read(new ByteArrayInputStream(data));
+            return image;
+        } catch (IOException e) {
+            MainLogger.getLogger().logException(e);
+        }
+
+        return null;
+    }
+
+    @Deprecated
+    public void sendImage(Player p) {
+        this.trySendImage(p);
+    }
+
+    public void setImage(File file) throws IOException {
+        setImage(ImageIO.read(file));
+    }
+
+    public void setImage(BufferedImage image) {
+        try {
+            if (this.getMapId() == 0) {
+                Server.getInstance().getLogger().debug("Uninitialized map", new Throwable(""));
+                this.initItem();
+            }
+
+            if (image.getHeight() != 128 || image.getWidth() != 128) {
+                this.image = new BufferedImage(128, 128, image.getType());
+                Graphics2D g = this.image.createGraphics();
+                g.drawImage(image, 0, 0, 128, 128, null);
+                g.dispose();
+            } else {
+                this.image = image;
+            }
+
+            FastByteArrayOutputStream baos = ThreadCache.fbaos.get().reset();
+            ImageIO.write(this.image, "png", baos);
+
+            this.setNamedTag(this.getNamedTag().putByteArray("Colors", baos.toByteArray()));
+        } catch (IOException e) {
+            MainLogger.getLogger().logException(e);
+        }
+    }
+
+    public boolean trySendImage(Player p) {
+        // Don't load the image from NBT if it has been done before
+        BufferedImage image = this.image != null ? this.image : loadImageFromNBT();
+        if (image == null) {
+            return false;
+        }
+
+        ClientboundMapItemDataPacket pk = new ClientboundMapItemDataPacket();
+        pk.mapId = getMapId();
+        pk.update = ClientboundMapItemDataPacket.TEXTURE_UPDATE;
+        pk.scale = 0;
+        pk.width = 128;
+        pk.height = 128;
+        pk.offsetX = 0;
+        pk.offsetZ = 0;
+        pk.image = image;
+        if (p.protocol >= ProtocolInfo.v1_19_50) {
+            pk.eids = new long[]{pk.mapId};
+        }
+
+        p.dataPacket(pk);
+
+        // Hack: Fix client not rendering the map
+        if (p.protocol >= ProtocolInfo.v1_19_20 && p.protocol < ProtocolInfo.v1_19_50) {
+            Server.getInstance().getScheduler().scheduleDelayedTask(null, () -> p.dataPacket(pk), 20);
+        }
         return true;
     }
 }

@@ -18,6 +18,33 @@ public interface Oxidizable {
 
     Location getLocation();
 
+    OxidizationLevel getOxidizationLevel();
+
+    Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel);
+
+    default boolean onActivate(Item item, Player player) {
+        if (!item.isAxe()) {
+            return false;
+        }
+
+        OxidizationLevel oxidizationLevel = getOxidizationLevel();
+        if (OxidizationLevel.UNAFFECTED.equals(oxidizationLevel)) {
+            return false;
+        }
+
+        oxidizationLevel = OxidizationLevel.values()[oxidizationLevel.ordinal() - 1];
+        if (!setOxidizationLevel(oxidizationLevel)) {
+            return false;
+        }
+
+        Position location = this instanceof Block ? (Position) this : getLocation();
+        if (player == null || !player.isCreative()) {
+            item.useOn(this instanceof Block ? (Block) this : location.getLevelBlock());
+        }
+        location.getLevel().addParticle(new ScrapeParticle(location));
+        return true;
+    }
+
     default int onUpdate(int type) {
         if (type != Level.BLOCK_UPDATE_RANDOM) {
             return 0;
@@ -37,7 +64,7 @@ public interface Oxidizable {
             return 0;
         }
 
-        Block block = this instanceof Block? (Block) this : getLocation().getLevelBlock();
+        Block block = this instanceof Block ? (Block) this : getLocation().getLevelBlock();
         Location mutableLocation = block.getLocation();
 
         int odds = 0;
@@ -51,7 +78,7 @@ public interface Oxidizable {
                     }
                     mutableLocation.setComponents(block.x + x, block.y + y, block.z + z);
                     if (block.distanceSquared(mutableLocation) > 4) {
-                        continue ;
+                        continue;
                     }
                     Block relative = mutableLocation.getLevelBlock();
                     if (!(relative instanceof Oxidizable)) {
@@ -71,8 +98,8 @@ public interface Oxidizable {
             }
         }
 
-        float chance = (float)(cons + 1) / (float)(cons + odds + 1);
-        float multiplier = oxiLvl == 0? 0.75F : 1.0F;
+        float chance = (float) (cons + 1) / (float) (cons + odds + 1);
+        float multiplier = oxiLvl == 0 ? 0.75F : 1.0F;
         chance = chance * chance * multiplier;
         if (random.nextFloat() < chance) {
             Block nextBlock = this.getStateWithOxidizationLevel(OxidizationLevel.values()[oxiLvl + 1]);
@@ -85,33 +112,5 @@ public interface Oxidizable {
         return type;
     }
 
-
-    default boolean onActivate(Item item, Player player) {
-        if (!item.isAxe()) {
-            return false;
-        }
-
-        OxidizationLevel oxidizationLevel = getOxidizationLevel();
-        if (OxidizationLevel.UNAFFECTED.equals(oxidizationLevel)) {
-            return false;
-        }
-
-        oxidizationLevel = OxidizationLevel.values()[oxidizationLevel.ordinal() - 1];
-        if (!setOxidizationLevel(oxidizationLevel)) {
-            return false;
-        }
-
-        Position location = this instanceof Block? (Position) this : getLocation();
-        if (player == null || !player.isCreative()) {
-            item.useOn(this instanceof Block? (Block) this : location.getLevelBlock());
-        }
-        location.getLevel().addParticle(new ScrapeParticle(location));
-        return true;
-    }
-
-    OxidizationLevel getOxidizationLevel();
-
     boolean setOxidizationLevel(OxidizationLevel oxidizationLevel);
-
-    Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel);
 }

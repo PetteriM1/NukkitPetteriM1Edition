@@ -60,9 +60,8 @@ public class SmithingRecipe extends ShapelessRecipe {
         this.ingredientsAggregate = Collections.unmodifiableList(aggregation);
     }
 
-    @Override
-    public Item getResult() {
-        return result;
+    public Item getEquipment() {
+        return equipment;
     }
 
     public Item getFinalResult(Item equip, Item template) {
@@ -94,61 +93,26 @@ public class SmithingRecipe extends ShapelessRecipe {
         return Item.get(0);
     }
 
-    @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerSmithingRecipe(this);
-    }
-
-    @Override
-    public RecipeType getType() {
-        return RecipeType.SMITHING_TRANSFORM;
-    }
-
-    public Item getEquipment() {
-        return equipment;
-    }
-
     public Item getIngredient() {
         return ingredient;
-    }
-
-    public Item getTemplate() {
-        return template;
     }
 
     public List<Item> getIngredientsAggregate() {
         return ingredientsAggregate;
     }
 
-    public boolean matchItems(List<Item> inputList) {
-        return matchItems(inputList, 1);
+    @Override
+    public Item getResult() {
+        return result;
     }
 
-    public boolean matchItems(List<Item> inputList, int multiplier) {
-        List<Item> haveInputs = new ArrayList<>();
-        for (Item item : inputList) {
-            if (item.isNull())
-                continue;
-            haveInputs.add(item.clone());
-        }
-        List<Item> needInputs = new ArrayList<>();
-        if(multiplier != 1){
-            for (Item item : ingredientsAggregate) {
-                if (item.isNull())
-                    continue;
-                Item itemClone = item.clone();
-                itemClone.setCount(itemClone.getCount() * multiplier);
-                needInputs.add(itemClone);
-            }
-        } else {
-            for (Item item : ingredientsAggregate) {
-                if (item.isNull())
-                    continue;
-                needInputs.add(item.clone());
-            }
-        }
+    public Item getTemplate() {
+        return template;
+    }
 
-        return matchItemList(haveInputs, needInputs);
+    @Override
+    public RecipeType getType() {
+        return RecipeType.SMITHING_TRANSFORM;
     }
 
     private static boolean matchItemList(List<Item> haveItems, List<Item> needItems) {
@@ -169,5 +133,41 @@ public class SmithingRecipe extends ShapelessRecipe {
             }
         }
         return haveItems.isEmpty() && needItems.isEmpty();
+    }
+
+    public boolean matchItems(List<Item> inputList) {
+        return matchItems(inputList, 1);
+    }
+
+    public boolean matchItems(List<Item> inputList, int multiplier) {
+        List<Item> haveInputs = new ArrayList<>();
+        for (Item item : inputList) {
+            if (item.isNull())
+                continue;
+            haveInputs.add(item.clone());
+        }
+        List<Item> needInputs = new ArrayList<>();
+        if (multiplier != 1) {
+            for (Item item : ingredientsAggregate) {
+                if (item.isNull())
+                    continue;
+                Item itemClone = item.clone();
+                itemClone.setCount(itemClone.getCount() * multiplier);
+                needInputs.add(itemClone);
+            }
+        } else {
+            for (Item item : ingredientsAggregate) {
+                if (item.isNull())
+                    continue;
+                needInputs.add(item.clone());
+            }
+        }
+
+        return matchItemList(haveInputs, needInputs);
+    }
+
+    @Override
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerSmithingRecipe(this);
     }
 }

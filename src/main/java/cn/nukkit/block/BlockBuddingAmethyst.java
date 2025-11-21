@@ -6,7 +6,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,13 +18,23 @@ public class BlockBuddingAmethyst extends BlockSolid {
     }
 
     @Override
-    public int getId() {
-        return BUDDING_AMETHYST;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
-    public double getResistance() {
-        return 1.5;
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 
     @Override
@@ -31,8 +43,35 @@ public class BlockBuddingAmethyst extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return BUDDING_AMETHYST;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
     public String getName() {
         return "Budding Amethyst";
+    }
+
+    @Override
+    public double getResistance() {
+        return 7.5;
+    }
+
+    @Override
+    public boolean onBreak(Item item, Player player) {
+        for (BlockFace face : BlockFace.values()) {
+            Block side = this.getSide(face);
+            if (side instanceof BlockAmethystBud && ((BlockAmethystBud) side).getBlockFace() == face) {
+                this.getLevel().setBlock(side, Block.get(BlockID.AIR), true, true);
+                this.getLevel().addParticle(new DestroyBlockParticle(side.add(0.5), side));
+            }
+        }
+        return super.onBreak(item, player);
     }
 
     @Override
@@ -65,32 +104,5 @@ public class BlockBuddingAmethyst extends BlockSolid {
             }
         }
         return type;
-    }
-
-    @Override
-    public boolean onBreak(Item item, Player player) {
-        for (BlockFace face : BlockFace.values()) {
-            Block side = this.getSide(face);
-            if (side instanceof BlockAmethystBud && ((BlockAmethystBud) side).getBlockFace() == face) {
-                this.getLevel().setBlock(side, Block.get(BlockID.AIR), true, true);
-                this.getLevel().addParticle(new DestroyBlockParticle(side.add(0.5), side));
-            }
-        }
-        return super.onBreak(item, player);
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 }

@@ -26,33 +26,6 @@ public class JarPluginResourcePack extends AbstractResourcePack {
     protected byte[] sha256;
     protected String encryptionKey = "";
 
-    public static boolean hasResourcePack(File jarPluginFile) {
-        try {
-            return findManifestInJar(new ZipFile(jarPluginFile)) != null;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    @Nullable
-    protected static ZipEntry findManifestInJar(ZipFile jar) {
-        ZipEntry manifest = jar.getEntry(RESOURCE_PACK_PATH + "manifest.json");
-        if (manifest == null) {
-            manifest = jar.stream()
-                    .filter(e -> e.getName().toLowerCase(Locale.ROOT).endsWith("manifest.json") && !e.isDirectory())
-                    .filter(e -> {
-                        File fe = new File(e.getName());
-                        if (!fe.getName().equalsIgnoreCase("manifest.json")) {
-                            return false;
-                        }
-                        return fe.getParent() == null || fe.getParentFile().getParent() == null;
-                    })
-                    .findFirst()
-                    .orElse(null);
-        }
-        return manifest;
-    }
-
     public JarPluginResourcePack(File jarPluginFile) {
         if (!jarPluginFile.exists()) {
             throw new IllegalArgumentException(Server.getInstance().getLanguage()
@@ -77,7 +50,7 @@ public class JarPluginResourcePack extends AbstractResourcePack {
 
             ZipEntry encryptionKeyEntry = jar.getEntry(RESOURCE_PACK_PATH + "encryption.key");
             if (encryptionKeyEntry != null) {
-                this.encryptionKey = new String(readAllBytes(jar, encryptionKeyEntry),StandardCharsets.UTF_8);
+                this.encryptionKey = new String(readAllBytes(jar, encryptionKeyEntry), StandardCharsets.UTF_8);
                 Server.getInstance().getLogger().debug(this.encryptionKey);
             }
 
@@ -116,14 +89,23 @@ public class JarPluginResourcePack extends AbstractResourcePack {
         }
     }
 
-    @Override
-    public int getPackSize() {
-        return this.zippedByteBuffer.limit();
-    }
-
-    @Override
-    public byte[] getSha256() {
-        return this.sha256;
+    @Nullable
+    protected static ZipEntry findManifestInJar(ZipFile jar) {
+        ZipEntry manifest = jar.getEntry(RESOURCE_PACK_PATH + "manifest.json");
+        if (manifest == null) {
+            manifest = jar.stream()
+                    .filter(e -> e.getName().toLowerCase(Locale.ROOT).endsWith("manifest.json") && !e.isDirectory())
+                    .filter(e -> {
+                        File fe = new File(e.getName());
+                        if (!fe.getName().equalsIgnoreCase("manifest.json")) {
+                            return false;
+                        }
+                        return fe.getParent() == null || fe.getParentFile().getParent() == null;
+                    })
+                    .findFirst()
+                    .orElse(null);
+        }
+        return manifest;
     }
 
     @Override
@@ -140,7 +122,7 @@ public class JarPluginResourcePack extends AbstractResourcePack {
             chunk = new byte[this.getPackSize() - off];
         }
 
-        try{
+        try {
             zippedByteBuffer.position(off);
             zippedByteBuffer.get(chunk);
         } catch (Exception e) {
@@ -148,6 +130,24 @@ public class JarPluginResourcePack extends AbstractResourcePack {
         }
 
         return chunk;
+    }
+
+    @Override
+    public int getPackSize() {
+        return this.zippedByteBuffer.limit();
+    }
+
+    @Override
+    public byte[] getSha256() {
+        return this.sha256;
+    }
+
+    public static boolean hasResourcePack(File jarPluginFile) {
+        try {
+            return findManifestInJar(new ZipFile(jarPluginFile)) != null;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     private static byte[] readAllBytes(ZipFile jar, ZipEntry encryptionKeyEntry) {

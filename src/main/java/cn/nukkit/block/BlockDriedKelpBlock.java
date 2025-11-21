@@ -6,8 +6,17 @@ import cn.nukkit.utils.BlockColor;
 public class BlockDriedKelpBlock extends Block {
 
     @Override
-    public String getName() {
-        return "Dried Kelp Block";
+    public int getBurnAbility() {
+        return 30;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.GREEN_BLOCK_COLOR;
+    }
+
+    public double getHardness() {
+        return 0.5;
     }
 
     @Override
@@ -16,12 +25,8 @@ public class BlockDriedKelpBlock extends Block {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
-    }
-
-    public double getHardness() {
-        return 0.5;
+    public String getName() {
+        return "Dried Kelp Block";
     }
 
     public double getResistance() {
@@ -29,12 +34,7 @@ public class BlockDriedKelpBlock extends Block {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 30;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GREEN_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 }

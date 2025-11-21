@@ -11,11 +11,6 @@ public class PlayerStartItemCooldownPacket extends DataPacket {
     public int cooldownDuration;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -25,5 +20,10 @@ public class PlayerStartItemCooldownPacket extends DataPacket {
         this.reset();
         this.putString(this.itemCategory);
         this.putVarInt(this.cooldownDuration);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

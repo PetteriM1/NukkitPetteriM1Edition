@@ -23,132 +23,6 @@ public class BlockLever extends BlockFlowable implements Faceable {
         super(meta);
     }
 
-    @Override
-    public String getName() {
-        return "Lever";
-    }
-
-    @Override
-    public int getId() {
-        return LEVER;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5d;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2.5d;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{toItem()};
-    }
-
-    public boolean isPowerOn() {
-        return (this.getDamage() & 0x08) > 0;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isPowerOn() ? 15 : 0, isPowerOn() ? 0 : 15));
-        this.setDamage(this.getDamage() ^ 0x08);
-
-        this.getLevel().setBlock(this, this, false, true);
-        if (this.isPowerOn()) {
-            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_POWER_ON);
-        } else {
-            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_POWER_OFF);
-        }
-
-        LeverOrientation orientation = LeverOrientation.byMetadata(this.isPowerOn() ? this.getDamage() ^ 0x08 : this.getDamage());
-        BlockFace face = orientation.getFacing();
-        level.updateAroundRedstone(this, null);
-        this.level.updateAroundRedstone(this.getSideVec(face.getOpposite()), isPowerOn() ? face : null);
-        return true;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            int face = this.isPowerOn() ? this.getDamage() ^ 0x08 : this.getDamage();
-            BlockFace faces = LeverOrientation.byMetadata(face).getFacing().getOpposite();
-            if (!isSupportValid(this.getSide(faces))) {
-                this.level.useBreakOn(this);
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        LeverOrientation faces = LeverOrientation.forFacings(face, player.getHorizontalFacing());
-        this.setDamage(faces.getMetadata());
-        if (!isSupportValid(this.getSide(faces.facing.getOpposite()))) {
-            return false;
-        }
-        return this.getLevel().setBlock(block, this, true, true);
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        if (!super.onBreak(item)) {
-            return false;
-        }
-
-        if (isPowerOn()) {
-            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 15, 0));
-
-            LeverOrientation orientation = LeverOrientation.byMetadata(this.getDamage() ^ 0x08);
-            BlockFace face = orientation.getFacing();
-            this.level.updateAroundRedstone(this, null);
-            this.level.updateAroundRedstone(this.getSideVec(face.getOpposite()), face);
-        }
-
-        return true;
-    }
-
-    private boolean isSupportValid(Block block) {
-        if (!block.isTransparent()) {
-            return true;
-        }
-        if (BlockFace.fromIndex(isPowerOn() ? getDamage() ^ 0x08 : getDamage()) == BlockFace.DOWN) {
-            return Block.canStayOnFullSolid(block);
-        }
-        return Block.canConnectToFullSolid(block);
-    }
-
-    @Override
-    public int getWeakPower(BlockFace side) {
-        return isPowerOn() ? 15 : 0;
-    }
-
-    public int getStrongPower(BlockFace side) {
-        if (!isPowerOn()) {
-            return 0;
-        } else {
-            return LeverOrientation.byMetadata(this.getDamage() ^ 0x08).getFacing() == side ? 15 : 0;
-        }
-    }
-
-    @Override
-    public boolean isPowerSource() {
-        return true;
-    }
-
     public enum LeverOrientation {
         DOWN_X(0, "down_x", BlockFace.DOWN),
         EAST(1, "east", BlockFace.EAST),
@@ -170,16 +44,10 @@ public class BlockLever extends BlockFlowable implements Faceable {
             this.facing = face;
         }
 
-        public int getMetadata() {
-            return this.meta;
-        }
-
-        public BlockFace getFacing() {
-            return this.facing;
-        }
-
-        public String toString() {
-            return this.name;
+        static {
+            for (LeverOrientation face : values()) {
+                META_LOOKUP[face.meta] = face;
+            }
         }
 
         public static LeverOrientation byMetadata(int meta) {
@@ -233,15 +101,36 @@ public class BlockLever extends BlockFlowable implements Faceable {
             }
         }
 
+        public BlockFace getFacing() {
+            return this.facing;
+        }
+
+        public int getMetadata() {
+            return this.meta;
+        }
+
         public String getName() {
             return this.name;
         }
 
-        static {
-            for (LeverOrientation face : values()) {
-                META_LOOKUP[face.meta] = face;
-            }
+        public String toString() {
+            return this.name;
         }
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
     }
 
     @Override
@@ -255,17 +144,128 @@ public class BlockLever extends BlockFlowable implements Faceable {
     }
 
     @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{toItem()};
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5d;
+    }
+
+    @Override
+    public int getId() {
+        return LEVER;
+    }
+
+    @Override
+    public String getName() {
+        return "Lever";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5d;
+    }
+
+    public int getStrongPower(BlockFace side) {
+        if (!isPowerOn()) {
+            return 0;
+        } else {
+            return LeverOrientation.byMetadata(this.getDamage() ^ 0x08).getFacing() == side ? 15 : 0;
+        }
+    }
+
+    @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     @Override
-    public boolean canBeFlowedInto() {
-        return false;
+    public int getWeakPower(BlockFace side) {
+        return isPowerOn() ? 15 : 0;
+    }
+
+    public boolean isPowerOn() {
+        return (this.getDamage() & 0x08) > 0;
     }
 
     @Override
-    public boolean breakWhenPushed() {
+    public boolean isPowerSource() {
         return true;
+    }
+
+    private boolean isSupportValid(Block block) {
+        if (!block.isTransparent()) {
+            return true;
+        }
+        if (BlockFace.fromIndex(isPowerOn() ? getDamage() ^ 0x08 : getDamage()) == BlockFace.DOWN) {
+            return Block.canStayOnFullSolid(block);
+        }
+        return Block.canConnectToFullSolid(block);
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isPowerOn() ? 15 : 0, isPowerOn() ? 0 : 15));
+        this.setDamage(this.getDamage() ^ 0x08);
+
+        this.getLevel().setBlock(this, this, false, true);
+        if (this.isPowerOn()) {
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_POWER_ON);
+        } else {
+            this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_POWER_OFF);
+        }
+
+        LeverOrientation orientation = LeverOrientation.byMetadata(this.isPowerOn() ? this.getDamage() ^ 0x08 : this.getDamage());
+        BlockFace face = orientation.getFacing();
+        level.updateAroundRedstone(this, null);
+        this.level.updateAroundRedstone(this.getSideVec(face.getOpposite()), isPowerOn() ? face : null);
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        if (!super.onBreak(item)) {
+            return false;
+        }
+
+        if (isPowerOn()) {
+            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 15, 0));
+
+            LeverOrientation orientation = LeverOrientation.byMetadata(this.getDamage() ^ 0x08);
+            BlockFace face = orientation.getFacing();
+            this.level.updateAroundRedstone(this, null);
+            this.level.updateAroundRedstone(this.getSideVec(face.getOpposite()), face);
+        }
+
+        return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            int face = this.isPowerOn() ? this.getDamage() ^ 0x08 : this.getDamage();
+            BlockFace faces = LeverOrientation.byMetadata(face).getFacing().getOpposite();
+            if (!isSupportValid(this.getSide(faces))) {
+                this.level.useBreakOn(this);
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        LeverOrientation faces = LeverOrientation.forFacings(face, player.getHorizontalFacing());
+        this.setDamage(faces.getMetadata());
+        if (!isSupportValid(this.getSide(faces.facing.getOpposite()))) {
+            return false;
+        }
+        return this.getLevel().setBlock(block, this, true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

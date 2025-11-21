@@ -14,23 +14,13 @@ public class BlockStairsGranite extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Granite Stairs";
-    }
-
-    @Override
-    public int getId() {
-        return GRANITE_STAIRS;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
     }
 
     @Override
@@ -39,12 +29,22 @@ public class BlockStairsGranite extends BlockStairs {
     }
 
     @Override
+    public int getId() {
+        return GRANITE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Granite Stairs";
+    }
+
+    @Override
     public double getResistance() {
         return 30;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

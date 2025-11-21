@@ -9,7 +9,7 @@ import java.util.List;
 public class ElementStepSlider extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "step_slider"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "step_slider";
     private String text = "";
     @SuppressWarnings("FieldMayBeFinal")
     private List<String> steps;
@@ -31,13 +31,21 @@ public class ElementStepSlider extends Element {
         this.defaultStepIndex = defaultStep;
     }
 
+    public void addStep(String step) {
+        addStep(step, false);
+    }
+
+    public void addStep(String step, boolean isDefault) {
+        steps.add(step);
+        if (isDefault) this.defaultStepIndex = steps.size() - 1;
+    }
+
     public int getDefaultStepIndex() {
         return defaultStepIndex;
     }
 
-    public void setDefaultOptionIndex(int index) {
-        if (index >= steps.size()) return;
-        this.defaultStepIndex = index;
+    public List<String> getSteps() {
+        return steps;
     }
 
     public String getText() {
@@ -48,19 +56,6 @@ public class ElementStepSlider extends Element {
         this.text = text;
     }
 
-    public List<String> getSteps() {
-        return steps;
-    }
-
-    public void addStep(String step) {
-        addStep(step, false);
-    }
-
-    public void addStep(String step, boolean isDefault) {
-        steps.add(step);
-        if (isDefault) this.defaultStepIndex = steps.size() - 1;
-    }
-
     @Nullable
     public String getTooltip() {
         return tooltip;
@@ -68,5 +63,10 @@ public class ElementStepSlider extends Element {
 
     public void setTooltip(String tooltip) {
         this.tooltip = tooltip;
+    }
+
+    public void setDefaultOptionIndex(int index) {
+        if (index >= steps.size()) return;
+        this.defaultStepIndex = index;
     }
 }

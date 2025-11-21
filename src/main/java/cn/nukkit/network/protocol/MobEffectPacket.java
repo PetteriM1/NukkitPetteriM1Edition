@@ -10,16 +10,9 @@ import lombok.ToString;
 public class MobEffectPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.MOB_EFFECT_PACKET;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public static final byte EVENT_ADD = 1;
     public static final byte EVENT_MODIFY = 2;
     public static final byte EVENT_REMOVE = 3;
-
     public long eid;
     public int eventId;
     public int effectId;
@@ -42,6 +35,15 @@ public class MobEffectPacket extends DataPacket {
         this.putVarInt(this.amplifier);
         this.putBoolean(this.particles);
         this.putVarInt(this.duration);
-        this.putUnsignedVarLong(this.tick);
+        if (protocol >= ProtocolInfo.v1_21_40) {
+            this.putUnsignedVarLong(this.tick);
+        } else if (protocol >= ProtocolInfo.v1_20_70) {
+            this.putLLong(this.tick);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

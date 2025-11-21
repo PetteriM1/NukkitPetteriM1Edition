@@ -15,17 +15,9 @@ import cn.nukkit.item.Item;
 public class CraftItemEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Item[] input;
-
     private final Recipe recipe;
-
     private final Player player;
-
     private CraftingTransaction transaction;
 
     public CraftItemEvent(CraftingTransaction transaction) {
@@ -41,19 +33,23 @@ public class CraftItemEvent extends Event implements Cancellable {
         this.recipe = recipe;
     }
 
-    public CraftingTransaction getTransaction() {
-        return transaction;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public Item[] getInput() {
         return input;
     }
 
+    public Player getPlayer() {
+        return this.player;
+    }
+
     public Recipe getRecipe() {
         return recipe;
     }
 
-    public Player getPlayer() {
-        return this.player;
+    public CraftingTransaction getTransaction() {
+        return transaction;
     }
 }

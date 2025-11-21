@@ -10,6 +10,15 @@ public class BlockEntityMusic extends BlockEntity {
         super(chunk, nbt);
     }
 
+    public void changePitch() {
+        this.namedTag.putByte("note", (this.namedTag.getByte("note") + 1) % 25);
+        setDirty();
+    }
+
+    public int getPitch() {
+        return this.namedTag.getByte("note");
+    }
+
     @Override
     protected void initBlockEntity() {
         if (!this.namedTag.contains("note")) {
@@ -28,21 +37,12 @@ public class BlockEntityMusic extends BlockEntity {
         return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.NOTEBLOCK;
     }
 
-    public void changePitch() {
-        this.namedTag.putByte("note", (this.namedTag.getByte("note") + 1) % 25);
-        setDirty();
-    }
-
-    public int getPitch() {
-        return this.namedTag.getByte("note");
+    public boolean isPowered() {
+        return this.namedTag.getBoolean("powered");
     }
 
     public void setPowered(boolean powered) {
         this.namedTag.putBoolean("powered", powered);
         setDirty();
-    }
-
-    public boolean isPowered() {
-        return this.namedTag.getBoolean("powered");
     }
 }

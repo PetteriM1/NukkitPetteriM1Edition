@@ -19,13 +19,13 @@ public class ItemPickaxeIron extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_IRON;
+    public int getAttackDamage() {
+        return 4;
     }
 
     @Override
-    public boolean isPickaxe() {
-        return true;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_IRON;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemPickaxeIron extends ItemTool {
     }
 
     @Override
-    public int getAttackDamage() {
-        return 4;
+    public boolean isPickaxe() {
+        return true;
     }
 }

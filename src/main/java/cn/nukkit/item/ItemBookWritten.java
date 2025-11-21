@@ -22,40 +22,20 @@ public class ItemBookWritten extends ItemBookWritable {
         super(Item.WRITTEN_BOOK, 0, count, "Written Book");
     }
 
-    @Override
-    public int getMaxStackSize() {
-        return 16;
+    /**
+     * Returns the author of this book.
+     * This is not a reliable way to get the name of the player who signed this book.
+     * The author can be set to anything when signing a book.
+     */
+    public String getAuthor() {
+        return this.hasCompoundTag() ? this.getNamedTag().getString("author") : "";
     }
 
-    public Item writeBook(String author, String title, String[] pages) {
-        ListTag<CompoundTag> pageList = new ListTag<>("pages");
-        for (String page : pages) {
-            pageList.add(createPageTag(page));
-        }
-        return writeBook(author, title, pageList);
-    }
-
-    public Item writeBook(String author, String title, ListTag<CompoundTag> pages) {
-        if (pages.size() > 50 || pages.size() <= 0) return this; // Minecraft does not support more than 50 pages
-        CompoundTag tag = this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag();
-
-        tag.putString("author", author);
-        tag.putString("title", title);
-        tag.putList(pages);
-
-        tag.putInt("generation", GENERATION_ORIGINAL);
-        tag.putString("xuid", "");
-
-        return this.setNamedTag(tag);
-    }
-
-    public boolean signBook(String title, String author, String xuid, int generation) {
-        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag())
-                .putString("title", title)
-                .putString("author", author)
-                .putInt("generation", generation)
-                .putString("xuid", xuid));
-        return true;
+    /**
+     * Sets the author of this book.
+     */
+    public void setAuthor(String author) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putString("author", author));
     }
 
     /**
@@ -73,20 +53,9 @@ public class ItemBookWritten extends ItemBookWritable {
         this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putInt("generation", generation));
     }
 
-    /**
-     * Returns the author of this book.
-     * This is not a reliable way to get the name of the player who signed this book.
-     * The author can be set to anything when signing a book.
-     */
-    public String getAuthor() {
-        return this.hasCompoundTag() ? this.getNamedTag().getString("author") : "";
-    }
-
-    /**
-     * Sets the author of this book.
-     */
-    public void setAuthor(String author) {
-        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putString("author", author));
+    @Override
+    public int getMaxStackSize() {
+        return 16;
     }
 
     /**
@@ -115,5 +84,36 @@ public class ItemBookWritten extends ItemBookWritable {
      */
     public void setXUID(String title) {
         this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag()).putString("xuid", title));
+    }
+
+    public boolean signBook(String title, String author, String xuid, int generation) {
+        this.setNamedTag((this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag())
+                .putString("title", title)
+                .putString("author", author)
+                .putInt("generation", generation)
+                .putString("xuid", xuid));
+        return true;
+    }
+
+    public Item writeBook(String author, String title, ListTag<CompoundTag> pages) {
+        if (pages.size() > 50 || pages.size() <= 0) return this; // Minecraft does not support more than 50 pages
+        CompoundTag tag = this.hasCompoundTag() ? this.getNamedTag() : new CompoundTag();
+
+        tag.putString("author", author);
+        tag.putString("title", title);
+        tag.putList(pages);
+
+        tag.putInt("generation", GENERATION_ORIGINAL);
+        tag.putString("xuid", "");
+
+        return this.setNamedTag(tag);
+    }
+
+    public Item writeBook(String author, String title, String[] pages) {
+        ListTag<CompoundTag> pageList = new ListTag<>("pages");
+        for (String page : pages) {
+            pageList.add(createPageTag(page));
+        }
+        return writeBook(author, title, pageList);
     }
 }

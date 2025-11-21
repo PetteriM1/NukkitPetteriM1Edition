@@ -17,32 +17,6 @@ public class AnimatePacket extends DataPacket {
     public float data;
     public float rowingTime;
 
-    @Override
-    public void decode() {
-        this.action = Action.fromId(this.getVarInt());
-        this.eid = getEntityRuntimeId();
-        this.data = this.getLFloat();
-        if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
-            this.rowingTime = this.getLFloat();
-        }
-    }
-
-    @Override
-    public void encode() {
-        this.reset();
-        this.putVarInt(this.action.getId());
-        this.putEntityRuntimeId(this.eid);
-        this.putLFloat(this.data);
-        if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
-            this.putLFloat(this.rowingTime);
-        }
-    }
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public enum Action {
         NO_ACTION(0),
         SWING_ARM(1),
@@ -66,12 +40,42 @@ public class AnimatePacket extends DataPacket {
             this.id = id;
         }
 
-        public int getId() {
-            return id;
-        }
-
         public static Action fromId(int id) {
             return ID_LOOKUP.get(id);
         }
+
+        public int getId() {
+            return id;
+        }
+    }
+
+    @Override
+    public void decode() {
+        this.action = Action.fromId(this.getVarInt());
+        this.eid = getEntityRuntimeId();
+        if (protocol >= ProtocolInfo.v1_21_120) {
+            this.data = this.getLFloat();
+        }
+        if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
+            this.rowingTime = this.getLFloat();
+        }
+    }
+
+    @Override
+    public void encode() {
+        this.reset();
+        this.putVarInt(this.action.getId());
+        this.putEntityRuntimeId(this.eid);
+        if (protocol >= ProtocolInfo.v1_21_120) {
+            this.putLFloat(this.data);
+        }
+        if (this.action == Action.ROW_RIGHT || this.action == Action.ROW_LEFT) {
+            this.putLFloat(this.rowingTime);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

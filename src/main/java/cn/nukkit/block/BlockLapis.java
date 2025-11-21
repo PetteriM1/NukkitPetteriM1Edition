@@ -11,28 +11,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockLapis extends BlockSolid {
 
     @Override
-    public int getId() {
-        return LAPIS_BLOCK;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Lapis Lazuli Block";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 5;
+    public BlockColor getColor() {
+        return BlockColor.LAPIS_BLOCK_COLOR;
     }
 
     @Override
@@ -47,12 +32,27 @@ public class BlockLapis extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.LAPIS_BLOCK_COLOR;
+    public double getHardness() {
+        return 3;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return LAPIS_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Lapis Lazuli Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

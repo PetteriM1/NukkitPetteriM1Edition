@@ -9,8 +9,13 @@ import cn.nukkit.item.Item;
 public class BlockBedrock extends BlockSolid {
 
     @Override
-    public int getId() {
-        return BEDROCK;
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -19,8 +24,8 @@ public class BlockBedrock extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 18000000;
+    public int getId() {
+        return BEDROCK;
     }
 
     @Override
@@ -29,17 +34,12 @@ public class BlockBedrock extends BlockSolid {
     }
 
     @Override
+    public double getResistance() {
+        return 18000000;
+    }
+
+    @Override
     public boolean isBreakable(Item item) {
-        return false;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
         return false;
     }
 }

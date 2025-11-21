@@ -14,19 +14,6 @@ public class TextContainer implements Cloneable {
         this.text = text;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    @Override
-    public String toString() {
-        return this.text;
-    }
-
     @Override
     public TextContainer clone() {
         try {
@@ -35,5 +22,18 @@ public class TextContainer implements Cloneable {
             Server.getInstance().getLogger().logException(e);
         }
         return null;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return this.text;
     }
 }

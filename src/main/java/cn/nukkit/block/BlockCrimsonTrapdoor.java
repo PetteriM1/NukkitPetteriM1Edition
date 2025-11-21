@@ -14,13 +14,13 @@ public class BlockCrimsonTrapdoor extends BlockTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Trapdoor";
+    public int getId() {
+        return CRIMSON_TRAPDOOR;
     }
 
     @Override
-    public int getId() {
-        return CRIMSON_TRAPDOOR;
+    public String getName() {
+        return "Crimson Trapdoor";
     }
 
     @Override

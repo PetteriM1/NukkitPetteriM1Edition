@@ -16,8 +16,17 @@ public class EnchantmentFireAspect extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 10 + (level - 1) * 20;
+    public void doAttack(Entity attacker, Entity entity) {
+        if ((!(entity instanceof Player) || !((Player) entity).isCreative())) {
+            int duration = Math.max(entity.fireTicks / 20, getLevel() << 2);
+
+            EntityCombustByEntityEvent ev = new EntityCombustByEntityEvent(attacker, entity, duration);
+            Server.getInstance().getPluginManager().callEvent(ev);
+
+            if (!ev.isCancelled()) {
+                entity.setOnFire(ev.getDuration());
+            }
+        }
     }
 
     @Override
@@ -31,16 +40,7 @@ public class EnchantmentFireAspect extends Enchantment {
     }
 
     @Override
-    public void doAttack(Entity attacker, Entity entity) {
-        if ((!(entity instanceof Player) || !((Player) entity).isCreative())) {
-            int duration = Math.max(entity.fireTicks / 20, getLevel() << 2);
-
-            EntityCombustByEntityEvent ev = new EntityCombustByEntityEvent(attacker, entity, duration);
-            Server.getInstance().getPluginManager().callEvent(ev);
-
-            if (!ev.isCancelled()) {
-                entity.setOnFire(ev.getDuration());
-            }
-        }
+    public int getMinEnchantAbility(int level) {
+        return 10 + (level - 1) * 20;
     }
 }

@@ -10,28 +10,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockDiamond extends BlockSolid {
 
     @Override
-    public double getHardness() {
-        return 5;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public double getResistance() {
-        return 30;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public int getId() {
-        return DIAMOND_BLOCK;
-    }
-
-    @Override
-    public String getName() {
-        return "Block of Diamond";
+    public BlockColor getColor() {
+        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 
     @Override
@@ -46,12 +31,27 @@ public class BlockDiamond extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DIAMOND_BLOCK_COLOR;
+    public double getHardness() {
+        return 5;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return DIAMOND_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Block of Diamond";
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

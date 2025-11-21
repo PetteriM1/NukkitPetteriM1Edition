@@ -14,16 +14,6 @@ public class FrozenOceanBiome extends OceanBiome {
     }
 
     @Override
-    public String getName() {
-        return "Frozen Ocean";
-    }
-
-    @Override
-    public boolean isFreezing() {
-        return true;
-    }
-
-    @Override
     public boolean canRain() {
         return false;
     }
@@ -31,5 +21,15 @@ public class FrozenOceanBiome extends OceanBiome {
     @Override
     public int getCoverId(int x, int z) {
         return SNOW_LAYER << Block.DATA_BITS;
+    }
+
+    @Override
+    public String getName() {
+        return "Frozen Ocean";
+    }
+
+    @Override
+    public boolean isFreezing() {
+        return true;
     }
 }

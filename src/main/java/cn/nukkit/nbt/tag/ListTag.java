@@ -1,5 +1,6 @@
 package cn.nukkit.nbt.tag;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.stream.NBTOutputStream;
 
@@ -24,53 +25,6 @@ public class ListTag<T extends Tag> extends Tag {
         super(name);
     }
 
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-        if (!list.isEmpty()) type = list.get(0).getId();
-        else type = 1;
-
-        dos.writeByte(type);
-        dos.writeInt(list.size());
-        for (T aList : list) aList.write(dos);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void load(NBTInputStream dis) throws IOException {
-        type = dis.readByte();
-        int size = dis.readInt();
-
-        list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            Tag tag = Tag.newTag(type, null);
-            tag.load(dis);
-            tag.setName("");
-            list.add((T) tag);
-        }
-    }
-
-    @Override
-    public byte getId() {
-        return TAG_List;
-    }
-
-    @Override
-    public String toString() {
-        StringJoiner joiner = new StringJoiner(",\n\t");
-        list.forEach(tag -> joiner.add(tag.toString().replace("\n", "\n\t")));
-        return "ListTag '" + this.getName() + "' (" + list.size() + " entries of type " + Tag.getTagName(type) + ") {\n\t" + joiner.toString() + "\n}";
-    }
-
-    public void print(String prefix, PrintStream out) {
-        super.print(prefix, out);
-
-        out.println(prefix + '{');
-        String orgPrefix = prefix;
-        prefix += "   ";
-        for (T aList : list) aList.print(prefix, out);
-        out.println(orgPrefix + '}');
-    }
-
     public ListTag<T> add(T tag) {
         type = tag.getId();
         tag.setName("");
@@ -88,45 +42,6 @@ public class ListTag<T extends Tag> extends Tag {
             list.set(index, tag);
         }
         return this;
-    }
-
-    @Override
-    public List<Object> parseValue() {
-        List<Object> value = new ArrayList<>(this.list.size());
-
-        for (T t : this.list) {
-            value.add(t.parseValue());
-        }
-
-        return value;
-    }
-
-    public T get(int index) {
-        return list.get(index);
-    }
-
-    public List<T> getAll() {
-        return new ArrayList<>(list);
-    }
-
-    public void setAll(List<T> tags) {
-        this.list = new ArrayList<>(tags);
-    }
-
-    public void remove(T tag) {
-        list.remove(tag);
-    }
-
-    public void remove(int index) {
-        list.remove(index);
-    }
-
-    public void removeAll(Collection<T> tags) {
-        list.removeAll(tags);
-    }
-
-    public int size() {
-        return list.size();
     }
 
     @Override
@@ -151,5 +66,95 @@ public class ListTag<T extends Tag> extends Tag {
             }
         }
         return false;
+    }
+
+    public T get(int index) {
+        return list.get(index);
+    }
+
+    public List<T> getAll() {
+        return new ArrayList<>(list);
+    }
+
+    public void setAll(List<T> tags) {
+        this.list = new ArrayList<>(tags);
+    }
+
+    @Override
+    public byte getId() {
+        return TAG_List;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void load(NBTInputStream dis) throws IOException {
+        type = dis.readByte();
+        int size = dis.readInt();
+
+        if (size > Short.MAX_VALUE && Server.getInstance().suomiCraftPEMode()) {
+            throw new RuntimeException("ListTag '" + this.getName() + "' is too long! " + size);
+        }
+
+        list = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            Tag tag = Tag.newTag(type, null);
+            tag.load(dis);
+            tag.setName("");
+            list.add((T) tag);
+        }
+    }
+
+    @Override
+    public List<Object> parseValue() {
+        List<Object> value = new ArrayList<>(this.list.size());
+
+        for (T t : this.list) {
+            value.add(t.parseValue());
+        }
+
+        return value;
+    }
+
+    public void print(String prefix, PrintStream out) {
+        super.print(prefix, out);
+
+        out.println(prefix + '{');
+        String orgPrefix = prefix;
+        prefix += "   ";
+        for (T aList : list) aList.print(prefix, out);
+        out.println(orgPrefix + '}');
+    }
+
+    public void remove(T tag) {
+        list.remove(tag);
+    }
+
+    public void remove(int index) {
+        list.remove(index);
+    }
+
+    public void removeAll(Collection<T> tags) {
+        list.removeAll(tags);
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner joiner = new StringJoiner(",\n\t");
+        list.forEach(tag -> joiner.add(tag.toString().replace("\n", "\n\t")));
+        return "ListTag '" + this.getName() + "' (" + list.size() + " entries of type " + Tag.getTagName(type) + ") {\n\t" + joiner + "\n}";
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        if (!list.isEmpty()) type = list.get(0).getId();
+        else type = 1;
+
+        dos.writeByte(type);
+        dos.writeInt(list.size());
+        for (T aList : list) aList.write(dos);
     }
 }

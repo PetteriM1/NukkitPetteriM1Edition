@@ -18,20 +18,51 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
     public double getHardness() {
         return 1.25;
     }
 
     @Override
-    public double getResistance() {
-        return 4.2;
+    public int getId() {
+        return BlockID.BASALT;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        this.getLevel().setBlock(block, this, true, true);
-        return true;
+    public String getName() {
+        return "Basalt";
+    }
+
+    public BlockFace.Axis getPillarAxis() {
+        switch (this.getDamage() % 3) {
+            case 2:
+                return BlockFace.Axis.Z;
+            case 1:
+                return BlockFace.Axis.X;
+            case 0:
+            default:
+                return BlockFace.Axis.Y;
+        }
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -48,16 +79,9 @@ public class BlockBasalt extends BlockSolidMeta {
         }
     }
 
-    public BlockFace.Axis getPillarAxis() {
-        switch (this.getDamage() % 3) {
-            case 2:
-                return BlockFace.Axis.Z;
-            case 1:
-                return BlockFace.Axis.X;
-            case 0:
-            default:
-                return BlockFace.Axis.Y;
-        }
+    @Override
+    public double getResistance() {
+        return 4.2;
     }
 
     @Override
@@ -66,34 +90,10 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Basalt";
-    }
-
-    @Override
-    public int getId() {
-        return BlockID.BASALT;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
     }
 
     @Override

@@ -4,8 +4,6 @@ import lombok.Getter;
 
 public interface ItemTrimMaterial {
 
-    Type getMaterial();
-
     enum Type {
 
         AMETHYST("amethyst"),
@@ -26,4 +24,6 @@ public interface ItemTrimMaterial {
             this.materialName = input;
         }
     }
+
+    Type getMaterial();
 }

@@ -13,7 +13,9 @@ import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDripleafSmall extends BlockFlowable implements BlockPropertiesHelper, Faceable {
 
@@ -28,8 +30,18 @@ public class BlockDripleafSmall extends BlockFlowable implements BlockProperties
     }
 
     @Override
-    public BlockProperties getBlockProperties() {
-        return PROPERTIES;
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
     }
 
     @Override
@@ -54,42 +66,50 @@ public class BlockDripleafSmall extends BlockFlowable implements BlockProperties
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = block.down();
-        if (!this.canPlaceOn(down, target)) {
-            return false;
-        }
-
-        if (down.getId() == SMALL_DRIPLEAF) {
-            BlockDripleafSmall floor = (BlockDripleafSmall) down;
-            floor.setHasHead(false);
-            this.getLevel().setBlock(floor, floor, true, true);
-            this.setDirection(floor.getDirection());
-        } else {
-            this.setDirection(player.getDirection().getOpposite());
-        }
-
-        this.setHasHead(true);
-        return this.getLevel().setBlock(this, this, true, true);
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.AIR;
     }
 
     @Override
-    public boolean onBreak(Item item, Player player) {
-        Block down = this.down();
-        while (down instanceof BlockDripleafSmall) {
-            this.getLevel().setBlock(down, Block.get(BlockID.AIR), true, true);
-            this.getLevel().addParticle(new DestroyBlockParticle(down.add(0.5), down));
-            down = down.down();
-        }
+    public BlockFace getBlockFace() {
+        return this.getDirection();
+    }
 
-        Block up = this.up();
-        while (up instanceof BlockDripleafSmall) {
-            this.getLevel().setBlock(up, Block.get(BlockID.AIR), true, true);
-            this.getLevel().addParticle(new DestroyBlockParticle(up.add(0.5), up));
-            up = up.up();
-        }
+    @Override
+    public BlockProperties getBlockProperties() {
+        return PROPERTIES;
+    }
 
-        return super.onBreak(item, player);
+    public BlockFace getDirection() {
+        return this.getPropertyValue(VanillaProperties.DIRECTION);
+    }
+
+    public void setDirection(BlockFace blockFace) {
+        this.setPropertyValue(VanillaProperties.DIRECTION, blockFace);
+    }
+
+    @Override
+    public int getId() {
+        return SMALL_DRIPLEAF;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Small Dripleaf";
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
+    }
+
+    public boolean hasHead() {
+        return this.getBooleanValue(VanillaProperties.UPPER_BLOCK);
     }
 
     @Override
@@ -135,63 +155,55 @@ public class BlockDripleafSmall extends BlockFlowable implements BlockProperties
     }
 
     @Override
+    public boolean onBreak(Item item, Player player) {
+        Block down = this.down();
+        while (down instanceof BlockDripleafSmall) {
+            this.getLevel().setBlock(down, Block.get(BlockID.AIR), true, true);
+            this.getLevel().addParticle(new DestroyBlockParticle(down.add(0.5), down));
+            down = down.down();
+        }
+
+        Block up = this.up();
+        while (up instanceof BlockDripleafSmall) {
+            this.getLevel().setBlock(up, Block.get(BlockID.AIR), true, true);
+            this.getLevel().addParticle(new DestroyBlockParticle(up.add(0.5), up));
+            up = up.up();
+        }
+
+        return super.onBreak(item, player);
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = block.down();
+        if (!this.canPlaceOn(down, target)) {
+            return false;
+        }
+
+        if (down.getId() == SMALL_DRIPLEAF) {
+            BlockDripleafSmall floor = (BlockDripleafSmall) down;
+            floor.setHasHead(false);
+            this.getLevel().setBlock(floor, floor, true, true);
+            this.setDirection(floor.getDirection());
+        } else {
+            this.setDirection(player.getDirection().getOpposite());
+        }
+
+        this.setHasHead(true);
+        return this.getLevel().setBlock(this, this, true, true);
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return null;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public String getName() {
-        return "Small Dripleaf";
-    }
-
-    @Override
-    public int getId() {
-        return SMALL_DRIPLEAF;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     public void setHasHead(boolean value) {
         this.setBooleanValue(VanillaProperties.UPPER_BLOCK, value);
     }
 
-    public boolean hasHead() {
-        return this.getBooleanValue(VanillaProperties.UPPER_BLOCK);
-    }
-
-    public void setDirection(BlockFace blockFace) {
-        this.setPropertyValue(VanillaProperties.DIRECTION, blockFace);
-    }
-
-    public BlockFace getDirection() {
-        return this.getPropertyValue(VanillaProperties.DIRECTION);
-    }
-
     @Override
-    public BlockFace getBlockFace() {
-        return this.getDirection();
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId()), 0, 1);
     }
 }

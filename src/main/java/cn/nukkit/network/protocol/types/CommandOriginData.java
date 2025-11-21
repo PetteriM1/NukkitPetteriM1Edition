@@ -24,13 +24,6 @@ public final class CommandOriginData {
         this.varlong = varlong;
     }
 
-    public OptionalLong getVarLong() {
-        if (varlong == null) {
-            return OptionalLong.empty();
-        }
-        return OptionalLong.of(varlong);
-    }
-
     public enum Origin {
         PLAYER,
         BLOCK,
@@ -44,5 +37,12 @@ public final class CommandOriginData {
         VIRTUAL,
         GAME_ARGUMENT,
         ENTITY_SERVER
+    }
+
+    public OptionalLong getVarLong() {
+        if (varlong == null) {
+            return OptionalLong.empty();
+        }
+        return OptionalLong.of(varlong);
     }
 }

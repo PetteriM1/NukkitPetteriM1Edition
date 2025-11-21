@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDoubleMudBrickSlab extends BlockDoubleSlabBase {
 
@@ -13,17 +15,23 @@ public class BlockDoubleMudBrickSlab extends BlockDoubleSlabBase {
     }
 
     @Override
-    public int getId() {
-        return MUD_BRICK_DOUBLE_SLAB;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getSlabName() {
-        return "Double Mud Brick Slab";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.DOUBLE_STONE_SLAB;
     }
+
     @Override
-    public int getSingleSlabId() {
-        return MUD_BRICK_SLAB;
+    public int getAlternateMeta(int protocol) {
+        return BlockSlabStone.BRICK;
+    }
+
+    @Override
+    public int getId() {
+        return MUD_BRICK_DOUBLE_SLAB;
     }
 
     @Override
@@ -32,8 +40,18 @@ public class BlockDoubleMudBrickSlab extends BlockDoubleSlabBase {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public int getSingleSlabId() {
+        return MUD_BRICK_SLAB;
+    }
+
+    @Override
+    public String getSlabName() {
+        return "Double Mud Brick Slab";
     }
 
     @Override

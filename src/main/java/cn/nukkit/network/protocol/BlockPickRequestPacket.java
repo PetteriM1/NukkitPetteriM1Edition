@@ -15,11 +15,6 @@ public class BlockPickRequestPacket extends DataPacket {
     public int selectedSlot;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         BlockVector3 v = this.getSignedBlockPosition();
         this.x = v.x;
@@ -32,5 +27,10 @@ public class BlockPickRequestPacket extends DataPacket {
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

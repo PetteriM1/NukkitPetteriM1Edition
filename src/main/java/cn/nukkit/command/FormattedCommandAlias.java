@@ -26,34 +26,6 @@ public class FormattedCommandAlias extends Command {
         this.formatStrings = formatStrings.toArray(new String[0]);
     }
 
-    @Override
-    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
-        boolean result = false;
-        ArrayList<String> commands = new ArrayList<>();
-        for (String formatString : formatStrings) {
-            try {
-                commands.add(buildCommand(formatString, args));
-            } catch (Exception e) {
-                if (e instanceof IllegalArgumentException) {
-                    sender.sendMessage(TextFormat.RED + e.getMessage());
-                } else {
-                    sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
-                    MainLogger logger = sender.getServer().getLogger();
-                    if (logger != null) {
-                        logger.logException(e);
-                    }
-                }
-                return false;
-            }
-        }
-
-        for (String command : commands) {
-            result |= Server.getInstance().dispatchCommand(sender, command);
-        }
-
-        return result;
-    }
-
     private String buildCommand(String formatString, String[] args) {
         int index = formatString.indexOf('$');
         while (index != -1) {
@@ -129,6 +101,34 @@ public class FormattedCommandAlias extends Command {
         }
 
         return formatString;
+    }
+
+    @Override
+    public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+        boolean result = false;
+        ArrayList<String> commands = new ArrayList<>();
+        for (String formatString : formatStrings) {
+            try {
+                commands.add(buildCommand(formatString, args));
+            } catch (Exception e) {
+                if (e instanceof IllegalArgumentException) {
+                    sender.sendMessage(TextFormat.RED + e.getMessage());
+                } else {
+                    sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.exception"));
+                    MainLogger logger = sender.getServer().getLogger();
+                    if (logger != null) {
+                        logger.logException(e);
+                    }
+                }
+                return false;
+            }
+        }
+
+        for (String command : commands) {
+            result |= Server.getInstance().dispatchCommand(sender, command);
+        }
+
+        return result;
     }
 
     private static boolean inRange(int i, int j, int k) {

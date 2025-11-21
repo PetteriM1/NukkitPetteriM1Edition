@@ -11,10 +11,17 @@ public class RemoteConsoleCommandSender extends ConsoleCommandSender {
 
     private final StringBuilder messages = new StringBuilder();
 
+    public void clearMessages() {
+        messages.delete(0, messages.length());
+    }
+
+    public String getMessages() {
+        return messages.toString();
+    }
+
     @Override
-    public void sendMessage(String message) {
-        message = this.getServer().getLanguage().translateString(message);
-        this.messages.append(message.trim()).append('\n');
+    public String getName() {
+        return "Rcon";
     }
 
     @Override
@@ -22,16 +29,9 @@ public class RemoteConsoleCommandSender extends ConsoleCommandSender {
         this.sendMessage(this.getServer().getLanguage().translate(message));
     }
 
-    public String getMessages() {
-        return messages.toString();
-    }
-
-    public void clearMessages() {
-        messages.delete(0, messages.length());
-    }
-
     @Override
-    public String getName() {
-        return "Rcon";
+    public void sendMessage(String message) {
+        message = this.getServer().getLanguage().translateString(message);
+        this.messages.append(message.trim()).append('\n');
     }
 }

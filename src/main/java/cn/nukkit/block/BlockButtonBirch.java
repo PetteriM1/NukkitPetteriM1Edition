@@ -11,12 +11,12 @@ public class BlockButtonBirch extends BlockButtonWooden {
     }
 
     @Override
-    public String getName() {
-        return "Birch Button";
+    public int getId() {
+        return BIRCH_BUTTON;
     }
 
     @Override
-    public int getId() {
-        return BIRCH_BUTTON;
+    public String getName() {
+        return "Birch Button";
     }
 }

@@ -19,9 +19,12 @@ public class BookEditPacket extends DataPacket {
     public String author;
     public String xuid;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public enum Action {
+        REPLACE_PAGE,
+        ADD_PAGE,
+        DELETE_PAGE,
+        SWAP_PAGES,
+        SIGN_BOOK
     }
 
     @Override
@@ -56,11 +59,8 @@ public class BookEditPacket extends DataPacket {
         this.encodeUnsupported();
     }
 
-    public enum Action {
-        REPLACE_PAGE,
-        ADD_PAGE,
-        DELETE_PAGE,
-        SWAP_PAGES,
-        SIGN_BOOK
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

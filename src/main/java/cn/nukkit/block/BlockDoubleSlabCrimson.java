@@ -14,43 +14,8 @@ public class BlockDoubleSlabCrimson extends BlockDoubleSlabBase {
     }
 
     @Override
-    public int getId() {
-        return CRIMSON_DOUBLE_SLAB;
-    }
-
-    @Override
-    public String getSlabName() {
-        return "Crimson";
-    }
-
-    @Override
-    public int getSingleSlabId() {
-        return CRIMSON_SLAB;
-    }
-
-    @Override
-    public int getItemDamage() {
+    public int getBurnAbility() {
         return 0;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -59,7 +24,42 @@ public class BlockDoubleSlabCrimson extends BlockDoubleSlabBase {
     }
 
     @Override
-    public int getBurnAbility() {
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return CRIMSON_DOUBLE_SLAB;
+    }
+
+    @Override
+    public int getItemDamage() {
         return 0;
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getSingleSlabId() {
+        return CRIMSON_SLAB;
+    }
+
+    @Override
+    public String getSlabName() {
+        return "Crimson";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 }

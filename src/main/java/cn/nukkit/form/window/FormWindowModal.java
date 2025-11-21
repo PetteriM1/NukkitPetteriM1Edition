@@ -5,7 +5,7 @@ import cn.nukkit.form.response.FormResponseModal;
 public class FormWindowModal extends FormWindow {
 
     @SuppressWarnings("unused")
-    private final String type = "modal"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "modal";
     private String title = "";
     private String content = "";
     private String button1 = "";
@@ -18,22 +18,6 @@ public class FormWindowModal extends FormWindow {
         this.content = content;
         this.button1 = trueButtonText;
         this.button2 = falseButtonText;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getButton1() {
@@ -52,6 +36,14 @@ public class FormWindowModal extends FormWindow {
         this.button2 = button2;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public FormResponseModal getResponse() {
         return response;
     }
@@ -63,5 +55,13 @@ public class FormWindowModal extends FormWindow {
         }
         if (data.equals("true")) response = new FormResponseModal(0, button1);
         else response = new FormResponseModal(1, button2);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

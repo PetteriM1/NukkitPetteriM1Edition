@@ -87,6 +87,11 @@ public class GrindstoneTransaction extends InventoryTransaction {
     }
 
     @Override
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return isIn(actions);
+    }
+
+    @Override
     public boolean execute() {
         if (this.invalid || this.hasExecuted() || !this.canExecute()) {
             this.source.removeAllWindows(false);
@@ -119,10 +124,5 @@ public class GrindstoneTransaction extends InventoryTransaction {
             if (action instanceof GrindstoneItemAction) return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return isIn(actions);
     }
 }

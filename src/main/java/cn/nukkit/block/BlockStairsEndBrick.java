@@ -13,8 +13,13 @@ public class BlockStairsEndBrick extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "End Brick Stairs";
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2; //3
     }
 
     @Override
@@ -23,8 +28,8 @@ public class BlockStairsEndBrick extends BlockStairs {
     }
 
     @Override
-    public double getHardness() {
-        return 2; //3
+    public String getName() {
+        return "End Brick Stairs";
     }
 
     @Override
@@ -35,10 +40,5 @@ public class BlockStairsEndBrick extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

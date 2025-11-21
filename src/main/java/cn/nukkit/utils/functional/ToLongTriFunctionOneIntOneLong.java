@@ -12,21 +12,10 @@ import java.util.function.LongUnaryOperator;
  * whose functional method is {@link #apply(Object, int, long)}.
  *
  * @param <F> the type of the first argument to the function
- *
  * @see Function
  */
 @FunctionalInterface
 public interface ToLongTriFunctionOneIntOneLong<F> {
-
-    /**
-     * Applies this function to the given arguments.
-     *
-     * @param f the first function argument
-     * @param s the second function argument
-     * @param t the third function argument
-     * @return the function result
-     */
-    long apply(F f, int s, long t);
 
     /**
      * Returns a composed function that first applies this function to
@@ -43,4 +32,14 @@ public interface ToLongTriFunctionOneIntOneLong<F> {
         Objects.requireNonNull(after);
         return (F f, int s, long t) -> after.applyAsLong(apply(f, s, t));
     }
+
+    /**
+     * Applies this function to the given arguments.
+     *
+     * @param f the first function argument
+     * @param s the second function argument
+     * @param t the third function argument
+     * @return the function result
+     */
+    long apply(F f, int s, long t);
 }

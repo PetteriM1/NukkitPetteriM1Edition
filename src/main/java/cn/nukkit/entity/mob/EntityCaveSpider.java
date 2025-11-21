@@ -1,12 +1,19 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.EntityPotionEffectEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropod {
@@ -18,24 +25,28 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1.32) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
-    @Override
-    public float getWidth() {
-        return 0.7f;
-    }
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
 
-    @Override
-    public float getHeight() {
-        return 0.5f;
-    }
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
 
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(12);
-        super.initEntity();
+                EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage);
+
+                if (player.attack(ev) && !ev.isCancelled() && this.server.getDifficulty() > 0) {
+                    player.addEffect(Effect.getEffect(Effect.POISON).setDuration(this.server.getDifficulty() > 1 ? 300 : 140), EntityPotionEffectEvent.Cause.ATTACK);
+                }
+            }
+        }
     }
 
     @Override
@@ -52,6 +63,11 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
     }
 
     @Override
+    public float getHeight() {
+        return 0.5f;
+    }
+
+    @Override
     public int getKillExperience() {
         return 5;
     }
@@ -59,5 +75,27 @@ public class EntityCaveSpider extends EntityWalkingMob implements EntityArthropo
     @Override
     public String getName() {
         return this.hasCustomName() ? this.getNameTag() : "Cave Spider";
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public double getSpeed() {
+        return 1.3;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.7f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(12);
+        super.initEntity();
+        this.setDamage(new int[]{0, 2, 3, 3});
     }
 }

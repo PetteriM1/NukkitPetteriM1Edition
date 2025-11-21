@@ -22,17 +22,18 @@ public class PlayerDataSerializeEvent extends ServerEvent {
         UUID uuid = null;
         try {
             uuid = UUID.fromString(name);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         this.uuid = Optional.ofNullable(uuid);
         this.name = this.uuid.isPresent() ? Optional.empty() : Optional.of(name);
     }
 
-    public Optional<String> getName() {
-        return name;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
-    public Optional<UUID> getUuid() {
-        return uuid;
+    public Optional<String> getName() {
+        return name;
     }
 
     public PlayerDataSerializer getSerializer() {
@@ -43,7 +44,7 @@ public class PlayerDataSerializeEvent extends ServerEvent {
         this.serializer = Preconditions.checkNotNull(serializer, "serializer");
     }
 
-    public static HandlerList getHandlers() {
-        return handlers;
+    public Optional<UUID> getUuid() {
+        return uuid;
     }
 }

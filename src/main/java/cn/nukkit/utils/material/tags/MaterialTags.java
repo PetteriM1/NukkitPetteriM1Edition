@@ -93,19 +93,19 @@ public class MaterialTags {
     public static final MaterialTag WOODEN_TIER = register("minecraft:wooden_tier", new LazilyInitializedMaterialTag("minecraft:wooden_tier"));
     public static final MaterialTag WOOL = register("minecraft:wool", new LazilyInitializedMaterialTag("minecraft:wool"));
 
+    public static MaterialTag get(String tag) {
+        return tags.get(tag);
+    }
+
+    public static Set<String> getVanillaDefinitions(String tag) {
+        return vanillaTagDefinitions.get(tag);
+    }
+
     public static MaterialTag register(String tagName, MaterialTag tag) {
         if (tags.containsKey(tagName)) {
             throw new IllegalArgumentException("Tag " + tagName + " is already registered");
         }
         tags.put(tagName, tag);
         return tag;
-    }
-
-    public static MaterialTag get(String tag) {
-        return tags.get(tag);
-    }
-
-    protected static Set<String> getVanillaDefinitions(String tag) {
-        return vanillaTagDefinitions.get(tag);
     }
 }

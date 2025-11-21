@@ -7,13 +7,13 @@ public class EnchantmentSoulSpeed extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 10 * level;
+    public int getMaxLevel() {
+        return 3;
     }
 
     @Override
-    public int getMaxLevel() {
-        return 3;
+    public int getMinEnchantAbility(int level) {
+        return 10 * level;
     }
 
     @Override

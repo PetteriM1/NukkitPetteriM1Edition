@@ -19,13 +19,8 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
     }
 
     @Override
-    public int getId() {
-        return POWERED_REPEATER;
-    }
-
-    @Override
-    public String getName() {
-        return "Powered Repeater";
+    protected int getDelay() {
+        return (1 + (getDamage() >> 2)) << 1;
     }
 
     @Override
@@ -34,18 +29,18 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
     }
 
     @Override
-    protected boolean isAlternateInput(Block block) {
-        return isDiode(block);
+    public int getId() {
+        return POWERED_REPEATER;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.REPEATER);
+    public int getLightLevel() {
+        return 7;
     }
 
     @Override
-    protected int getDelay() {
-        return (1 + (getDamage() >> 2)) << 1;
+    public String getName() {
+        return "Powered Repeater";
     }
 
     @Override
@@ -59,8 +54,13 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
     }
 
     @Override
-    public int getLightLevel() {
-        return 7;
+    protected boolean isAlternateInput(Block block) {
+        return isDiode(block);
+    }
+
+    @Override
+    public boolean isLocked() {
+        return this.getPowerOnSides() > 0;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class BlockRedstoneRepeaterPowered extends BlockRedstoneDiode {
     }
 
     @Override
-    public boolean isLocked() {
-        return this.getPowerOnSides() > 0;
+    public Item toItem() {
+        return Item.get(Item.REPEATER);
     }
 }

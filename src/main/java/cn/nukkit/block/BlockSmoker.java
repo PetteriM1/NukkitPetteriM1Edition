@@ -11,11 +11,6 @@ public class BlockSmoker extends BlockSmokerLit {
     }
 
     @Override
-    public String getName() {
-        return "Smoker";
-    }
-
-    @Override
     public int getId() {
         return SMOKER;
     }
@@ -23,5 +18,10 @@ public class BlockSmoker extends BlockSmokerLit {
     @Override
     public int getLightLevel() {
         return 0;
+    }
+
+    @Override
+    public String getName() {
+        return "Smoker";
     }
 }

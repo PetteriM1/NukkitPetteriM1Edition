@@ -5,7 +5,6 @@ import lombok.ToString;
 /**
  * @author Nukkit Project Team
  */
-@Deprecated
 @ToString
 public class AdventureSettingsPacket extends DataPacket {
 
@@ -49,6 +48,7 @@ public class AdventureSettingsPacket extends DataPacket {
     public long customFlags;
 
     public long commandPermission = PERMISSION_NORMAL;
+
     /**
      * PERMISSION_CUSTOM = 3, PERMISSION_OPERATOR = 2, PERMISSION_MEMBER = 1, PERMISSION_VISITOR = 0
      */
@@ -84,6 +84,11 @@ public class AdventureSettingsPacket extends DataPacket {
         return (this.flags & flag) != 0;
     }
 
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
+    }
+
     public void setFlag(int flag, boolean value) {
         boolean flags = (flag & BITFLAG_SECOND_SET) != 0;
 
@@ -100,10 +105,5 @@ public class AdventureSettingsPacket extends DataPacket {
                 this.flags &= ~flag;
             }
         }
-    }
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
     }
 }

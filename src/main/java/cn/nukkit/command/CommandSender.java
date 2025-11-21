@@ -18,31 +18,6 @@ import cn.nukkit.permission.Permissible;
 public interface CommandSender extends Permissible {
 
     /**
-     * 给命令发送者返回信息。<br>
-     * Sends a message to the command sender.
-     *
-     * @param message 要发送的信息。<br>Message to send.
-     * @see cn.nukkit.utils.TextFormat
-     */
-    void sendMessage(String message);
-
-    /**
-     * 给命令发送者返回信息。<br>
-     * Sends a message to the command sender.
-     *
-     * @param message 要发送的信息。<br>Message to send.
-     */
-    void sendMessage(TextContainer message);
-
-    /**
-     * 返回命令发送者所在的服务器。<br>
-     * Returns the server of the command sender.
-     *
-     * @return 命令发送者所在的服务器。<br>the server of the command sender.
-     */
-    Server getServer();
-
-    /**
      * 返回命令发送者的名称。<br>
      * Returns the name of the command sender.
      * <p>
@@ -61,5 +36,30 @@ public interface CommandSender extends Permissible {
      */
     String getName();
 
+    /**
+     * 返回命令发送者所在的服务器。<br>
+     * Returns the server of the command sender.
+     *
+     * @return 命令发送者所在的服务器。<br>the server of the command sender.
+     */
+    Server getServer();
+
     boolean isPlayer();
+
+    /**
+     * 给命令发送者返回信息。<br>
+     * Sends a message to the command sender.
+     *
+     * @param message 要发送的信息。<br>Message to send.
+     */
+    void sendMessage(TextContainer message);
+
+    /**
+     * 给命令发送者返回信息。<br>
+     * Sends a message to the command sender.
+     *
+     * @param message 要发送的信息。<br>Message to send.
+     * @see cn.nukkit.utils.TextFormat
+     */
+    void sendMessage(String message);
 }

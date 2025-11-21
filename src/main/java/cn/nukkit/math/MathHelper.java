@@ -14,24 +14,37 @@ public class MathHelper {
     private MathHelper() {
     }
 
-    public static float sqrt(float paramFloat) {
-        return (float) Math.sqrt(paramFloat);
+    public static int abs(int number) {
+        if (number > 0) {
+            return number;
+        } else {
+            return -number;
+        }
     }
 
-    public static float sin(float paramFloat) {
-        return a[((int) (paramFloat * 10430.378F) & 0xFFFF)];
+    public static int ceil(float floatNumber) {
+        int truncated = (int) floatNumber;
+        return floatNumber > truncated ? truncated + 1 : truncated;
+    }
+
+    public static int clamp(int check, int min, int max) {
+        return check > max ? max : (check < min ? min : check);
     }
 
     public static float cos(float paramFloat) {
         return a[((int) (paramFloat * 10430.378F + 16384.0F) & 0xFFFF)];
     }
 
-    public static float sin(double paramFloat) {
-        return a[((int) (paramFloat * 10430.378F) & 0xFFFF)];
-    }
-
     public static float cos(double paramFloat) {
         return a[((int) (paramFloat * 10430.378F + 16384.0F) & 0xFFFF)];
+    }
+
+    public static double denormalizeClamp(double lowerBnd, double upperBnd, double slide) {
+        return slide < 0.0D ? lowerBnd : (slide > 1.0D ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide);
+    }
+
+    public static float denormalizeClamp(float lowerBnd, float upperBnd, float slide) {
+        return slide < 0.0f ? lowerBnd : (slide > 1.0f ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide);
     }
 
     public static int floor(double d0) {
@@ -50,18 +63,6 @@ public class MathHelper {
         return f >= i ? i : i - 1;
     }
 
-    public static int abs(int number) {
-        if (number > 0) {
-            return number;
-        } else {
-            return -number;
-        }
-    }
-
-    public static int log2(int bits) {
-        return Integer.SIZE - Integer.numberOfLeadingZeros(bits);
-    }
-
     /**
      * Returns a random number between min and max, inclusive.
      *
@@ -74,6 +75,10 @@ public class MathHelper {
         return min + random.nextInt(max - min + 1);
     }
 
+    public static int log2(int bits) {
+        return Integer.SIZE - Integer.numberOfLeadingZeros(bits);
+    }
+
     public static double max(double first, double second, double third, double fourth) {
         if (first > second && first > third && first > fourth) {
             return first;
@@ -84,20 +89,15 @@ public class MathHelper {
         return Math.max(third, fourth);
     }
 
-    public static int ceil(float floatNumber) {
-        int truncated = (int) floatNumber;
-        return floatNumber > truncated ? truncated + 1 : truncated;
+    public static float sin(float paramFloat) {
+        return a[((int) (paramFloat * 10430.378F) & 0xFFFF)];
     }
 
-    public static int clamp(int check, int min, int max) {
-        return check > max ? max : (check < min ? min : check);
+    public static float sin(double paramFloat) {
+        return a[((int) (paramFloat * 10430.378F) & 0xFFFF)];
     }
 
-    public static double denormalizeClamp(double lowerBnd, double upperBnd, double slide) {
-        return slide < 0.0D ? lowerBnd : (slide > 1.0D ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide);
-    }
-
-    public static float denormalizeClamp(float lowerBnd, float upperBnd, float slide) {
-        return slide < 0.0f ? lowerBnd : (slide > 1.0f ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide);
+    public static float sqrt(float paramFloat) {
+        return (float) Math.sqrt(paramFloat);
     }
 }

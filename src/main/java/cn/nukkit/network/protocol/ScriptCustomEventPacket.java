@@ -2,7 +2,6 @@ package cn.nukkit.network.protocol;
 
 import lombok.ToString;
 
-@Deprecated
 @ToString
 public class ScriptCustomEventPacket extends DataPacket {
 
@@ -10,11 +9,6 @@ public class ScriptCustomEventPacket extends DataPacket {
 
     public String eventName;
     public byte[] eventData;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
 
     @Override
     public void decode() {
@@ -27,5 +21,10 @@ public class ScriptCustomEventPacket extends DataPacket {
         this.reset();
         this.putString(this.eventName);
         this.putByteArray(this.eventData);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

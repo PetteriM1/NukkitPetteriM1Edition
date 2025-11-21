@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTilesDeepslate extends BlockSolid {
 
@@ -10,13 +12,18 @@ public class BlockTilesDeepslate extends BlockSolid {
     }
 
     @Override
-    public int getId() {
-        return DEEPSLATE_TILES;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Deepslate Tiles";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
     }
 
     @Override
@@ -25,18 +32,23 @@ public class BlockTilesDeepslate extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return DEEPSLATE_TILES;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Deepslate Tiles";
+    }
+
+    @Override
     public double getResistance() {
         return 6;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -44,9 +56,8 @@ public class BlockTilesDeepslate extends BlockSolid {
         return ItemTool.TIER_WOODEN;
     }
 
-
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

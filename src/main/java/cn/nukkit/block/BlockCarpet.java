@@ -26,23 +26,8 @@ public class BlockCarpet extends BlockFlowable {
     }
 
     @Override
-    public int getId() {
-        return CARPET;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.5;
-    }
-
-    @Override
-    public boolean isSolid() {
+    public boolean breakWhenPushed() {
         return true;
-    }
-
-    @Override
-    public String getName() {
-        return DyeColor.getByWoolData(getDamage()).getName() + " Carpet";
     }
 
     @Override
@@ -51,18 +36,42 @@ public class BlockCarpet extends BlockFlowable {
     }
 
     @Override
+    public BlockColor getColor() {
+        return DyeColor.getByWoolData(getDamage()).getColor();
+    }
+
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(getDamage());
+    }
+
+    @Override
+    public int getId() {
+        return CARPET;
+    }
+
+    @Override
     public double getMaxY() {
         return this.y + 0.0625;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        if (down.getId() != Item.AIR) {
-            this.getLevel().setBlock(this, this, true, true);
-            return true;
-        }
-        return false;
+    public String getName() {
+        return DyeColor.getByWoolData(getDamage()).getName() + " Carpet";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return true;
     }
 
     @Override
@@ -79,21 +88,12 @@ public class BlockCarpet extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return DyeColor.getByWoolData(getDamage()).getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(getDamage());
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        if (down.getId() != Item.AIR) {
+            this.getLevel().setBlock(this, this, true, true);
+            return true;
+        }
+        return false;
     }
 }

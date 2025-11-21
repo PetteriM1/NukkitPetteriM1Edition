@@ -13,8 +13,8 @@ public class BlockWoodStrippedJungle extends BlockWoodStripped {
     }
 
     @Override
-    public String getName() {
-        return "Stripped Jungle Log";
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockWoodStrippedJungle extends BlockWoodStripped {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
+    public String getName() {
+        return "Stripped Jungle Log";
     }
 }

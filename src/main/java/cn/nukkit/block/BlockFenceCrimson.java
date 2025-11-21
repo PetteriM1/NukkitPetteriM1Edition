@@ -2,6 +2,8 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockFenceCrimson extends BlockFence {
 
@@ -14,13 +16,13 @@ public class BlockFenceCrimson extends BlockFence {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Fence";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.FENCE;
     }
 
     @Override
-    public int getId() {
-        return CRIMSON_FENCE;
+    public int getBurnAbility() {
+        return 0;
     }
 
     @Override
@@ -29,8 +31,18 @@ public class BlockFenceCrimson extends BlockFence {
     }
 
     @Override
-    public int getBurnAbility() {
-        return 0;
+    public int getId() {
+        return CRIMSON_FENCE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Crimson Fence";
     }
 
     @Override

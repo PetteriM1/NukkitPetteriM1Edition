@@ -11,41 +11,41 @@ import java.util.UUID;
  */
 public interface LoginChainData {
 
-    String getUsername();
-
-    UUID getClientUUID();
-
-    String getIdentityPublicKey();
+    String getCapeData();
 
     long getClientId();
 
-    String getServerAddress();
-
-    String getDeviceModel();
-
-    int getDeviceOS();
-
-    String getDeviceId();
-
-    String getGameVersion();
-
-    int getGuiScale();
-
-    String getLanguageCode();
-
-    String getXUID();
-
-    boolean isXboxAuthed();
+    UUID getClientUUID();
 
     int getCurrentInputMode();
 
     int getDefaultInputMode();
 
-    String getCapeData();
+    String getDeviceId();
 
-    int getUIProfile();
+    String getDeviceModel();
+
+    int getDeviceOS();
+
+    String getGameVersion();
+
+    int getGuiScale();
+
+    String getIdentityPublicKey();
+
+    String getLanguageCode();
 
     JsonObject getRawData();
 
+    String getServerAddress();
+
     String getTitleId();
+
+    int getUIProfile();
+
+    String getUsername();
+
+    String getXUID();
+
+    boolean isXboxAuthed();
 }

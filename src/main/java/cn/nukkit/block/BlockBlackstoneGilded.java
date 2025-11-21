@@ -11,18 +11,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockBlackstoneGilded extends BlockSolid {
 
     @Override
-    public int getId() {
-        return GILDED_BLACKSTONE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Gilded Blackstone";
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override
@@ -54,25 +54,10 @@ public class BlockBlackstoneGilded extends BlockSolid {
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
         if (dropOdds > 1 && random.nextInt(dropOdds) != 0) {
-            return new Item[] { toItem() };
+            return new Item[]{toItem()};
         }
 
-        return new Item[] { Item.get(ItemID.GOLD_NUGGET, 0, random.nextInt(2, 6)) };
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+        return new Item[]{Item.get(ItemID.GOLD_NUGGET, 0, random.nextInt(2, 6))};
     }
 
     @Override
@@ -81,7 +66,22 @@ public class BlockBlackstoneGilded extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return GILDED_BLACKSTONE;
+    }
+
+    @Override
+    public String getName() {
+        return "Gilded Blackstone";
+    }
+
+    @Override
     public double getResistance() {
         return 6;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

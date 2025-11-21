@@ -6,8 +6,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockHoneycombBlock extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Honeycomb Block";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.6;
     }
 
     @Override
@@ -16,13 +21,8 @@ public class BlockHoneycombBlock extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.6;
+    public String getName() {
+        return "Honeycomb Block";
     }
 
     @Override

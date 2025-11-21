@@ -22,6 +22,19 @@ public class BlockStemMelon extends BlockCrops {
     }
 
     @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (this.getDamage() < 4) return new Item[0];
+        return new Item[]{
+                Item.get(Item.MELON_SEEDS, 0, Utils.rand(0, 48) >> 4)
+        };
+    }
+
+    @Override
     public int getId() {
         return MELON_STEM;
     }
@@ -75,18 +88,5 @@ public class BlockStemMelon extends BlockCrops {
     @Override
     public Item toItem() {
         return Item.get(Item.MELON_SEEDS);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (this.getDamage() < 4) return new Item[0];
-        return new Item[]{
-                Item.get(Item.MELON_SEEDS, 0, Utils.rand(0, 48) >> 4)
-        };
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

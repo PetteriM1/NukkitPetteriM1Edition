@@ -11,12 +11,12 @@ public class BlockStairsAndesitePolished extends BlockStairsAndesite {
     }
 
     @Override
-    public String getName() {
-        return "Polished Andesite Stairs";
+    public int getId() {
+        return POLISHED_ANDESITE_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return POLISHED_ANDESITE_STAIRS;
+    public String getName() {
+        return "Polished Andesite Stairs";
     }
 }

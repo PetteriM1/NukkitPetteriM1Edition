@@ -8,11 +8,6 @@ public class SetLastHurtByPacket extends DataPacket {
     public static final byte NETWORK_ID = ProtocolInfo.SET_LAST_HURT_BY_PACKET;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -20,5 +15,10 @@ public class SetLastHurtByPacket extends DataPacket {
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

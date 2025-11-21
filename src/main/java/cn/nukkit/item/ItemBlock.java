@@ -25,27 +25,13 @@ public class ItemBlock extends Item {
     }
 
     public ItemBlock(Block block, Integer meta, int count) {
-        super(block.getItemId(), meta, count, block.getName());
+        super(block.getItemId(), meta, count, null);
         this.block = block;
     }
 
     public ItemBlock(Block block, int meta, int count) {
-        super(block.getItemId(), meta, count, block.getName());
+        super(block.getItemId(), meta, count, null);
         this.block = block;
-    }
-
-    public void setDamage(Integer meta) {
-        if (meta != null) {
-            this.meta = meta & 0xffff;
-        } else {
-            this.hasMeta = false;
-        }
-
-        if (this.block instanceof BlockStorageContainer) {
-            ((BlockStorageContainer) this.block).setStorageFromItem(meta == null ? 0 : meta);
-        } else {
-            this.block.setDamage(meta);
-        }
     }
 
     @Override
@@ -55,6 +41,7 @@ public class ItemBlock extends Item {
         return block;
     }
 
+    @Override
     public Block getBlock() {
         return this.block.clone();
     }
@@ -76,6 +63,26 @@ public class ItemBlock extends Item {
     @Override
     final public String getName() {
         return this.hasCustomName() ? this.getCustomName() : this.block.getName();
+    }
+
+    @Override
+    public boolean isSupportedOn(int protocol) {
+        return this.id >= 0 || (protocol >= this.block.getMinimumVersion() && super.isSupportedOn(protocol));
+    }
+
+    @Override
+    public void setDamage(Integer meta) {
+        if (meta != null) {
+            this.meta = meta & 0xffff;
+        } else {
+            this.hasMeta = false;
+        }
+
+        if (this.block instanceof BlockStorageContainer) {
+            ((BlockStorageContainer) this.block).setStorageFromItem(meta == null ? 0 : meta);
+        } else {
+            this.block.setDamage(meta);
+        }
     }
 
     @Override

@@ -12,11 +12,6 @@ public class NetworkChunkPublisherUpdatePacket extends DataPacket {
     public int radius;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -26,6 +21,13 @@ public class NetworkChunkPublisherUpdatePacket extends DataPacket {
         this.reset();
         this.putSignedBlockPosition(position);
         this.putUnsignedVarInt(radius);
-        this.putInt(0); // Saved chunks
+        if (protocol >= ProtocolInfo.v1_19_20) {
+            this.putInt(0); // Saved chunks
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

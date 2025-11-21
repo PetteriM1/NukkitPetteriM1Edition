@@ -2,7 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSlabMangrove extends BlockSlabWood {
 
@@ -15,13 +17,13 @@ public class BlockSlabMangrove extends BlockSlabWood {
     }
 
     @Override
-    public String getName() {
-        return "Mangrove Slab";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.WOODEN_SLABS;
     }
 
     @Override
-    public int getId() {
-        return MANGROVE_SLAB;
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
@@ -32,8 +34,18 @@ public class BlockSlabMangrove extends BlockSlabWood {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public int getId() {
+        return MANGROVE_SLAB;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mangrove Slab";
     }
 
     @Override
@@ -47,7 +59,7 @@ public class BlockSlabMangrove extends BlockSlabWood {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

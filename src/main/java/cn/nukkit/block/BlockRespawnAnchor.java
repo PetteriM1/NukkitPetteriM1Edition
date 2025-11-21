@@ -9,6 +9,8 @@ import cn.nukkit.level.GameRule;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockRespawnAnchor extends BlockSolidMeta {
 
@@ -21,23 +23,39 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return RESPAWN_ANCHOR;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
-    public double getHardness() {
-        return 50;
+    public boolean canBePushed() {
+        return false;
     }
 
     @Override
-    public double getResistance() {
-        return 1200;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.OBSIDIAN;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        switch (this.getDamage()) {
+            case 1:
+                return 3;
+            case 2:
+                return 7;
+            case 3:
+                return 11;
+            case 4:
+                return 15;
+            default:
+                return 0;
+        }
     }
 
     @Override
@@ -49,6 +67,16 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
         } else {
             return new Item[0];
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 50;
+    }
+
+    @Override
+    public int getId() {
+        return RESPAWN_ANCHOR;
     }
 
     @Override
@@ -66,13 +94,18 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
     public String getName() {
         return "Respawn Anchor";
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getResistance() {
+        return 1200;
     }
 
     @Override
@@ -81,12 +114,7 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
     }
 
     @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canBeActivated() {
+    public boolean hasComparatorInputOverride() {
         return true;
     }
 
@@ -117,7 +145,7 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
             return true;
         }
 
-        if (player != null && chargeLevel > 0 && this.level.getDimension() == Level.DIMENSION_NETHER) {
+        if (level.getServer().bedSpawnpoints && player != null && chargeLevel > 0 && this.level.getDimension() == Level.DIMENSION_NETHER) {
             if (player.distanceSquared(this) > 36) {
                 return false;
             }
@@ -138,9 +166,9 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
     public boolean onBreak(Item item) {
         boolean r = super.onBreak(item);
         if (r) {
-            if (level.getDimension() == Level.DIMENSION_NETHER) {
+            if (level.getServer().bedSpawnpoints && level.getDimension() == Level.DIMENSION_NETHER) {
                 Vector3 safeSpawn = null;
-                for (Player player : level.getServer().getOnlinePlayers().values()) {
+                for (Player player : level.getServer().getOnlinePlayersList()) {
                     if (this.equals(player.getSpawnPosition())) {
                         player.setSpawn(safeSpawn == null ? (safeSpawn = level.getServer().getDefaultLevel().getSafeSpawn()) : safeSpawn);
                     }
@@ -151,23 +179,7 @@ public class BlockRespawnAnchor extends BlockSolidMeta {
     }
 
     @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public int getComparatorInputOverride() {
-        switch (this.getDamage()) {
-            case 1:
-                return 3;
-            case 2:
-                return 7;
-            case 3:
-                return 11;
-            case 4:
-                return 15;
-            default:
-                return 0;
-        }
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

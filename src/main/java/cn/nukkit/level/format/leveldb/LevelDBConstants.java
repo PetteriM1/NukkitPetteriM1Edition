@@ -1,8 +1,10 @@
 package cn.nukkit.level.format.leveldb;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+
 public class LevelDBConstants {
     // This is protocol version if block palette used in storage
-    public static final int PALETTE_VERSION = 729;
+    public static final int PALETTE_VERSION = ProtocolInfo.v1_21_30;
     // By combining this versions we can get block state version
     public static final int STATE_MAYOR_VERSION = 1;
     public static final int STATE_MINOR_VERSION = 21;

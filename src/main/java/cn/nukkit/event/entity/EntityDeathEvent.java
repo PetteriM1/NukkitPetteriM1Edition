@@ -10,11 +10,6 @@ import cn.nukkit.item.Item;
  */
 public class EntityDeathEvent extends EntityEvent {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Item[] drops;
 
     public EntityDeathEvent(EntityLiving entity) {
@@ -36,5 +31,9 @@ public class EntityDeathEvent extends EntityEvent {
         }
 
         this.drops = drops;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

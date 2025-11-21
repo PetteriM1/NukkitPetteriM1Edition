@@ -8,17 +8,17 @@ import java.util.List;
  */
 public interface CommandMap {
 
-    void registerAll(String fallbackPrefix, List<? extends Command> commands);
-
-    boolean register(String fallbackPrefix, Command command);
-
-    boolean register(String fallbackPrefix, Command command, String label);
-
-    void registerSimpleCommands(Object object);
+    void clearCommands();
 
     boolean dispatch(CommandSender sender, String cmdLine);
 
-    void clearCommands();
-
     Command getCommand(String name);
+
+    boolean register(String fallbackPrefix, Command command, String label);
+
+    boolean register(String fallbackPrefix, Command command);
+
+    void registerAll(String fallbackPrefix, List<? extends Command> commands);
+
+    void registerSimpleCommands(Object object);
 }

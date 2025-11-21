@@ -15,8 +15,8 @@ public class EnchantmentDurability extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 5 + ((level - 1) << 3);
+    public boolean canEnchant(Item item) {
+        return item.getMaxDurability() >= 0 || super.canEnchant(item);
     }
 
     @Override
@@ -30,8 +30,8 @@ public class EnchantmentDurability extends Enchantment {
     }
 
     @Override
-    public boolean canEnchant(Item item) {
-        return item.getMaxDurability() >= 0 || super.canEnchant(item);
+    public int getMinEnchantAbility(int level) {
+        return 5 + ((level - 1) << 3);
     }
 
     public static boolean negateDamage(Item item, int level, Random random) {

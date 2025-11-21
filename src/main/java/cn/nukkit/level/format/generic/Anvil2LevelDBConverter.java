@@ -1,6 +1,8 @@
 package cn.nukkit.level.format.generic;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockLayer;
 import cn.nukkit.level.DimensionData;
 import cn.nukkit.level.DimensionEnum;
 import cn.nukkit.level.Level;
@@ -33,6 +35,9 @@ import java.util.regex.Pattern;
 
 public class Anvil2LevelDBConverter {
 
+    // TODO: Running the converter on multiple threads causes issues with adding and removing entities and block entities on the Level
+    private static final int EXECUTORS_COUNT = 1;
+
     private final Level sourceLevel;
     private final Level targetLevel;
     private final ExecutorService executor;
@@ -58,10 +63,28 @@ public class Anvil2LevelDBConverter {
         this.targetLevel.setAutoSave(false);
         this.targetLevel.isBeingConverted = true;
 
-        // DO NOT INCREASE THREAD COUNT
-        this.executor = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
+        this.executor = Executors.newFixedThreadPool(EXECUTORS_COUNT, new ThreadFactoryBuilder()
                 .setNameFormat("Converted Thread " + sourceLevel.getFolderName() + " - %s")
                 .build());
+    }
+
+    @ToString
+    @RequiredArgsConstructor
+    private static class RegionPosition {
+        private static final Pattern PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
+
+        private final int x;
+        private final int z;
+
+        static RegionPosition fromPath(Path regionPath) {
+            Matcher matcher = PATTERN.matcher(regionPath.getFileName().toString());
+            if (!matcher.matches()) {
+                return null;
+            }
+            int x = Integer.parseInt(matcher.group(1));
+            int z = Integer.parseInt(matcher.group(2));
+            return new RegionPosition(x, z);
+        }
     }
 
     public CompletableFuture<Void> convert() {
@@ -74,70 +97,38 @@ public class Anvil2LevelDBConverter {
         }
     }
 
-    private CompletableFuture<Void> convertUnsafe() throws IOException {
-        Anvil anvil = (Anvil) this.sourceLevel.getProvider();
-        LevelDBProvider levelDBProvider = (LevelDBProvider) this.targetLevel.getProvider();
+    private static void convertChunk(BaseFullChunk oldChunk, LevelDBChunk newChunk, LevelDBProvider levelDBProvider, Anvil anvil, int maxY) {
+        oldChunk.initChunk();
+        newChunk.setGenerated(true);
+        newChunk.setPopulated(oldChunk.isPopulated());
 
-        Server server = this.sourceLevel.getServer();
-        server.getLogger().info("Converting level " + this.targetLevel.getFolderName());
+        newChunk.setBiomeIdArray(oldChunk.getBiomeIdArray());
 
-        // Clone level data
-        CompoundTag levelData = anvil.getLevelData().clone();
-        levelData.putString("generatorName", this.sourceLevel.getGenerator().getName());
-        levelData.remove("GameRules");
-        levelDBProvider.setLevelData(levelData, this.sourceLevel.getGameRules());
-        levelDBProvider.saveLevelData();
+        newChunk.heightMap = Arrays.copyOf(oldChunk.getHeightMapArray(), oldChunk.getHeightMapArray().length);
+        newChunk.tiles = oldChunk.getBlockEntities();
+        newChunk.entities = oldChunk.getEntities();
+        newChunk.tileList = oldChunk.tileList;
 
-        boolean nether = this.sourceLevel.getDimension() == Level.DIMENSION_NETHER;
-        DimensionData dimensionData = DimensionEnum.getDataFromId(this.sourceLevel.getDimension());
-        if (dimensionData == null) {
-            server.getLogger().warning("Invalid DimensionData, using OVERWORLD");
-            dimensionData = DimensionEnum.OVERWORLD.getDimensionData();
-        }
-        this.targetLevel.setDimensionData(dimensionData);
+        for (int blockX = 0; blockX < 16; blockX++) {
+            for (int blockY = 0; blockY < maxY; blockY++) {
+                for (int blockZ = 0; blockZ < 16; blockZ++) {
+                    int fullId = oldChunk.getFullBlock(blockX, blockY, blockZ);
+                    newChunk.setFullBlockId(blockX, blockY, blockZ, fullId);
 
-        List<Path> regions = new ObjectArrayList<>();
-        Path regionFolder = Paths.get("worlds/" + this.sourceLevel.getFolderName() + "/region");
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(regionFolder, "**.mca")) {
-            for (Path path : stream) {
-                regions.add(path);
+                    // Convert fake waterlogged blocks
+                    int id = fullId >> Block.DATA_BITS;
+                    if (id == Block.SEAGRASS || id == Block.BLOCK_KELP || id == Block.BUBBLE_COLUMN) {
+                        newChunk.setFullBlockId(blockX, blockY, blockZ, BlockLayer.WATERLOGGED, Block.STILL_WATER << Block.DATA_BITS);
+                    }
+
+                    newChunk.setBlockLight(blockX, blockY, blockZ, oldChunk.getBlockSkyLight(blockX, blockY, blockZ));
+                }
             }
         }
 
-        AtomicInteger regionCounter = new AtomicInteger();
-        AtomicInteger chunksConverted = new AtomicInteger();
-        AtomicInteger chunksConvertedPerSecond = new AtomicInteger();
-
-        TaskHandler tickFuture = server.getScheduler().scheduleRepeatingTask(null, () ->
-                chunksConvertedPerSecond.set(0), 20);
-
-        IntConsumer callback = chunksCount -> {
-            chunksConverted.addAndGet(chunksCount);
-            int regionNumber = regionCounter.incrementAndGet();
-
-            int chps = chunksConvertedPerSecond.addAndGet(chunksCount);
-            String message = "[Convert-%s] [%s/%s] [%s chps] Converted %s chunks";
-            server.getLogger().info(String.format(message, this.sourceLevel.getFolderName(), regionNumber, regions.size(), chps, chunksCount));
-        };
-
-        List<CompletableFuture<Void>> futures = new ObjectArrayList<>();
-        for (Path regionPath : regions) {
-            CompletableFuture<Void> future = new CompletableFuture<>();
-            this.executor.execute(() -> {
-                convertRegion(regionPath, anvil, levelDBProvider, callback, nether ? 128 : 256);
-                future.complete(null);
-            });
-            futures.add(future);
-        }
-
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).whenCompleteAsync((v, error) -> {
-            server.getScheduler().cancelTask(tickFuture.getTaskId());
-            if (error != null) {
-                server.getLogger().error("Failed to convert level " + this.sourceLevel.getFolderName(), error);
-            } else {
-                this.convertFinished();
-            }
-        }, task -> server.getScheduler().scheduleTask(null, task));
+        levelDBProvider.saveChunkSync(newChunk.getX(), newChunk.getZ(), newChunk);
+        levelDBProvider.unloadChunk(newChunk.getX(), newChunk.getZ(), false);
+        anvil.unloadChunk(oldChunk.getX(), oldChunk.getZ(), false);
     }
 
     private void convertFinished() {
@@ -183,31 +174,70 @@ public class Anvil2LevelDBConverter {
         }
     }
 
-    private static void convertChunk(BaseFullChunk oldChunk, LevelDBChunk newChunk, LevelDBProvider levelDBProvider, Anvil anvil, int maxY) {
-        oldChunk.initChunk();
-        newChunk.setGenerated(true);
-        newChunk.setPopulated(oldChunk.isPopulated());
+    private CompletableFuture<Void> convertUnsafe() throws IOException {
+        Anvil anvil = (Anvil) this.sourceLevel.getProvider();
+        LevelDBProvider levelDBProvider = (LevelDBProvider) this.targetLevel.getProvider();
 
-        newChunk.setBiomeIdArray(oldChunk.getBiomeIdArray());
+        Server server = this.sourceLevel.getServer();
+        server.getLogger().info("Converting level " + this.targetLevel.getFolderName());
 
-        newChunk.heightMap = Arrays.copyOf(oldChunk.getHeightMapArray(), oldChunk.getHeightMapArray().length);
-        newChunk.tiles = oldChunk.getBlockEntities();
-        newChunk.entities = oldChunk.getEntities();
-        newChunk.tileList = oldChunk.tileList;
+        // Clone level data
+        CompoundTag levelData = anvil.getLevelData().clone();
+        levelData.putString("generatorName", this.sourceLevel.getGenerator().getName());
+        levelData.remove("GameRules");
+        levelDBProvider.setLevelData(levelData, this.sourceLevel.getGameRules());
+        levelDBProvider.saveLevelData();
 
-        for (int blockX = 0; blockX < 16; blockX++) {
-            for (int blockY = 0; blockY < maxY; blockY++) {
-                for (int blockZ = 0; blockZ < 16; blockZ++) {
-                    int fullId = oldChunk.getFullBlock(blockX, blockY, blockZ);
-                    newChunk.setFullBlockId(blockX, blockY, blockZ, fullId);
-                    newChunk.setBlockLight(blockX, blockY, blockZ, oldChunk.getBlockSkyLight(blockX, blockY, blockZ));
-                }
+        boolean nether = this.sourceLevel.getDimension() == Level.DIMENSION_NETHER;
+        DimensionData dimensionData = DimensionEnum.getDataFromId(this.sourceLevel.getDimension());
+        if (dimensionData == null) {
+            server.getLogger().warning("Invalid DimensionData, using OVERWORLD");
+            dimensionData = DimensionEnum.OVERWORLD.getDimensionData();
+        }
+        this.targetLevel.setDimensionData(dimensionData);
+
+        List<Path> regions = new ObjectArrayList<>();
+        Path regionFolder = Paths.get("worlds/" + this.sourceLevel.getFolderName() + "/region");
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(regionFolder, "**.mca")) {
+            for (Path path : stream) {
+                regions.add(path);
             }
         }
 
-        levelDBProvider.saveChunkSync(newChunk.getX(), newChunk.getZ(), newChunk);
-        levelDBProvider.unloadChunk(newChunk.getX(), newChunk.getZ(), false);
-        anvil.unloadChunk(oldChunk.getX(), oldChunk.getZ(), false);
+        AtomicInteger regionCounter = new AtomicInteger();
+        AtomicInteger chunksConverted = new AtomicInteger();
+        AtomicInteger chunksConvertedPerSecond = new AtomicInteger();
+
+        TaskHandler tickFuture = server.getScheduler().scheduleRepeatingTask(() ->
+                chunksConvertedPerSecond.set(0), 20);
+
+        IntConsumer callback = chunksCount -> {
+            chunksConverted.addAndGet(chunksCount);
+            int regionNumber = regionCounter.incrementAndGet();
+
+            int chps = chunksConvertedPerSecond.addAndGet(chunksCount);
+            String message = "[Convert-%s] [%s/%s] [%s chps] Converted %s chunks";
+            server.getLogger().info(String.format(message, this.sourceLevel.getFolderName(), regionNumber, regions.size(), chps, chunksCount));
+        };
+
+        List<CompletableFuture<Void>> futures = new ObjectArrayList<>();
+        for (Path regionPath : regions) {
+            CompletableFuture<Void> future = new CompletableFuture<>();
+            this.executor.execute(() -> {
+                convertRegion(regionPath, anvil, levelDBProvider, callback, nether ? 128 : 256);
+                future.complete(null);
+            });
+            futures.add(future);
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).whenCompleteAsync((v, error) -> {
+            server.getScheduler().cancelTask(tickFuture.getTaskId());
+            if (error != null) {
+                server.getLogger().error("Failed to convert level " + this.sourceLevel.getFolderName(), error);
+            } else {
+                this.convertFinished();
+            }
+        }, server.getScheduler()::scheduleTask);
     }
 
     protected static int getRegionIndexX(int chunkX) {
@@ -216,24 +246,5 @@ public class Anvil2LevelDBConverter {
 
     protected static int getRegionIndexZ(int chunkZ) {
         return chunkZ >> 5;
-    }
-
-    @ToString
-    @RequiredArgsConstructor
-    private static class RegionPosition {
-        private static final Pattern PATTERN = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-
-        private final int x;
-        private final int z;
-
-        static RegionPosition fromPath(Path regionPath) {
-            Matcher matcher = PATTERN.matcher(regionPath.getFileName().toString());
-            if (!matcher.matches()) {
-                return null;
-            }
-            int x = Integer.parseInt(matcher.group(1));
-            int z = Integer.parseInt(matcher.group(2));
-            return new RegionPosition(x, z);
-        }
     }
 }

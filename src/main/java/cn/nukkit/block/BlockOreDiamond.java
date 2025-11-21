@@ -15,13 +15,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreDiamond extends BlockOre {
 
     @Override
-    public int getId() {
-        return DIAMOND_ORE;
-    }
-
-    @Override
-    public String getName() {
-        return "Diamond Ore";
+    public int getDropExp() {
+        return Utils.rand(3, 7);
     }
 
     @Override
@@ -52,13 +47,18 @@ public class BlockOreDiamond extends BlockOre {
     }
 
     @Override
-    protected int getRawMaterial() {
-        return ItemID.DIAMOND;
+    public int getId() {
+        return DIAMOND_ORE;
     }
 
     @Override
-    public int getDropExp() {
-        return Utils.rand(3, 7);
+    public String getName() {
+        return "Diamond Ore";
+    }
+
+    @Override
+    protected int getRawMaterial() {
+        return ItemID.DIAMOND;
     }
 
     @Override

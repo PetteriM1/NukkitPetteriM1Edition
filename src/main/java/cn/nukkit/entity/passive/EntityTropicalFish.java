@@ -18,6 +18,36 @@ public class EntityTropicalFish extends EntityFish {
     }
 
     @Override
+    protected int getBucketMeta() {
+        return 4;
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.CLOWNFISH, 0, 1), Item.get(Item.BONE, 0, Utils.rand(0, 2))};
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.4f;
+    }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Tropical Fish";
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.5f;
+    }
+
+    @Override
     protected void initEntity() {
         this.setMaxHealth(3);
         super.initEntity();
@@ -53,35 +83,5 @@ public class EntityTropicalFish extends EntityFish {
         this.namedTag.putInt("VariantA", this.variantA);
         this.namedTag.putInt("VariantB", this.variantB);
         this.namedTag.putInt("Color", this.color);
-    }
-
-    @Override
-    protected int getBucketMeta() {
-        return 4;
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.5f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0.4f;
-    }
-
-    @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.CLOWNFISH, 0, 1), Item.get(Item.BONE, 0, Utils.rand(0, 2))};
-    }
-
-    @Override
-    public String getName() {
-        return this.hasCustomName() ? this.getNameTag() : "Tropical Fish";
     }
 }

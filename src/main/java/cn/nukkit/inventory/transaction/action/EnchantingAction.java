@@ -16,21 +16,21 @@ public class EnchantingAction extends InventoryAction {
     }
 
     @Override
-    public boolean isValid(Player source) {
-        return source.getWindowById(Player.ENCHANT_WINDOW_ID) instanceof EnchantInventory;
-    }
-
-    @Override
     public boolean execute(Player source) {
         return true;
     }
 
     @Override
-    public void onExecuteSuccess(Player source) {
+    public boolean isValid(Player source) {
+        return source.getWindowById(Player.ENCHANT_WINDOW_ID) instanceof EnchantInventory;
     }
 
     @Override
     public void onExecuteFail(Player source) {
 
+    }
+
+    @Override
+    public void onExecuteSuccess(Player source) {
     }
 }

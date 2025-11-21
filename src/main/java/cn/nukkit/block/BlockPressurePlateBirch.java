@@ -13,8 +13,8 @@ public class BlockPressurePlateBirch extends BlockPressurePlateWood {
     }
 
     @Override
-    public String getName() {
-        return "Birch Pressure Plate";
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockPressurePlateBirch extends BlockPressurePlateWood {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
+    public String getName() {
+        return "Birch Pressure Plate";
     }
 }

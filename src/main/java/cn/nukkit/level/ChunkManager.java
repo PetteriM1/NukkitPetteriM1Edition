@@ -10,11 +10,45 @@ import cn.nukkit.level.format.generic.BaseFullChunk;
  */
 public interface ChunkManager {
 
+    default int getBlockDataAt(int x, int y, int z) {
+        return this.getBlockDataAt(x, y, z, Block.LAYER_NORMAL);
+    }
+
+    int getBlockDataAt(int x, int y, int z, BlockLayer layer);
+
     default int getBlockIdAt(int x, int y, int z) {
         return this.getBlockIdAt(x, y, z, Block.LAYER_NORMAL);
     }
 
     int getBlockIdAt(int x, int y, int z, BlockLayer layer);
+
+    BaseFullChunk getChunk(int chunkX, int chunkZ);
+
+    default int getMaxBlockY() {
+        return 255;
+    }
+
+    default int getMinBlockY() {
+        return 0;
+    }
+
+    long getSeed();
+
+    default void setBlockAt(int x, int y, int z, int id) {
+        setBlockAt(x, y, z, id, 0);
+    }
+
+    void setBlockAt(int x, int y, int z, int id, int data);
+
+    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id);
+
+    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data);
+
+    default void setBlockDataAt(int x, int y, int z, int data) {
+        this.setBlockDataAt(x, y, z, Block.LAYER_NORMAL, data);
+    }
+
+    void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data);
 
     default void setBlockFullIdAt(int x, int y, int z, int fullId) {
         this.setBlockFullIdAt(x, y, z, Block.LAYER_NORMAL, fullId);
@@ -28,40 +62,7 @@ public interface ChunkManager {
 
     void setBlockIdAt(int x, int y, int z, BlockLayer layer, int id);
 
-    default void setBlockAt(int x, int y, int z, int id) {
-        setBlockAt(x, y, z, id, 0);
-    }
-
-    void setBlockAt(int x, int y, int z, int id, int data);
-
-    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id);
-    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data);
-
-    default int getBlockDataAt(int x, int y, int z) {
-        return this.getBlockDataAt(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getBlockDataAt(int x, int y, int z, BlockLayer layer);
-
-    default void setBlockDataAt(int x, int y, int z, int data) {
-        this.setBlockDataAt(x, y, z, Block.LAYER_NORMAL, data);
-    }
-
-    void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data);
-
-    BaseFullChunk getChunk(int chunkX, int chunkZ);
-
     void setChunk(int chunkX, int chunkZ);
 
     void setChunk(int chunkX, int chunkZ, BaseFullChunk chunk);
-
-    long getSeed();
-
-    default int getMinBlockY() {
-        return 0;
-    }
-
-    default int getMaxBlockY() {
-        return 255;
-    }
 }

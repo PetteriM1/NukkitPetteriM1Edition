@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityChest;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityPiglin;
 import cn.nukkit.inventory.ContainerInventory;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
@@ -37,6 +39,36 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityChest) {
+            return ContainerInventory.calculateRedstone(((BlockEntityChest) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
+    }
+
+    @Override
+    public double getHardness() {
+        return 2.5;
+    }
+
+    @Override
     public int getId() {
         return CHEST;
     }
@@ -47,11 +79,6 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getHardness() {
-        return 2.5;
-    }
-
-    @Override
     public double getResistance() {
         return 12.5;
     }
@@ -59,6 +86,75 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            Block top = this.up();
+            if (!(top instanceof BlockStairs)) { // Stairs don't block chest on vanilla
+                if (!top.isTransparent()) {
+                    return true;
+                }
+            }
+
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityChest)) {
+                return false;
+            }
+
+            BlockEntityChest chest = (BlockEntityChest) t;
+            if (chest.namedTag.contains("Lock") && chest.namedTag.get("Lock") instanceof StringTag) {
+                if (!chest.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return true;
+                }
+            }
+
+            player.addWindow(chest.getInventory());
+
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        BlockEntity t = this.getLevel().getBlockEntity(this);
+        if (t instanceof BlockEntityChest) {
+            ((BlockEntityChest) t).unpair();
+        }
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item, Player player) {
+        boolean broken = this.onBreak(item);
+
+        if (broken && player != null) {
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
+        }
+
+        return broken;
     }
 
     @Override
@@ -115,80 +211,7 @@ public class BlockChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        BlockEntity t = this.getLevel().getBlockEntity(this);
-        if (t instanceof BlockEntityChest) {
-            ((BlockEntityChest) t).unpair();
-        }
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            Block top = this.up();
-            if (!(top instanceof BlockStairs)) { // Stairs don't block chest on vanilla
-                if (!top.isTransparent()) {
-                    return true;
-                }
-            }
-
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityChest)) {
-                return false;
-            }
-
-            BlockEntityChest chest = (BlockEntityChest) t;
-            if (chest.namedTag.contains("Lock") && chest.namedTag.get("Lock") instanceof StringTag) {
-                if (!chest.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return true;
-                }
-            }
-
-            player.addWindow(chest.getInventory());
-        }
-
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    public int getComparatorInputOverride() {
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (blockEntity instanceof BlockEntityChest) {
-            return ContainerInventory.calculateRedstone(((BlockEntityChest) blockEntity).getInventory());
-        }
-
-        return super.getComparatorInputOverride();
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

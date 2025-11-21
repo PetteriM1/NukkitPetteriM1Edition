@@ -14,13 +14,28 @@ public class BlockStairsPurpur extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return PURPUR_STAIRS;
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.MAGENTA_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 1.5;
+    }
+
+    @Override
+    public int getId() {
+        return PURPUR_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Purpur Stairs";
     }
 
     @Override
@@ -31,20 +46,5 @@ public class BlockStairsPurpur extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Purpur Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.MAGENTA_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

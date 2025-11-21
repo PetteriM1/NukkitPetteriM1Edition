@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Adam Matthew [larryTheCoder]
- *
+ * <p>
  * Nukkit Project.
  */
 public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityExplosive {
@@ -36,20 +36,20 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public boolean isRideable() {
-        return false;
+    public void activate(int x, int y, int z, boolean flag) {
+        level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
+        this.fuse = 79;
     }
 
     @Override
-    public void initEntity() {
-        super.initEntity();
-
-        if (namedTag.contains("TNTFuse")) {
-            fuse = namedTag.getByte("TNTFuse");
-        } else {
-            fuse = 80;
+    public void dropItem() {
+        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
+            Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
+            if (damager instanceof Player && ((Player) damager).isCreative()) {
+                return;
+            }
         }
-        //this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, false);
+        level.dropItem(this, Item.get(Item.MINECART_WITH_TNT));
     }
 
     @Override
@@ -73,12 +73,6 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
         }
 
         return hasUpdate;
-    }
-
-    @Override
-    public void activate(int x, int y, int z, boolean flag) {
-        level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_IGNITE);
-        this.fuse = 79;
     }
 
     @Override
@@ -107,14 +101,8 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public void dropItem() {
-        if (this.lastDamageCause instanceof EntityDamageByEntityEvent) {
-            Entity damager = ((EntityDamageByEntityEvent) this.lastDamageCause).getDamager();
-            if (damager instanceof Player && ((Player) damager).isCreative()) {
-                return;
-            }
-        }
-        level.dropItem(this, Item.get(Item.MINECART_WITH_TNT));
+    public int getNetworkId() {
+        return EntityMinecartTNT.NETWORK_ID;
     }
 
     @Override
@@ -123,15 +111,25 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public int getNetworkId() {
-        return EntityMinecartTNT.NETWORK_ID;
+    public void initEntity() {
+        super.initEntity();
+
+        if (namedTag.contains("TNTFuse")) {
+            fuse = namedTag.getByte("TNTFuse");
+        } else {
+            fuse = 80;
+        }
+        //this.setDataFlag(DATA_FLAGS, DATA_FLAG_CHARGED, false);
     }
 
     @Override
-    public void saveNBT() {
-        super.saveNBT();
+    public boolean isRideable() {
+        return false;
+    }
 
-        super.namedTag.putInt("TNTFuse", this.fuse);
+    @Override
+    public boolean mountEntity(Entity entity, byte mode) {
+        return false;
     }
 
     @Override
@@ -146,7 +144,9 @@ public class EntityMinecartTNT extends EntityMinecartAbstract implements EntityE
     }
 
     @Override
-    public boolean mountEntity(Entity entity, byte mode) {
-        return false;
+    public void saveNBT() {
+        super.saveNBT();
+
+        super.namedTag.putInt("TNTFuse", this.fuse);
     }
 }

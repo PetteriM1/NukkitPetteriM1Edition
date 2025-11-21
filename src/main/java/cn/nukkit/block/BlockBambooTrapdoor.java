@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockBambooTrapdoor extends BlockTrapdoor {
 
@@ -13,8 +15,13 @@ public class BlockBambooTrapdoor extends BlockTrapdoor {
     }
 
     @Override
-    public String getName() {
-        return "Bamboo Trapdoor";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.TRAPDOOR;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.YELLOW_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +30,12 @@ public class BlockBambooTrapdoor extends BlockTrapdoor {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.YELLOW_BLOCK_COLOR;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Bamboo Trapdoor";
     }
 }

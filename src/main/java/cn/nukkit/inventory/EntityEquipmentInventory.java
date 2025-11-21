@@ -17,10 +17,22 @@ public class EntityEquipmentInventory extends BaseInventory {
         this.entityLiving = entity;
     }
 
+    @Override
+    public InventoryHolder getHolder() {
+        return this.holder;
+    }
+
+    public Item getItemInHand() {
+        return this.getItem(MAINHAND);
+    }
 
     @Override
     public String getName() {
         return "Entity Equipment";
+    }
+
+    public Item getOffHandItem() {
+        return this.getItem(OFFHAND);
     }
 
     @Override
@@ -29,8 +41,16 @@ public class EntityEquipmentInventory extends BaseInventory {
     }
 
     @Override
-    public InventoryHolder getHolder() {
-        return this.holder;
+    public void sendContents(Player target) {
+        this.sendSlot(MAINHAND, target);
+        this.sendSlot(OFFHAND, target);
+    }
+
+    @Override
+    public void sendContents(Player... target) {
+        for (Player player : target) {
+            this.sendContents(player);
+        }
     }
 
     @Override
@@ -49,32 +69,11 @@ public class EntityEquipmentInventory extends BaseInventory {
         player.dataPacket(mobEquipmentPacket);
     }
 
-    public Item getItemInHand() {
-        return this.getItem(MAINHAND);
-    }
-
-    public Item getOffHandItem() {
-        return this.getItem(OFFHAND);
-    }
-
     public boolean setItemInHand(Item item, boolean send) {
         return this.setItem(MAINHAND, item, send);
     }
 
     public boolean setOffhandItem(Item item, boolean send) {
         return this.setItem(OFFHAND, item, send);
-    }
-
-    @Override
-    public void sendContents(Player target) {
-        this.sendSlot(MAINHAND, target);
-        this.sendSlot(OFFHAND, target);
-    }
-
-    @Override
-    public void sendContents(Player... target) {
-        for (Player player : target) {
-            this.sendContents(player);
-        }
     }
 }

@@ -11,13 +11,18 @@ import cn.nukkit.utils.BlockColor;
 public class BlockSlime extends BlockSolid {
 
     @Override
-    public double getHardness() {
-        return 0;
+    public BlockColor getColor() {
+        return BlockColor.GRASS_BLOCK_COLOR;
     }
 
     @Override
-    public String getName() {
-        return "Slime Block";
+    public double getFrictionFactor() {
+        return 0.8;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0;
     }
 
     @Override
@@ -26,13 +31,13 @@ public class BlockSlime extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 0;
+    public String getName() {
+        return "Slime Block";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GRASS_BLOCK_COLOR;
+    public double getResistance() {
+        return 0;
     }
 
     @Override
@@ -46,10 +51,5 @@ public class BlockSlime extends BlockSolid {
             double d = entity instanceof EntityLiving ? 1.0 : 0.8;
             entity.setMotion(new Vector3(entity.motionX, -entity.motionY * d, entity.motionZ));
         }
-    }
-
-    @Override
-    public double getFrictionFactor() {
-        return 0.8;
     }
 }

@@ -50,31 +50,6 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
     }
 
     @Override
-    public Inventory getInventory() {
-        return this;
-    }
-
-    @Override
-    public BlockEntityChest getHolder() {
-        return this.left.getHolder();
-    }
-
-    @Override
-    public Item getItem(int index) {
-        return index < this.left.getSize() ? this.left.getItem(index) : this.right.getItem(index - this.right.getSize());
-    }
-
-    @Override
-    public Item getItemFast(int index) {
-        return index < this.left.getSize() ? this.left.getItemFast(index) : this.right.getItemFast(index - this.right.getSize());
-    }
-
-    @Override
-    public boolean setItem(int index, Item item, boolean send) {
-        return index < this.left.getSize() ? this.left.setItem(index, item, send) : this.right.setItem(index - this.right.getSize(), item, send);
-    }
-
-    @Override
     public boolean clear(int index) {
         return index < this.left.getSize() ? this.left.clear(index) : this.right.clear(index - this.right.getSize());
     }
@@ -116,33 +91,31 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
     }
 
     @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
-        this.left.viewers.add(who);
-        this.right.viewers.add(who);
+    public BlockEntityChest getHolder() {
+        return this.left.getHolder();
+    }
 
-        if (this.getViewers().size() == 1) {
-            Level level = this.left.getHolder().getLevel();
-            if (level != null) {
-                BlockEventPacket pk1 = new BlockEventPacket();
-                pk1.x = (int) this.left.getHolder().getX();
-                pk1.y = (int) this.left.getHolder().getY();
-                pk1.z = (int) this.left.getHolder().getZ();
-                pk1.case1 = 1;
-                pk1.case2 = 2;
+    @Override
+    public Inventory getInventory() {
+        return this;
+    }
 
-                BlockEventPacket pk2 = new BlockEventPacket();
-                pk2.x = (int) this.right.getHolder().getX();
-                pk2.y = (int) this.right.getHolder().getY();
-                pk2.z = (int) this.right.getHolder().getZ();
-                pk2.case1 = 1;
-                pk2.case2 = 2;
+    @Override
+    public Item getItem(int index) {
+        return index < this.left.getSize() ? this.left.getItem(index) : this.right.getItem(index - this.right.getSize());
+    }
 
-                level.addLevelSoundEvent(this.left.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
-                level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk1);
-                level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk2);
-            }
-        }
+    @Override
+    public Item getItemFast(int index) {
+        return index < this.left.getSize() ? this.left.getItemFast(index) : this.right.getItemFast(index - this.right.getSize());
+    }
+
+    public ChestInventory getLeftSide() {
+        return this.left;
+    }
+
+    public ChestInventory getRightSide() {
+        return this.right;
     }
 
     @Override
@@ -175,12 +148,42 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
         super.onClose(who);
     }
 
-    public ChestInventory getLeftSide() {
-        return this.left;
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        this.left.viewers.add(who);
+        this.right.viewers.add(who);
+
+        if (this.getViewers().size() == 1) {
+            Level level = this.left.getHolder().getLevel();
+            if (level != null) {
+                BlockEventPacket pk1 = new BlockEventPacket();
+                pk1.x = (int) this.left.getHolder().getX();
+                pk1.y = (int) this.left.getHolder().getY();
+                pk1.z = (int) this.left.getHolder().getZ();
+                pk1.case1 = 1;
+                pk1.case2 = 2;
+
+                BlockEventPacket pk2 = new BlockEventPacket();
+                pk2.x = (int) this.right.getHolder().getX();
+                pk2.y = (int) this.right.getHolder().getY();
+                pk2.z = (int) this.right.getHolder().getZ();
+                pk2.case1 = 1;
+                pk2.case2 = 2;
+
+                level.addLevelSoundEvent(this.left.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
+                level.addChunkPacket((int) this.left.getHolder().getX() >> 4, (int) this.left.getHolder().getZ() >> 4, pk1);
+                level.addChunkPacket((int) this.right.getHolder().getX() >> 4, (int) this.right.getHolder().getZ() >> 4, pk2);
+            }
+        }
     }
 
-    public ChestInventory getRightSide() {
-        return this.right;
+    @Override
+    public void onSlotChange(int index, Item before, boolean send) {
+        super.onSlotChange(index, before, send);
+
+        this.left.getHolder().chunk.setChanged();
+        this.right.getHolder().chunk.setChanged();
     }
 
     public void sendSlot(Inventory inv, int index, Player... players) {
@@ -200,10 +203,7 @@ public class DoubleChestInventory extends ContainerInventory implements Inventor
     }
 
     @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        super.onSlotChange(index, before, send);
-
-        this.left.getHolder().chunk.setChanged();
-        this.right.getHolder().chunk.setChanged();
+    public boolean setItem(int index, Item item, boolean send) {
+        return index < this.left.getSize() ? this.left.setItem(index, item, send) : this.right.setItem(index - this.right.getSize(), item, send);
     }
 }

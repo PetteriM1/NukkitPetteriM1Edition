@@ -24,12 +24,12 @@ public class ItemShovelGold extends ItemTool {
     }
 
     @Override
-    public boolean isShovel() {
-        return true;
+    public int getTier() {
+        return ItemTool.TIER_GOLD;
     }
 
     @Override
-    public int getTier() {
-        return ItemTool.TIER_GOLD;
+    public boolean isShovel() {
+        return true;
     }
 }

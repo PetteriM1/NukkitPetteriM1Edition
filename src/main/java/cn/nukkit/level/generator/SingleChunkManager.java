@@ -13,6 +13,14 @@ public class SingleChunkManager extends SimpleChunkManager {
     }
 
     @Override
+    public void cleanChunks(long seed) {
+        super.cleanChunks(seed);
+        chunk = null;
+        CX = Integer.MAX_VALUE;
+        CZ = Integer.MAX_VALUE;
+    }
+
+    @Override
     public BaseFullChunk getChunk(int chunkX, int chunkZ) {
         if (chunkX == CX && chunkZ == CZ) {
             return chunk;
@@ -33,13 +41,5 @@ public class SingleChunkManager extends SimpleChunkManager {
             this.CX = chunk.getX();
             this.CZ = chunk.getZ();
         }
-    }
-
-    @Override
-    public void cleanChunks(long seed) {
-        super.cleanChunks(seed);
-        chunk = null;
-        CX = Integer.MAX_VALUE;
-        CZ = Integer.MAX_VALUE;
     }
 }

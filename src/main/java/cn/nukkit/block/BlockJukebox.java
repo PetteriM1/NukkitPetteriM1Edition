@@ -19,8 +19,29 @@ import cn.nukkit.utils.BlockColor;
 public class BlockJukebox extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Jukebox";
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntityIfLoaded(this);
+        return blockEntity instanceof BlockEntityJukebox ? ((BlockEntityJukebox) blockEntity).getComparatorSignal() : 0;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.8; //2
     }
 
     @Override
@@ -29,8 +50,8 @@ public class BlockJukebox extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 2;
+    public String getName() {
+        return "Jukebox";
     }
 
     @Override
@@ -44,13 +65,8 @@ public class BlockJukebox extends BlockSolid {
     }
 
     @Override
-    public boolean canBeActivated() {
+    public boolean hasComparatorInputOverride() {
         return true;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 
     @Override
@@ -101,23 +117,7 @@ public class BlockJukebox extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public int getComparatorInputOverride() {
-        BlockEntity blockEntity = this.getLevel().getBlockEntityIfLoaded(this);
-        return blockEntity instanceof BlockEntityJukebox ? ((BlockEntityJukebox) blockEntity).getComparatorSignal() : 0;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

@@ -42,6 +42,81 @@ public class BlockCauldron extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    // Source: PN/#666
+    public void clearWithFizz(BlockEntityCauldron cauldron) {
+        this.setFillLevel(0);
+        cauldron.setPotionId(0xffff);
+        cauldron.setSplashPotion(false);
+        cauldron.clearCustomColor();
+        this.level.setBlock(this, Block.get(CAULDRON_BLOCK), true);
+        this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
+        this.getLevel().addParticle(new SmokeParticle(add(ThreadLocalRandom.current().nextDouble(), 1.2, ThreadLocalRandom.current().nextDouble())), null, 8);
+    }
+
+    // Source: PN/#666
+    private void consumePotion(Item item, Player player) {
+        if (player.isSurvival() || player.isAdventure()) {
+            if (item.getCount() == 1) {
+                player.getInventory().setItemInHand(new ItemBlock(Block.get(AIR)));
+            } else if (item.getCount() > 1) {
+                item.count--;
+                Item bottle = Item.get(Item.GLASS_BOTTLE);
+                if (player.getInventory().canAddItem(bottle)) {
+                    player.getInventory().addItem(bottle);
+                } else {
+                    player.getLevel().dropItem(player.add(0, 1.3, 0), bottle, player.getDirectionVector().multiply(0.4));
+                }
+            }
+        }
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.GRAY_BLOCK_COLOR;
+    }
+
+    public int getComparatorInputOverride() {
+        return getFillLevel();
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.getTier() >= ItemTool.TIER_WOODEN) {
+            return new Item[]{Item.get(Item.CAULDRON)};
+        }
+
+        return new Item[0];
+    }
+
+    public int getFillLevel() {
+        return (getDamage() & 0x6) >> 1;
+    }
+
+    public void setFillLevel(int fillLevel) {
+        fillLevel = MathHelper.clamp(fillLevel, 0, 3);
+        setDamage(fillLevel << 1);
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
     public int getId() {
         return CAULDRON_BLOCK;
     }
@@ -56,35 +131,25 @@ public class BlockCauldron extends BlockTransparentMeta {
     }
 
     @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
-    public boolean isFull() {
-        return (this.getDamage() & 0x06) == 0x06;
+    public boolean hasComparatorInputOverride() {
+        return true;
     }
 
     public boolean isEmpty() {
         return this.getDamage() == 0x00;
     }
 
-    public int getFillLevel() {
-        return (getDamage() & 0x6) >> 1;
-    }
-
-    public void setFillLevel(int fillLevel) {
-        fillLevel = MathHelper.clamp(fillLevel, 0, 3);
-        setDamage(fillLevel << 1);
+    public boolean isFull() {
+        return (this.getDamage() & 0x06) == 0x06;
     }
 
     @Override
@@ -323,25 +388,19 @@ public class BlockCauldron extends BlockTransparentMeta {
         return true;
     }
 
-    private static int potion2arrow(int potion) {
-        int id = potion & 0xffff;
-        if (id < 5 || id > 43) return 1; // if it fails don't create game crashing arrows
-        return id < 43 ? id + 1 : id;
-    }
-
-    protected void replaceBucket(Item oldBucket, Player player, Item newBucket) {
-        if (player.isSurvival() || player.isAdventure()) {
-            if (oldBucket.getCount() == 1) {
-                player.getInventory().setItemInHand(newBucket);
-            } else {
-                oldBucket.setCount(oldBucket.getCount() - 1);
-                if (player.getInventory().canAddItem(newBucket)) {
-                    player.getInventory().addItem(newBucket);
-                } else {
-                    player.getLevel().dropItem(player.add(0, 1.3, 0), newBucket, player.getDirectionVector().multiply(0.4));
-                }
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_RANDOM && level.isRaining() && !this.isFull()) {
+            if (freezing < 1) {
+                freezing = Biome.getBiome(level.getBiomeId((int) this.x, (int) this.z)).isFreezing() ? (byte) 2 : (byte) 1;
+            }
+            if (freezing == 1 && ThreadLocalRandom.current().nextInt(20) == 0 && level.canBlockSeeSky(this)) {
+                this.setFillLevel(this.getFillLevel() + 1);
+                this.getLevel().setBlock(this, this, true, true);
+                return Level.BLOCK_UPDATE_RANDOM;
             }
         }
+        return super.onUpdate(type);
     }
 
     @Override
@@ -367,88 +426,29 @@ public class BlockCauldron extends BlockTransparentMeta {
         return true;
     }
 
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.getTier() >= ItemTool.TIER_WOODEN) {
-            return new Item[]{Item.get(Item.CAULDRON)};
-        }
-
-        return new Item[0];
+    private static int potion2arrow(int potion) {
+        int id = potion & 0xffff;
+        if (id < 5 || id > 43) return 1; // if it fails don't create game crashing arrows
+        return id < 43 ? id + 1 : id;
     }
 
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_RANDOM && level.isRaining() && !this.isFull()) {
-            if (freezing < 1) {
-                freezing = Biome.getBiome(level.getBiomeId((int) this.x, (int) this.z)).isFreezing() ? (byte) 2 : (byte) 1;
-            }
-            if (freezing == 1 && ThreadLocalRandom.current().nextInt(20) == 0 && level.canBlockSeeSky(this)) {
-                this.setFillLevel(this.getFillLevel() + 1);
-                this.getLevel().setBlock(this, this, true, true);
-                return Level.BLOCK_UPDATE_RANDOM;
-            }
-        }
-        return super.onUpdate(type);
-    }
-
-    @Override
-    public Item toItem() {
-        return Item.get(Item.CAULDRON);
-    }
-
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    public int getComparatorInputOverride() {
-        return getFillLevel();
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    // Source: PN/#666
-    private void consumePotion(Item item, Player player) {
+    protected void replaceBucket(Item oldBucket, Player player, Item newBucket) {
         if (player.isSurvival() || player.isAdventure()) {
-            if (item.getCount() == 1) {
-                player.getInventory().setItemInHand(new ItemBlock(Block.get(AIR)));
-            } else if (item.getCount() > 1) {
-                item.count--;
-                Item bottle = Item.get(Item.GLASS_BOTTLE);
-                if (player.getInventory().canAddItem(bottle)) {
-                    player.getInventory().addItem(bottle);
+            if (oldBucket.getCount() == 1) {
+                player.getInventory().setItemInHand(newBucket);
+            } else {
+                oldBucket.setCount(oldBucket.getCount() - 1);
+                if (player.getInventory().canAddItem(newBucket)) {
+                    player.getInventory().addItem(newBucket);
                 } else {
-                    player.getLevel().dropItem(player.add(0, 1.3, 0), bottle, player.getDirectionVector().multiply(0.4));
+                    player.getLevel().dropItem(player.add(0, 1.3, 0), newBucket, player.getDirectionVector().multiply(0.4));
                 }
             }
         }
     }
 
-    // Source: PN/#666
-    public void clearWithFizz(BlockEntityCauldron cauldron) {
-        this.setFillLevel(0);
-        cauldron.setPotionId(0xffff);
-        cauldron.setSplashPotion(false);
-        cauldron.clearCustomColor();
-        this.level.setBlock(this, Block.get(CAULDRON_BLOCK), true);
-        this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
-        this.getLevel().addParticle(new SmokeParticle(add(ThreadLocalRandom.current().nextDouble(), 1.2, ThreadLocalRandom.current().nextDouble())), null, 8);
-    }
-
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GRAY_BLOCK_COLOR;
+    public Item toItem() {
+        return Item.get(Item.CAULDRON);
     }
 }

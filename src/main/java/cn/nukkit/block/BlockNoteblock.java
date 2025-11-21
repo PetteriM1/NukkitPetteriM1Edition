@@ -18,29 +18,33 @@ import cn.nukkit.utils.BlockColor;
  */
 public class BlockNoteblock extends BlockSolid {
 
-    @Override
-    public String getName() {
-        return "Note Block";
-    }
+    public enum Instrument {
+        PIANO(Sound.NOTE_HARP),
+        BASS_DRUM(Sound.NOTE_BD),
+        DRUM(Sound.NOTE_SNARE),
+        STICKS(Sound.NOTE_HAT),
+        BASS(Sound.NOTE_BASS),
+        FLUTE(Sound.NOTE_FLUTE),
+        GLOCKENSPIEL(Sound.NOTE_BELL),
+        GUITAR(Sound.NOTE_GUITAR),
+        CHIME(Sound.NOTE_CHIME),
+        XYLOPHONE(Sound.NOTE_XYLOPHONE),
+        VIBRAPHONE(Sound.NOTE_IRON_XYLOPHONE),
+        COW_BELL(Sound.NOTE_COW_BELL),
+        DIDGERIDOO(Sound.NOTE_DIDGERIDOO),
+        SQUARE_WAVE(Sound.NOTE_BIT),
+        BANJO(Sound.NOTE_BANJO),
+        ELECTRIC_PIANO(Sound.NOTE_PLING);
 
-    @Override
-    public int getId() {
-        return NOTEBLOCK;
-    }
+        private final Sound sound;
 
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
+        Instrument(Sound sound) {
+            this.sound = sound;
+        }
 
-    @Override
-    public double getHardness() {
-        return 0.8D;
-    }
-
-    @Override
-    public double getResistance() {
-        return 4D;
+        public Sound getSound() {
+            return sound;
+        }
     }
 
     @Override
@@ -49,22 +53,50 @@ public class BlockNoteblock extends BlockSolid {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.getLevel().setBlock(block, this, true);
-        BlockEntity.createBlockEntity(BlockEntity.MUSIC, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.MUSIC));
-        return true;
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
     }
 
-    public int getStrength() {
-        BlockEntityMusic blockEntity = this.getBlockEntity();
-        return blockEntity != null ? blockEntity.getPitch() : 0;
-    }
-
-    public void increaseStrength() {
-        BlockEntityMusic blockEntity = this.getBlockEntity();
-        if (blockEntity != null) {
-            blockEntity.changePitch();
+    public void emitSound() {
+        if (this.level.getBlockIdAt((int) this.x, (int) this.y + 1, (int) this.z) != AIR) {
+            return;
         }
+
+        int instrumentId = this.getInstrument().ordinal();
+        int strength = this.getStrength();
+
+        this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_NOTE, instrumentId << 8 | strength);
+
+        BlockEventPacket pk = new BlockEventPacket();
+        pk.x = this.getFloorX();
+        pk.y = this.getFloorY();
+        pk.z = this.getFloorZ();
+        pk.case1 = instrumentId;
+        pk.case2 = strength;
+        this.getLevel().addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
+    }
+
+    private BlockEntityMusic getBlockEntity() {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (blockEntity instanceof BlockEntityMusic) {
+            return (BlockEntityMusic) blockEntity;
+        }
+        return null;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.8D;
+    }
+
+    @Override
+    public int getId() {
+        return NOTEBLOCK;
     }
 
     public Instrument getInstrument() {
@@ -207,23 +239,31 @@ public class BlockNoteblock extends BlockSolid {
         }
     }
 
-    public void emitSound() {
-        if (this.level.getBlockIdAt((int) this.x, (int) this.y + 1, (int) this.z) != AIR) {
-            return;
+    @Override
+    public String getName() {
+        return "Note Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 4D;
+    }
+
+    public int getStrength() {
+        BlockEntityMusic blockEntity = this.getBlockEntity();
+        return blockEntity != null ? blockEntity.getPitch() : 0;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    public void increaseStrength() {
+        BlockEntityMusic blockEntity = this.getBlockEntity();
+        if (blockEntity != null) {
+            blockEntity.changePitch();
         }
-
-        int instrumentId = this.getInstrument().ordinal();
-        int strength = this.getStrength();
-
-        this.level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_NOTE, instrumentId << 8 | strength);
-
-        BlockEventPacket pk = new BlockEventPacket();
-        pk.x = this.getFloorX();
-        pk.y = this.getFloorY();
-        pk.z = this.getFloorZ();
-        pk.case1 = instrumentId;
-        pk.case2 = strength;
-        this.getLevel().addChunkPacket(this.getChunkX(), this.getChunkZ(), pk);
     }
 
     @Override
@@ -252,50 +292,10 @@ public class BlockNoteblock extends BlockSolid {
         return super.onUpdate(type);
     }
 
-    private BlockEntityMusic getBlockEntity() {
-        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
-        if (blockEntity instanceof BlockEntityMusic) {
-            return (BlockEntityMusic) blockEntity;
-        }
-        return null;
-    }
-
-    public enum Instrument {
-        PIANO(Sound.NOTE_HARP),
-        BASS_DRUM(Sound.NOTE_BD),
-        DRUM(Sound.NOTE_SNARE),
-        STICKS(Sound.NOTE_HAT),
-        BASS(Sound.NOTE_BASS),
-        FLUTE(Sound.NOTE_FLUTE),
-        GLOCKENSPIEL(Sound.NOTE_BELL),
-        GUITAR(Sound.NOTE_GUITAR),
-        CHIME(Sound.NOTE_CHIME),
-        XYLOPHONE(Sound.NOTE_XYLOPHONE),
-        VIBRAPHONE(Sound.NOTE_IRON_XYLOPHONE),
-        COW_BELL(Sound.NOTE_COW_BELL),
-        DIDGERIDOO(Sound.NOTE_DIDGERIDOO),
-        SQUARE_WAVE(Sound.NOTE_BIT),
-        BANJO(Sound.NOTE_BANJO),
-        ELECTRIC_PIANO(Sound.NOTE_PLING);
-
-        private final Sound sound;
-
-        Instrument(Sound sound) {
-            this.sound = sound;
-        }
-
-        public Sound getSound() {
-            return sound;
-        }
-    }
-
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.getLevel().setBlock(block, this, true);
+        BlockEntity.createBlockEntity(BlockEntity.MUSIC, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.MUSIC));
+        return true;
     }
 }

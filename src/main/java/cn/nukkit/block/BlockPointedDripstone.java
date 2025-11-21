@@ -21,8 +21,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -45,14 +47,36 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
         super(meta);
     }
 
-    @Override
-    public String getName() {
-        return "Pointed Dripstone";
+    private void buildBaseToTipColumn(int height, boolean merge, Consumer<DripstoneThickness> callback) {
+        if (height >= 3) {
+            callback.accept(DripstoneThickness.BASE);
+            for (int i = 0; i < height - 3; ++i) {
+                callback.accept(DripstoneThickness.MIDDLE);
+            }
+        }
+
+        if (height >= 2) {
+            callback.accept(DripstoneThickness.FRUSTUM);
+        }
+
+        if (height >= 1) {
+            callback.accept(merge ? DripstoneThickness.MERGE : DripstoneThickness.TIP);
+        }
+    }
+
+    private boolean canGrow() {
+        // TODO: grow from ground too
+        return this.down().getId() == AIR && this.up().getId() == DRIPSTONE_BLOCK && Block.isWater(this.up(2).getId());
     }
 
     @Override
-    public int getId() {
-        return POINTED_DRIPSTONE;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return this.getBooleanValue(HANGING) ? BlockFace.DOWN : BlockFace.UP;
     }
 
     @Override
@@ -61,48 +85,84 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!this.canPlaceOn(block.down(), target)) {
-            return false;
+    public BlockColor getColor() {
+        return BlockColor.BROWN_TERRACOTA_BLOCK_COLOR;
+    }
+
+    private int getDripstoneHeightFromBase(Block block, boolean hanging) {
+        int height = 0;
+        while (block instanceof BlockPointedDripstone) {
+            height++;
+            block = hanging ? block.down() : block.up();
         }
+        return height;
+    }
 
-        Block up = this.up();
-        Block down = this.down();
-
-        boolean hanging = false;
-        if (face == BlockFace.UP || face == BlockFace.DOWN) {
-            if ((face == BlockFace.UP && !down.isSolid()) || (face == BlockFace.DOWN && !up.isSolid())) {
-                return false;
-            }
-            hanging = face == BlockFace.DOWN;
-        } else if (up.isSolid()) {
-            hanging = true;
-        } else if (!down.isSolid()) {
-            return false;
+    private IntObjectPair<Block> getDripstoneHeightFromTip(Block block, boolean hanging) {
+        int height = 0;
+        BlockPointedDripstone dripstone = null;
+        while (block instanceof BlockPointedDripstone) {
+            height++;
+            dripstone = (BlockPointedDripstone) block;
+            block = hanging ? block.up() : block.down();
         }
+        return IntObjectPair.of(height, dripstone);
+    }
 
+    @Override
+    public double getHardness() {
+        return 1.5;
+    }
 
-        Block tip = null;
-        if (up instanceof BlockPointedDripstone && hanging) {
-            tip = up;
-        } else if (down instanceof BlockPointedDripstone) {
-            tip = down;
-        }
+    @Override
+    public int getId() {
+        return POINTED_DRIPSTONE;
+    }
 
-        if (tip != null) {
-            IntObjectPair<Block> pair = this.getDripstoneHeightFromTip(tip, hanging);
-            int height = pair.keyInt();
-            if (height == 0 || height == MAX_HEIGHT) {
-                return false;
-            }
-            Location location = pair.right().getLocation();
-            this.growPointedDripstone(location, hanging, height);
-        } else {
-            this.setHanging(hanging);
-            this.setThickness(DripstoneThickness.TIP);
-            this.getLevel().setBlock(this, this, true, true);
-        }
-        return true;
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Pointed Dripstone";
+    }
+
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    public DripstoneThickness getThickness() {
+        return this.getPropertyValue(THICKNESS);
+    }
+
+    public void setThickness(DripstoneThickness value) {
+        this.setPropertyValue(THICKNESS, value);
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    private void growPointedDripstone(Position position, boolean hanging, int height) {
+        this.buildBaseToTipColumn(height + 1, false, thickness -> {
+            BlockPointedDripstone dripstone = (BlockPointedDripstone) Block.get(POINTED_DRIPSTONE);
+            dripstone.setHanging(hanging);
+            dripstone.setThickness(thickness);
+            this.getLevel().setBlock(position, dripstone);
+            position.setY(hanging ? position.getY() - 1 : position.getY() + 1);
+        });
+    }
+
+    public boolean isHanging() {
+        return this.getBooleanValue(HANGING);
+    }
+
+    public void setHanging(boolean hanging) {
+        this.setBooleanValue(HANGING, hanging);
     }
 
     @Override
@@ -161,56 +221,48 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
         return 0;
     }
 
-    private void growPointedDripstone(Position position, boolean hanging, int height) {
-        this.buildBaseToTipColumn(height + 1, false, thickness -> {
-            BlockPointedDripstone dripstone = (BlockPointedDripstone) Block.get(POINTED_DRIPSTONE);
-            dripstone.setHanging(hanging);
-            dripstone.setThickness(thickness);
-            this.getLevel().setBlock(position, dripstone);
-            position.setY(hanging ? position.getY() - 1 : position.getY() + 1);
-        });
-    }
-
-    private IntObjectPair<Block> getDripstoneHeightFromTip(Block block, boolean hanging) {
-        int height = 0;
-        BlockPointedDripstone dripstone = null;
-        while (block instanceof BlockPointedDripstone) {
-            height++;
-            dripstone = (BlockPointedDripstone) block;
-            block = hanging ? block.up() : block.down();
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!this.canPlaceOn(block.down(), target)) {
+            return false;
         }
-        return IntObjectPair.of(height, dripstone);
-    }
 
-    private int getDripstoneHeightFromBase(Block block, boolean hanging) {
-        int height = 0;
-        while (block instanceof BlockPointedDripstone) {
-            height++;
-            block = hanging ? block.down() : block.up();
-        }
-        return height;
-    }
+        Block up = this.up();
+        Block down = this.down();
 
-    private void buildBaseToTipColumn(int height, boolean merge, Consumer<DripstoneThickness> callback) {
-        if (height >= 3) {
-            callback.accept(DripstoneThickness.BASE);
-            for(int i = 0; i < height - 3; ++i) {
-                callback.accept(DripstoneThickness.MIDDLE);
+        boolean hanging = false;
+        if (face == BlockFace.UP || face == BlockFace.DOWN) {
+            if ((face == BlockFace.UP && !down.isSolid()) || (face == BlockFace.DOWN && !up.isSolid())) {
+                return false;
             }
+            hanging = face == BlockFace.DOWN;
+        } else if (up.isSolid()) {
+            hanging = true;
+        } else if (!down.isSolid()) {
+            return false;
         }
 
-        if (height >= 2) {
-            callback.accept(DripstoneThickness.FRUSTUM);
+        Block tip = null;
+        if (up instanceof BlockPointedDripstone && hanging) {
+            tip = up;
+        } else if (down instanceof BlockPointedDripstone) {
+            tip = down;
         }
 
-        if (height >= 1) {
-            callback.accept(merge ? DripstoneThickness.MERGE : DripstoneThickness.TIP);
+        if (tip != null) {
+            IntObjectPair<Block> pair = this.getDripstoneHeightFromTip(tip, hanging);
+            int height = pair.keyInt();
+            if (height == 0 || height == MAX_HEIGHT) {
+                return false;
+            }
+            Location location = pair.right().getLocation();
+            this.growPointedDripstone(location, hanging, height);
+        } else {
+            this.setHanging(hanging);
+            this.setThickness(DripstoneThickness.TIP);
+            this.getLevel().setBlock(this, this, true, true);
         }
-    }
-
-    private boolean canGrow() {
-        // TODO: grow from ground too
-        return this.down().getId() == AIR && this.up().getId() == DRIPSTONE_BLOCK && Block.isWater(this.up(2).getId());
+        return true;
     }
 
     private void spawnFallingBlock(BlockPointedDripstone block) {
@@ -240,48 +292,7 @@ public class BlockPointedDripstone extends BlockSolidMeta implements BlockProper
     }
 
     @Override
-    public double getHardness() {
-        return 1.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_TERRACOTA_BLOCK_COLOR;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return this.getBooleanValue(HANGING) ? BlockFace.DOWN : BlockFace.UP;
-    }
-
-    public boolean isHanging() {
-        return this.getBooleanValue(HANGING);
-    }
-
-    public void setHanging(boolean hanging) {
-        this.setBooleanValue(HANGING, hanging);
-    }
-
-    public DripstoneThickness getThickness() {
-        return this.getPropertyValue(THICKNESS);
-    }
-
-    public void setThickness(DripstoneThickness value) {
-        this.setPropertyValue(THICKNESS, value);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

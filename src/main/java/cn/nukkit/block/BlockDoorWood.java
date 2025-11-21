@@ -19,8 +19,13 @@ public class BlockDoorWood extends BlockDoor {
     }
 
     @Override
-    public String getName() {
-        return "Wood Door Block";
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 3;
     }
 
     @Override
@@ -29,8 +34,8 @@ public class BlockDoorWood extends BlockDoor {
     }
 
     @Override
-    public double getHardness() {
-        return 3;
+    public String getName() {
+        return "Wood Door Block";
     }
 
     @Override
@@ -46,10 +51,5 @@ public class BlockDoorWood extends BlockDoor {
     @Override
     public Item toItem() {
         return Item.get(Item.WOODEN_DOOR);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
     }
 }

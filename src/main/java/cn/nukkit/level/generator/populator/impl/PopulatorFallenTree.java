@@ -9,12 +9,21 @@ import cn.nukkit.math.NukkitMath;
 import cn.nukkit.math.NukkitRandom;
 
 public class PopulatorFallenTree extends Populator {
-    
+
     private ChunkManager level;
     private int type;
 
-    public void setType(int type) { //0 = oak, 1 = birch
-        this.type = type;
+    private int getHighestWorkableBlock(int x, int z) {
+        int y;
+
+        for (y = 127; y > 0; --y) {
+            int b = this.level.getBlockIdAt(x, y, z);
+            if (b == Block.GRASS) {
+                break;
+            }
+        }
+
+        return ++y;
     }
 
     @Override
@@ -54,16 +63,7 @@ public class PopulatorFallenTree extends Populator {
         }
     }
 
-    private int getHighestWorkableBlock(int x, int z) {
-        int y;
-
-        for (y = 127; y > 0; --y) {
-            int b = this.level.getBlockIdAt(x, y, z);
-            if (b == Block.GRASS) {
-                break;
-            }
-        }
-
-        return ++y;
+    public void setType(int type) { //0 = oak, 1 = birch
+        this.type = type;
     }
 }

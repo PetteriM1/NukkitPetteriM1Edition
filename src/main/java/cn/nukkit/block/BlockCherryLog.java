@@ -4,6 +4,8 @@ import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCherryLog extends BlockWood {
 
@@ -16,8 +18,8 @@ public class BlockCherryLog extends BlockWood {
     }
 
     @Override
-    public String getName() {
-        return "Cherry Log";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LOG;
     }
 
     @Override
@@ -26,24 +28,25 @@ public class BlockCherryLog extends BlockWood {
     }
 
     @Override
-    protected int getStrippedId() {
-        return STRIPPED_CHERRY_LOG;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
     }
 
     @Override
-    protected int getStrippedDamage() {
-        return getDamage();
+    public String getName() {
+        return "Cherry Log";
     }
 
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        return this.getLevel().setBlock(block, this, true, true);
+    public BlockFace.Axis getPillarAxis() {
+        switch (this.getDamage() % 3) {
+            case 2:
+                return BlockFace.Axis.Z;
+            case 1:
+                return BlockFace.Axis.X;
+            case 0:
+            default:
+                return BlockFace.Axis.Y;
+        }
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -60,15 +63,24 @@ public class BlockCherryLog extends BlockWood {
         }
     }
 
-    public BlockFace.Axis getPillarAxis() {
-        switch (this.getDamage() % 3) {
-            case 2:
-                return BlockFace.Axis.Z;
-            case 1:
-                return BlockFace.Axis.X;
-            case 0:
-            default:
-                return BlockFace.Axis.Y;
-        }
+    @Override
+    protected int getStrippedDamage() {
+        return getDamage();
+    }
+
+    @Override
+    protected int getStrippedId() {
+        return STRIPPED_CHERRY_LOG;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        return this.getLevel().setBlock(block, this, true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

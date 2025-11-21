@@ -5,13 +5,8 @@ import cn.nukkit.item.Item;
 public class BlockInfoUpdate extends BlockSolid {
 
     @Override
-    public int getId() {
-        return INFO_UPDATE;
-    }
-
-    @Override
-    public String getName() {
-        return "Update Game Block";
+    public Item[] getDrops(Item item) {
+        return new Item[0];
     }
 
     @Override
@@ -20,7 +15,12 @@ public class BlockInfoUpdate extends BlockSolid {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
+    public int getId() {
+        return INFO_UPDATE;
+    }
+
+    @Override
+    public String getName() {
+        return "Update Game Block";
     }
 }

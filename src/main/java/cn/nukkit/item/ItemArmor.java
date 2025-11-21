@@ -36,6 +36,31 @@ abstract public class ItemArmor extends Item implements ItemDurable {
     }
 
     @Override
+    public boolean canBePutInHelmetSlot() {
+        return this.isHelmet();
+    }
+
+    @Override
+    public int getEnchantAbility() {
+        switch (this.getTier()) {
+            case TIER_CHAIN:
+                return 12;
+            case TIER_LEATHER:
+                return 15;
+            case TIER_DIAMOND:
+                return 10;
+            case TIER_GOLD:
+                return 25;
+            case TIER_IRON:
+                return 9;
+            case TIER_NETHERITE:
+                return 10; //TODO
+        }
+
+        return 0;
+    }
+
+    @Override
     public int getMaxStackSize() {
         return 1;
     }
@@ -98,31 +123,6 @@ abstract public class ItemArmor extends Item implements ItemDurable {
         }
 
         return false; // We already use setItem & clear here
-    }
-
-    @Override
-    public int getEnchantAbility() {
-        switch (this.getTier()) {
-            case TIER_CHAIN:
-                return 12;
-            case TIER_LEATHER:
-                return 15;
-            case TIER_DIAMOND:
-                return 10;
-            case TIER_GOLD:
-                return 25;
-            case TIER_IRON:
-                return 9;
-            case TIER_NETHERITE:
-                return 10; //TODO
-        }
-
-        return 0;
-    }
-
-    @Override
-    public boolean canBePutInHelmetSlot() {
-        return this.isHelmet();
     }
 
     public ItemArmor setArmorTrim(ItemTrimPattern.Type pattern, ItemTrimMaterial.Type material) {

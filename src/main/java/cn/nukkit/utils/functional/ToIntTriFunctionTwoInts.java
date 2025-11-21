@@ -12,21 +12,10 @@ import java.util.function.IntUnaryOperator;
  * whose functional method is {@link #apply(Object, int, int)}.
  *
  * @param <F> the type of the first argument to the function
- *
  * @see Function
  */
 @FunctionalInterface
 public interface ToIntTriFunctionTwoInts<F> {
-
-    /**
-     * Applies this function to the given arguments.
-     *
-     * @param f the first function argument
-     * @param s the second function argument
-     * @param t the third function argument
-     * @return the function result
-     */
-    int apply(F f, int s, int t);
 
     /**
      * Returns a composed function that first applies this function to
@@ -43,4 +32,14 @@ public interface ToIntTriFunctionTwoInts<F> {
         Objects.requireNonNull(after);
         return (F f, int s, int t) -> after.applyAsInt(apply(f, s, t));
     }
+
+    /**
+     * Applies this function to the given arguments.
+     *
+     * @param f the first function argument
+     * @param s the second function argument
+     * @param t the third function argument
+     * @return the function result
+     */
+    int apply(F f, int s, int t);
 }

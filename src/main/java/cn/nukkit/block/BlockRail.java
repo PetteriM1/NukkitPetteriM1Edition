@@ -41,8 +41,101 @@ public class BlockRail extends BlockFlowable implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Rail";
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    public boolean canPowered() {
+        return this.canBePowered;
+    }
+
+    private Map<BlockRail, BlockFace> checkRailsAround(Collection<BlockFace> faces) {
+        Map<BlockRail, BlockFace> result = new HashMap<>();
+        faces.forEach(f -> {
+            Block b = this.getSide(f);
+            Stream.of(b, b.up(), b.down())
+                    .filter(Rail::isRailBlock)
+                    .forEach(block -> result.put((BlockRail) block, f));
+        });
+        return result;
+    }
+
+    private Map<BlockRail, BlockFace> checkRailsAroundAffected() {
+        Map<BlockRail, BlockFace> railsAround = this.checkRailsAround(SIDES);
+        return railsAround.keySet().stream()
+                .filter(r -> r.checkRailsConnected().size() != 2)
+                .collect(Collectors.toMap(r -> r, railsAround::get));
+    }
+
+    protected Map<BlockRail, BlockFace> checkRailsConnected() {
+        Map<BlockRail, BlockFace> railsAround = this.checkRailsAround(this.getOrientation().connectingDirections());
+        return railsAround.keySet().stream()
+                .filter(r -> r.getOrientation().hasConnectingDirections(railsAround.get(r).getOpposite()))
+                .collect(Collectors.toMap(r -> r, railsAround::get));
+    }
+
+    private Orientation connect(BlockRail rail1, BlockFace face1, BlockRail rail2, BlockFace face2) {
+        this.connect(rail1, face1);
+        this.connect(rail2, face2);
+
+        if (face1.getOpposite() == face2) {
+            int delta1 = (int) (this.y - rail1.y);
+            int delta2 = (int) (this.y - rail2.y);
+
+            if (delta1 == -1) {
+                return Orientation.ascending(face1);
+            } else if (delta2 == -1) {
+                return Orientation.ascending(face2);
+            }
+        }
+        return straightOrCurved(face1, face2);
+    }
+
+    private Orientation connect(BlockRail other, BlockFace face) {
+        int delta = (int) (this.y - other.y);
+        Map<BlockRail, BlockFace> rails = other.checkRailsConnected();
+        if (rails.isEmpty()) { //Only one
+            other.setOrientation(delta == 1 ? ascending(face.getOpposite()) : straight(face));
+            return delta == -1 ? ascending(face) : straight(face);
+        } else if (rails.size() == 1) { //Already connected
+            BlockFace faceConnected = rails.values().iterator().next();
+
+            if (other.isAbstract() && faceConnected != face) { //Curve!
+                other.setOrientation(curved(face.getOpposite(), faceConnected));
+                return delta == -1 ? ascending(face) : straight(face);
+            } else if (faceConnected == face) { //Turn!
+                if (!other.getOrientation().isAscending()) {
+                    other.setOrientation(delta == 1 ? ascending(face.getOpposite()) : straight(face));
+                }
+                return delta == -1 ? ascending(face) : straight(face);
+            } else if (other.getOrientation().hasConnectingDirections(NORTH, SOUTH)) { //North-south
+                other.setOrientation(delta == 1 ? ascending(face.getOpposite()) : straight(face));
+                return delta == -1 ? ascending(face) : straight(face);
+            }
+        }
+        return STRAIGHT_NORTH_SOUTH;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                Item.get(Item.RAIL)
+        };
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.7;
     }
 
     @Override
@@ -51,8 +144,36 @@ public class BlockRail extends BlockFlowable implements Faceable {
     }
 
     @Override
-    public double getHardness() {
-        return 0.7;
+    public double getMaxY() {
+        return this.y + 0.125;
+    }
+
+    @Override
+    public String getName() {
+        return "Rail";
+    }
+
+    public Orientation getOrientation() {
+        return byMetadata(this.getRealMeta());
+    }
+
+    public void setOrientation(Orientation o) {
+        if (o.metadata() != this.getRealMeta()) {
+            this.setDamage(o.metadata());
+            this.level.setBlock(this, this, false, true);
+        }
+    }
+
+    public int getRealMeta() {
+        // Check if this can be powered
+        // Avoid modifying the value from meta (The rail orientation may be false)
+        // Reason: When the rail is curved, the meta will return STRAIGHT_NORTH_SOUTH.
+        // OR Null Pointer Exception
+        if (!isAbstract()) {
+            return getDamage() & 0x7;
+        }
+        // Return the default: This meta
+        return getDamage();
     }
 
     @Override
@@ -63,6 +184,28 @@ public class BlockRail extends BlockFlowable implements Faceable {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isAbstract() {
+        return this.getId() == RAIL;
+    }
+
+    public boolean isActive() {
+        return (getDamage() & 0x8) != 0;
+    }
+
+    public void setActive(boolean active) {
+        if (active) {
+            setDamage(getDamage() | 0x8);
+        } else {
+            setDamage(getDamage() & 0x7);
+        }
+        level.setBlock(this, this, true, true);
     }
 
     @Override
@@ -134,21 +277,6 @@ public class BlockRail extends BlockFlowable implements Faceable {
         return 0;
     }
 
-    @Override
-    public AxisAlignedBB recalculateBoundingBox() {
-        return this;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.125;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
     //Information from http://minecraft.gamepedia.com/Rail
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
@@ -204,141 +332,13 @@ public class BlockRail extends BlockFlowable implements Faceable {
         return true;
     }
 
-    private Orientation connect(BlockRail rail1, BlockFace face1, BlockRail rail2, BlockFace face2) {
-        this.connect(rail1, face1);
-        this.connect(rail2, face2);
-
-        if (face1.getOpposite() == face2) {
-            int delta1 = (int) (this.y - rail1.y);
-            int delta2 = (int) (this.y - rail2.y);
-
-            if (delta1 == -1) {
-                return Orientation.ascending(face1);
-            } else if (delta2 == -1) {
-                return Orientation.ascending(face2);
-            }
-        }
-        return straightOrCurved(face1, face2);
-    }
-
-    private Orientation connect(BlockRail other, BlockFace face) {
-        int delta = (int) (this.y - other.y);
-        Map<BlockRail, BlockFace> rails = other.checkRailsConnected();
-        if (rails.isEmpty()) { //Only one
-            other.setOrientation(delta == 1 ? ascending(face.getOpposite()) : straight(face));
-            return delta == -1 ? ascending(face) : straight(face);
-        } else if (rails.size() == 1) { //Already connected
-            BlockFace faceConnected = rails.values().iterator().next();
-
-            if (other.isAbstract() && faceConnected != face) { //Curve!
-                other.setOrientation(curved(face.getOpposite(), faceConnected));
-                return delta == -1 ? ascending(face) : straight(face);
-            } else if (faceConnected == face) { //Turn!
-                if (!other.getOrientation().isAscending()) {
-                    other.setOrientation(delta == 1 ? ascending(face.getOpposite()) : straight(face));
-                }
-                return delta == -1 ? ascending(face) : straight(face);
-            } else if (other.getOrientation().hasConnectingDirections(NORTH, SOUTH)) { //North-south
-                other.setOrientation(delta == 1 ? ascending(face.getOpposite()) : straight(face));
-                return delta == -1 ? ascending(face) : straight(face);
-            }
-        }
-        return STRAIGHT_NORTH_SOUTH;
-    }
-
-    private Map<BlockRail, BlockFace> checkRailsAroundAffected() {
-        Map<BlockRail, BlockFace> railsAround = this.checkRailsAround(SIDES);
-        return railsAround.keySet().stream()
-                .filter(r -> r.checkRailsConnected().size() != 2)
-                .collect(Collectors.toMap(r -> r, railsAround::get));
-    }
-
-    private Map<BlockRail, BlockFace> checkRailsAround(Collection<BlockFace> faces) {
-        Map<BlockRail, BlockFace> result = new HashMap<>();
-        faces.forEach(f -> {
-            Block b = this.getSide(f);
-            Stream.of(b, b.up(), b.down())
-                    .filter(Rail::isRailBlock)
-                    .forEach(block -> result.put((BlockRail) block, f));
-        });
-        return result;
-    }
-
-    protected Map<BlockRail, BlockFace> checkRailsConnected() {
-        Map<BlockRail, BlockFace> railsAround = this.checkRailsAround(this.getOrientation().connectingDirections());
-        return railsAround.keySet().stream()
-                .filter(r -> r.getOrientation().hasConnectingDirections(railsAround.get(r).getOpposite()))
-                .collect(Collectors.toMap(r -> r, railsAround::get));
-    }
-
-    public boolean isAbstract() {
-        return this.getId() == RAIL;
-    }
-
-    public boolean canPowered() {
-        return this.canBePowered;
-    }
-
-    public Orientation getOrientation() {
-        return byMetadata(this.getRealMeta());
-    }
-
-    public void setOrientation(Orientation o) {
-        if (o.metadata() != this.getRealMeta()) {
-            this.setDamage(o.metadata());
-            this.level.setBlock(this, this, false, true);
-        }
-    }
-
-    public int getRealMeta() {
-        // Check if this can be powered
-        // Avoid modifying the value from meta (The rail orientation may be false)
-        // Reason: When the rail is curved, the meta will return STRAIGHT_NORTH_SOUTH.
-        // OR Null Pointer Exception
-        if (!isAbstract()) {
-            return getDamage() & 0x7;
-        }
-        // Return the default: This meta
-        return getDamage();
-    }
-
-    public boolean isActive() {
-        return (getDamage() & 0x8) != 0;
-    }
-
-    public void setActive(boolean active) {
-        if (active) {
-            setDamage(getDamage() | 0x8);
-        } else {
-            setDamage(getDamage() & 0x7);
-        }
-        level.setBlock(this, this, true, true);
+    @Override
+    public AxisAlignedBB recalculateBoundingBox() {
+        return this;
     }
 
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                Item.get(Item.RAIL)
-        };
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

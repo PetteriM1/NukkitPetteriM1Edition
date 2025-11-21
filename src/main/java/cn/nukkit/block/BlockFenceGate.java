@@ -24,37 +24,6 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
     public BlockFenceGate(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return FENCE_GATE_OAK;
-    }
-
-    @Override
-    public String getName() {
-        return "Oak Fence Gate";
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
     private static final double[] offMinX = new double[2];
     private static final double[] offMinZ = new double[2];
     private static final double[] offMaxX = new double[2];
@@ -72,24 +41,34 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
         offMaxZ[1] = 1;
     }
 
-    private int getOffsetIndex() {
-        switch (this.getDamage() & 0x03) {
-            case 0:
-            case 2:
-                return 0;
-            default:
-                return 1;
-        }
+    @Override
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
-    public double getMinX() {
-        return this.x + offMinX[getOffsetIndex()];
+    public boolean canPassThrough() {
+        return this.isOpen();
     }
 
     @Override
-    public double getMinZ() {
-        return this.z + offMinZ[getOffsetIndex()];
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return FENCE_GATE_OAK;
     }
 
     @Override
@@ -103,11 +82,47 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(player != null ? player.getDirection().getHorizontalIndex() : 0);
+    public double getMinX() {
+        return this.x + offMinX[getOffsetIndex()];
+    }
 
-        this.getLevel().setBlock(this, this, true, true);
-        return true;
+    @Override
+    public double getMinZ() {
+        return this.z + offMinZ[getOffsetIndex()];
+    }
+
+    @Override
+    public String getName() {
+        return "Oak Fence Gate";
+    }
+
+    private int getOffsetIndex() {
+        switch (this.getDamage() & 0x03) {
+            case 0:
+            case 2:
+                return 0;
+            default:
+                return 1;
+        }
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isOpen() {
+        return (this.getDamage() & 0x04) > 0;
     }
 
     @Override
@@ -130,8 +145,29 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            boolean powered = this.level.isBlockPowered(this);
+            if ((!isOpen() && powered) || (isOpen() && !powered)) {
+                this.toggle(null);
+                return type;
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(player != null ? player.getDirection().getHorizontalIndex() : 0);
+
+        this.getLevel().setBlock(this, this, true, true);
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 
     public boolean toggle(Player player) {
@@ -187,42 +223,5 @@ public class BlockFenceGate extends BlockTransparentMeta implements Faceable {
             this.level.addSound(this, Sound.RANDOM_DOOR_CLOSE);
         }
         return true;
-    }
-
-    public boolean isOpen() {
-        return (this.getDamage() & 0x04) > 0;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_REDSTONE) {
-            boolean powered = this.level.isBlockPowered(this);
-            if ((!isOpen() && powered) || (isOpen() && !powered)) {
-                this.toggle(null);
-                return type;
-            }
-        }
-
-        return 0;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return this.isOpen();
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

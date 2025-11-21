@@ -17,34 +17,17 @@ public class UpdateBlockPacket extends DataPacket {
     public static final int FLAG_NOGRAPHIC = 0b0100;
     public static final int FLAG_PRIORITY = 0b1000;
 
-    public static final int FLAG_ALL = (FLAG_NEIGHBORS | FLAG_NETWORK);
-    public static final int FLAG_ALL_PRIORITY = (FLAG_ALL | FLAG_PRIORITY);
+    public static final int FLAG_ALL = 3; // FLAG_NEIGHBORS | FLAG_NETWORK
+    public static final int FLAG_ALL_PRIORITY = 11; // FLAG_ALL | FLAG_PRIORITY
 
     public int x;
     public int z;
     public int y;
+    public int blockId;
+    public int blockData;
     public int blockRuntimeId;
     public int flags;
     public int dataLayer = 0;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public void decode() {
-        this.decodeUnsupported();
-    }
-
-    @Override
-    public void encode() {
-        this.reset();
-        this.putBlockVector3(x, y, z);
-        this.putUnsignedVarInt(blockRuntimeId);
-        this.putUnsignedVarInt(flags);
-        this.putUnsignedVarInt(dataLayer);
-    }
 
     public static class Entry {
         public final int x;
@@ -62,5 +45,31 @@ public class UpdateBlockPacket extends DataPacket {
             this.blockData = blockData;
             this.flags = flags;
         }
+    }
+
+    @Override
+    public void decode() {
+        this.decodeUnsupported();
+    }
+
+    @Override
+    public void encode() {
+        this.reset();
+        this.putBlockVector3(x, y, z);
+        if (protocol > 201) {
+            this.putUnsignedVarInt(blockRuntimeId);
+            this.putUnsignedVarInt(flags);
+        } else {
+            this.putUnsignedVarInt(blockId);
+            this.putUnsignedVarInt(176 | blockData & 0xf); // (0xb << 4) | blockData & 0xf
+        }
+        if (protocol > 224) {
+            this.putUnsignedVarInt(dataLayer);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }
