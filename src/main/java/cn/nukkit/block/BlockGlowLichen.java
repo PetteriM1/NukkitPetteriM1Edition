@@ -9,7 +9,9 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -35,13 +37,18 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
     }
 
     @Override
-    public int getId() {
-        return GLOW_LICHEN;
+    public boolean canBeReplaced() {
+        return true;
     }
 
     @Override
-    public String getName() {
-        return "Glow Lichen";
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.AIR;
     }
 
     @Override
@@ -50,28 +57,80 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!this.canPlaceOn(block.down(), target) || !target.isSolid()) {
-            return false;
-        }
-
-        if (block.getId() == GLOW_LICHEN) {
-            this.setDamage(block.getDamage());
-        } else {
-            this.setDamage(0);
-        }
-
-        this.setBlockFace(face.getOpposite(), true);
-        this.getLevel().setBlock(this, this, false, true);
-        return true;
+    public BlockColor getColor() {
+        return BlockColor.GLOW_LICHEN_BLOCK_COLOR;
     }
 
     @Override
     public Item[] getDrops(Item item) {
         if (item.isShears()) {
-            return new Item[] { this.toItem() };
+            return new Item[]{this.toItem()};
         }
         return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.2;
+    }
+
+    @Override
+    public int getId() {
+        return GLOW_LICHEN;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 7;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Glow Lichen";
+    }
+
+    private Set<BlockFace> getSupportedFaces() {
+        EnumSet<BlockFace> faces = EnumSet.noneOf(BlockFace.class);
+        for (BlockFace face : BlockFace.values()) {
+            if (this.hasBlockFace(face)) {
+                faces.add(face);
+            }
+        }
+        return faces;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean hasBlockFace(BlockFace face) {
+        switch (face) {
+            case UP:
+                return this.getBooleanValue(CONNECTION_UP);
+            case DOWN:
+                return this.getBooleanValue(CONNECTION_DOWN);
+            case NORTH:
+                return this.getBooleanValue(CONNECTION_NORTH);
+            case SOUTH:
+                return this.getBooleanValue(CONNECTION_SOUTH);
+            case WEST:
+                return this.getBooleanValue(CONNECTION_WEST);
+            case EAST:
+                return this.getBooleanValue(CONNECTION_EAST);
+
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
     }
 
     @Override
@@ -79,7 +138,7 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
         if (type == Level.BLOCK_UPDATE_SCHEDULED) {
             this.getLevel().useBreakOn(this, null, null, true);
         } else if (type != Level.BLOCK_UPDATE_NORMAL) {
-           return type;
+            return type;
         }
 
         boolean update = false;
@@ -105,43 +164,25 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!this.canPlaceOn(block.down(), target) || !target.isSolid()) {
+            return false;
+        }
 
-    @Override
-    public double getHardness() {
-        return 0.2;
-    }
+        if (block.getId() == GLOW_LICHEN) {
+            this.setDamage(block.getDamage());
+        } else {
+            this.setDamage(0);
+        }
 
-    @Override
-    public int getLightLevel() {
-        return 7;
-    }
-
-    @Override
-    public boolean canPassThrough() {
+        this.setBlockFace(face.getOpposite(), true);
+        this.getLevel().setBlock(this, this, false, true);
         return true;
-    }
-
-    @Override
-    public boolean canBeReplaced() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
     }
 
     @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         return null;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.GLOW_LICHEN_BLOCK_COLOR;
     }
 
     public void setBlockFace(BlockFace face, boolean value) {
@@ -168,37 +209,8 @@ public class BlockGlowLichen extends BlockTransparentMeta implements BlockProper
         }
     }
 
-    public boolean hasBlockFace(BlockFace face) {
-        switch (face) {
-            case UP:
-                return this.getBooleanValue(CONNECTION_UP);
-            case DOWN:
-                return this.getBooleanValue(CONNECTION_DOWN);
-            case NORTH:
-                return this.getBooleanValue(CONNECTION_NORTH);
-            case SOUTH:
-                return this.getBooleanValue(CONNECTION_SOUTH);
-            case WEST:
-                return this.getBooleanValue(CONNECTION_WEST);
-            case EAST:
-                return this.getBooleanValue(CONNECTION_EAST);
-
-        }
-        return false;
-    }
-
-    private Set<BlockFace> getSupportedFaces() {
-        EnumSet<BlockFace> faces = EnumSet.noneOf(BlockFace.class);
-        for (BlockFace face : BlockFace.values()) {
-            if (this.hasBlockFace(face)) {
-                faces.add(face);
-            }
-        }
-        return faces;
-    }
-
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId()), 0, 1);
     }
 }

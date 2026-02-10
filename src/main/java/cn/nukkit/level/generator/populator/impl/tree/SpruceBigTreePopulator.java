@@ -18,12 +18,18 @@ public class SpruceBigTreePopulator extends Populator {
     public SpruceBigTreePopulator() {
     }
 
-    public void setRandomAmount(int randomAmount) {
-        this.randomAmount = randomAmount;
-    }
+    private int getHighestWorkableBlock(int x, int z) {
+        int y;
+        for (y = 255; y > 0; --y) {
+            int b = this.level.getBlockIdAt(x, y, z);
+            if (b == Block.DIRT || b == Block.GRASS || b == Block.PODZOL) {
+                break;
+            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
+                return -1;
+            }
+        }
 
-    public void setBaseAmount(int baseAmount) {
-        this.baseAmount = baseAmount;
+        return ++y;
     }
 
     @Override
@@ -43,17 +49,11 @@ public class SpruceBigTreePopulator extends Populator {
         }
     }
 
-    private int getHighestWorkableBlock(int x, int z) {
-        int y;
-        for (y = 255; y > 0; --y) {
-            int b = this.level.getBlockIdAt(x, y, z);
-            if (b == Block.DIRT || b == Block.GRASS || b == Block.PODZOL) {
-                break;
-            } else if (b != Block.AIR && b != Block.SNOW_LAYER) {
-                return -1;
-            }
-        }
+    public void setBaseAmount(int baseAmount) {
+        this.baseAmount = baseAmount;
+    }
 
-        return ++y;
+    public void setRandomAmount(int randomAmount) {
+        this.randomAmount = randomAmount;
     }
 }

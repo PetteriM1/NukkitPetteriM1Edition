@@ -14,11 +14,6 @@ public class ShowProfilePacket extends DataPacket {
     public String xuid;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -27,5 +22,10 @@ public class ShowProfilePacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putString(this.xuid);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

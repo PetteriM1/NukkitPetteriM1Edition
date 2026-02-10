@@ -11,6 +11,11 @@ public class BlockBlastFurnace extends BlockBlastFurnaceLit {
     }
 
     @Override
+    public int getId() {
+        return BLAST_FURNACE;
+    }
+
+    @Override
     public int getLightLevel() {
         return 0;
     }
@@ -18,10 +23,5 @@ public class BlockBlastFurnace extends BlockBlastFurnaceLit {
     @Override
     public String getName() {
         return "Blast Furnace";
-    }
-
-    @Override
-    public int getId() {
-        return BLAST_FURNACE;
     }
 }

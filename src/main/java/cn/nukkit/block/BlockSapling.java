@@ -40,13 +40,7 @@ public class BlockSapling extends BlockFlowable {
     public BlockSapling(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return SAPLING;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Sapling",
             "Spruce Sapling",
             "Birch Sapling",
@@ -56,27 +50,18 @@ public class BlockSapling extends BlockFlowable {
             "",
             ""
     };
+    private static final Vector2[][] VALID_SAPLINGS = new Vector2[4][4];
 
-    @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x07];
+    static {
+        VALID_SAPLINGS[0] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1)};
+        VALID_SAPLINGS[1] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, -1), new Vector2(-1, -1)};
+        VALID_SAPLINGS[2] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, -1), new Vector2(1, -1)};
+        VALID_SAPLINGS[3] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(-1, 1)};
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!(this instanceof BlockMangrovePropagule) &&
-                (block instanceof BlockWater || block.level.isBlockWaterloggedAt(block.getChunk(), (int) block.x, (int) block.y, (int) block.z))) {
-            return false;
-        }
-
-        Block down = this.down();
-        int id = down.getId();
-        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD) {
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
-        }
-
-        return false;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -84,20 +69,47 @@ public class BlockSapling extends BlockFlowable {
         return true;
     }
 
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
-            if (player != null && !player.isCreative()) {
-                item.count--;
+    private Vector2 findSaplings(int type) {
+        for (Vector2[] validVectors : VALID_SAPLINGS) {
+            boolean found = true;
+
+            for (Vector2 vector2 : validVectors) {
+                if (!this.isSameType(this.add(vector2.x, 0, vector2.y), type)) {
+                    found = false;
+                }
             }
 
-            this.level.addParticle(new BoneMealParticle(this));
-            if (ThreadLocalRandom.current().nextFloat() >= 0.45) {
-                return true;
+            if (found) {
+                int lowestX = 0;
+                int lowestZ = 0;
+                for (Vector2 vector2 : validVectors) {
+                    if (vector2.getFloorX() < lowestX) {
+                        lowestX = vector2.getFloorX();
+                    }
+                    if (vector2.getFloorY() < lowestZ) {
+                        lowestZ = vector2.getFloorY();
+                    }
+                }
+                return new Vector2(lowestX, lowestZ);
             }
-
-            return growTreeHere();
         }
-        return false;
+
+        return null;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getId() {
+        return SAPLING;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x07];
     }
 
     protected boolean growTreeHere() {
@@ -203,6 +215,27 @@ public class BlockSapling extends BlockFlowable {
         return true;
     }
 
+    public boolean isSameType(Vector3 pos, int type) {
+        Block block = this.level.getBlock(pos);
+        return block.getId() == this.getId() && (block.getDamage() & 0x07) == (type & 0x07);
+    }
+
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == Item.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
+            if (player != null && !player.isCreative()) {
+                item.count--;
+            }
+
+            this.level.addParticle(new BoneMealParticle(this));
+            if (ThreadLocalRandom.current().nextFloat() >= 0.45) {
+                return true;
+            }
+
+            return growTreeHere();
+        }
+        return false;
+    }
+
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (this.down().isTransparent()) {
@@ -225,59 +258,25 @@ public class BlockSapling extends BlockFlowable {
         return 1;
     }
 
-    public boolean isSameType(Vector3 pos, int type) {
-        Block block = this.level.getBlock(pos);
-        return block.getId() == this.getId() && (block.getDamage() & 0x07) == (type & 0x07);
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!(this instanceof BlockMangrovePropagule) &&
+                (block instanceof BlockWater || block.level.isBlockWaterloggedAt(block.getChunk(), (int) block.x, (int) block.y, (int) block.z))) {
+            return false;
+        }
+
+        Block down = this.down();
+        int id = down.getId();
+        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD || id == MUDDY_MANGROVE_ROOTS) {
+            this.getLevel().setBlock(block, this, true, true);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public Item toItem() {
         return Item.get(BlockID.SAPLING, this.getDamage() & 0x7);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    private static final Vector2[][] VALID_SAPLINGS = new Vector2[4][4];
-    static {
-        VALID_SAPLINGS[0] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1)};
-        VALID_SAPLINGS[1] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, -1), new Vector2(-1, -1)};
-        VALID_SAPLINGS[2] = new Vector2[]{new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, -1), new Vector2(1, -1)};
-        VALID_SAPLINGS[3] = new Vector2[]{new Vector2(0, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(-1, 1)};
-    }
-
-    private Vector2 findSaplings(int type) {
-        for (Vector2[] validVectors : VALID_SAPLINGS) {
-            boolean found = true;
-
-            for (Vector2 vector2 : validVectors) {
-                if (!this.isSameType(this.add(vector2.x, 0, vector2.y), type)) {
-                    found = false;
-                }
-            }
-
-            if (found) {
-                int lowestX = 0;
-                int lowestZ = 0;
-                for (Vector2 vector2 : validVectors) {
-                    if (vector2.getFloorX() < lowestX) {
-                        lowestX = vector2.getFloorX();
-                    }
-                    if (vector2.getFloorY() < lowestZ) {
-                        lowestZ = vector2.getFloorY();
-                    }
-                }
-                return new Vector2(lowestX, lowestZ);
-            }
-        }
-
-        return null;
     }
 }

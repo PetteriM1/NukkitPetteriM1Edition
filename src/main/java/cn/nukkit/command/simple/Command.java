@@ -11,11 +11,11 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Command {
-    String name();
+    String[] aliases() default {};
 
     String description() default "";
 
-    String usageMessage() default "";
+    String name();
 
-    String[] aliases() default {};
+    String usageMessage() default "";
 }

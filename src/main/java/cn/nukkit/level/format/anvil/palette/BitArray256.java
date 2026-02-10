@@ -21,17 +21,13 @@ public final class BitArray256 {
         this.data = other.data.clone();
     }
 
-    public void setAt(int index, int value) {
-        int bitIndexStart = index * bitsPerEntry;
-        int longIndexStart = bitIndexStart >> 6;
-        int localBitIndexStart = bitIndexStart & 63;
-        this.data[longIndexStart] = this.data[longIndexStart] & ~((long) ((1 << bitsPerEntry) - 1) << localBitIndexStart) | ((long) value) << localBitIndexStart;
+    public BitArray256 clone() {
+        return new BitArray256(this);
+    }
 
-        if (localBitIndexStart > 64 - bitsPerEntry) {
-            int longIndexEnd = longIndexStart + 1;
-            int localShiftStart = 64 - localBitIndexStart;
-            int localShiftEnd = bitsPerEntry - localShiftStart;
-            this.data[longIndexEnd] = this.data[longIndexEnd] >>> localShiftEnd << localShiftEnd | (((long) value) >> localShiftStart);
+    public void fromRaw(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            setAt(i, arr[i]);
         }
     }
 
@@ -42,15 +38,9 @@ public final class BitArray256 {
 
         int localBitIndexStart = bitIndexStart & 63;
         if (localBitIndexStart <= 64 - bitsPerEntry) {
-            return (int)(this.data[longIndexStart] >>> localBitIndexStart & ((1 << bitsPerEntry) - 1));
+            return (int) (this.data[longIndexStart] >>> localBitIndexStart & ((1 << bitsPerEntry) - 1));
         } else {
             return (int) ((this.data[longIndexStart] >>> localBitIndexStart | this.data[longIndexStart + 1] << (64 - localBitIndexStart)) & ((1 << bitsPerEntry) - 1));
-        }
-    }
-
-    public void fromRaw(int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            setAt(i, arr[i]);
         }
     }
 
@@ -73,18 +63,28 @@ public final class BitArray256 {
         return newBitArray;
     }
 
-    public int[] toRaw(int[] buffer) {
-        for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = getAt(i);
+    public void setAt(int index, int value) {
+        int bitIndexStart = index * bitsPerEntry;
+        int longIndexStart = bitIndexStart >> 6;
+        int localBitIndexStart = bitIndexStart & 63;
+        this.data[longIndexStart] = this.data[longIndexStart] & ~((long) ((1 << bitsPerEntry) - 1) << localBitIndexStart) | ((long) value) << localBitIndexStart;
+
+        if (localBitIndexStart > 64 - bitsPerEntry) {
+            int longIndexEnd = longIndexStart + 1;
+            int localShiftStart = 64 - localBitIndexStart;
+            int localShiftEnd = bitsPerEntry - localShiftStart;
+            this.data[longIndexEnd] = this.data[longIndexEnd] >>> localShiftEnd << localShiftEnd | (((long) value) >> localShiftStart);
         }
-        return buffer;
     }
 
     public int[] toRaw() {
         return toRaw(new int[256]);
     }
 
-    public BitArray256 clone() {
-        return new BitArray256(this);
+    public int[] toRaw(int[] buffer) {
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = getAt(i);
+        }
+        return buffer;
     }
 }

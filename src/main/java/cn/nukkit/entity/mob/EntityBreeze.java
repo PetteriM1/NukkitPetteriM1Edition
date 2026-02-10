@@ -1,8 +1,12 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.EntityLiving;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.utils.Utils;
 
 public class EntityBreeze extends EntityFlyingMob {
 
@@ -10,6 +14,26 @@ public class EntityBreeze extends EntityFlyingMob {
 
     public EntityBreeze(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public void attackEntity(Entity player) {
+        //TODO
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.BREEZE_ROD, 0, Utils.rand(1, 2))};
+    }
+
+    @Override
+    public float getHeight() {
+        return 1.77f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 10;
     }
 
     @Override
@@ -23,23 +47,19 @@ public class EntityBreeze extends EntityFlyingMob {
     }
 
     @Override
-    public float getHeight() {
-        return 1.77f;
-    }
-
-    @Override
     public void initEntity() {
         this.setMaxHealth(30);
         super.initEntity();
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[]{/*Item.get(Item.BREEZE_ROD, 0, Utils.rand(1, 2))*/};
+    protected int nearbyDistanceMultiplier() {
+        return target instanceof EntityLiving || followTarget instanceof EntityLiving ? 1000 : 1; // don't follow
     }
 
     @Override
-    public int getKillExperience() {
-        return 10;
+    public boolean targetOption(EntityCreature creature, double distance) {
+        //TODO
+        return false;
     }
 }

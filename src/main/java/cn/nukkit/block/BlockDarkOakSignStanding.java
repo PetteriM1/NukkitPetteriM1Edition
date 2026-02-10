@@ -14,18 +14,13 @@ public class BlockDarkOakSignStanding extends BlockSignPost {
     }
 
     @Override
-    public String getName() {
-        return "Dark Oak Sign Post";
-    }
-
-    @Override
     public int getId() {
         return DARK_OAK_STANDING_SIGN;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.DARKOAK_SIGN);
+    public String getName() {
+        return "Dark Oak Sign Post";
     }
 
     @Override
@@ -36,5 +31,10 @@ public class BlockDarkOakSignStanding extends BlockSignPost {
     @Override
     protected int getWallId() {
         return DARK_OAK_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.DARKOAK_SIGN);
     }
 }

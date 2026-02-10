@@ -6,7 +6,9 @@ import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemDye;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.level.particle.BoneMealParticle;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,13 +22,31 @@ public class BlockMoss extends BlockDirt {
     }
 
     @Override
-    public int getId() {
-        return MOSS_BLOCK;
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
-    public String getName() {
-        return "Moss Block";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GRASS;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.GREEN_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (this.canHarvestWithHand() || this.canHarvest(item)) {
+            return new Item[]{this.toItem()};
+        }
+        return new Item[0];
+    }
+
+    @Override
+    public int getFullId() {
+        return this.getId() << Block.DATA_BITS;
     }
 
     @Override
@@ -35,8 +55,28 @@ public class BlockMoss extends BlockDirt {
     }
 
     @Override
+    public int getId() {
+        return MOSS_BLOCK;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Moss Block";
+    }
+
+    @Override
     public double getResistance() {
         return 2.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 
     @Override
@@ -79,21 +119,6 @@ public class BlockMoss extends BlockDirt {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GREEN_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public int getFullId() {
-        return this.getId() << Block.DATA_BITS;
-    }
-
-    @Override
     public void setDamage(int meta) {
         // Noop
     }
@@ -101,18 +126,5 @@ public class BlockMoss extends BlockDirt {
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (this.canHarvestWithHand() || this.canHarvest(item)) {
-            return new Item[]{this.toItem()};
-        }
-        return new Item[0];
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
     }
 }

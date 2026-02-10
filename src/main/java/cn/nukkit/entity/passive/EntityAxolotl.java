@@ -12,9 +12,13 @@ public class EntityAxolotl extends EntityFish {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(14);
-        super.initEntity();
+    protected int getBucketMeta() {
+        return 12;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.42f;
     }
 
     @Override
@@ -28,12 +32,8 @@ public class EntityAxolotl extends EntityFish {
     }
 
     @Override
-    public float getHeight() {
-        return 0.42f;
-    }
-
-    @Override
-    protected int getBucketMeta() {
-        return 12;
+    public void initEntity() {
+        this.setMaxHealth(14);
+        super.initEntity();
     }
 }

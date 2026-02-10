@@ -5,8 +5,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockWarpedNylium extends BlockNylium {
 
     @Override
-    public String getName() {
-        return "Warped Nylium";
+    public BlockColor getColor() {
+        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
     }
 
     @Override
@@ -15,7 +15,7 @@ public class BlockWarpedNylium extends BlockNylium {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_NYLIUM_BLOCK_COLOR;
+    public String getName() {
+        return "Warped Nylium";
     }
 }

@@ -7,11 +7,11 @@ import cn.nukkit.Player;
  */
 public interface EntityInteractable {
 
-    String getInteractButtonText();
+    boolean canDoInteraction();
 
     default String getInteractButtonText(Player player) {
         return this.getInteractButtonText();
     }
 
-    boolean canDoInteraction();
+    String getInteractButtonText();
 }

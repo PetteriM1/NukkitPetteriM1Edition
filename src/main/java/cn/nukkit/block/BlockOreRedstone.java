@@ -16,13 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreRedstone extends BlockOre {
 
     @Override
-    public int getId() {
-        return REDSTONE_ORE;
-    }
-
-    @Override
-    public String getName() {
-        return "Redstone Ore";
+    public int getDropExp() {
+        return Utils.rand(1, 5);
     }
 
     @Override
@@ -48,8 +43,23 @@ public class BlockOreRedstone extends BlockOre {
     }
 
     @Override
+    public int getId() {
+        return REDSTONE_ORE;
+    }
+
+    @Override
+    public String getName() {
+        return "Redstone Ore";
+    }
+
+    @Override
     protected int getRawMaterial() {
         return ItemID.REDSTONE_DUST;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
     }
 
     @Override
@@ -62,15 +72,5 @@ public class BlockOreRedstone extends BlockOre {
         }
 
         return 0;
-    }
-
-    @Override
-    public int getDropExp() {
-        return Utils.rand(1, 5);
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_IRON;
     }
 }

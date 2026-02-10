@@ -18,24 +18,24 @@ public class BlockHarvestEvent extends BlockEvent implements Cancellable {
         this.drops = drops;
     }
 
-    public Block getNewState() {
-        return newState;
-    }
-
-    public void setNewState(Block newState) {
-        this.newState = newState;
-    }
-
     public Item[] getDrops() {
         return drops;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Block getNewState() {
+        return newState;
     }
 
     public void setDrops(Item[] drops) {
         this.drops = drops;
     }
 
-    public static HandlerList getHandlers() {
-        return handlers;
+    public void setNewState(Block newState) {
+        this.newState = newState;
     }
 
 }

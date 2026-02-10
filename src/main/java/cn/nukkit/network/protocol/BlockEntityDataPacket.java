@@ -18,11 +18,6 @@ public class BlockEntityDataPacket extends DataPacket {
     public byte[] namedTag;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         BlockVector3 v = this.getBlockVector3();
         this.x = v.x;
@@ -36,5 +31,10 @@ public class BlockEntityDataPacket extends DataPacket {
         this.reset();
         this.putBlockVector3(this.x, this.y, this.z);
         this.put(this.namedTag);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

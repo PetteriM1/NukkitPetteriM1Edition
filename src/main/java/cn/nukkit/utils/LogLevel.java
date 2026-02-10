@@ -12,7 +12,9 @@ import java.util.function.BiConsumer;
  */
 public enum LogLevel implements Comparable<LogLevel> {
 
-    NONE((logger, message) -> {}, (mainLogger, s, throwable) -> {}),
+    NONE((logger, message) -> {
+    }, (mainLogger, s, throwable) -> {
+    }),
     EMERGENCY(MainLogger::emergency, MainLogger::emergency),
     ALERT(MainLogger::alert, MainLogger::alert),
     CRITICAL(MainLogger::critical, MainLogger::critical),
@@ -36,14 +38,6 @@ public enum LogLevel implements Comparable<LogLevel> {
         this.logThrowableTo = logThrowableTo;
     }
 
-    public void log(MainLogger logger, String message) {
-        logTo.accept(logger, message);
-    }
-
-    public void log(MainLogger logger, String message, Throwable throwable) {
-        logThrowableTo.accept(logger, message, throwable);
-    }
-
     /**
      * Get log level
      *
@@ -51,5 +45,13 @@ public enum LogLevel implements Comparable<LogLevel> {
      */
     public int getLevel() {
         return ordinal();
+    }
+
+    public void log(MainLogger logger, String message, Throwable throwable) {
+        logThrowableTo.accept(logger, message, throwable);
+    }
+
+    public void log(MainLogger logger, String message) {
+        logTo.accept(logger, message);
     }
 }

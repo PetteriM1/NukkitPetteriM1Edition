@@ -11,12 +11,12 @@ public class EnchantmentWaterWorker extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 1;
+    public int getMaxEnchantAbility(int level) {
+        return this.getMinEnchantAbility(level) + 40;
     }
 
     @Override
-    public int getMaxEnchantAbility(int level) {
-        return this.getMinEnchantAbility(level) + 40;
+    public int getMinEnchantAbility(int level) {
+        return 1;
     }
 }

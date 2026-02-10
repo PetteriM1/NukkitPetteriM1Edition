@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
@@ -27,28 +28,7 @@ public class BlockFence extends BlockTransparentMeta {
     public BlockFence(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return FENCE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Fence",
             "Spruce Fence",
             "Birch Fence",
@@ -59,33 +39,8 @@ public class BlockFence extends BlockTransparentMeta {
             ""
     };
 
-    @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x07];
-    }
-
-    protected AxisAlignedBB recalculateBoundingBox() {
-        boolean north = this.canConnect(this.north());
-        boolean south = this.canConnect(this.south());
-        boolean west = this.canConnect(this.west());
-        boolean east = this.canConnect(this.east());
-        double n = north ? 0 : 0.375;
-        double s = south ? 1 : 0.625;
-        double w = west ? 0 : 0.375;
-        double e = east ? 1 : 0.625;
-        return new SimpleAxisAlignedBB(
-                this.x + w,
-                this.y,
-                this.z + n,
-                this.x + e,
-                this.y + 1.5,
-                this.z + s
-        );
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 5;
+    public boolean canConnect(Block block) {
+        return (block instanceof BlockFence || block instanceof BlockFenceGate) || block.isSolid() && !block.isTransparent();
     }
 
     @Override
@@ -93,8 +48,9 @@ public class BlockFence extends BlockTransparentMeta {
         return 20;
     }
 
-    public boolean canConnect(Block block) {
-        return (block instanceof BlockFence || block instanceof BlockFenceGate) || block.isSolid() && !block.isTransparent();
+    @Override
+    public int getBurnChance() {
+        return 5;
     }
 
     @Override
@@ -117,12 +73,67 @@ public class BlockFence extends BlockTransparentMeta {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(this, this.getDamage());
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return FENCE;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x07];
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return new SimpleAxisAlignedBB(
+                    this.x + 1,
+                    this.y,
+                    this.z + 1,
+                    this.x + 1,
+                    this.y + 1.5,
+                    this.z + 1
+            ); // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
+        }
+
+        boolean north = this.canConnect(this.north());
+        boolean south = this.canConnect(this.south());
+        boolean west = this.canConnect(this.west());
+        boolean east = this.canConnect(this.east());
+        double n = north ? 0 : 0.375;
+        double s = south ? 1 : 0.625;
+        double w = west ? 0 : 0.375;
+        double e = east ? 1 : 0.625;
+        return new SimpleAxisAlignedBB(
+                this.x + w,
+                this.y,
+                this.z + n,
+                this.x + e,
+                this.y + 1.5,
+                this.z + s
+        );
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, this.getDamage());
     }
 }

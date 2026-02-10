@@ -18,18 +18,18 @@ public interface BlockEntityNameable {
     String getName();
 
     /**
-     * 设置或更改这个事物的名字。<br>
-     * Changes the name of this object, or names it.
-     *
-     * @param name 这个事物的新名字。<br>The new name of this object.
-     */
-    void setName(String name);
-
-    /**
      * 返回这个事物是否有名字。<br>
      * Whether this object has a name.
      *
      * @return 如果有名字，返回 {@code true}。<br>{@code true} for this object has a name.
      */
     boolean hasName();
+
+    /**
+     * 设置或更改这个事物的名字。<br>
+     * Changes the name of this object, or names it.
+     *
+     * @param name 这个事物的新名字。<br>The new name of this object.
+     */
+    void setName(String name);
 }

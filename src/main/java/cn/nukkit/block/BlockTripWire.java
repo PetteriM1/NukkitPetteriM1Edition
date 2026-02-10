@@ -21,13 +21,13 @@ public class BlockTripWire extends BlockFlowable {
     }
 
     @Override
-    public int getId() {
-        return TRIPWIRE;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
-    public String getName() {
-        return "Tripwire";
+    public boolean canBeFlowedInto() {
+        return false;
     }
 
     @Override
@@ -36,12 +36,23 @@ public class BlockTripWire extends BlockFlowable {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.STRING);
+    public int getId() {
+        return TRIPWIRE;
     }
 
-    public boolean isPowered() {
-        return (this.getDamage() & 1) > 0;
+    @Override
+    public double getMaxY() {
+        return this.y + 0.5;
+    }
+
+    @Override
+    public String getName() {
+        return "Tripwire";
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     public boolean isAttached() {
@@ -52,22 +63,24 @@ public class BlockTripWire extends BlockFlowable {
         return (this.getDamage() & 8) > 0;
     }
 
-    public void setPowered(boolean value) {
-        if (value ^ this.isPowered()) {
-            this.setDamage(this.getDamage() ^ 0x01);
-        }
+    public boolean isPowered() {
+        return (this.getDamage() & 1) > 0;
     }
 
-    public void setAttached(boolean value) {
-        if (value ^ this.isAttached()) {
-            this.setDamage(this.getDamage() ^ 0x04);
+    @Override
+    public boolean onBreak(Item item) {
+        if (item.getId() == Item.SHEARS) {
+            this.setDisarmed(true);
+            this.level.setBlock(this, this, true, true);
+            this.updateHook(false);
+            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+        } else {
+            this.setPowered(true);
+            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+            this.updateHook(true);
         }
-    }
 
-    public void setDisarmed(boolean value) {
-        if (value ^ this.isDisarmed()) {
-            this.setDamage(this.getDamage() ^ 0x08);
-        }
+        return true;
     }
 
     @Override
@@ -84,31 +97,6 @@ public class BlockTripWire extends BlockFlowable {
             this.updateHook(false);
 
             this.level.scheduleUpdate(this, 10);
-        }
-    }
-
-    public void updateHook(boolean scheduleUpdate) {
-        for (BlockFace side : new BlockFace[]{BlockFace.SOUTH, BlockFace.WEST}) {
-            for (int i = 1; i < 42; ++i) {
-                Block block = this.getSide(side, i);
-
-                if (block instanceof BlockTripWireHook) {
-                    BlockTripWireHook hook = (BlockTripWireHook) block;
-
-                    if (hook.getFacing() == side.getOpposite()) {
-                        hook.calculateState(false, true, i, this);
-                    }
-
-                    /*if (scheduleUpdate) {
-                        this.level.scheduleUpdate(hook, 10);
-                    }*/
-                    break;
-                }
-
-                if (block.getId() != Block.TRIPWIRE) {
-                    break;
-                }
-            }
         }
     }
 
@@ -151,43 +139,55 @@ public class BlockTripWire extends BlockFlowable {
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        if (item.getId() == Item.SHEARS) {
-            this.setDisarmed(true);
-            this.level.setBlock(this, this, true, true);
-            this.updateHook(false);
-            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-        } else {
-            this.setPowered(true);
-            this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-            this.updateHook(true);
-        }
-
-        return true;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.5;
-    }
-
-    @Override
     protected AxisAlignedBB recalculateCollisionBoundingBox() {
         return this;
     }
 
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
+    public void setAttached(boolean value) {
+        if (value ^ this.isAttached()) {
+            this.setDamage(this.getDamage() ^ 0x04);
+        }
+    }
+
+    public void setDisarmed(boolean value) {
+        if (value ^ this.isDisarmed()) {
+            this.setDamage(this.getDamage() ^ 0x08);
+        }
+    }
+
+    public void setPowered(boolean value) {
+        if (value ^ this.isPowered()) {
+            this.setDamage(this.getDamage() ^ 0x01);
+        }
     }
 
     @Override
-    public boolean canBeFlowedInto() {
-        return false;
+    public Item toItem() {
+        return Item.get(Item.STRING);
     }
 
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public void updateHook(boolean scheduleUpdate) {
+        for (BlockFace side : new BlockFace[]{BlockFace.SOUTH, BlockFace.WEST}) {
+            for (int i = 1; i < 42; ++i) {
+                Block block = this.getSide(side, i);
+
+                if (block instanceof BlockTripWireHook) {
+                    BlockTripWireHook hook = (BlockTripWireHook) block;
+
+                    if (hook.getFacing() == side.getOpposite()) {
+                        hook.calculateState(false, true, i, this);
+                    }
+
+                    /*if (scheduleUpdate) {
+                        this.level.scheduleUpdate(hook, 10);
+                    }*/
+                    break;
+                }
+
+                if (block.getId() != Block.TRIPWIRE) {
+                    break;
+                }
+            }
+        }
     }
 }

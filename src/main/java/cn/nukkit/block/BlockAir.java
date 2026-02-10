@@ -11,26 +11,6 @@ import cn.nukkit.utils.BlockColor;
 public class BlockAir extends BlockTransparent {
 
     @Override
-    public int getId() {
-        return AIR;
-    }
-
-    @Override
-    public String getName() {
-        return "Air";
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
-        return false;
-    }
-
-    @Override
     public boolean canBeFlowedInto() {
         return true;
     }
@@ -46,8 +26,13 @@ public class BlockAir extends BlockTransparent {
     }
 
     @Override
-    public boolean isSolid() {
+    public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
     }
 
     @Override
@@ -56,8 +41,23 @@ public class BlockAir extends BlockTransparent {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
     public double getHardness() {
         return 0;
+    }
+
+    @Override
+    public int getId() {
+        return AIR;
+    }
+
+    @Override
+    public String getName() {
+        return "Air";
     }
 
     @Override
@@ -66,12 +66,12 @@ public class BlockAir extends BlockTransparent {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
+    public boolean isBreakable(Item item) {
         return false;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
+    public boolean isSolid() {
+        return false;
     }
 }

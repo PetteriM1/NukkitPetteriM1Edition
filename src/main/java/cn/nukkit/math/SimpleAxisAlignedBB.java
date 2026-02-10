@@ -32,38 +32,8 @@ public class SimpleAxisAlignedBB implements AxisAlignedBB {
     }
 
     @Override
-    public String toString() {
-        return "AxisAlignedBB(" + this.getMinX() + ", " + this.getMinY() + ", " + this.getMinZ() + ", " + this.getMaxX() + ", " + this.getMaxY() + ", " + this.getMaxZ() + ")";
-    }
-
-    @Override
-    public double getMinX() {
-        return minX;
-    }
-
-    @Override
-    public void setMinX(double minX) {
-        this.minX = minX;
-    }
-
-    @Override
-    public double getMinY() {
-        return minY;
-    }
-
-    @Override
-    public void setMinY(double minY) {
-        this.minY = minY;
-    }
-
-    @Override
-    public double getMinZ() {
-        return minZ;
-    }
-
-    @Override
-    public void setMinZ(double minZ) {
-        this.minZ = minZ;
+    public AxisAlignedBB clone() {
+        return new SimpleAxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     @Override
@@ -72,18 +42,8 @@ public class SimpleAxisAlignedBB implements AxisAlignedBB {
     }
 
     @Override
-    public void setMaxX(double maxX) {
-        this.maxX = maxX;
-    }
-
-    @Override
     public double getMaxY() {
         return maxY;
-    }
-
-    @Override
-    public void setMaxY(double maxY) {
-        this.maxY = maxY;
     }
 
     @Override
@@ -92,12 +52,52 @@ public class SimpleAxisAlignedBB implements AxisAlignedBB {
     }
 
     @Override
+    public double getMinX() {
+        return minX;
+    }
+
+    @Override
+    public double getMinY() {
+        return minY;
+    }
+
+    @Override
+    public double getMinZ() {
+        return minZ;
+    }
+
+    @Override
+    public void setMaxX(double maxX) {
+        this.maxX = maxX;
+    }
+
+    @Override
+    public void setMaxY(double maxY) {
+        this.maxY = maxY;
+    }
+
+    @Override
     public void setMaxZ(double maxZ) {
         this.maxZ = maxZ;
     }
 
     @Override
-    public AxisAlignedBB clone() {
-        return new SimpleAxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+    public void setMinX(double minX) {
+        this.minX = minX;
+    }
+
+    @Override
+    public void setMinY(double minY) {
+        this.minY = minY;
+    }
+
+    @Override
+    public void setMinZ(double minZ) {
+        this.minZ = minZ;
+    }
+
+    @Override
+    public String toString() {
+        return "AxisAlignedBB(" + this.getMinX() + ", " + this.getMinY() + ", " + this.getMinZ() + ", " + this.getMaxX() + ", " + this.getMaxY() + ", " + this.getMaxZ() + ")";
     }
 }

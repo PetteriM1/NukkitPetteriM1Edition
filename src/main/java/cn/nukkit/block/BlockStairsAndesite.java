@@ -13,21 +13,6 @@ public class BlockStairsAndesite extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Andesite Stairs";
-    }
-
-    @Override
-    public int getId() {
-        return ANDESITE_STAIRS;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
     public boolean canHarvestWithHand() {
         return false;
     }
@@ -38,7 +23,22 @@ public class BlockStairsAndesite extends BlockStairs {
     }
 
     @Override
+    public int getId() {
+        return ANDESITE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Andesite Stairs";
+    }
+
+    @Override
     public double getResistance() {
         return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

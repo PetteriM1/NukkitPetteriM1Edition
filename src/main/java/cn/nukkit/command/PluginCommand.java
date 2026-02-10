@@ -43,12 +43,12 @@ public class PluginCommand<T extends Plugin> extends Command implements PluginId
         return executor;
     }
 
-    public void setExecutor(CommandExecutor executor) {
-        this.executor = (executor != null) ? executor : this.owningPlugin;
-    }
-
     @Override
     public T getPlugin() {
         return this.owningPlugin;
+    }
+
+    public void setExecutor(CommandExecutor executor) {
+        this.executor = (executor != null) ? executor : this.owningPlugin;
     }
 }

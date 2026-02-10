@@ -14,33 +14,33 @@ public abstract class BlockDoubleSlabBase extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Double " + this.getSlabName() + " Slab";
+    public Item[] getDrops(Item item) {
+        if (isCorrectTool(item)) {
+            Item slab = toItem();
+            slab.setCount(2);
+            return new Item[]{slab};
+        } else {
+            return new Item[0];
+        }
     }
-
-    public abstract String getSlabName();
-
-    public abstract int getSingleSlabId();
 
     public abstract int getItemDamage();
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getSingleSlabId(), this.getItemDamage()), this.getItemDamage(), 1);
+    public String getName() {
+        return "Double " + this.getSlabName() + " Slab";
     }
+
+    public abstract int getSingleSlabId();
+
+    public abstract String getSlabName();
 
     protected boolean isCorrectTool(Item item) {
         return canHarvestWithHand() || canHarvest(item);
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (isCorrectTool(item)) {
-            Item slab = toItem();
-            slab.setCount(2);
-            return new Item[]{ slab };
-        } else {
-            return new Item[0];
-        }
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getSingleSlabId(), this.getItemDamage()), this.getItemDamage(), 1);
     }
 }

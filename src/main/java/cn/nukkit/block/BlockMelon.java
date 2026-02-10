@@ -15,21 +15,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockMelon extends BlockSolid {
 
     @Override
-    public int getId() {
-        return MELON_BLOCK;
-    }
-
-    public String getName() {
-        return "Melon Block";
-    }
-
-    public double getHardness() {
-        return 1;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
-    public double getResistance() {
-        return 5;
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.LIME_BLOCK_COLOR;
     }
 
     @Override
@@ -50,23 +47,26 @@ public class BlockMelon extends BlockSolid {
         };
     }
 
+    public double getHardness() {
+        return 1;
+    }
+
+    @Override
+    public int getId() {
+        return MELON_BLOCK;
+    }
+
+    public String getName() {
+        return "Melon Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
+    }
+
     @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.LIME_BLOCK_COLOR;
-    }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

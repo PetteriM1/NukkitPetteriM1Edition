@@ -42,20 +42,32 @@ public class FormResponseCustom extends FormResponse {
         this.dividerResponses = dividerResponses;
     }
 
-    public HashMap<Integer, Object> getResponses() {
-        return responses;
-    }
-
-    public Object getResponse(int id) {
-        return responses.get(id);
+    public String getDividerResponses(int id) {
+        return dividerResponses.get(id);
     }
 
     public FormResponseData getDropdownResponse(int id) {
         return dropdownResponses.get(id);
     }
 
+    public String getHeaderResponse(int id) {
+        return headerResponses.get(id);
+    }
+
     public String getInputResponse(int id) {
         return inputResponses.get(id);
+    }
+
+    public String getLabelResponse(int id) {
+        return labelResponses.get(id);
+    }
+
+    public Object getResponse(int id) {
+        return responses.get(id);
+    }
+
+    public HashMap<Integer, Object> getResponses() {
+        return responses;
     }
 
     public float getSliderResponse(int id) {
@@ -68,17 +80,5 @@ public class FormResponseCustom extends FormResponse {
 
     public boolean getToggleResponse(int id) {
         return toggleResponses.get(id);
-    }
-
-    public String getLabelResponse(int id) {
-        return labelResponses.get(id);
-    }
-
-    public String getHeaderResponse(int id) {
-        return headerResponses.get(id);
-    }
-
-    public String getDividerResponses(int id) {
-        return dividerResponses.get(id);
     }
 }

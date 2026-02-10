@@ -17,18 +17,8 @@ public class BlockButtonStone extends BlockButton {
     }
 
     @Override
-    public int getId() {
-        return STONE_BUTTON;
-    }
-
-    @Override
-    public String getName() {
-        return "Stone Button";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -42,7 +32,17 @@ public class BlockButtonStone extends BlockButton {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getId() {
+        return STONE_BUTTON;
+    }
+
+    @Override
+    public String getName() {
+        return "Stone Button";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

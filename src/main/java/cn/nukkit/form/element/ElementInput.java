@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 public class ElementInput extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "input"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "input";
     private String text = "";
     private String placeholder = "";
     @SerializedName("default")
@@ -28,33 +28,33 @@ public class ElementInput extends Element {
         this.defaultText = defaultText;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+    public String getDefaultText() {
+        return defaultText;
     }
 
     public String getPlaceHolder() {
         return placeholder;
     }
 
-    public void setPlaceHolder(String placeholder) {
-        this.placeholder = placeholder;
+    public String getText() {
+        return text;
     }
 
-    public String getDefaultText() {
-        return defaultText;
+    @Nullable
+    public String getTooltip() {
+        return tooltip;
     }
 
     public void setDefaultText(String defaultText) {
         this.defaultText = defaultText;
     }
 
-    @Nullable
-    public String getTooltip() {
-        return tooltip;
+    public void setPlaceHolder(String placeholder) {
+        this.placeholder = placeholder;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void setTooltip(String tooltip) {

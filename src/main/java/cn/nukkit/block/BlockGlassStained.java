@@ -19,6 +19,20 @@ public class BlockGlassStained extends BlockGlass {
     }
 
     @Override
+    public BlockColor getColor() {
+        return DyeColor.getByWoolData(meta).getColor();
+    }
+
+    @Override
+    public final int getDamage() {
+        return this.meta;
+    }
+
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(meta);
+    }
+
+    @Override
     public int getFullId() {
         return (this.getId() << Block.DATA_BITS) + this.getDamage();
     }
@@ -31,20 +45,6 @@ public class BlockGlassStained extends BlockGlass {
     @Override
     public String getName() {
         return getDyeColor().getName() + " Stained Glass";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return DyeColor.getByWoolData(meta).getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(meta);
-    }
-
-    @Override
-    public final int getDamage() {
-        return this.meta;
     }
 
     @Override

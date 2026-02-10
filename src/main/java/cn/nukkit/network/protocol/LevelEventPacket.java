@@ -146,11 +146,6 @@ public class LevelEventPacket extends DataPacket {
     public int data = 0;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -161,5 +156,10 @@ public class LevelEventPacket extends DataPacket {
         this.putVarInt(this.evid);
         this.putVector3f(this.x, this.y, this.z);
         this.putVarInt(this.data);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

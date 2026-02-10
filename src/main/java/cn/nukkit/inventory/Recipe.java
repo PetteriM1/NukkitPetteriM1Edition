@@ -10,7 +10,7 @@ public interface Recipe {
 
     Item getResult();
 
-    void registerToCraftingManager(CraftingManager manager);
-
     RecipeType getType();
+
+    void registerToCraftingManager(CraftingManager manager);
 }

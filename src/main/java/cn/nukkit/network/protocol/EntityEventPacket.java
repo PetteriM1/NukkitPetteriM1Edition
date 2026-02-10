@@ -70,12 +70,6 @@ public class EntityEventPacket extends DataPacket {
     public static final int GROW_UP = 76;
     public static final int VIBRATION_DETECTED = 77;
     public static final int DRINK_MILK = 78;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public long eid;
     public int event;
     public int data = 0;
@@ -93,5 +87,10 @@ public class EntityEventPacket extends DataPacket {
         this.putEntityRuntimeId(this.eid);
         this.putByte((byte) this.event);
         this.putVarInt(this.data);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

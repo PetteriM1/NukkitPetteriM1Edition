@@ -2,6 +2,8 @@ package cn.nukkit.block;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCandleCake extends BlockCake {
 
@@ -14,8 +16,13 @@ public class BlockCandleCake extends BlockCake {
     }
 
     @Override
-    public String getName() {
-        return "Candle Cake";
+    public boolean canBeActivated() {
+        return false; // TODO
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.CAKE_BLOCK;
     }
 
     @Override
@@ -24,8 +31,13 @@ public class BlockCandleCake extends BlockCake {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return false; // TODO
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Candle Cake";
     }
 
     @Override

@@ -21,14 +21,20 @@ public class BlockEntityComparator extends BlockEntity {
         this.outputSignal = nbt.getInt("OutputSignal");
     }
 
+    public int getOutputSignal() {
+        return outputSignal;
+    }
+
     @Override
     public boolean isBlockEntityValid() {
         int blockID = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
         return blockID == Block.POWERED_COMPARATOR || blockID == Block.UNPOWERED_COMPARATOR;
     }
 
-    public int getOutputSignal() {
-        return outputSignal;
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.putInt("OutputSignal", this.outputSignal);
     }
 
     public void setOutputSignal(int outputSignal) {
@@ -36,11 +42,5 @@ public class BlockEntityComparator extends BlockEntity {
             this.outputSignal = outputSignal;
             setDirty();
         }
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.putInt("OutputSignal", this.outputSignal);
     }
 }

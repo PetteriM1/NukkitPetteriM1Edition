@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockCoralFan extends BlockCoral implements Faceable {
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Tube Coral Fan",
             "Brain Coral Fan",
             "Bubble Coral Fan",
@@ -26,6 +26,59 @@ public class BlockCoralFan extends BlockCoral implements Faceable {
 
     public BlockCoralFan(int meta) {
         super(meta);
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
+            return super.getDrops(item);
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
+    public int getId() {
+        return CORAL_FAN;
+    }
+
+    @Override
+    public String getName() {
+        int variant = this.getType();
+        String name;
+        if (variant >= names.length) {
+            name = names[0];
+        } else {
+            name = names[variant];
+        }
+        return name;
+    }
+
+    public BlockFace getRootsFace() {
+        return BlockFace.DOWN;
+    }
+
+    public int getType() {
+        return this.getDamage() & 0x7;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
+    }
+
+    public boolean isDead() {
+        return false;
     }
 
     @Override
@@ -90,13 +143,13 @@ public class BlockCoralFan extends BlockCoral implements Faceable {
             if (rotation < 0) {
                 rotation += 360.0;
             }
-            int axisBit = rotation >= 0 && rotation < 12 || (342 <= rotation && rotation < 360)? 0x0 : 0x8;
+            int axisBit = rotation >= 0 && rotation < 12 || (342 <= rotation && rotation < 360) ? 0x0 : 0x8;
             this.setDamage(this.getDamage() & 0x7 | axisBit);
             this.getLevel().setBlock(this, BlockLayer.NORMAL, hasWater ? new BlockCoralFan(this.getDamage()) : new BlockCoralFanDead(this.getDamage()), true, true);
         } else {
             int type = this.getType();
             int typeBit = type % 2;
-            int deadBit = this.isDead()? 0x1 : 0;
+            int deadBit = this.isDead() ? 0x1 : 0;
             int faceBit;
             switch (face) {
                 case WEST:
@@ -134,62 +187,8 @@ public class BlockCoralFan extends BlockCoral implements Faceable {
         return true;
     }
 
-
-    @Override
-    public String getName() {
-        int variant = this.getType();
-        String name;
-        if (variant >= NAMES.length) {
-            name = NAMES[0];
-        } else {
-            name = NAMES[variant];
-        }
-        return name;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
-    }
-
-    @Override
-    public int getId() {
-        return CORAL_FAN;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
     @Override
     public Item toItem() {
         return Item.get(this.getItemId(), this.getDamage() ^ 0x8);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
-            return super.getDrops(item);
-        } else {
-            return new Item[0];
-        }
-    }
-
-    public boolean isDead() {
-        return false;
-    }
-
-    public int getType() {
-        return this.getDamage() & 0x7;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    public BlockFace getRootsFace() {
-        return BlockFace.DOWN;
     }
 }

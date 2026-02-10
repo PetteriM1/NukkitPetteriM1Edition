@@ -162,15 +162,15 @@ public class ObjectSavannaTree extends TreeGenerator {
         }
     }
 
-    private void placeLogAt(ChunkManager worldIn, Vector3 pos) {
-        this.setBlockAndNotifyAdequately(worldIn, pos, TRUNK);
-    }
-
     private void placeLeafAt(ChunkManager worldIn, Vector3 pos) {
         int material = worldIn.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ());
 
         if (material == Block.AIR || material == Block.LEAVES) {
             this.setBlockAndNotifyAdequately(worldIn, pos, LEAF);
         }
+    }
+
+    private void placeLogAt(ChunkManager worldIn, Vector3 pos) {
+        this.setBlockAndNotifyAdequately(worldIn, pos, TRUNK);
     }
 }

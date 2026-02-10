@@ -2,6 +2,7 @@ package cn.nukkit.level.util;
 
 import cn.nukkit.Server;
 import cn.nukkit.level.GlobalBlockPalette;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BinaryStream;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
@@ -15,27 +16,6 @@ public class PalettedBlockStorage {
     private final IntList palette;
     private BitArray bitArray;
 
-    public static PalettedBlockStorage createFromBlockPalette() {
-        return createFromBlockPalette(BitArrayVersion.V2);
-    }
-
-    public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version) {
-        int runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(0);
-        return new PalettedBlockStorage(version, runtimeId);
-    }
-
-    public static PalettedBlockStorage createWithDefaultState(int defaultState) {
-        return createWithDefaultState(BitArrayVersion.V2, defaultState);
-    }
-
-    public static PalettedBlockStorage createWithDefaultState(BitArrayVersion version, int defaultState) {
-        return new PalettedBlockStorage(version, defaultState);
-    }
-
-    public static PalettedBlockStorage createFromBitArray(BitArray bitArray, IntList palette) {
-        return new PalettedBlockStorage(bitArray, palette);
-    }
-
     private PalettedBlockStorage(BitArrayVersion version, int defaultState) {
         this.bitArray = version.createPalette(SIZE);
         this.palette = new IntArrayList(16);
@@ -47,20 +27,40 @@ public class PalettedBlockStorage {
         this.bitArray = bitArray;
     }
 
-    private int getPaletteHeader(BitArrayVersion version, boolean runtime) {
-        return (version.getId() << 1) | (runtime ? 1 : 0);
+    public PalettedBlockStorage copy() {
+        return new PalettedBlockStorage(this.bitArray.copy(), new IntArrayList(this.palette));
     }
 
-    private static BitArrayVersion getVersionFromHeader(byte header) {
-        return BitArrayVersion.get(header >> 1, true);
+    public static PalettedBlockStorage createFromBitArray(BitArray bitArray, IntList palette) {
+        return new PalettedBlockStorage(bitArray, palette);
     }
 
-    private int getIndex(int x, int y, int z) {
-        return (x << 8) | (z << 4) | y;
+    public static PalettedBlockStorage createFromBlockPalette() {
+        return createFromBlockPalette(BitArrayVersion.V2);
     }
 
-    public void setBlock(int x, int y, int z, int runtimeId) {
-        this.setBlock(this.getIndex(x, y, z), runtimeId);
+    public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version) {
+        return createFromBlockPalette(version, 0);
+    }
+
+    public static PalettedBlockStorage createFromBlockPalette(int protocol) {
+        return createFromBlockPalette(BitArrayVersion.V2, protocol);
+    }
+
+    public static PalettedBlockStorage createFromBlockPalette(BitArrayVersion version, int protocol) {
+        int runtimeId = 0;
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            runtimeId = GlobalBlockPalette.getOrCreateRuntimeId(protocol, 0);
+        }
+        return new PalettedBlockStorage(version, runtimeId);
+    }
+
+    public static PalettedBlockStorage createWithDefaultState(int defaultState) {
+        return createWithDefaultState(BitArrayVersion.V2, defaultState);
+    }
+
+    public static PalettedBlockStorage createWithDefaultState(BitArrayVersion version, int defaultState) {
+        return new PalettedBlockStorage(version, defaultState);
     }
 
     public int getBlock(int x, int y, int z) {
@@ -68,87 +68,16 @@ public class PalettedBlockStorage {
         return this.palette.getInt(this.bitArray.get(index));
     }
 
-    public void setBlock(int index, int runtimeId) {
-        try {
-            int id = this.idFor(runtimeId);
-            this.bitArray.set(index, id);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unable to set block runtime ID: " + runtimeId + ", palette: " + palette, e);
-        }
+    private int getIndex(int x, int y, int z) {
+        return (x << 8) | (z << 4) | y;
     }
 
-    public void readFromStorage(ByteBuf buffer) {
-        BitArrayVersion version = getVersionFromHeader(buffer.readByte());
-        this.palette.clear();
-        int paletteSize = 1;
-
-        if (version == BitArrayVersion.V0) {
-            this.bitArray = version.createPalette(SIZE, null);
-        } else {
-            int expectedWordCount = version.getWordsForSize(SIZE);
-            int[] words = new int[expectedWordCount];
-            for (int i = 0; i < expectedWordCount; i++) {
-                words[i] = buffer.readIntLE();
-            }
-            paletteSize = buffer.readIntLE();
-            this.bitArray = version.createPalette(SIZE, words);
-        }
-
-        if (!(version.getMaxEntryValue() >= paletteSize - 1)) {
-            throw new IllegalArgumentException(String.format("Palette (version " + version.name() + ") is too large. Max size %s. Actual size %s", version.getMaxEntryValue(), paletteSize));
-        }
-
-        for (int i = 0; i < paletteSize; i++) {
-            int id = buffer.readIntLE();
-            this.palette.add(id);
-            if (id < 0) {
-                Server.getInstance().getLogger().warning("Negative biome ID " + id);
-            }
-        }
+    private int getPaletteHeader(BitArrayVersion version, boolean runtime) {
+        return (version.getId() << 1) | (runtime ? 1 : 0);
     }
 
-    public void writeToStorage(ByteBuf buffer) {
-        int paletteSize = this.palette.size();
-        BitArrayVersion version = paletteSize <= 1 ? BitArrayVersion.V0 : this.bitArray.getVersion();
-        buffer.writeByte(getPaletteHeader(version, false));
-
-        if (version != BitArrayVersion.V0) {
-            for (int word : this.bitArray.getWords()) {
-                buffer.writeIntLE(word);
-            }
-            buffer.writeIntLE(paletteSize);
-        }
-
-        for (int runtimeId : this.palette) {
-            buffer.writeIntLE(runtimeId);
-        }
-    }
-
-    public void writeTo(BinaryStream stream) {
-        this.writeTo(stream, i -> i);
-    }
-
-    public void writeTo(BinaryStream stream, Int2IntFunction mapper) {
-        stream.putByte((byte) getPaletteHeader(this.bitArray.getVersion(), true));
-        if (this.bitArray.getVersion() != BitArrayVersion.V0) {
-            for (int word : this.bitArray.getWords()) {
-                stream.putLInt(word);
-            }
-            stream.putVarInt(this.palette.size());
-        }
-
-        for (int runtimeId : this.palette) {
-            stream.putVarInt(mapper.get(runtimeId));
-        }
-    }
-
-    private void onResize(BitArrayVersion version) {
-        BitArray newBitArray = version.createPalette();
-
-        for (int i = 0; i < SIZE; i++) {
-            newBitArray.set(i, this.bitArray.get(i));
-        }
-        this.bitArray = newBitArray;
+    private static BitArrayVersion getVersionFromHeader(byte header) {
+        return BitArrayVersion.get(header >> 1, true);
     }
 
     private int idFor(int runtimeId) {
@@ -181,7 +110,90 @@ public class PalettedBlockStorage {
         return true;
     }
 
-    public PalettedBlockStorage copy() {
-        return new PalettedBlockStorage(this.bitArray.copy(), new IntArrayList(this.palette));
+    private void onResize(BitArrayVersion version) {
+        BitArray newBitArray = version.createPalette();
+
+        for (int i = 0; i < SIZE; i++) {
+            newBitArray.set(i, this.bitArray.get(i));
+        }
+        this.bitArray = newBitArray;
+    }
+
+    public void readFromStorage(ByteBuf buffer) {
+        BitArrayVersion version = getVersionFromHeader(buffer.readByte());
+        this.palette.clear();
+        int paletteSize = 1;
+
+        if (version == BitArrayVersion.V0) {
+            this.bitArray = version.createPalette(SIZE, null);
+        } else {
+            int expectedWordCount = version.getWordsForSize(SIZE);
+            int[] words = new int[expectedWordCount];
+            for (int i = 0; i < expectedWordCount; i++) {
+                words[i] = buffer.readIntLE();
+            }
+            paletteSize = buffer.readIntLE();
+            this.bitArray = version.createPalette(SIZE, words);
+        }
+
+        if (!(version.getMaxEntryValue() >= paletteSize - 1)) {
+            throw new IllegalArgumentException(String.format("Palette (version " + version.name() + ") is too large. Max size %s. Actual size %s", version.getMaxEntryValue(), paletteSize));
+        }
+
+        for (int i = 0; i < paletteSize; i++) {
+            int id = buffer.readIntLE();
+            this.palette.add(id);
+            if (id < 0) {
+                Server.getInstance().getLogger().warning("Negative biome ID " + id);
+            }
+        }
+    }
+
+    public void setBlock(int x, int y, int z, int runtimeId) {
+        this.setBlock(this.getIndex(x, y, z), runtimeId);
+    }
+
+    public void setBlock(int index, int runtimeId) {
+        try {
+            int id = this.idFor(runtimeId);
+            this.bitArray.set(index, id);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unable to set block runtime ID: " + runtimeId + ", palette: " + palette, e);
+        }
+    }
+
+    public void writeTo(BinaryStream stream) {
+        this.writeTo(stream, i -> i);
+    }
+
+    public void writeTo(BinaryStream stream, Int2IntFunction mapper) {
+        stream.putByte((byte) getPaletteHeader(this.bitArray.getVersion(), true));
+        if (this.bitArray.getVersion() != BitArrayVersion.V0) {
+            for (int word : this.bitArray.getWords()) {
+                stream.putLInt(word);
+            }
+            stream.putVarInt(this.palette.size());
+        }
+
+        for (int runtimeId : this.palette) {
+            stream.putVarInt(mapper.get(runtimeId));
+        }
+    }
+
+    public void writeToStorage(ByteBuf buffer) {
+        int paletteSize = this.palette.size();
+        BitArrayVersion version = paletteSize <= 1 ? BitArrayVersion.V0 : this.bitArray.getVersion();
+        buffer.writeByte(getPaletteHeader(version, false));
+
+        if (version != BitArrayVersion.V0) {
+            for (int word : this.bitArray.getWords()) {
+                buffer.writeIntLE(word);
+            }
+            buffer.writeIntLE(paletteSize);
+        }
+
+        for (int runtimeId : this.palette) {
+            buffer.writeIntLE(runtimeId);
+        }
     }
 }

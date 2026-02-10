@@ -9,16 +9,6 @@ public class ByteTag extends NumberTag<Integer> {
 
     public int data;
 
-    @Override
-    public Integer getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Integer data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public ByteTag(String name) {
         super(name);
     }
@@ -29,32 +19,8 @@ public class ByteTag extends NumberTag<Integer> {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeByte(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readByte();
-    }
-
-    @Override
-    public byte getId() {
-        return TAG_Byte;
-    }
-
-    @Override
-    public Integer parseValue() {
-        return this.data;
-    }
-
-    @Override
-    public String toString() {
-        String hex = Integer.toHexString(this.data);
-        if (hex.length() < 2) {
-            hex = '0' + hex;
-        }
-        return "ByteTag " + this.getName() + " (data: 0x" + hex + ')';
+    public Tag copy() {
+        return new ByteTag(getName(), data);
     }
 
     @Override
@@ -67,7 +33,41 @@ public class ByteTag extends NumberTag<Integer> {
     }
 
     @Override
-    public Tag copy() {
-        return new ByteTag(getName(), data);
+    public Integer getData() {
+        return data;
+    }
+
+    @Override
+    public byte getId() {
+        return TAG_Byte;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readByte();
+    }
+
+    @Override
+    public Integer parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public void setData(Integer data) {
+        this.data = data == null ? 0 : data;
+    }
+
+    @Override
+    public String toString() {
+        String hex = Integer.toHexString(this.data);
+        if (hex.length() < 2) {
+            hex = '0' + hex;
+        }
+        return "ByteTag " + this.getName() + " (data: 0x" + hex + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeByte(data);
     }
 }

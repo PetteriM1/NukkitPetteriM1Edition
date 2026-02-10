@@ -15,9 +15,9 @@ public interface AdvancedSourceInterface extends SourceInterface {
 
     void blockAddress(InetAddress address, int timeout);
 
-    void unblockAddress(InetAddress address);
+    void sendRawPacket(InetSocketAddress socketAddress, ByteBuf payload);
 
     void setNetwork(Network network);
 
-    void sendRawPacket(InetSocketAddress socketAddress, ByteBuf payload);
+    void unblockAddress(InetAddress address);
 }

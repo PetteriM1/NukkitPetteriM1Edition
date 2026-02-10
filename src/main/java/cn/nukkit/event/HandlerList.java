@@ -18,43 +18,6 @@ public class HandlerList {
     private static final List<HandlerList> allLists = new ObjectArrayList<>();
     private static final Map<Class<?>, HandlerList> eventHandlerLists = new Object2ObjectOpenHashMap<>();
 
-    public static void bakeAll() {
-        synchronized (allLists) {
-            for (HandlerList h : allLists) {
-                h.bake();
-            }
-        }
-    }
-
-    public static void unregisterAll() {
-        synchronized (allLists) {
-            for (HandlerList h : allLists) {
-                synchronized (h) {
-                    for (List<RegisteredListener> list : h.handlerslots.values()) {
-                        list.clear();
-                    }
-                    h.handlers = null;
-                }
-            }
-        }
-    }
-
-    public static void unregisterAll(Plugin plugin) {
-        synchronized (allLists) {
-            for (HandlerList h : allLists) {
-                h.unregister(plugin);
-            }
-        }
-    }
-
-    public static void unregisterAll(Listener listener) {
-        synchronized (allLists) {
-            for (HandlerList h : allLists) {
-                h.unregister(listener);
-            }
-        }
-    }
-
     public HandlerList() {
         handlerslots = new EnumMap<>(EventPriority.class);
         for (EventPriority o : EventPriority.values()) {
@@ -63,6 +26,63 @@ public class HandlerList {
         synchronized (allLists) {
             allLists.add(this);
         }
+    }
+
+    public synchronized void bake() {
+        if (handlers != null) return; // don't re-bake when still valid
+        List<RegisteredListener> entries = new ObjectArrayList<>();
+        for (Map.Entry<EventPriority, List<RegisteredListener>> entry : handlerslots.entrySet()) {
+            entries.addAll(entry.getValue());
+        }
+        handlers = entries.toArray(new RegisteredListener[0]);
+    }
+
+    public static void bakeAll() {
+        synchronized (allLists) {
+            for (HandlerList h : allLists) {
+                h.bake();
+            }
+        }
+    }
+
+    public static HandlerList getCachedHandlerList(Class<? extends Event> clazz) {
+        return eventHandlerLists.get(clazz);
+    }
+
+    public static ArrayList<HandlerList> getHandlerLists() {
+        synchronized (allLists) {
+            return new ArrayList<>(allLists);
+        }
+    }
+
+    public RegisteredListener[] getRegisteredListeners() {
+        RegisteredListener[] handlers;
+        while ((handlers = this.handlers) == null) {
+            bake();
+        } // This prevents fringe cases of returning null
+        return handlers;
+    }
+
+    public static ArrayList<RegisteredListener> getRegisteredListeners(Plugin plugin) {
+        ArrayList<RegisteredListener> listeners = new ArrayList<>();
+        synchronized (allLists) {
+            for (HandlerList h : allLists) {
+                synchronized (h) {
+                    for (List<RegisteredListener> list : h.handlerslots.values()) {
+                        for (RegisteredListener listener : list) {
+                            if (listener.getPlugin().equals(plugin)) {
+                                listeners.add(listener);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return listeners;
+    }
+
+    public static void putCachedHandlerList(Class<? extends Event> clazz, HandlerList handlerList) {
+        eventHandlerLists.put(clazz, handlerList);
     }
 
     public synchronized void register(RegisteredListener listener) {
@@ -110,53 +130,32 @@ public class HandlerList {
         if (changed) handlers = null;
     }
 
-    public synchronized void bake() {
-        if (handlers != null) return; // don't re-bake when still valid
-        List<RegisteredListener> entries = new ObjectArrayList<>();
-        for (Map.Entry<EventPriority, List<RegisteredListener>> entry : handlerslots.entrySet()) {
-            entries.addAll(entry.getValue());
-        }
-        handlers = entries.toArray(new RegisteredListener[0]);
-    }
-
-    public RegisteredListener[] getRegisteredListeners() {
-        RegisteredListener[] handlers;
-        while ((handlers = this.handlers) == null) {
-            bake();
-        } // This prevents fringe cases of returning null
-        return handlers;
-    }
-
-
-    public static ArrayList<RegisteredListener> getRegisteredListeners(Plugin plugin) {
-        ArrayList<RegisteredListener> listeners = new ArrayList<>();
+    public static void unregisterAll() {
         synchronized (allLists) {
             for (HandlerList h : allLists) {
                 synchronized (h) {
                     for (List<RegisteredListener> list : h.handlerslots.values()) {
-                        for (RegisteredListener listener : list) {
-                            if (listener.getPlugin().equals(plugin)) {
-                                listeners.add(listener);
-                            }
-                        }
+                        list.clear();
                     }
+                    h.handlers = null;
                 }
             }
         }
-        return listeners;
     }
 
-    public static ArrayList<HandlerList> getHandlerLists() {
+    public static void unregisterAll(Plugin plugin) {
         synchronized (allLists) {
-            return new ArrayList<>(allLists);
+            for (HandlerList h : allLists) {
+                h.unregister(plugin);
+            }
         }
     }
 
-    public static HandlerList getCachedHandlerList(Class<? extends Event> clazz) {
-        return eventHandlerLists.get(clazz);
-    }
-
-    public static void putCachedHandlerList(Class<? extends Event> clazz, HandlerList handlerList) {
-        eventHandlerLists.put(clazz, handlerList);
+    public static void unregisterAll(Listener listener) {
+        synchronized (allLists) {
+            for (HandlerList h : allLists) {
+                h.unregister(listener);
+            }
+        }
     }
 }

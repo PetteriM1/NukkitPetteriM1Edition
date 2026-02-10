@@ -13,13 +13,8 @@ public class EnchantmentSilkTouch extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 15;
-    }
-
-    @Override
-    public int getMaxEnchantAbility(int level) {
-        return super.getMinEnchantAbility(level) + 50;
+    public boolean canEnchant(Item item) {
+        return item.isShears() || super.canEnchant(item);
     }
 
     @Override
@@ -28,7 +23,12 @@ public class EnchantmentSilkTouch extends Enchantment {
     }
 
     @Override
-    public boolean canEnchant(Item item) {
-        return item.isShears() || super.canEnchant(item);
+    public int getMaxEnchantAbility(int level) {
+        return super.getMinEnchantAbility(level) + 50;
+    }
+
+    @Override
+    public int getMinEnchantAbility(int level) {
+        return 15;
     }
 }

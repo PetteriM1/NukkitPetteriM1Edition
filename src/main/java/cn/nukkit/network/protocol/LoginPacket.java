@@ -25,9 +25,7 @@ public class LoginPacket extends DataPacket {
 
     private static final Gson GSON = new Gson();
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    private static class MapTypeToken extends TypeToken<Map<String, Object>> {
     }
 
     @Override
@@ -37,20 +35,11 @@ public class LoginPacket extends DataPacket {
             setOffset(getOffset() + 2);
             this.protocol_ = getInt();
         }
-        if (ProtocolInfo.SUPPORTED_PROTOCOLS.contains(this.protocol_)) { // Avoid errors with unsupported versions
+        if (ProtocolInfo.ENABLED_PROTOCOLS.contains(this.protocol_)) { // Avoid errors with unsupported versions
             this.setBuffer(this.getByteArray(), 0);
             decodeChainData();
             decodeSkinData();
         }
-    }
-
-    @Override
-    public void encode() {
-        this.encodeUnsupported();
-    }
-
-    public int getProtocol() {
-        return protocol_;
     }
 
     private void decodeChainData() {
@@ -63,6 +52,7 @@ public class LoginPacket extends DataPacket {
 
         Map<String, Object> map = GSON.fromJson(data, new MapTypeToken());
 
+        // Since 1.21.90
         String certificate = (String) map.get("Certificate");
         if (certificate != null) {
             map = GSON.fromJson(certificate, new MapTypeToken());
@@ -87,9 +77,18 @@ public class LoginPacket extends DataPacket {
 
     private void decodeSkinData() {
         int size = this.getLInt();
-        if (size > 52428800) {
-            Server.getInstance().getLogger().warning(username + ": The skin data is too big: " + size);
-            return; // Get disconnected due to "invalid skin"
+        if (size > 4194304) {
+            if (Server.getInstance().doNotLimitSkinGeometry) {
+                if (size > 10485760) {
+                    Server.getInstance().getLogger().warning(username + ": 10 MB hard limit! The skin data is too big: " + size);
+                    return; // Get disconnected due to "invalid skin"
+                } else {
+                    Server.getInstance().getLogger().warning(username + ": got large skin data but do-not-limit-skin-geometry is enabled: " + size);
+                }
+            } else {
+                Server.getInstance().getLogger().warning(username + ": skin data is too big: " + size);
+                return; // Get disconnected due to "invalid skin"
+            }
         }
 
         JsonObject skinToken = ClientChainData.decodeToken(new String(this.get(size), StandardCharsets.UTF_8));
@@ -97,6 +96,13 @@ public class LoginPacket extends DataPacket {
 
         if (skinToken.has("ClientRandomId")) {
             this.clientId = skinToken.get("ClientRandomId").getAsLong();
+        }
+
+        // Hack: 1.19.62 hotfix includes protocol changes but doesn't bump the protocol, so we have to do that
+        if (this.protocol_ == ProtocolInfo.v1_19_60 && skinToken.has("GameVersion")) {
+            if (!skinToken.get("GameVersion").getAsString().startsWith("1.19.60")) {
+                this.protocol_ = ProtocolInfo.v1_19_63;
+            }
         }
 
         skin = new Skin();
@@ -164,7 +170,7 @@ public class LoginPacket extends DataPacket {
 
             if (skinToken.has("AnimatedImageData")) {
                 for (JsonElement element : skinToken.get("AnimatedImageData").getAsJsonArray()) {
-                    skin.getAnimations().add(getAnimation(element.getAsJsonObject()));
+                    skin.getAnimations().add(getAnimation(protocol_, element.getAsJsonObject()));
                 }
             }
 
@@ -190,13 +196,18 @@ public class LoginPacket extends DataPacket {
         }
     }
 
-    private static SkinAnimation getAnimation(JsonObject element) {
+    @Override
+    public void encode() {
+        this.encodeUnsupported();
+    }
+
+    private static SkinAnimation getAnimation(int protocol, JsonObject element) {
         float frames = element.get("Frames").getAsFloat();
         int type = element.get("Type").getAsInt();
         byte[] data = Base64.getDecoder().decode(element.get("Image").getAsString());
         int width = element.get("ImageWidth").getAsInt();
         int height = element.get("ImageHeight").getAsInt();
-        int expression = element.get("AnimationExpression").getAsInt();
+        int expression = protocol >= ProtocolInfo.v1_16_100 ? element.get("AnimationExpression").getAsInt() : 0;
         return new SkinAnimation(new SerializedImage(width, height, data), type, frames, expression);
     }
 
@@ -223,6 +234,10 @@ public class LoginPacket extends DataPacket {
         return new PersonaPiece(pieceId, pieceType, packId, isDefault, productId);
     }
 
+    public int getProtocol() {
+        return protocol_;
+    }
+
     public static PersonaPieceTint getTint(JsonObject object) {
         String pieceType = object.get("PieceType").getAsString();
         List<String> colors = new ArrayList<>();
@@ -232,6 +247,8 @@ public class LoginPacket extends DataPacket {
         return new PersonaPieceTint(pieceType, colors);
     }
 
-    private static class MapTypeToken extends TypeToken<Map<String, Object>> {
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

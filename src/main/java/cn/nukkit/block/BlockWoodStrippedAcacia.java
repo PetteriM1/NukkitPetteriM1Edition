@@ -13,8 +13,8 @@ public class BlockWoodStrippedAcacia extends BlockWoodStripped {
     }
 
     @Override
-    public String getName() {
-        return "Stripped Acacia Log";
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockWoodStrippedAcacia extends BlockWoodStripped {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
+    public String getName() {
+        return "Stripped Acacia Log";
     }
 }

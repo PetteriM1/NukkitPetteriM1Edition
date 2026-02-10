@@ -9,37 +9,19 @@ import cn.nukkit.nbt.tag.CompoundTag;
 public class CreatureSpawnEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final SpawnReason reason;
     private final int entityNetworkId;
     private final Position position;
     private final CompoundTag compoundTag;
+    public CreatureSpawnEvent(int networkId, Position position, SpawnReason reason) {
+        this(networkId, position, new CompoundTag(), reason);
+    }
 
     public CreatureSpawnEvent(int networkId, Position position, CompoundTag nbt, SpawnReason reason) {
         this.reason = reason;
         this.entityNetworkId = networkId;
         this.position = position;
         this.compoundTag = nbt;
-    }
-
-    public SpawnReason getReason() {
-        return reason;
-    }
-
-    public int getEntityNetworkId() {
-        return entityNetworkId;
-    }
-
-    public CompoundTag getCompoundTag() {
-        return compoundTag;
-    }
-
-    public Position getPosition() {
-        return position;
     }
 
     /**
@@ -162,5 +144,25 @@ public class CreatureSpawnEvent extends Event implements Cancellable {
          * When SpawnReason is missing
          */
         DEFAULT
+    }
+
+    public CompoundTag getCompoundTag() {
+        return compoundTag;
+    }
+
+    public int getEntityNetworkId() {
+        return entityNetworkId;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public SpawnReason getReason() {
+        return reason;
     }
 }

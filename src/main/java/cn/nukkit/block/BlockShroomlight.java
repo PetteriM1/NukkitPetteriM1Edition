@@ -10,23 +10,8 @@ public class BlockShroomlight extends BlockSolid {
     }
 
     @Override
-    public int getId() {
-        return SHROOMLIGHT;
-    }
-
-    @Override
-    public String getName() {
-        return "Shroomlight";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1;
+    public BlockColor getColor() {
+        return BlockColor.ORANGE_BLOCK_COLOR;
     }
 
     @Override
@@ -35,12 +20,27 @@ public class BlockShroomlight extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return SHROOMLIGHT;
+    }
+
+    @Override
     public int getLightLevel() {
         return 15;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.ORANGE_BLOCK_COLOR;
+    public String getName() {
+        return "Shroomlight";
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 }

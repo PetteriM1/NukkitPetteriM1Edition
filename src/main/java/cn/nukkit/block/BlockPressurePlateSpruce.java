@@ -13,8 +13,8 @@ public class BlockPressurePlateSpruce extends BlockPressurePlateWood {
     }
 
     @Override
-    public String getName() {
-        return "Spruce Pressure Plate";
+    public BlockColor getColor() {
+        return BlockColor.SPRUCE_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockPressurePlateSpruce extends BlockPressurePlateWood {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SPRUCE_BLOCK_COLOR;
+    public String getName() {
+        return "Spruce Pressure Plate";
     }
 }

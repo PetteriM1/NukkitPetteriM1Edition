@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 public class ElementSlider extends Element {
 
     @SuppressWarnings("unused")
-    private final String type = "slider"; //This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "slider";
     private String text = "";
     private float min = 0f;
     private float max = 100f;
@@ -32,49 +32,49 @@ public class ElementSlider extends Element {
         if (defaultValue != -1f) this.defaultValue = defaultValue;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public float getMin() {
-        return min;
-    }
-
-    public void setMin(float min) {
-        this.min = min;
+    public float getDefaultValue() {
+        return defaultValue;
     }
 
     public float getMax() {
         return max;
     }
 
-    public void setMax(float max) {
-        this.max = max;
+    public float getMin() {
+        return min;
     }
 
     public int getStep() {
         return step;
     }
 
-    public void setStep(int step) {
-        this.step = step;
+    public String getText() {
+        return text;
     }
 
-    public float getDefaultValue() {
-        return defaultValue;
+    @Nullable
+    public String getTooltip() {
+        return tooltip;
     }
 
     public void setDefaultValue(float defaultValue) {
         this.defaultValue = defaultValue;
     }
 
-    @Nullable
-    public String getTooltip() {
-        return tooltip;
+    public void setMax(float max) {
+        this.max = max;
+    }
+
+    public void setMin(float min) {
+        this.min = min;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void setTooltip(String tooltip) {

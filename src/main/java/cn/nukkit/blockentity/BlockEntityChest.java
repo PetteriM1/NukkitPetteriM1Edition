@@ -31,137 +31,6 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         super(chunk, nbt);
     }
 
-    private void initInventory() {
-        if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
-            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
-        }
-        ListTag<CompoundTag> list = (ListTag<CompoundTag>) this.namedTag.getList("Items");
-
-        this.inventory = new ChestInventory(this);
-
-        for (CompoundTag compound : list.getAll()) {
-            Item item = NBTIO.getItemHelper(compound);
-            if (item.getId() != 0 && item.getCount() > 0) {
-                this.inventory.slots.put(compound.getByte("Slot"), item);
-            }
-        }
-    }
-
-    @Override
-    public void close() {
-        if (!this.closed && this.inventory != null) {
-            if (this.doubleInventory != null) {
-                for (Player player : new ArrayList<>(this.doubleInventory.getViewers())) {
-                    player.removeWindow(this.doubleInventory);
-                }
-
-                this.doubleInventory = null;
-            }
-
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-        }
-
-        super.close();
-    }
-
-    @Override
-    public void onBreak() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        unpair();
-        for (Item content : inventory.getContents().values()) {
-            level.dropItem(this, content);
-        }
-        inventory.clearAll(); // Stop items from being moved around by another player in the inventory
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        if (this.inventory != null) {
-            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
-            for (int index = 0; index < this.getSize(); index++) {
-                this.setItem(index, this.inventory.getItem(index));
-            }
-        }
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        int id = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
-        return id == Block.CHEST || id == Block.TRAPPED_CHEST;
-    }
-
-    @Override
-    public int getSize() {
-        return 27;
-    }
-
-    protected int getSlotIndex(int index) {
-        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getByte("Slot") == index) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return NBTIO.getItemHelper(data);
-        }
-    }
-
-    @Override
-    public void setItem(int index, Item item) {
-        int i = this.getSlotIndex(index);
-
-        CompoundTag d = NBTIO.putItemHelper(item, index);
-
-        // If item is air or count less than 0, remove the item from the "Items" list
-        if (item.getId() == Item.AIR || item.getCount() <= 0) {
-            if (i >= 0) {
-                this.namedTag.getList("Items").remove(i);
-            }
-        } else if (i < 0) {
-            // If it is less than i, then it is a new item, so we are going to add it at the end of the list
-            (this.namedTag.getList("Items", CompoundTag.class)).add(d);
-        } else {
-            // If it is more than i, then it is an update on a inventorySlot, so we are going to overwrite the item in the list
-            (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
-        }
-    }
-
-    @Override
-    public BaseInventory getInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        if (this.doubleInventory == null && this.isPaired()) {
-            this.checkPairing();
-        }
-
-        return this.doubleInventory != null ? this.doubleInventory : this.inventory;
-    }
-
-    public ChestInventory getRealInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        return inventory;
-    }
-
     protected void checkPairing() {
         BlockEntityChest pair = this.getPair();
 
@@ -190,27 +59,57 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
     }
 
     @Override
-    public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Chest";
-    }
+    public void close() {
+        if (!this.closed && this.inventory != null) {
+            if (this.doubleInventory != null) {
+                for (Player player : new ArrayList<>(this.doubleInventory.getViewers())) {
+                    player.removeWindow(this.doubleInventory);
+                }
 
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
-    }
+                this.doubleInventory = null;
+            }
 
-    @Override
-    public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            this.namedTag.remove("CustomName");
-            return;
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
+            }
         }
 
-        this.namedTag.putString("CustomName", name);
+        super.close();
     }
 
-    public boolean isPaired() {
-        return this.namedTag.contains("pairx") && this.namedTag.contains("pairz");
+    public void createPair(BlockEntityChest chest) {
+        this.namedTag.putInt("pairx", (int) chest.x);
+        this.namedTag.putInt("pairz", (int) chest.z);
+        chest.namedTag.putInt("pairx", (int) this.x);
+        chest.namedTag.putInt("pairz", (int) this.z);
+    }
+
+    @Override
+    public BaseInventory getInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        if (this.doubleInventory == null && this.isPaired()) {
+            this.checkPairing();
+        }
+
+        return this.doubleInventory != null ? this.doubleInventory : this.inventory;
+    }
+
+    @Override
+    public Item getItem(int index) {
+        int i = this.getSlotIndex(index);
+        if (i < 0) {
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+        } else {
+            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+            return NBTIO.getItemHelper(data);
+        }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Chest";
     }
 
     public BlockEntityChest getPair() {
@@ -224,50 +123,27 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         return null;
     }
 
-    public boolean pairWith(BlockEntityChest chest) {
-        if (this.isPaired() || chest.isPaired() || this.getBlock().getId() != chest.getBlock().getId()) {
-            return false;
+    public ChestInventory getRealInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
         }
-
-        this.createPair(chest);
-
-        chest.spawnToAll();
-        this.spawnToAll();
-        this.checkPairing();
-
-        return true;
+        return inventory;
     }
 
-    public void createPair(BlockEntityChest chest) {
-        this.namedTag.putInt("pairx", (int) chest.x);
-        this.namedTag.putInt("pairz", (int) chest.z);
-        chest.namedTag.putInt("pairx", (int) this.x);
-        chest.namedTag.putInt("pairz", (int) this.z);
+    @Override
+    public int getSize() {
+        return 27;
     }
 
-    public boolean unpair() {
-        if (!this.isPaired()) {
-            return false;
+    protected int getSlotIndex(int index) {
+        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getByte("Slot") == index) {
+                return i;
+            }
         }
 
-        BlockEntityChest chest = this.getPair();
-
-        this.doubleInventory = null;
-        this.namedTag.remove("pairx");
-        this.namedTag.remove("pairz");
-
-        this.spawnToAll();
-
-        if (chest != null) {
-            chest.namedTag.remove("pairx");
-            chest.namedTag.remove("pairz");
-            chest.doubleInventory = null;
-            chest.checkPairing();
-            chest.spawnToAll();
-        }
-        this.checkPairing();
-
-        return true;
+        return -1;
     }
 
     @Override
@@ -294,5 +170,129 @@ public class BlockEntityChest extends BlockEntitySpawnable implements InventoryH
         }
 
         return c;
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
+    private void initInventory() {
+        if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
+            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
+        }
+        ListTag<CompoundTag> list = (ListTag<CompoundTag>) this.namedTag.getList("Items");
+
+        this.inventory = new ChestInventory(this);
+
+        for (CompoundTag compound : list.getAll()) {
+            Item item = NBTIO.getItemHelper(compound);
+            if (item.getId() != 0 && item.getCount() > 0) {
+                this.inventory.slots.put(compound.getByte("Slot"), item);
+            }
+        }
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        int id = level.getBlockIdAt(chunk, (int) x, (int) y, (int) z);
+        return id == Block.CHEST || id == Block.TRAPPED_CHEST;
+    }
+
+    public boolean isPaired() {
+        return this.namedTag.contains("pairx") && this.namedTag.contains("pairz");
+    }
+
+    @Override
+    public void onBreak() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        unpair();
+        for (Item content : inventory.getContents().values()) {
+            level.dropItem(this, content);
+        }
+        inventory.clearAll(); // Stop items from being moved around by another player in the inventory
+    }
+
+    public boolean pairWith(BlockEntityChest chest) {
+        if (this.isPaired() || chest.isPaired() || this.getBlock().getId() != chest.getBlock().getId()) {
+            return false;
+        }
+
+        this.createPair(chest);
+
+        chest.spawnToAll();
+        this.spawnToAll();
+        this.checkPairing();
+
+        return true;
+    }
+
+    @Override
+    public void saveNBT() {
+        super.saveNBT();
+
+        if (this.inventory != null) {
+            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
+            for (int index = 0; index < this.getSize(); index++) {
+                this.setItem(index, this.inventory.getItem(index));
+            }
+        }
+    }
+
+    @Override
+    public void setItem(int index, Item item) {
+        int i = this.getSlotIndex(index);
+
+        CompoundTag d = NBTIO.putItemHelper(item, index);
+
+        // If item is air or count less than 0, remove the item from the "Items" list
+        if (item.getId() == Item.AIR || item.getCount() <= 0) {
+            if (i >= 0) {
+                this.namedTag.getList("Items").remove(i);
+            }
+        } else if (i < 0) {
+            // If it is less than i, then it is a new item, so we are going to add it at the end of the list
+            (this.namedTag.getList("Items", CompoundTag.class)).add(d);
+        } else {
+            // If it is more than i, then it is an update on a inventorySlot, so we are going to overwrite the item in the list
+            (this.namedTag.getList("Items", CompoundTag.class)).add(i, d);
+        }
+    }
+
+    @Override
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
+    }
+
+    public boolean unpair() {
+        if (!this.isPaired()) {
+            return false;
+        }
+
+        BlockEntityChest chest = this.getPair();
+
+        this.doubleInventory = null;
+        this.namedTag.remove("pairx");
+        this.namedTag.remove("pairz");
+
+        this.spawnToAll();
+
+        if (chest != null) {
+            chest.namedTag.remove("pairx");
+            chest.namedTag.remove("pairz");
+            chest.doubleInventory = null;
+            chest.checkPairing();
+            chest.spawnToAll();
+        }
+        this.checkPairing();
+
+        return true;
     }
 }

@@ -27,6 +27,23 @@ public class BlockEntityPistonArm extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
+    public void broadcastMove() {
+        this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), this.createSpawnPacket());
+    }
+
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.PISTON_ARM)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putFloat("Progress", this.progress)
+                .putFloat("LastProgress", this.lastProgress)
+                .putBoolean("Sticky", this.sticky)
+                .putByte("State", this.state)
+                .putByte("NewState", this.newState);
+    }
+
     @Override
     protected void initBlockEntity() {
         this.isMovable = true;
@@ -63,25 +80,13 @@ public class BlockEntityPistonArm extends BlockEntitySpawnable {
         super.initBlockEntity();
     }
 
-    public void setExtended(boolean extending) {
-        this.extending = extending;
-        this.newState = this.state;
-        this.lastProgress = this.progress;
-        this.state = (byte) (extending ? 1 : 0);
-        this.progress = extending ? 1.0f : 0;
+    public boolean isBlockEntityValid() {
+        int blockId = getBlock().getId();
+        return blockId == Block.PISTON || blockId == Block.STICKY_PISTON;
     }
 
     public boolean isExtended() {
         return this.extending;
-    }
-
-    public void broadcastMove() {
-        this.level.addChunkPacket(this.getChunkX(), this.getChunkZ(), this.createSpawnPacket());
-    }
-
-    public boolean isBlockEntityValid() {
-        int blockId = getBlock().getId();
-        return blockId == Block.PISTON || blockId == Block.STICKY_PISTON;
     }
 
     public void saveNBT() {
@@ -94,16 +99,11 @@ public class BlockEntityPistonArm extends BlockEntitySpawnable {
         this.namedTag.putBoolean("Sticky", this.sticky);
     }
 
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.PISTON_ARM)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putFloat("Progress", this.progress)
-                .putFloat("LastProgress", this.lastProgress)
-                .putBoolean("Sticky", this.sticky)
-                .putByte("State", this.state)
-                .putByte("NewState", this.newState);
+    public void setExtended(boolean extending) {
+        this.extending = extending;
+        this.newState = this.state;
+        this.lastProgress = this.progress;
+        this.state = (byte) (extending ? 1 : 0);
+        this.progress = extending ? 1.0f : 0;
     }
 }

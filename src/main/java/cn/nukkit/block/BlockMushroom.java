@@ -24,6 +24,63 @@ public abstract class BlockMushroom extends BlockFlowable {
     }
 
     @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    public boolean canStay() {
+        Block block = this.down();
+        return block.getId() == MYCELIUM || block.getId() == PODZOL || (!block.isTransparent() && this.level.getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 13); // TODO: sky/full light
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    protected abstract int getType();
+
+    public boolean grow() {
+        this.level.setBlock(this, Block.get(BlockID.AIR), true, true);
+
+        BigMushroom generator = new BigMushroom(getType());
+
+        if (generator.generate(this.level, new NukkitRandom(), this)) {
+            return true;
+        } else {
+            this.level.setBlock(this, this, true, false);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == Item.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
+            if (player != null && !player.isCreative()) {
+                item.count--;
+            }
+
+            if (ThreadLocalRandom.current().nextFloat() < 0.4) {
+                this.grow();
+            }
+
+            this.level.addParticle(new BoneMealParticle(this));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
             if (!canStay()) {
@@ -46,63 +103,6 @@ public abstract class BlockMushroom extends BlockFlowable {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
-            if (player != null && !player.isCreative()) {
-                item.count--;
-            }
-
-            if (ThreadLocalRandom.current().nextFloat() < 0.4) {
-                this.grow();
-            }
-
-            this.level.addParticle(new BoneMealParticle(this));
-            return true;
-        }
-        return false;
-    }
-
-    public boolean grow() {
-        this.level.setBlock(this, Block.get(BlockID.AIR), true, true);
-
-        BigMushroom generator = new BigMushroom(getType());
-
-        if (generator.generate(this.level, new NukkitRandom(), this)) {
-            return true;
-        } else {
-            this.level.setBlock(this, this, true, false);
-            return false;
-        }
-    }
-
-    public boolean canStay() {
-        Block block = this.down();
-        return block.getId() == MYCELIUM || block.getId() == PODZOL || (!block.isTransparent() && this.level.getBlockLightAt((int) this.x, (int) this.y, (int) this.z) < 13); // TODO: sky/full light
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    protected abstract int getType();
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 
     @Override

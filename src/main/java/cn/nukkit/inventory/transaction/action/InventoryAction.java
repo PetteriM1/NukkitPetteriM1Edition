@@ -22,6 +22,16 @@ public abstract class InventoryAction {
         //this.creationTime = System.currentTimeMillis();
     }
 
+    /**
+     * Performs actions needed to complete the inventory-action server-side. Returns if it was successful. Will return
+     * false if plugins cancelled events. This will only be called if the transaction which it is part of is considered
+     * valid.
+     *
+     * @param source player
+     * @return successfully executed
+     */
+    abstract public boolean execute(Player source);
+
     @Deprecated
     public long getCreationTime() {
         return 0; //creationTime;
@@ -64,17 +74,6 @@ public abstract class InventoryAction {
     }
 
     /**
-     * Called by inventory transactions before any actions are processed. If this returns false, the transaction will
-     * be cancelled.
-     *
-     * @param source player
-     * @return cancelled
-     */
-    public boolean onPreExecute(Player source) {
-        return true;
-    }
-
-    /**
      * Returns whether this action is currently valid. This should perform any necessary sanity checks.
      *
      * @param source player
@@ -91,14 +90,11 @@ public abstract class InventoryAction {
     }
 
     /**
-     * Performs actions needed to complete the inventory-action server-side. Returns if it was successful. Will return
-     * false if plugins cancelled events. This will only be called if the transaction which it is part of is considered
-     * valid.
+     * Performs additional actions when this inventory-action did not complete successfully.
      *
      * @param source player
-     * @return successfully executed
      */
-    abstract public boolean execute(Player source);
+    abstract public void onExecuteFail(Player source);
 
     /**
      * Performs additional actions when this inventory-action completed successfully.
@@ -108,9 +104,13 @@ public abstract class InventoryAction {
     abstract public void onExecuteSuccess(Player source);
 
     /**
-     * Performs additional actions when this inventory-action did not complete successfully.
+     * Called by inventory transactions before any actions are processed. If this returns false, the transaction will
+     * be cancelled.
      *
      * @param source player
+     * @return cancelled
      */
-    abstract public void onExecuteFail(Player source);
+    public boolean onPreExecute(Player source) {
+        return true;
+    }
 }

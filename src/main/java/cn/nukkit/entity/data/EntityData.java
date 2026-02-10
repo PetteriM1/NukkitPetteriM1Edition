@@ -14,23 +14,23 @@ public abstract class EntityData<T> {
         this.id = id;
     }
 
-    public abstract int getType();
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof EntityData && ((EntityData) obj).id == this.id && Objects.equals(((EntityData) obj).getData(), this.getData());
+    }
 
     public abstract T getData();
-
-    public abstract void setData(T data);
 
     public int getId() {
         return id;
     }
 
+    public abstract int getType();
+
+    public abstract void setData(T data);
+
     public EntityData setId(int id) {
         this.id = id;
         return this;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof EntityData && ((EntityData) obj).id == this.id && Objects.equals(((EntityData) obj).getData(), this.getData());
     }
 }

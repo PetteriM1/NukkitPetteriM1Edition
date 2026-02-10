@@ -36,24 +36,14 @@ public class BlockSponge extends BlockSolidMeta {
         super(meta);
     }
 
-    @Override
-    public int getId() {
-        return SPONGE;
-    }
+    private static class Entry {
+        private final Block block;
+        private final int distance;
 
-    @Override
-    public double getHardness() {
-        return 0.6;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0b1];
+        public Entry(Block block, int distance) {
+            this.block = block;
+            this.distance = distance;
+        }
     }
 
     @Override
@@ -62,26 +52,28 @@ public class BlockSponge extends BlockSolidMeta {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
+    public double getHardness() {
+        return 0.6;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.getDamage() == WET && level.getDimension() == Level.DIMENSION_NETHER) {
-            level.setBlock(block, Block.get(BlockID.SPONGE, DRY), true, true);
-            level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_FIZZ);
-            level.addParticle(new ExplodeParticle(block.add(0.5, 1, 0.5)));
-            return true;
-        } else if (this.getDamage() == DRY && performWaterAbsorb(block)) {
-            level.setBlock(block, Block.get(BlockID.SPONGE, WET), true, true);
+    public int getId() {
+        return SPONGE;
+    }
 
-            Map<Integer, Player> players = this.level.getChunkPlayers(block.getChunkX(), block.getChunkZ());
-            level.addParticle(new DestroyBlockParticle(block.add(0.5, 0.5, 0.5), Block.get(BlockID.WATER)), players.values().toArray(new Player[0]));
-            return true;
-        }
+    @Override
+    public String getName() {
+        return NAMES[this.getDamage() & 0b1];
+    }
 
-        return super.place(item, block, target, face, fx, fy, fz, player);
+    @Override
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 
     private boolean performWaterAbsorb(Block block) {
@@ -122,13 +114,21 @@ public class BlockSponge extends BlockSolidMeta {
         return waterRemoved > 0;
     }
 
-    private static class Entry {
-        private final Block block;
-        private final int distance;
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.getDamage() == WET && level.getDimension() == Level.DIMENSION_NETHER) {
+            level.setBlock(block, Block.get(BlockID.SPONGE, DRY), true, true);
+            level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_FIZZ);
+            level.addParticle(new ExplodeParticle(block.add(0.5, 1, 0.5)));
+            return true;
+        } else if (this.getDamage() == DRY && performWaterAbsorb(block)) {
+            level.setBlock(block, Block.get(BlockID.SPONGE, WET), true, true);
 
-        public Entry(Block block, int distance) {
-            this.block = block;
-            this.distance = distance;
+            Map<Integer, Player> players = this.level.getChunkPlayers(block.getChunkX(), block.getChunkZ());
+            level.addParticle(new DestroyBlockParticle(block.add(0.5, 0.5, 0.5), Block.get(BlockID.WATER)), players.values().toArray(new Player[0]));
+            return true;
         }
+
+        return super.place(item, block, target, face, fx, fy, fz, player);
     }
 }

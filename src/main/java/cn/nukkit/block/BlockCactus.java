@@ -28,8 +28,20 @@ public class BlockCactus extends BlockTransparentMeta {
     }
 
     @Override
-    public int getId() {
-        return CACTUS;
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                Item.get(Item.CACTUS, 0, 1)
+        };
     }
 
     @Override
@@ -38,13 +50,23 @@ public class BlockCactus extends BlockTransparentMeta {
     }
 
     @Override
-    public double getResistance() {
-        return 2;
+    public int getId() {
+        return CACTUS;
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return true;
+    public double getMaxX() {
+        return this.x + 0.9375;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.9375;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 0.9375;
     }
 
     @Override
@@ -58,23 +80,23 @@ public class BlockCactus extends BlockTransparentMeta {
     }
 
     @Override
-    public double getMaxX() {
-        return this.x + 0.9375;
+    public String getName() {
+        return "Cactus";
     }
 
     @Override
-    public double getMaxZ() {
-        return this.z + 0.9375;
+    public double getResistance() {
+        return 2;
     }
 
     @Override
-    protected AxisAlignedBB recalculateCollisionBoundingBox() {
-        return new SimpleAxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
-    public double getMaxY() {
-        return this.y + 0.9375;
+    public boolean hasEntityCollision() {
+        return true;
     }
 
     @Override
@@ -138,29 +160,7 @@ public class BlockCactus extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Cactus";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                Item.get(Item.CACTUS, 0, 1)
-        };
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    protected AxisAlignedBB recalculateCollisionBoundingBox() {
+        return new SimpleAxisAlignedBB(x, y, z, x + 1, y + 1, z + 1);
     }
 }

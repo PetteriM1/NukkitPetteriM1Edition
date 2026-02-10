@@ -7,18 +7,6 @@ import java.util.List;
 public interface ServiceManager {
 
     /**
-     * Register an object as a service's provider.
-     *
-     * @param service  the service
-     * @param provider the service provider
-     * @param plugin   the plugin
-     * @param priority the priority
-     * @return {@code true}, or {@code false} only if {@code provider}
-     * already registered
-     */
-    <T> boolean register(Class<T> service, T provider, Plugin plugin, ServicePriority priority);
-
-    /**
      * Cancel service's provider(s) offered this plugin.
      *
      * @param plugin the plugin
@@ -38,6 +26,14 @@ public interface ServiceManager {
     <T> RegisteredServiceProvider<T> cancel(Class<T> service, T provider);
 
     /**
+     * Return the known service(s).
+     *
+     * @return a {@link com.google.common.collect.ImmutableList} contains the
+     * known service(s)
+     */
+    List<Class<?>> getKnownService();
+
+    /**
      * Return the service's provider.
      *
      * @param service the target service
@@ -46,17 +42,21 @@ public interface ServiceManager {
      */
     <T> RegisteredServiceProvider<T> getProvider(Class<T> service);
 
-    /**
-     * Return the known service(s).
-     *
-     * @return a {@link com.google.common.collect.ImmutableList} contains the
-     * known service(s)
-     */
-    List<Class<?>> getKnownService();
-
     List<RegisteredServiceProvider<?>> getRegistrations(Plugin plugin);
 
     <T> List<RegisteredServiceProvider<T>> getRegistrations(Class<T> service);
 
     <T> boolean isProvidedFor(Class<T> service);
+
+    /**
+     * Register an object as a service's provider.
+     *
+     * @param service  the service
+     * @param provider the service provider
+     * @param plugin   the plugin
+     * @param priority the priority
+     * @return {@code true}, or {@code false} only if {@code provider}
+     * already registered
+     */
+    <T> boolean register(Class<T> service, T provider, Plugin plugin, ServicePriority priority);
 }

@@ -10,8 +10,12 @@ public class EnchantmentTridentImpaling extends EnchantmentTrident {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 8 * level - 7;
+    public double getDamageBonus(Entity entity) {
+        if (entity.isInsideOfWater() || (entity.getLevel().isRaining() && entity.canSeeSky())) {
+            return 2.5 * getLevel();
+        }
+
+        return 0;
     }
 
     @Override
@@ -25,11 +29,7 @@ public class EnchantmentTridentImpaling extends EnchantmentTrident {
     }
 
     @Override
-    public double getDamageBonus(Entity entity) {
-        if (entity.isInsideOfWater() || (entity.getLevel().isRaining() && entity.canSeeSky())) {
-            return 2.5 * getLevel();
-        }
-
-        return 0;
+    public int getMinEnchantAbility(int level) {
+        return 8 * level - 7;
     }
 }

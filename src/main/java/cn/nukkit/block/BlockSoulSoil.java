@@ -11,6 +11,16 @@ public class BlockSoulSoil extends BlockSolid {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5;
+    }
+
+    @Override
     public int getId() {
         return SOUL_SOIL;
     }
@@ -21,13 +31,8 @@ public class BlockSoulSoil extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
     public double getResistance() {
-        return 0.5;
+        return 2.5;
     }
 
     @Override
@@ -44,10 +49,5 @@ public class BlockSoulSoil extends BlockSolid {
     public void onEntityCollide(Entity entity) {
         entity.motionX *= 0.4d;
         entity.motionZ *= 0.4d;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_BLOCK_COLOR;
     }
 }

@@ -17,11 +17,6 @@ public class SpawnParticleEffectPacket extends DataPacket {
     public Optional<String> molangVariablesJson = Optional.empty();
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -30,10 +25,19 @@ public class SpawnParticleEffectPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putByte((byte) this.dimensionId);
-        this.putEntityUniqueId(uniqueEntityId);
+        if (protocol >= 332) {
+            this.putEntityUniqueId(uniqueEntityId);
+        }
         this.putVector3f(this.position);
         this.putString(this.identifier);
-        this.putBoolean(this.molangVariablesJson.isPresent());
-        this.molangVariablesJson.ifPresent(this::putString);
+        if (protocol >= ProtocolInfo.v1_18_30) {
+            this.putBoolean(this.molangVariablesJson.isPresent());
+            this.molangVariablesJson.ifPresent(this::putString);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

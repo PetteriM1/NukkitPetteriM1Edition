@@ -45,6 +45,29 @@ public class EnchantTransaction extends InventoryTransaction {
     }
 
     @Override
+    public void addAction(InventoryAction action) {
+        super.addAction(action);
+        if (action instanceof EnchantingAction) {
+            switch (((EnchantingAction) action).getType()) {
+                case NetworkInventoryAction.SOURCE_TYPE_ENCHANT_INPUT:
+                    this.inputItem = action.getTargetItem(); // Input sent as newItem
+                    break;
+                case NetworkInventoryAction.SOURCE_TYPE_ENCHANT_OUTPUT:
+                    this.outputItem = action.getSourceItem(); // Output sent as oldItem
+                    break;
+                case NetworkInventoryAction.SOURCE_TYPE_ENCHANT_MATERIAL:
+                    if (action.getTargetItemUnsafe().getId() == Item.AIR) {
+                        this.cost = action.getSourceItemUnsafe().count;
+                    } else {
+                        this.cost = action.getSourceItemUnsafe().count - action.getTargetItemUnsafe().count;
+                    }
+                    break;
+            }
+
+        }
+    }
+
+    @Override
     public boolean canExecute() {
         if (!(matchItems(false, true) && !this.invalid && !this.actions.isEmpty())) {
             return false;
@@ -84,31 +107,12 @@ public class EnchantTransaction extends InventoryTransaction {
                 && validateNBT());
     }
 
-    private boolean validateNBT() {
-        if (!(outputItem instanceof ItemTool || outputItem instanceof ItemArmor || outputItem instanceof ItemBookEnchanted)) {
-            source.getServer().getLogger().debug("Non-enchantable item");
-            return false;
+    @Override
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        for (InventoryAction action : actions) {
+            if (action instanceof EnchantingAction) return true;
         }
-
-        for (Enchantment e : outputItem.getEnchantments()) {
-            if (e.isTreasure()) {
-                source.getServer().getLogger().debug("Illegal treasure enchantment");
-                return false;
-            }
-        }
-
-        CompoundTag a = this.inputItem.getNamedTag();
-        a = a == null ? new CompoundTag() : a.clone().remove("ench");
-        CompoundTag b = this.outputItem.getNamedTag();
-        b = b == null ? new CompoundTag() : b.clone().remove("ench");
-        if (!a.equals(b)) {
-            if (Nukkit.DEBUG > 1) {
-                source.getServer().getLogger().debug("NBT check failed: input=" + a + ", output=" + b);
-            }
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     @Override
@@ -151,34 +155,30 @@ public class EnchantTransaction extends InventoryTransaction {
         return true;
     }
 
-    @Override
-    public void addAction(InventoryAction action) {
-        super.addAction(action);
-        if (action instanceof EnchantingAction) {
-            switch (((EnchantingAction) action).getType()) {
-                case NetworkInventoryAction.SOURCE_TYPE_ENCHANT_INPUT:
-                    this.inputItem = action.getTargetItem(); // Input sent as newItem
-                    break;
-                case NetworkInventoryAction.SOURCE_TYPE_ENCHANT_OUTPUT:
-                    this.outputItem = action.getSourceItem(); // Output sent as oldItem
-                    break;
-                case NetworkInventoryAction.SOURCE_TYPE_ENCHANT_MATERIAL:
-                    if (action.getTargetItemUnsafe().getId() == Item.AIR) {
-                        this.cost = action.getSourceItemUnsafe().count;
-                    } else {
-                        this.cost = action.getSourceItemUnsafe().count - action.getTargetItemUnsafe().count;
-                    }
-                    break;
+    private boolean validateNBT() {
+        if (!(outputItem instanceof ItemTool || outputItem instanceof ItemArmor || outputItem instanceof ItemBookEnchanted)) {
+            source.getServer().getLogger().debug("Non-enchantable item");
+            return false;
+        }
+
+        for (Enchantment e : outputItem.getEnchantments()) {
+            if (e.isTreasure()) {
+                source.getServer().getLogger().debug("Illegal treasure enchantment");
+                return false;
             }
-
         }
-    }
 
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        for (InventoryAction action : actions) {
-            if (action instanceof EnchantingAction) return true;
+        CompoundTag a = this.inputItem.getNamedTag();
+        a = a == null ? new CompoundTag() : a.clone().remove("ench");
+        CompoundTag b = this.outputItem.getNamedTag();
+        b = b == null ? new CompoundTag() : b.clone().remove("ench");
+        if (!a.equals(b)) {
+            if (Nukkit.DEBUG > 1) {
+                source.getServer().getLogger().debug("NBT check failed: input=" + a + ", output=" + b);
+            }
+            return false;
         }
-        return false;
+
+        return true;
     }
 }

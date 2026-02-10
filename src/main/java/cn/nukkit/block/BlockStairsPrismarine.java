@@ -14,13 +14,28 @@ public class BlockStairsPrismarine extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return PRISMARINE_STAIRS;
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 0.8;
+    }
+
+    @Override
+    public int getId() {
+        return PRISMARINE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Prismarine Stairs";
     }
 
     @Override
@@ -31,20 +46,5 @@ public class BlockStairsPrismarine extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Prismarine Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

@@ -35,17 +35,22 @@ public class TrimDataPacket extends DataPacket {
         trimMaterials.add(new TrimMaterial("redstone", "§m", "minecraft:redstone"));
 
         TrimDataPacket pk = new TrimDataPacket();
+        pk.protocol = ProtocolInfo.v1_20_0_23;
         pk.tryEncode();
         CACHED_PACKET = pk.compress(Deflater.BEST_COMPRESSION);
     }
 
-    public static BatchPacket getCachedPacket() {
-        return CACHED_PACKET;
+    @Data
+    public static class TrimPattern {
+        private final String itemName;
+        private final String patternId;
     }
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    @Data
+    public static class TrimMaterial {
+        private final String materialId;
+        private final String color;
+        private final String itemName;
     }
 
     @Override
@@ -70,16 +75,12 @@ public class TrimDataPacket extends DataPacket {
         }
     }
 
-    @Data
-    public static class TrimPattern {
-        private final String itemName;
-        private final String patternId;
+    public static BatchPacket getCachedPacket(int protocol) {
+        return CACHED_PACKET;
     }
 
-    @Data
-    public static class TrimMaterial {
-        private final String materialId;
-        private final String color;
-        private final String itemName;
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -19,17 +19,17 @@ public class FloatEntityData extends EntityData<Float> {
         return data;
     }
 
+    @Override
+    public int getType() {
+        return Entity.DATA_TYPE_FLOAT;
+    }
+
     public void setData(Float data) {
         if (data == null) {
             this.data = 0;
         } else {
             this.data = data;
         }
-    }
-
-    @Override
-    public int getType() {
-        return Entity.DATA_TYPE_FLOAT;
     }
 
     @Override

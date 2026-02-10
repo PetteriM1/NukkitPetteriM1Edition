@@ -20,11 +20,11 @@ public class EnumBlockProperty<E extends Serializable> extends BlockProperty<E> 
     private final Class<E> typeOf;
     private final boolean ordinal;
 
-    
+
     public EnumBlockProperty(String name, boolean exportedToItem, E[] values, int bitSize, String persistenceName) {
         this(name, exportedToItem, values, bitSize, persistenceName, false);
     }
-    
+
     public EnumBlockProperty(String name, boolean exportedToItem, E[] values, int bitSize, String persistenceName, boolean ordinal) {
         this(name, exportedToItem, values, bitSize, persistenceName, ordinal, ordinal ? null :
                 Arrays.stream(values).map(Objects::toString).map(String::toLowerCase).toArray(String[]::new));
@@ -73,31 +73,27 @@ public class EnumBlockProperty<E extends Serializable> extends BlockProperty<E> 
         }
     }
 
-    public EnumBlockProperty<E> ordinal(boolean ordinal) {
-        if (ordinal == this.ordinal) {
-            return this;
-        }
-        return new EnumBlockProperty<>(this.getName(), this.isExportedToItem(), this.values, this.getBitSize(), this.getPersistenceName(), ordinal);
+    private static <E> E[] checkUniverseLength(E[] universe) {
+        Preconditions.checkNotNull(universe, "universe can't be null");
+        Preconditions.checkArgument(universe.length > 0, "The universe can't be empty");
+        return universe;
     }
 
     @Override
-    public int getMetaForValue( E value) {
-        if (value == null) {
-            return 0;
-        }
-        for (int i = 0; i < this.values.length; i++) {
-            if (this.values[i].equals(value)) {
-                return i;
-            }
-        }
-        throw new InvalidBlockPropertyValueException(this, null, value, "Element is not part of this property");
+    public EnumBlockProperty<E> copy() {
+        return new EnumBlockProperty<>(this.getName(), this.isExportedToItem(), values, this.getBitSize(), this.getPersistenceName(), this.isOrdinal(), persistenceNames);
     }
-    
+
     @Override
-    public E getValueForMeta(int meta) {
-        return this.values[meta];
+    public EnumBlockProperty<E> exportingToItems(boolean exportedToItem) {
+        return new EnumBlockProperty<>(this.getName(), exportedToItem, values, this.getBitSize(), this.getPersistenceName(), this.isOrdinal(), persistenceNames);
     }
-    
+
+    @Override
+    public E getDefaultValue() {
+        return this.values[0];
+    }
+
     @Override
     public int getIntValueForMeta(int meta) {
         try {
@@ -107,20 +103,41 @@ public class EnumBlockProperty<E extends Serializable> extends BlockProperty<E> 
         }
         return meta;
     }
-    
+
     @Override
-    protected void validateDirectly( E value) {
-        for (E object : this.values) {
-            if (object == value) {
-                return;
+    public int getMetaForPersistenceValue(String persistenceValue) {
+        int meta;
+        if (this.isOrdinal()) {
+            try {
+                meta = Integer.parseInt(persistenceValue);
+                this.validateMetaDirectly(meta);
+            } catch (IndexOutOfBoundsException | IllegalArgumentException e) {
+                throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue,
+                        "Expected a number from 0 to " + (this.values.length - 1), e);
+            }
+            return meta;
+        }
+
+        for (int index = 0; index < persistenceNames.length; index++) {
+            if (persistenceNames[index].equals(persistenceValue)) {
+                return index;
             }
         }
-        throw new IllegalArgumentException(value+" is not valid for this property");
+
+        throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue, "The value does not exists in this property.");
     }
-    
+
     @Override
-    protected void validateMetaDirectly(int meta) {
-        Preconditions.checkElementIndex(meta, this.values.length);
+    public int getMetaForValue(E value) {
+        if (value == null) {
+            return 0;
+        }
+        for (int i = 0; i < this.values.length; i++) {
+            if (this.values[i].equals(value)) {
+                return i;
+            }
+        }
+        throw new InvalidBlockPropertyValueException(this, null, value, "Element is not part of this property");
     }
 
     @Override
@@ -138,64 +155,47 @@ public class EnumBlockProperty<E extends Serializable> extends BlockProperty<E> 
     }
 
     @Override
-    public int getMetaForPersistenceValue(String persistenceValue) {
-        int meta;
-        if (this.isOrdinal()) {
-            try {
-                meta = Integer.parseInt(persistenceValue);
-                this.validateMetaDirectly(meta);
-            } catch (IndexOutOfBoundsException|IllegalArgumentException e) {
-                throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue,
-                        "Expected a number from 0 to " + (this.values.length - 1), e);
-            }
-            return meta;
-        }
-
-        for (int index = 0; index < persistenceNames.length; index++) {
-            if (persistenceNames[index].equals(persistenceValue)) {
-                return index;
-            }
-        }
-
-        throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue, "The value does not exists in this property.");
-    }
-    
-    public E[] getValues() {
-        return this.values.clone();
-    }
-    
-    public boolean isOrdinal() {
-        return this.ordinal;
-    }
-    
-    @Override
-    public E getDefaultValue() {
-        return this.values[0];
-    }
-    
-    @Override
-    public boolean isDefaultValue( E value) {
-        return value == null || this.values[0].equals(value);
-    }
-
-    @Override
     public Class<E> getValueClass() {
         return this.typeOf;
     }
 
     @Override
-    public EnumBlockProperty<E> copy() {
-        return new EnumBlockProperty<>(this.getName(), this.isExportedToItem(), values, this.getBitSize(), this.getPersistenceName(), this.isOrdinal(), persistenceNames);
+    public E getValueForMeta(int meta) {
+        return this.values[meta];
+    }
+
+    public E[] getValues() {
+        return this.values.clone();
     }
 
     @Override
-    public EnumBlockProperty<E> exportingToItems(boolean exportedToItem) {
-        return new EnumBlockProperty<>(this.getName(), exportedToItem, values, this.getBitSize(), this.getPersistenceName(), this.isOrdinal(), persistenceNames);
+    public boolean isDefaultValue(E value) {
+        return value == null || this.values[0].equals(value);
     }
 
-    private static <E> E[] checkUniverseLength(E[] universe) {
-        Preconditions.checkNotNull(universe, "universe can't be null");
-        Preconditions.checkArgument(universe.length > 0, "The universe can't be empty");
-        return universe;
+    public boolean isOrdinal() {
+        return this.ordinal;
+    }
+
+    public EnumBlockProperty<E> ordinal(boolean ordinal) {
+        if (ordinal == this.ordinal) {
+            return this;
+        }
+        return new EnumBlockProperty<>(this.getName(), this.isExportedToItem(), this.values, this.getBitSize(), this.getPersistenceName(), ordinal);
+    }
+
+    @Override
+    protected void validateDirectly(E value) {
+        for (E object : this.values) {
+            if (object == value) {
+                return;
+            }
+        }
+        throw new IllegalArgumentException(value + " is not valid for this property");
+    }
+
+    @Override
+    protected void validateMetaDirectly(int meta) {
+        Preconditions.checkElementIndex(meta, this.values.length);
     }
 }

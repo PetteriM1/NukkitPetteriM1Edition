@@ -10,25 +10,23 @@ import java.util.UUID;
  */
 public interface CraftingRecipe extends Recipe {
 
-    String getRecipeId();
-
-    UUID getId();
-
-    void setId(UUID id);
-
-    boolean requiresCraftingTable();
+    List<Item> getAllResults();
 
     List<Item> getExtraResults();
 
-    List<Item> getAllResults();
+    UUID getId();
+
+    List<Item> getIngredientsAggregate();
 
     int getPriority();
+
+    String getRecipeId();
 
     /**
      * Returns whether the specified list of crafting grid inputs and outputs matches this recipe. Outputs DO NOT
      * include the primary result item.
      *
-     * @param inputList list of items taken from the crafting grid
+     * @param inputList       list of items taken from the crafting grid
      * @param extraOutputList list of items put back into the crafting grid (secondary results)
      * @return bool
      */
@@ -36,5 +34,7 @@ public interface CraftingRecipe extends Recipe {
 
     boolean matchItems(List<Item> inputList, List<Item> extraOutputList, int multiplier);
 
-    List<Item> getIngredientsAggregate();
+    boolean requiresCraftingTable();
+
+    void setId(UUID id);
 }

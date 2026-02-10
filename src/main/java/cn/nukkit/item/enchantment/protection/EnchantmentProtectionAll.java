@@ -15,18 +15,13 @@ public class EnchantmentProtectionAll extends EnchantmentProtection {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 1 + (level - 1) * 11;
-    }
-
-    @Override
     public int getMaxEnchantAbility(int level) {
         return this.getMinEnchantAbility(level) + 20;
     }
 
     @Override
-    public double getTypeModifier() {
-        return 1;
+    public int getMinEnchantAbility(int level) {
+        return 1 + (level - 1) * 11;
     }
 
     @Override
@@ -38,5 +33,10 @@ public class EnchantmentProtectionAll extends EnchantmentProtection {
         }
 
         return (float) (getLevel() * getTypeModifier());
+    }
+
+    @Override
+    public double getTypeModifier() {
+        return 1;
     }
 }

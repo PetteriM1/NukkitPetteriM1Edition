@@ -11,28 +11,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockEndStone extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "End Stone";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public int getId() {
-        return END_STONE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 45;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -47,12 +32,27 @@ public class BlockEndStone extends BlockSolid {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getHardness() {
+        return 3;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
+    public int getId() {
+        return END_STONE;
+    }
+
+    @Override
+    public String getName() {
+        return "End Stone";
+    }
+
+    @Override
+    public double getResistance() {
+        return 45;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

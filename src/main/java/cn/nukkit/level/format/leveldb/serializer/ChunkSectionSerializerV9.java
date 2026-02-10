@@ -9,15 +9,6 @@ public class ChunkSectionSerializerV9 implements ChunkSectionSerializer {
     public static final ChunkSectionSerializer INSTANCE = new ChunkSectionSerializerV9();
 
     @Override
-    public void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection) {
-        buf.writeByte(storage.length);
-        buf.writeByte(ySection);
-        for (StateBlockStorage blockStorage : storage) {
-            blockStorage.writeToStorage(buf);
-        }
-    }
-
-    @Override
     public StateBlockStorage[] deserialize(ByteBuf buf, ChunkBuilder builder) {
         int storageCount = buf.readUnsignedByte();
         buf.readUnsignedByte(); // ySection
@@ -28,5 +19,14 @@ public class ChunkSectionSerializerV9 implements ChunkSectionSerializer {
             storage[i].readFromStorage(buf, builder);
         }
         return storage;
+    }
+
+    @Override
+    public void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection) {
+        buf.writeByte(storage.length);
+        buf.writeByte(ySection);
+        for (StateBlockStorage blockStorage : storage) {
+            blockStorage.writeToStorage(buf);
+        }
     }
 }

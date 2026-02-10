@@ -8,7 +8,7 @@ import cn.nukkit.math.BlockFace;
 
 public abstract class BlockStem extends BlockSolidMeta {
 
-    private static final short[] FACES = {
+    private static final short[] faces = {
             0,
             0,
             2,
@@ -26,15 +26,25 @@ public abstract class BlockStem extends BlockSolidMeta {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(FACES[face.getIndex()]);
-        this.getLevel().setBlock(block, this, true, true);
+    public boolean canBeActivated() {
         return true;
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public double getResistance() {
+        return 2;
+    }
+
+    public abstract int getStrippedId();
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
@@ -49,25 +59,15 @@ public abstract class BlockStem extends BlockSolidMeta {
         return false;
     }
 
-    public abstract int getStrippedId();
-
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(faces[face.getIndex()]);
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
     }
 
     @Override
     public Item toItem() {
         return new ItemBlock(this, 0);
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2;
     }
 }

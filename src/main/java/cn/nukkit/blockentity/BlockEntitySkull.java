@@ -14,6 +14,17 @@ public class BlockEntitySkull extends BlockEntitySpawnable {
     }
 
     @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.SKULL)
+                .put("SkullType", this.namedTag.get("SkullType"))
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .put("Rot", this.namedTag.get("Rot"));
+    }
+
+    @Override
     protected void initBlockEntity() {
         if (!namedTag.contains("SkullType")) {
             namedTag.putByte("SkullType", 0);
@@ -26,24 +37,13 @@ public class BlockEntitySkull extends BlockEntitySpawnable {
     }
 
     @Override
-    public void saveNBT() {
-        super.saveNBT();
-        this.namedTag.remove("Creator");
-    }
-
-    @Override
     public boolean isBlockEntityValid() {
         return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.SKULL_BLOCK;
     }
 
     @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.SKULL)
-                .put("SkullType", this.namedTag.get("SkullType"))
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .put("Rot", this.namedTag.get("Rot"));
+    public void saveNBT() {
+        super.saveNBT();
+        this.namedTag.remove("Creator");
     }
 }

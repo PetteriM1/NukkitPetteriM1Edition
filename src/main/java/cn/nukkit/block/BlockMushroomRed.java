@@ -14,13 +14,13 @@ public class BlockMushroomRed extends BlockMushroom {
     }
 
     @Override
-    public String getName() {
-        return "Red Mushroom";
+    public int getId() {
+        return RED_MUSHROOM;
     }
 
     @Override
-    public int getId() {
-        return RED_MUSHROOM;
+    public String getName() {
+        return "Red Mushroom";
     }
 
     @Override

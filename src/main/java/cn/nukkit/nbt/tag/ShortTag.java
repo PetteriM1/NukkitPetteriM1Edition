@@ -9,16 +9,6 @@ public class ShortTag extends NumberTag<Integer> {
 
     public int data;
 
-    @Override
-    public Integer getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Integer data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public ShortTag(String name) {
         super(name);
     }
@@ -26,31 +16,6 @@ public class ShortTag extends NumberTag<Integer> {
     public ShortTag(String name, int data) {
         super(name);
         this.data = data;
-    }
-
-    @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeShort(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readShort();
-    }
-
-    @Override
-    public Integer parseValue() {
-        return this.data;
-    }
-
-    @Override
-    public byte getId() {
-        return TAG_Short;
-    }
-
-    @Override
-    public String toString() {
-        return "ShortTag " + this.getName() + "(data: " + data + ')';
     }
 
     @Override
@@ -65,5 +30,40 @@ public class ShortTag extends NumberTag<Integer> {
             return data == o.data;
         }
         return false;
+    }
+
+    @Override
+    public Integer getData() {
+        return data;
+    }
+
+    @Override
+    public byte getId() {
+        return TAG_Short;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readShort();
+    }
+
+    @Override
+    public Integer parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public void setData(Integer data) {
+        this.data = data == null ? 0 : data;
+    }
+
+    @Override
+    public String toString() {
+        return "ShortTag " + this.getName() + "(data: " + data + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeShort(data);
     }
 }

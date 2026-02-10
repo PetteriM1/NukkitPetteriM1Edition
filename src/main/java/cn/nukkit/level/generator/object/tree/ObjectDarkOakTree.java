@@ -130,6 +130,21 @@ public class ObjectDarkOakTree extends TreeGenerator {
         }
     }
 
+    private void placeLeafAt(ChunkManager worldIn, int x, int y, int z) {
+        Vector3 blockpos = new Vector3(x, y, z);
+        int material = worldIn.getBlockIdAt(blockpos.getFloorX(), blockpos.getFloorY(), blockpos.getFloorZ());
+
+        if (material == Block.AIR) {
+            this.setBlockAndNotifyAdequately(worldIn, blockpos, DARK_OAK_LEAVES);
+        }
+    }
+
+    private void placeLogAt(ChunkManager worldIn, Vector3 pos) {
+        if (this.canGrowInto(worldIn.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()))) {
+            this.setBlockAndNotifyAdequately(worldIn, pos, DARK_OAK_LOG);
+        }
+    }
+
     private boolean placeTreeOfHeight(ChunkManager worldIn, Vector3 pos, int height) {
         int i = pos.getFloorX();
         int j = pos.getFloorY();
@@ -158,20 +173,5 @@ public class ObjectDarkOakTree extends TreeGenerator {
         }
 
         return true;
-    }
-
-    private void placeLogAt(ChunkManager worldIn, Vector3 pos) {
-        if (this.canGrowInto(worldIn.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ()))) {
-            this.setBlockAndNotifyAdequately(worldIn, pos, DARK_OAK_LOG);
-        }
-    }
-
-    private void placeLeafAt(ChunkManager worldIn, int x, int y, int z) {
-        Vector3 blockpos = new Vector3(x, y, z);
-        int material = worldIn.getBlockIdAt(blockpos.getFloorX(), blockpos.getFloorY(), blockpos.getFloorZ());
-
-        if (material == Block.AIR) {
-            this.setBlockAndNotifyAdequately(worldIn, blockpos, DARK_OAK_LEAVES);
-        }
     }
 }

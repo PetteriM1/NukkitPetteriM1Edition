@@ -19,13 +19,17 @@ public class BlockConcrete extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return CONCRETE;
+    public BlockColor getColor() {
+        return DyeColor.getByWoolData(getDamage()).getColor();
     }
 
     @Override
-    public double getResistance() {
-        return 9;
+    public Item[] getDrops(Item item) {
+        return item.getTier() >= ItemTool.TIER_WOODEN ? new Item[]{toItem()} : new Item[0];
+    }
+
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(getDamage());
     }
 
     @Override
@@ -34,26 +38,22 @@ public class BlockConcrete extends BlockSolidMeta {
     }
 
     @Override
+    public int getId() {
+        return CONCRETE;
+    }
+
+    @Override
     public String getName() {
         return getDyeColor().getName() + " Concrete";
     }
 
     @Override
+    public double getResistance() {
+        return 9;
+    }
+
+    @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return item.getTier() >= ItemTool.TIER_WOODEN ? new Item[]{toItem()} : new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return DyeColor.getByWoolData(getDamage()).getColor();
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(getDamage());
     }
 }

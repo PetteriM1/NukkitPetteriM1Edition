@@ -27,18 +27,90 @@ public class BlockBrewingStand extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Brewing Stand";
-    }
-
-    @Override
     public boolean canBeActivated() {
         return true;
     }
 
     @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityBrewingStand) {
+            return ContainerInventory.calculateRedstone(((BlockEntityBrewingStand) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
     public double getHardness() {
         return 0.5;
+    }
+
+    @Override
+    public int getId() {
+        return BREWING_STAND_BLOCK;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 1;
+    }
+
+    @Override
+    public double getMaxX() {
+        return this.x + 1 - 7 / 16.0;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 1 - 2 / 16.0;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 1 - 7 / 16.0;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 7 / 16.0;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 7 / 16.0;
+    }
+
+    @Override
+    public String getName() {
+        return "Brewing Stand";
     }
 
     @Override
@@ -52,13 +124,39 @@ public class BlockBrewingStand extends BlockTransparentMeta {
     }
 
     @Override
-    public int getId() {
-        return BREWING_STAND_BLOCK;
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
-    public int getLightLevel() {
-        return 1;
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            BlockEntity t = getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityBrewingStand)) {
+                return false;
+            }
+
+            BlockEntityBrewingStand brewing = (BlockEntityBrewingStand) t;
+            if (brewing.namedTag.contains("Lock") && brewing.namedTag.get("Lock") instanceof StringTag) {
+                if (!brewing.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return false;
+                }
+            }
+
+            player.addWindow(brewing.getInventory());
+        }
+
+        return true;
     }
 
     @Override
@@ -88,105 +186,7 @@ public class BlockBrewingStand extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            BlockEntity t = getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityBrewingStand)) {
-                return false;
-            }
-
-            BlockEntityBrewingStand brewing = (BlockEntityBrewingStand) t;
-            if (brewing.namedTag.contains("Lock") && brewing.namedTag.get("Lock") instanceof StringTag) {
-                if (!brewing.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return false;
-                }
-            }
-
-            player.addWindow(brewing.getInventory());
-        }
-
-        return true;
-    }
-
-    @Override
     public Item toItem() {
         return Item.get(Item.BREWING_STAND);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 7 / 16.0;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 7 / 16.0;
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + 1 - 7 / 16.0;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 1 - 2 / 16.0;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + 1 - 7 / 16.0;
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public int getComparatorInputOverride() {
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (blockEntity instanceof BlockEntityBrewingStand) {
-            return ContainerInventory.calculateRedstone(((BlockEntityBrewingStand) blockEntity).getInventory());
-        }
-
-        return super.getComparatorInputOverride();
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
     }
 }

@@ -10,13 +10,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreGoldNether extends BlockOre {
 
     @Override
-    public int getId() {
-        return NETHER_GOLD_ORE;
-    }
-
-    @Override
-    public String getName() {
-        return "Nether Gold Ore";
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -55,16 +50,21 @@ public class BlockOreGoldNether extends BlockOre {
                 break;
         }
 
-        return new Item[]{ Item.get(Item.GOLD_NUGGET, 0, count) };
+        return new Item[]{Item.get(Item.GOLD_NUGGET, 0, count)};
+    }
+
+    @Override
+    public int getId() {
+        return NETHER_GOLD_ORE;
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Gold Ore";
     }
 
     @Override
     protected int getRawMaterial() {
         return ItemID.GOLD_NUGGET;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 }

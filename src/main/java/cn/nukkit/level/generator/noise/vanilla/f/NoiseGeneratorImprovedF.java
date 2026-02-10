@@ -37,8 +37,9 @@ public class NoiseGeneratorImprovedF {
         }
     }
 
-    public final float lerp(float p_76311_1_, float p_76311_3_, float p_76311_5_) {
-        return p_76311_3_ + p_76311_1_ * (p_76311_5_ - p_76311_3_);
+    public final float grad(int p_76310_1_, float p_76310_2_, float p_76310_4_, float p_76310_6_) {
+        int i = p_76310_1_ & 15;
+        return GRAD_X[i] * p_76310_2_ + GRAD_Y[i] * p_76310_4_ + GRAD_Z[i] * p_76310_6_;
     }
 
     public final float grad2(int p_76309_1_, float p_76309_2_, float p_76309_4_) {
@@ -46,9 +47,8 @@ public class NoiseGeneratorImprovedF {
         return GRAD_2X[i] * p_76309_2_ + GRAD_2Z[i] * p_76309_4_;
     }
 
-    public final float grad(int p_76310_1_, float p_76310_2_, float p_76310_4_, float p_76310_6_) {
-        int i = p_76310_1_ & 15;
-        return GRAD_X[i] * p_76310_2_ + GRAD_Y[i] * p_76310_4_ + GRAD_Z[i] * p_76310_6_;
+    public final float lerp(float p_76311_1_, float p_76311_3_, float p_76311_5_) {
+        return p_76311_3_ + p_76311_1_ * (p_76311_5_ - p_76311_3_);
     }
 
     /*

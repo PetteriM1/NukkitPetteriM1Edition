@@ -11,12 +11,12 @@ public class BlockQuartzBricks extends BlockQuartz {
     }
 
     @Override
-    public String getName() {
-        return "Quartz Bricks";
+    public int getId() {
+        return QUARTZ_BRICKS;
     }
 
     @Override
-    public int getId() {
-        return QUARTZ_BRICKS;
+    public String getName() {
+        return "Quartz Bricks";
     }
 }

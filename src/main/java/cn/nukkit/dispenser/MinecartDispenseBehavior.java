@@ -28,17 +28,17 @@ public class MinecartDispenseBehavior extends DefaultDispenseBehavior {
 
             Entity minecart = Entity.createEntity(getMinecartId(item),
                     block.level.getChunk(target.getChunkX(), target.getChunkZ()), new CompoundTag("")
-                    .putList(new ListTag<>("Pos")
-                            .add(new DoubleTag("", target.getX() + 0.5))
-                            .add(new DoubleTag("", target.getY() + 0.0625D + adjacent))
-                            .add(new DoubleTag("", target.getZ() + 0.5)))
-                    .putList(new ListTag<>("Motion")
-                            .add(new DoubleTag("", 0))
-                            .add(new DoubleTag("", 0))
-                            .add(new DoubleTag("", 0)))
-                    .putList(new ListTag<>("Rotation")
-                            .add(new FloatTag("", 0))
-                            .add(new FloatTag("", 0)))
+                            .putList(new ListTag<>("Pos")
+                                    .add(new DoubleTag("", target.getX() + 0.5))
+                                    .add(new DoubleTag("", target.getY() + 0.0625D + adjacent))
+                                    .add(new DoubleTag("", target.getZ() + 0.5)))
+                            .putList(new ListTag<>("Motion")
+                                    .add(new DoubleTag("", 0))
+                                    .add(new DoubleTag("", 0))
+                                    .add(new DoubleTag("", 0)))
+                            .putList(new ListTag<>("Rotation")
+                                    .add(new FloatTag("", 0))
+                                    .add(new FloatTag("", 0)))
             );
 
             minecart.spawnToAll();

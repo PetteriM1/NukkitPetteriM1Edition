@@ -19,6 +19,29 @@ public class BlockPistonHead extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        BlockFace face = BlockFace.fromIndex(this.getDamage()).getOpposite();
+        if (face == BlockFace.UP) return BlockFace.DOWN;
+        if (face == BlockFace.DOWN) return BlockFace.UP;
+        return face;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5; // 1.5
+    }
+
+    @Override
     public int getId() {
         return PISTON_HEAD;
     }
@@ -34,16 +57,6 @@ public class BlockPistonHead extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getHardness() {
-        return 1.5;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
     public boolean onBreak(Item item) {
         this.level.setBlock(this, Block.get(BlockID.AIR), true, true);
         Block piston = getSide(getBlockFace().getOpposite());
@@ -51,19 +64,6 @@ public class BlockPistonHead extends BlockTransparentMeta implements Faceable {
             piston.onBreak(item);
         }
         return true;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        BlockFace face = BlockFace.fromIndex(this.getDamage()).getOpposite();
-        if (face == BlockFace.UP) return BlockFace.DOWN;
-        if (face == BlockFace.DOWN) return BlockFace.UP;
-        return face;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
     }
 
     @Override

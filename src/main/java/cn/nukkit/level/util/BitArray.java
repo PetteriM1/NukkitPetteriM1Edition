@@ -2,15 +2,15 @@ package cn.nukkit.level.util;
 
 public interface BitArray {
 
-    void set(int index, int value);
+    BitArray copy();
 
     int get(int index);
 
-    int size();
+    BitArrayVersion getVersion();
 
     int[] getWords();
 
-    BitArrayVersion getVersion();
+    void set(int index, int value);
 
-    BitArray copy();
+    int size();
 }

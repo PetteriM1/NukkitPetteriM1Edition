@@ -17,57 +17,6 @@ public abstract class AsyncTask implements Runnable {
     private int taskId;
     private boolean finished = false;
 
-    public void run() {
-        this.result = null;
-        this.onRun();
-        this.finished = true;
-        FINISHED_LIST.offer(this);
-    }
-
-    public boolean isFinished() {
-        return this.finished;
-    }
-
-    public Object getResult() {
-        return this.result;
-    }
-
-    public boolean hasResult() {
-        return this.result != null;
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public int getTaskId() {
-        return this.taskId;
-    }
-
-    public Object getFromThreadStore(String identifier) {
-        return this.finished ? null : ThreadStore.store.get(identifier);
-    }
-
-    public void saveToThreadStore(String identifier, Object value) {
-        if (!this.finished) {
-            if (value == null) {
-                ThreadStore.store.remove(identifier);
-            } else {
-                ThreadStore.store.put(identifier, value);
-            }
-        }
-    }
-
-    public abstract void onRun();
-
-    public void onCompletion(Server server) {
-
-    }
-
     public void cleanObject() {
         this.result = null;
         this.taskId = 0;
@@ -85,5 +34,56 @@ public abstract class AsyncTask implements Runnable {
                         + " invoking onCompletion", e);
             }
         }
+    }
+
+    public Object getFromThreadStore(String identifier) {
+        return this.finished ? null : ThreadStore.store.get(identifier);
+    }
+
+    public Object getResult() {
+        return this.result;
+    }
+
+    public int getTaskId() {
+        return this.taskId;
+    }
+
+    public boolean hasResult() {
+        return this.result != null;
+    }
+
+    public boolean isFinished() {
+        return this.finished;
+    }
+
+    public void onCompletion(Server server) {
+
+    }
+
+    public abstract void onRun();
+
+    public void run() {
+        this.result = null;
+        this.onRun();
+        this.finished = true;
+        FINISHED_LIST.offer(this);
+    }
+
+    public void saveToThreadStore(String identifier, Object value) {
+        if (!this.finished) {
+            if (value == null) {
+                ThreadStore.store.remove(identifier);
+            } else {
+                ThreadStore.store.put(identifier, value);
+            }
+        }
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
     }
 }

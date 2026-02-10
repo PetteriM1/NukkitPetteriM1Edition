@@ -6,11 +6,6 @@ import cn.nukkit.event.HandlerList;
 
 public class PlayerAchievementAwardedEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected final String achievement;
 
     public PlayerAchievementAwardedEvent(Player player, String achievementId) {
@@ -20,5 +15,9 @@ public class PlayerAchievementAwardedEvent extends PlayerEvent implements Cancel
 
     public String getAchievement() {
         return this.achievement;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

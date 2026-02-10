@@ -53,6 +53,48 @@ public class EncryptionUtils {
         }
     }
 
+    public static Cipher createCipher(boolean gcm, boolean encrypt, SecretKey key) {
+        try {
+            byte[] iv;
+            String transformation;
+            if (gcm) {
+                iv = new byte[16];
+                System.arraycopy(key.getEncoded(), 0, iv, 0, 12);
+                iv[15] = 2;
+                transformation = "AES/CTR/NoPadding";
+            } else {
+                iv = Arrays.copyOf(key.getEncoded(), 16);
+                transformation = "AES/CFB8/NoPadding";
+            }
+            Cipher cipher = Cipher.getInstance(transformation);
+            cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+            return cipher;
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                 InvalidAlgorithmParameterException e) {
+            throw new AssertionError("Unable to initialize required encryption", e);
+        }
+    }
+
+    /**
+     * Create handshake JWS used in the ServerToClientHandshakePacket
+     * which completes the encryption handshake.
+     *
+     * @param serverKeyPair used to sign the JWT
+     * @param token         salt for the encryption handshake
+     * @return signed JWS object
+     * @throws JOSEException invalid key pair provided
+     */
+    public static JWSObject createHandshakeJwt(KeyPair serverKeyPair, byte[] token) throws JOSEException {
+        URI x5u = URI.create(Base64.getEncoder().encodeToString(serverKeyPair.getPublic().getEncoded()));
+
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("salt", Base64.getEncoder().encodeToString(token)).build();
+        SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.ES384).x509CertURL(x5u).build(), claimsSet);
+
+        signJwt(jwt, (ECPrivateKey) serverKeyPair.getPrivate());
+
+        return jwt;
+    }
+
     /**
      * Generate EC public key from base 64 encoded string
      *
@@ -66,14 +108,36 @@ public class EncryptionUtils {
     }
 
     /**
-     * Sign JWS object with a given private key.
+     * Generate 16 bytes of random data for the handshake token using a {@link SecureRandom}
      *
-     * @param jws object to be signed
-     * @param key key to sign object with
-     * @throws JOSEException invalid key provided
+     * @return 16 byte token
      */
-    public static void signJwt(JWSObject jws, ECPrivateKey key) throws JOSEException {
-        jws.sign(new ECDSASigner(key, Curve.P_384));
+    public static byte[] generateRandomToken() {
+        byte[] token = new byte[16];
+        SECURE_RANDOM.nextBytes(token);
+        return token;
+    }
+
+    private static byte[] getEcdhSecret(PrivateKey localPrivateKey, PublicKey remotePublicKey) throws InvalidKeyException {
+        KeyAgreement agreement;
+        try {
+            agreement = KeyAgreement.getInstance("ECDH");
+        } catch (NoSuchAlgorithmException e) {
+            throw new AssertionError(e);
+        }
+
+        agreement.init(localPrivateKey);
+        agreement.doPhase(remotePublicKey, true);
+        return agreement.generateSecret();
+    }
+
+    /**
+     * Mojang's public key used to verify the JWT during login.
+     *
+     * @return Mojang's public EC key
+     */
+    public static ECPublicKey getMojangPublicKey() {
+        return MOJANG_PUBLIC_KEY;
     }
 
     /**
@@ -101,77 +165,14 @@ public class EncryptionUtils {
         return new SecretKeySpec(secretKeyBytes, "AES");
     }
 
-    private static byte[] getEcdhSecret(PrivateKey localPrivateKey, PublicKey remotePublicKey) throws InvalidKeyException {
-        KeyAgreement agreement;
-        try {
-            agreement = KeyAgreement.getInstance("ECDH");
-        } catch (NoSuchAlgorithmException e) {
-            throw new AssertionError(e);
-        }
-
-        agreement.init(localPrivateKey);
-        agreement.doPhase(remotePublicKey, true);
-        return agreement.generateSecret();
-    }
-
     /**
-     * Create handshake JWS used in the ServerToClientHandshakePacket
-     * which completes the encryption handshake.
+     * Sign JWS object with a given private key.
      *
-     * @param serverKeyPair used to sign the JWT
-     * @param token         salt for the encryption handshake
-     * @return signed JWS object
-     * @throws JOSEException invalid key pair provided
+     * @param jws object to be signed
+     * @param key key to sign object with
+     * @throws JOSEException invalid key provided
      */
-    public static JWSObject createHandshakeJwt(KeyPair serverKeyPair, byte[] token) throws JOSEException {
-        URI x5u = URI.create(Base64.getEncoder().encodeToString(serverKeyPair.getPublic().getEncoded()));
-
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("salt", Base64.getEncoder().encodeToString(token)).build();
-        SignedJWT jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.ES384).x509CertURL(x5u).build(), claimsSet);
-
-        signJwt(jwt, (ECPrivateKey) serverKeyPair.getPrivate());
-
-        return jwt;
-    }
-
-    /**
-     * Generate 16 bytes of random data for the handshake token using a {@link SecureRandom}
-     *
-     * @return 16 byte token
-     */
-    public static byte[] generateRandomToken() {
-        byte[] token = new byte[16];
-        SECURE_RANDOM.nextBytes(token);
-        return token;
-    }
-
-    /**
-     * Mojang's public key used to verify the JWT during login.
-     *
-     * @return Mojang's public EC key
-     */
-    public static ECPublicKey getMojangPublicKey() {
-        return MOJANG_PUBLIC_KEY;
-    }
-
-    public static Cipher createCipher(boolean gcm, boolean encrypt, SecretKey key) {
-        try {
-            byte[] iv;
-            String transformation;
-            if (gcm) {
-                iv = new byte[16];
-                System.arraycopy(key.getEncoded(), 0, iv, 0, 12);
-                iv[15] = 2;
-                transformation = "AES/CTR/NoPadding";
-            } else {
-                iv = Arrays.copyOf(key.getEncoded(), 16);
-                transformation = "AES/CFB8/NoPadding";
-            }
-            Cipher cipher = Cipher.getInstance(transformation);
-            cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
-            return cipher;
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw new AssertionError("Unable to initialize required encryption", e);
-        }
+    public static void signJwt(JWSObject jws, ECPrivateKey key) throws JOSEException {
+        jws.sign(new ECDSASigner(key, Curve.P_384));
     }
 }

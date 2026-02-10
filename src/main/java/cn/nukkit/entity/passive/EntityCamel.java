@@ -13,20 +13,6 @@ public class EntityCamel extends EntityWalkingAnimal {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(32);
-        super.initEntity();
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.85f;
-        }
-        return 1.77f;
-    }
-
-    @Override
     public float getHeight() {
         if (this.isBaby()) {
             return 1.1875f;
@@ -42,5 +28,19 @@ public class EntityCamel extends EntityWalkingAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.85f;
+        }
+        return 1.77f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(32);
+        super.initEntity();
     }
 }

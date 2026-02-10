@@ -17,12 +17,12 @@ public abstract class BlockTransparentMeta extends BlockMeta {
     }
 
     @Override
-    public boolean isTransparent() {
-        return true;
+    public BlockColor getColor() {
+        return BlockColor.TRANSPARENT_BLOCK_COLOR;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.TRANSPARENT_BLOCK_COLOR;
+    public boolean isTransparent() {
+        return true;
     }
 }

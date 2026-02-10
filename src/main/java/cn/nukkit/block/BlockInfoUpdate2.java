@@ -5,6 +5,11 @@ import cn.nukkit.item.Item;
 public class BlockInfoUpdate2 extends BlockSolid {
 
     @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
     public int getId() {
         return INFO_UPDATE2;
     }
@@ -12,10 +17,5 @@ public class BlockInfoUpdate2 extends BlockSolid {
     @Override
     public String getName() {
         return "Update Game Block";
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
     }
 }

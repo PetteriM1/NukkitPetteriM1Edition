@@ -10,8 +10,8 @@ public class RequestNetworkSettingsPacket extends DataPacket {
     public int protocolVersion;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public void decode() {
+        this.protocolVersion = this.getInt();
     }
 
     @Override
@@ -20,7 +20,7 @@ public class RequestNetworkSettingsPacket extends DataPacket {
     }
 
     @Override
-    public void decode() {
-        this.protocolVersion = this.getInt();
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -36,196 +36,6 @@ public class ServerScheduler {
         this.asyncPool = new AsyncPool(Server.getInstance(), WORKERS);
     }
 
-    public TaskHandler scheduleTask(Task task) {
-        return addTask(task, 0, 0, false);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleTask(Plugin, Runnable)}
-     */
-    @Deprecated
-    public TaskHandler scheduleTask(Runnable task) {
-        return addTask(null, task, 0, 0, false);
-    }
-
-    public TaskHandler scheduleTask(Plugin plugin, Runnable task) {
-        return addTask(plugin, task, 0, 0, false);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleTask(Plugin, Runnable, boolean)}
-     */
-    @Deprecated
-    public TaskHandler scheduleTask(Runnable task, boolean asynchronous) {
-        return addTask(null, task, 0, 0, asynchronous);
-    }
-
-    public TaskHandler scheduleTask(Plugin plugin, Runnable task, boolean asynchronous) {
-        return addTask(plugin, task, 0, 0, asynchronous);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleAsyncTask(Plugin, AsyncTask)}
-     */
-    @Deprecated
-    public TaskHandler scheduleAsyncTask(AsyncTask task) {
-        return addTask(null, task, 0, 0, true);
-    }
-
-    public TaskHandler scheduleAsyncTask(Plugin plugin, AsyncTask task) {
-        return addTask(plugin, task, 0, 0, true);
-    }
-
-    @Deprecated
-    public void scheduleAsyncTaskToWorker(AsyncTask task, int worker) {
-        scheduleAsyncTask(task);
-    }
-
-    public int getAsyncTaskPoolSize() {
-        return asyncPool.getCorePoolSize();
-    }
-
-    public TaskHandler scheduleDelayedTask(Task task, int delay) {
-        return this.addTask(task, delay, 0, false);
-    }
-
-    public TaskHandler scheduleDelayedTask(Task task, int delay, boolean asynchronous) {
-        return this.addTask(task, delay, 0, asynchronous);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleDelayedTask(Plugin, Runnable, int)}
-     */
-    @Deprecated
-    public TaskHandler scheduleDelayedTask(Runnable task, int delay) {
-        return addTask(null, task, delay, 0, false);
-    }
-
-    public TaskHandler scheduleDelayedTask(Plugin plugin, Runnable task, int delay) {
-        return addTask(plugin, task, delay, 0, false);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleDelayedTask(Plugin, Runnable, int, boolean)}
-     */
-    @Deprecated
-    public TaskHandler scheduleDelayedTask(Runnable task, int delay, boolean asynchronous) {
-        return addTask(null, task, delay, 0, asynchronous);
-    }
-
-    public TaskHandler scheduleDelayedTask(Plugin plugin, Runnable task, int delay, boolean asynchronous) {
-        return addTask(plugin, task, delay, 0, asynchronous);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleRepeatingTask(Plugin, Runnable, int)}
-     */
-    @Deprecated
-    public TaskHandler scheduleRepeatingTask(Runnable task, int period) {
-        return addTask(null, task, 0, period, false);
-    }
-
-    public TaskHandler scheduleRepeatingTask(Plugin plugin, Runnable task, int period) {
-        return addTask(plugin, task, 0, period, false);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleRepeatingTask(Plugin, Runnable, int, boolean)}
-     */
-    @Deprecated
-    public TaskHandler scheduleRepeatingTask(Runnable task, int period, boolean asynchronous) {
-        return addTask(null, task, 0, period, asynchronous);
-    }
-
-    public TaskHandler scheduleRepeatingTask(Plugin plugin, Runnable task, int period, boolean asynchronous) {
-        return addTask(plugin, task, 0, period, asynchronous);
-    }
-
-    public TaskHandler scheduleRepeatingTask(Task task, int period) {
-        return addTask(task, 0, period, false);
-    }
-
-    public TaskHandler scheduleRepeatingTask(Task task, int period, boolean asynchronous) {
-        return addTask(task, 0, period, asynchronous);
-    }
-
-    public TaskHandler scheduleDelayedRepeatingTask(Task task, int delay, int period) {
-        return addTask(task, delay, period, false);
-    }
-
-    public TaskHandler scheduleDelayedRepeatingTask(Task task, int delay, int period, boolean asynchronous) {
-        return addTask(task, delay, period, asynchronous);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleDelayedRepeatingTask(Plugin, Runnable, int, int)}
-     */
-    @Deprecated
-    public TaskHandler scheduleDelayedRepeatingTask(Runnable task, int delay, int period) {
-        return addTask(null, task, delay, period, false);
-    }
-
-    public TaskHandler scheduleDelayedRepeatingTask(Plugin plugin, Runnable task, int delay, int period) {
-        return addTask(plugin, task, delay, period, false);
-    }
-
-    /**
-     * @deprecated Use {@link #scheduleDelayedRepeatingTask(Plugin, Runnable, int, int, boolean)}
-     */
-    @Deprecated
-    public TaskHandler scheduleDelayedRepeatingTask(Runnable task, int delay, int period, boolean asynchronous) {
-        return addTask(null, task, delay, period, asynchronous);
-    }
-
-    public TaskHandler scheduleDelayedRepeatingTask(Plugin plugin, Runnable task, int delay, int period, boolean asynchronous) {
-        return addTask(plugin, task, delay, period, asynchronous);
-    }
-
-    public void cancelTask(int taskId) {
-        if (taskMap.containsKey(taskId)) {
-            try {
-                taskMap.remove(taskId).cancel();
-            } catch (RuntimeException ex) {
-                Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
-            }
-        }
-    }
-
-    public void cancelTask(Plugin plugin) {
-        if (plugin == null) {
-            throw new NullPointerException("Plugin cannot be null!");
-        }
-        for (Map.Entry<Integer, TaskHandler> entry : taskMap.entrySet()) {
-            TaskHandler taskHandler = entry.getValue();
-            // TODO: Remove the "taskHandler.getPlugin() == null" check
-            // It is only there for backwards compatibility!
-            if (taskHandler.getPlugin() == null || plugin.equals(taskHandler.getPlugin())) {
-                try {
-                    taskHandler.cancel(); // It will remove from task map automatic in next main heartbeat
-                } catch (RuntimeException ex) {
-                    Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
-                }
-            }
-        }
-    }
-
-    public void cancelAllTasks() {
-        for (Map.Entry<Integer, TaskHandler> entry : this.taskMap.entrySet()) {
-            try {
-                entry.getValue().cancel();
-            } catch (RuntimeException ex) {
-                Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
-            }
-        }
-        this.taskMap.clear();
-        this.queueMap .clear();
-        this.currentTaskId.set(0);
-    }
-
-    public boolean isQueued(int taskId) {
-        return this.taskMap.containsKey(taskId);
-    }
-
     private TaskHandler addTask(Task task, int delay, int period, boolean asynchronous) {
         return addTask(task instanceof PluginTask ? ((PluginTask) task).getOwner() : null, task, delay, period, asynchronous);
     }
@@ -253,6 +63,61 @@ public class ServerScheduler {
         return taskHandler;
     }
 
+    public void cancelAllTasks() {
+        for (Map.Entry<Integer, TaskHandler> entry : this.taskMap.entrySet()) {
+            try {
+                entry.getValue().cancel();
+            } catch (RuntimeException ex) {
+                Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
+            }
+        }
+        this.taskMap.clear();
+        this.queueMap.clear();
+        this.currentTaskId.set(0);
+    }
+
+    public void cancelTask(int taskId) {
+        if (taskMap.containsKey(taskId)) {
+            try {
+                taskMap.remove(taskId).cancel();
+            } catch (RuntimeException ex) {
+                Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
+            }
+        }
+    }
+
+    public void cancelTask(Plugin plugin) {
+        if (plugin == null) {
+            throw new NullPointerException("Plugin cannot be null!");
+        }
+        for (Map.Entry<Integer, TaskHandler> entry : taskMap.entrySet()) {
+            TaskHandler taskHandler = entry.getValue();
+            if (taskHandler.getPlugin() == null || plugin.equals(taskHandler.getPlugin())) {
+                try {
+                    taskHandler.cancel(); // It will remove from task map automatic in next main heartbeat
+                } catch (RuntimeException ex) {
+                    Server.getInstance().getLogger().critical("Exception while invoking onCancel", ex);
+                }
+            }
+        }
+    }
+
+    public int getAsyncTaskPoolSize() {
+        return asyncPool.getCorePoolSize();
+    }
+
+    public int getQueueSize() {
+        int size = pending.size();
+        for (ArrayDeque<TaskHandler> queue : queueMap.values()) {
+            size += queue.size();
+        }
+        return size;
+    }
+
+    public boolean isQueued(int taskId) {
+        return this.taskMap.containsKey(taskId);
+    }
+
     public void mainThreadHeartbeat(int currentTick) {
         // Accepts pending.
         TaskHandler task;
@@ -275,6 +140,10 @@ public class ServerScheduler {
         }
         this.currentTick = currentTick;
         AsyncTask.collectTask();
+    }
+
+    private int nextTaskId() {
+        return currentTaskId.incrementAndGet();
     }
 
     private void runTasks(int currentTick) {
@@ -309,15 +178,107 @@ public class ServerScheduler {
         }
     }
 
-    public int getQueueSize() {
-        int size = pending.size();
-        for (ArrayDeque<TaskHandler> queue : queueMap.values()) {
-            size += queue.size();
-        }
-        return size;
+    public TaskHandler scheduleAsyncTask(AsyncTask task) {
+        return addTask(null, task, 0, 0, true);
     }
 
-    private int nextTaskId() {
-        return currentTaskId.incrementAndGet();
+    public TaskHandler scheduleAsyncTask(Plugin plugin, AsyncTask task) {
+        return addTask(plugin, task, 0, 0, true);
+    }
+
+    public void scheduleAsyncTaskToWorker(AsyncTask task, int worker) {
+        scheduleAsyncTask(task);
+    }
+
+    public TaskHandler scheduleDelayedRepeatingTask(Task task, int delay, int period) {
+        return addTask(task, delay, period, false);
+    }
+
+    public TaskHandler scheduleDelayedRepeatingTask(Task task, int delay, int period, boolean asynchronous) {
+        return addTask(task, delay, period, asynchronous);
+    }
+
+    public TaskHandler scheduleDelayedRepeatingTask(Runnable task, int delay, int period) {
+        return addTask(null, task, delay, period, false);
+    }
+
+    public TaskHandler scheduleDelayedRepeatingTask(Plugin plugin, Runnable task, int delay, int period) {
+        return addTask(plugin, task, delay, period, false);
+    }
+
+    public TaskHandler scheduleDelayedRepeatingTask(Runnable task, int delay, int period, boolean asynchronous) {
+        return addTask(null, task, delay, period, asynchronous);
+    }
+
+    public TaskHandler scheduleDelayedRepeatingTask(Plugin plugin, Runnable task, int delay, int period, boolean asynchronous) {
+        return addTask(plugin, task, delay, period, asynchronous);
+    }
+
+    public TaskHandler scheduleDelayedTask(Task task, int delay) {
+        return this.addTask(task, delay, 0, false);
+    }
+
+    public TaskHandler scheduleDelayedTask(Task task, int delay, boolean asynchronous) {
+        return this.addTask(task, delay, 0, asynchronous);
+    }
+
+    public TaskHandler scheduleDelayedTask(Runnable task, int delay) {
+        return addTask(null, task, delay, 0, false);
+    }
+
+    public TaskHandler scheduleDelayedTask(Plugin plugin, Runnable task, int delay) {
+        return addTask(plugin, task, delay, 0, false);
+    }
+
+    public TaskHandler scheduleDelayedTask(Runnable task, int delay, boolean asynchronous) {
+        return addTask(null, task, delay, 0, asynchronous);
+    }
+
+    public TaskHandler scheduleDelayedTask(Plugin plugin, Runnable task, int delay, boolean asynchronous) {
+        return addTask(plugin, task, delay, 0, asynchronous);
+    }
+
+    public TaskHandler scheduleRepeatingTask(Runnable task, int period) {
+        return addTask(null, task, 0, period, false);
+    }
+
+    public TaskHandler scheduleRepeatingTask(Plugin plugin, Runnable task, int period) {
+        return addTask(plugin, task, 0, period, false);
+    }
+
+    public TaskHandler scheduleRepeatingTask(Runnable task, int period, boolean asynchronous) {
+        return addTask(null, task, 0, period, asynchronous);
+    }
+
+    public TaskHandler scheduleRepeatingTask(Plugin plugin, Runnable task, int period, boolean asynchronous) {
+        return addTask(plugin, task, 0, period, asynchronous);
+    }
+
+    public TaskHandler scheduleRepeatingTask(Task task, int period) {
+        return addTask(task, 0, period, false);
+    }
+
+    public TaskHandler scheduleRepeatingTask(Task task, int period, boolean asynchronous) {
+        return addTask(task, 0, period, asynchronous);
+    }
+
+    public TaskHandler scheduleTask(Task task) {
+        return addTask(task, 0, 0, false);
+    }
+
+    public TaskHandler scheduleTask(Runnable task) {
+        return addTask(null, task, 0, 0, false);
+    }
+
+    public TaskHandler scheduleTask(Plugin plugin, Runnable task) {
+        return addTask(plugin, task, 0, 0, false);
+    }
+
+    public TaskHandler scheduleTask(Runnable task, boolean asynchronous) {
+        return addTask(null, task, 0, 0, asynchronous);
+    }
+
+    public TaskHandler scheduleTask(Plugin plugin, Runnable task, boolean asynchronous) {
+        return addTask(plugin, task, 0, 0, asynchronous);
     }
 }

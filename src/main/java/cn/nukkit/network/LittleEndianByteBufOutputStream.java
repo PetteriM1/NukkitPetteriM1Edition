@@ -31,8 +31,8 @@ public class LittleEndianByteBufOutputStream extends ByteBufOutputStream {
     }
 
     @Override
-    public void writeShort(int val) throws IOException {
-        this.buffer.writeShortLE(val);
+    public void writeInt(int val) throws IOException {
+        this.buffer.writeIntLE(val);
     }
 
     @Override
@@ -41,8 +41,8 @@ public class LittleEndianByteBufOutputStream extends ByteBufOutputStream {
     }
 
     @Override
-    public void writeInt(int val) throws IOException {
-        this.buffer.writeIntLE(val);
+    public void writeShort(int val) throws IOException {
+        this.buffer.writeShortLE(val);
     }
 
     @Override

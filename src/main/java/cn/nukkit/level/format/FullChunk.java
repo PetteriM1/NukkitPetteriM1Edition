@@ -15,30 +15,9 @@ import java.util.Map;
  */
 public interface FullChunk extends Cloneable {
 
-    int getX();
+    void addBlockEntity(BlockEntity blockEntity);
 
-    int getZ();
-
-    default void setPosition(int x, int z) {
-        setX(x);
-        setZ(z);
-    }
-
-    void setX(int x);
-
-    void setZ(int z);
-
-    long getIndex();
-
-    LevelProvider getProvider();
-
-    void setProvider(LevelProvider provider);
-
-    default int getFullBlock(int x, int y, int z) {
-        return this.getFullBlock(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getFullBlock(int x, int y, int z, BlockLayer layer);
+    void addEntity(Entity entity);
 
     default Block getAndSetBlock(int x, int y, int z, Block block) {
         return this.getAndSetBlock(x, y, z, Block.LAYER_NORMAL, block);
@@ -46,76 +25,14 @@ public interface FullChunk extends Cloneable {
 
     Block getAndSetBlock(int x, int y, int z, BlockLayer layer, Block block);
 
-    default boolean setFullBlockId(int x, int y, int z, int fullId) {
-        return setFullBlockId(x, y, z, Block.LAYER_NORMAL, fullId);
+    @Deprecated
+    default int getBiomeColor(int x, int z) {
+        return 0;
     }
 
-    default boolean setFullBlockId(int x, int y, int z, BlockLayer layer, int fullId) {
-        return setBlockAtLayer(x, y, z, layer, fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK);
-    }
-
-    boolean setBlock(int x, int y, int z, int blockId);
-    
-    boolean setBlock(int x, int y, int z, int blockId, int meta);
-
-    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id);
-
-    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data);
-
-    default int getBlockId(int x, int y, int z) {
-        return this.getBlockId(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getBlockId(int x, int y, int z, BlockLayer layer);
-
-    default void setBlockId(int x, int y, int z, int id) {
-        this.setBlockId(x, y, z, Block.LAYER_NORMAL, id);
-    }
-
-    void setBlockId(int x, int y, int z, BlockLayer layer, int id);
-
-    default int getBlockData(int x, int y, int z) {
-        return this.getBlockData(x, y, z, Block.LAYER_NORMAL);
-    }
-
-    int getBlockData(int x, int y, int z, BlockLayer layer);
-
-    default void setBlockData(int x, int y, int z, int data) {
-        this.setBlockData(x, y, z, Block.LAYER_NORMAL, data);
-    }
-
-    void setBlockData(int x, int y, int z, BlockLayer layer, int data);
-
-    int getBlockExtraData(int x, int y, int z);
-
-    void setBlockExtraData(int x, int y, int z, int data);
-
-    int getBlockSkyLight(int x, int y, int z);
-
-    void setBlockSkyLight(int x, int y, int z, int level);
-
-    int getBlockLight(int x, int y, int z);
-
-    void setBlockLight(int x, int y, int z, int level);
-
-    int getHighestBlockAt(int x, int z);
-
-    int getHighestBlockAt(int x, int z, boolean cache);
-
-    int getHeightMap(int x, int z);
-
-    void setHeightMap(int x, int z, int value);
-
-    void recalculateHeightMap();
-
-    void populateSkyLight();
-
-    default boolean has3dBiomes() {
-        return false;
-    }
-
-    default PalettedBlockStorage getBiomeStorage(int y) {
-        return null;
+    @Deprecated
+    default int[] getBiomeColorArray() {
+        return new int[0];
     }
 
     int getBiomeId(int x, int z);
@@ -124,11 +41,113 @@ public interface FullChunk extends Cloneable {
         return this.getBiomeId(x, z);
     }
 
-    default void setBiomeId(int x, int y, int z, int biomeId)  {
+    byte[] getBiomeIdArray();
+
+    default PalettedBlockStorage getBiomeStorage(int y) {
+        return null;
+    }
+
+    default int getBlockData(int x, int y, int z) {
+        return this.getBlockData(x, y, z, Block.LAYER_NORMAL);
+    }
+
+    int getBlockData(int x, int y, int z, BlockLayer layer);
+
+    @Deprecated
+    byte[] getBlockDataArray();
+
+    Map<Long, BlockEntity> getBlockEntities();
+
+    int getBlockExtraData(int x, int y, int z);
+
+    Map<Integer, Integer> getBlockExtraDataArray();
+
+    default int getBlockId(int x, int y, int z) {
+        return this.getBlockId(x, y, z, Block.LAYER_NORMAL);
+    }
+
+    int getBlockId(int x, int y, int z, BlockLayer layer);
+
+    @Deprecated
+    byte[] getBlockIdArray();
+
+    int getBlockLight(int x, int y, int z);
+
+    @Deprecated
+    byte[] getBlockLightArray();
+
+    int getBlockSkyLight(int x, int y, int z);
+
+    @Deprecated
+    byte[] getBlockSkyLightArray();
+
+    Map<Long, Entity> getEntities();
+
+    default int getFullBlock(int x, int y, int z) {
+        return this.getFullBlock(x, y, z, Block.LAYER_NORMAL);
+    }
+
+    int getFullBlock(int x, int y, int z, BlockLayer layer);
+
+    int getHeightMap(int x, int z);
+
+    byte[] getHeightMapArray();
+
+    int getHighestBlockAt(int x, int z);
+
+    int getHighestBlockAt(int x, int z, boolean cache);
+
+    long getIndex();
+
+    LevelProvider getProvider();
+
+    BlockEntity getTile(int x, int y, int z);
+
+    int getX();
+
+    int getZ();
+
+    default boolean has3dBiomes() {
+        return false;
+    }
+
+    boolean hasChanged();
+
+    void initChunk();
+
+    boolean isGenerated();
+
+    boolean isLightPopulated();
+
+    boolean isLoaded();
+
+    boolean isPopulated();
+
+    boolean load() throws IOException;
+
+    boolean load(boolean generate) throws IOException;
+
+    void populateSkyLight();
+
+    void recalculateHeightMap();
+
+    void removeBlockEntity(BlockEntity blockEntity);
+
+    void removeEntity(Entity entity);
+
+    default void setBiome(int x, int z, cn.nukkit.level.biome.Biome biome) {
+        setBiomeId(x, z, biome.getId());
+    }
+
+    @Deprecated
+    default void setBiomeColor(int x, int z, int r, int g, int b) {
+    }
+
+    default void setBiomeId(int x, int y, int z, int biomeId) {
         this.setBiomeId(x, y, z, (byte) biomeId);
     }
 
-    default void setBiomeId(int x, int z, int biomeId)  {
+    default void setBiomeId(int x, int z, int biomeId) {
         setBiomeId(x, z, (byte) biomeId);
     }
 
@@ -138,84 +157,83 @@ public interface FullChunk extends Cloneable {
 
     void setBiomeId(int x, int z, byte biomeId);
 
-    default void setBiome(int x, int z, cn.nukkit.level.biome.Biome biome) {
-        setBiomeId(x, z, biome.getId());
+    @Deprecated
+    default void setBiomeIdAndColor(int x, int z, int idAndColor) {
     }
 
-    boolean isLightPopulated();
+    void setBiomeIdArray(byte[] biomeIdArray);
 
-    void setLightPopulated();
+    boolean setBlock(int x, int y, int z, int blockId);
 
-    void setLightPopulated(boolean value);
+    boolean setBlock(int x, int y, int z, int blockId, int meta);
 
-    boolean isPopulated();
+    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id);
 
-    void setPopulated();
+    boolean setBlockAtLayer(int x, int y, int z, BlockLayer layer, int id, int data);
 
-    void setPopulated(boolean value);
+    default void setBlockData(int x, int y, int z, int data) {
+        this.setBlockData(x, y, z, Block.LAYER_NORMAL, data);
+    }
 
-    boolean isGenerated();
+    void setBlockData(int x, int y, int z, BlockLayer layer, int data);
+
+    void setBlockExtraData(int x, int y, int z, int data);
+
+    default void setBlockId(int x, int y, int z, int id) {
+        this.setBlockId(x, y, z, Block.LAYER_NORMAL, id);
+    }
+
+    void setBlockId(int x, int y, int z, BlockLayer layer, int id);
+
+    void setBlockLight(int x, int y, int z, int level);
+
+    void setBlockSkyLight(int x, int y, int z, int level);
+
+    void setChanged();
+
+    void setChanged(boolean changed);
+
+    default boolean setFullBlockId(int x, int y, int z, int fullId) {
+        return setFullBlockId(x, y, z, Block.LAYER_NORMAL, fullId);
+    }
+
+    default boolean setFullBlockId(int x, int y, int z, BlockLayer layer, int fullId) {
+        return setBlockAtLayer(x, y, z, layer, fullId >> Block.DATA_BITS, fullId & Block.DATA_MASK);
+    }
 
     void setGenerated();
 
     void setGenerated(boolean value);
 
-    void addEntity(Entity entity);
+    void setHeightMap(int x, int z, int value);
 
-    void removeEntity(Entity entity);
+    void setLightPopulated();
 
-    void addBlockEntity(BlockEntity blockEntity);
+    void setLightPopulated(boolean value);
 
-    void removeBlockEntity(BlockEntity blockEntity);
+    void setPopulated();
 
-    Map<Long, Entity> getEntities();
+    void setPopulated(boolean value);
 
-    Map<Long, BlockEntity> getBlockEntities();
+    default void setPosition(int x, int z) {
+        setX(x);
+        setZ(z);
+    }
 
-    BlockEntity getTile(int x, int y, int z);
+    void setProvider(LevelProvider provider);
 
-    boolean isLoaded();
+    void setX(int x);
 
-    boolean load() throws IOException;
-
-    boolean load(boolean generate) throws IOException;
-
-    boolean unload() throws Exception;
-
-    boolean unload(boolean save) throws Exception;
-
-    boolean unload(boolean save, boolean safe) throws Exception;
-
-    void initChunk();
-
-    byte[] getBiomeIdArray();
-
-    void setBiomeIdArray(byte[] biomeIdArray);
-
-    byte[] getHeightMapArray();
-
-    @Deprecated
-    byte[] getBlockIdArray();
-
-    @Deprecated
-    byte[] getBlockDataArray();
-
-    Map<Integer, Integer> getBlockExtraDataArray();
-
-    @Deprecated
-    byte[] getBlockSkyLightArray();
-
-    @Deprecated
-    byte[] getBlockLightArray();
+    void setZ(int z);
 
     byte[] toBinary();
 
     @Deprecated
     byte[] toFastBinary();
 
-    boolean hasChanged();
+    boolean unload() throws Exception;
 
-    void setChanged();
+    boolean unload(boolean save) throws Exception;
 
-    void setChanged(boolean changed);
+    boolean unload(boolean save, boolean safe) throws Exception;
 }

@@ -1,5 +1,6 @@
 package cn.nukkit.item;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.potion.Effect;
 
 /**
@@ -18,6 +19,11 @@ public class ItemArrow extends Item {
 
     public ItemArrow(Integer meta, int count) {
         super(ARROW, meta, count, "Arrow");
+    }
+
+    @Override
+    public boolean allowOffhand() {
+        return true;
     }
 
     public static Effect getEffect(int meta) {
@@ -107,7 +113,14 @@ public class ItemArrow extends Item {
     }
 
     @Override
-    public boolean allowOffhand() {
-        return true;
+    public boolean isSupportedOn(int protocol) {
+        int damage = this.getDamage();
+        if (damage <= 42) {
+            return true;
+        }
+        if (damage == 43) {
+            return protocol >= ProtocolInfo.v1_16_0;
+        }
+        return protocol >= ProtocolInfo.v1_21_0;
     }
 }

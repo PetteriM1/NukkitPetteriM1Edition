@@ -20,6 +20,31 @@ public class BlockEntityBell extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
+    public int getDirection() {
+        return direction;
+    }
+
+    @Override
+    public String getName() {
+        return "Bell";
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.BELL)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putBoolean("Ringing", this.ringing)
+                .putInt("Direction", this.direction)
+                .putInt("Ticks", this.ticks);
+    }
+
+    public int getTicks() {
+        return ticks;
+    }
+
     @Override
     protected void initBlockEntity() {
         if (!namedTag.contains("Ringing") || !(namedTag.get("Ringing") instanceof ByteTag)) {
@@ -45,11 +70,12 @@ public class BlockEntityBell extends BlockEntitySpawnable {
     }
 
     @Override
-    public void saveNBT() {
-        namedTag.putBoolean("Ringing", ringing);
-        namedTag.putInt("Direction", direction);
-        namedTag.putInt("Ticks", ticks);
-        super.saveNBT();
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == BlockID.BELL;
+    }
+
+    public boolean isRinging() {
+        return ringing;
     }
 
     @Override
@@ -82,16 +108,19 @@ public class BlockEntityBell extends BlockEntitySpawnable {
         return false;
     }
 
-    private void spawnToAllWithExceptions() {
-        for (Player player : this.getLevel().getChunkPlayers(this.chunk.getX(), this.chunk.getZ()).values()) {
-            if (player.spawned && !spawnExceptions.contains(player.getId())) {
-                this.spawnTo(player);
-            }
-        }
+    @Override
+    public void saveNBT() {
+        namedTag.putBoolean("Ringing", ringing);
+        namedTag.putInt("Direction", direction);
+        namedTag.putInt("Ticks", ticks);
+        super.saveNBT();
     }
 
-    public boolean isRinging() {
-        return ringing;
+    public void setDirection(int direction) {
+        if (this.direction != direction) {
+            this.direction = direction;
+            setDirty();
+        }
     }
 
     public void setRinging(boolean ringing) {
@@ -102,21 +131,6 @@ public class BlockEntityBell extends BlockEntitySpawnable {
         }
     }
 
-    public int getDirection() {
-        return direction;
-    }
-
-    public void setDirection(int direction) {
-        if (this.direction != direction) {
-            this.direction = direction;
-            setDirty();
-        }
-    }
-
-    public int getTicks() {
-        return ticks;
-    }
-
     public void setTicks(int ticks) {
         if (this.ticks != ticks) {
             this.ticks = ticks;
@@ -124,25 +138,11 @@ public class BlockEntityBell extends BlockEntitySpawnable {
         }
     }
 
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.BELL)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putBoolean("Ringing", this.ringing)
-                .putInt("Direction", this.direction)
-                .putInt("Ticks", this.ticks);
-    }
-
-    @Override
-    public String getName() {
-        return "Bell";
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == BlockID.BELL;
+    private void spawnToAllWithExceptions() {
+        for (Player player : this.getLevel().getChunkPlayers(this.chunk.getX(), this.chunk.getZ()).values()) {
+            if (player.spawned && !spawnExceptions.contains(player.getId())) {
+                this.spawnTo(player);
+            }
+        }
     }
 }

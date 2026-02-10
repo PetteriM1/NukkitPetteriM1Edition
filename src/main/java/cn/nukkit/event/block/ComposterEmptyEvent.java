@@ -25,12 +25,28 @@ public class ComposterEmptyEvent extends BlockEvent implements Cancellable {
         this.newLevel = Math.max(0, Math.min(newLevel, 8));
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
     public Item getDrop() {
         return drop.clone();
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public Item getItemUsed() {
+        return itemUsed;
+    }
+
+    public Vector3 getMotion() {
+        return motion;
+    }
+
+    public int getNewLevel() {
+        return newLevel;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public void setDrop(Item drop) {
@@ -42,32 +58,16 @@ public class ComposterEmptyEvent extends BlockEvent implements Cancellable {
         this.drop = drop;
     }
 
-    public Item getItemUsed() {
-        return itemUsed;
-    }
-
     public void setItemUsed(Item itemUsed) {
         this.itemUsed = itemUsed;
-    }
-
-    public int getNewLevel() {
-        return newLevel;
-    }
-
-    public void setNewLevel(int newLevel) {
-        this.newLevel = Math.max(0, Math.min(newLevel, 8));
-    }
-
-    public Vector3 getMotion() {
-        return motion;
     }
 
     public void setMotion(Vector3 motion) {
         this.motion = motion;
     }
 
-    public static HandlerList getHandlers() {
-        return handlers;
+    public void setNewLevel(int newLevel) {
+        this.newLevel = Math.max(0, Math.min(newLevel, 8));
     }
 
 }

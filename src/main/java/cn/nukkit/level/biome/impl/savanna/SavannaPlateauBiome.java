@@ -13,12 +13,12 @@ public class SavannaPlateauBiome extends SavannaBiome {
     }
 
     @Override
-    public String getName() {
-        return "Savanna Plateau";
+    public boolean canRain() {
+        return true;
     }
 
     @Override
-    public boolean canRain() {
-        return true;
+    public String getName() {
+        return "Savanna Plateau";
     }
 }

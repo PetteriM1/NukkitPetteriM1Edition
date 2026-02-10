@@ -31,37 +31,6 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     public BlockTrapdoor(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return TRAPDOOR;
-    }
-
-    @Override
-    public String getName() {
-        return "Oak Trapdoor";
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 15;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
     private static final AxisAlignedBB[] BOUNDING_BOX_DAMAGE = new AxisAlignedBB[16];
 
     static {
@@ -132,13 +101,29 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
         }
     }
 
-    private AxisAlignedBB getRelativeBoundingBox() {
-        return BOUNDING_BOX_DAMAGE[this.getDamage()];
+    @Override
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
-    public double getMinX() {
-        return this.x + getRelativeBoundingBox().getMinX();
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public int getId() {
+        return TRAPDOOR;
     }
 
     @Override
@@ -147,13 +132,23 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getMinY() {
-        return this.y + getRelativeBoundingBox().getMinY();
+    public double getMaxY() {
+        return this.y + getRelativeBoundingBox().getMaxY();
     }
 
     @Override
-    public double getMaxY() {
-        return this.y + getRelativeBoundingBox().getMaxY();
+    public double getMaxZ() {
+        return this.z + getRelativeBoundingBox().getMaxZ();
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + getRelativeBoundingBox().getMinX();
+    }
+
+    @Override
+    public double getMinY() {
+        return this.y + getRelativeBoundingBox().getMinY();
     }
 
     @Override
@@ -162,8 +157,40 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getMaxZ() {
-        return this.z + getRelativeBoundingBox().getMaxZ();
+    public String getName() {
+        return "Oak Trapdoor";
+    }
+
+    private AxisAlignedBB getRelativeBoundingBox() {
+        return BOUNDING_BOX_DAMAGE[this.getDamage()];
+    }
+
+    @Override
+    public double getResistance() {
+        return 15;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isOpen() {
+        return (this.getDamage() & TRAPDOOR_OPEN_BIT) != 0;
+    }
+
+    public boolean isTop() {
+        return (this.getDamage() & TRAPDOOR_TOP_BIT) != 0;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        return toggle(player);
     }
 
     @Override
@@ -217,11 +244,6 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        return toggle(player);
-    }
-
     public boolean toggle(Player player) {
         DoorToggleEvent ev = new DoorToggleEvent(this, player);
         level.getServer().getPluginManager().callEvent(ev);
@@ -236,28 +258,5 @@ public class BlockTrapdoor extends BlockTransparentMeta implements Faceable {
             this.level.addSound(this, Sound.RANDOM_DOOR_CLOSE);
         }
         return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    public boolean isOpen() {
-        return (this.getDamage() & TRAPDOOR_OPEN_BIT) != 0;
-    }
-
-    public boolean isTop() {
-        return (this.getDamage() & TRAPDOOR_TOP_BIT) != 0;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

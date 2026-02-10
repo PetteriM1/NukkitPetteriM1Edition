@@ -29,41 +29,25 @@ public class PermissionAttachment {
         this.plugin = plugin;
     }
 
-    public Plugin getPlugin() {
-        return plugin;
-    }
-
-    public void setRemovalCallback(PermissionRemovedExecutor executor) {
-        this.removed = executor;
-    }
-
-    public PermissionRemovedExecutor getRemovalCallback() {
-        return removed;
+    public void clearPermissions() {
+        this.permissions.clear();
+        this.permissible.recalculatePermissions();
     }
 
     public Map<String, Boolean> getPermissions() {
         return permissions;
     }
 
-    public void clearPermissions() {
-        this.permissions.clear();
-        this.permissible.recalculatePermissions();
+    public Plugin getPlugin() {
+        return plugin;
     }
 
-    public void setPermissions(Map<String, Boolean> permissions) {
-        for (Map.Entry<String, Boolean> entry : permissions.entrySet()) {
-            String key = entry.getKey();
-            Boolean value = entry.getValue();
-            this.permissions.put(key, value);
-        }
-        this.permissible.recalculatePermissions();
+    public PermissionRemovedExecutor getRemovalCallback() {
+        return removed;
     }
 
-    public void unsetPermissions(List<String> permissions) {
-        for (String node : permissions) {
-            this.permissions.remove(node);
-        }
-        this.permissible.recalculatePermissions();
+    public void remove() {
+        this.permissible.removeAttachment(this);
     }
 
     public void setPermission(Permission permission, boolean value) {
@@ -81,6 +65,19 @@ public class PermissionAttachment {
         this.permissible.recalculatePermissions();
     }
 
+    public void setPermissions(Map<String, Boolean> permissions) {
+        for (Map.Entry<String, Boolean> entry : permissions.entrySet()) {
+            String key = entry.getKey();
+            Boolean value = entry.getValue();
+            this.permissions.put(key, value);
+        }
+        this.permissible.recalculatePermissions();
+    }
+
+    public void setRemovalCallback(PermissionRemovedExecutor executor) {
+        this.removed = executor;
+    }
+
     public void unsetPermission(Permission permission, boolean value) {
         this.unsetPermission(permission.getName(), value);
     }
@@ -92,7 +89,10 @@ public class PermissionAttachment {
         }
     }
 
-    public void remove() {
-        this.permissible.removeAttachment(this);
+    public void unsetPermissions(List<String> permissions) {
+        for (String node : permissions) {
+            this.permissions.remove(node);
+        }
+        this.permissible.recalculatePermissions();
     }
 }

@@ -33,6 +33,16 @@ public class SlotChangeAction extends InventoryAction {
     }
 
     /**
+     * Sets the item into the target inventory.
+     *
+     * @param source player
+     * @return successfully executed
+     */
+    public boolean execute(Player source) {
+        return this.inventory.setItem(this.inventorySlot, this.targetItem, false);
+    }
+
+    /**
      * Returns the inventory involved in this action.
      *
      * @return inventory
@@ -66,11 +76,13 @@ public class SlotChangeAction extends InventoryAction {
             return false;
         }
 
+        // Patch a dupe with blink
         if (inventory.getHolder() instanceof BlockEntityContainer && !((BlockEntity) inventory.getHolder()).closed && (source.distanceSquared((BlockEntity) inventory.getHolder()) > 4096 || !source.getLevel().equals(((BlockEntity) inventory.getHolder()).getLevel()))) {
             source.getServer().getLogger().debug(source.getName() + ": got SlotChangeAction but player is too far away from the holder of " + inventory);
             return false;
         }
 
+        // Patch a dupe with blink
         if (inventory.getHolder() != source && inventory.getHolder() instanceof Entity && !((Entity) inventory.getHolder()).closed && (source.distanceSquared((Entity) inventory.getHolder()) > 4096 || !source.getLevel().equals(((Entity) inventory.getHolder()).getLevel()))) {
             source.getServer().getLogger().debug(source.getName() + ": got SlotChangeAction but player is too far away from the holder of " + inventory);
             return false;
@@ -85,14 +97,18 @@ public class SlotChangeAction extends InventoryAction {
         return (check.getId() == Item.AIR && this.sourceItem.getId() == Item.AIR) || check.equalsExact(this.sourceItem);
     }
 
+    @Override
+    public void onAddToTransaction(InventoryTransaction transaction) {
+        transaction.addInventory(this.inventory);
+    }
+
     /**
-     * Sets the item into the target inventory.
+     * Sends the original inventorySlot contents to the source player to revert the action.
      *
      * @param source player
-     * @return successfully executed
      */
-    public boolean execute(Player source) {
-        return this.inventory.setItem(this.inventorySlot, this.targetItem, false);
+    public void onExecuteFail(Player source) {
+        this.inventory.sendSlot(this.inventorySlot, source);
     }
 
     /**
@@ -127,19 +143,5 @@ public class SlotChangeAction extends InventoryAction {
                 }
             }
         }
-    }
-
-    /**
-     * Sends the original inventorySlot contents to the source player to revert the action.
-     *
-     * @param source player
-     */
-    public void onExecuteFail(Player source) {
-        this.inventory.sendSlot(this.inventorySlot, source);
-    }
-
-    @Override
-    public void onAddToTransaction(InventoryTransaction transaction) {
-        transaction.addInventory(this.inventory);
     }
 }

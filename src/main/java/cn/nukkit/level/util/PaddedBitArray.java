@@ -33,6 +33,32 @@ public class PaddedBitArray implements BitArray {
     }
 
     @Override
+    public BitArray copy() {
+        return new PaddedBitArray(this.version, this.size, Arrays.copyOf(this.words, this.words.length));
+    }
+
+    @Override
+    public int get(int index) {
+        if (index < 0 || index >= this.size) {
+            throw new IndexOutOfBoundsException();
+        }
+        int arrayIndex = index / this.version.entriesPerWord;
+        int offset = (index % this.version.entriesPerWord) * this.version.bits;
+
+        return (this.words[arrayIndex] >>> offset) & this.version.maxEntryValue;
+    }
+
+    @Override
+    public BitArrayVersion getVersion() {
+        return this.version;
+    }
+
+    @Override
+    public int[] getWords() {
+        return this.words;
+    }
+
+    @Override
     public void set(int index, int value) {
         if (index < 0 || index >= this.size) {
             throw new IndexOutOfBoundsException();
@@ -48,33 +74,7 @@ public class PaddedBitArray implements BitArray {
     }
 
     @Override
-    public int get(int index) {
-        if (index < 0 || index >= this.size) {
-            throw new IndexOutOfBoundsException();
-        }
-        int arrayIndex = index / this.version.entriesPerWord;
-        int offset = (index % this.version.entriesPerWord) * this.version.bits;
-
-        return (this.words[arrayIndex] >>> offset) & this.version.maxEntryValue;
-    }
-
-    @Override
     public int size() {
         return this.size;
-    }
-
-    @Override
-    public int[] getWords() {
-        return this.words;
-    }
-
-    @Override
-    public BitArrayVersion getVersion() {
-        return this.version;
-    }
-
-    @Override
-    public BitArray copy() {
-        return new PaddedBitArray(this.version, this.size, Arrays.copyOf(this.words, this.words.length));
     }
 }

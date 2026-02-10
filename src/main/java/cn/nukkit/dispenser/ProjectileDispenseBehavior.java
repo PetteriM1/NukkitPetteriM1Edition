@@ -21,6 +21,22 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
         this.entityType = entity;
     }
 
+    /**
+     * You can add extra data of projectile here
+     *
+     * @param nbt  tag
+     * @param item item
+     */
+    protected void correctNBT(CompoundTag nbt, Item item) {
+        if (item != null) {
+            if (item.getId() == ItemID.SPLASH_POTION || item.getId() == ItemID.LINGERING_POTION) {
+                nbt.putInt("PotionId", item.getDamage());
+            } else if (item.getId() == ItemID.ARROW && item.getDamage() > 0) {
+                nbt.putByte("arrowData", item.getDamage());
+            }
+        }
+    }
+
     @Override
     public Item dispense(BlockDispenser source, BlockFace face, Item item) {
         Vector3 dispensePos = source.getDispensePosition();
@@ -52,27 +68,11 @@ public class ProjectileDispenseBehavior extends DefaultDispenseBehavior {
         return null;
     }
 
-    protected double getMotion() {
-        return 1.1;
-    }
-
     protected float getAccuracy() {
         return 6;
     }
 
-    /**
-     * You can add extra data of projectile here
-     *
-     * @param nbt tag
-     * @param item item
-     */
-    protected void correctNBT(CompoundTag nbt, Item item) {
-        if (item != null) {
-            if (item.getId() == ItemID.SPLASH_POTION || item.getId() == ItemID.LINGERING_POTION) {
-                nbt.putInt("PotionId", item.getDamage());
-            } else if (item.getId() == ItemID.ARROW && item.getDamage() > 0) {
-                nbt.putByte("arrowData", item.getDamage());
-            }
-        }
+    protected double getMotion() {
+        return 1.1;
     }
 }

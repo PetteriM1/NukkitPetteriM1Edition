@@ -1,46 +1,21 @@
 package cn.nukkit.entity.mob;
 
-import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
-import cn.nukkit.entity.EntitySmite;
-import cn.nukkit.entity.projectile.EntityArrow;
-import cn.nukkit.event.entity.EntityDamageByChildEntityEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBow;
 import cn.nukkit.level.format.FullChunk;
-import cn.nukkit.math.Vector2;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class EntityStray extends EntityWalkingMob implements EntitySmite {
+public class EntityStray extends EntitySkeleton {
 
     public static final int NETWORK_ID = 46;
 
     public EntityStray(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
-    }
-
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(20);
-        super.initEntity();
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        return 0.6f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 1.9f;
     }
 
     @Override
@@ -59,29 +34,20 @@ public class EntityStray extends EntityWalkingMob implements EntitySmite {
             drops.add(Item.get(Item.ARROW, 18, 1));
         }
 
+        if (this.getTool() instanceof ItemBow && ThreadLocalRandom.current().nextInt(1000) < 85) {
+            drops.add(Item.get(Item.BOW, Utils.rand(100, 380), 1));
+        }
+
         return drops.toArray(new Item[0]);
     }
 
     @Override
-    public int getKillExperience() {
-        return 5;
+    protected float getFreezingDamage() {
+        return 0f;
     }
 
     @Override
-    public void kill() {
-        if (!this.isAlive()) {
-            return;
-        }
-
-        super.kill();
-
-        if (this.lastDamageCause instanceof EntityDamageByChildEntityEvent) {
-            Entity damager;
-            if (((EntityDamageByChildEntityEvent) this.lastDamageCause).getChild() instanceof EntityArrow && (damager = ((EntityDamageByChildEntityEvent) this.lastDamageCause).getDamager()) instanceof Player) {
-                if (new Vector2(this.x, this.z).distance(new Vector2(damager.x, damager.z)) >= 50) {
-                    ((Player) damager).awardAchievement("snipeSkeleton");
-                }
-            }
-        }
+    public int getNetworkId() {
+        return NETWORK_ID;
     }
 }

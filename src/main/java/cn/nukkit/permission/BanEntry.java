@@ -27,55 +27,7 @@ public class BanEntry {
         this.creationDate = new Date();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public Date getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public boolean hasExpired() {
-        Date now = new Date();
-        return this.expirationDate != null && this.expirationDate.before(now);
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
-
-    public LinkedHashMap<String, String> getMap() {
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        map.put("name", name);
-        map.put("creationDate", new SimpleDateFormat(format).format(creationDate));
-        map.put("source", this.source);
-        map.put("expireDate", expirationDate != null ? new SimpleDateFormat(format).format(expirationDate) : "Forever");
-        map.put("reason", this.reason);
-        return map;
+    private static class TreeMapTypeToken extends TypeToken<TreeMap<String, String>> {
     }
 
     public static BanEntry fromMap(Map<String, String> map) {
@@ -89,10 +41,6 @@ public class BanEntry {
         banEntry.setSource(map.get("source"));
         banEntry.setReason(map.get("reason"));
         return banEntry;
-    }
-
-    public String getString() {
-        return new Gson().toJson(this.getMap());
     }
 
     public static BanEntry fromString(String str) {
@@ -109,6 +57,58 @@ public class BanEntry {
         return banEntry;
     }
 
-    private static class TreeMapTypeToken extends TypeToken<TreeMap<String, String>> {
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public LinkedHashMap<String, String> getMap() {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        map.put("name", name);
+        map.put("creationDate", new SimpleDateFormat(format).format(creationDate));
+        map.put("source", this.source);
+        map.put("expireDate", expirationDate != null ? new SimpleDateFormat(format).format(expirationDate) : "Forever");
+        map.put("reason", this.reason);
+        return map;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getString() {
+        return new Gson().toJson(this.getMap());
+    }
+
+    public boolean hasExpired() {
+        Date now = new Date();
+        return this.expirationDate != null && this.expirationDate.before(now);
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

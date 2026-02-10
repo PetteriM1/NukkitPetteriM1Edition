@@ -26,9 +26,25 @@ public class EntityArmorInventory extends BaseInventory {
         this.entityLiving = entity;
     }
 
+    public Item getBoots() {
+        return this.getItem(SLOT_FEET);
+    }
+
+    public Item getChestplate() {
+        return this.getItem(SLOT_CHEST);
+    }
+
+    public Item getHelmet() {
+        return this.getItem(SLOT_HEAD);
+    }
+
     @Override
     public InventoryHolder getHolder() {
         return this.holder;
+    }
+
+    public Item getLeggings() {
+        return this.getItem(SLOT_LEGS);
     }
 
     @Override
@@ -41,60 +57,19 @@ public class EntityArmorInventory extends BaseInventory {
         return 4;
     }
 
-    public Item getHelmet() {
-        return this.getItem(SLOT_HEAD);
-    }
-
-    public Item getChestplate() {
-        return this.getItem(SLOT_CHEST);
-    }
-
-    public Item getLeggings() {
-        return this.getItem(SLOT_LEGS);
-    }
-
-    public Item getBoots() {
-        return this.getItem(SLOT_FEET);
-    }
-
-    public void setHelmet(Item item) {
-        this.setItem(SLOT_CHEST, item);
-    }
-
-    public void setChestplate(Item item) {
-        this.setItem(SLOT_CHEST, item);
-    }
-
-    public void setLeggings(Item item) {
-        this.setItem(SLOT_LEGS, item);
-    }
-
-    public void setBoots(Item item) {
-        this.setItem(SLOT_FEET, item);
+    @Override
+    public Set<Player> getViewers() {
+        return this.viewers;
     }
 
     @Override
-    public void sendSlot(int index, Player... players) {
-        for (Player player : players) {
-            this.sendSlot(index, player);
-        }
+    public void onClose(Player who) {
+        this.viewers.remove(who);
     }
 
     @Override
-    public void sendSlot(int index, Player player) {
-        MobArmorEquipmentPacket mobArmorEquipmentPacket = new MobArmorEquipmentPacket();
-        mobArmorEquipmentPacket.eid = this.entityLiving.getId();
-        mobArmorEquipmentPacket.slots = new Item[]{this.getHelmet(), this.getChestplate(), this.getLeggings(), this.getBoots()};
-
-        if (player == this.holder) {
-            InventorySlotPacket inventorySlotPacket = new InventorySlotPacket();
-            inventorySlotPacket.inventoryId = player.getWindowId(this);
-            inventorySlotPacket.slot = index;
-            inventorySlotPacket.item = this.getItem(index);
-            player.dataPacket(inventorySlotPacket);
-        } else {
-            player.dataPacket(mobArmorEquipmentPacket);
-        }
+    public void onOpen(Player who) {
+        this.viewers.add(who);
     }
 
     @Override
@@ -121,17 +96,42 @@ public class EntityArmorInventory extends BaseInventory {
     }
 
     @Override
-    public void onOpen(Player who) {
-        this.viewers.add(who);
+    public void sendSlot(int index, Player... players) {
+        for (Player player : players) {
+            this.sendSlot(index, player);
+        }
     }
 
     @Override
-    public void onClose(Player who) {
-        this.viewers.remove(who);
+    public void sendSlot(int index, Player player) {
+        MobArmorEquipmentPacket mobArmorEquipmentPacket = new MobArmorEquipmentPacket();
+        mobArmorEquipmentPacket.eid = this.entityLiving.getId();
+        mobArmorEquipmentPacket.slots = new Item[]{this.getHelmet(), this.getChestplate(), this.getLeggings(), this.getBoots()};
+
+        if (player == this.holder) {
+            InventorySlotPacket inventorySlotPacket = new InventorySlotPacket();
+            inventorySlotPacket.inventoryId = player.getWindowId(this);
+            inventorySlotPacket.slot = index;
+            inventorySlotPacket.item = this.getItem(index);
+            player.dataPacket(inventorySlotPacket);
+        } else {
+            player.dataPacket(mobArmorEquipmentPacket);
+        }
     }
 
-    @Override
-    public Set<Player> getViewers() {
-        return this.viewers;
+    public void setBoots(Item item) {
+        this.setItem(SLOT_FEET, item);
+    }
+
+    public void setChestplate(Item item) {
+        this.setItem(SLOT_CHEST, item);
+    }
+
+    public void setHelmet(Item item) {
+        this.setItem(SLOT_CHEST, item);
+    }
+
+    public void setLeggings(Item item) {
+        this.setItem(SLOT_LEGS, item);
     }
 }

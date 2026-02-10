@@ -16,13 +16,30 @@ public class BlockSlabCrimson extends BlockSlab {
     }
 
     @Override
-    public String getSlabName() {
-        return "Crimson";
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                this.toItem()
+        };
     }
 
     @Override
     public int getId() {
         return CRIMSON_SLAB;
+    }
+
+    @Override
+    public String getSlabName() {
+        return "Crimson";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 
     @Override
@@ -36,29 +53,7 @@ public class BlockSlabCrimson extends BlockSlab {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                this.toItem()
-        };
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 }

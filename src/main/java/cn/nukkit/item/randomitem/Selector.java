@@ -15,11 +15,6 @@ public class Selector {
         this.setParent(parent);
     }
 
-    public Selector setParent(Selector parent) {
-        this.parent = parent;
-        return parent;
-    }
-
     public Selector getParent() {
         return parent;
     }
@@ -43,5 +38,10 @@ public class Selector {
             }
         });
         return temp[0];
+    }
+
+    public Selector setParent(Selector parent) {
+        this.parent = parent;
+        return parent;
     }
 }

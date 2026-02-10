@@ -8,12 +8,12 @@ import cn.nukkit.block.Block;
 public class ObjectWarpedTree extends ObjectNetherTree {
 
     @Override
-    public int getTrunkBlock() {
-        return Block.WARPED_STEM;
+    public int getLeafBlock() {
+        return Block.WARPED_WART_BLOCK;
     }
 
     @Override
-    public int getLeafBlock() {
-        return Block.WARPED_WART_BLOCK;
+    public int getTrunkBlock() {
+        return Block.WARPED_STEM;
     }
 }

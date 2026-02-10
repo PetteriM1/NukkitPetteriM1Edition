@@ -3,38 +3,15 @@ package cn.nukkit.block;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSculkSensor extends BlockTransparent {
 
     @Override
-    public int getId() {
-        return SCULK_SENSOR;
-    }
-
-    @Override
-    public String getName() {
-        return "Sculk Sensor";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.5;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 1;
+    public boolean canBePushed() {
+        return false;
     }
 
     @Override
@@ -43,13 +20,18 @@ public class BlockSculkSensor extends BlockTransparent {
     }
 
     @Override
-    public boolean canBePushed() {
-        return false;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 
     @Override
     public BlockColor getColor() {
         return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getDropExp() {
+        return 5;
     }
 
     @Override
@@ -63,8 +45,38 @@ public class BlockSculkSensor extends BlockTransparent {
     }
 
     @Override
-    public int getDropExp() {
-        return 5;
+    public double getHardness() {
+        return 0.5;
+    }
+
+    @Override
+    public int getId() {
+        return SCULK_SENSOR;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 1;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Sculk Sensor";
+    }
+
+    @Override
+    public double getResistance() {
+        return 7.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
     }
 
     @Override

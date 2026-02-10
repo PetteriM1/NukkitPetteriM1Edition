@@ -6,7 +6,7 @@ package cn.nukkit.utils;
  * Created by Snake1999 on 2016/1/10.
  * Package cn.nukkit.utils in project Nukkit
  */
-public class BlockColor  {
+public class BlockColor {
 
     // https://minecraft.wiki/w/Map_item_format#Color_table
 
@@ -126,33 +126,16 @@ public class BlockColor  {
                 this.blue == other.blue && this.alpha == other.alpha;
     }
 
-    @Override
-    public String toString() {
-        return "BlockColor[r=" + this.red + ",g=" + this.green + ",b=" + this.blue + ",a=" + this.alpha + ']';
-    }
-
-    public int getRed() {
-        return this.red;
-    }
-
-    public int getGreen() {
-        return this.green;
-    }
-
-    public int getBlue() {
-        return this.blue;
+    public int getARGB() {
+        return this.alpha << 24 | this.red << 16 | this.green << 8 | this.blue;
     }
 
     public int getAlpha() {
         return this.alpha;
     }
 
-    public int getRGB() {
-        return (this.red << 16 | this.green << 8 | this.blue) & 0xffffff;
-    }
-
-    public int getARGB() {
-        return this.alpha << 24 | this.red << 16 | this.green << 8 | this.blue;
+    public int getBlue() {
+        return this.blue;
     }
 
     /**
@@ -161,8 +144,24 @@ public class BlockColor  {
      * @param dyeColorMeta dye item meta value
      * @return BlockColor
      */
-    @Deprecated
     public static BlockColor getDyeColor(int dyeColorMeta) {
         return DyeColor.getByDyeData(dyeColorMeta).getColor();
+    }
+
+    public int getGreen() {
+        return this.green;
+    }
+
+    public int getRGB() {
+        return (this.red << 16 | this.green << 8 | this.blue) & 0xffffff;
+    }
+
+    public int getRed() {
+        return this.red;
+    }
+
+    @Override
+    public String toString() {
+        return "BlockColor[r=" + this.red + ",g=" + this.green + ",b=" + this.blue + ",a=" + this.alpha + ']';
     }
 }

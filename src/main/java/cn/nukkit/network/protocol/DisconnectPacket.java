@@ -12,26 +12,34 @@ public class DisconnectPacket extends DataPacket {
     public String filteredMessage = "";
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
-        this.getVarInt(); // Disconnect fail reason
+        if (protocol >= ProtocolInfo.v1_20_40) {
+            this.getVarInt(); // Disconnect fail reason
+        }
         this.hideDisconnectionScreen = this.getBoolean();
         this.message = this.getString();
-        this.filteredMessage = this.getString();
+        if (this.protocol >= ProtocolInfo.v1_21_20) {
+            this.filteredMessage = this.getString();
+        }
     }
 
     @Override
     public void encode() {
         this.reset();
-        this.putVarInt(0); // Disconnect fail reason UNKNOWN
+        if (protocol >= ProtocolInfo.v1_20_40) {
+            this.putVarInt(0); // Disconnect fail reason UNKNOWN
+        }
         this.putBoolean(this.hideDisconnectionScreen);
         if (!this.hideDisconnectionScreen) {
             this.putString(this.message);
-            this.putString(this.filteredMessage);
+            if (this.protocol >= ProtocolInfo.v1_21_20) {
+                this.putString(this.filteredMessage);
+            }
         }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

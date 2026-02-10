@@ -45,55 +45,6 @@ public enum DyeColor {
         this.dyeName = dyeName;
     }
 
-    /**
-     * Get as BlockColor
-     *
-     * @return BlockColor of the DyeColor
-     */
-    public BlockColor getColor() {
-        return this.blockColor;
-    }
-
-    public BlockColor getSignColor() {
-        return this.signColor;
-    }
-
-    /**
-     * Get as dye item meta value
-     *
-     * @return dye item meta value of the DyeColor
-     */
-    public int getDyeData() {
-        return this.dyeColorMeta;
-    }
-
-    /**
-     * Get as wool block meta value
-     *
-     * @return wool block meta value of the DyeColor
-     */
-    public int getWoolData() {
-        return this.woolColorMeta;
-    }
-
-    /**
-     * Get color name
-     *
-     * @return color name
-     */
-    public String getName() {
-        return this.colorName;
-    }
-
-    /**
-     * Get dye name
-     *
-     * @return dye name
-     */
-    public String getDyeName() {
-        return this.dyeName;
-    }
-
     static {
         BY_DYE_DATA = values();
         BY_WOOL_DATA = values();
@@ -122,5 +73,54 @@ public enum DyeColor {
      */
     public static DyeColor getByWoolData(int woolColorMeta) {
         return BY_WOOL_DATA[woolColorMeta & 0x0f];
+    }
+
+    /**
+     * Get as BlockColor
+     *
+     * @return BlockColor of the DyeColor
+     */
+    public BlockColor getColor() {
+        return this.blockColor;
+    }
+
+    /**
+     * Get as dye item meta value
+     *
+     * @return dye item meta value of the DyeColor
+     */
+    public int getDyeData() {
+        return this.dyeColorMeta;
+    }
+
+    /**
+     * Get dye name
+     *
+     * @return dye name
+     */
+    public String getDyeName() {
+        return this.dyeName;
+    }
+
+    /**
+     * Get color name
+     *
+     * @return color name
+     */
+    public String getName() {
+        return this.colorName;
+    }
+
+    public BlockColor getSignColor() {
+        return this.signColor;
+    }
+
+    /**
+     * Get as wool block meta value
+     *
+     * @return wool block meta value of the DyeColor
+     */
+    public int getWoolData() {
+        return this.woolColorMeta;
     }
 }

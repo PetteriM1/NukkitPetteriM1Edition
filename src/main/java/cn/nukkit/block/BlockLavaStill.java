@@ -15,6 +15,11 @@ public class BlockLavaStill extends BlockLava {
     }
 
     @Override
+    public BlockLiquid getBlock(int meta) {
+        return (BlockLiquid) Block.get(STILL_LAVA, meta);
+    }
+
+    @Override
     public int getId() {
         return STILL_LAVA;
     }
@@ -22,10 +27,5 @@ public class BlockLavaStill extends BlockLava {
     @Override
     public String getName() {
         return "Still Lava";
-    }
-
-    @Override
-    public BlockLiquid getBlock(int meta) {
-        return (BlockLiquid) Block.get(STILL_LAVA, meta);
     }
 }

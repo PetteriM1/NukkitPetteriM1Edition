@@ -16,6 +16,14 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class NukkitConsoleCompleter implements Completer {
 
+    private static void addCandidates(Consumer<String> commandConsumer) {
+        for (String command : Server.getInstance().getCommandMap().getCommands().keySet()) {
+            if (!command.contains(":")) {
+                commandConsumer.accept(command);
+            }
+        }
+    }
+
     @Override
     public void complete(LineReader lineReader, ParsedLine parsedLine, List<Candidate> candidates) {
         if (parsedLine.wordIndex() == 0) {
@@ -35,21 +43,13 @@ public class NukkitConsoleCompleter implements Completer {
         } else if (parsedLine.wordIndex() > 0 && !parsedLine.word().isEmpty()) {
             String word = parsedLine.word();
             SortedSet<String> names = new TreeSet<>();
-            Server.getInstance().getOnlinePlayers().values().forEach((p) -> names.add(p.getName()));
+            Server.getInstance().getOnlinePlayersList().forEach((p) -> names.add(p.getName()));
             for (String match : names) {
                 if (!match.toLowerCase(Locale.ROOT).startsWith(word.toLowerCase(Locale.ROOT))) {
                     continue;
                 }
 
                 candidates.add(new Candidate(match));
-            }
-        }
-    }
-
-    private static void addCandidates(Consumer<String> commandConsumer) {
-        for (String command : Server.getInstance().getCommandMap().getCommands().keySet()) {
-            if (!command.contains(":")) {
-                commandConsumer.accept(command);
             }
         }
     }

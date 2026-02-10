@@ -17,18 +17,25 @@ import cn.nukkit.utils.Utils;
 public class BlockMycelium extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Mycelium";
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
-    public int getId() {
-        return MYCELIUM;
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                new ItemBlock(Block.get(BlockID.DIRT))
+        };
     }
 
     @Override
@@ -37,15 +44,39 @@ public class BlockMycelium extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return MYCELIUM;
+    }
+
+    @Override
+    public String getName() {
+        return "Mycelium";
+    }
+
+    @Override
     public double getResistance() {
         return 2.5;
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                new ItemBlock(Block.get(BlockID.DIRT))
-        };
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.isShovel()) {
+            Block up = this.up();
+            if (up instanceof BlockAir || up instanceof BlockFlowable) {
+                item.useOn(this);
+                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
+                if (player != null) {
+                    player.getLevel().addSound(player, Sound.STEP_GRASS);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -66,36 +97,5 @@ public class BlockMycelium extends BlockSolid {
             }
         }
         return 0;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
-    }
-    
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.isShovel()) {
-            Block up = this.up();
-            if (up instanceof BlockAir || up instanceof BlockFlowable) {
-                item.useOn(this);
-                this.getLevel().setBlock(this, Block.get(GRASS_PATH));
-                if (player != null) {
-                    player.getLevel().addSound(player, Sound.STEP_GRASS);
-                }
-                return true;
-            }
-        }
-        return false;
     }
 }

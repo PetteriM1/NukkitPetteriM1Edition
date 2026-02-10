@@ -13,13 +13,13 @@ public class ObjectBirchTree extends ObjectTree {
     protected int treeHeight = 7;
 
     @Override
-    public int getType() {
-        return BlockWood.BIRCH;
+    public int getTreeHeight() {
+        return this.treeHeight;
     }
 
     @Override
-    public int getTreeHeight() {
-        return this.treeHeight;
+    public int getType() {
+        return BlockWood.BIRCH;
     }
 
     @Override

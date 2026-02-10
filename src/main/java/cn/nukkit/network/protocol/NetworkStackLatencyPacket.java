@@ -11,20 +11,24 @@ public class NetworkStackLatencyPacket extends DataPacket {
     public boolean needResponse;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         timestamp = this.getLLong();
-        needResponse = this.getBoolean();
+        if (protocol >= 332) {
+            needResponse = this.getBoolean();
+        }
     }
 
     @Override
     public void encode() {
         this.reset();
         this.putLLong(timestamp);
-        this.putBoolean(needResponse);
+        if (protocol >= 332) {
+            this.putBoolean(needResponse);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

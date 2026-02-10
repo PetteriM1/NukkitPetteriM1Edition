@@ -25,6 +25,11 @@ public abstract class BlockWoodStripped extends BlockWood {
     }
 
     @Override
+    public boolean canBeActivated() {
+        return false;
+    }
+
+    @Override
     public abstract int getId();
 
     @Override
@@ -35,11 +40,6 @@ public abstract class BlockWoodStripped extends BlockWood {
         this.setDamage(FACES[face.getIndex()]);
         this.getLevel().setBlock(block, this, true, true);
         return true;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return false;
     }
 
     @Override

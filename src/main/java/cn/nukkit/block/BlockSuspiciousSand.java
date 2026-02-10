@@ -2,7 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockSuspiciousSand extends BlockFallableMeta {
 
@@ -15,28 +17,8 @@ public class BlockSuspiciousSand extends BlockFallableMeta {
     }
 
     @Override
-    public int getId() {
-        return SUSPICIOUS_SAND;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.25;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1.25;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
-    }
-
-    @Override
-    public String getName() {
-        return "Suspicious Sand";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SAND;
     }
 
     @Override
@@ -47,5 +29,35 @@ public class BlockSuspiciousSand extends BlockFallableMeta {
     @Override
     public Item[] getDrops(Item item) {
         return new Item[]{Item.get(AIR)};
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.25;
+    }
+
+    @Override
+    public int getId() {
+        return SUSPICIOUS_SAND;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Suspicious Sand";
+    }
+
+    @Override
+    public double getResistance() {
+        return 1.25;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
     }
 }

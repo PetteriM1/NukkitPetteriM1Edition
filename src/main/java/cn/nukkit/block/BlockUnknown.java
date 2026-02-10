@@ -18,13 +18,13 @@ public class BlockUnknown extends BlockMeta {
     }
 
     @Override
-    public int getId() {
-        return id;
+    public double getHardness() {
+        return 0.1;
     }
 
     @Override
-    public double getHardness() {
-        return 0.1;
+    public int getId() {
+        return id;
     }
 
     @Override

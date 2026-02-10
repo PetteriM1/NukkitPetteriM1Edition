@@ -8,12 +8,12 @@ import cn.nukkit.block.Block;
 public class ObjectCrimsonTree extends ObjectNetherTree {
 
     @Override
-    public int getTrunkBlock() {
-        return Block.CRIMSON_STEM;
+    public int getLeafBlock() {
+        return Block.BLOCK_NETHER_WART_BLOCK;
     }
 
     @Override
-    public int getLeafBlock() {
-        return Block.BLOCK_NETHER_WART_BLOCK;
+    public int getTrunkBlock() {
+        return Block.CRIMSON_STEM;
     }
 }

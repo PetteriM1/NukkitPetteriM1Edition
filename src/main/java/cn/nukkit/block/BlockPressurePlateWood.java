@@ -22,43 +22,6 @@ public class BlockPressurePlateWood extends BlockPressurePlateBase {
     }
 
     @Override
-    public String getName() {
-        return "Oak Pressure Plate";
-    }
-
-    @Override
-    public int getId() {
-        return WOODEN_PRESSURE_PLATE;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.1D;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.5D;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                toItem()
-        };
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    @Override
     protected int computeRedstoneStrength() {
         AxisAlignedBB bb = getCollisionBoundingBox();
 
@@ -69,5 +32,42 @@ public class BlockPressurePlateWood extends BlockPressurePlateBase {
         }
 
         return 0;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                toItem()
+        };
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.1D;
+    }
+
+    @Override
+    public int getId() {
+        return WOODEN_PRESSURE_PLATE;
+    }
+
+    @Override
+    public String getName() {
+        return "Oak Pressure Plate";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
     }
 }

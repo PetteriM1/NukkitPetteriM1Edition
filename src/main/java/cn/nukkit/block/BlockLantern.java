@@ -20,33 +20,8 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Lantern";
-    }
-
-    @Override
-    public int getId() {
-        return LANTERN;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 15;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3.5;
-    }
-
-    @Override
-    public double getHardness() {
-        return 3.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -60,23 +35,18 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(LANTERN));
+    public double getHardness() {
+        return 3.5;
     }
 
     @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return this;
+    public int getId() {
+        return LANTERN;
     }
 
     @Override
-    public double getMinX() {
-        return this.x + 0.3125;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.3125;
+    public int getLightLevel() {
+        return 15;
     }
 
     @Override
@@ -92,6 +62,31 @@ public class BlockLantern extends BlockFlowable {
     @Override
     public double getMaxZ() {
         return this.z + 0.6875;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.3125;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.3125;
+    }
+
+    @Override
+    public String getName() {
+        return "Lantern";
+    }
+
+    @Override
+    public double getResistance() {
+        return 3.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     private boolean isBlockAboveValid() {
@@ -124,6 +119,21 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.getDamage() == 0) {
+                if (!this.isBlockUnderValid()) {
+                    level.useBreakOn(this, null, null, true);
+                }
+            } else if (!this.isBlockAboveValid()) {
+                level.useBreakOn(this, null, null, true);
+            }
+            return type;
+        }
+        return 0;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         boolean isUnderValid = this.isBlockUnderValid();
         boolean hanging = face != BlockFace.UP && this.isBlockAboveValid() && (!isUnderValid || face == BlockFace.DOWN);
@@ -142,22 +152,12 @@ public class BlockLantern extends BlockFlowable {
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.getDamage() == 0) {
-                if (!this.isBlockUnderValid()) {
-                    level.useBreakOn(this, null, null, true);
-                }
-            } else if (!this.isBlockAboveValid()) {
-                level.useBreakOn(this, null, null, true);
-            }
-            return type;
-        }
-        return 0;
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return this;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public Item toItem() {
+        return new ItemBlock(Block.get(LANTERN));
     }
 }

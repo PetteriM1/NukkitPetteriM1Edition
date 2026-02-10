@@ -16,6 +16,20 @@ public class BlockEntityBed extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
+    public DyeColor getDyeColor() {
+        return DyeColor.getByWoolData(color);
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.BED)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z)
+                .putByte("color", this.color);
+    }
+
     @Override
     protected void initBlockEntity() {
         if (!this.namedTag.contains("color")) {
@@ -36,19 +50,5 @@ public class BlockEntityBed extends BlockEntitySpawnable {
     public void saveNBT() {
         super.saveNBT();
         this.namedTag.putByte("color", this.color);
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.BED)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z)
-                .putByte("color", this.color);
-    }
-
-    public DyeColor getDyeColor() {
-        return DyeColor.getByWoolData(color);
     }
 }

@@ -14,13 +14,13 @@ public class BlockSoulLantern extends BlockLantern {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(SOUL_LANTERN));
+    public int getId() {
+        return SOUL_LANTERN;
     }
 
     @Override
-    public int getId() {
-        return SOUL_LANTERN;
+    public int getLightLevel() {
+        return 10;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class BlockSoulLantern extends BlockLantern {
     }
 
     @Override
-    public int getLightLevel() {
-        return 10;
+    public Item toItem() {
+        return new ItemBlock(Block.get(SOUL_LANTERN));
     }
 }

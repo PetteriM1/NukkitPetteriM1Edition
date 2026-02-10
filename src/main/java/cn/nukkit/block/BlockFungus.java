@@ -9,7 +9,9 @@ import cn.nukkit.level.Position;
 import cn.nukkit.level.generator.object.tree.ObjectNetherTree;
 import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.math.NukkitRandom;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -19,34 +21,9 @@ public abstract class BlockFungus extends BlockFlowable {
         super(0);
     }
 
-    protected abstract ObjectNetherTree getTree();
-
-    protected abstract int getGround();
-
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL && !canPlaceOn(this.down(), this)) {
-            this.level.useBreakOn(this);
-            return type;
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == Item.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
-            if (player != null && (player.gamemode & 0x01) == 0) {
-                item.count--;
-            }
-
-            if (ThreadLocalRandom.current().nextFloat() < 0.4 && this.level.getBlockIdAt((int) this.x, (int) this.y - 1, (int) this.z) == this.getGround()) {
-                growTreeHere();
-            }
-
-            this.level.addParticle(new BoneMealParticle(this));
-            return true;
-        }
-        return false;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -67,9 +44,18 @@ public abstract class BlockFungus extends BlockFlowable {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.BROWN_MUSHROOM;
     }
+
+    protected abstract int getGround();
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    protected abstract ObjectNetherTree getTree();
 
     private boolean growTreeHere() {
         NukkitRandom random = new NukkitRandom();
@@ -87,5 +73,31 @@ public abstract class BlockFungus extends BlockFlowable {
             this.level.setBlock(block, block);
         }
         return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == Item.DYE && item.getDamage() == DyeColor.WHITE.getDyeData()) {
+            if (player != null && (player.gamemode & 0x01) == 0) {
+                item.count--;
+            }
+
+            if (ThreadLocalRandom.current().nextFloat() < 0.4 && this.level.getBlockIdAt((int) this.x, (int) this.y - 1, (int) this.z) == this.getGround()) {
+                growTreeHere();
+            }
+
+            this.level.addParticle(new BoneMealParticle(this));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL && !canPlaceOn(this.down(), this)) {
+            this.level.useBreakOn(this);
+            return type;
+        }
+        return 0;
     }
 }

@@ -13,18 +13,8 @@ public class BlockStairsStone extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Stone Stairs";
-    }
-
-    @Override
-    public int getId() {
-        return NORMAL_STONE_STAIRS;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -33,12 +23,22 @@ public class BlockStairsStone extends BlockStairs {
     }
 
     @Override
+    public int getId() {
+        return NORMAL_STONE_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Stone Stairs";
+    }
+
+    @Override
     public double getResistance() {
         return 30;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

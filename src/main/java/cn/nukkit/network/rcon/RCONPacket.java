@@ -37,6 +37,18 @@ public class RCONPacket {
         buffer.get(new byte[2]);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public byte[] getPayload() {
+        return payload;
+    }
+
+    public int getType() {
+        return type;
+    }
+
     public ByteBuffer toBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(this.payload.length + 14);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -52,17 +64,5 @@ public class RCONPacket {
         //noinspection RedundantCast
         ((Buffer) buffer).flip(); // do not remove the cast
         return buffer;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public byte[] getPayload() {
-        return payload;
     }
 }

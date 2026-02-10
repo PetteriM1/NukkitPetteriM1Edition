@@ -14,9 +14,16 @@ public class PacketViolationWarningPacket extends DataPacket {
     public int packetId;
     public String context;
 
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public enum PacketViolationType {
+        UNKNOWN,
+        MALFORMED_PACKET
+    }
+
+    public enum PacketViolationSeverity {
+        UNKNOWN,
+        WARNING,
+        FINAL_WARNING,
+        TERMINATING_CONNECTION
     }
 
     @Override
@@ -43,15 +50,8 @@ public class PacketViolationWarningPacket extends DataPacket {
         this.encodeUnsupported();
     }
 
-    public enum PacketViolationType {
-        UNKNOWN,
-        MALFORMED_PACKET
-    }
-
-    public enum PacketViolationSeverity {
-        UNKNOWN,
-        WARNING,
-        FINAL_WARNING,
-        TERMINATING_CONNECTION
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

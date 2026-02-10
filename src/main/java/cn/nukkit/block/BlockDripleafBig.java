@@ -22,7 +22,9 @@ import cn.nukkit.level.particle.BoneMealParticle;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.Faceable;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesHelper, Faceable {
 
@@ -40,8 +42,18 @@ public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesH
     }
 
     @Override
-    public BlockProperties getBlockProperties() {
-        return PROPERTIES;
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return !this.hasHead() || !this.getTilt().isStable();
     }
 
     @Override
@@ -66,24 +78,109 @@ public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesH
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = block.down();
-        if (!this.canPlaceOn(down, target)) {
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LILY_PAD;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return this.getDirection();
+    }
+
+    @Override
+    public BlockProperties getBlockProperties() {
+        return PROPERTIES;
+    }
+
+    public BlockFace getDirection() {
+        return this.getPropertyValue(VanillaProperties.DIRECTION);
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.1;
+    }
+
+    @Override
+    public int getId() {
+        return BIG_DRIPLEAF;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Big Dripleaf";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    public DripleafTilt getTilt() {
+        return this.getPropertyValue(TILT_PROPERTY);
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
+    }
+
+    public boolean hasHead() {
+        return this.getBooleanValue(HEAD_PROPERTY);
+    }
+
+    @Override
+    public boolean isSolid() {
+        return this.hasHead() && this.getTilt().isStable();
+    }
+
+    @Override
+    public boolean isTransparent() {
+        return !this.hasHead() || !this.getTilt().isStable();
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
             return false;
         }
 
-        if (down.getId() == BIG_DRIPLEAF) {
-            BlockDripleafBig floor = (BlockDripleafBig) down;
-            floor.setHasHead(false);
-            this.getLevel().setBlock(floor, floor, true, true);
-            this.setDirection(floor.getDirection());
-        } else {
-            this.setDirection(player.getDirection().getOpposite());
+        BlockGrowEvent event = new BlockGrowEvent(this, Block.get(BlockID.BIG_DRIPLEAF, 0, this));
+        this.getLevel().getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            return false;
         }
 
-        this.setTilt(DripleafTilt.NONE);
-        this.setHasHead(true);
-        return this.getLevel().setBlock(this, this, true, true);
+        Block up = this;
+        BlockDripleafBig highestPart = null;
+        while (up instanceof BlockDripleafBig) {
+            highestPart = (BlockDripleafBig) up;
+            up = up.up();
+        }
+
+        if (highestPart == null) {
+            return false;
+        }
+
+        highestPart.setHasHead(false);
+        this.getLevel().setBlock(highestPart, highestPart, false, true);
+
+        BlockDripleafBig block = (BlockDripleafBig) this.clone();
+        block.setHasHead(true);
+
+        this.getLevel().setBlock(highestPart.up(), block, false, true);
+
+        this.level.addParticle(new BoneMealParticle(this));
+
+        if (player != null && !player.isCreative()) {
+            item.count--;
+        }
+        return true;
     }
 
     @Override
@@ -137,6 +234,50 @@ public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesH
         return 0;
     }
 
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = block.down();
+        if (!this.canPlaceOn(down, target)) {
+            return false;
+        }
+
+        if (down.getId() == BIG_DRIPLEAF) {
+            BlockDripleafBig floor = (BlockDripleafBig) down;
+            floor.setHasHead(false);
+            this.getLevel().setBlock(floor, floor, true, true);
+            this.setDirection(floor.getDirection());
+        } else {
+            this.setDirection(player.getDirection().getOpposite());
+        }
+
+        this.setTilt(DripleafTilt.NONE);
+        this.setHasHead(true);
+        return this.getLevel().setBlock(this, this, true, true);
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return super.recalculateBoundingBox(); // TODO:
+    }
+
+    private void resetTilt() {
+        this.setTilt(DripleafTilt.NONE);
+        this.getLevel().setBlock(this, this, true, true);
+        this.getLevel().addSound(this, Sound.TILT_UP_BIG_DRIPLEAF);
+    }
+
+    public void setDirection(BlockFace blockFace) {
+        this.setPropertyValue(VanillaProperties.DIRECTION, blockFace);
+    }
+
+    public void setHasHead(boolean value) {
+        this.setBooleanValue(HEAD_PROPERTY, value);
+    }
+
+    public void setTilt(DripleafTilt tilt) {
+        this.setPropertyValue(TILT_PROPERTY, tilt);
+    }
+
     private void setTiltAndScheduleTick(DripleafTilt tilt, boolean sound) {
         this.setTilt(tilt);
         this.getLevel().setBlock(this, this, true, true);
@@ -151,137 +292,8 @@ public class BlockDripleafBig extends BlockSolidMeta implements BlockPropertiesH
         }
     }
 
-    private void resetTilt() {
-        this.setTilt(DripleafTilt.NONE);
-        this.getLevel().setBlock(this, this, true, true);
-        this.getLevel().addSound(this, Sound.TILT_UP_BIG_DRIPLEAF);
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() != Item.DYE || item.getDamage() != ItemDye.BONE_MEAL) {
-            return false;
-        }
-
-        BlockGrowEvent event = new BlockGrowEvent(this, Block.get(BlockID.BIG_DRIPLEAF, 0, this));
-        this.getLevel().getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return false;
-        }
-
-        Block up = this;
-        BlockDripleafBig highestPart = null;
-        while (up instanceof BlockDripleafBig) {
-            highestPart = (BlockDripleafBig) up;
-            up = up.up();
-        }
-
-        if (highestPart == null) {
-            return false;
-        }
-
-        highestPart.setHasHead(false);
-        this.getLevel().setBlock(highestPart, highestPart, false, true);
-
-        BlockDripleafBig block = (BlockDripleafBig) this.clone();
-        block.setHasHead(true);
-
-        this.getLevel().setBlock(highestPart.up(), block, false, true);
-
-        this.level.addParticle(new BoneMealParticle(this));
-
-        if (player != null && !player.isCreative()) {
-            item.count--;
-        }
-        return true;
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return super.recalculateBoundingBox(); // TODO:
-    }
-
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId()), 0, 1);
-    }
-
-    @Override
-    public String getName() {
-        return "Big Dripleaf";
-    }
-
-    @Override
-    public int getId() {
-        return BIG_DRIPLEAF;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public double getResistance() {
-        return 0.1;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.1;
-    }
-
-    public void setTilt(DripleafTilt tilt) {
-        this.setPropertyValue(TILT_PROPERTY, tilt);
-    }
-
-    public DripleafTilt getTilt() {
-        return this.getPropertyValue(TILT_PROPERTY);
-    }
-
-    public void setHasHead(boolean value) {
-        this.setBooleanValue(HEAD_PROPERTY, value);
-    }
-
-    public boolean hasHead() {
-        return this.getBooleanValue(HEAD_PROPERTY);
-    }
-
-    public void setDirection(BlockFace blockFace) {
-        this.setPropertyValue(VanillaProperties.DIRECTION, blockFace);
-    }
-
-    public BlockFace getDirection() {
-        return this.getPropertyValue(VanillaProperties.DIRECTION);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return this.getDirection();
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean isTransparent() {
-        return !this.hasHead() || !this.getTilt().isStable();
-    }
-
-    @Override
-    public boolean isSolid() {
-        return this.hasHead() && this.getTilt().isStable();
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return !this.hasHead() || !this.getTilt().isStable();
     }
 }

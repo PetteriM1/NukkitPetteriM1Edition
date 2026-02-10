@@ -15,11 +15,6 @@ public class PlaySoundPacket extends DataPacket {
     public float pitch;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -31,5 +26,10 @@ public class PlaySoundPacket extends DataPacket {
         this.putBlockVector3(this.x << 3, this.y << 3, this.z << 3);
         this.putLFloat(this.volume);
         this.putLFloat(this.pitch);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

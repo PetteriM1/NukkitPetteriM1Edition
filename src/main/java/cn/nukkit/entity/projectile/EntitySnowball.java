@@ -14,6 +14,34 @@ public class EntitySnowball extends EntityProjectile {
 
     public static final int NETWORK_ID = 81;
 
+    public EntitySnowball(FullChunk chunk, CompoundTag nbt) {
+        this(chunk, nbt, null);
+    }
+
+    public EntitySnowball(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
+        super(chunk, nbt, shootingEntity);
+    }
+
+    @Override
+    protected float getDrag() {
+        return 0.01f;
+    }
+
+    @Override
+    protected float getGravity() {
+        return 0.03f;
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.25f;
+    }
+
+    @Override
+    public float getLength() {
+        return 0.25f;
+    }
+
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
@@ -25,31 +53,8 @@ public class EntitySnowball extends EntityProjectile {
     }
 
     @Override
-    public float getLength() {
-        return 0.25f;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0.25f;
-    }
-
-    @Override
-    protected float getGravity() {
-        return 0.03f;
-    }
-
-    @Override
-    protected float getDrag() {
-        return 0.01f;
-    }
-
-    public EntitySnowball(FullChunk chunk, CompoundTag nbt) {
-        this(chunk, nbt, null);
-    }
-
-    public EntitySnowball(FullChunk chunk, CompoundTag nbt, Entity shootingEntity) {
-        super(chunk, nbt, shootingEntity);
+    public void onHit() {
+        level.addParticle(new ItemBreakParticle(this, Item.get(Item.SNOWBALL)), null, 5);
     }
 
     @Override
@@ -65,10 +70,5 @@ public class EntitySnowball extends EntityProjectile {
 
         super.onUpdate(currentTick);
         return !this.closed;
-    }
-
-    @Override
-    public void onHit() {
-        level.addParticle(new ItemBreakParticle(this, Item.get(Item.SNOWBALL)), null, 5);
     }
 }

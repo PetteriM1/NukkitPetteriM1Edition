@@ -1,9 +1,11 @@
 package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.EntityHuman;
 import cn.nukkit.entity.EntityHumanType;
 import cn.nukkit.item.Item;
+import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
 import cn.nukkit.network.protocol.MobEquipmentPacket;
@@ -16,53 +18,8 @@ public class PlayerOffhandInventory extends BaseInventory {
     }
 
     @Override
-    public void setSize(int size) {
-        throw new UnsupportedOperationException("Offhand can only carry one item at a time");
-    }
-
-    @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        EntityHuman holder = this.getHolder();
-        if (holder instanceof Player && !((Player) holder).spawned) {
-            return;
-        }
-
-        this.sendContents(this.getViewers());
-        this.sendContents(holder.getViewers().values());
-    }
-
-    @Override
-    public void sendContents(Player... players) {
-        Item item = this.getItem(0);
-
-        for (Player player : players) {
-            if (player == this.getHolder()) {
-                InventoryContentPacket pk = new InventoryContentPacket(); // content vs slot
-                pk.inventoryId = ContainerIds.OFFHAND;
-                pk.slots = new Item[]{item};
-                player.dataPacket(pk);
-            } else {
-                MobEquipmentPacket pk = this.createMobEquipmentPacket(item);
-                player.dataPacket(pk);
-            }
-        }
-    }
-
-    @Override
-    public void sendSlot(int index, Player... players) {
-        Item item = this.getItem(0);
-
-        for (Player player : players) {
-            if (player == this.getHolder()) {
-                InventorySlotPacket pk = new InventorySlotPacket(); // slot vs content
-                pk.inventoryId = ContainerIds.OFFHAND;
-                pk.item = item;
-                player.dataPacket(pk);
-            } else {
-                MobEquipmentPacket pk = this.createMobEquipmentPacket(item);
-                player.dataPacket(pk);
-            }
-        }
+    public boolean allowedToAdd(Item item) {
+        return item.allowOffhand();
     }
 
     private MobEquipmentPacket createMobEquipmentPacket(Item item) {
@@ -80,7 +37,76 @@ public class PlayerOffhandInventory extends BaseInventory {
     }
 
     @Override
-    public boolean allowedToAdd(Item item) {
-        return item.allowOffhand();
+    public void onSlotChange(int index, Item before, boolean send) {
+        EntityHuman holder = this.getHolder();
+        if (holder instanceof Player && !((Player) holder).spawned) {
+            return;
+        }
+
+        this.sendContents(this.getViewers());
+        this.sendContents(holder.getViewers().values());
+    }
+
+    @Override
+    public void sendContents(Player... players) {
+        Item item = this.getItemFast(0);
+
+        Item clean = null;
+        boolean reduceTraffic = Server.getInstance().reduceTraffic;
+        if (reduceTraffic) {
+            clean = Item.get(item.getId(), item.getDamage(), 1);
+
+            CompoundTag oldTag = item.getNamedTag();
+
+            if (oldTag != null) {
+                clean.setNamedTag(CompoundTag.sanitize(oldTag));
+            }
+        }
+
+        for (Player player : players) {
+            if (player == this.getHolder()) {
+                InventoryContentPacket pk = new InventoryContentPacket(); // content vs slot
+                pk.inventoryId = ContainerIds.OFFHAND;
+                pk.slots = new Item[]{item};
+                player.dataPacket(pk);
+            } else {
+                MobEquipmentPacket pk = this.createMobEquipmentPacket(reduceTraffic ? clean : item);
+                player.dataPacket(pk);
+            }
+        }
+    }
+
+    @Override
+    public void sendSlot(int index, Player... players) {
+        Item item = this.getItemFast(0);
+
+        Item clean = null;
+        boolean reduceTraffic = Server.getInstance().reduceTraffic;
+        if (reduceTraffic) {
+            clean = Item.get(item.getId(), item.getDamage(), 1);
+
+            CompoundTag oldTag = item.getNamedTag();
+
+            if (oldTag != null) {
+                clean.setNamedTag(CompoundTag.sanitize(oldTag));
+            }
+        }
+
+        for (Player player : players) {
+            if (player == this.getHolder()) {
+                InventorySlotPacket pk = new InventorySlotPacket(); // slot vs content
+                pk.inventoryId = ContainerIds.OFFHAND;
+                pk.item = item;
+                player.dataPacket(pk);
+            } else {
+                MobEquipmentPacket pk = this.createMobEquipmentPacket(reduceTraffic ? clean : item);
+                player.dataPacket(pk);
+            }
+        }
+    }
+
+    @Override
+    public void setSize(int size) {
+        throw new UnsupportedOperationException("Offhand can only carry one item at a time");
     }
 }

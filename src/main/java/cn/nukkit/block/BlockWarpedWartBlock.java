@@ -9,18 +9,8 @@ public class BlockWarpedWartBlock extends BlockNetherWartBlock {
     }
 
     @Override
-    public String getName() {
-        return "Warped Wart Block";
-    }
-
-    @Override
-    public int getId() {
-        return WARPED_WART_BLOCK;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1;
+    public BlockColor getColor() {
+        return BlockColor.WARPED_WART_BLOCK_COLOR;
     }
 
     @Override
@@ -29,7 +19,17 @@ public class BlockWarpedWartBlock extends BlockNetherWartBlock {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_WART_BLOCK_COLOR;
+    public int getId() {
+        return WARPED_WART_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Warped Wart Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
     }
 }

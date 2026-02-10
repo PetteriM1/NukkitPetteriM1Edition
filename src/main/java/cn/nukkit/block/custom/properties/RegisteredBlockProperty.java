@@ -9,8 +9,9 @@ public class RegisteredBlockProperty {
     BlockProperty<?> property;
     int offset;
 
-    public void validateMeta(int meta) {
-        this.property.validateMeta(meta, this.offset);
+    @Override
+    public String toString() {
+        return this.offset + "-" + (this.offset + this.property.getBitSize()) + ":" + this.property.getName();
     }
 
     public void validateMeta(long meta) {
@@ -21,8 +22,7 @@ public class RegisteredBlockProperty {
         this.property.validateMeta(meta, this.offset);
     }
 
-    @Override
-    public String toString() {
-        return this.offset + "-" + (this.offset + this.property.getBitSize()) + ":" + this.property.getName();
+    public void validateMeta(int meta) {
+        this.property.validateMeta(meta, this.offset);
     }
 }

@@ -28,8 +28,38 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public int getId() {
-        return SKULL_BLOCK;
+    public boolean alwaysDropsOnExplosion() {
+        return true;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return true;
+    }
+
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        BlockEntity blockEntity = getLevel().getBlockEntity(this);
+        int dropMeta = 0;
+        if (blockEntity != null) dropMeta = blockEntity.namedTag.getByte("SkullType");
+        return new Item[]{
+                Item.get(Item.SKULL, dropMeta)
+        };
     }
 
     @Override
@@ -38,13 +68,8 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getResistance() {
-        return 5;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
+    public int getId() {
+        return SKULL_BLOCK;
     }
 
     @Override
@@ -57,6 +82,26 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable {
         }
 
         return ItemSkull.getItemSkullName(itemMeta);
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
     }
 
     @Override
@@ -94,38 +139,6 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        BlockEntity blockEntity = getLevel().getBlockEntity(this);
-        int dropMeta = 0;
-        if (blockEntity != null) dropMeta = blockEntity.namedTag.getByte("SkullType");
-        return new Item[]{
-                Item.get(Item.SKULL, dropMeta)
-        };
-    }
-
-    @Override
-    public Item toItem() {
-        BlockEntity blockEntity = getLevel().getBlockEntity(this);
-        int itemMeta = 0;
-        if (blockEntity != null) itemMeta = blockEntity.namedTag.getByte("SkullType");
-        return Item.get(Item.SKULL, itemMeta);
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
         AxisAlignedBB bb = new SimpleAxisAlignedBB(this.x + 0.25, this.y, this.z + 0.25, this.x + 1 - 0.25, this.y + 0.5, this.z + 1 - 0.25);
         switch (this.getBlockFace()) {
@@ -142,22 +155,10 @@ public class BlockSkull extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return true;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean alwaysDropsOnExplosion() {
-        return true;
+    public Item toItem() {
+        BlockEntity blockEntity = getLevel().getBlockEntity(this);
+        int itemMeta = 0;
+        if (blockEntity != null) itemMeta = blockEntity.namedTag.getByte("SkullType");
+        return Item.get(Item.SKULL, itemMeta);
     }
 }

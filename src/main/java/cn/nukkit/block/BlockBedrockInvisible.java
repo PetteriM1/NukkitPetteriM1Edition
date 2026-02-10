@@ -9,6 +9,21 @@ import cn.nukkit.utils.BlockColor;
 public class BlockBedrockInvisible extends BlockSolid {
 
     @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.TRANSPARENT_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return -1;
+    }
+
+    @Override
     public int getId() {
         return INVISIBLE_BEDROCK;
     }
@@ -19,13 +34,13 @@ public class BlockBedrockInvisible extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return -1;
+    public double getResistance() {
+        return 18000000;
     }
 
     @Override
-    public double getResistance() {
-        return 18000000;
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 
     @Override
@@ -34,22 +49,7 @@ public class BlockBedrockInvisible extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.TRANSPARENT_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
     public Item toItem() {
         return Item.get(0);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
     }
 }

@@ -26,28 +26,13 @@ public class BlockObserver extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public int getId() {
-        return OBSERVER;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public String getName() {
-        return "Observer";
-    }
-
-    @Override
-    public double getHardness() {
-        return 3.5;
-    }
-
-    @Override
-    public double getResistance() {
-        return 17.5;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage() & 0x07);
     }
 
     @Override
@@ -62,34 +47,47 @@ public class BlockObserver extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public double getHardness() {
+        return 3.5;
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (player != null) {
-            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
-                double y = player.y + player.getEyeHeight();
-
-                if (y - this.y > 2) {
-                    this.setDamage(BlockFace.DOWN.getIndex());
-                } else if (this.y - y > 0) {
-                    this.setDamage(BlockFace.UP.getIndex());
-                } else {
-                    this.setDamage(player.getHorizontalFacing().getIndex());
-                }
-            } else {
-                this.setDamage(player.getHorizontalFacing().getIndex());
-            }
-        }
-
-        return this.getLevel().setBlock(this, this, true, true);
+    public int getId() {
+        return OBSERVER;
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage() & 0x07);
+    public String getName() {
+        return "Observer";
+    }
+
+    @Override
+    public double getResistance() {
+        return 17.5;
+    }
+
+    @Override
+    public int getStrongPower(BlockFace side) {
+        return this.isPowered() && side == this.getBlockFace() ? 15 : 0;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public int getWeakPower(BlockFace face) {
+        return this.getStrongPower(face);
+    }
+
+    @Override
+    public boolean isPowerSource() {
+        return true;
+    }
+
+    public boolean isPowered() {
+        return (this.getDamage() & 0x8) == 0x8;
     }
 
     @Override
@@ -127,27 +125,24 @@ public class BlockObserver extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(Block.OBSERVER));
-    }
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (player != null) {
+            if (Math.abs(player.x - this.x) < 2 && Math.abs(player.z - this.z) < 2) {
+                double y = player.y + player.getEyeHeight();
 
-    @Override
-    public boolean isPowerSource() {
-        return true;
-    }
+                if (y - this.y > 2) {
+                    this.setDamage(BlockFace.DOWN.getIndex());
+                } else if (this.y - y > 0) {
+                    this.setDamage(BlockFace.UP.getIndex());
+                } else {
+                    this.setDamage(player.getHorizontalFacing().getIndex());
+                }
+            } else {
+                this.setDamage(player.getHorizontalFacing().getIndex());
+            }
+        }
 
-    @Override
-    public int getStrongPower(BlockFace side) {
-        return this.isPowered() && side == this.getBlockFace() ? 15 : 0;
-    }
-
-    @Override
-    public int getWeakPower(BlockFace face) {
-        return this.getStrongPower(face);
-    }
-
-    public boolean isPowered() {
-        return (this.getDamage() & 0x8) == 0x8;
+        return this.getLevel().setBlock(this, this, true, true);
     }
 
     public void setPowered(boolean powered) {
@@ -158,5 +153,10 @@ public class BlockObserver extends BlockSolidMeta implements Faceable {
     public Block setUpdatePos(Vector3 pos) {
         this.updatePos = pos;
         return this;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(Block.OBSERVER));
     }
 }

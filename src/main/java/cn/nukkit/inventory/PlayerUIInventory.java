@@ -2,7 +2,9 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.InventoryContentPacket;
 import cn.nukkit.network.protocol.InventorySlotPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.network.protocol.types.ContainerIds;
 
 import java.util.HashMap;
@@ -24,21 +26,66 @@ public class PlayerUIInventory extends BaseInventory {
         this.bigCraftingGrid = new BigCraftingGrid(this);
     }
 
-    public PlayerCursorInventory getCursorInventory() {
-        return cursorInventory;
+    public BigCraftingGrid getBigCraftingGrid() {
+        return bigCraftingGrid;
     }
 
     public CraftingGrid getCraftingGrid() {
         return craftingGrid;
     }
 
-    public BigCraftingGrid getBigCraftingGrid() {
-        return bigCraftingGrid;
+    public PlayerCursorInventory getCursorInventory() {
+        return cursorInventory;
     }
 
     @Override
-    public void setSize(int size) {
-        throw new UnsupportedOperationException("UI size is immutable");
+    public Player getHolder() {
+        return player;
+    }
+
+    @Override
+    public int getSize() {
+        return 51;
+    }
+
+    @Override
+    public void sendContents(Player... target) {
+        boolean hasLegacyPlayers = false;
+        for (Player p : target) {
+            if (p.protocol < ProtocolInfo.v1_16_0) {
+                hasLegacyPlayers = true;
+                break;
+            }
+        }
+
+        if (!hasLegacyPlayers) {
+            return;
+        }
+
+        InventoryContentPacket pk = new InventoryContentPacket();
+        pk.slots = new Item[this.getSize()];
+        for (int i = 0; i < this.getSize(); ++i) {
+            pk.slots[i] = this.getItem(i);
+        }
+
+        for (Player p : target) {
+            if (p.protocol >= ProtocolInfo.v1_16_0) {
+                continue;
+            }
+
+            if (p == this.getHolder()) {
+                pk.inventoryId = ContainerIds.UI;
+            } else {
+                int id;
+
+                if ((id = p.getWindowId(this)) == ContainerIds.NONE) {
+                    if (this.getHolder() != player) this.close(p);
+                    continue;
+                }
+                pk.inventoryId = id;
+            }
+            p.dataPacket(pk);
+        }
     }
 
     @Override
@@ -65,17 +112,7 @@ public class PlayerUIInventory extends BaseInventory {
     }
 
     @Override
-    public void sendContents(Player... target) {
-
-    }
-
-    @Override
-    public int getSize() {
-        return 51;
-    }
-
-    @Override
-    public Player getHolder() {
-        return player;
+    public void setSize(int size) {
+        throw new UnsupportedOperationException("UI size is immutable");
     }
 }

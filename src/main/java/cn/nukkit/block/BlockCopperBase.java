@@ -4,42 +4,13 @@ import cn.nukkit.Player;
 import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
 
 public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, Waxable {
 
     public BlockCopperBase() {
         // Does nothing
-    }
-
-    @Override
-    public double getHardness() {
-        return 3;
-    }
-
-    @Override
-    public double getResistance() {
-        return 6;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_STONE;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        return Waxable.super.onActivate(item, player)
-                || Oxidizable.super.onActivate(item, player);
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        return Oxidizable.super.onUpdate(type);
     }
 
     @Override
@@ -53,29 +24,8 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
     }
 
     @Override
-    public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
-        return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
-    }
-
-    @Override
-    public boolean setOxidizationLevel(OxidizationLevel oxidizationLevel) {
-        if (this.getOxidizationLevel().equals(oxidizationLevel)) {
-            return true;
-        }
-        return this.level.setBlock(this, Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel)));
-    }
-
-    @Override
-    public boolean setWaxed(boolean waxed) {
-        if (this.isWaxed() == waxed) {
-            return true;
-        }
-        return this.level.setBlock(this, Block.get(getCopperId(waxed, getOxidizationLevel())));
-    }
-
-    @Override
-    public boolean isWaxed() {
-        return false;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.IRON_BLOCK;
     }
 
     protected int getCopperId(boolean waxed, OxidizationLevel oxidizationLevel) {
@@ -94,5 +44,67 @@ public abstract class BlockCopperBase extends BlockSolid implements Oxidizable, 
             default:
                 return this.getId();
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 3;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public Block getStateWithOxidizationLevel(OxidizationLevel oxidizationLevel) {
+        return Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel), this.getDamage());
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_STONE;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean isWaxed() {
+        return false;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        return Waxable.super.onActivate(item, player)
+                || Oxidizable.super.onActivate(item, player);
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        return Oxidizable.super.onUpdate(type);
+    }
+
+    @Override
+    public boolean setOxidizationLevel(OxidizationLevel oxidizationLevel) {
+        if (this.getOxidizationLevel().equals(oxidizationLevel)) {
+            return true;
+        }
+        return this.level.setBlock(this, Block.get(this.getCopperId(this.isWaxed(), oxidizationLevel)));
+    }
+
+    @Override
+    public boolean setWaxed(boolean waxed) {
+        if (this.isWaxed() == waxed) {
+            return true;
+        }
+        return this.level.setBlock(this, Block.get(getCopperId(waxed, getOxidizationLevel())));
     }
 }

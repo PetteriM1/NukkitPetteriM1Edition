@@ -9,21 +9,23 @@ import javax.crypto.SecretKey;
 
 public interface NetworkPlayerSession {
 
-    void sendPacket(DataPacket packet);
-    void sendImmediatePacket(DataPacket packet, Runnable callback);
-
     void disconnect(String reason);
 
-    Player getPlayer();
-
-    void setCompression(CompressionProvider compression);
     CompressionProvider getCompression();
-
-    default void setEncryption(SecretKey encryptionKey, Cipher encryptionCipher, Cipher decryptionCipher) {
-
-    }
 
     default long getPing() {
         return -1;
+    }
+
+    Player getPlayer();
+
+    void sendImmediatePacket(DataPacket packet, Runnable callback);
+
+    void sendPacket(DataPacket packet);
+
+    void setCompression(CompressionProvider compression);
+
+    default void setEncryption(SecretKey encryptionKey, Cipher encryptionCipher, Cipher decryptionCipher) {
+
     }
 }

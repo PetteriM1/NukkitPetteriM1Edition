@@ -18,6 +18,9 @@ public class PlayerAuthInputPacket extends DataPacket {
 
     public static final byte NETWORK_ID = ProtocolInfo.PLAYER_AUTH_INPUT_PACKET;
 
+    private static final Vector2f EMPTY_VECTOR2F = new Vector2f();
+    private static final Vector3f EMPTY_VECTOR3F = new Vector3f();
+
     private float yaw;
     private float pitch;
     private float headYaw;
@@ -26,21 +29,38 @@ public class PlayerAuthInputPacket extends DataPacket {
     private final Set<AuthInputAction> inputData = EnumSet.noneOf(AuthInputAction.class);
     private InputMode inputMode;
     private ClientPlayMode playMode;
+    /**
+     * Note: On versions below 1.19.0.29 this will always return AuthInteractionModel.CLASSIC
+     */
     private AuthInteractionModel interactionModel;
+    private Vector3f vrGazeDirection;
     private long tick;
     private Vector3f delta;
     private final Map<PlayerActionType, PlayerBlockActionData> blockActionData = new EnumMap<>(PlayerActionType.class);
+    /**
+     * Note: 1.20.60+
+     */
     private long predictedVehicle;
-    private Vector2f analogMoveVector;
-    private Vector2f vehicleRotation;
-    private Vector2f interactRotation;
-    private Vector3f cameraOrientation;
-    private Vector2f rawMoveVector;
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
+    /**
+     * Note: 1.20.70.24+
+     */
+    private Vector2f analogMoveVector = EMPTY_VECTOR2F;
+    /**
+     * Note: 1.20.70+
+     */
+    private Vector2f vehicleRotation = EMPTY_VECTOR2F;
+    /**
+     * Note: 1.21.40+
+     */
+    private Vector2f interactRotation = EMPTY_VECTOR2F;
+    /**
+     * Note: 1.21.40+
+     */
+    private Vector3f cameraOrientation = EMPTY_VECTOR3F;
+    /**
+     * Note: 1.21.50+
+     */
+    private Vector2f rawMoveVector = EMPTY_VECTOR2F;
 
     @Override
     public void decode() {
@@ -60,16 +80,25 @@ public class PlayerAuthInputPacket extends DataPacket {
         this.inputMode = InputMode.fromOrdinal((int) this.getUnsignedVarInt());
         this.playMode = ClientPlayMode.fromOrdinal((int) this.getUnsignedVarInt());
 
-        this.interactionModel = AuthInteractionModel.fromOrdinal((int) this.getUnsignedVarInt());
+        if (protocol >= ProtocolInfo.v1_19_0_29) {
+            this.interactionModel = AuthInteractionModel.fromOrdinal((int) this.getUnsignedVarInt());
+        } else {
+            this.interactionModel = AuthInteractionModel.CLASSIC;
+        }
 
-        this.interactRotation = this.getVector2f();
+        if (protocol >= ProtocolInfo.v1_21_40) {
+            this.interactRotation = this.getVector2f();
+        } else if (this.playMode == ClientPlayMode.REALITY) {
+            this.vrGazeDirection = this.getVector3f();
+        }
 
         this.tick = this.getUnsignedVarLong();
         this.delta = this.getVector3f();
 
         if (this.inputData.contains(AuthInputAction.PERFORM_BLOCK_ACTIONS)) {
             int arraySize = this.getVarInt();
-            if (arraySize > 256) throw new IllegalArgumentException("PlayerAuthInputPacket PERFORM_BLOCK_ACTIONS is too long: " + arraySize);
+            if (arraySize > 128)
+                throw new IllegalArgumentException("PlayerAuthInputPacket PERFORM_BLOCK_ACTIONS is too long: " + arraySize);
             for (int i = 0; i < arraySize; i++) {
                 PlayerActionType type = PlayerActionType.from(this.getVarInt());
                 switch (type) {
@@ -86,18 +115,34 @@ public class PlayerAuthInputPacket extends DataPacket {
             }
         }
 
-        if (this.inputData.contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
-            this.vehicleRotation = this.getVector2f();
+        if (protocol >= ProtocolInfo.v1_20_60 && this.inputData.contains(AuthInputAction.IN_CLIENT_PREDICTED_IN_VEHICLE)) {
+            if (protocol >= ProtocolInfo.v1_20_70) {
+                this.vehicleRotation = this.getVector2f();
+            }
+
             this.predictedVehicle = this.getVarLong();
         }
 
-        this.analogMoveVector = this.getVector2f();
-        this.cameraOrientation = this.getVector3f();
-        this.rawMoveVector = this.getVector2f();
+        if (protocol >= ProtocolInfo.v1_19_70_24) {
+            this.analogMoveVector = this.getVector2f();
+
+            if (protocol >= ProtocolInfo.v1_21_40) {
+                this.cameraOrientation = this.getVector3f();
+
+                if (protocol >= ProtocolInfo.v1_21_50_28) {
+                    this.rawMoveVector = this.getVector2f();
+                }
+            }
+        }
     }
 
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

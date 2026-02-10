@@ -19,15 +19,15 @@ public class RCONCommand {
         this.command = command;
     }
 
-    public SocketChannel getSender() {
-        return this.sender;
+    public String getCommand() {
+        return this.command;
     }
 
     public int getId() {
         return this.id;
     }
 
-    public String getCommand() {
-        return this.command;
+    public SocketChannel getSender() {
+        return this.sender;
     }
 }

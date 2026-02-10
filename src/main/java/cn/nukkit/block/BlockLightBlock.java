@@ -14,28 +14,13 @@ public class BlockLightBlock extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Light Block";
-    }
-
-    @Override
-    public int getId() {
-        return LIGHT_BLOCK;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return getDamage() & 0xF;
-    }
-
-    @Override
-    public AxisAlignedBB getBoundingBox() {
-        return null;
-    }
-
-    @Override
     public boolean canBeFlowedInto() {
         return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
     }
 
     @Override
@@ -49,8 +34,38 @@ public class BlockLightBlock extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox() {
+        return null;
+    }
+
+    @Override
+    public double getFrictionFactor() {
+        return 0.9;
+    }
+
+    @Override
     public double getHardness() {
         return 0;
+    }
+
+    @Override
+    public int getId() {
+        return LIGHT_BLOCK;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return getDamage() & 0xF;
+    }
+
+    @Override
+    public String getName() {
+        return "Light Block";
     }
 
     @Override
@@ -59,22 +74,7 @@ public class BlockLightBlock extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
     public Item toItem() {
         return Item.get(Item.AIR);
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public double getFrictionFactor() {
-        return 0.9;
     }
 }

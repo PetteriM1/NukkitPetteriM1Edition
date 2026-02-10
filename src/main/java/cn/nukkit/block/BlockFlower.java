@@ -30,7 +30,7 @@ public class BlockFlower extends BlockFlowable {
     public static final int TYPE_CORNFLOWER = 9;
     public static final int TYPE_LILY_OF_THE_VALLEY = 10;
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Poppy",
             "Blue Orchid",
             "Allium",
@@ -58,37 +58,13 @@ public class BlockFlower extends BlockFlowable {
     }
 
     @Override
-    public int getId() {
-        return FLOWER;
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x0f];
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        int id = down.getId();
-        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK) {
-            this.getLevel().setBlock(block, this, true);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.down().isTransparent()) {
-                this.getLevel().useBreakOn(this);
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-
-        return 0;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
@@ -97,8 +73,22 @@ public class BlockFlower extends BlockFlowable {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public int getId() {
+        return FLOWER;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x0f];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHEARS;
+    }
+
+    protected Block getUncommonFlower() {
+        return get(DANDELION);
     }
 
     @Override
@@ -132,17 +122,27 @@ public class BlockFlower extends BlockFlowable {
         return false;
     }
 
-    protected Block getUncommonFlower() {
-        return get(DANDELION);
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().isTransparent()) {
+                this.getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        return 0;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHEARS;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        int id = down.getId();
+        if (id == Block.GRASS || id == Block.DIRT || id == Block.FARMLAND || id == Block.PODZOL || id == MYCELIUM || id == MOSS_BLOCK || id == MUD || id == MUDDY_MANGROVE_ROOTS) {
+            this.getLevel().setBlock(block, this, true);
+            return true;
+        }
+        return false;
     }
 }

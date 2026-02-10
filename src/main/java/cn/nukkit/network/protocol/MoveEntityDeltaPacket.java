@@ -24,11 +24,6 @@ public class MoveEntityDeltaPacket extends DataPacket {
     public double pitchDelta = 0;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -46,9 +41,18 @@ public class MoveEntityDeltaPacket extends DataPacket {
         putRotation(FLAG_HAS_PITCH, this.pitchDelta);
     }
 
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
+    }
+
     private void putCoordinate(int flag, float value) {
         if ((flags & flag) != 0) {
-            this.putLFloat(value);
+            if (protocol < ProtocolInfo.v1_16_100) {
+                this.putVarInt((int) value);
+            } else {
+                this.putLFloat(value);
+            }
         }
     }
 

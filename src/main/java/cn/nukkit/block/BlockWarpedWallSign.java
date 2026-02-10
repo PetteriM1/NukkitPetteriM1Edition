@@ -13,13 +13,13 @@ public class BlockWarpedWallSign extends BlockWallSign {
     }
 
     @Override
-    public String getName() {
-        return "Warped Wall Sign";
+    public int getId() {
+        return WARPED_WALL_SIGN;
     }
 
     @Override
-    public int getId() {
-        return WARPED_WALL_SIGN;
+    public String getName() {
+        return "Warped Wall Sign";
     }
 
     @Override

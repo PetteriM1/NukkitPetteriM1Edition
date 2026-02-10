@@ -25,13 +25,88 @@ public class BlockBambooSapling extends BlockFlowable {
     }
 
     @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    public int getAge() {
+        return getDamage() & 0x1;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return BAMBOO_SAPLING;
     }
 
     @Override
+    public double getMaxX() {
+        return this.x + 0.875;
+    }
+
+    @Override
+    public double getMaxY() {
+        return this.y + 0.875;
+    }
+
+    @Override
+    public double getMaxZ() {
+        return this.z + 0.875;
+    }
+
+    @Override
+    public double getMinX() {
+        return this.x + 0.125;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.125;
+    }
+
+    @Override
     public String getName() {
         return "Bamboo Sapling";
+    }
+
+    public boolean grow(Block up) {
+        BlockBamboo bamboo = (BlockBamboo) Block.get(Block.BAMBOO);
+        bamboo.x = x;
+        bamboo.y = y;
+        bamboo.z = z;
+        bamboo.level = level;
+        return bamboo.grow(up);
+    }
+
+    private boolean isSupportInvalid() {
+        int downId = down().getId();
+        return downId != DIRT && downId != GRASS && downId != SAND && downId != GRAVEL && downId != PODZOL;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == ItemID.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
+            boolean success = false;
+            Block block = this.up();
+            if (block.getId() == AIR) {
+                success = this.grow(block);
+            }
+
+            if (success) {
+                if (player != null && (player.gamemode & 0x01) == 0) {
+                    item.count--;
+                }
+
+                this.level.addParticle(new BoneMealParticle(this));
+            }
+
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -51,9 +126,7 @@ public class BlockBambooSapling extends BlockFlowable {
             return type;
         } else if (type == Level.BLOCK_UPDATE_RANDOM) {
             Block up;
-            int time = level.getTime() % Level.TIME_FULL;
-            boolean canGrow = time < 13184 || time > 22800;
-            if (getAge() == 0 && (up = this.up()).getId() == AIR && canGrow/*level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL*/ && ThreadLocalRandom.current().nextInt(3) == 0) {
+            if (getAge() == 0 && (up = this.up()).getId() == AIR && level.isAnimalSpawningAllowedByTime()/*level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL*/ && ThreadLocalRandom.current().nextInt(3) == 0) {
                 BlockBamboo newState = (BlockBamboo) Block.get(Block.BAMBOO);
                 newState.setLeafSize(BlockBamboo.LEAF_SIZE_SMALL);
                 BlockGrowEvent blockGrowEvent = new BlockGrowEvent(up, newState);
@@ -86,52 +159,6 @@ public class BlockBambooSapling extends BlockFlowable {
         return true;
     }
 
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == ItemID.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
-            boolean success = false;
-            Block block = this.up();
-            if (block.getId() == AIR) {
-                success = this.grow(block);
-            }
-
-            if (success) {
-                if (player != null && (player.gamemode & 0x01) == 0) {
-                    item.count--;
-                }
-
-                this.level.addParticle(new BoneMealParticle(this));
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    public boolean grow(Block up) {
-        BlockBamboo bamboo = (BlockBamboo) Block.get(Block.BAMBOO);
-        bamboo.x = x;
-        bamboo.y = y;
-        bamboo.z = z;
-        bamboo.level = level;
-        return bamboo.grow(up);
-    }
-
-    private boolean isSupportInvalid() {
-        int downId = down().getId();
-        return downId != DIRT && downId != GRASS && downId != SAND && downId != GRAVEL && downId != PODZOL;
-    }
-
-    public int getAge() {
-        return getDamage() & 0x1;
-    }
-
     public void setAge(int age) {
         age = MathHelper.clamp(age, 0, 1) & 0x1;
         setDamage(getDamage() & (15 ^ 0x1) | age);
@@ -140,35 +167,5 @@ public class BlockBambooSapling extends BlockFlowable {
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(BAMBOO), 0);
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.125;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.125;
-    }
-
-    @Override
-    public double getMaxX() {
-        return this.x + 0.875;
-    }
-
-    @Override
-    public double getMaxY() {
-        return this.y + 0.875;
-    }
-
-    @Override
-    public double getMaxZ() {
-        return this.z + 0.875;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 }

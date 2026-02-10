@@ -63,11 +63,11 @@ public class EntityDamageByEntityEvent extends EntityDamageEvent {
         return knockBack;
     }
 
-    public void setKnockBack(float knockBack) {
-        this.knockBack = knockBack;
-    }
-
     public Enchantment[] getWeaponEnchantments() {
         return enchantments;
+    }
+
+    public void setKnockBack(float knockBack) {
+        this.knockBack = knockBack;
     }
 }

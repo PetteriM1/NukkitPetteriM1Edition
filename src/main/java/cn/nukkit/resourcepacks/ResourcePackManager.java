@@ -24,7 +24,9 @@ public class ResourcePackManager {
     public ResourcePackManager(Set<ResourcePackLoader> loaders) {
         this.loaders = loaders;
 
-        this.reloadPacks();
+        if (!Server.getInstance().suomiCraftPEMode()) {
+            this.reloadPacks();
+        }
     }
 
     public ResourcePackManager(ResourcePackLoader... loaders) {
@@ -35,12 +37,12 @@ public class ResourcePackManager {
         this(new ZippedResourcePackLoader(resourcePacksDir));
     }
 
-    public ResourcePack[] getResourceStack() {
-        return this.resourcePacks.toArray(ResourcePack.EMPTY_ARRAY);
-    }
-
     public ResourcePack getPackById(UUID id) {
         return this.resourcePacksById.get(id);
+    }
+
+    public ResourcePack[] getResourceStack() {
+        return this.resourcePacks.toArray(ResourcePack.EMPTY_ARRAY);
     }
 
     public void registerPackLoader(ResourcePackLoader loader) {

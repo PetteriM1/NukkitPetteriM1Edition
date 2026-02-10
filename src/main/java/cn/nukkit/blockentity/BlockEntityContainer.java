@@ -26,6 +26,14 @@ public interface BlockEntityContainer {
     Item getItem(int index);
 
     /**
+     * 返回这个容器最多能包含的物品数量。<br>
+     * Returns the max number of items that this container can contain.
+     *
+     * @return 最多能包含的物品数量。<br>The max number.
+     */
+    int getSize();
+
+    /**
      * 把一个物品存储进容器。<br>
      * Sets or stores this item into this container.
      * <p>
@@ -36,12 +44,4 @@ public interface BlockEntityContainer {
      * @param item  描述这个物品的 {@code Item}对象。<br>The {@code Item} object that describes this item.
      */
     void setItem(int index, Item item);
-
-    /**
-     * 返回这个容器最多能包含的物品数量。<br>
-     * Returns the max number of items that this container can contain.
-     *
-     * @return 最多能包含的物品数量。<br>The max number.
-     */
-    int getSize();
 }

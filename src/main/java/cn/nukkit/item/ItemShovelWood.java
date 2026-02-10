@@ -24,12 +24,12 @@ public class ItemShovelWood extends ItemTool {
     }
 
     @Override
-    public boolean isShovel() {
-        return true;
+    public int getTier() {
+        return ItemTool.TIER_WOODEN;
     }
 
     @Override
-    public int getTier() {
-        return ItemTool.TIER_WOODEN;
+    public boolean isShovel() {
+        return true;
     }
 }

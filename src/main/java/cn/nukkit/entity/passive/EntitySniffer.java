@@ -13,17 +13,8 @@ public class EntitySniffer extends EntityWalkingAnimal {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(14);
-        super.initEntity();
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.855f;
-        }
-        return 1.9f;
+    public boolean canDespawn() {
+        return false;
     }
 
     @Override
@@ -42,5 +33,19 @@ public class EntitySniffer extends EntityWalkingAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.855f;
+        }
+        return 1.9f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(14);
+        super.initEntity();
     }
 }

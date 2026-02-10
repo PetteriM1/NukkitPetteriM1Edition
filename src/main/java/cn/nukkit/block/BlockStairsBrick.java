@@ -18,13 +18,28 @@ public class BlockStairsBrick extends BlockStairs {
     }
 
     @Override
-    public int getId() {
-        return BRICK_STAIRS;
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 2;
+    }
+
+    @Override
+    public int getId() {
+        return BRICK_STAIRS;
+    }
+
+    @Override
+    public String getName() {
+        return "Brick Stairs";
     }
 
     @Override
@@ -35,20 +50,5 @@ public class BlockStairsBrick extends BlockStairs {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Brick Stairs";
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
     }
 }

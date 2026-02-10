@@ -14,11 +14,6 @@ public class AnvilDamagePacket extends DataPacket {
     public int z;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.damage = this.getByte();
         BlockVector3 vec = this.getBlockVector3();
@@ -30,5 +25,10 @@ public class AnvilDamagePacket extends DataPacket {
     @Override
     public void encode() {
         this.encodeUnsupported();
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

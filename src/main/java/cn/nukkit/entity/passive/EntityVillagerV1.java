@@ -36,17 +36,23 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
         super(chunk, nbt);
     }
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public void addTradeRecipe(TradeInventoryRecipe recipe) {
+        this.recipes.add(recipe);
     }
 
     @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.3f;
-        }
-        return 0.6f;
+    public boolean canDespawn() {
+        return false;
+    }
+
+    private ListTag<CompoundTag> getDefaultTierExpRequirements() {
+        ListTag<CompoundTag> tag = new ListTag<>("TierExpRequirements");
+        tag.add(new CompoundTag().putInt("0", 0));
+        tag.add(new CompoundTag().putInt("1", 10));
+        tag.add(new CompoundTag().putInt("2", 70));
+        tag.add(new CompoundTag().putInt("3", 150));
+        tag.add(new CompoundTag().putInt("4", 250));
+        return tag;
     }
 
     @Override
@@ -55,6 +61,53 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
             return 0.975f;
         }
         return 1.9f;
+    }
+
+    @Override
+    public TradeInventory getInventory() {
+        return this.inventory;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 0;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    public CompoundTag getOffers() {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putList(recipesToNbt());
+        nbt.putList(getDefaultTierExpRequirements());
+        return nbt;
+    }
+
+    public int getProfession() {
+        return this.namedTag.getInt("Profession");
+    }
+
+    public List<TradeInventoryRecipe> getRecipes() {
+        return this.recipes;
+    }
+
+    @Override
+    public double getSpeed() {
+        return 1.1;
+    }
+
+    public int getTradeTier() {
+        return this.tradeTier;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.3f;
+        }
+        return 0.6f;
     }
 
     @Override
@@ -81,17 +134,17 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
         }
     }
 
-    public int getProfession() {
-        return this.namedTag.getInt("Profession");
-    }
-
-    public void setProfession(int profession) {
-        this.namedTag.putInt("Profession", profession);
+    public boolean isWilling() {
+        return this.willing;
     }
 
     @Override
-    public int getKillExperience() {
-        return 0;
+    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
+        if (!recipes.isEmpty()) {
+            player.addWindow(this.getInventory());
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -125,46 +178,6 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
         }
     }
 
-    public void setTradeTier(int tier) {
-        this.tradeTier = tier;
-    }
-
-    public int getTradeTier() {
-        return this.tradeTier;
-    }
-
-    public void setWilling(boolean value) {
-        this.willing = value;
-    }
-
-    public boolean isWilling() {
-        return this.willing;
-    }
-
-    @Override
-    public boolean onInteract(Player player, Item item, Vector3 clickedPos) {
-        if (!recipes.isEmpty()) {
-            player.addWindow(this.getInventory());
-            return true;
-        }
-        return false;
-    }
-
-    public void addTradeRecipe(TradeInventoryRecipe recipe) {
-        this.recipes.add(recipe);
-    }
-
-    public List<TradeInventoryRecipe> getRecipes() {
-        return this.recipes;
-    }
-
-    public CompoundTag getOffers() {
-        CompoundTag nbt = new CompoundTag();
-        nbt.putList(recipesToNbt());
-        nbt.putList(getDefaultTierExpRequirements());
-        return nbt;
-    }
-
     private ListTag<CompoundTag> recipesToNbt() {
         ListTag<CompoundTag> tag = new ListTag<>("Recipes");
         for (TradeInventoryRecipe recipe : this.recipes) {
@@ -173,18 +186,15 @@ public class EntityVillagerV1 extends EntityWalkingAnimal implements InventoryHo
         return tag;
     }
 
-    private ListTag<CompoundTag> getDefaultTierExpRequirements() {
-        ListTag<CompoundTag> tag = new ListTag<>("TierExpRequirements");
-        tag.add(new CompoundTag().putInt("0", 0));
-        tag.add(new CompoundTag().putInt("1", 10));
-        tag.add(new CompoundTag().putInt("2", 70));
-        tag.add(new CompoundTag().putInt("3", 150));
-        tag.add(new CompoundTag().putInt("4", 250));
-        return tag;
+    public void setProfession(int profession) {
+        this.namedTag.putInt("Profession", profession);
     }
 
-    @Override
-    public TradeInventory getInventory() {
-        return this.inventory;
+    public void setTradeTier(int tier) {
+        this.tradeTier = tier;
+    }
+
+    public void setWilling(boolean value) {
+        this.willing = value;
     }
 }

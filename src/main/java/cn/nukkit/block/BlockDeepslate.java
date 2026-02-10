@@ -5,7 +5,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockDeepslate extends BlockSolidMeta {
 
@@ -18,13 +20,32 @@ public class BlockDeepslate extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Deepslate";
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
-    public int getId() {
-        return DEEPSLATE;
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (!this.canHarvest(item)) {
+            return new Item[0];
+        }
+
+        return new Item[]{new ItemBlock(Block.get(COBBLED_DEEPSLATE), 0)};
     }
 
     @Override
@@ -33,8 +54,40 @@ public class BlockDeepslate extends BlockSolidMeta {
     }
 
     @Override
+    public int getId() {
+        return DEEPSLATE;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Deepslate";
+    }
+
+    public BlockFace.Axis getPillarAxis() {
+        switch (this.getDamage() % 3) {
+            case 2:
+                return BlockFace.Axis.Z;
+            case 1:
+                return BlockFace.Axis.X;
+            case 0:
+            default:
+                return BlockFace.Axis.Y;
+        }
+    }
+
+    @Override
     public double getResistance() {
-        return 6;
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -58,49 +111,8 @@ public class BlockDeepslate extends BlockSolidMeta {
         }
     }
 
-    public BlockFace.Axis getPillarAxis() {
-        switch (this.getDamage() % 3) {
-            case 2:
-                return BlockFace.Axis.Z;
-            case 1:
-                return BlockFace.Axis.X;
-            case 0:
-            default:
-                return BlockFace.Axis.Y;
-        }
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(DEEPSLATE), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (!this.canHarvest(item)) {
-            return new Item[0];
-        }
-
-        return new Item[]{new ItemBlock(Block.get(COBBLED_DEEPSLATE), 0)};
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DEEPSLATE_GRAY_BLOCK_COLOR;
     }
 }

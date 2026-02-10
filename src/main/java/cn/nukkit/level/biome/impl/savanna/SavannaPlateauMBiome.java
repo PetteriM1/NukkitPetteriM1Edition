@@ -13,12 +13,12 @@ public class SavannaPlateauMBiome extends SavannaPlateauBiome {
     }
 
     @Override
-    public String getName() {
-        return "Savanna Plateau M";
+    public boolean doesOverhang() {
+        return true;
     }
 
     @Override
-    public boolean doesOverhang() {
-        return true;
+    public String getName() {
+        return "Savanna Plateau M";
     }
 }

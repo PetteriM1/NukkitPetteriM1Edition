@@ -117,8 +117,21 @@ public abstract class BlockEntity extends Position {
         this.getLevel().addBlockEntity(this);
     }
 
-    protected void initBlockEntity() {
+    public boolean canSaveToStorage() {
+        return true;
+    }
 
+    public void close() {
+        if (!this.closed) {
+            this.closed = true;
+            if (this.chunk != null) {
+                this.chunk.removeBlockEntity(this);
+            }
+            if (this.level != null) {
+                this.level.removeBlockEntity(this);
+            }
+            this.level = null;
+        }
     }
 
     public static BlockEntity createBlockEntity(String type, FullChunk chunk, CompoundTag nbt, Object... args) {
@@ -148,7 +161,8 @@ public abstract class BlockEntity extends Position {
                         blockEntity = (BlockEntity) constructor.newInstance(objects);
 
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         } else {
             Server.getInstance().getLogger().warning("Tried to create block entity that doesn't exists: " + type);
@@ -157,132 +171,13 @@ public abstract class BlockEntity extends Position {
         return blockEntity;
     }
 
-    public static boolean registerBlockEntity(String name, Class<? extends BlockEntity> c) {
-        if (c == null) {
-            return false;
-        }
-
-        knownBlockEntities.put(name, c);
-        return true;
-    }
-
-    public final String getSaveId() {
-        return knownBlockEntities.inverse().get(getClass());
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void saveNBT() {
-        this.namedTag.putString("id", this.getSaveId());
-        this.namedTag.putInt("x", (int) this.getX());
-        this.namedTag.putInt("y", (int) this.getY());
-        this.namedTag.putInt("z", (int) this.getZ());
-        this.namedTag.putBoolean("isMovable", this.movable);
-    }
-
-    public CompoundTag getCleanedNBT() {
-        this.saveNBT();
-        CompoundTag tag = this.namedTag.clone();
-        tag.remove("x").remove("y").remove("z").remove("id");
-        if (!tag.isEmpty()) {
-            return tag;
-        } else {
-            return null;
-        }
-    }
-
-    public Block getBlock() {
-        return this.getLevelBlock();
-    }
-
-    @Override
-    public Block getLevelBlock() {
-        if (this.isValid()) return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), BlockLayer.NORMAL, true);
-        else throw new LevelException("Undefined Level reference");
-    }
-
-    @Override
-    public Block getLevelBlock(BlockLayer layer) {
-        if (this.isValid()) return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), layer, true);
-        else throw new LevelException("Undefined Level reference");
-    }
-
-    public abstract boolean isBlockEntityValid();
-
-    public boolean onUpdate() {
-        return false;
-    }
-
-    public final void scheduleUpdate() {
-        if (this.level.isBeingConverted) {
-            return;
-        }
-        this.level.scheduleBlockEntityUpdate(this);
-    }
-
-    public void close() {
-        if (!this.closed) {
-            this.closed = true;
-            if (this.chunk != null) {
-                this.chunk.removeBlockEntity(this);
-            }
-            if (this.level != null) {
-                this.level.removeBlockEntity(this);
-            }
-            this.level = null;
-        }
-    }
-
-    public void onBreak() {
-
-    }
-
-    public void setDirty() {
-        if (this.chunk != null) {
-            this.chunk.setChanged();
-        }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public boolean isMovable() {
-        return movable;
-    }
-
-    public static CompoundTag getDefaultCompound(Vector3 pos, String id) {
-        return new CompoundTag()
-                .putString("id", id)
-                .putInt("x", pos.getFloorX())
-                .putInt("y", pos.getFloorY())
-                .putInt("z", pos.getFloorZ());
-    }
-
-    public PersistentDataContainer getPersistentDataContainer() {
-        if (this.persistentContainer == null) {
-            this.persistentContainer = new PersistentDataContainerBlockWrapper(this);
-        }
-        return this.persistentContainer;
-    }
-
-    public boolean hasPersistentDataContainer() {
-        return !this.getPersistentDataContainer().isEmpty();
-    }
-
-    public void onReplacedWith(BlockEntity blockEntity) {
-        blockEntity.getPersistentDataContainer().setStorage(this.getPersistentDataContainer().getStorage().clone());
-    }
-
     @Override
     public boolean equals(Object obj) {
         return obj instanceof BlockEntity && this.getClass().equals(obj.getClass()) && super.equals(obj);
     }
 
-    public boolean canSaveToStorage() {
-        return true;
+    public Block getBlock() {
+        return this.getLevelBlock();
     }
 
     protected int getBlockIdIfLoaded(int bx, int by, int bz) {
@@ -297,5 +192,111 @@ public abstract class BlockEntity extends Position {
             }
         }
         return fullChunk.getBlockId(bx & 0x0f, by, bz & 0x0f);
+    }
+
+    public CompoundTag getCleanedNBT() {
+        this.saveNBT();
+        CompoundTag tag = this.namedTag.clone();
+        tag.remove("x").remove("y").remove("z").remove("id");
+        if (!tag.isEmpty()) {
+            return tag;
+        } else {
+            return null;
+        }
+    }
+
+    public static CompoundTag getDefaultCompound(Vector3 pos, String id) {
+        return new CompoundTag()
+                .putString("id", id)
+                .putInt("x", pos.getFloorX())
+                .putInt("y", pos.getFloorY())
+                .putInt("z", pos.getFloorZ());
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public Block getLevelBlock() {
+        if (this.isValid())
+            return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), BlockLayer.NORMAL, true);
+        else throw new LevelException("Undefined Level reference");
+    }
+
+    @Override
+    public Block getLevelBlock(BlockLayer layer) {
+        if (this.isValid())
+            return this.level.getBlock(this.chunk, this.getFloorX(), this.getFloorY(), this.getFloorZ(), layer, true);
+        else throw new LevelException("Undefined Level reference");
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public PersistentDataContainer getPersistentDataContainer() {
+        if (this.persistentContainer == null) {
+            this.persistentContainer = new PersistentDataContainerBlockWrapper(this);
+        }
+        return this.persistentContainer;
+    }
+
+    public final String getSaveId() {
+        return knownBlockEntities.inverse().get(getClass());
+    }
+
+    public boolean hasPersistentDataContainer() {
+        return !this.getPersistentDataContainer().isEmpty();
+    }
+
+    protected void initBlockEntity() {
+    }
+
+    public abstract boolean isBlockEntityValid();
+
+    public boolean isMovable() {
+        return movable;
+    }
+
+    public void onBreak() {
+    }
+
+    public void onReplacedWith(BlockEntity blockEntity) {
+        blockEntity.getPersistentDataContainer().setStorage(this.getPersistentDataContainer().getStorage().clone());
+    }
+
+    public boolean onUpdate() {
+        return false;
+    }
+
+    public static boolean registerBlockEntity(String name, Class<? extends BlockEntity> c) {
+        if (c == null) {
+            return false;
+        }
+
+        knownBlockEntities.put(name, c);
+        return true;
+    }
+
+    public void saveNBT() {
+        this.namedTag.putString("id", this.getSaveId());
+        this.namedTag.putInt("x", (int) this.getX());
+        this.namedTag.putInt("y", (int) this.getY());
+        this.namedTag.putInt("z", (int) this.getZ());
+        this.namedTag.putBoolean("isMovable", this.movable);
+    }
+
+    public final void scheduleUpdate() {
+        if (this.level.isBeingConverted) {
+            return;
+        }
+        this.level.scheduleBlockEntityUpdate(this);
+    }
+
+    public void setDirty() {
+        if (this.chunk != null) {
+            this.chunk.setChanged();
+        }
     }
 }

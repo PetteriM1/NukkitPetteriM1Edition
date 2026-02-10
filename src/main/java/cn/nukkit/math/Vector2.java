@@ -22,20 +22,8 @@ public class Vector2 {
         this.y = y;
     }
 
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public int getFloorX() {
-        return (int) Math.floor(this.x);
-    }
-
-    public int getFloorY() {
-        return (int) Math.floor(this.y);
+    public Vector2 abs() {
+        return new Vector2(Math.abs(this.x), Math.abs(this.y));
     }
 
     public Vector2 add(double x) {
@@ -50,40 +38,8 @@ public class Vector2 {
         return this.add(x.x, x.y);
     }
 
-    public Vector2 subtract(double x) {
-        return this.subtract(x, 0);
-    }
-
-    public Vector2 subtract(double x, double y) {
-        return this.add(-x, -y);
-    }
-
-    public Vector2 subtract(Vector2 x) {
-        return this.add(-x.x, -x.y);
-    }
-
     public Vector2 ceil() {
         return new Vector2((int) (this.x + 1), (int) (this.y + 1));
-    }
-
-    public Vector2 floor() {
-        return new Vector2((int) Math.floor(this.x), (int) Math.floor(this.y));
-    }
-
-    public Vector2 round() {
-        return new Vector2(Math.round(this.x), Math.round(this.y));
-    }
-
-    public Vector2 abs() {
-        return new Vector2(Math.abs(this.x), Math.abs(this.y));
-    }
-
-    public Vector2 multiply(double number) {
-        return new Vector2(this.x * number, this.y * number);
-    }
-
-    public Vector2 divide(double number) {
-        return new Vector2(this.x / number, this.y / number);
     }
 
     public double distance(double x) {
@@ -110,12 +66,48 @@ public class Vector2 {
         return this.distanceSquared(vector.x, vector.y);
     }
 
+    public Vector2 divide(double number) {
+        return new Vector2(this.x / number, this.y / number);
+    }
+
+    public double dot(Vector2 v) {
+        return this.x * v.x + this.y * v.y;
+    }
+
+    public double dot(double vx, double vy) {
+        return this.x * vx + this.y * vy;
+    }
+
+    public Vector2 floor() {
+        return new Vector2((int) Math.floor(this.x), (int) Math.floor(this.y));
+    }
+
+    public int getFloorX() {
+        return (int) Math.floor(this.x);
+    }
+
+    public int getFloorY() {
+        return (int) Math.floor(this.y);
+    }
+
+    public double getX() {
+        return this.x;
+    }
+
+    public double getY() {
+        return this.y;
+    }
+
     public double length() {
         return Math.sqrt(this.lengthSquared());
     }
 
     public double lengthSquared() {
         return this.x * this.x + this.y * this.y;
+    }
+
+    public Vector2 multiply(double number) {
+        return new Vector2(this.x * number, this.y * number);
     }
 
     public Vector2 normalize() {
@@ -126,8 +118,20 @@ public class Vector2 {
         return new Vector2(0, 0);
     }
 
-    public double dot(Vector2 v) {
-        return this.x * v.x + this.y * v.y;
+    public Vector2 round() {
+        return new Vector2(Math.round(this.x), Math.round(this.y));
+    }
+
+    public Vector2 subtract(double x) {
+        return this.subtract(x, 0);
+    }
+
+    public Vector2 subtract(double x, double y) {
+        return this.add(-x, -y);
+    }
+
+    public Vector2 subtract(Vector2 x) {
+        return this.add(-x.x, -x.y);
     }
 
     @Override

@@ -11,7 +11,7 @@ public class PlayerUIComponent extends BaseInventory {
 
     public static final int CREATED_ITEM_OUTPUT_UI_SLOT = 50;
 
-    private  final PlayerUIInventory playerUI;
+    private final PlayerUIInventory playerUI;
     private final int offset;
     private final int size;
 
@@ -23,24 +23,15 @@ public class PlayerUIComponent extends BaseInventory {
     }
 
     @Override
-    public int getSize() {
-        return size;
+    public void close(Player who) {
+
     }
 
     @Override
-    public int getMaxStackSize() {
-        return 64;
-    }
-
-    @Override
-    public void setMaxStackSize(int size) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public String getTitle() {
-        throw new UnsupportedOperationException();
+    public Map<Integer, Item> getContents() {
+        Map<Integer, Item> contents = playerUI.getContents();
+        contents.keySet().removeIf(slot -> slot < offset || slot > offset + size);
+        return contents;
     }
 
     @Override
@@ -54,17 +45,49 @@ public class PlayerUIComponent extends BaseInventory {
     }
 
     @Override
-    public boolean setItem(int index, Item item, boolean send) {
-        return this.playerUI.setItem(index + this.offset, item, send);
+    public int getMaxStackSize() {
+        return 64;
     }
 
     @Override
-    public Map<Integer, Item> getContents() {
-        Map<Integer, Item> contents = playerUI.getContents();
-        contents.keySet().removeIf(slot -> slot < offset || slot > offset + size);
-        return contents;
+    public int getSize() {
+        return size;
     }
 
+    @Override
+    public String getTitle() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public InventoryType getType() {
+        return playerUI.type;
+    }
+
+    @Override
+    public Set<Player> getViewers() {
+        return playerUI.viewers;
+    }
+
+    @Override
+    public void onClose(Player who) {
+
+    }
+
+    @Override
+    public void onOpen(Player who) {
+
+    }
+
+    @Override
+    public void onSlotChange(int index, Item before, boolean send) {
+        this.playerUI.onSlotChange(index + this.offset, before, send);
+    }
+
+    @Override
+    public boolean open(Player who) {
+        return false;
+    }
 
     @Override
     public void sendContents(Player... players) {
@@ -77,37 +100,12 @@ public class PlayerUIComponent extends BaseInventory {
     }
 
     @Override
-    public Set<Player> getViewers() {
-        return playerUI.viewers;
+    public boolean setItem(int index, Item item, boolean send) {
+        return this.playerUI.setItem(index + this.offset, item, send);
     }
 
     @Override
-    public InventoryType getType() {
-        return playerUI.type;
-    }
-
-    @Override
-    public void onOpen(Player who) {
-
-    }
-
-    @Override
-    public boolean open(Player who) {
-        return false;
-    }
-
-    @Override
-    public void close(Player who) {
-
-    }
-
-    @Override
-    public void onClose(Player who) {
-
-    }
-
-    @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        this.playerUI.onSlotChange(index + this.offset, before, send);
+    public void setMaxStackSize(int size) {
+        throw new UnsupportedOperationException();
     }
 }

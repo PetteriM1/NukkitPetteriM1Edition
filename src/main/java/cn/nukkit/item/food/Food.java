@@ -100,17 +100,48 @@ public abstract class Food {
     public static final Food suspicious_stew_wither = registerDefaultFood(new FoodEffectiveInBow(6, 7.2F)
             .addEffect(Effect.getEffect(Effect.WITHER).setAmplifier(1).setDuration(120)).addRelative(Item.SUSPICIOUS_STEW, 9));
     public static final Food honey_bottle = registerDefaultFood(new FoodNormal(6, 1.2F).addRelative(Item.HONEY_BOTTLE));
+    protected int restoreFood;
+    protected float restoreSaturation;
+    protected final List<NodeIDMeta> relativeIDs = new ArrayList<>();
 
-    public static Food registerFood(Food food, Plugin plugin) {
-        Objects.requireNonNull(food);
-        Objects.requireNonNull(plugin);
-        food.relativeIDs.forEach(n -> registryCustom.put(new NodeIDMetaPlugin(n.id, n.meta, plugin), food));
-        return food;
+    static class NodeIDMeta {
+        final int id;
+        final int meta;
+
+        NodeIDMeta(int id, int meta) {
+            this.id = id;
+            this.meta = meta;
+        }
     }
 
-    private static Food registerDefaultFood(Food food) {
-        food.relativeIDs.forEach(n -> registryDefault.put(n, food));
-        return food;
+    static class NodeIDMetaPlugin extends NodeIDMeta {
+        final Plugin plugin;
+
+        NodeIDMetaPlugin(int id, int meta, Plugin plugin) {
+            super(id, meta);
+            this.plugin = plugin;
+        }
+    }
+
+    public Food addRelative(int relativeID) {
+        return addRelative(relativeID, 0);
+    }
+
+    public Food addRelative(int relativeID, int meta) {
+        NodeIDMeta node = new NodeIDMeta(relativeID, meta);
+        return addRelative(node);
+    }
+
+    private Food addRelative(NodeIDMeta node) {
+        if (!relativeIDs.contains(node)) relativeIDs.add(node);
+        return this;
+    }
+
+    public final boolean eatenBy(Player player) {
+        PlayerEatFoodEvent event = new PlayerEatFoodEvent(player, this);
+        player.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) return false;
+        return event.getFood().onEatenBy(player);
     }
 
     public static Food getByRelative(Item item) {
@@ -136,15 +167,12 @@ public abstract class Food {
         return result[0];
     }
 
-    protected int restoreFood;
-    protected float restoreSaturation;
-    protected final List<NodeIDMeta> relativeIDs = new ArrayList<>();
+    public int getRestoreFood() {
+        return restoreFood;
+    }
 
-    public final boolean eatenBy(Player player) {
-        PlayerEatFoodEvent event = new PlayerEatFoodEvent(player, this);
-        player.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) return false;
-        return event.getFood().onEatenBy(player);
+    public float getRestoreSaturation() {
+        return restoreSaturation;
     }
 
     protected boolean onEatenBy(Player player) {
@@ -152,22 +180,16 @@ public abstract class Food {
         return true;
     }
 
-    public Food addRelative(int relativeID) {
-        return addRelative(relativeID, 0);
+    private static Food registerDefaultFood(Food food) {
+        food.relativeIDs.forEach(n -> registryDefault.put(n, food));
+        return food;
     }
 
-    public Food addRelative(int relativeID, int meta) {
-        NodeIDMeta node = new NodeIDMeta(relativeID, meta);
-        return addRelative(node);
-    }
-
-    private Food addRelative(NodeIDMeta node) {
-        if (!relativeIDs.contains(node)) relativeIDs.add(node);
-        return this;
-    }
-
-    public int getRestoreFood() {
-        return restoreFood;
+    public static Food registerFood(Food food, Plugin plugin) {
+        Objects.requireNonNull(food);
+        Objects.requireNonNull(plugin);
+        food.relativeIDs.forEach(n -> registryCustom.put(new NodeIDMetaPlugin(n.id, n.meta, plugin), food));
+        return food;
     }
 
     public Food setRestoreFood(int restoreFood) {
@@ -175,31 +197,8 @@ public abstract class Food {
         return this;
     }
 
-    public float getRestoreSaturation() {
-        return restoreSaturation;
-    }
-
     public Food setRestoreSaturation(float restoreSaturation) {
         this.restoreSaturation = restoreSaturation;
         return this;
-    }
-
-    static class NodeIDMeta {
-        final int id;
-        final int meta;
-
-        NodeIDMeta(int id, int meta) {
-            this.id = id;
-            this.meta = meta;
-        }
-    }
-
-    static class NodeIDMetaPlugin extends NodeIDMeta {
-        final Plugin plugin;
-
-        NodeIDMetaPlugin(int id, int meta, Plugin plugin) {
-            super(id, meta);
-            this.plugin = plugin;
-        }
     }
 }

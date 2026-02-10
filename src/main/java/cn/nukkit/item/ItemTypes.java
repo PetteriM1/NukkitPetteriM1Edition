@@ -342,6 +342,20 @@ public class ItemTypes {
     public static final ItemType SOUL_CAMPFIRE = register("minecraft:soul_campfire", ItemID.SOUL_CAMPFIRE);
     public static final ItemType GLOW_ITEM_FRAME = register("minecraft:glow_frame", ItemID.GLOW_ITEM_FRAME);
 
+    @Data
+    private static class ItemTypeImpl implements ItemType {
+        private final String identifier;
+        private final int legacyId;
+    }
+
+    public static ItemType get(String identifier) {
+        return identifiers.get(identifier);
+    }
+
+    public static ItemType getFromLegacy(int legacyId) {
+        return types.get(legacyId);
+    }
+
     private static ItemType register(String identifier, int legacyId) {
         return register(new ItemTypeImpl(identifier, legacyId));
     }
@@ -353,19 +367,5 @@ public class ItemTypes {
         }*/
         identifiers.putIfAbsent(itemType.getIdentifier(), itemType); // TODO: using identifiers.put() would be better
         return old == null ? itemType : old;
-    }
-
-    public static ItemType getFromLegacy(int legacyId) {
-        return types.get(legacyId);
-    }
-
-    public static ItemType get(String identifier) {
-        return identifiers.get(identifier);
-    }
-
-    @Data
-    private static class ItemTypeImpl implements ItemType {
-        private final String identifier;
-        private final int legacyId;
     }
 }

@@ -508,7 +508,9 @@ public class LevelSoundEventPacket extends DataPacket {
         this.entityIdentifier = this.getString();
         this.isBabyMob = this.getBoolean();
         this.isGlobal = this.getBoolean();
-        this.entityUniqueId = this.getLLong();
+        if (protocol >= ProtocolInfo.v1_21_70_24) {
+            this.entityUniqueId = this.getLLong();
+        }
     }
 
     @Override
@@ -516,11 +518,34 @@ public class LevelSoundEventPacket extends DataPacket {
         this.reset();
         this.putUnsignedVarInt(this.sound);
         this.putVector3f(this.x, this.y, this.z);
-        this.putVarInt(this.extraData);
+        if (this.sound == SOUND_NOTE && this.protocol < ProtocolInfo.v1_21_50) {
+            // Instrument enum order changed so map IDs back for old versions
+            int instrumentId = this.extraData >> 8;
+            int strength = this.extraData & 0xFF;
+            switch (instrumentId) {
+                case 6: // GLOCKENSPIEL
+                    instrumentId = 5;
+                    break;
+                case 5: // FLUTE
+                    instrumentId = 6;
+                    break;
+                case 8: // CHIME
+                    instrumentId = 7;
+                    break;
+                case 7: // GUITAR
+                    instrumentId = 8;
+                    break;
+            }
+            this.putVarInt(instrumentId << 8 | strength);
+        } else {
+            this.putVarInt(this.extraData);
+        }
         this.putString(this.entityIdentifier);
         this.putBoolean(this.isBabyMob);
         this.putBoolean(this.isGlobal);
-        this.putLLong(this.entityUniqueId);
+        if (protocol >= ProtocolInfo.v1_21_70_24) {
+            this.putLLong(this.entityUniqueId);
+        }
     }
 
     @Override

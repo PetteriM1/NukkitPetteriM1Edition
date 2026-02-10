@@ -31,6 +31,40 @@ public abstract class ContainerInventory extends BaseInventory {
         super(holder, type, items, overrideSize, overrideTitle);
     }
 
+    public static int calculateRedstone(Inventory inv) {
+        if (inv == null) {
+            return 0;
+        } else {
+            int itemCount = 0;
+            float averageCount = 0;
+
+            for (int slot = 0; slot < inv.getSize(); ++slot) {
+                Item item = inv.getItemFast(slot);
+
+                if (item.getId() != 0) {
+                    averageCount += (float) item.getCount() / (float) Math.min(inv.getMaxStackSize(), item.getMaxStackSize());
+                    ++itemCount;
+                }
+            }
+
+            averageCount = averageCount / (float) inv.getSize();
+            return NukkitMath.floorFloat(averageCount * 14) + (itemCount > 0 ? 1 : 0);
+        }
+    }
+
+    @Override
+    public void onClose(Player who) {
+        if (who.getClosingWindowId() != Integer.MAX_VALUE) {
+            ContainerClosePacket pk = new ContainerClosePacket();
+            int id = who.getWindowId(this);
+            pk.wasServerInitiated = id != who.getClosingWindowId();
+            pk.windowId = pk.wasServerInitiated ? id : who.getClosingWindowId();
+            who.dataPacket(pk);
+        }
+
+        super.onClose(who);
+    }
+
     @Override
     public void onOpen(Player who) {
         super.onOpen(who);
@@ -53,39 +87,5 @@ public abstract class ContainerInventory extends BaseInventory {
         who.dataPacket(pk);
 
         this.sendContents(who);
-    }
-
-    @Override
-    public void onClose(Player who) {
-        if (who.getClosingWindowId() != Integer.MAX_VALUE) {
-            ContainerClosePacket pk = new ContainerClosePacket();
-            int id = who.getWindowId(this);
-            pk.wasServerInitiated = id != who.getClosingWindowId();
-            pk.windowId = pk.wasServerInitiated ? id : who.getClosingWindowId();
-            who.dataPacket(pk);
-        }
-
-        super.onClose(who);
-    }
-
-    public static int calculateRedstone(Inventory inv) {
-        if (inv == null) {
-            return 0;
-        } else {
-            int itemCount = 0;
-            float averageCount = 0;
-
-            for (int slot = 0; slot < inv.getSize(); ++slot) {
-                Item item = inv.getItemFast(slot);
-
-                if (item.getId() != 0) {
-                    averageCount += (float) item.getCount() / (float) Math.min(inv.getMaxStackSize(), item.getMaxStackSize());
-                    ++itemCount;
-                }
-            }
-
-            averageCount = averageCount / (float) inv.getSize();
-            return NukkitMath.floorFloat(averageCount * 14) + (itemCount > 0 ? 1 : 0);
-        }
     }
 }

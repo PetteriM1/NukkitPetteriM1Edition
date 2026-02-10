@@ -19,13 +19,13 @@ public class ItemSwordIron extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_IRON;
+    public int getAttackDamage() {
+        return 6;
     }
 
     @Override
-    public boolean isSword() {
-        return true;
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_IRON;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemSwordIron extends ItemTool {
     }
 
     @Override
-    public int getAttackDamage() {
-        return 6;
+    public boolean isSword() {
+        return true;
     }
 }

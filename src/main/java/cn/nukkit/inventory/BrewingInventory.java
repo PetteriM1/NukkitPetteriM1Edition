@@ -3,6 +3,7 @@ package cn.nukkit.inventory;
 
 import cn.nukkit.blockentity.BlockEntityBrewingStand;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemID;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
@@ -10,43 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BrewingInventory extends ContainerInventory {
-  
+
     public BrewingInventory(BlockEntityBrewingStand brewingStand) {
         super(brewingStand, InventoryType.BREWING_STAND);
-    }
-
-    @Override
-    public BlockEntityBrewingStand getHolder() {
-        return (BlockEntityBrewingStand) this.holder;
-    }
-
-    public Item getIngredient() {
-        return getItem(0);
-    }
-
-    public void setIngredient(Item item) {
-        setItem(0, item);
-    }
-
-    public void setFuel(Item fuel) {
-        setItem(4, fuel);
-    }
-
-    public Item getFuel() {
-        return getItem(4);
-    }
-
-    @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        super.onSlotChange(index, before, send);
-
-        if (index >= 1 && index <= 3) {
-            this.getHolder().updateBlock();
-        }
-
-        this.getHolder().scheduleUpdate();
-
-        this.getHolder().chunk.setChanged();
     }
 
     @Override
@@ -107,5 +74,44 @@ public class BrewingInventory extends ContainerInventory {
         }
 
         return itemSlots.toArray(new Item[0]);
+    }
+
+    @Override
+    public boolean allowedToAdd(Item item) {
+        return item.getId() == 0 || !(item instanceof ItemBlock);
+    }
+
+    public Item getFuel() {
+        return getItem(4);
+    }
+
+    @Override
+    public BlockEntityBrewingStand getHolder() {
+        return (BlockEntityBrewingStand) this.holder;
+    }
+
+    public Item getIngredient() {
+        return getItem(0);
+    }
+
+    @Override
+    public void onSlotChange(int index, Item before, boolean send) {
+        super.onSlotChange(index, before, send);
+
+        if (index >= 1 && index <= 3) {
+            this.getHolder().updateBlock();
+        }
+
+        this.getHolder().scheduleUpdate();
+
+        this.getHolder().chunk.setChanged();
+    }
+
+    public void setFuel(Item fuel) {
+        setItem(4, fuel);
+    }
+
+    public void setIngredient(Item item) {
+        setItem(0, item);
     }
 }

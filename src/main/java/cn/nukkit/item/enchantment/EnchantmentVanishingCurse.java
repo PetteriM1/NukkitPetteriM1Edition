@@ -8,12 +8,12 @@ public class EnchantmentVanishingCurse extends Enchantment {
         super(ID_VANISHING_CURSE, "curse.vanishing", Rarity.VERY_RARE, EnchantmentType.BREAKABLE);
     }
 
+    public boolean canEnchant(Item item) {
+        return item.getId() == Item.SKULL || item.getId() == Item.COMPASS || super.canEnchant(item);
+    }
+
     @Override
     public boolean isTreasure() {
         return true;
-    }
-
-    public boolean canEnchant(Item item) {
-        return item.getId() == Item.SKULL || item.getId() == Item.COMPASS || super.canEnchant(item);
     }
 }

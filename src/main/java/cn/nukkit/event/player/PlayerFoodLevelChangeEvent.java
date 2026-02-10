@@ -6,14 +6,8 @@ import cn.nukkit.event.HandlerList;
 
 public class PlayerFoodLevelChangeEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     protected int foodLevel;
     protected float foodSaturationLevel;
-
     public PlayerFoodLevelChangeEvent(Player player, int foodLevel, float foodSaturationLevel) {
         this.player = player;
         this.foodLevel = foodLevel;
@@ -24,12 +18,16 @@ public class PlayerFoodLevelChangeEvent extends PlayerEvent implements Cancellab
         return this.foodLevel;
     }
 
-    public void setFoodLevel(int foodLevel) {
-        this.foodLevel = foodLevel;
-    }
-
     public float getFoodSaturationLevel() {
         return foodSaturationLevel;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public void setFoodLevel(int foodLevel) {
+        this.foodLevel = foodLevel;
     }
 
     public void setFoodSaturationLevel(float foodSaturationLevel) {

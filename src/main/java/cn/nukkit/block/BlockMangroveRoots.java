@@ -1,18 +1,30 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMangroveRoots extends BlockTransparent {
 
     @Override
-    public String getName() {
-        return "Mangrove Roots";
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.LEAVES;
     }
 
     @Override
-    public int getId() {
-        return MANGROVE_ROOTS;
+    public int getBurnAbility() {
+        return 60;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 30;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.SPRUCE_BLOCK_COLOR;
     }
 
     @Override
@@ -21,8 +33,23 @@ public class BlockMangroveRoots extends BlockTransparent {
     }
 
     @Override
+    public int getId() {
+        return MANGROVE_ROOTS;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mangrove Roots";
+    }
+
+    @Override
     public double getResistance() {
-        return 0.7;
+        return 3.5;
     }
 
     @Override
@@ -33,20 +60,5 @@ public class BlockMangroveRoots extends BlockTransparent {
     @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 30;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 60;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SPRUCE_BLOCK_COLOR;
     }
 }

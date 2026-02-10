@@ -13,6 +13,7 @@ import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 
 public class ItemTrident extends ItemTool {
 
@@ -29,18 +30,23 @@ public class ItemTrident extends ItemTool {
     }
 
     @Override
+    public int getAttackDamage() {
+        return 9;
+    }
+
+    @Override
     public int getMaxDurability() {
         return ItemTool.DURABILITY_TRIDENT;
     }
 
     @Override
-    public boolean isSword() {
-        return true;
+    public boolean isSupportedOn(int protocol) {
+        return protocol >= ProtocolInfo.v1_4_0;
     }
 
     @Override
-    public int getAttackDamage() {
-        return 9;
+    public boolean isSword() {
+        return true;
     }
 
     @Override

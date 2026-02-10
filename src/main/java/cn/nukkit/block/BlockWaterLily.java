@@ -22,28 +22,23 @@ public class BlockWaterLily extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Lily Pad";
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return false;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
     public int getId() {
         return WATER_LILY;
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return this;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.0625;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.0625;
     }
 
     @Override
@@ -62,15 +57,18 @@ public class BlockWaterLily extends BlockFlowable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (target instanceof BlockWater) {
-            Block up = target.up();
-            if (up.getId() == Block.AIR) {
-                this.getLevel().setBlock(up, this, true, true);
-                return true;
-            }
-        }
-        return false;
+    public double getMinX() {
+        return this.x + 0.0625;
+    }
+
+    @Override
+    public double getMinZ() {
+        return this.z + 0.0625;
+    }
+
+    @Override
+    public String getName() {
+        return "Lily Pad";
     }
 
     @Override
@@ -85,17 +83,19 @@ public class BlockWaterLily extends BlockFlowable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canPassThrough() {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (target instanceof BlockWater) {
+            Block up = target.up();
+            if (up.getId() == Block.AIR) {
+                this.getLevel().setBlock(up, this, true, true);
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
-    public boolean breakWhenPushed() {
-        return true;
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return this;
     }
 }

@@ -1,8 +1,15 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityArthropod;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
+
+import java.util.HashMap;
 
 public class EntityEndermite extends EntityWalkingMob implements EntityArthropod {
 
@@ -13,13 +20,23 @@ public class EntityEndermite extends EntityWalkingMob implements EntityArthropod
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 23 && this.distanceSquared(player) < 1) {
+            this.attackDelay = 0;
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, (float) this.getDamage());
 
-    @Override
-    public float getWidth() {
-        return 0.4f;
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+        }
     }
 
     @Override
@@ -28,13 +45,29 @@ public class EntityEndermite extends EntityWalkingMob implements EntityArthropod
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(8);
-        super.initEntity();
+    public int getKillExperience() {
+        return 3;
     }
 
     @Override
-    public int getKillExperience() {
-        return 3;
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public double getSpeed() {
+        return 1.1;
+    }
+
+    @Override
+    public float getWidth() {
+        return 0.4f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(8);
+        super.initEntity();
+        this.setDamage(new int[]{0, 2, 2, 3});
     }
 }

@@ -4,6 +4,13 @@ public class NewFrozenOceanBiome extends OceanBiome {
 
     public NewFrozenOceanBiome() {
         super();
+
+        //TODO: ice mountains
+    }
+
+    @Override
+    public boolean canRain() {
+        return false;
     }
 
     @Override
@@ -14,10 +21,5 @@ public class NewFrozenOceanBiome extends OceanBiome {
     @Override
     public boolean isFreezing() {
         return true;
-    }
-
-    @Override
-    public boolean canRain() {
-        return false;
     }
 }

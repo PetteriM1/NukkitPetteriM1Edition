@@ -21,20 +21,19 @@ public class ByteArrayTag extends Tag {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
-        if (data == null) {
-            dos.writeInt(0);
-            return;
-        }
-        dos.writeInt(data.length);
-        dos.write(data);
+    public Tag copy() {
+        byte[] cp = new byte[data.length];
+        System.arraycopy(data, 0, cp, 0, data.length);
+        return new ByteArrayTag(getName(), cp);
     }
 
     @Override
-    public void load(NBTInputStream dis) throws IOException {
-        int length = dis.readInt();
-        data = new byte[length];
-        dis.readFully(data);
+    public boolean equals(Object obj) {
+        if (super.equals(obj)) {
+            ByteArrayTag byteArrayTag = (ByteArrayTag) obj;
+            return ((data == null && byteArrayTag.data == null) || (data != null && Arrays.equals(data, byteArrayTag.data)));
+        }
+        return false;
     }
 
     public byte[] getData() {
@@ -47,28 +46,29 @@ public class ByteArrayTag extends Tag {
     }
 
     @Override
-    public String toString() {
-        return "ByteArrayTag " + this.getName() + " (data: 0x" + Binary.bytesToHexString(data, true) + " [" + data.length + " bytes])";
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (super.equals(obj)) {
-            ByteArrayTag byteArrayTag = (ByteArrayTag) obj;
-            return ((data == null && byteArrayTag.data == null) || (data != null && Arrays.equals(data, byteArrayTag.data)));
-        }
-        return false;
-    }
-
-    @Override
-    public Tag copy() {
-        byte[] cp = new byte[data.length];
-        System.arraycopy(data, 0, cp, 0, data.length);
-        return new ByteArrayTag(getName(), cp);
+    public void load(NBTInputStream dis) throws IOException {
+        int length = dis.readInt();
+        data = new byte[length];
+        dis.readFully(data);
     }
 
     @Override
     public byte[] parseValue() {
         return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "ByteArrayTag " + this.getName() + " (data: 0x" + Binary.bytesToHexString(data, true) + " [" + data.length + " bytes])";
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        if (data == null) {
+            dos.writeInt(0);
+            return;
+        }
+        dos.writeInt(data.length);
+        dos.write(data);
     }
 }

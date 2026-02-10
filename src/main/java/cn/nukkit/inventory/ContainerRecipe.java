@@ -9,12 +9,12 @@ public class ContainerRecipe extends MixRecipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerContainerRecipe(this);
+    public RecipeType getType() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public RecipeType getType() {
-        throw new UnsupportedOperationException();
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerContainerRecipe(this);
     }
 }

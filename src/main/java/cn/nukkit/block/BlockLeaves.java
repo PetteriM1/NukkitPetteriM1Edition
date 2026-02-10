@@ -33,23 +33,7 @@ public class BlockLeaves extends BlockTransparentMeta {
     public BlockLeaves(int meta) {
         super(meta);
     }
-
-    @Override
-    public int getId() {
-        return LEAVES;
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_HOE;
-    }
-
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Leaves",
             "Spruce Leaves",
             "Birch Leaves",
@@ -57,120 +41,7 @@ public class BlockLeaves extends BlockTransparentMeta {
     };
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x03];
-    }
-
-    @Override
-    public int getBurnChance() {
-        return 30;
-    }
-
-    @Override
-    public int getBurnAbility() {
-        return 60;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        setPersistent(true);
-        this.getLevel().setBlock(this, this, true, true);
-        return true;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(this, this.getDamage() & 0x3, 1);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isShears()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-                return new Item[]{this.toItem()};
-            }
-            if (this.canDropApple() && ThreadLocalRandom.current().nextInt(200) == 0) {
-                return new Item[]{
-                        Item.get(Item.APPLE)
-                };
-            }
-            if (ThreadLocalRandom.current().nextInt(20) == 0) {
-                if (Utils.rand()) {
-                    return new Item[]{
-                            Item.get(Item.STICK, 0, ThreadLocalRandom.current().nextInt(1, 2))
-                    };
-                } else if ((this.getDamage() & 0x03) != JUNGLE || ThreadLocalRandom.current().nextInt(20) == 0) {
-                    return new Item[]{
-                            this.getSapling()
-                    };
-                }
-            }
-        }
-        return new Item[0];
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL && !isPersistent() && !isCheckDecay()) {
-            if (this.level.getBlockIdAt((int) this.x, (int) this.y, (int) this.z) != this.getId()) {
-                return 0;
-            }
-
-            setCheckDecay(true);
-            getLevel().setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
-
-            return Level.BLOCK_UPDATE_NORMAL;
-        } else if (type == Level.BLOCK_UPDATE_RANDOM && isCheckDecay() && !isPersistent()) {
-            LeavesDecayEvent ev = new LeavesDecayEvent(this);
-            Server.getInstance().getPluginManager().callEvent(ev);
-
-            if (ev.isCancelled() || findLog()) {
-                setCheckDecay(false);
-                getLevel().setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
-            } else {
-                getLevel().useBreakOn(this);
-            }
-
-            return Level.BLOCK_UPDATE_RANDOM;
-        }
-        return 0;
-    }
-
-    public boolean isCheckDecay() {
-        return (this.getDamage() & 0x08) != 0;
-    }
-
-    public void setCheckDecay(boolean checkDecay) {
-        if (checkDecay) {
-            this.setDamage(this.getDamage() | 0x08);
-        } else {
-            this.setDamage(this.getDamage() & -9);
-        }
-    }
-
-    public boolean isPersistent() {
-        return (this.getDamage() & 0x04) != 0;
-    }
-
-    public void setPersistent(boolean persistent) {
-        if (persistent) {
-            this.setDamage(this.getDamage() | 0x04);
-        } else {
-            this.setDamage(this.getDamage() & -5);
-        }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
+    public boolean breakWhenPushed() {
         return true;
     }
 
@@ -178,17 +49,8 @@ public class BlockLeaves extends BlockTransparentMeta {
         return (this.getDamage() & 0x03) == OAK;
     }
 
-    protected Item getSapling() {
-        return Item.get(BlockID.SAPLING, this.getDamage() & 0x03);
-    }
-
     @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
+    public boolean canSilkTouch() {
         return true;
     }
 
@@ -224,5 +86,142 @@ public class BlockLeaves extends BlockTransparentMeta {
         }
 
         return false;
+    }
+
+    @Override
+    public int getBurnAbility() {
+        return 60;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 30;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isShears()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
+            if (this.canDropApple() && ThreadLocalRandom.current().nextInt(200) == 0) {
+                return new Item[]{
+                        Item.get(Item.APPLE)
+                };
+            }
+            if (ThreadLocalRandom.current().nextInt(20) == 0) {
+                if (Utils.rand()) {
+                    return new Item[]{
+                            Item.get(Item.STICK, 0, ThreadLocalRandom.current().nextInt(1, 2))
+                    };
+                } else if ((this.getDamage() & 0x03) != JUNGLE || ThreadLocalRandom.current().nextInt(20) == 0) {
+                    return new Item[]{
+                            this.getSapling()
+                    };
+                }
+            }
+        }
+        return new Item[0];
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.1; //0.2
+    }
+
+    @Override
+    public int getId() {
+        return LEAVES;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x03];
+    }
+
+    protected Item getSapling() {
+        return Item.get(BlockID.SAPLING, this.getDamage() & 0x03);
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_HOE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isCheckDecay() {
+        return (this.getDamage() & 0x08) != 0;
+    }
+
+    public boolean isPersistent() {
+        return (this.getDamage() & 0x04) != 0;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL && !isPersistent() && !isCheckDecay()) {
+            if (this.level.getBlockIdAt((int) this.x, (int) this.y, (int) this.z) != this.getId()) {
+                return 0;
+            }
+
+            setCheckDecay(true);
+            getLevel().setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
+
+            return Level.BLOCK_UPDATE_NORMAL;
+        } else if (type == Level.BLOCK_UPDATE_RANDOM && isCheckDecay() && !isPersistent()) {
+            LeavesDecayEvent ev = new LeavesDecayEvent(this);
+            Server.getInstance().getPluginManager().callEvent(ev);
+
+            if (ev.isCancelled() || findLog()) {
+                setCheckDecay(false);
+                getLevel().setBlock((int) this.x, (int) this.y, (int) this.z, BlockLayer.NORMAL, this, false, false, false); // No need to send this to client
+            } else {
+                getLevel().useBreakOn(this);
+            }
+
+            return Level.BLOCK_UPDATE_RANDOM;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        setPersistent(true);
+        this.getLevel().setBlock(this, this, true, true);
+        return true;
+    }
+
+    public void setCheckDecay(boolean checkDecay) {
+        if (checkDecay) {
+            this.setDamage(this.getDamage() | 0x08);
+        } else {
+            this.setDamage(this.getDamage() & -9);
+        }
+    }
+
+    public void setPersistent(boolean persistent) {
+        if (persistent) {
+            this.setDamage(this.getDamage() | 0x04);
+        } else {
+            this.setDamage(this.getDamage() & -5);
+        }
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(this, this.getDamage() & 0x3, 1);
     }
 }

@@ -22,6 +22,77 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
         super(chunk, nbt);
     }
 
+    @Override
+    public void close() {
+        if (!this.closed && this.inventory != null) {
+            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
+                player.removeWindow(this.inventory);
+            }
+        }
+
+        super.close();
+    }
+
+    @Override
+    public DropperInventory getInventory() {
+        if (this.inventory == null) {
+            this.initInventory();
+        }
+        return this.inventory;
+    }
+
+    @Override
+    public Item getItem(int index) {
+        int i = this.getSlotIndex(index);
+        if (i < 0) {
+            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
+        } else {
+            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
+            return NBTIO.getItemHelper(data);
+        }
+    }
+
+    @Override
+    public String getName() {
+        return this.hasName() ? this.namedTag.getString("CustomName") : "Dropper";
+    }
+
+    @Override
+    public int getSize() {
+        return 9;
+    }
+
+    protected int getSlotIndex(int index) {
+        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getByte("Slot") == index) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        CompoundTag c = new CompoundTag()
+                .putString("id", BlockEntity.DROPPER)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+
+        if (this.hasName()) {
+            c.put("CustomName", this.namedTag.get("CustomName"));
+        }
+
+        return c;
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
+    }
+
     private void initInventory() {
         if (!this.namedTag.contains("Items") || !(this.namedTag.get("Items") instanceof ListTag)) {
             this.namedTag.putList(new ListTag<CompoundTag>("Items"));
@@ -44,49 +115,25 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public String getName() {
-        return this.hasName() ? this.namedTag.getString("CustomName") : "Dropper";
-    }
-
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
-    }
-
-    @Override
-    public void setName(String name) {
-        if (name == null || name.isEmpty()) {
-            this.namedTag.remove("CustomName");
-            return;
+    public void onBreak() {
+        if (this.inventory == null) {
+            this.initInventory();
         }
-
-        this.namedTag.putString("CustomName", name);
+        for (Item content : inventory.getContents().values()) {
+            level.dropItem(this, content);
+        }
+        inventory.clearAll();
     }
 
     @Override
-    public int getSize() {
-        return 9;
-    }
+    public void saveNBT() {
+        super.saveNBT();
 
-    protected int getSlotIndex(int index) {
-        ListTag<CompoundTag> list = this.namedTag.getList("Items", CompoundTag.class);
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getByte("Slot") == index) {
-                return i;
+        if (this.inventory != null) {
+            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
+            for (int index = 0; index < this.getSize(); index++) {
+                this.setItem(index, this.inventory.getItem(index));
             }
-        }
-
-        return -1;
-    }
-
-    @Override
-    public Item getItem(int index) {
-        int i = this.getSlotIndex(index);
-        if (i < 0) {
-            return new ItemBlock(Block.get(BlockID.AIR), 0, 0);
-        } else {
-            CompoundTag data = (CompoundTag) this.namedTag.getList("Items").get(i);
-            return NBTIO.getItemHelper(data);
         }
     }
 
@@ -108,59 +155,12 @@ public class BlockEntityDropper extends BlockEntitySpawnable implements Inventor
     }
 
     @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        if (this.inventory != null) {
-            this.namedTag.putList(new ListTag<CompoundTag>("Items"));
-            for (int index = 0; index < this.getSize(); index++) {
-                this.setItem(index, this.inventory.getItem(index));
-            }
-        }
-    }
-
-    @Override
-    public DropperInventory getInventory() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        return this.inventory;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        CompoundTag c = new CompoundTag()
-                .putString("id", BlockEntity.DROPPER)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-
-        if (this.hasName()) {
-            c.put("CustomName", this.namedTag.get("CustomName"));
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            this.namedTag.remove("CustomName");
+            return;
         }
 
-        return c;
-    }
-
-    @Override
-    public void close() {
-        if (!this.closed && this.inventory != null) {
-            for (Player player : new ArrayList<>(this.inventory.getViewers())) {
-                player.removeWindow(this.inventory);
-            }
-        }
-
-        super.close();
-    }
-
-    @Override
-    public void onBreak() {
-        if (this.inventory == null) {
-            this.initInventory();
-        }
-        for (Item content : inventory.getContents().values()) {
-            level.dropItem(this, content);
-        }
-        inventory.clearAll();
+        this.namedTag.putString("CustomName", name);
     }
 }

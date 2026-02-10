@@ -24,54 +24,9 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
         super(meta);
     }
 
-    @Override
-    protected int getDelay() {
-        return 2;
-    }
-
-    @Override
-    public BlockFace getFacing() {
-        return BlockFace.fromHorizontalIndex(this.getDamage());
-    }
-
-    public Mode getMode() {
-        return (getDamage() & 4) > 0 ? Mode.SUBTRACT : Mode.COMPARE;
-    }
-
-    @Override
-    protected BlockRedstoneComparator getUnpowered() {
-        return (BlockRedstoneComparator) Block.get(UNPOWERED_COMPARATOR, this.getDamage());
-    }
-
-    @Override
-    protected BlockRedstoneComparator getPowered() {
-        return (BlockRedstoneComparator) Block.get(POWERED_COMPARATOR, this.getDamage());
-    }
-
-    @Override
-    protected int getRedstoneSignal() {
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        return blockEntity instanceof BlockEntityComparator ? ((BlockEntityComparator) blockEntity).getOutputSignal() : 0;
-    }
-
-    @Override
-    public void updateState() {
-        if (!this.level.isBlockTickPending(this, this)) {
-            int output = this.calculateOutput();
-            BlockEntity blockEntity = this.level.getBlockEntity(this);
-            int power = blockEntity instanceof BlockEntityComparator ? ((BlockEntityComparator) blockEntity).getOutputSignal() : 0;
-
-            if (output != power || this.isPowered() != this.shouldBePowered()) {
-                /*if (isFacingTowardsRepeater()) {
-                    this.level.scheduleUpdate(this, this, 2, -1);
-                } else {
-                    this.level.scheduleUpdate(this, this, 2, 0);
-                }*/
-
-                this.level.scheduleUpdate(this, this, 2);
-            }
-        }
+    public enum Mode {
+        COMPARE,
+        SUBTRACT
     }
 
     protected int calculateInputStrength() {
@@ -92,21 +47,54 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
         return power;
     }
 
-    protected boolean shouldBePowered() {
-        int input = this.calculateInputStrength();
-
-        if (input >= 15) {
-            return true;
-        } else if (input == 0) {
-            return false;
-        } else {
-            int sidePower = this.getPowerOnSides();
-            return sidePower == 0 || input >= sidePower;
-        }
-    }
-
     private int calculateOutput() {
         return getMode() == Mode.SUBTRACT ? Math.max(this.calculateInputStrength() - this.getPowerOnSides(), 0) : this.calculateInputStrength();
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
+
+    @Override
+    protected int getDelay() {
+        return 2;
+    }
+
+    @Override
+    public BlockFace getFacing() {
+        return BlockFace.fromHorizontalIndex(this.getDamage());
+    }
+
+    public Mode getMode() {
+        return (getDamage() & 4) > 0 ? Mode.SUBTRACT : Mode.COMPARE;
+    }
+
+    @Override
+    protected BlockRedstoneComparator getPowered() {
+        return (BlockRedstoneComparator) Block.get(POWERED_COMPARATOR, this.getDamage());
+    }
+
+    @Override
+    protected int getRedstoneSignal() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        return blockEntity instanceof BlockEntityComparator ? ((BlockEntityComparator) blockEntity).getOutputSignal() : 0;
+    }
+
+    @Override
+    protected BlockRedstoneComparator getUnpowered() {
+        return (BlockRedstoneComparator) Block.get(UNPOWERED_COMPARATOR, this.getDamage());
+    }
+
+    @Override
+    public boolean isPowered() {
+        return this.isPowered || (this.getDamage() & 8) > 0;
     }
 
     @Override
@@ -126,16 +114,6 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
 
         this.onChange();
         return true;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            this.onChange();
-            return type;
-        }
-
-        return super.onUpdate(type);
     }
 
     private void onChange() {
@@ -167,6 +145,16 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
     }
 
     @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            this.onChange();
+            return type;
+        }
+
+        return super.onUpdate(type);
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (super.place(item, block, target, face, fx, fy, fz, player)) {
             CompoundTag nbt = new CompoundTag()
@@ -184,9 +172,17 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
         return false;
     }
 
-    @Override
-    public boolean isPowered() {
-        return this.isPowered || (this.getDamage() & 8) > 0;
+    protected boolean shouldBePowered() {
+        int input = this.calculateInputStrength();
+
+        if (input >= 15) {
+            return true;
+        } else if (input == 0) {
+            return false;
+        } else {
+            int sidePower = this.getPowerOnSides();
+            return sidePower == 0 || input >= sidePower;
+        }
     }
 
     @Override
@@ -194,18 +190,22 @@ public abstract class BlockRedstoneComparator extends BlockRedstoneDiode {
         return Item.get(Item.COMPARATOR);
     }
 
-    public enum Mode {
-        COMPARE,
-        SUBTRACT
-    }
-
     @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
+    public void updateState() {
+        if (!this.level.isBlockTickPending(this, this)) {
+            int output = this.calculateOutput();
+            BlockEntity blockEntity = this.level.getBlockEntity(this);
+            int power = blockEntity instanceof BlockEntityComparator ? ((BlockEntityComparator) blockEntity).getOutputSignal() : 0;
 
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
+            if (output != power || this.isPowered() != this.shouldBePowered()) {
+                /*if (isFacingTowardsRepeater()) {
+                    this.level.scheduleUpdate(this, this, 2, -1);
+                } else {
+                    this.level.scheduleUpdate(this, this, 2, 0);
+                }*/
+
+                this.level.scheduleUpdate(this, this, 2);
+            }
+        }
     }
 }

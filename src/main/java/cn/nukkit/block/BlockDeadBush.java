@@ -23,42 +23,17 @@ public class BlockDeadBush extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Dead Bush";
+    public boolean breakWhenPushed() {
+        return true;
     }
 
-    @Override
-    public int getId() {
-        return DEAD_BUSH;
-    }
-    
     @Override
     public boolean canBeReplaced() {
         return true;
     }
 
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        Block down = this.down();
-        int id = down.getId();
-        if (id == SAND || id == TERRACOTTA || id == STAINED_TERRACOTTA || id == DIRT  || id == PODZOL || id == MYCELIUM || id == GRASS || id == MOSS_BLOCK) {
-            this.getLevel().setBlock(block, this, true, true);
-            return true;
-        }
-        return false;
-    }
-
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.down().isTransparent()) {
-                this.getLevel().useBreakOn(this);
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-        return 0;
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
     }
 
     @Override
@@ -74,8 +49,14 @@ public class BlockDeadBush extends BlockFlowable {
         }
     }
 
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    @Override
+    public int getId() {
+        return DEAD_BUSH;
+    }
+
+    @Override
+    public String getName() {
+        return "Dead Bush";
     }
 
     @Override
@@ -84,7 +65,25 @@ public class BlockDeadBush extends BlockFlowable {
     }
 
     @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().isTransparent()) {
+                this.getLevel().useBreakOn(this);
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        Block down = this.down();
+        int id = down.getId();
+        if (id == SAND || id == TERRACOTTA || id == STAINED_TERRACOTTA || id == DIRT || id == PODZOL || id == MYCELIUM || id == GRASS || id == MOSS_BLOCK) {
+            this.getLevel().setBlock(block, this, true, true);
+            return true;
+        }
+        return false;
     }
 }

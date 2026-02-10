@@ -23,18 +23,19 @@ public class BlockDirt extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return DIRT;
-    }
-
-    @Override
     public boolean canBeActivated() {
         return true;
     }
 
     @Override
-    public double getResistance() {
-        return 2.5;
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        int damage = this.getDamage() & 0x01;
+        return new Item[]{new ItemBlock(Block.get(BlockID.DIRT, damage), damage)};
     }
 
     @Override
@@ -43,13 +44,23 @@ public class BlockDirt extends BlockSolidMeta {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_SHOVEL;
+    public int getId() {
+        return DIRT;
     }
 
     @Override
     public String getName() {
         return this.getDamage() == 0 ? "Dirt" : "Coarse Dirt";
+    }
+
+    @Override
+    public double getResistance() {
+        return 2.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_SHOVEL;
     }
 
     @Override
@@ -103,16 +114,5 @@ public class BlockDirt extends BlockSolidMeta {
         }
 
         return false;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        int damage = this.getDamage() & 0x01;
-        return new Item[]{new ItemBlock(Block.get(BlockID.DIRT, damage), damage)};
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
     }
 }

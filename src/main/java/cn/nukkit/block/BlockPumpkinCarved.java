@@ -10,8 +10,8 @@ public class BlockPumpkinCarved extends BlockPumpkin {
     }
 
     @Override
-    public String getName() {
-        return "Carved Pumpkin";
+    public boolean canBeActivated() {
+        return false;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class BlockPumpkinCarved extends BlockPumpkin {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return false;
+    public String getName() {
+        return "Carved Pumpkin";
     }
 }

@@ -13,20 +13,6 @@ public class EntityArmadillo extends EntityWalkingAnimal {
     }
 
     @Override
-    public void initEntity() {
-        this.setMaxHealth(12);
-        super.initEntity();
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.42f;
-        }
-        return 0.7f;
-    }
-
-    @Override
     public float getHeight() {
         if (this.isBaby()) {
             return 0.39f;
@@ -42,5 +28,19 @@ public class EntityArmadillo extends EntityWalkingAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.42f;
+        }
+        return 0.7f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(12);
+        super.initEntity();
     }
 }

@@ -20,7 +20,7 @@ public abstract class MetadataValue {
         return this.owningPlugin.get();
     }
 
-    public abstract Object value();
-
     public abstract void invalidate();
+
+    public abstract Object value();
 }

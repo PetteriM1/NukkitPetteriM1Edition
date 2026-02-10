@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author  MagicDroidX
+ * @author MagicDroidX
  * Nukkit Project
  */
 public class BaseLang {
@@ -20,7 +20,7 @@ public class BaseLang {
 
     protected final String langName;
 
-    protected Map<String, String> lang = new HashMap<>();
+    protected Map<String, String> lang;
     protected Map<String, String> fallbackLang = new HashMap<>();
 
     public BaseLang(String lang) {
@@ -37,32 +37,52 @@ public class BaseLang {
 
         if (path == null) {
             path = "lang/";
-            this.lang = this.loadLang(this.getClass().getClassLoader().getResourceAsStream(path + this.langName + "/lang.ini"));
-            if (useFallback) this.fallbackLang = this.loadLang(this.getClass().getClassLoader().getResourceAsStream(path + fallback + "/lang.ini"));
+            this.lang = loadLang(this.getClass().getClassLoader().getResourceAsStream(path + this.langName + "/lang.ini"));
+            if (useFallback)
+                this.fallbackLang = loadLang(this.getClass().getClassLoader().getResourceAsStream(path + fallback + "/lang.ini"));
         } else {
-            this.lang = this.loadLang(path + this.langName + "/lang.ini");
-            if (useFallback) this.fallbackLang = this.loadLang(path + fallback + "/lang.ini");
+            this.lang = loadLang(path + this.langName + "/lang.ini");
+            if (useFallback) this.fallbackLang = loadLang(path + fallback + "/lang.ini");
         }
-        if (this.fallbackLang == null) this.fallbackLang = this.lang;
+
+        if (this.fallbackLang == null) {
+            this.fallbackLang = this.lang;
+        }
     }
 
-    public Map<String, String> getLangMap() {
-        return lang;
+    public String get(String id) {
+        String translation = this.lang.get(id);
+        if (translation == null) {
+            translation = this.fallbackLang.get(id);
+        }
+        return translation == null ? id : translation;
     }
 
     public Map<String, String> getFallbackLangMap() {
         return fallbackLang;
     }
 
-    public String getName() {
-        return this.get("language.name");
-    }
-
     public String getLang() {
         return langName;
     }
 
-    protected Map<String, String> loadLang(String path) {
+    public Map<String, String> getLangMap() {
+        return lang;
+    }
+
+    public String getName() {
+        return this.get("language.name");
+    }
+
+    public String internalGet(String id) {
+        String translation = this.lang.get(id);
+        if (translation == null) {
+            translation = this.fallbackLang.get(id);
+        }
+        return translation;
+    }
+
+    protected static Map<String, String> loadLang(String path) {
         try {
             String content = Utils.readFile(path);
             Map<String, String> d = new HashMap<>();
@@ -78,7 +98,7 @@ public class BaseLang {
                 String key = t[0];
                 StringBuilder value = new StringBuilder();
                 for (int i = 1; i < t.length - 1; i++) {
-                    value.append(t[i]).append("=");
+                    value.append(t[i]).append('=');
                 }
                 value.append(t[t.length - 1]);
                 if (value.length() == 0) {
@@ -93,7 +113,7 @@ public class BaseLang {
         }
     }
 
-    protected Map<String, String> loadLang(InputStream stream) {
+    protected static Map<String, String> loadLang(InputStream stream) {
         try {
             String content = Utils.readFile(stream);
             Map<String, String> d = new HashMap<>();
@@ -109,7 +129,7 @@ public class BaseLang {
                 String key = t[0];
                 StringBuilder value = new StringBuilder();
                 for (int i = 1; i < t.length - 1; i++) {
-                    value.append(t[i]).append("=");
+                    value.append(t[i]).append('=');
                 }
                 value.append(t[t.length - 1]);
                 if (value.length() == 0) {
@@ -122,70 +142,6 @@ public class BaseLang {
             Server.getInstance().getLogger().logException(e);
             return null;
         }
-    }
-
-    public String translateString(String str) {
-        return this.translateString(str, new String[0], null);
-    }
-
-    public String translateString(String str, String... params) {
-        if (params != null) {
-            return this.translateString(str, params, null);
-        }
-        return this.translateString(str, new String[0], null);
-    }
-
-    public String translateString(String str, Object... params) {
-        if (params != null) {
-            String[] paramsToString = new String[params.length];
-            for (int i = 0; i < params.length; i++) {
-                paramsToString[i] = Objects.toString(params[i]);
-            }
-            return this.translateString(str, paramsToString, null);
-        }
-        return this.translateString(str, new String[0], null);
-    }
-
-    public String translateString(String str, String param, String onlyPrefix) {
-        return this.translateString(str, new String[]{param}, onlyPrefix);
-    }
-
-    public String translateString(String str, String[] params, String onlyPrefix) {
-        String baseText = this.get(str);
-        baseText = this.parseTranslation((baseText != null && (onlyPrefix == null || str.indexOf(onlyPrefix) == 0)) ? baseText : str, onlyPrefix);
-        for (int i = 0; i < params.length; i++) {
-            baseText = baseText.replace("{%" + i + "}", this.parseTranslation(String.valueOf(params[i])));
-        }
-
-        return baseText;
-    }
-
-    public String translate(TextContainer c) {
-        String baseText = this.parseTranslation(c.getText());
-        if (c instanceof TranslationContainer) {
-            baseText = this.internalGet(c.getText());
-            baseText = this.parseTranslation(baseText != null ? baseText : c.getText());
-            for (int i = 0; i < ((TranslationContainer) c).getParameters().length; i++) {
-                baseText = baseText.replace("{%" + i + "}", this.parseTranslation(((TranslationContainer) c).getParameters()[i]));
-            }
-        }
-        return baseText;
-    }
-
-    public String internalGet(String id) {
-        String translation = this.lang.get(id);
-        if (translation == null) {
-            translation = this.fallbackLang.get(id);
-        }
-        return translation;
-    }
-
-    public String get(String id) {
-        String translation = this.lang.get(id);
-        if (translation == null) {
-            translation = this.fallbackLang.get(id);
-        }
-        return translation == null ? id : translation;
     }
 
     protected String parseTranslation(String text) {
@@ -238,5 +194,53 @@ public class BaseLang {
             }
         }
         return newString.toString();
+    }
+
+    public String translate(TextContainer c) {
+        String baseText = this.parseTranslation(c.getText());
+        if (c instanceof TranslationContainer) {
+            baseText = this.internalGet(c.getText());
+            baseText = this.parseTranslation(baseText != null ? baseText : c.getText());
+            for (int i = 0; i < ((TranslationContainer) c).getParameters().length; i++) {
+                baseText = baseText.replace("{%" + i + '}', this.parseTranslation(((TranslationContainer) c).getParameters()[i]));
+            }
+        }
+        return baseText;
+    }
+
+    public String translateString(String str) {
+        return this.translateString(str, new String[0], null);
+    }
+
+    public String translateString(String str, String... params) {
+        if (params != null) {
+            return this.translateString(str, params, null);
+        }
+        return this.translateString(str, new String[0], null);
+    }
+
+    public String translateString(String str, Object... params) {
+        if (params != null) {
+            String[] paramsToString = new String[params.length];
+            for (int i = 0; i < params.length; i++) {
+                paramsToString[i] = Objects.toString(params[i]);
+            }
+            return this.translateString(str, paramsToString, null);
+        }
+        return this.translateString(str, new String[0], null);
+    }
+
+    public String translateString(String str, String param, String onlyPrefix) {
+        return this.translateString(str, new String[]{param}, onlyPrefix);
+    }
+
+    public String translateString(String str, String[] params, String onlyPrefix) {
+        String baseText = this.get(str);
+        baseText = this.parseTranslation((baseText != null && (onlyPrefix == null || str.indexOf(onlyPrefix) == 0)) ? baseText : str, onlyPrefix);
+        for (int i = 0; i < params.length; i++) {
+            baseText = baseText.replace("{%" + i + '}', this.parseTranslation(String.valueOf(params[i])));
+        }
+
+        return baseText;
     }
 }

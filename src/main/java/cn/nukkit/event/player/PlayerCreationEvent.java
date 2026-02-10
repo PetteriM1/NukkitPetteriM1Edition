@@ -14,19 +14,10 @@ import java.net.InetSocketAddress;
 public class PlayerCreationEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final SourceInterface interfaz;
-
     private final Long clientId;
-
     private final InetSocketAddress socketAddress;
-
     private Class<? extends Player> baseClass;
-
     private Class<? extends Player> playerClass;
 
     public PlayerCreationEvent(SourceInterface interfaz, Class<? extends Player> baseClass, Class<? extends Player> playerClass, Long clientId, InetSocketAddress socketAddress) {
@@ -38,12 +29,28 @@ public class PlayerCreationEvent extends Event {
         this.playerClass = playerClass;
     }
 
+    public String getAddress() {
+        return this.socketAddress.getAddress().toString();
+    }
+
+    public Class<? extends Player> getBaseClass() {
+        return baseClass;
+    }
+
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
     public SourceInterface getInterface() {
         return interfaz;
     }
 
-    public String getAddress() {
-        return this.socketAddress.getAddress().toString();
+    public Class<? extends Player> getPlayerClass() {
+        return playerClass;
     }
 
     public int getPort() {
@@ -54,20 +61,8 @@ public class PlayerCreationEvent extends Event {
         return socketAddress;
     }
 
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public Class<? extends Player> getBaseClass() {
-        return baseClass;
-    }
-
     public void setBaseClass(Class<? extends Player> baseClass) {
         this.baseClass = baseClass;
-    }
-
-    public Class<? extends Player> getPlayerClass() {
-        return playerClass;
     }
 
     public void setPlayerClass(Class<? extends Player> playerClass) {
