@@ -64,6 +64,14 @@ public abstract class Command {
         this.commandParameters.put("default", new CommandParameter[]{CommandParameter.newType("args", true, CommandParamType.RAWTEXT)});
     }
 
+    public String[] getAliases() {
+        return this.activeAliases;
+    }
+
+    public Map<String, CommandParameter[]> getCommandParameters() {
+        return commandParameters;
+    }
+
     /**
      * Returns an CommandData containing command data
      *
@@ -73,157 +81,36 @@ public abstract class Command {
         return this.commandData;
     }
 
-    public CommandParameter[] getCommandParameters(String key) {
-        return commandParameters.get(key);
-    }
-
-    public Map<String, CommandParameter[]> getCommandParameters() {
-        return commandParameters;
-    }
-
-    public void setCommandParameters(Map<String, CommandParameter[]> commandParameters) {
-        this.commandParameters = commandParameters;
-    }
-
-    public void addCommandParameters(String key, CommandParameter[] parameters) {
-        this.commandParameters.put(key, parameters);
-    }
-
-    /**
-     * Generates modified command data for the specified player
-     * for AvailableCommandsPacket.
-     *
-     * @param player player
-     * @return CommandData|null
-     */
-    public CommandDataVersions generateCustomCommandData(Player player) {
-        if (!this.testPermissionSilent(player)) {
-            return null;
-        }
-
-        CommandData customData = this.commandData.clone();
-
-        if (getAliases().length > 0) {
-            List<String> aliases = new ArrayList<>(Arrays.asList(getAliases()));
-            if (!aliases.contains(this.name)) {
-                aliases.add(this.name);
-            }
-
-            customData.aliases = new CommandEnum(this.name + "Aliases", aliases);
-        }
-
-        customData.description = player.getServer().getLanguage().translateString(this.getDescription());
-        this.commandParameters.forEach((key, par) -> {
-            CommandOverload overload = new CommandOverload();
-            overload.input.parameters = par;
-            customData.overloads.put(key, overload);
-        });
-        if (customData.overloads.isEmpty()) customData.overloads.put("default", new CommandOverload());
-        CommandDataVersions versions = new CommandDataVersions();
-        versions.versions.add(customData);
-        return versions;
-    }
-
-    public Map<String, CommandOverload> getOverloads() {
-        return this.commandData.overloads;
-    }
-
-    public abstract boolean execute(CommandSender sender, String commandLabel, String[] args);
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public void setPermission(String permission) {
-        this.permission = permission;
-    }
-
-    public boolean testPermission(CommandSender target) {
-        if (this.testPermissionSilent(target)) {
-            return true;
-        }
-
-        if (this.permissionMessage == null) {
-            target.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.unknown", this.name));
-        } else if (!this.permissionMessage.isEmpty()) {
-            target.sendMessage(this.permissionMessage.replace("<permission>", this.permission));
-        }
-
-        return false;
-    }
-
-    public boolean testPermissionSilent(CommandSender target) {
-        if (this.permission == null || this.permission.isEmpty()) {
-            return true;
-        }
-
-        String[] permissions = this.permission.split(";");
-        for (String permission : permissions) {
-            if (target.hasPermission(permission)) {
-                return true;
-            }
-        }
-
-        return false;
+    public String getDescription() {
+        return description;
     }
 
     public String getLabel() {
         return label;
     }
 
-    public boolean setLabel(String name) {
-        this.nextLabel = name;
-        if (!this.isRegistered()) {
-            this.label = name;
-            return true;
-        }
-        return false;
+    public String getName() {
+        return name;
     }
 
-    public boolean register(CommandMap commandMap) {
-        if (this.allowChangesFrom(commandMap)) {
-            this.commandMap = commandMap;
-            return true;
-        }
-        return false;
+    public Map<String, CommandOverload> getOverloads() {
+        return this.commandData.overloads;
     }
 
-    public boolean unregister(CommandMap commandMap) {
-        if (this.allowChangesFrom(commandMap)) {
-            this.commandMap = null;
-            this.activeAliases = this.aliases;
-            this.label = this.nextLabel;
-            return true;
-        }
-        return false;
-    }
-
-    public boolean allowChangesFrom(CommandMap commandMap) {
-        return commandMap != null && !commandMap.equals(this.commandMap);
-    }
-
-    public boolean isRegistered() {
-        return this.commandMap != null;
-    }
-
-    public String[] getAliases() {
-        return this.activeAliases;
+    public String getPermission() {
+        return permission;
     }
 
     public String getPermissionMessage() {
         return permissionMessage;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public String getUsage() {
         return usageMessage;
+    }
+
+    public boolean isRegistered() {
+        return this.commandMap != null;
     }
 
     public void setAliases(String[] aliases) {
@@ -233,8 +120,16 @@ public abstract class Command {
         }
     }
 
+    public void setCommandParameters(Map<String, CommandParameter[]> commandParameters) {
+        this.commandParameters = commandParameters;
+    }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
     }
 
     public void setPermissionMessage(String permissionMessage) {
@@ -245,9 +140,12 @@ public abstract class Command {
         this.usageMessage = usageMessage;
     }
 
-    @Deprecated
-    public static CommandData generateDefaultData() {
-        return null; //defaultDataTemplate.clone();
+    public void addCommandParameters(String key, CommandParameter[] parameters) {
+        this.commandParameters.put(key, parameters);
+    }
+
+    public boolean allowChangesFrom(CommandMap commandMap) {
+        return commandMap != null && !commandMap.equals(this.commandMap);
     }
 
     public static void broadcastCommandMessage(CommandSender source, String message) {
@@ -308,8 +206,110 @@ public abstract class Command {
         }
     }
 
+    public abstract boolean execute(CommandSender sender, String commandLabel, String[] args);
+
+    /**
+     * Generates modified command data for the specified player
+     * for AvailableCommandsPacket.
+     *
+     * @param player player
+     * @return CommandData|null
+     */
+    public CommandDataVersions generateCustomCommandData(Player player) {
+        if (!this.testPermissionSilent(player)) {
+            return null;
+        }
+
+        CommandData customData = this.commandData.clone();
+
+        if (getAliases().length > 0) {
+            List<String> aliases = new ArrayList<>(Arrays.asList(getAliases()));
+            if (!aliases.contains(this.name)) {
+                aliases.add(this.name);
+            }
+
+            customData.aliases = new CommandEnum(this.name + "Aliases", aliases);
+        }
+
+        customData.description = player.getServer().getLanguage().translateString(this.getDescription());
+        this.commandParameters.forEach((key, par) -> {
+            CommandOverload overload = new CommandOverload();
+            overload.input.parameters = par;
+            customData.overloads.put(key, overload);
+        });
+        if (customData.overloads.isEmpty()) customData.overloads.put("default", new CommandOverload());
+        CommandDataVersions versions = new CommandDataVersions();
+        versions.versions.add(customData);
+        return versions;
+    }
+
+    @Deprecated
+    public static CommandData generateDefaultData() {
+        return null; //defaultDataTemplate.clone();
+    }
+
+    public CommandParameter[] getCommandParameters(String key) {
+        return commandParameters.get(key);
+    }
+
+    public boolean register(CommandMap commandMap) {
+        if (this.allowChangesFrom(commandMap)) {
+            this.commandMap = commandMap;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean setLabel(String name) {
+        this.nextLabel = name;
+        if (!this.isRegistered()) {
+            this.label = name;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean testPermission(CommandSender target) {
+        if (this.testPermissionSilent(target)) {
+            return true;
+        }
+
+        if (this.permissionMessage == null) {
+            target.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.unknown", this.name));
+        } else if (!this.permissionMessage.isEmpty()) {
+            target.sendMessage(this.permissionMessage.replace("<permission>", this.permission));
+        }
+
+        return false;
+    }
+
+    public boolean testPermissionSilent(CommandSender target) {
+        if (this.permission == null || this.permission.isEmpty()) {
+            return true;
+        }
+
+        String[] permissions = this.permission.split(";");
+        for (String permission : permissions) {
+            if (target.hasPermission(permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public String toString() {
         return this.name;
+    }
+
+    public boolean unregister(CommandMap commandMap) {
+        if (this.allowChangesFrom(commandMap)) {
+            this.commandMap = null;
+            this.activeAliases = this.aliases;
+            this.label = this.nextLabel;
+            return true;
+        }
+        return false;
     }
 }

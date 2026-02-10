@@ -17,6 +17,11 @@ public class BlockStairsDarkOak extends BlockStairsWood {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return DARK_OAK_WOOD_STAIRS;
     }
@@ -24,10 +29,5 @@ public class BlockStairsDarkOak extends BlockStairsWood {
     @Override
     public String getName() {
         return "Dark Oak Stairs";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_BLOCK_COLOR;
     }
 }

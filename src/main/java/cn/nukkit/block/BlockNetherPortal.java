@@ -29,100 +29,6 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
         super(0);
     }
 
-    @Override
-    public String getName() {
-        return "Nether Portal Block";
-    }
-
-    @Override
-    public int getId() {
-        return NETHER_PORTAL;
-    }
-
-    @Override
-    public boolean isBreakable(Item item) {
-        return false;
-    }
-
-    @Override
-    public double getHardness() {
-        return -1;
-    }
-
-    @Override
-    public int getLightLevel() {
-        return 11;
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(BlockID.AIR));
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        boolean result = super.onBreak(item);
-        for (BlockFace face : BlockFace.values()) {
-            Block b = this.getSide(face);
-            if (b instanceof BlockNetherPortal) {
-                result &= b.onBreak(item);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.AIR_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    public static boolean trySpawnPortal(Level level, Vector3 pos) {
-        return trySpawnPortal(level, pos, false);
-    }
-
-    @Override
-    protected AxisAlignedBB recalculateBoundingBox() {
-        return this;
-    }
-
-    public static boolean trySpawnPortal(Level level, Vector3 pos, boolean force) {
-        PortalBuilder builder = new PortalBuilder(level, pos, Axis.X, force);
-
-        if (builder.isValid() && builder.portalBlockCount == 0) {
-            builder.placePortalBlocks();
-            return true;
-        } else {
-            builder = new PortalBuilder(level, pos, Axis.Z, force);
-
-            if (builder.isValid() && builder.portalBlockCount == 0) {
-                builder.placePortalBlocks();
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
     public static class PortalBuilder {
 
         private final Level level;
@@ -170,26 +76,16 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
             }
         }
 
-        protected int getDistanceUntilEdge(Vector3 pos, BlockFace dir) {
-            int i;
-
-            for (i = 0; i < 22; ++i) {
-                Vector3 v = pos.getSideVec(dir, i);
-
-                if (!this.isEmptyBlock(getBlockId(v)) || getBlockId(v.getSideVec(BlockFace.DOWN)) != OBSIDIAN) {
-                    break;
-                }
-            }
-
-            return getBlockId(pos.getSideVec(dir, i)) == OBSIDIAN ? i : 0;
-        }
-
         public int getHeight() {
             return this.height;
         }
 
         public int getWidth() {
             return this.width;
+        }
+
+        public boolean isValid() {
+            return this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
         }
 
         protected int calculatePortalHeight() {
@@ -245,12 +141,22 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
             return this.level.getBlockIdAt(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ());
         }
 
-        protected boolean isEmptyBlock(int id) {
-            return force || id == AIR || id == FIRE || id == NETHER_PORTAL;
+        protected int getDistanceUntilEdge(Vector3 pos, BlockFace dir) {
+            int i;
+
+            for (i = 0; i < 22; ++i) {
+                Vector3 v = pos.getSideVec(dir, i);
+
+                if (!this.isEmptyBlock(getBlockId(v)) || getBlockId(v.getSideVec(BlockFace.DOWN)) != OBSIDIAN) {
+                    break;
+                }
+            }
+
+            return getBlockId(pos.getSideVec(dir, i)) == OBSIDIAN ? i : 0;
         }
 
-        public boolean isValid() {
-            return this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
+        protected boolean isEmptyBlock(int id) {
+            return force || id == AIR || id == FIRE || id == NETHER_PORTAL;
         }
 
         public void placePortalBlocks() {
@@ -264,16 +170,49 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
         }
     }
 
-    public static Position getSafePortal(Position portal) {
-        Level level = portal.getLevel();
-        FullChunk chunk = portal.getChunk();
-        Vector3 down = portal.getSideVec(BlockFace.DOWN);
+    @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
 
-        while (level.getBlockIdAt(chunk, down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL) {
-            down = down.getSideVec(BlockFace.DOWN);
-        }
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.AIR_BLOCK_COLOR;
+    }
 
-        return Position.fromObject(down.up(), portal.getLevel());
+    @Override
+    public double getHardness() {
+        return -1;
+    }
+
+    @Override
+    public int getId() {
+        return NETHER_PORTAL;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 11;
+    }
+
+    @Override
+    public String getName() {
+        return "Nether Portal Block";
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     public static Position findNearestPortal(Position pos) {
@@ -309,6 +248,45 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
             }
         }
         return found;
+    }
+
+    public static Position getSafePortal(Position portal) {
+        Level level = portal.getLevel();
+        FullChunk chunk = portal.getChunk();
+        Vector3 down = portal.getSideVec(BlockFace.DOWN);
+
+        while (level.getBlockIdAt(chunk, down.getFloorX(), down.getFloorY(), down.getFloorZ()) == NETHER_PORTAL) {
+            down = down.getSideVec(BlockFace.DOWN);
+        }
+
+        return Position.fromObject(down.up(), portal.getLevel());
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public boolean isBreakable(Item item) {
+        return false;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        boolean result = super.onBreak(item);
+        for (BlockFace face : BlockFace.values()) {
+            Block b = this.getSide(face);
+            if (b instanceof BlockNetherPortal) {
+                result &= b.onBreak(item);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected AxisAlignedBB recalculateBoundingBox() {
+        return this;
     }
 
     public static void spawnPortal(Position pos) {
@@ -370,7 +348,29 @@ public class BlockNetherPortal extends BlockFlowable implements Faceable {
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    public Item toItem() {
+        return new ItemBlock(Block.get(BlockID.AIR));
+    }
+
+    public static boolean trySpawnPortal(Level level, Vector3 pos) {
+        return trySpawnPortal(level, pos, false);
+    }
+
+    public static boolean trySpawnPortal(Level level, Vector3 pos, boolean force) {
+        PortalBuilder builder = new PortalBuilder(level, pos, Axis.X, force);
+
+        if (builder.isValid() && builder.portalBlockCount == 0) {
+            builder.placePortalBlocks();
+            return true;
+        } else {
+            builder = new PortalBuilder(level, pos, Axis.Z, force);
+
+            if (builder.isValid() && builder.portalBlockCount == 0) {
+                builder.placePortalBlocks();
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }

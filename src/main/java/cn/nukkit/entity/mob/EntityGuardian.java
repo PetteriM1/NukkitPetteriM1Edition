@@ -1,16 +1,42 @@
 package cn.nukkit.entity.mob;
 
+import cn.nukkit.Player;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.EntityCreature;
+import cn.nukkit.entity.data.LongEntityData;
+import cn.nukkit.entity.passive.EntitySquid;
+import cn.nukkit.event.entity.EntityDamageByEntityEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Utils;
 
+import java.util.HashMap;
+
 public class EntityGuardian extends EntitySwimmingMob {
 
     public static final int NETWORK_ID = 49;
+    private int laserChargeTick = 60;
+    private long laserTargetEid = -1;
 
     public EntityGuardian(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    @Override
+    public Item[] getDrops() {
+        return new Item[]{Item.get(Item.PRISMARINE_SHARD, 0, Utils.rand(0, 2))};
+    }
+
+    @Override
+    public float getHeight() {
+        return 0.85f;
+    }
+
+    @Override
+    public int getKillExperience() {
+        return 10;
     }
 
     @Override
@@ -24,23 +50,71 @@ public class EntityGuardian extends EntitySwimmingMob {
     }
 
     @Override
-    public float getHeight() {
-        return 0.85f;
+    public void attackEntity(Entity player) {
+        if (this.attackDelay > 40 && target.distanceSquared(this) <= 225) {
+            this.attackDelay = 0;
+
+            HashMap<EntityDamageEvent.DamageModifier, Float> damage = new HashMap<>();
+            damage.put(EntityDamageEvent.DamageModifier.BASE, 1F);
+            if (player instanceof Player) {
+                float points = 0;
+                for (Item i : ((Player) player).getInventory().getArmorContents()) {
+                    points += this.getArmorPoints(i.getId());
+                }
+                damage.put(EntityDamageEvent.DamageModifier.ARMOR,
+                        (float) (damage.getOrDefault(EntityDamageEvent.DamageModifier.ARMOR, 0f) - Math.floor(damage.getOrDefault(EntityDamageEvent.DamageModifier.BASE, 1f) * points * 0.04)));
+            }
+            player.attack(new EntityDamageByEntityEvent(this, player, EntityDamageEvent.DamageCause.ENTITY_ATTACK, damage));
+        }
+    }
+
+    @Override
+    public boolean canDespawn() {
+        return false; // TODO: spawning
+    }
+
+    @Override
+    public boolean entityBaseTick(int tickDiff) {
+        if (getServer().getDifficulty() == 0) {
+            this.close();
+            return true;
+        }
+
+        boolean hasUpdate = super.entityBaseTick(tickDiff);
+        if (!this.closed && followTarget != null) {
+            if (laserTargetEid != followTarget.getId()) {
+                this.setDataProperty(new LongEntityData(Entity.DATA_TARGET_EID, laserTargetEid = followTarget.getId()));
+                laserChargeTick = 60;
+            }
+            if (targetOption((EntityCreature) followTarget, this.distanceSquared(followTarget))) {
+                if (--laserChargeTick < 0) {
+                    if (this.getServer().getMobAiEnabled()) attackEntity(followTarget);
+                    this.setDataProperty(new LongEntityData(Entity.DATA_TARGET_EID, laserTargetEid = -1));
+                    laserChargeTick = 60;
+                }
+            } else {
+                this.setDataProperty(new LongEntityData(Entity.DATA_TARGET_EID, laserTargetEid = -1));
+                laserChargeTick = 60;
+            }
+        }
+        return hasUpdate;
     }
 
     @Override
     public void initEntity() {
         this.setMaxHealth(30);
         super.initEntity();
+        this.setDamage(new int[]{0, 4, 6, 9});
     }
 
     @Override
-    public Item[] getDrops() {
-        return new Item[]{Item.get(Item.PRISMARINE_SHARD, 0, Utils.rand(0, 2))};
-    }
-
-    @Override
-    public int getKillExperience() {
-        return 10;
+    public boolean targetOption(EntityCreature creature, double distance) {
+        if (creature instanceof Player) {
+            Player player = (Player) creature;
+            return (!player.closed) && player.spawned && player.isAlive() && (player.isSurvival() || player.isAdventure()) && distance <= 256;
+        } else if (creature instanceof EntitySquid) {
+            return creature.isAlive() && this.distanceSquared(creature) <= 80;
+        }
+        return false;
     }
 }

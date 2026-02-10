@@ -15,13 +15,6 @@ public class BlockVector3 implements Cloneable {
     public BlockVector3() {
     }
 
-    public BlockVector3 setComponents(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-    }
-
     public int getX() {
         return this.x;
     }
@@ -65,22 +58,6 @@ public class BlockVector3 implements Cloneable {
         return new Vector3(this.x + x.getX(), this.y + x.getY(), this.z + x.getZ());
     }
 
-    public Vector3 subtract(double x) {
-        return this.subtract(x, 0, 0);
-    }
-
-    public Vector3 subtract(double x, double y) {
-        return this.subtract(x, y, 0);
-    }
-
-    public Vector3 subtract(double x, double y, double z) {
-        return this.add(-x, -y, -z);
-    }
-
-    public Vector3 subtract(Vector3 x) {
-        return this.add(-x.getX(), -x.getY(), -x.getZ());
-    }
-
     public BlockVector3 add(int x) {
         return this.add(x, 0, 0);
     }
@@ -95,6 +72,135 @@ public class BlockVector3 implements Cloneable {
 
     public BlockVector3 add(BlockVector3 x) {
         return new BlockVector3(this.x + x.x, this.y + x.y, this.z + x.z);
+    }
+
+    public Vector3 asVector3() {
+        return new Vector3(this.x, this.y, this.z);
+    }
+
+    public Vector3f asVector3f() {
+        return new Vector3f(this.x, this.y, this.z);
+    }
+
+    @Override
+    public BlockVector3 clone() {
+        try {
+            return (BlockVector3) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
+
+    public double distance(Vector3 pos) {
+        return Math.sqrt(this.distanceSquared(pos));
+    }
+
+    public double distance(BlockVector3 pos) {
+        return Math.sqrt(this.distanceSquared(pos));
+    }
+
+    public double distanceSquared(Vector3 pos) {
+        return distanceSquared(pos.x, pos.y, pos.z);
+    }
+
+    public double distanceSquared(BlockVector3 pos) {
+        return distanceSquared(pos.x, pos.y, pos.z);
+    }
+
+    public double distanceSquared(double x, double y, double z) {
+        double dx = this.x - x;
+        double dy = this.y - y;
+        double dz = this.z - z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    public BlockVector3 divide(int number) {
+        return new BlockVector3(this.x / number, this.y / number, this.z / number);
+    }
+
+    public BlockVector3 down() {
+        return down(1);
+    }
+
+    public BlockVector3 down(int step) {
+        return getSide(BlockFace.DOWN, step);
+    }
+
+    public BlockVector3 east() {
+        return east(1);
+    }
+
+    public BlockVector3 east(int step) {
+        return getSide(BlockFace.EAST, step);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o == this) return true;
+
+        if (!(o instanceof BlockVector3)) return false;
+        BlockVector3 that = (BlockVector3) o;
+
+        return this.x == that.x &&
+                this.y == that.y &&
+                this.z == that.z;
+    }
+
+    public BlockVector3 getSide(BlockFace face) {
+        return this.getSide(face, 1);
+    }
+
+    public BlockVector3 getSide(BlockFace face, int step) {
+        return new BlockVector3(this.x + face.getXOffset() * step, this.y + face.getYOffset() * step, this.z + face.getZOffset() * step);
+    }
+
+    @Override
+    public final int hashCode() {
+        return (x ^ (z << 12)) ^ (y << 24);
+    }
+
+    public BlockVector3 multiply(int number) {
+        return new BlockVector3(this.x * number, this.y * number, this.z * number);
+    }
+
+    public BlockVector3 north() {
+        return north(1);
+    }
+
+    public BlockVector3 north(int step) {
+        return getSide(BlockFace.NORTH, step);
+    }
+
+    public BlockVector3 setComponents(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
+    public BlockVector3 south() {
+        return south(1);
+    }
+
+    public BlockVector3 south(int step) {
+        return getSide(BlockFace.SOUTH, step);
+    }
+
+    public Vector3 subtract(double x) {
+        return this.subtract(x, 0, 0);
+    }
+
+    public Vector3 subtract(double x, double y) {
+        return this.subtract(x, y, 0);
+    }
+
+    public Vector3 subtract(double x, double y, double z) {
+        return this.add(-x, -y, -z);
+    }
+
+    public Vector3 subtract(Vector3 x) {
+        return this.add(-x.getX(), -x.getY(), -x.getZ());
     }
 
     public BlockVector3 subtract() {
@@ -117,20 +223,9 @@ public class BlockVector3 implements Cloneable {
         return this.add(-x.x, -x.y, -x.z);
     }
 
-    public BlockVector3 multiply(int number) {
-        return new BlockVector3(this.x * number, this.y * number, this.z * number);
-    }
-
-    public BlockVector3 divide(int number) {
-        return new BlockVector3(this.x / number, this.y / number, this.z / number);
-    }
-
-    public BlockVector3 getSide(BlockFace face) {
-        return this.getSide(face, 1);
-    }
-
-    public BlockVector3 getSide(BlockFace face, int step) {
-        return new BlockVector3(this.x + face.getXOffset() * step, this.y + face.getYOffset() * step, this.z + face.getZOffset() * step);
+    @Override
+    public String toString() {
+        return "BlockVector3(level=" + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ')';
     }
 
     public BlockVector3 up() {
@@ -141,103 +236,11 @@ public class BlockVector3 implements Cloneable {
         return getSide(BlockFace.UP, step);
     }
 
-    public BlockVector3 down() {
-        return down(1);
-    }
-
-    public BlockVector3 down(int step) {
-        return getSide(BlockFace.DOWN, step);
-    }
-
-    public BlockVector3 north() {
-        return north(1);
-    }
-
-    public BlockVector3 north(int step) {
-        return getSide(BlockFace.NORTH, step);
-    }
-
-    public BlockVector3 south() {
-        return south(1);
-    }
-
-    public BlockVector3 south(int step) {
-        return getSide(BlockFace.SOUTH, step);
-    }
-
-    public BlockVector3 east() {
-        return east(1);
-    }
-
-    public BlockVector3 east(int step) {
-        return getSide(BlockFace.EAST, step);
-    }
-
     public BlockVector3 west() {
         return west(1);
     }
 
     public BlockVector3 west(int step) {
         return getSide(BlockFace.WEST, step);
-    }
-
-    public double distance(Vector3 pos) {
-        return Math.sqrt(this.distanceSquared(pos));
-    }
-
-    public double distance(BlockVector3 pos) {
-        return Math.sqrt(this.distanceSquared(pos));
-    }
-
-    public double distanceSquared(Vector3 pos) {
-        return distanceSquared(pos.x, pos.y, pos.z);
-    }
-
-    public double distanceSquared(BlockVector3 pos) {
-        return distanceSquared(pos.x, pos.y, pos.z);
-    }
-
-    public double distanceSquared(double x, double y, double z) {
-        return Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) + Math.pow(this.z - z, 2);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (o == this) return true;
-
-        if (!(o instanceof BlockVector3)) return false;
-        BlockVector3 that = (BlockVector3) o;
-
-        return this.x == that.x &&
-                this.y == that.y &&
-                this.z == that.z;
-    }
-
-    @Override
-    public final int hashCode() {
-        return (x ^ (z << 12)) ^ (y << 24);
-    }
-
-    @Override
-    public String toString() {
-        return "BlockVector3(level=" + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ')';
-    }
-
-    @Override
-    public BlockVector3 clone() {
-        try {
-            return (BlockVector3) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
-    }
-
-    public Vector3 asVector3() {
-        return new Vector3(this.x, this.y, this.z);
-    }
-
-    public Vector3f asVector3f() {
-        return new Vector3f(this.x, this.y, this.z);
     }
 }

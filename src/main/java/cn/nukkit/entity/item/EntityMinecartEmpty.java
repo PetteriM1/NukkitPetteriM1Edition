@@ -22,21 +22,26 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
     private static final Vector3f RIDER_OFFSET = new Vector3f(0f, -0.35f);
     private static final Vector3f RIDER_PLAYER_OFFSET = new Vector3f(0f, 0.525f);
 
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
     public EntityMinecartEmpty(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
         setName("Minecart");
     }
 
     @Override
+    public String getInteractButtonText() {
+        return this.passengers.isEmpty() ? "action.interact.ride.minecart" : "";
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
     public MinecartType getType() {
         return MinecartType.valueOf(0);
     }
-    
+
     @Override
     public boolean isRideable() {
         return true;
@@ -60,11 +65,6 @@ public class EntityMinecartEmpty extends EntityMinecartAbstract {
         }
 
         super.applyEntityCollision(entity);
-    }
-
-    @Override
-    public String getInteractButtonText() {
-        return this.passengers.isEmpty() ? "action.interact.ride.minecart" : "";
     }
 
     @Override

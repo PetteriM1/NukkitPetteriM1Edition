@@ -15,12 +15,12 @@ public class Selector {
         this.setParent(parent);
     }
 
-    public Selector setParent(Selector parent) {
-        this.parent = parent;
+    public Selector getParent() {
         return parent;
     }
 
-    public Selector getParent() {
+    public Selector setParent(Selector parent) {
+        this.parent = parent;
         return parent;
     }
 

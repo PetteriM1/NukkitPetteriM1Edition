@@ -45,6 +45,10 @@ public class ItemPainting extends Item {
         return true;
     }
 
+    private static double offset(int value) {
+        return value > 1 ? 0.5 : 0;
+    }
+
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
         if (player.isAdventure() || face.getHorizontalIndex() == -1 || !Block.canConnectToFullSolid(target) || block.isSolid()) {
@@ -125,9 +129,5 @@ public class ItemPainting extends Item {
 
         level.addLevelEvent(block, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_PLACED);
         return true;
-    }
-
-    private static double offset(int value) {
-        return value > 1 ? 0.5 : 0;
     }
 }

@@ -3,6 +3,7 @@ package cn.nukkit.item.enchantment;
 /**
  * @author Nukkit Project Team
  */
+@Deprecated
 public class EnchantmentEntry {
 
     private final Enchantment[] enchantments;
@@ -15,12 +16,12 @@ public class EnchantmentEntry {
         this.randomName = randomName;
     }
 
-    public Enchantment[] getEnchantments() {
-        return enchantments;
-    }
-
     public int getCost() {
         return cost;
+    }
+
+    public Enchantment[] getEnchantments() {
+        return enchantments;
     }
 
     public String getRandomName() {

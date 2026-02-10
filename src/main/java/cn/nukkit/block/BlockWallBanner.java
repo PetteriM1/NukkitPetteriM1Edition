@@ -14,6 +14,11 @@ public class BlockWallBanner extends BlockBanner {
     }
 
     @Override
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
     public int getId() {
         return WALL_BANNER;
     }
@@ -34,10 +39,5 @@ public class BlockWallBanner extends BlockBanner {
             }
         }
         return 0;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(this.getDamage() & 0x7);
     }
 }

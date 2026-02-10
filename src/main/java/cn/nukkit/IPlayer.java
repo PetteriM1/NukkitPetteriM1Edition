@@ -18,11 +18,18 @@ import java.util.UUID;
 public interface IPlayer extends ServerOperator, Metadatable {
 
     /**
-     * Returns if this player is online.
+     * Returns the time this player first played in this server.
      *
-     * @return 这个玩家是否在线。<br>If this player is online.
+     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
      */
-    boolean isOnline();
+    Long getFirstPlayed();
+
+    /**
+     * Returns the time this player last joined in this server.
+     *
+     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
+     */
+    Long getLastPlayed();
 
     /**
      * Returns the name of this player.
@@ -34,44 +41,6 @@ public interface IPlayer extends ServerOperator, Metadatable {
      * @return 这个玩家的名称。<br>The name of this player.
      */
     String getName();
-    
-    UUID getUniqueId();
-
-    /**
-     * Returns if this player is banned.
-     *
-     * @return 这个玩家的名称。<br>The name of this player.
-     * @see #setBanned
-     */
-    boolean isBanned();
-
-    /**
-     * Sets this player to be banned or to be pardoned.
-     *
-     * @param value 如果为{@code true}，封禁这个玩家。如果为{@code false}，解封这个玩家。<br>
-     *              {@code true} for ban and {@code false} for pardon.
-     * @see #isBanned
-     */
-    void setBanned(boolean value);
-
-    /**
-     * Returns if this player is pardoned by whitelist.
-     *
-     * @return 这个玩家是否已加入白名单。<br>If this player is pardoned by whitelist.
-     * @see cn.nukkit.Server#isWhitelisted
-     */
-    boolean isWhitelisted();
-
-    /**
-     * Adds this player to the white list, or removes it from the whitelist.
-     *
-     * @param value 如果为{@code true}，把玩家加入白名单。如果为{@code false}，取消这个玩家的白名单。<br>
-     *              {@code true} for add and {@code false} for remove.
-     * @see #isWhitelisted
-     * @see cn.nukkit.Server#addWhitelist
-     * @see cn.nukkit.Server#removeWhitelist
-     */
-    void setWhitelisted(boolean value);
 
     /**
      * Returns a {@code Player} object for this interface.
@@ -88,19 +57,50 @@ public interface IPlayer extends ServerOperator, Metadatable {
      */
     Server getServer();
 
-    /**
-     * Returns the time this player first played in this server.
-     *
-     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
-     */
-    Long getFirstPlayed();
+    UUID getUniqueId();
 
     /**
-     * Returns the time this player last joined in this server.
+     * Returns if this player is banned.
      *
-     * @return Unix时间（以秒为单位。<br>Unix time in seconds.
+     * @return 这个玩家的名称。<br>The name of this player.
+     * @see #setBanned
      */
-    Long getLastPlayed();
+    boolean isBanned();
+
+    /**
+     * Returns if this player is online.
+     *
+     * @return 这个玩家是否在线。<br>If this player is online.
+     */
+    boolean isOnline();
+
+    /**
+     * Returns if this player is pardoned by whitelist.
+     *
+     * @return 这个玩家是否已加入白名单。<br>If this player is pardoned by whitelist.
+     * @see cn.nukkit.Server#isWhitelisted
+     */
+    boolean isWhitelisted();
+
+    /**
+     * Sets this player to be banned or to be pardoned.
+     *
+     * @param value 如果为{@code true}，封禁这个玩家。如果为{@code false}，解封这个玩家。<br>
+     *              {@code true} for ban and {@code false} for pardon.
+     * @see #isBanned
+     */
+    void setBanned(boolean value);
+
+    /**
+     * Adds this player to the white list, or removes it from the whitelist.
+     *
+     * @param value 如果为{@code true}，把玩家加入白名单。如果为{@code false}，取消这个玩家的白名单。<br>
+     *              {@code true} for add and {@code false} for remove.
+     * @see #isWhitelisted
+     * @see cn.nukkit.Server#addWhitelist
+     * @see cn.nukkit.Server#removeWhitelist
+     */
+    void setWhitelisted(boolean value);
 
     /**
      * Returns if this player has played in this server before.

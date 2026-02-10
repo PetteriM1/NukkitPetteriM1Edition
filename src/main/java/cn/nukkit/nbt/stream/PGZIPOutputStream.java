@@ -22,36 +22,10 @@ import java.util.zip.DeflaterOutputStream;
 public class PGZIPOutputStream extends FilterOutputStream {
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
-
-    public static ExecutorService getSharedThreadPool() {
-        return EXECUTOR;
-    }
-
     private final static int GZIP_MAGIC = 0x8b1f;
-
     private final IntList blockSizes = new IntArrayList();
-
     private int level = Deflater.BEST_SPEED;
     private int strategy = Deflater.DEFAULT_STRATEGY;
-
-    protected Deflater newDeflater() {
-        Deflater def = new Deflater(level, true);
-        def.setStrategy(strategy);
-        return def;
-    }
-
-    public void setStrategy(int strategy) {
-        this.strategy = strategy;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    protected static DeflaterOutputStream newDeflaterOutputStream(OutputStream out, Deflater deflater) {
-        return new DeflaterOutputStream(out, deflater, 512, true);
-    }
-
     private final ExecutorService executor;
     private final int nthreads;
     private final CRC32 crc = new CRC32();
@@ -61,7 +35,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
      * Used as a sentinel for 'closed'.
      */
     private int bytesWritten = 0;
-
     // Master thread only
     public PGZIPOutputStream(OutputStream out, ExecutorService executor, int nthreads) throws IOException {
         super(out);
@@ -70,7 +43,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
         this.emitQueue = new ArrayBlockingQueue<>(nthreads);
         writeHeader();
     }
-
     /**
      * Creates a PGZIPOutputStream
      * using {@link PGZIPOutputStream#getSharedThreadPool()}.
@@ -81,7 +53,6 @@ public class PGZIPOutputStream extends FilterOutputStream {
     public PGZIPOutputStream(OutputStream out, int nthreads) throws IOException {
         this(out, PGZIPOutputStream.getSharedThreadPool(), nthreads);
     }
-
     /**
      * Creates a PGZIPOutputStream
      * using {@link PGZIPOutputStream#getSharedThreadPool()}
@@ -94,87 +65,38 @@ public class PGZIPOutputStream extends FilterOutputStream {
         this(out, Runtime.getRuntime().availableProcessors());
     }
 
-    /*
-     * @see http://www.gzip.org/zlib/rfc-gzip.html#file-format
-     */
-    private void writeHeader() throws IOException {
-        out.write(new byte[]{
-                (byte) GZIP_MAGIC, // ID1: Magic number (little-endian short)
-                (byte) (GZIP_MAGIC >> 8), // ID2: Magic number (little-endian short)
-                Deflater.DEFLATED, // CM: Compression method
-                0, // FLG: Flags (byte)
-                0, 0, 0, 0, // MTIME: Modification time (int)
-                0, // XFL: Extra flags
-                3 // OS: Operating system (3 = Linux)
-        });
+    public static ExecutorService getSharedThreadPool() {
+        return EXECUTOR;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void setStrategy(int strategy) {
+        this.strategy = strategy;
     }
 
     // Master thread only
     @Override
-    public void write(int b) throws IOException {
-        byte[] single = new byte[1];
-        single[0] = (byte) (b & 0xFF);
-        write(single);
-    }
+    public void close() throws IOException {
+        if (bytesWritten >= 0) {
+            flush();
 
-    // Master thread only
-    @Override
-    public void write(byte[] b) throws IOException {
-        write(b, 0, b.length);
-    }
+            newDeflaterOutputStream(out, newDeflater()).finish();
 
-    // Master thread only
-    @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        crc.update(b, off, len);
-        bytesWritten += len;
-        while (len > 0) {
-            // assert block.in_length < block.in.length
-            int capacity = block.in.length - block.in_length;
-            if (len >= capacity) {
-                System.arraycopy(b, off, block.in, block.in_length, capacity);
-                block.in_length += capacity;   // == block.in.length
-                off += capacity;
-                len -= capacity;
-                submit();
-            } else {
-                System.arraycopy(b, off, block.in, block.in_length, len);
-                block.in_length += len;
-                // off += len;
-                // len = 0;
-                break;
-            }
+            ByteBuffer buf = ByteBuffer.allocate(8);
+            buf.order(ByteOrder.LITTLE_ENDIAN);
+            buf.putInt((int) crc.getValue());
+            buf.putInt(bytesWritten);
+            out.write(buf.array());
+
+            out.flush();
+            out.close();
+
+            bytesWritten = Integer.MIN_VALUE;
         }
     }
-
-    // Master thread only
-    private void submit() throws IOException {
-        emitUntil(nthreads - 1);
-        emitQueue.add(executor.submit(block));
-        block = new PGZIPBlock(this/* block.index + 1 */);
-    }
-
-    // Emit If Available - submit always
-    // Emit At Least one - submit when executor is full
-    // Emit All Remaining - flush(), close()
-    // Master thread only
-    private void tryEmit() throws IOException, InterruptedException, ExecutionException {
-        for (; ; ) {
-            Future<byte[]> future = emitQueue.peek();
-            // LOG.info("Peeked future " + future);
-            if (future == null)
-                return;
-            if (!future.isDone())
-                return;
-            // It's an ordered queue. This MUST be the same element as above.
-            emitQueue.remove();
-            byte[] toWrite = future.get();
-            blockSizes.add(toWrite.length);  // todo: remove after block guessing is implemented
-            out.write(toWrite);
-        }
-    }
-
-    // Master thread only
 
     /**
      * Emits any opportunistically available blocks. Furthermore, emits blocks until the number of executing tasks is less than taskCountAllowed.
@@ -206,24 +128,95 @@ public class PGZIPOutputStream extends FilterOutputStream {
         super.flush();
     }
 
+    protected Deflater newDeflater() {
+        Deflater def = new Deflater(level, true);
+        def.setStrategy(strategy);
+        return def;
+    }
+
+    protected static DeflaterOutputStream newDeflaterOutputStream(OutputStream out, Deflater deflater) {
+        return new DeflaterOutputStream(out, deflater, 512, true);
+    }
+
+    // Master thread only
+    private void submit() throws IOException {
+        emitUntil(nthreads - 1);
+        emitQueue.add(executor.submit(block));
+        block = new PGZIPBlock(this/* block.index + 1 */);
+    }
+
+    // Emit If Available - submit always
+    // Emit At Least one - submit when executor is full
+    // Emit All Remaining - flush(), close()
+    // Master thread only
+    private void tryEmit() throws IOException, InterruptedException, ExecutionException {
+        for (; ; ) {
+            Future<byte[]> future = emitQueue.peek();
+            // LOG.info("Peeked future " + future);
+            if (future == null)
+                return;
+            if (!future.isDone())
+                return;
+            // It's an ordered queue. This MUST be the same element as above.
+            emitQueue.remove();
+            byte[] toWrite = future.get();
+            blockSizes.add(toWrite.length);  // todo: remove after block guessing is implemented
+            out.write(toWrite);
+        }
+    }
+
     // Master thread only
     @Override
-    public void close() throws IOException {
-        if (bytesWritten >= 0) {
-            flush();
+    public void write(int b) throws IOException {
+        byte[] single = new byte[1];
+        single[0] = (byte) (b & 0xFF);
+        write(single);
+    }
 
-            newDeflaterOutputStream(out, newDeflater()).finish();
+    // Master thread only
 
-            ByteBuffer buf = ByteBuffer.allocate(8);
-            buf.order(ByteOrder.LITTLE_ENDIAN);
-            buf.putInt((int) crc.getValue());
-            buf.putInt(bytesWritten);
-            out.write(buf.array());
+    // Master thread only
+    @Override
+    public void write(byte[] b) throws IOException {
+        write(b, 0, b.length);
+    }
 
-            out.flush();
-            out.close();
-
-            bytesWritten = Integer.MIN_VALUE;
+    // Master thread only
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        crc.update(b, off, len);
+        bytesWritten += len;
+        while (len > 0) {
+            // assert block.in_length < block.in.length
+            int capacity = block.in.length - block.in_length;
+            if (len >= capacity) {
+                System.arraycopy(b, off, block.in, block.in_length, capacity);
+                block.in_length += capacity;   // == block.in.length
+                off += capacity;
+                len -= capacity;
+                submit();
+            } else {
+                System.arraycopy(b, off, block.in, block.in_length, len);
+                block.in_length += len;
+                // off += len;
+                // len = 0;
+                break;
+            }
         }
+    }
+
+    /*
+     * @see http://www.gzip.org/zlib/rfc-gzip.html#file-format
+     */
+    private void writeHeader() throws IOException {
+        out.write(new byte[]{
+                (byte) GZIP_MAGIC, // ID1: Magic number (little-endian short)
+                (byte) (GZIP_MAGIC >> 8), // ID2: Magic number (little-endian short)
+                Deflater.DEFLATED, // CM: Compression method
+                0, // FLG: Flags (byte)
+                0, 0, 0, 0, // MTIME: Modification time (int)
+                0, // XFL: Extra flags
+                3 // OS: Operating system (3 = Linux)
+        });
     }
 }

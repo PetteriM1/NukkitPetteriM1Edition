@@ -23,8 +23,13 @@ public abstract class BlockButton extends BlockFlowable implements Faceable {
     }
 
     @Override
-    public double getResistance() {
-        return 2.5;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    public BlockFace getFacing() {
+        int side = isActivated() ? getDamage() ^ 0x08 : getDamage();
+        return BlockFace.fromIndex(side);
     }
 
     @Override
@@ -33,19 +38,55 @@ public abstract class BlockButton extends BlockFlowable implements Faceable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(face.getIndex());
-        if (!isSupportValid(this.getSide(this.getFacing().getOpposite()))) {
-            return false;
-        }
+    public double getResistance() {
+        return 2.5;
+    }
 
-        this.getLevel().setBlock(this, this, true, true);
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isActivated() {
+        return ((this.getDamage() & 0x08) == 0x08);
+    }
+
+    @Override
+    public boolean isPowerSource() {
+        return true;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
         return true;
     }
 
     @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return false;
+    }
+
+    public int getStrongPower(BlockFace side) {
+        return !isActivated() ? 0 : (getFacing() == side ? 15 : 0);
+    }
+
+    public int getWeakPower(BlockFace side) {
+        return isActivated() ? 15 : 0;
+    }
+
+    private boolean isSupportValid(Block block) {
+        if (!block.isTransparent()) {
+            return true;
+        }
+        if (this.getFacing() == BlockFace.UP) {
+            return Block.canStayOnFullSolid(block);
+        }
+        return Block.canConnectToFullSolid(block);
     }
 
     @Override
@@ -62,6 +103,22 @@ public abstract class BlockButton extends BlockFlowable implements Faceable {
 
         level.updateAroundRedstone(this, null);
         level.updateAroundRedstone(getSideVec(getFacing().getOpposite()), null);
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        if (!super.onBreak(item)) {
+            return false;
+        }
+
+        if (isActivated()) {
+            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 15, 0));
+
+            this.level.updateAroundRedstone(this, null);
+            this.level.updateAroundRedstone(getSideVec(getFacing().getOpposite()), null);
+        }
+
         return true;
     }
 
@@ -90,76 +147,19 @@ public abstract class BlockButton extends BlockFlowable implements Faceable {
         return 0;
     }
 
-    private boolean isSupportValid(Block block) {
-        if (!block.isTransparent()) {
-            return true;
-        }
-        if (this.getFacing() == BlockFace.UP) {
-            return Block.canStayOnFullSolid(block);
-        }
-        return Block.canConnectToFullSolid(block);
-    }
-
-    public boolean isActivated() {
-        return ((this.getDamage() & 0x08) == 0x08);
-    }
-
     @Override
-    public boolean isPowerSource() {
-        return true;
-    }
-
-    public int getWeakPower(BlockFace side) {
-        return isActivated() ? 15 : 0;
-    }
-
-    public int getStrongPower(BlockFace side) {
-        return !isActivated() ? 0 : (getFacing() == side ? 15 : 0);
-    }
-
-    public BlockFace getFacing() {
-        int side = isActivated() ? getDamage() ^ 0x08 : getDamage();
-        return BlockFace.fromIndex(side);
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        if (!super.onBreak(item)) {
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(face.getIndex());
+        if (!isSupportValid(this.getSide(this.getFacing().getOpposite()))) {
             return false;
         }
 
-        if (isActivated()) {
-            this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, 15, 0));
-
-            this.level.updateAroundRedstone(this, null);
-            this.level.updateAroundRedstone(getSideVec(getFacing().getOpposite()), null);
-        }
-
+        this.getLevel().setBlock(this, this, true, true);
         return true;
     }
 
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return false;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

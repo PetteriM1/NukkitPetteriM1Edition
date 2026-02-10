@@ -23,8 +23,13 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
     }
 
     @Override
-    public String getName() {
-        return "Stone Pressure Plate";
+    public BlockColor getColor() {
+        return BlockColor.STONE_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 0.5D;
     }
 
     @Override
@@ -33,8 +38,8 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
     }
 
     @Override
-    public double getHardness() {
-        return 0.5D;
+    public String getName() {
+        return "Stone Pressure Plate";
     }
 
     @Override
@@ -48,22 +53,6 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.STONE_BLOCK_COLOR;
-    }
-
-    @Override
     protected int computeRedstoneStrength() {
         AxisAlignedBB bb = getCollisionBoundingBox();
 
@@ -74,5 +63,16 @@ public class BlockPressurePlateStone extends BlockPressurePlateBase {
         }
 
         return 0;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    toItem()
+            };
+        } else {
+            return new Item[0];
+        }
     }
 }

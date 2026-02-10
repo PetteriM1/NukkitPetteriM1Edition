@@ -11,11 +11,6 @@ public class MapCreateLockedCopyPacket extends DataPacket {
     public long newMapId;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.originalMapId = this.getVarLong();
         this.newMapId = this.getVarLong();
@@ -26,5 +21,10 @@ public class MapCreateLockedCopyPacket extends DataPacket {
         this.reset();
         this.putVarLong(this.originalMapId);
         this.putVarLong(this.newMapId);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

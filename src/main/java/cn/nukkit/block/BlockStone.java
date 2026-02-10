@@ -19,7 +19,7 @@ public class BlockStone extends BlockSolidMeta {
     public static final int ANDESITE = 5;
     public static final int POLISHED_ANDESITE = 6;
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Stone",
             "Granite",
             "Polished Granite",
@@ -39,13 +39,29 @@ public class BlockStone extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return STONE;
+    public BlockColor getColor() {
+        int damage = this.getDamage() & 0x07;
+        if (damage == GRANITE || damage == POLISHED_GRANITE) {
+            return BlockColor.DIRT_BLOCK_COLOR;
+        } else if (damage == DIORITE || damage == POLISHED_DIORITE) {
+            return BlockColor.QUARTZ_BLOCK_COLOR;
+        }
+        return BlockColor.STONE_BLOCK_COLOR;
     }
 
     @Override
     public double getHardness() {
         return 1.5;
+    }
+
+    @Override
+    public int getId() {
+        return STONE;
+    }
+
+    @Override
+    public String getName() {
+        return names[this.getDamage() & 0x07];
     }
 
     @Override
@@ -59,8 +75,13 @@ public class BlockStone extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return NAMES[this.getDamage() & 0x07];
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
     }
 
     @Override
@@ -75,26 +96,5 @@ public class BlockStone extends BlockSolidMeta {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        int damage = this.getDamage() & 0x07;
-        if (damage == GRANITE || damage == POLISHED_GRANITE) {
-            return BlockColor.DIRT_BLOCK_COLOR;
-        } else if (damage == DIORITE || damage == POLISHED_DIORITE) {
-            return BlockColor.QUARTZ_BLOCK_COLOR;
-        }
-        return BlockColor.STONE_BLOCK_COLOR;
     }
 }

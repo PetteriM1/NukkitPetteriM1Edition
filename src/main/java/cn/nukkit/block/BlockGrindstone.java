@@ -23,19 +23,13 @@ public class BlockGrindstone extends BlockTransparentMeta implements Faceable {
         super(meta);
     }
 
-    @Override
-    public String getName() {
-        return "Grindstone";
+    public int getAttachmentType() {
+        return (getDamage() & 0b1100) >> 2 & 0b11;
     }
 
     @Override
-    public int getId() {
-        return GRINDSTONE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(getDamage() & 0b11);
     }
 
     @Override
@@ -49,13 +43,23 @@ public class BlockGrindstone extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getId() {
+        return GRINDSTONE;
+    }
+
+    @Override
+    public String getName() {
+        return "Grindstone";
+    }
+
+    @Override
     public double getResistance() {
         return 6;
     }
 
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(getDamage() & 0b11);
+    public void setAttachmentType(int attachmentType) {
+        attachmentType = attachmentType & 0b11;
+        setDamage(getDamage() & (DATA_MASK ^ 0b1100) | (attachmentType << 2));
     }
 
     public void setBlockFace(BlockFace face) {
@@ -66,13 +70,49 @@ public class BlockGrindstone extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(GRINDSTONE));
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
     public boolean canBePushed() {
         return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    private boolean checkSupport() {
+        switch (this.getAttachmentType()) {
+            case TYPE_ATTACHMENT_STANDING:
+                if (down().getId() != AIR) {
+                    return true;
+                }
+                break;
+            case TYPE_ATTACHMENT_HANGING:
+                if (up().getId() != AIR) {
+                    return true;
+                }
+                break;
+            case TYPE_ATTACHMENT_SIDE:
+                BlockFace blockFace = getBlockFace();
+                if (getSide(blockFace.getOpposite()).getId() != AIR) {
+                    return true;
+                }
+                break;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            player.addWindow(new GrindstoneInventory(player.getUIInventory(), this), Player.GRINDSTONE_WINDOW_ID);
+        }
+        return true;
     }
 
     @Override
@@ -102,48 +142,8 @@ public class BlockGrindstone extends BlockTransparentMeta implements Faceable {
         return super.place(item, block, target, face, fx, fy, fz, player);
     }
 
-    public int getAttachmentType() {
-        return (getDamage() & 0b1100) >> 2 & 0b11;
-    }
-
-    public void setAttachmentType(int attachmentType) {
-        attachmentType = attachmentType & 0b11;
-        setDamage(getDamage() & (DATA_MASK ^ 0b1100) | (attachmentType << 2));
-    }
-
-    private boolean checkSupport() {
-        switch (this.getAttachmentType()) {
-            case TYPE_ATTACHMENT_STANDING:
-                if (down().getId() != AIR) {
-                    return true;
-                }
-                break;
-            case TYPE_ATTACHMENT_HANGING:
-                if (up().getId() != AIR) {
-                    return true;
-                }
-                break;
-            case TYPE_ATTACHMENT_SIDE:
-                BlockFace blockFace = getBlockFace();
-                if (getSide(blockFace.getOpposite()).getId() != AIR) {
-                    return true;
-                }
-                break;
-        }
-
-        return false;
-    }
-
     @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            player.addWindow(new GrindstoneInventory(player.getUIInventory(), this), Player.GRINDSTONE_WINDOW_ID);
-        }
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(GRINDSTONE));
     }
 }

@@ -21,10 +21,6 @@ public class ChunkSectionSerializers {
         SERIALIZERS[9] = ChunkSectionSerializerV9.INSTANCE;
     }
 
-    public static void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection, int version) {
-        getSerializer(version).serialize(buf, storage, ySection);
-    }
-
     public static StateBlockStorage[] deserialize(ByteBuf buf, ChunkBuilder builder, int version) {
         return getSerializer(version).deserialize(buf, builder);
     }
@@ -34,5 +30,9 @@ public class ChunkSectionSerializers {
         ChunkSectionSerializer serializer = SERIALIZERS[version];
         if (serializer == null) throw new NullPointerException("No ChunkSectionSerializer for version " + version);
         return serializer;
+    }
+
+    public static void serialize(ByteBuf buf, StateBlockStorage[] storage, int ySection, int version) {
+        getSerializer(version).serialize(buf, storage, ySection);
     }
 }

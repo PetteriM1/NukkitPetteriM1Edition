@@ -11,8 +11,8 @@ public class EnchantmentKnockback extends Enchantment {
     }
 
     @Override
-    public int getMinEnchantAbility(int level) {
-        return 5 + (level - 1) * 20;
+    public int getMaxLevel() {
+        return 2;
     }
 
     @Override
@@ -21,7 +21,7 @@ public class EnchantmentKnockback extends Enchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 2;
+    public int getMinEnchantAbility(int level) {
+        return 5 + (level - 1) * 20;
     }
 }

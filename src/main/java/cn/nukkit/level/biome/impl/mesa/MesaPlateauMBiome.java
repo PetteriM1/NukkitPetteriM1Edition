@@ -4,6 +4,7 @@ package cn.nukkit.level.biome.impl.mesa;
  * @author DaPorkchop_
  */
 public class MesaPlateauMBiome extends MesaBiome {
+
     public MesaPlateauMBiome() {
         super();
 
@@ -11,13 +12,13 @@ public class MesaPlateauMBiome extends MesaBiome {
     }
 
     @Override
-    public String getName() {
-        return "Mesa Plateau M";
+    protected float getMoundFrequency() {
+        return 0.02f;
     }
 
     @Override
-    protected float getMoundFrequency() {
-        return 0.02f;
+    public String getName() {
+        return "Mesa Plateau M";
     }
 
     @Override

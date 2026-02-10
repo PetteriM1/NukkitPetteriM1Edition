@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockBambooPlanks extends BlockPlanks {
 
@@ -9,7 +11,12 @@ public class BlockBambooPlanks extends BlockPlanks {
     }
 
     public BlockBambooPlanks(int meta) {
-         super(0);
+        super(0);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.YELLOW_BLOCK_COLOR;
     }
 
     @Override
@@ -18,12 +25,17 @@ public class BlockBambooPlanks extends BlockPlanks {
     }
 
     @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
     public String getName() {
         return "Bamboo Planks";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.YELLOW_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.PLANKS;
     }
 }

@@ -25,16 +25,16 @@ public class PermissionAttachmentInfo {
         this.value = value;
     }
 
+    public PermissionAttachment getAttachment() {
+        return attachment;
+    }
+
     public Permissible getPermissible() {
         return permissible;
     }
 
     public String getPermission() {
         return permission;
-    }
-
-    public PermissionAttachment getAttachment() {
-        return attachment;
     }
 
     public boolean getValue() {

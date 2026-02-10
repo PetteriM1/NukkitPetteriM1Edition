@@ -10,11 +10,6 @@ public class ClientCacheStatusPacket extends DataPacket {
     public boolean supported;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.supported = this.getBoolean();
     }
@@ -23,5 +18,10 @@ public class ClientCacheStatusPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putBoolean(this.supported);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

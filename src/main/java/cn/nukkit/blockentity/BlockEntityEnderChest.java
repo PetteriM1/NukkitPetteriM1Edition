@@ -11,11 +11,6 @@ public class BlockEntityEnderChest extends BlockEntitySpawnable {
     }
 
     @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.ENDER_CHEST;
-    }
-
-    @Override
     public String getName() {
         return "EnderChest";
     }
@@ -27,5 +22,10 @@ public class BlockEntityEnderChest extends BlockEntitySpawnable {
                 .putInt("x", (int) this.x)
                 .putInt("y", (int) this.y)
                 .putInt("z", (int) this.z);
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.ENDER_CHEST;
     }
 }

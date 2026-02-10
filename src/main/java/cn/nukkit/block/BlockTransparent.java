@@ -9,12 +9,12 @@ import cn.nukkit.utils.BlockColor;
 public abstract class BlockTransparent extends Block {
 
     @Override
-    public boolean isTransparent() {
-        return true;
+    public BlockColor getColor() {
+        return BlockColor.TRANSPARENT_BLOCK_COLOR;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.TRANSPARENT_BLOCK_COLOR;
+    public boolean isTransparent() {
+        return true;
     }
 }

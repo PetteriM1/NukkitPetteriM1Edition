@@ -24,10 +24,8 @@ public class AnvilInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.ANVIL, 1, position);
     }
 
-    @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
-        who.craftingType = Player.ANVIL_WINDOW_ID;
+    public int getCost() {
+        return this.cost;
     }
 
     public Item getInputSlot() {
@@ -42,11 +40,13 @@ public class AnvilInventory extends FakeBlockUIComponent {
         return this.getItem(RESULT);
     }
 
-    public int getCost() {
-        return this.cost;
-    }
-
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+        who.craftingType = Player.ANVIL_WINDOW_ID;
     }
 }

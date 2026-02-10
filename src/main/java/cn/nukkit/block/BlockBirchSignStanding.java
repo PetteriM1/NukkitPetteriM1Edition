@@ -14,18 +14,13 @@ public class BlockBirchSignStanding extends BlockSignPost {
     }
 
     @Override
-    public String getName() {
-        return "Birch Sign Post";
-    }
-
-    @Override
     public int getId() {
         return BIRCH_STANDING_SIGN;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.BIRCH_SIGN);
+    public String getName() {
+        return "Birch Sign Post";
     }
 
     @Override
@@ -36,5 +31,10 @@ public class BlockBirchSignStanding extends BlockSignPost {
     @Override
     protected int getWallId() {
         return BIRCH_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.BIRCH_SIGN);
     }
 }

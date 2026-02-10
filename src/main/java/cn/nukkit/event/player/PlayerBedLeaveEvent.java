@@ -6,11 +6,6 @@ import cn.nukkit.event.HandlerList;
 
 public class PlayerBedLeaveEvent extends PlayerEvent {
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final Block bed;
 
     public PlayerBedLeaveEvent(Player player, Block bed) {
@@ -20,5 +15,9 @@ public class PlayerBedLeaveEvent extends PlayerEvent {
 
     public Block getBed() {
         return bed;
+    }
+
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 }

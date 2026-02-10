@@ -11,12 +11,12 @@ public class BlockCandleCakeYellow extends BlockCandleCake {
     }
 
     @Override
-    public String getName() {
-        return "Yellow Candle Cake";
+    public int getId() {
+        return YELLOW_CANDLE_CAKE;
     }
 
     @Override
-    public int getId() {
-        return YELLOW_CANDLE_CAKE;
+    public String getName() {
+        return "Yellow Candle Cake";
     }
 }

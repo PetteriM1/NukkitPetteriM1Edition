@@ -29,13 +29,8 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     private int getFullDamage() {
@@ -52,6 +47,138 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         boolean isRight = (up & DOOR_HINGE_BIT) > 0;
 
         return down & 0x07 | (isTop() ? 0x08 : 0) | (isRight ? 0x10 : 0);
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    public boolean isOpen() {
+        if (isTop(this.getDamage())) {
+            return (this.down().getDamage() & DOOR_OPEN_BIT) > 0;
+        } else {
+            return (this.getDamage() & DOOR_OPEN_BIT) > 0;
+        }
+    }
+
+    public boolean isRightHinged() {
+        if (isTop()) {
+            return (this.getDamage() & DOOR_HINGE_BIT) > 0;
+        }
+        return (this.up().getDamage() & DOOR_HINGE_BIT) > 0;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    public boolean isTop() {
+        return isTop(this.getDamage());
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    private boolean isOpenAfter(int data) {
+        if (isTop(data)) {
+            return (this.down().getDamage() & DOOR_OPEN_BIT) > 0;
+        } else {
+            return (data & DOOR_OPEN_BIT) > 0;
+        }
+    }
+
+    public boolean isTop(int meta) {
+        return (meta & DOOR_TOP_BIT) != 0;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        return this.toggle(player);
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        if (isTop(this.getDamage())) {
+            Block down = this.down();
+            if (down.getId() == this.getId()) {
+                this.getLevel().setBlock(down, Block.get(BlockID.AIR), true);
+            }
+        } else {
+            Block up = this.up();
+            if (up.getId() == this.getId()) {
+                this.getLevel().setBlock(up, Block.get(BlockID.AIR), true);
+            }
+        }
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
+
+        return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.down().getId() == AIR) {
+                Block up = this.up();
+
+                if (up instanceof BlockDoor) {
+                    this.getLevel().setBlock(up, Block.get(BlockID.AIR), false);
+                    this.getLevel().useBreakOn(this, Item.get(Item.WOODEN_PICKAXE));
+                }
+
+                return Level.BLOCK_UPDATE_NORMAL;
+            }
+        }
+
+        if (type == Level.BLOCK_UPDATE_REDSTONE) {
+            boolean powered = this.level.isBlockPowered(this);
+            if ((!isOpen() && powered) || (isOpen() && !powered)) {
+                this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isOpen() ? 15 : 0, isOpen() ? 0 : 15));
+
+                this.toggle(null);
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.y > target.getLevel().getMaxBlockY() - 1) return false;
+        if (face == BlockFace.UP) {
+            Block blockUp = this.up();
+            if (!blockUp.canBeReplaced() || !canStayOnFullNonSolid(this.down())) {
+                return false;
+            }
+
+            int direction = FACES[player != null ? player.getDirection().getHorizontalIndex() : 0];
+
+            Block left = this.getSide(player.getDirection().rotateYCCW());
+            Block right = this.getSide(player.getDirection().rotateY());
+            int metaUp = DOOR_TOP_BIT;
+            if (left.getId() == this.getId() || (!right.isTransparent() && left.isTransparent())) { //Door hinge
+                metaUp |= DOOR_HINGE_BIT;
+            }
+
+            this.setDamage(direction);
+
+            //Bottom
+            this.getLevel().setBlock(this, this, true, true);
+
+            //Top
+            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -202,87 +329,6 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         return bb;
     }
 
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.down().getId() == AIR) {
-                Block up = this.up();
-
-                if (up instanceof BlockDoor) {
-                    this.getLevel().setBlock(up, Block.get(BlockID.AIR), false);
-                    this.getLevel().useBreakOn(this, Item.get(Item.WOODEN_PICKAXE));
-                }
-
-                return Level.BLOCK_UPDATE_NORMAL;
-            }
-        }
-
-        if (type == Level.BLOCK_UPDATE_REDSTONE) {
-            boolean powered = this.level.isBlockPowered(this);
-            if ((!isOpen() && powered) || (isOpen() && !powered)) {
-                this.level.getServer().getPluginManager().callEvent(new BlockRedstoneEvent(this, isOpen() ? 15 : 0, isOpen() ? 0 : 15));
-
-                this.toggle(null);
-            }
-        }
-
-        return 0;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.y > target.getLevel().getMaxBlockY() - 1) return false;
-        if (face == BlockFace.UP) {
-            Block blockUp = this.up();
-            if (!blockUp.canBeReplaced() || !canStayOnFullNonSolid(this.down())) {
-                return false;
-            }
-
-            int direction = FACES[player != null ? player.getDirection().getHorizontalIndex() : 0];
-
-            Block left = this.getSide(player.getDirection().rotateYCCW());
-            Block right = this.getSide(player.getDirection().rotateY());
-            int metaUp = DOOR_TOP_BIT;
-            if (left.getId() == this.getId() || (!right.isTransparent() && left.isTransparent())) { //Door hinge
-                metaUp |= DOOR_HINGE_BIT;
-            }
-
-            this.setDamage(direction);
-
-            //Bottom
-            this.getLevel().setBlock(this, this, true, true);
-
-            //Top
-            this.getLevel().setBlock(blockUp, Block.get(this.getId(), metaUp), true);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        if (isTop(this.getDamage())) {
-            Block down = this.down();
-            if (down.getId() == this.getId()) {
-                this.getLevel().setBlock(down, Block.get(BlockID.AIR), true);
-            }
-        } else {
-            Block up = this.up();
-            if (up.getId() == this.getId()) {
-                this.getLevel().setBlock(up, Block.get(BlockID.AIR), true);
-            }
-        }
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true);
-
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        return this.toggle(player);
-    }
-
     public boolean toggle(Player player) {
         DoorToggleEvent event = new DoorToggleEvent(this, player);
         this.getLevel().getServer().getPluginManager().callEvent(event);
@@ -312,52 +358,6 @@ public abstract class BlockDoor extends BlockTransparentMeta implements Faceable
         } else {
             this.level.addSound(this, Sound.RANDOM_DOOR_CLOSE);
         }
-        return true;
-    }
-
-    private boolean isOpenAfter(int data) {
-        if (isTop(data)) {
-            return (this.down().getDamage() & DOOR_OPEN_BIT) > 0;
-        } else {
-            return (data & DOOR_OPEN_BIT) > 0;
-        }
-    }
-
-    public boolean isOpen() {
-        if (isTop(this.getDamage())) {
-            return (this.down().getDamage() & DOOR_OPEN_BIT) > 0;
-        } else {
-            return (this.getDamage() & DOOR_OPEN_BIT) > 0;
-        }
-    }
-
-    public boolean isTop() {
-        return isTop(this.getDamage());
-    }
-
-    public boolean isTop(int meta) {
-        return (meta & DOOR_TOP_BIT) != 0;
-    }
-
-    public boolean isRightHinged() {
-        if (isTop()) {
-            return (this.getDamage() & DOOR_HINGE_BIT ) > 0;
-        }
-        return (this.up().getDamage() & DOOR_HINGE_BIT) > 0;
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
         return true;
     }
 }

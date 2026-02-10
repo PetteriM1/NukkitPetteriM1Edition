@@ -15,11 +15,6 @@ public class VideoStreamConnectPacket extends DataPacket {
     public byte action;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -30,5 +25,10 @@ public class VideoStreamConnectPacket extends DataPacket {
         this.putString(address);
         this.putLFloat(screenshotFrequency);
         this.putByte(action);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

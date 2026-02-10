@@ -9,16 +9,6 @@ public class LongTag extends NumberTag<Long> {
 
     public long data;
 
-    @Override
-    public Long getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Long data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public LongTag(String name) {
         super(name);
     }
@@ -29,18 +19,8 @@ public class LongTag extends NumberTag<Long> {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeLong(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readLong();
-    }
-
-    @Override
-    public Long parseValue() {
-        return this.data;
+    public Long getData() {
+        return data;
     }
 
     @Override
@@ -49,8 +29,8 @@ public class LongTag extends NumberTag<Long> {
     }
 
     @Override
-    public String toString() {
-        return "LongTag " + this.getName() + " (data:" + data + ')';
+    public void setData(Long data) {
+        this.data = data == null ? 0 : data;
     }
 
     @Override
@@ -65,5 +45,25 @@ public class LongTag extends NumberTag<Long> {
             return data == o.data;
         }
         return false;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readLong();
+    }
+
+    @Override
+    public Long parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "LongTag " + this.getName() + " (data:" + data + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeLong(data);
     }
 }

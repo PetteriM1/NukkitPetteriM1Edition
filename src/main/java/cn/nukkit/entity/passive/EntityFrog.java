@@ -13,6 +13,11 @@ public class EntityFrog extends EntityJumpingAnimal {
     }
 
     @Override
+    public float getHeight() {
+        return 0.55f;
+    }
+
+    @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
     }
@@ -20,11 +25,6 @@ public class EntityFrog extends EntityJumpingAnimal {
     @Override
     public int getNetworkId() {
         return NETWORK_ID;
-    }
-
-    @Override
-    public float getHeight() {
-        return 0.55f;
     }
 
     @Override

@@ -17,23 +17,13 @@ public class BlockJigsaw extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Jigsaw";
+    public BlockFace getBlockFace() {
+        return BlockFace.fromIndex(getDamage());
     }
 
     @Override
-    public int getId() {
-        return JIGSAW;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public double getResistance() {
-        return 18000000;
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_BLOCK_COLOR;
     }
 
     @Override
@@ -42,8 +32,18 @@ public class BlockJigsaw extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean isBreakable(Item item) {
-        return false;
+    public int getId() {
+        return JIGSAW;
+    }
+
+    @Override
+    public String getName() {
+        return "Jigsaw";
+    }
+
+    @Override
+    public double getResistance() {
+        return 18000000;
     }
 
     @Override
@@ -52,8 +52,18 @@ public class BlockJigsaw extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromIndex(getDamage());
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[0];
+    }
+
+    @Override
+    public boolean isBreakable(Item item) {
+        return false;
     }
 
     @Override
@@ -71,15 +81,5 @@ public class BlockJigsaw extends BlockSolidMeta implements Faceable {
             this.setDamage(player.getHorizontalFacing().getOpposite().getIndex());
         }
         return super.place(item, block, target, face, fx, fy, fz, player);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[0];
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_BLOCK_COLOR;
     }
 }

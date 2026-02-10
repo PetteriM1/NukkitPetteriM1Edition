@@ -94,28 +94,28 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityXPOrb.NETWORK_ID, "minecraft:xp_orb")
             .put(70, "minecraft:eye_of_ender_signal")
             .put(EntityEndCrystal.NETWORK_ID, "minecraft:ender_crystal")
-            .put(76, "minecraft:shulker_bullet")
+            .put(EntityShulkerBullet.NETWORK_ID, "minecraft:shulker_bullet")
             .put(EntityFishingHook.NETWORK_ID, "minecraft:fishing_hook")
-            .put(79, "minecraft:dragon_fireball")
+            .put(EntityEnderCharge.NETWORK_ID, "minecraft:dragon_fireball")
             .put(EntityArrow.NETWORK_ID, "minecraft:arrow")
             .put(EntitySnowball.NETWORK_ID, "minecraft:snowball")
             .put(EntityEgg.NETWORK_ID, "minecraft:egg")
             .put(EntityPainting.NETWORK_ID, "minecraft:painting")
             .put(EntityThrownTrident.NETWORK_ID, "minecraft:thrown_trident")
-            .put(85, "minecraft:fireball")
+            .put(EntityGhastFireBall.NETWORK_ID, "minecraft:fireball")
             .put(EntityPotion.NETWORK_ID, "minecraft:splash_potion")
             .put(EntityEnderPearl.NETWORK_ID, "minecraft:ender_pearl")
             .put(88, "minecraft:leash_knot")
-            .put(89, "minecraft:wither_skull")
-            .put(91, "minecraft:wither_skull_dangerous")
+            .put(EntityWitherSkull.NETWORK_ID, "minecraft:wither_skull")
+            .put(EntityBlueWitherSkull.NETWORK_ID, "minecraft:wither_skull_dangerous")
             .put(EntityBoat.NETWORK_ID, "minecraft:boat")
             .put(EntityLightning.NETWORK_ID, "minecraft:lightning_bolt")
-            .put(94, "minecraft:small_fireball")
-            .put(102, "minecraft:llama_spit")
+            .put(EntityBlazeFireBall.NETWORK_ID, "minecraft:small_fireball")
+            .put(EntityLlamaSpit.NETWORK_ID, "minecraft:llama_spit")
             .put(EntityAreaEffectCloud.NETWORK_ID, "minecraft:area_effect_cloud")
             .put(EntityPotionLingering.NETWORK_ID, "minecraft:lingering_potion")
             .put(EntityFirework.NETWORK_ID, "minecraft:fireworks_rocket")
-            .put(103, "minecraft:evocation_fang")
+            .put(EntityEvocationFangs.NETWORK_ID, "minecraft:evocation_fang")
             .put(104, "minecraft:evocation_illager")
             .put(EntityVex.NETWORK_ID, "minecraft:vex")
             .put(56, "minecraft:agent")
@@ -153,13 +153,11 @@ public class AddEntityPacket extends DataPacket {
             .put(EntityCreaking.NETWORK_ID, "minecraft:creaking")
             .put(EntityHappyGhast.NETWORK_ID, "minecraft:happy_ghast")
             .put(EntityCopperGolem.NETWORK_ID, "minecraft:copper_golem")
+            .put(EntityNautilus.NETWORK_ID, "minecraft:nautilus")
+            .put(EntityZombieNautilus.NETWORK_ID, "minecraft:zombie_nautilus")
+            .put(EntityParched.NETWORK_ID, "minecraft:parched")
+            .put(EntityCamelHusk.NETWORK_ID, "minecraft:camel_husk")
             .build();
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     public long entityUniqueId;
     public long entityRuntimeId;
     public int type;
@@ -178,36 +176,110 @@ public class AddEntityPacket extends DataPacket {
     public Attribute[] attributes = new Attribute[0];
     public EntityLink[] links = new EntityLink[0];
 
-    @Override
-    public void decode() {
-        this.decodeUnsupported();
-    }
-
-    @Override
-    public void encode() {
-        this.reset();
-        this.putEntityUniqueId(this.entityUniqueId);
-        this.putEntityRuntimeId(this.entityRuntimeId);
-        this.putString(this.getEntityIdentifier());
-        this.putVector3f(this.x, this.y, this.z);
-        this.putVector3f(this.speedX, this.speedY, this.speedZ);
-        this.putLFloat(this.pitch);
-        this.putLFloat(this.yaw);
-        this.putLFloat(this.headYaw);
-        this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw); // For backwards compatibility
-        this.putAttributeList(this.attributes);
-        this.put(Binary.writeMetadata(this.metadata));
-        this.putUnsignedVarInt(0); // Entity properties int
-        this.putUnsignedVarInt(0); // Entity properties float
-        this.putUnsignedVarInt(this.links.length);
-        for (EntityLink link : links) {
-            putEntityLink(link);
-        }
-    }
-
     private String getEntityIdentifier() {
         if (this.id != null) {
             return this.id;
+        }
+
+        if (protocol < ProtocolInfo.v1_21_130) {
+            if (type == EntityNautilus.NETWORK_ID) {
+                return "minecraft:squid";
+            }
+            if (type == EntityZombieNautilus.NETWORK_ID) {
+                return "minecraft:squid";
+            }
+            if (type == EntityParched.NETWORK_ID) {
+                return "minecraft:skeleton";
+            }
+            if (type == EntityCamelHusk.NETWORK_ID) {
+                return "minecraft:camel";
+            }
+
+            if (protocol < ProtocolInfo.v1_21_100) {
+                if (type == EntityCopperGolem.NETWORK_ID) {
+                    return "minecraft:iron_golem";
+                }
+
+                if (protocol < ProtocolInfo.v1_21_90) {
+                    if (type == EntityHappyGhast.NETWORK_ID) {
+                        return "minecraft:ghast";
+                    }
+
+                    if (protocol < ProtocolInfo.v1_21_50) {
+                        if (type == EntityCreaking.NETWORK_ID) {
+                            return "minecraft:enderman";
+                        } else if (type == 145) { // ominous_item_spawner
+                            return "minecraft:lingering_potion";
+                        } else if (type == 143 || type == 141) { // wind_charge_projectile || breeze_wind_charge_projectile
+                            return "minecraft:snowball";
+                        }
+
+                        if (protocol < ProtocolInfo.v1_21_0) {
+                            if (type == EntityBogged.NETWORK_ID) {
+                                return "minecraft:skeleton";
+                            } else if (type == EntityBreeze.NETWORK_ID) {
+                                return "minecraft:blaze";
+                            }
+
+                            if (protocol < ProtocolInfo.v1_20_80) {
+                                if (type == EntityArmadillo.NETWORK_ID) {
+                                    return "minecraft:pig";
+                                }
+
+                                if (protocol < ProtocolInfo.v1_20_0_23) {
+                                    if (type == EntitySniffer.NETWORK_ID) {
+                                        return "minecraft:pig";
+                                    } else if (type == EntityCamel.NETWORK_ID) {
+                                        return "minecraft:horse";
+                                    }
+
+                                    if (protocol < ProtocolInfo.v1_19_0_29) {
+                                        if (type == EntityChestBoat.NETWORK_ID) {
+                                            return "minecraft:boat";
+                                        } else if (type == EntityAllay.NETWORK_ID) {
+                                            return "minecraft:bat";
+                                        } else if (type == EntityWarden.NETWORK_ID) {
+                                            return "minecraft:iron_golem";
+                                        } else if (type == EntityTadpole.NETWORK_ID) {
+                                            return "minecraft:cod";
+                                        } else if (type == EntityFrog.NETWORK_ID) {
+                                            return "minecraft:rabbit";
+                                        }
+
+                                        if (protocol < ProtocolInfo.v1_17_0) {
+                                            if (type == EntityGoat.NETWORK_ID) {
+                                                return "minecraft:sheep";
+                                            } else if (type == EntityAxolotl.NETWORK_ID) {
+                                                return "minecraft:tropicalfish";
+                                            } else if (type == EntityGlowSquid.NETWORK_ID) {
+                                                return "minecraft:squid";
+                                            }
+
+                                            if (protocol < ProtocolInfo.v1_16_0) {
+                                                if (type == EntityPiglin.NETWORK_ID || type == EntityPiglinBrute.NETWORK_ID) {
+                                                    return "minecraft:zombie_pigman";
+                                                } else if (type == EntityHoglin.NETWORK_ID || type == EntityStrider.NETWORK_ID || type == EntityZoglin.NETWORK_ID) {
+                                                    return "minecraft:pig";
+                                                }
+
+                                                if (protocol < ProtocolInfo.v1_14_0) {
+                                                    if (type == EntityBee.NETWORK_ID) {
+                                                        return "minecraft:bat";
+                                                    }
+
+                                                    if (type == EntityFox.NETWORK_ID && protocol < ProtocolInfo.v1_13_0) {
+                                                        return "minecraft:wolf";
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         String identifier = LEGACY_IDS.get(type);
@@ -224,5 +296,47 @@ public class AddEntityPacket extends DataPacket {
             throw new IllegalStateException("Unknown entity with network id " + this.type);
         }
         return identifier;
+    }
+
+    @Override
+    public void decode() {
+        this.decodeUnsupported();
+    }
+
+    @Override
+    public void encode() {
+        this.reset();
+        this.putEntityUniqueId(this.entityUniqueId);
+        this.putEntityRuntimeId(this.entityRuntimeId);
+        if (protocol < 313) {
+            this.putUnsignedVarInt(this.type);
+        } else {
+            this.putString(this.getEntityIdentifier());
+        }
+        this.putVector3f(this.x, this.y, this.z);
+        this.putVector3f(this.speedX, this.speedY, this.speedZ);
+        this.putLFloat(this.pitch);
+        this.putLFloat(this.yaw);
+        if (protocol >= ProtocolInfo.v1_5_0) {
+            this.putLFloat(this.headYaw);
+            if (protocol >= ProtocolInfo.v1_19_10) {
+                this.putLFloat(this.bodyYaw == -1 ? this.yaw : this.bodyYaw); // For backwards compatibility
+            }
+        }
+        this.putAttributeList(this.attributes);
+        this.put(Binary.writeMetadata(protocol, this.metadata));
+        if (protocol >= ProtocolInfo.v1_19_40) {
+            this.putUnsignedVarInt(0); // Entity properties int
+            this.putUnsignedVarInt(0); // Entity properties float
+        }
+        this.putUnsignedVarInt(this.links.length);
+        for (EntityLink link : links) {
+            putEntityLink(protocol, link);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

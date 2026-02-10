@@ -11,12 +11,12 @@ public class BlockButtonDarkOak extends BlockButtonWooden {
     }
 
     @Override
-    public String getName() {
-        return "Dark Oak Button";
+    public int getId() {
+        return DARK_OAK_BUTTON;
     }
 
     @Override
-    public int getId() {
-        return DARK_OAK_BUTTON;
+    public String getName() {
+        return "Dark Oak Button";
     }
 }

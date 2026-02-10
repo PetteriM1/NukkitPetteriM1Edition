@@ -21,43 +21,15 @@ import java.util.regex.Pattern;
  */
 public class Flat extends Generator {
 
-    @Override
-    public int getId() {
-        return TYPE_FLAT;
-    }
-
     private ChunkManager level;
-
     private NukkitRandom random;
-
     private final List<Populator> populators = new ArrayList<>();
-
     private int[][] structure;
-
     private final Map<String, Object> options;
-
     private int floorLevel;
-
     private String preset;
-
     private boolean init = false;
-
     private int biome;
-
-    @Override
-    public ChunkManager getChunkManager() {
-        return level;
-    }
-
-    @Override
-    public Map<String, Object> getSettings() {
-        return this.options;
-    }
-
-    @Override
-    public String getName() {
-        return "flat";
-    }
 
     public Flat() {
         this(Collections.emptyMap());
@@ -80,6 +52,64 @@ public class Flat extends Generator {
             });
             this.populators.add(ores);
         }
+    }
+
+    @Override
+    public ChunkManager getChunkManager() {
+        return level;
+    }
+
+    @Override
+    public int getId() {
+        return TYPE_FLAT;
+    }
+
+    @Override
+    public String getName() {
+        return "flat";
+    }
+
+    @Override
+    public Map<String, Object> getSettings() {
+        return this.options;
+    }
+
+    @Override
+    public Vector3 getSpawn() {
+        return new Vector3(0.5, this.floorLevel, 0.5);
+    }
+
+    @Override
+    public void generateChunk(int chunkX, int chunkZ) {
+        if (!this.init) {
+            init = true;
+            if (this.options.containsKey("preset") && !"".equals(this.options.get("preset"))) {
+                this.parsePreset((String) this.options.get("preset"));
+            } else {
+                this.parsePreset(this.preset);
+            }
+        }
+        this.generateChunk(level.getChunk(chunkX, chunkZ));
+    }
+
+    private void generateChunk(FullChunk chunk) {
+        chunk.setGenerated();
+
+        for (int Z = 0; Z < 16; ++Z) {
+            for (int X = 0; X < 16; ++X) {
+                chunk.setBiomeId(X, Z, biome);
+
+                for (int y = 0; y < 256; ++y) {
+                    chunk.setBlock(X, y, Z, this.structure[y][0], this.structure[y][1]);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void init(ChunkManager level, NukkitRandom random) {
+        this.level = level;
+        this.random = random;
     }
 
     protected void parsePreset(String preset) {
@@ -143,49 +173,11 @@ public class Flat extends Generator {
     }
 
     @Override
-    public void init(ChunkManager level, NukkitRandom random) {
-        this.level = level;
-        this.random = random;
-    }
-
-    @Override
-    public void generateChunk(int chunkX, int chunkZ) {
-        if (!this.init) {
-            init = true;
-            if (this.options.containsKey("preset") && !"".equals(this.options.get("preset"))) {
-                this.parsePreset((String) this.options.get("preset"));
-            } else {
-                this.parsePreset(this.preset);
-            }
-        }
-        this.generateChunk(level.getChunk(chunkX, chunkZ));
-    }
-
-    private void generateChunk(FullChunk chunk) {
-        chunk.setGenerated();
-
-        for (int Z = 0; Z < 16; ++Z) {
-            for (int X = 0; X < 16; ++X) {
-                chunk.setBiomeId(X, Z, biome);
-
-                for (int y = 0; y < 256; ++y) {
-                    chunk.setBlock(X, y, Z, this.structure[y][0], this.structure[y][1]);
-                }
-            }
-        }
-    }
-
-    @Override
     public void populateChunk(int chunkX, int chunkZ) {
         BaseFullChunk chunk = level.getChunk(chunkX, chunkZ);
         this.random.setSeed(0xdeadbeef ^ (chunkX << 8) ^ chunkZ ^ this.level.getSeed());
         for (Populator populator : this.populators) {
             populator.populate(this.level, chunkX, chunkZ, this.random, chunk);
         }
-    }
-
-    @Override
-    public Vector3 getSpawn() {
-        return new Vector3(0.5, this.floorLevel, 0.5);
     }
 }

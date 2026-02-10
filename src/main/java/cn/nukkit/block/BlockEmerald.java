@@ -11,8 +11,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockEmerald extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Block of Emerald";
+    public BlockColor getColor() {
+        return BlockColor.EMERALD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 5;
     }
 
     @Override
@@ -21,8 +26,8 @@ public class BlockEmerald extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 5;
+    public String getName() {
+        return "Block of Emerald";
     }
 
     @Override
@@ -36,6 +41,11 @@ public class BlockEmerald extends BlockSolid {
     }
 
     @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
     public Item[] getDrops(Item item) {
         if (item.isPickaxe()) {
             return new Item[]{
@@ -44,15 +54,5 @@ public class BlockEmerald extends BlockSolid {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.EMERALD_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

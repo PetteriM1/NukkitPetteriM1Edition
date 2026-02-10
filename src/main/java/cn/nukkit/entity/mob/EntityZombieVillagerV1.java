@@ -12,12 +12,17 @@ public class EntityZombieVillagerV1 extends EntityZombie {
     }
 
     @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Zombie Villager";
+    }
+
+    @Override
     public int getNetworkId() {
         return NETWORK_ID;
     }
 
     @Override
-    public String getName() {
-        return this.hasCustomName() ? this.getNameTag() : "Zombie Villager";
+    public boolean canDespawn() {
+        return false;
     }
 }

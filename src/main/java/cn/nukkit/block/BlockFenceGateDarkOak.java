@@ -17,6 +17,11 @@ public class BlockFenceGateDarkOak extends BlockFenceGate {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BROWN_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return FENCE_GATE_DARK_OAK;
     }
@@ -24,10 +29,5 @@ public class BlockFenceGateDarkOak extends BlockFenceGate {
     @Override
     public String getName() {
         return "Dark Oak Fence Gate";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BROWN_BLOCK_COLOR;
     }
 }

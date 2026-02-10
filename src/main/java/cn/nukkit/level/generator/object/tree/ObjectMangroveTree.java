@@ -7,6 +7,16 @@ import cn.nukkit.math.NukkitRandom;
 public class ObjectMangroveTree extends ObjectTree {
 
     @Override
+    public int getLeafBlock() {
+        return BlockID.MANGROVE_LEAVES;
+    }
+
+    @Override
+    public int getTrunkBlock() {
+        return BlockID.MANGROVE_LOG;
+    }
+
+    @Override
     protected boolean overridable(int id) {
         switch (id) {
             case BlockID.AIR:
@@ -21,14 +31,16 @@ public class ObjectMangroveTree extends ObjectTree {
         }
     }
 
-    @Override
-    public int getTrunkBlock() {
-        return BlockID.MANGROVE_LOG;
+    private void placeLeafAt(ChunkManager level, int x, int y, int z) {
+        if (level.getBlockIdAt(x, y, z) == BlockID.AIR) {
+            level.setBlockAt(x, y, z, this.getLeafBlock(), 0);
+        }
     }
 
-    @Override
-    public int getLeafBlock() {
-        return BlockID.MANGROVE_LEAVES;
+    private void placeLogAt(ChunkManager level, int x, int y, int z) {
+        if (overridable(level.getBlockIdAt(x, y, z))) {
+            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
+        }
     }
 
     @Override
@@ -43,8 +55,6 @@ public class ObjectMangroveTree extends ObjectTree {
         }
 
         level.setBlockAt(x, y, z, BlockID.AIR);
-
-        // Adapted from https://github.com/PowerNukkitX/PowerNukkitX/blob/master/src/main/java/cn/nukkit/level/generator/object/ObjectMangroveTree.java
 
         for (int il = 0; il <= treeHeight + 1; il++) { // +1 to stop leaves decay
             if (il > 2) {
@@ -61,6 +71,8 @@ public class ObjectMangroveTree extends ObjectTree {
         placeRootAt(level, x - 2, y, z);
         placeRootAt(level, x, y, z + 2);
         placeRootAt(level, x, y, z - 2);
+
+        // Adapted from https://github.com/PowerNukkitX/PowerNukkitX/blob/master/src/main/java/cn/nukkit/level/generator/object/ObjectMangroveTree.java
 
         for (int i3 = -2; i3 <= 1; ++i3) {
             for (int l3 = -2; l3 <= 1; ++l3) {
@@ -101,21 +113,9 @@ public class ObjectMangroveTree extends ObjectTree {
         this.placeLeafAt(level, x, i2 + 2, z);
     }
 
-    private void placeLogAt(ChunkManager level, int x, int y, int z) {
-        if (overridable(level.getBlockIdAt(x, y, z))) {
-            level.setBlockAt(x, y, z, this.getTrunkBlock(), 0);
-        }
-    }
-
     private void placeRootAt(ChunkManager level, int x, int y, int z) {
         if (overridable(level.getBlockIdAt(x, y, z))) {
             level.setBlockAt(x, y, z, BlockID.MANGROVE_ROOTS, 0);
-        }
-    }
-
-    private void placeLeafAt(ChunkManager level, int x, int y, int z) {
-        if (level.getBlockIdAt(x, y, z) == BlockID.AIR) {
-            level.setBlockAt(x, y, z, this.getLeafBlock(), 0);
         }
     }
 }

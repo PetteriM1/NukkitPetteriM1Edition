@@ -11,12 +11,12 @@ public class BlockStairsGranitePolished extends BlockStairsGranite {
     }
 
     @Override
-    public String getName() {
-        return "Polished Granite Stairs";
+    public int getId() {
+        return POLISHED_GRANITE_STAIRS;
     }
 
     @Override
-    public int getId() {
-        return POLISHED_GRANITE_STAIRS;
+    public String getName() {
+        return "Polished Granite Stairs";
     }
 }

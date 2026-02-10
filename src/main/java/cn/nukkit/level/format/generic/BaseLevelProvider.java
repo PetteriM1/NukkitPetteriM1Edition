@@ -67,13 +67,13 @@ public abstract class BaseLevelProvider implements LevelProvider {
             Server.getInstance().getLogger().error("Failed to load level.dat in " + file_path.getPath(), ex1);
 
             try {
-                File backup = new File(this.path + "level.dat_old");
+                File backup = new File(this.path + "level.dat.bak");
 
                 if (backup.exists()) {
-                    Server.getInstance().getLogger().warning("Attempting to load level.dat_old in " + file_path.getPath());
+                    Server.getInstance().getLogger().warning("Attempting to load level.dat.bak in " + file_path.getPath());
 
                     // Save a copy of the corrupted one
-                    com.google.common.io.Files.copy(levelDat, new File(this.path + "level.dat_invalid"));
+                    com.google.common.io.Files.copy(levelDat, new File(this.path + "level.dat.invalid"));
 
                     // Replace the corrupted one with a backup
                     com.google.common.io.Files.copy(backup, levelDat);
@@ -81,7 +81,7 @@ public abstract class BaseLevelProvider implements LevelProvider {
                     levelData = NBTIO.readCompressed(Files.newInputStream(levelDat.toPath()), ByteOrder.BIG_ENDIAN);
                 }
             } catch (Exception ex2) {
-                Server.getInstance().getLogger().error("Failed to load level.dat_old in " + file_path.getPath(), ex2);
+                Server.getInstance().getLogger().error("Failed to load level.dat.bak in " + file_path.getPath(), ex2);
             }
         }
 
@@ -102,21 +102,19 @@ public abstract class BaseLevelProvider implements LevelProvider {
         this.spawn = new Vector3(this.levelData.getInt("SpawnX"), this.levelData.getInt("SpawnY"), this.levelData.getInt("SpawnZ"));
     }
 
-    public abstract BaseFullChunk loadChunk(long index, int chunkX, int chunkZ, boolean create);
-
-    public int size() {
-        synchronized (chunks) {
-            return this.chunks.size();
-        }
+    @Override
+    public long getCurrentTick() {
+        return this.levelData.getLong("Time");
     }
 
     @Override
-    public void unloadChunks() {
-        ObjectIterator<BaseFullChunk> iter = chunks.values().iterator();
-        while (iter.hasNext()) {
-            iter.next().unload(level.isSaveOnUnloadEnabled(), false);
-            iter.remove();
-        }
+    public GameRules getGamerules() {
+        GameRules rules = GameRules.getDefault();
+
+        if (this.levelData.contains("GameRules"))
+            rules.readNBT(this.levelData.getCompound("GameRules"));
+
+        return rules;
     }
 
     @Override
@@ -134,57 +132,19 @@ public abstract class BaseLevelProvider implements LevelProvider {
     }
 
     @Override
+    public Level getLevel() {
+        return level;
+    }
+
+    public CompoundTag getLevelData() {
+        return levelData;
+    }
+
+    @Override
     public Map<Long, BaseFullChunk> getLoadedChunks() {
         synchronized (chunks) {
             return ImmutableMap.copyOf(chunks);
         }
-    }
-
-    @Override
-    public boolean isChunkLoaded(int X, int Z) {
-        return isChunkLoaded(Level.chunkHash(X, Z));
-    }
-
-    public void putChunk(long index, BaseFullChunk chunk) {
-        synchronized (chunks) {
-            chunks.put(index, chunk);
-        }
-    }
-
-    @Override
-    public boolean isChunkLoaded(long hash) {
-        synchronized (chunks) {
-            return this.chunks.containsKey(hash);
-        }
-    }
-
-    public BaseRegionLoader getRegion(int x, int z) {
-        long index = Level.chunkHash(x, z);
-        synchronized (regions) {
-            return this.regions.get(index);
-        }
-    }
-
-    protected static int getRegionIndexX(int chunkX) {
-        return chunkX >> 5;
-    }
-
-    protected static int getRegionIndexZ(int chunkZ) {
-        return chunkZ >> 5;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
-    }
-
-    public Server getServer() {
-        return this.level.getServer();
-    }
-
-    @Override
-    public Level getLevel() {
-        return level;
     }
 
     @Override
@@ -193,63 +153,13 @@ public abstract class BaseLevelProvider implements LevelProvider {
     }
 
     @Override
-    public boolean isRaining() {
-        return this.levelData.getBoolean("raining");
-    }
-
-    @Override
-    public void setRaining(boolean raining) {
-        this.levelData.putBoolean("raining", raining);
+    public String getPath() {
+        return path;
     }
 
     @Override
     public int getRainTime() {
         return this.levelData.getInt("rainTime");
-    }
-
-    @Override
-    public void setRainTime(int rainTime) {
-        this.levelData.putInt("rainTime", rainTime);
-    }
-
-    @Override
-    public boolean isThundering() {
-        return this.levelData.getBoolean("thundering");
-    }
-
-    @Override
-    public void setThundering(boolean thundering) {
-        this.levelData.putBoolean("thundering", thundering);
-    }
-
-    @Override
-    public int getThunderTime() {
-        return this.levelData.getInt("thunderTime");
-    }
-
-    @Override
-    public void setThunderTime(int thunderTime) {
-        this.levelData.putInt("thunderTime", thunderTime);
-    }
-
-    @Override
-    public long getCurrentTick() {
-        return this.levelData.getLong("Time");
-    }
-
-    @Override
-    public void setCurrentTick(long currentTick) {
-        this.levelData.putLong("Time", currentTick);
-    }
-
-    @Override
-    public long getTime() {
-        return this.levelData.getLong("DayTime");
-    }
-
-    @Override
-    public void setTime(long value) {
-        this.levelData.putLong("DayTime", value);
     }
 
     @Override
@@ -260,15 +170,59 @@ public abstract class BaseLevelProvider implements LevelProvider {
         return this.cachedSeed;
     }
 
-    @Override
-    public void setSeed(long value) {
-        this.cachedSeed = null;
-        this.levelData.putLong("RandomSeed", value);
+    public Server getServer() {
+        return this.level.getServer();
     }
 
     @Override
     public Vector3 getSpawn() {
         return spawn;
+    }
+
+    @Override
+    public int getThunderTime() {
+        return this.levelData.getInt("thunderTime");
+    }
+
+    @Override
+    public long getTime() {
+        return this.levelData.getLong("DayTime");
+    }
+
+    @Override
+    public boolean isRaining() {
+        return this.levelData.getBoolean("raining");
+    }
+
+    @Override
+    public boolean isThundering() {
+        return this.levelData.getBoolean("thundering");
+    }
+
+    @Override
+    public void setCurrentTick(long currentTick) {
+        this.levelData.putLong("Time", currentTick);
+    }
+
+    @Override
+    public void setGameRules(GameRules rules) {
+        this.levelData.putCompound("GameRules", rules.writeNBT());
+    }
+
+    @Override
+    public void setRainTime(int rainTime) {
+        this.levelData.putInt("rainTime", rainTime);
+    }
+
+    @Override
+    public void setRaining(boolean raining) {
+        this.levelData.putBoolean("raining", raining);
+    }
+
+    @Override
+    public void setSeed(long value) {
+        this.cachedSeed = null;
+        this.levelData.putLong("RandomSeed", value);
     }
 
     @Override
@@ -280,18 +234,37 @@ public abstract class BaseLevelProvider implements LevelProvider {
     }
 
     @Override
-    public GameRules getGamerules() {
-        GameRules rules = GameRules.getDefault();
-
-        if (this.levelData.contains("GameRules"))
-            rules.readNBT(this.levelData.getCompound("GameRules"));
-
-        return rules;
+    public void setThunderTime(int thunderTime) {
+        this.levelData.putInt("thunderTime", thunderTime);
     }
 
     @Override
-    public void setGameRules(GameRules rules) {
-        this.levelData.putCompound("GameRules", rules.writeNBT());
+    public void setThundering(boolean thundering) {
+        this.levelData.putBoolean("thundering", thundering);
+    }
+
+    @Override
+    public void setTime(long value) {
+        this.levelData.putLong("DayTime", value);
+    }
+
+    @Override
+    public synchronized void close() {
+        this.unloadChunks();
+        synchronized (regions) {
+            ObjectIterator<BaseRegionLoader> iter = this.regions.values().iterator();
+
+            while (iter.hasNext()) {
+                try {
+                    iter.next().close();
+                } catch (IOException e) {
+                    throw new RuntimeException("Unable to close RegionLoader", e);
+                }
+                lastRegion.set(null);
+                iter.remove();
+            }
+        }
+        this.level = null;
     }
 
     @Override
@@ -320,81 +293,25 @@ public abstract class BaseLevelProvider implements LevelProvider {
     }
 
     @Override
-    public void saveChunks() {
-        synchronized (chunks) {
-            for (BaseFullChunk chunk : this.chunks.values()) {
-                if (chunk.hasChanged()) {
-                    chunk.setChanged(false);
-                    this.saveChunk(chunk.getX(), chunk.getZ(), chunk);
-                }
-            }
-        }
-    }
-
-    public CompoundTag getLevelData() {
-        return levelData;
-    }
-
-    @Override
-    public void saveLevelData() {
-        String file = this.path + "level.dat";
-        File old = new File(file);
-        if (old.exists()) {
-            try {
-                com.google.common.io.Files.copy(old, new File(file + ".bak"));
-            } catch (IOException e) {
-                Server.getInstance().getLogger().logException(e);
-            }
-        }
-        try {
-            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), Files.newOutputStream(Paths.get(file)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void updateLevelName(String name) {
-        this.levelData.putString("LevelName", name);
-    }
-
-    @Override
-    public boolean loadChunk(int chunkX, int chunkZ) {
-        return this.loadChunk(chunkX, chunkZ, false);
-    }
-
-    @Override
-    public boolean loadChunk(int chunkX, int chunkZ, boolean create) {
-        long index = Level.chunkHash(chunkX, chunkZ);
-        synchronized (chunks) {
-            if (this.chunks.containsKey(index)) {
-                return true;
-            }
-        }
-        return loadChunk(index, chunkX, chunkZ, create) != null;
-    }
-
-    @Override
-    public boolean unloadChunk(int X, int Z) {
-        return this.unloadChunk(X, Z, true);
-    }
-
-    @Override
-    public boolean unloadChunk(int X, int Z, boolean safe) {
-        long index = Level.chunkHash(X, Z);
-        synchronized (chunks) {
-            BaseFullChunk chunk = this.chunks.get(index);
-            if (chunk != null && chunk.unload(false, safe)) {
-                lastChunk.set(null);
-                this.chunks.remove(index, chunk);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public BaseFullChunk getChunk(int chunkX, int chunkZ) {
         return this.getChunk(chunkX, chunkZ, false);
+    }
+
+    @Override
+    public BaseFullChunk getChunk(int chunkX, int chunkZ, boolean create) {
+        BaseFullChunk tmp = lastChunk.get();
+        if (tmp != null && tmp.getX() == chunkX && tmp.getZ() == chunkZ) {
+            return tmp;
+        }
+        long index = Level.chunkHash(chunkX, chunkZ);
+        synchronized (chunks) {
+            lastChunk.set(tmp = chunks.get(index));
+        }
+        if (tmp == null) {
+            tmp = this.loadChunk(index, chunkX, chunkZ, create);
+            lastChunk.set(tmp);
+        }
+        return tmp;
     }
 
     @Override
@@ -422,21 +339,99 @@ public abstract class BaseLevelProvider implements LevelProvider {
         return tmp;
     }
 
-    @Override
-    public BaseFullChunk getChunk(int chunkX, int chunkZ, boolean create) {
-        BaseFullChunk tmp = lastChunk.get();
-        if (tmp != null && tmp.getX() == chunkX && tmp.getZ() == chunkZ) {
-            return tmp;
+    public BaseRegionLoader getRegion(int x, int z) {
+        long index = Level.chunkHash(x, z);
+        synchronized (regions) {
+            return this.regions.get(index);
         }
+    }
+
+    protected static int getRegionIndexX(int chunkX) {
+        return chunkX >> 5;
+    }
+
+    protected static int getRegionIndexZ(int chunkZ) {
+        return chunkZ >> 5;
+    }
+
+    @Override
+    public boolean isChunkGenerated(int chunkX, int chunkZ) {
+        BaseRegionLoader region = this.getRegion(chunkX >> 5, chunkZ >> 5);
+        BaseFullChunk chunk;
+        return region != null && region.chunkExists(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5)) &&
+                (chunk = this.getChunk(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5))) != null && chunk.isGenerated();
+    }
+
+    @Override
+    public boolean isChunkLoaded(int X, int Z) {
+        return isChunkLoaded(Level.chunkHash(X, Z));
+    }
+
+    @Override
+    public boolean isChunkLoaded(long hash) {
+        synchronized (chunks) {
+            return this.chunks.containsKey(hash);
+        }
+    }
+
+    @Override
+    public boolean isChunkPopulated(int chunkX, int chunkZ) {
+        BaseFullChunk chunk = this.getChunk(chunkX, chunkZ);
+        return chunk != null && chunk.isPopulated();
+    }
+
+    public abstract BaseFullChunk loadChunk(long index, int chunkX, int chunkZ, boolean create);
+
+    @Override
+    public boolean loadChunk(int chunkX, int chunkZ) {
+        return this.loadChunk(chunkX, chunkZ, false);
+    }
+
+    @Override
+    public boolean loadChunk(int chunkX, int chunkZ, boolean create) {
         long index = Level.chunkHash(chunkX, chunkZ);
         synchronized (chunks) {
-            lastChunk.set(tmp = chunks.get(index));
+            if (this.chunks.containsKey(index)) {
+                return true;
+            }
         }
-        if (tmp == null) {
-            tmp = this.loadChunk(index, chunkX, chunkZ, create);
-            lastChunk.set(tmp);
+        return loadChunk(index, chunkX, chunkZ, create) != null;
+    }
+
+    public void putChunk(long index, BaseFullChunk chunk) {
+        synchronized (chunks) {
+            chunks.put(index, chunk);
         }
-        return tmp;
+    }
+
+    @Override
+    public void saveChunks() {
+        synchronized (chunks) {
+            for (BaseFullChunk chunk : this.chunks.values()) {
+                if (chunk.hasChanged()) {
+                    chunk.setChanged(false);
+                    this.saveChunk(chunk.getX(), chunk.getZ(), chunk);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void saveLevelData() {
+        String file = this.path + "level.dat";
+        File old = new File(file);
+        if (old.exists()) {
+            try {
+                com.google.common.io.Files.copy(old, new File(file + ".bak"));
+            } catch (IOException e) {
+                Server.getInstance().getLogger().logException(e);
+            }
+        }
+        try {
+            NBTIO.writeGZIPCompressed(new CompoundTag().putCompound("Data", this.levelData), Files.newOutputStream(Paths.get(file)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -456,36 +451,41 @@ public abstract class BaseLevelProvider implements LevelProvider {
         }
     }
 
-    @Override
-    public boolean isChunkPopulated(int chunkX, int chunkZ) {
-        BaseFullChunk chunk = this.getChunk(chunkX, chunkZ);
-        return chunk != null && chunk.isPopulated();
+    public int size() {
+        synchronized (chunks) {
+            return this.chunks.size();
+        }
     }
 
     @Override
-    public synchronized void close() {
-        this.unloadChunks();
-        synchronized (regions) {
-            ObjectIterator<BaseRegionLoader> iter = this.regions.values().iterator();
+    public boolean unloadChunk(int X, int Z) {
+        return this.unloadChunk(X, Z, true);
+    }
 
-            while (iter.hasNext()) {
-                try {
-                    iter.next().close();
-                } catch (IOException e) {
-                    throw new RuntimeException("Unable to close RegionLoader", e);
-                }
-                lastRegion.set(null);
-                iter.remove();
+    @Override
+    public boolean unloadChunk(int X, int Z, boolean safe) {
+        long index = Level.chunkHash(X, Z);
+        synchronized (chunks) {
+            BaseFullChunk chunk = this.chunks.get(index);
+            if (chunk != null && chunk.unload(false, safe)) {
+                lastChunk.set(null);
+                this.chunks.remove(index, chunk);
+                return true;
             }
         }
-        this.level = null;
+        return false;
     }
 
     @Override
-    public boolean isChunkGenerated(int chunkX, int chunkZ) {
-        BaseRegionLoader region = this.getRegion(chunkX >> 5, chunkZ >> 5);
-        BaseFullChunk chunk;
-        return region != null && region.chunkExists(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5)) &&
-                (chunk = this.getChunk(chunkX - (region.getX() << 5), chunkZ - (region.getZ() << 5))) != null && chunk.isGenerated();
+    public void unloadChunks() {
+        ObjectIterator<BaseFullChunk> iter = chunks.values().iterator();
+        while (iter.hasNext()) {
+            iter.next().unload(level.isSaveOnUnloadEnabled(), false);
+            iter.remove();
+        }
+    }
+
+    public void updateLevelName(String name) {
+        this.levelData.putString("LevelName", name);
     }
 }

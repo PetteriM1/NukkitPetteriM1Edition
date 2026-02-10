@@ -28,45 +28,6 @@ public class BlockDoubleSlabStone4 extends BlockDoubleSlabBase {
     }
 
     @Override
-    public int getId() {
-        return DOUBLE_STONE_SLAB4;
-    }
-
-    @Override
-    public int getSingleSlabId() {
-        return STONE_SLAB4;
-    }
-
-    @Override
-    public double getResistance() {
-        return this.getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
-    }
-
-    @Override
-    public double getHardness() {
-        return 2;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getSlabName() {
-        int variant = this.getDamage() & 0x07;
-        if (variant >= NAMES.length) {
-            return NAMES[0];
-        }
-        return NAMES[variant];
-    }
-
-    @Override
-    public int getItemDamage() {
-        return this.getDamage() & 0x07;
-    }
-
-    @Override
     public BlockColor getColor() {
         switch (this.getDamage() & 0x07) {
             default:
@@ -80,6 +41,45 @@ public class BlockDoubleSlabStone4 extends BlockDoubleSlabBase {
             case CUT_RED_SANDSTONE:
                 return BlockColor.ORANGE_BLOCK_COLOR;
         }
+    }
+
+    @Override
+    public double getHardness() {
+        return 2;
+    }
+
+    @Override
+    public int getId() {
+        return DOUBLE_STONE_SLAB4;
+    }
+
+    @Override
+    public int getItemDamage() {
+        return this.getDamage() & 0x07;
+    }
+
+    @Override
+    public double getResistance() {
+        return this.getToolType() > ItemTool.TIER_WOODEN ? 30 : 15;
+    }
+
+    @Override
+    public int getSingleSlabId() {
+        return STONE_SLAB4;
+    }
+
+    @Override
+    public String getSlabName() {
+        int variant = this.getDamage() & 0x07;
+        if (variant >= NAMES.length) {
+            return NAMES[0];
+        }
+        return NAMES[variant];
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override

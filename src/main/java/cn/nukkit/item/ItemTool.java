@@ -42,6 +42,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
     public static final int DURABILITY_FISHING_ROD = 385;
     public static final int DURABILITY_CARROT_ON_A_STICK = 26;
     public static final int DURABILITY_WARPED_FUNGUS_ON_A_STICK = 100;
+    public static final int DURABILITY_MACE = 500;
 
     public ItemTool(int id) {
         this(id, 0, 1, UNKNOWN_STR);
@@ -60,8 +61,56 @@ public abstract class ItemTool extends Item implements ItemDurable {
     }
 
     @Override
+    public int getEnchantAbility() {
+        switch (this.getTier()) {
+            case TIER_STONE:
+                return 5;
+            case TIER_WOODEN:
+                return 15;
+            case TIER_DIAMOND:
+                return 10;
+            case TIER_GOLD:
+                return 22;
+            case TIER_IRON:
+                return 14;
+            case TIER_NETHERITE:
+                return 10; //TODO
+        }
+
+        return 0;
+    }
+
+    @Override
     public int getMaxStackSize() {
         return 1;
+    }
+
+    private boolean isDurable() {
+        Enchantment durability = getEnchantment(Enchantment.ID_DURABILITY);
+        return durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= ThreadLocalRandom.current().nextInt(100);
+    }
+
+    @Override
+    public boolean isTool() {
+        return true;
+    }
+
+    /**
+     * No damage to item when it's used to attack entities
+     *
+     * @return whether the item should take damage when used to attack entities
+     */
+    public boolean noDamageOnAttack() {
+        return false;
+    }
+
+    /**
+     * No damage to item when it's used to break blocks
+     *
+     * @return whether the item should take damage when used to break blocks
+     */
+    public boolean noDamageOnBreak() {
+        return false;
     }
 
     @Override
@@ -86,7 +135,7 @@ public abstract class ItemTool extends Item implements ItemDurable {
             return true;
         }
 
-        if (this.isHoe() && ((block.getId() == GRASS || block.getId() == DIRT))) {
+        if (this.isHoe() && (block.getId() == GRASS || block.getId() == DIRT)) {
             this.meta++;
             return true;
         }
@@ -112,51 +161,5 @@ public abstract class ItemTool extends Item implements ItemDurable {
         }
 
         return true;
-    }
-
-    private boolean isDurable() {
-        Enchantment durability = getEnchantment(Enchantment.ID_DURABILITY);
-        return durability != null && durability.getLevel() > 0 && (100 / (durability.getLevel() + 1)) <= ThreadLocalRandom.current().nextInt(100);
-    }
-
-    @Override
-    public boolean isTool() {
-        return true;
-    }
-
-    @Override
-    public int getEnchantAbility() {
-        switch (this.getTier()) {
-            case TIER_STONE:
-                return 5;
-            case TIER_WOODEN:
-                return 15;
-            case TIER_DIAMOND:
-                return 10;
-            case TIER_GOLD:
-                return 22;
-            case TIER_IRON:
-                return 14;
-            case TIER_NETHERITE:
-                return 10; //TODO
-        }
-
-        return 0;
-    }
-
-    /**
-     * No damage to item when it's used to attack entities
-     * @return whether the item should take damage when used to attack entities
-     */
-    public boolean noDamageOnAttack() {
-        return false;
-    }
-
-    /**
-     * No damage to item when it's used to break blocks
-     * @return whether the item should take damage when used to break blocks
-     */
-    public boolean noDamageOnBreak() {
-        return false;
     }
 }

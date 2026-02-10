@@ -25,8 +25,17 @@ abstract class PlayerBucketEvent extends PlayerEvent implements Cancellable {
         this.bucket = bucket;
     }
 
+    public Block getBlockClicked() {
+        return this.blockClicked;
+    }
+
+    public BlockFace getBlockFace() {
+        return this.blockFace;
+    }
+
     /**
      * Returns the bucket used in this event
+     *
      * @return bucket
      */
     public Item getBucket() {
@@ -35,6 +44,7 @@ abstract class PlayerBucketEvent extends PlayerEvent implements Cancellable {
 
     /**
      * Returns the item in hand after the event
+     *
      * @return item
      */
     public Item getItem() {
@@ -43,13 +53,5 @@ abstract class PlayerBucketEvent extends PlayerEvent implements Cancellable {
 
     public void setItem(Item item) {
         this.item = item;
-    }
-
-    public Block getBlockClicked() {
-        return this.blockClicked;
-    }
-
-    public BlockFace getBlockFace() {
-        return this.blockFace;
     }
 }

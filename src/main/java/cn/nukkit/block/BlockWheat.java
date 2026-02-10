@@ -19,18 +19,18 @@ public class BlockWheat extends BlockCrops {
     }
 
     @Override
-    public String getName() {
-        return "Wheat Block";
-    }
-
-    @Override
     public int getId() {
         return WHEAT_BLOCK;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.WHEAT_SEEDS);
+    public String getName() {
+        return "Wheat Block";
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BlockWheat extends BlockCrops {
     }
 
     @Override
-    public boolean breakWhenPushed() {
-        return true;
+    public Item toItem() {
+        return Item.get(Item.WHEAT_SEEDS);
     }
 }

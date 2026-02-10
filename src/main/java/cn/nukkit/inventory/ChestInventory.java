@@ -20,33 +20,17 @@ public class ChestInventory extends ContainerInventory {
         super(chest, InventoryType.CHEST);
     }
 
+    public DoubleChestInventory getDoubleInventory() {
+        return doubleInventory;
+    }
+
     @Override
     public BlockEntityChest getHolder() {
         return (BlockEntityChest) this.holder;
     }
 
-    @Override
-    public void onOpen(Player who) {
-        super.onOpen(who);
-
-        if (this.getViewers().size() == 1) {
-            BlockEventPacket pk = new BlockEventPacket();
-            pk.x = (int) this.getHolder().getX();
-            pk.y = (int) this.getHolder().getY();
-            pk.z = (int) this.getHolder().getZ();
-            pk.case1 = 1;
-            pk.case2 = 2;
-
-            Level level = this.getHolder().getLevel();
-            if (level != null) {
-                level.addLevelSoundEvent(this.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
-                level.addChunkPacket((int) this.getHolder().getX() >> 4, (int) this.getHolder().getZ() >> 4, pk);
-
-                if (this.getHolder().getBlock() instanceof BlockTrappedChest) {
-                    level.updateAroundRedstone(this.getHolder(), null);
-                }
-            }
-        }
+    public void setDoubleInventory(DoubleChestInventory doubleInventory) {
+        this.doubleInventory = doubleInventory;
     }
 
     @Override
@@ -78,12 +62,35 @@ public class ChestInventory extends ContainerInventory {
         }
     }
 
-    public void setDoubleInventory(DoubleChestInventory doubleInventory) {
-        this.doubleInventory = doubleInventory;
+    @Override
+    public void onOpen(Player who) {
+        super.onOpen(who);
+
+        if (this.getViewers().size() == 1) {
+            BlockEventPacket pk = new BlockEventPacket();
+            pk.x = (int) this.getHolder().getX();
+            pk.y = (int) this.getHolder().getY();
+            pk.z = (int) this.getHolder().getZ();
+            pk.case1 = 1;
+            pk.case2 = 2;
+
+            Level level = this.getHolder().getLevel();
+            if (level != null) {
+                level.addLevelSoundEvent(this.getHolder().add(0.5, 0.5, 0.5), LevelSoundEventPacket.SOUND_CHEST_OPEN);
+                level.addChunkPacket((int) this.getHolder().getX() >> 4, (int) this.getHolder().getZ() >> 4, pk);
+
+                if (this.getHolder().getBlock() instanceof BlockTrappedChest) {
+                    level.updateAroundRedstone(this.getHolder(), null);
+                }
+            }
+        }
     }
 
-    public DoubleChestInventory getDoubleInventory() {
-        return doubleInventory;
+    @Override
+    public void onSlotChange(int index, Item before, boolean send) {
+        super.onSlotChange(index, before, send);
+
+        this.getHolder().chunk.setChanged();
     }
 
     @Override
@@ -93,12 +100,5 @@ public class ChestInventory extends ContainerInventory {
         } else {
             super.sendSlot(index, players);
         }
-    }
-
-    @Override
-    public void onSlotChange(int index, Item before, boolean send) {
-        super.onSlotChange(index, before, send);
-
-        this.getHolder().chunk.setChanged();
     }
 }

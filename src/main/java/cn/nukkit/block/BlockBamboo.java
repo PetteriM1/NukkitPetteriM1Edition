@@ -26,9 +26,27 @@ public class BlockBamboo extends BlockTransparentMeta {
         super(meta);
     }
 
+    public int getAge() {
+        return (this.getDamage() & 0x8) >> 3;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.FOLIAGE_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1;
+    }
+
     @Override
     public int getId() {
         return BAMBOO;
+    }
+
+    public int getLeafSize() {
+        return (this.getDamage() >> 1) & 0x3;
     }
 
     @Override
@@ -37,24 +55,69 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (this.isSupportInvalid()) {
-                this.level.scheduleUpdate(this, 0);
+    public double getResistance() {
+        return 2;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    private boolean isSupportInvalid() {
+        int downId = this.down().getId();
+        return downId != BAMBOO && downId != DIRT && downId != GRASS && downId != SAND && downId != GRAVEL && downId != PODZOL && downId != BAMBOO_SAPLING;
+    }
+
+    public boolean isThick() {
+        return (this.getDamage() & 0x1) == 0x1;
+    }
+
+    public void setAge(int age) {
+        age = MathHelper.clamp(age, 0, 1) << 3;
+        this.setDamage(this.getDamage() & (15 ^ 0b1000) | age);
+    }
+
+    public void setLeafSize(int leafSize) {
+        leafSize = MathHelper.clamp(leafSize, LEAF_SIZE_NONE, LEAF_SIZE_LARGE) & 0b11;
+        this.setDamage(this.getDamage() & (15 ^ 0b110) | (leafSize << 1));
+    }
+
+    public void setThick(boolean thick) {
+        this.setDamage(this.getDamage() & (15 ^ 0x1) | (thick ? 0x1 : 0x0));
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    private int countHeight() {
+        int count = 0;
+        Block opt;
+        Block down = this;
+        while ((opt = down.down()).getId() == BAMBOO) {
+            down = opt;
+            if (++count >= 16) {
+                break;
             }
-            return type;
-        } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
-            this.level.useBreakOn(this, null, null, true);
-        } else if (type == Level.BLOCK_UPDATE_RANDOM) {
-            Block up;
-            int time = level.getTime() % Level.TIME_FULL;
-            boolean canGrow = time < 13184 || time > 22800;
-            if (this.getAge() == 0 && (up = this.up()).getId() == AIR && canGrow/*this.level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL*/ && ThreadLocalRandom.current().nextInt(3) == 0) {
-                this.grow(up);
-            }
-            return type;
         }
-        return 0;
+        return count;
     }
 
     public boolean grow(Block up) {
@@ -79,17 +142,85 @@ public class BlockBamboo extends BlockTransparentMeta {
         return false;
     }
 
-    private int countHeight() {
-        int count = 0;
-        Block opt;
-        Block down = this;
-        while ((opt = down.down()).getId() == BAMBOO) {
-            down = opt;
-            if (++count >= 16) {
-                break;
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (item.getId() == ItemID.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
+            int top = (int) y;
+            int count = 1;
+
+            for (int i = 1; i <= 16; i++) {
+                int id = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY() - i, this.getFloorZ());
+                if (id == BAMBOO) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            for (int i = 1; i <= 16; i++) {
+                int id = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY() + i, this.getFloorZ());
+                if (id == BAMBOO) {
+                    top++;
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            if (count >= 15) {
+                return false;
+            }
+
+            boolean success = false;
+
+            Block block = this.up(top - (int) y + 1);
+            if (block.getId() == BlockID.AIR) {
+                success = this.grow(block);
+            }
+
+            if (success) {
+                if (player != null && !player.isCreative()) {
+                    item.count--;
+                }
+                level.addParticle(new BoneMealParticle(this));
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        Block down = this.down();
+        if (down instanceof BlockBamboo) {
+            BlockBamboo bambooDown = (BlockBamboo) down;
+            int height = bambooDown.countHeight();
+            if (height < 15 && (height < 11 || !(ThreadLocalRandom.current().nextFloat() < 0.25F))) {
+                bambooDown.setAge(0);
+                this.level.setBlock(bambooDown, bambooDown, false, true);
             }
         }
-        return count;
+        return super.onBreak(item);
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (this.isSupportInvalid()) {
+                this.level.scheduleUpdate(this, 0);
+            }
+            return type;
+        } else if (type == Level.BLOCK_UPDATE_SCHEDULED) {
+            this.level.useBreakOn(this, null, null, true);
+        } else if (type == Level.BLOCK_UPDATE_RANDOM) {
+            Block up;
+            if (this.getAge() == 0 && (up = this.up()).getId() == AIR && level.isAnimalSpawningAllowedByTime()/*this.level.getFullLight(up) >= BlockCrops.MINIMUM_LIGHT_LEVEL*/ && ThreadLocalRandom.current().nextInt(3) == 0) {
+                this.grow(up);
+            }
+            return type;
+        }
+        return 0;
     }
 
     @Override
@@ -115,7 +246,8 @@ public class BlockBamboo extends BlockTransparentMeta {
                 this.getLevel().addChunkPacket(player.getChunkX(), player.getChunkZ(), animatePacket);
             }
             this.setLeafSize(LEAF_SIZE_SMALL);
-        } if (down instanceof BlockBamboo) {
+        }
+        if (down instanceof BlockBamboo) {
             BlockBamboo bambooDown = (BlockBamboo) down;
             canGrow = bambooDown.getAge() == 0;
             boolean thick = bambooDown.isThick();
@@ -171,7 +303,7 @@ public class BlockBamboo extends BlockTransparentMeta {
             return false;
         }
 
-        int height = canGrow? this.countHeight() : 0;
+        int height = canGrow ? this.countHeight() : 0;
         if (!canGrow || height >= 15 || height >= 11 && ThreadLocalRandom.current().nextFloat() < 0.25F) {
             this.setAge(1);
         }
@@ -181,140 +313,7 @@ public class BlockBamboo extends BlockTransparentMeta {
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        Block down = this.down();
-        if (down instanceof BlockBamboo) {
-            BlockBamboo bambooDown = (BlockBamboo) down;
-            int height = bambooDown.countHeight();
-            if (height < 15 && (height < 11 || !(ThreadLocalRandom.current().nextFloat() < 0.25F))) {
-                bambooDown.setAge(0);
-                this.level.setBlock(bambooDown, bambooDown, false, true);
-            }
-        }
-        return super.onBreak(item);
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    private boolean isSupportInvalid() {
-        int downId = this.down().getId();
-        return downId != BAMBOO && downId != DIRT && downId != GRASS && downId != SAND && downId != GRAVEL && downId != PODZOL && downId != BAMBOO_SAPLING;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.FOLIAGE_BLOCK_COLOR;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1;
-    }
-
-    @Override
-    public double getResistance() {
-        return 2;
-    }
-
-    public boolean isThick() {
-        return (this.getDamage() & 0x1) == 0x1;
-    }
-
-    public void setThick(boolean thick) {
-        this.setDamage(this.getDamage() & (15 ^ 0x1) | (thick? 0x1 : 0x0));
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_AXE;
-    }
-
-    public int getLeafSize() {
-        return (this.getDamage() >> 1) & 0x3;
-    }
-
-    public void setLeafSize(int leafSize) {
-        leafSize = MathHelper.clamp(leafSize, LEAF_SIZE_NONE, LEAF_SIZE_LARGE) & 0b11;
-        this.setDamage(this.getDamage() & (15 ^ 0b110) | (leafSize << 1));
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (item.getId() == ItemID.DYE && item.getDamage() == ItemDye.BONE_MEAL) {
-            int top = (int) y;
-            int count = 1;
-
-            for (int i = 1; i <= 16; i++) {
-                int id = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY() - i, this.getFloorZ());
-                if (id == BAMBOO) {
-                    count++;
-                } else {
-                    break;
-                }
-            }
-
-            for (int i = 1; i <= 16; i++) {
-                int id = this.level.getBlockIdAt(this.getFloorX(), this.getFloorY() + i, this.getFloorZ());
-                if (id == BAMBOO) {
-                    top++;
-                    count++;
-                } else {
-                    break;
-                }
-            }
-
-            if (count >= 15) {
-                return false;
-            }
-
-            boolean success = false;
-
-            Block block = this.up(top - (int)y + 1);
-            if (block.getId() == BlockID.AIR) {
-                success = this.grow(block);
-            }
-
-            if (success) {
-                if (player != null && !player.isCreative()) {
-                    item.count--;
-                }
-                level.addParticle(new BoneMealParticle(this));
-            }
-
-            return true;
-        }
-        return false;
-    }
-
-    public int getAge() {
-        return (this.getDamage() & 0x8) >> 3;
-    }
-
-    public void setAge(int age) {
-        age = MathHelper.clamp(age, 0, 1) << 3;
-        this.setDamage(this.getDamage() & (15 ^ 0b1000) | age);
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
     }
 }

@@ -20,8 +20,12 @@ public class BlockSeagrass extends BlockFlowable {
     }
 
     @Override
-    public String getName() {
-        return "Seagrass";
+    public BlockColor getColor() {
+        return BlockColor.WATER_BLOCK_COLOR;
+    }
+
+    public double getHardness() {
+        return 0;
     }
 
     @Override
@@ -29,38 +33,67 @@ public class BlockSeagrass extends BlockFlowable {
         return SEAGRASS;
     }
 
-    public int getToolType() {
-        return ItemTool.SHEARS;
-    }
-
-    public double getHardness() {
-        return 0;
+    @Override
+    public String getName() {
+        return "Seagrass";
     }
 
     public double getResistance() {
         return 0;
     }
 
+    public int getToolType() {
+        return ItemTool.SHEARS;
+    }
+
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (level != null && level.getProvider() instanceof Anvil) {
-            if (!(block instanceof BlockWater && block.getDamage() == 0) || this.down().isTransparent()) {
-                return false;
-            }
-            return this.getLevel().setBlock(this, this, true, true);
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.FLOW_INTO_BLOCK;
+    }
+
+    @Override
+    public void setDamage(int meta) {
+        super.setDamage(meta % 3);
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return this.getDamage() == 0;
+    }
+
+    @Override
+    public boolean canBeFlowedInto() {
+        return level == null || !(level.getProvider() instanceof Anvil);
+    }
+
+    @Override
+    public boolean canBeReplaced() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isShears()) {
+            return new Item[]{toItem()};
+        } else {
+            return new Item[0];
         }
+    }
 
-
-        Block down = this.down();
-        Block layer1Block = block.getLevelBlock(BlockLayer.WATERLOGGED);
-        int waterDamage;
-        if (down.isSolid() && down.getId() != MAGMA && down.getId() != SOUL_SAND &&
-                (layer1Block instanceof BlockWater && ((waterDamage = (block.getDamage())) == 0 || waterDamage == 8))
-        ) {
-            if (waterDamage == 8) {
-                this.getLevel().setBlock((int) this.x, (int) this.y, (int) this.z, Block.LAYER_WATERLOGGED, Block.get(Block.STILL_WATER), true, true);
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (this.getDamage() == 0 && item.getId() == ItemID.DYE && item.getDamage() == ItemDye.BONE_MEAL && up() instanceof BlockWater) {
+            Vector3 up = this.getSideVec(BlockFace.UP);
+            if (this.level.setBlock(up, Block.get(SEAGRASS, 1), true, true)) {
+                this.level.setBlock(this, Block.get(SEAGRASS, 2), true, true);
             }
-            this.getLevel().setBlock(this, BlockLayer.NORMAL, this, true, true);
+
+            if (player != null && !player.isCreative()) {
+                item.count--;
+            }
+
+            this.level.addParticle(new BoneMealParticle(this));
+
             return true;
         }
         return false;
@@ -113,66 +146,32 @@ public class BlockSeagrass extends BlockFlowable {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        if (item.isShears()) {
-            return new Item[] { toItem() };
-        } else {
-            return new Item[0];
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (level != null && level.getProvider() instanceof Anvil) {
+            if (!(block instanceof BlockWater && block.getDamage() == 0) || this.down().isTransparent()) {
+                return false;
+            }
+            return this.getLevel().setBlock(this, this, true, true);
         }
+
+
+        Block down = this.down();
+        Block layer1Block = block.getLevelBlock(BlockLayer.WATERLOGGED);
+        int waterDamage;
+        if (down.isSolid() && down.getId() != MAGMA && down.getId() != SOUL_SAND &&
+                (layer1Block instanceof BlockWater && ((waterDamage = (block.getDamage())) == 0 || waterDamage == 8))
+        ) {
+            if (waterDamage == 8) {
+                this.getLevel().setBlock((int) this.x, (int) this.y, (int) this.z, Block.LAYER_WATERLOGGED, Block.get(Block.STILL_WATER), true, true);
+            }
+            this.getLevel().setBlock(this, BlockLayer.NORMAL, this, true, true);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(SEAGRASS), 0, 1);
-    }
-
-    @Override
-    public void setDamage(int meta) {
-        super.setDamage(meta % 3);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.FLOW_INTO_BLOCK;
-    }
-
-    @Override
-    public boolean canBeFlowedInto() {
-        return level == null || !(level.getProvider() instanceof Anvil);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WATER_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBeReplaced() {
-        return true;
-    }
-
-
-    @Override
-    public boolean canBeActivated() {
-        return this.getDamage() == 0;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (this.getDamage() == 0 && item.getId() == ItemID.DYE && item.getDamage() == ItemDye.BONE_MEAL && up() instanceof BlockWater) {
-            Vector3 up = this.getSideVec(BlockFace.UP);
-            if (this.level.setBlock(up, Block.get(SEAGRASS, 1), true, true)) {
-                this.level.setBlock(this, Block.get(SEAGRASS, 2), true, true);
-            }
-
-            if (player != null && !player.isCreative()) {
-                item.count--;
-            }
-
-            this.level.addParticle(new BoneMealParticle(this));
-
-            return true;
-        }
-        return false;
     }
 }

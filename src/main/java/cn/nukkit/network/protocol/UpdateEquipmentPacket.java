@@ -13,12 +13,6 @@ public class UpdateEquipmentPacket extends DataPacket {
     public long eid;
     public byte[] namedtag;
 
-
-    @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
     @Override
     public void decode() {
         this.decodeUnsupported();
@@ -31,5 +25,10 @@ public class UpdateEquipmentPacket extends DataPacket {
         this.putByte((byte) this.windowType);
         this.putEntityUniqueId(this.eid);
         this.put(this.namedtag);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

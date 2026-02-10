@@ -14,8 +14,8 @@ public class BlockDoorBirch extends BlockDoorWood {
     }
 
     @Override
-    public String getName() {
-        return "Birch Door Block";
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
     }
 
     @Override
@@ -24,12 +24,12 @@ public class BlockDoorBirch extends BlockDoorWood {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.BIRCH_DOOR);
+    public String getName() {
+        return "Birch Door Block";
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
+    public Item toItem() {
+        return Item.get(Item.BIRCH_DOOR);
     }
 }

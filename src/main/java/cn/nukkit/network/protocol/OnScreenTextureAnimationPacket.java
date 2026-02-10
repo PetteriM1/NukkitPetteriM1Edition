@@ -10,11 +10,6 @@ public class OnScreenTextureAnimationPacket extends DataPacket {
     public int effectId;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -23,5 +18,10 @@ public class OnScreenTextureAnimationPacket extends DataPacket {
     public void encode() {
         this.reset();
         this.putLInt(this.effectId);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

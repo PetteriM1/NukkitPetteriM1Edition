@@ -21,18 +21,8 @@ import java.util.Map;
 public class BlockEnchantingTable extends BlockTransparent {
 
     @Override
-    public int getId() {
-        return ENCHANTING_TABLE;
-    }
-
-    @Override
-    public String getName() {
-        return "Enchanting Table";
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
@@ -41,8 +31,8 @@ public class BlockEnchantingTable extends BlockTransparent {
     }
 
     @Override
-    public double getResistance() {
-        return 6000;
+    public int getId() {
+        return ENCHANTING_TABLE;
     }
 
     @Override
@@ -51,8 +41,33 @@ public class BlockEnchantingTable extends BlockTransparent {
     }
 
     @Override
+    public String getName() {
+        return "Enchanting Table";
+    }
+
+    @Override
+    public double getResistance() {
+        return 6000;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
     public boolean canBeActivated() {
         return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -64,6 +79,27 @@ public class BlockEnchantingTable extends BlockTransparent {
         } else {
             return new Item[0];
         }
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityEnchantTable)) {
+                return false;
+            }
+
+            BlockEntityEnchantTable enchantTable = (BlockEntityEnchantTable) t;
+            if (enchantTable.namedTag.contains("Lock") && enchantTable.namedTag.get("Lock") instanceof StringTag) {
+                if (!enchantTable.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return true;
+                }
+            }
+
+            player.addWindow(new EnchantInventory(player.getUIInventory(), this), Player.ENCHANT_WINDOW_ID);
+        }
+
+        return true;
     }
 
     @Override
@@ -90,41 +126,5 @@ public class BlockEnchantingTable extends BlockTransparent {
         BlockEntity.createBlockEntity(BlockEntity.ENCHANT_TABLE, this.getChunk(), nbt);
 
         return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityEnchantTable)) {
-                return false;
-            }
-
-            BlockEntityEnchantTable enchantTable = (BlockEntityEnchantTable) t;
-            if (enchantTable.namedTag.contains("Lock") && enchantTable.namedTag.get("Lock") instanceof StringTag) {
-                if (!enchantTable.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return true;
-                }
-            }
-
-            player.addWindow(new EnchantInventory(player.getUIInventory(), this), Player.ENCHANT_WINDOW_ID);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
     }
 }

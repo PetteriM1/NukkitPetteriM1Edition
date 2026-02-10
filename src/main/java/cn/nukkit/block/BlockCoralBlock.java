@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BlockCoralBlock extends BlockSolidMeta {
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Tube Coral Block",
             "Brain Coral Block",
             "Bubble Coral Block",
@@ -27,6 +27,71 @@ public class BlockCoralBlock extends BlockSolidMeta {
 
     public BlockCoralBlock(int meta) {
         super(meta);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.BLUE_BLOCK_COLOR;
+    }
+
+    public double getHardness() {
+        return 1.5;
+    }
+
+    @Override
+    public int getId() {
+        return CORAL_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        int variant = this.getDamage() & 0x7;
+        String name;
+        if (variant >= names.length) {
+            name = names[0];
+        } else {
+            name = names[variant];
+        }
+        return this.isDead() ? "Dead " + name : name;
+    }
+
+    public double getResistance() {
+        return 6;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    public boolean isDead() {
+        return (this.getDamage() & 0x8) == 0x8;
+    }
+
+    public void setDead(boolean dead) {
+        if (dead) {
+            this.setDamage(this.getDamage() | 0x8);
+        } else {
+            this.setDamage(this.getDamage() ^ 0x8);
+        }
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
+            if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
+                return new Item[]{this.toItem()};
+            } else {
+                return new Item[]{new ItemBlock(this.clone(), this.getDamage() | 0x8)};
+            }
+        } else {
+            return new Item[0];
+        }
     }
 
     @Override
@@ -60,70 +125,5 @@ public class BlockCoralBlock extends BlockSolidMeta {
             this.getLevel().setBlock(this, event.getNewState(), true, true);
         }
         return type;
-    }
-
-    public double getHardness() {
-        return 1.5;
-    }
-
-    public double getResistance() {
-        return 6;
-    }
-
-    @Override
-    public String getName() {
-        int variant = this.getDamage() & 0x7;
-        String name;
-        if (variant >= NAMES.length) {
-            name = NAMES[0];
-        } else {
-            name = NAMES[variant];
-        }
-        return this.isDead() ? "Dead " + name : name;
-    }
-
-    @Override
-    public int getId() {
-        return CORAL_BLOCK;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe() && item.getTier() >= ItemTool.TIER_WOODEN) {
-            if (item.getEnchantment(Enchantment.ID_SILK_TOUCH) != null) {
-                return new Item[]{this.toItem() };
-            } else {
-                return new Item[]{ new ItemBlock(this.clone(), this.getDamage() | 0x8) };
-            }
-        } else {
-            return new Item[0];
-        }
-    }
-
-    public boolean isDead() {
-        return (this.getDamage() & 0x8) == 0x8;
-    }
-
-    public void setDead(boolean dead) {
-        if (dead) {
-            this.setDamage(this.getDamage() | 0x8);
-        } else {
-            this.setDamage(this.getDamage() ^ 0x8);
-        }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLUE_BLOCK_COLOR;
     }
 }

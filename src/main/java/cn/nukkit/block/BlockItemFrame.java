@@ -27,104 +27,8 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public int getId() {
-        return ITEM_FRAME_BLOCK;
-    }
-
-    @Override
-    public String getName() {
-        return "Item Frame";
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!this.getSide(getFacing()).isSolid()) {
-                this.level.useBreakOn(this);
-                return type;
-            }
-        }
-
-        return 0;
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
-        if (!(blockEntity instanceof BlockEntityItemFrame)) {
-            return false;
-        }
-
-        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntity;
-        if (itemFrame.getItem() == null) {
-            return true;
-        }
-        if (itemFrame.getItem().getId() == Item.AIR) {
-            Item itemToFrame = item.clone();
-            if (player != null && !player.isCreative()) {
-                item.count--;
-            }
-            itemToFrame.setCount(1);
-            itemFrame.setItem(itemToFrame);
-            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_ITEM_ADDED);
-        } else {
-            itemFrame.setItemRotation((itemFrame.getItemRotation() + 1) % 8);
-            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_ITEM_ROTATED);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (target.isSolid() && (!block.isSolid() || block.canBeReplaced())) {
-            this.setDamage(FACING[face.getIndex()]);
-
-            this.getLevel().setBlock(this, this, true, true);
-
-            CompoundTag nbt = new CompoundTag()
-                    .putString("id", BlockEntity.ITEM_FRAME)
-                    .putInt("x", (int) block.x)
-                    .putInt("y", (int) block.y)
-                    .putInt("z", (int) block.z)
-                    .putByte("ItemRotation", 0)
-                    .putFloat("ItemDropChance", 1.0f);
-            if (item.hasCustomBlockData()) {
-                for (Tag aTag : item.getCustomBlockData().getAllTags()) {
-                    nbt.put(aTag.getName(), aTag);
-                }
-            }
-            BlockEntity.createBlockEntity(BlockEntity.ITEM_FRAME, this.getChunk(), nbt);
-            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_PLACED);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onBreak(Item item) {
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-        this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_REMOVED);
-        return true;
-    }
-
-    @Override
-    public Item toItem() {
-        return Item.get(Item.ITEM_FRAME);
-    }
-
-    @Override
-    public boolean canPassThrough() {
-        return true;
-    }
-
-    @Override
-    public boolean hasComparatorInputOverride() {
-        return true;
+    public BlockFace getBlockFace() {
+        return this.getFacing().getOpposite();
     }
 
     @Override
@@ -167,6 +71,21 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public int getId() {
+        return ITEM_FRAME_BLOCK;
+    }
+
+    @Override
+    public String getName() {
+        return "Item Frame";
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
     public boolean isSolid() {
         return false;
     }
@@ -177,17 +96,98 @@ public class BlockItemFrame extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return this.getFacing().getOpposite();
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    public boolean canBeActivated() {
+        return true;
     }
 
     @Override
     public boolean canBePushed() {
         return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public boolean canPassThrough() {
+        return true;
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        BlockEntity blockEntity = this.getLevel().getBlockEntity(this);
+        if (!(blockEntity instanceof BlockEntityItemFrame)) {
+            return false;
+        }
+
+        BlockEntityItemFrame itemFrame = (BlockEntityItemFrame) blockEntity;
+        if (itemFrame.getItem() == null) {
+            return true;
+        }
+        if (itemFrame.getItem().getId() == Item.AIR) {
+            Item itemToFrame = item.clone();
+            if (player != null && !player.isCreative()) {
+                item.count--;
+            }
+            itemToFrame.setCount(1);
+            itemFrame.setItem(itemToFrame);
+            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_ITEM_ADDED);
+        } else {
+            itemFrame.setItemRotation((itemFrame.getItemRotation() + 1) % 8);
+            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_ITEM_ROTATED);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+        this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_REMOVED);
+        return true;
+    }
+
+    @Override
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!this.getSide(getFacing()).isSolid()) {
+                this.level.useBreakOn(this);
+                return type;
+            }
+        }
+
+        return 0;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (target.isSolid() && (!block.isSolid() || block.canBeReplaced())) {
+            this.setDamage(FACING[face.getIndex()]);
+
+            this.getLevel().setBlock(this, this, true, true);
+
+            CompoundTag nbt = new CompoundTag()
+                    .putString("id", BlockEntity.ITEM_FRAME)
+                    .putInt("x", (int) block.x)
+                    .putInt("y", (int) block.y)
+                    .putInt("z", (int) block.z)
+                    .putByte("ItemRotation", 0)
+                    .putFloat("ItemDropChance", 1.0f);
+            if (item.hasCustomBlockData()) {
+                for (Tag aTag : item.getCustomBlockData().getAllTags()) {
+                    nbt.put(aTag.getName(), aTag);
+                }
+            }
+            BlockEntity.createBlockEntity(BlockEntity.ITEM_FRAME, this.getChunk(), nbt);
+            this.getLevel().addLevelEvent(this, LevelEventPacket.EVENT_SOUND_ITEM_FRAME_PLACED);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.ITEM_FRAME);
     }
 }

@@ -1,5 +1,6 @@
 package cn.nukkit.console;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.event.server.ServerCommandEvent;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,37 @@ public class NukkitConsole extends SimpleTerminalConsole {
     private final BlockingQueue<String> consoleQueue = new LinkedBlockingQueue<>();
     private final AtomicBoolean executingCommands = new AtomicBoolean(false);
 
+    public boolean isExecutingCommands() {
+        return executingCommands.get();
+    }
+
     @Override
     protected boolean isRunning() {
         return Server.getInstance().isRunning();
+    }
+
+    public void setExecutingCommands(boolean executingCommands) {
+        if (this.executingCommands.compareAndSet(!executingCommands, executingCommands) && executingCommands) {
+            consoleQueue.clear();
+        }
+    }
+
+    @Override
+    protected LineReader buildReader(LineReaderBuilder builder) {
+        builder.completer(new NukkitConsoleCompleter());
+        builder.appName(Nukkit.NUKKIT_PM1E);
+        builder.option(LineReader.Option.HISTORY_BEEP, false);
+        builder.option(LineReader.Option.HISTORY_IGNORE_DUPS, true);
+        builder.option(LineReader.Option.HISTORY_IGNORE_SPACE, true);
+        return super.buildReader(builder);
+    }
+
+    public String readLine() {
+        try {
+            return consoleQueue.take();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -37,36 +66,8 @@ public class NukkitConsole extends SimpleTerminalConsole {
         }
     }
 
-    public String readLine() {
-        try {
-            return consoleQueue.take();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     protected void shutdown() {
         Server.getInstance().shutdown();
-    }
-
-    @Override
-    protected LineReader buildReader(LineReaderBuilder builder) {
-        builder.completer(new NukkitConsoleCompleter());
-        builder.appName("Nukkit");
-        builder.option(LineReader.Option.HISTORY_BEEP, false);
-        builder.option(LineReader.Option.HISTORY_IGNORE_DUPS, true);
-        builder.option(LineReader.Option.HISTORY_IGNORE_SPACE, true);
-        return super.buildReader(builder);
-    }
-
-    public boolean isExecutingCommands() {
-        return executingCommands.get();
-    }
-
-    public void setExecutingCommands(boolean executingCommands) {
-        if (this.executingCommands.compareAndSet(!executingCommands, executingCommands) && executingCommands) {
-            consoleQueue.clear();
-        }
     }
 }

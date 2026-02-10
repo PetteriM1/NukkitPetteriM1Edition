@@ -14,6 +14,11 @@ public abstract class BlockStemStripped extends BlockStem {
     }
 
     @Override
+    public int getStrippedId() {
+        return this.getId();
+    }
+
+    @Override
     public boolean canBeActivated() {
         return false;
     }
@@ -21,10 +26,5 @@ public abstract class BlockStemStripped extends BlockStem {
     @Override
     public boolean onActivate(Item item, Player player) {
         return false;
-    }
-
-    @Override
-    public int getStrippedId() {
-        return this.getId();
     }
 }

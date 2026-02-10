@@ -16,9 +16,8 @@ public class SmithingItemAction extends InventoryAction {
         this.type = type;
     }
 
-    @Override
-    public boolean isValid(Player source) {
-        return source.getWindowById(Player.SMITHING_WINDOW_ID) instanceof SmithingInventory;
+    public int getType() {
+        return type;
     }
 
     @Override
@@ -27,8 +26,8 @@ public class SmithingItemAction extends InventoryAction {
     }
 
     @Override
-    public void onExecuteSuccess(Player source) {
-        // Does nothing
+    public boolean isValid(Player source) {
+        return source.getWindowById(Player.SMITHING_WINDOW_ID) instanceof SmithingInventory;
     }
 
     @Override
@@ -36,7 +35,8 @@ public class SmithingItemAction extends InventoryAction {
         // Does nothing
     }
 
-    public int getType() {
-        return type;
+    @Override
+    public void onExecuteSuccess(Player source) {
+        // Does nothing
     }
 }

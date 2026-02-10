@@ -14,13 +14,17 @@ public class LoomItemAction extends InventoryAction {
     }
 
     @Override
+    public boolean execute(Player source) {
+        return true;
+    }
+
+    @Override
     public boolean isValid(Player source) {
         return source.getWindowById(Player.LOOM_WINDOW_ID) instanceof LoomInventory;
     }
 
     @Override
-    public boolean execute(Player source) {
-        return true;
+    public void onExecuteFail(Player source) {
     }
 
     @Override
@@ -36,10 +40,5 @@ public class LoomItemAction extends InventoryAction {
             inventory.setDye(dye);
         }
         // Pattern not consumed
-    }
-
-    @Override
-    public void onExecuteFail(Player source) {
-        inventory.sendContents(source);
     }
 }

@@ -23,14 +23,6 @@ public abstract class Tag {
 
     private String name;
 
-    abstract void write(NBTOutputStream dos) throws IOException;
-
-    abstract void load(NBTInputStream dis) throws IOException;
-
-    public abstract String toString();
-
-    public abstract byte getId();
-
     protected Tag(String name) {
         if (name == null) {
             this.name = "";
@@ -39,29 +31,11 @@ public abstract class Tag {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Tag)) {
-            return false;
-        }
-        Tag o = (Tag) obj;
-        return getId() == o.getId() && !(name == null && o.name != null || name != null && o.name == null) && !(name != null && !name.equals(o.name));
-    }
+    public abstract byte getId();
 
-    public void print(PrintStream out) {
-        print("", out);
-    }
-
-    public void print(String prefix, PrintStream out) {
-        String name = getName();
-
-        out.print(prefix);
-        out.print(getTagName(getId()));
-        if (!name.isEmpty()) {
-            out.print("(\"" + name + "\")");
-        }
-        out.print(": ");
-        out.println(toString());
+    public String getName() {
+        if (name == null) return "";
+        return name;
     }
 
     public Tag setName(String name) {
@@ -73,63 +47,15 @@ public abstract class Tag {
         return this;
     }
 
-    public String getName() {
-        if (name == null) return "";
-        return name;
-    }
+    public abstract Tag copy();
 
-    public static Tag readNamedTag(NBTInputStream dis) throws IOException {
-        byte type = dis.readByte();
-        if (type == 0) return new EndTag();
-
-        String name = dis.readUTF(1024);
-
-        Tag tag = newTag(type, name);
-
-        tag.load(dis);
-        return tag;
-    }
-
-    public static void writeNamedTag(Tag tag, NBTOutputStream dos) throws IOException {
-        writeNamedTag(tag, tag.getName(), dos);
-    }
-
-    public static void writeNamedTag(Tag tag, String name, NBTOutputStream dos) throws IOException {
-        dos.writeByte(tag.getId());
-        if (tag.getId() == Tag.TAG_End) return;
-        dos.writeUTF(name);
-
-        tag.write(dos);
-    }
-
-    public static Tag newTag(byte type, String name) {
-        switch (type) {
-            case TAG_End:
-                return new EndTag();
-            case TAG_Byte:
-                return new ByteTag(name);
-            case TAG_Short:
-                return new ShortTag(name);
-            case TAG_Int:
-                return new IntTag(name);
-            case TAG_Long:
-                return new LongTag(name);
-            case TAG_Float:
-                return new FloatTag(name);
-            case TAG_Double:
-                return new DoubleTag(name);
-            case TAG_Byte_Array:
-                return new ByteArrayTag(name);
-            case TAG_Int_Array:
-                return new IntArrayTag(name);
-            case TAG_String:
-                return new StringTag(name);
-            case TAG_List:
-                return new ListTag<>(name);
-            case TAG_Compound:
-                return new CompoundTag(name);
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Tag)) {
+            return false;
         }
-        return new EndTag();
+        Tag o = (Tag) obj;
+        return getId() == o.getId() && !(name == null && o.name != null || name != null && o.name == null) && !(name != null && !name.equals(o.name));
     }
 
     public static String getTagName(byte type) {
@@ -162,7 +88,82 @@ public abstract class Tag {
         return "UNKNOWN";
     }
 
-    public abstract Tag copy();
+    abstract void load(NBTInputStream dis) throws IOException;
+
+    public static Tag newTag(byte type, String name) {
+        switch (type) {
+            case TAG_End:
+                return new EndTag();
+            case TAG_Byte:
+                return new ByteTag(name);
+            case TAG_Short:
+                return new ShortTag(name);
+            case TAG_Int:
+                return new IntTag(name);
+            case TAG_Long:
+                return new LongTag(name);
+            case TAG_Float:
+                return new FloatTag(name);
+            case TAG_Double:
+                return new DoubleTag(name);
+            case TAG_Byte_Array:
+                return new ByteArrayTag(name);
+            case TAG_Int_Array:
+                return new IntArrayTag(name);
+            case TAG_String:
+                return new StringTag(name);
+            case TAG_List:
+                return new ListTag<>(name);
+            case TAG_Compound:
+                return new CompoundTag(name);
+        }
+        return new EndTag();
+    }
 
     public abstract Object parseValue();
+
+    public void print(PrintStream out) {
+        print("", out);
+    }
+
+    public void print(String prefix, PrintStream out) {
+        String name = getName();
+
+        out.print(prefix);
+        out.print(getTagName(getId()));
+        if (!name.isEmpty()) {
+            out.print("(\"" + name + "\")");
+        }
+        out.print(": ");
+        out.println(this);
+    }
+
+    public static Tag readNamedTag(NBTInputStream dis) throws IOException {
+        byte type = dis.readByte();
+        if (type == 0) return new EndTag();
+
+        String name = dis.readUTF(1024);
+
+        // TODO: we should limit the size of array tags this can create
+        Tag tag = newTag(type, name);
+
+        tag.load(dis);
+        return tag;
+    }
+
+    public abstract String toString();
+
+    abstract void write(NBTOutputStream dos) throws IOException;
+
+    public static void writeNamedTag(Tag tag, NBTOutputStream dos) throws IOException {
+        writeNamedTag(tag, tag.getName(), dos);
+    }
+
+    public static void writeNamedTag(Tag tag, String name, NBTOutputStream dos) throws IOException {
+        dos.writeByte(tag.getId());
+        if (tag.getId() == Tag.TAG_End) return;
+        dos.writeUTF(name);
+
+        tag.write(dos);
+    }
 }

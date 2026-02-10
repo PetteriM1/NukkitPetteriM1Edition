@@ -45,6 +45,7 @@ public class MesaBiome extends CoveredBiome {
 
     protected int moundHeight;
     private final SimplexF moundNoise = new SimplexF(new NukkitRandom(347228794), 2f, 1 / 4f, getMoundFrequency());
+
     public MesaBiome() {
         PopulatorCactus cactus = new PopulatorCactus();
         cactus.setBaseAmount(1);
@@ -59,19 +60,39 @@ public class MesaBiome extends CoveredBiome {
         this.setMoundHeight(17);
     }
 
-    private static void setRandomLayerColor(SplittableRandom random, int sliceCount, int color) {
-        for (int i = 0; i < random.nextInt(4) + sliceCount; i++) {
-            int j = random.nextInt(colorLayer.length);
-            int k = 0;
-            while (k < random.nextInt(2) + 1 && j < colorLayer.length) {
-                colorLayer[j++] = color;
-                k++;
-            }
-        }
+    protected float getMoundFrequency() {
+        return 0.0078125f;
+    }
+
+    @Override
+    public String getName() {
+        return "Mesa";
     }
 
     public void setMoundHeight(int height) {
         this.moundHeight = height;
+    }
+
+    @Override
+    public boolean canRain() {
+        return false;
+    }
+
+    @Override
+    public int getGroundDepth(int x, int y, int z) {
+        return y < (71 + Math.round((redSandNoise.noise2D(x, z, true) + 1) * 1.5f)) ? 2 : 0;
+    }
+
+    @Override
+    public int getGroundId(int x, int y, int z) {
+        return Block.RED_SANDSTONE << Block.DATA_BITS;
+    }
+
+    @Override
+    public int getHeightOffset(int x, int z) {
+        float n = moundNoise.noise2D(x, z, true);
+        float a = minHill();
+        return (n > a && n < a + 0.2f) ? (int) ((n - a) * 5f * moundHeight) : n < a + 0.1f ? 0 : moundHeight;
     }
 
     @Override
@@ -89,38 +110,18 @@ public class MesaBiome extends CoveredBiome {
         }
     }
 
-    @Override
-    public int getGroundDepth(int x, int y, int z) {
-        return y < (71 + Math.round((redSandNoise.noise2D(x, z, true) + 1) * 1.5f)) ? 2 : 0;
-    }
-
-    @Override
-    public int getGroundId(int x, int y, int z) {
-        return Block.RED_SANDSTONE << Block.DATA_BITS;
-    }
-
-    @Override
-    public String getName() {
-        return "Mesa";
-    }
-
-    protected float getMoundFrequency() {
-        return 0.0078125f;
-    }
-
-    @Override
-    public int getHeightOffset(int x, int z) {
-        float n = moundNoise.noise2D(x, z, true);
-        float a = minHill();
-        return (n > a && n < a + 0.2f) ? (int) ((n - a) * 5f * moundHeight) : n < a + 0.1f ? 0 : moundHeight;
-    }
-
     protected float minHill() {
         return -0.1f;
     }
 
-    @Override
-    public boolean canRain() {
-        return false;
+    private static void setRandomLayerColor(SplittableRandom random, int sliceCount, int color) {
+        for (int i = 0; i < random.nextInt(4) + sliceCount; i++) {
+            int j = random.nextInt(colorLayer.length);
+            int k = 0;
+            while (k < random.nextInt(2) + 1 && j < colorLayer.length) {
+                colorLayer[j++] = color;
+                k++;
+            }
+        }
     }
 }

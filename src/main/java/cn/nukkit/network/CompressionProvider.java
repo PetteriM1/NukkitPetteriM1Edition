@@ -9,6 +9,11 @@ public interface CompressionProvider {
 
     CompressionProvider NONE = new CompressionProvider() {
         @Override
+        public byte getPrefix() {
+            return (byte) 0xff;
+        }
+
+        @Override
         public byte[] compress(BinaryStream packet, int level) throws Exception {
             return packet.getBuffer();
         }
@@ -22,14 +27,31 @@ public interface CompressionProvider {
         public byte[] decompress(byte[] compressed, int maxSize) throws Exception {
             return compressed;
         }
+    };
+
+    CompressionProvider ZLIB = new CompressionProvider() {
+        @Override
+        public byte[] compress(BinaryStream packet, int level) throws Exception {
+            return Zlib.deflatePre16Packet(packet.getBuffer(), level);
+        }
 
         @Override
-        public byte getPrefix() {
-            return (byte) 0xff;
+        public byte[] decompress(byte[] compressed) throws Exception {
+            return Zlib.inflate(compressed, 6291456);
+        }
+
+        @Override
+        public byte[] decompress(byte[] compressed, int maxSize) throws Exception {
+            return Zlib.inflate(compressed, maxSize);
         }
     };
 
     CompressionProvider ZLIB_RAW = new CompressionProvider() {
+        @Override
+        public byte getPrefix() {
+            return (byte) 0x00;
+        }
+
         @Override
         public byte[] compress(BinaryStream packet, int level) throws Exception {
             return Zlib.deflateRaw(packet.getBuffer(), level);
@@ -44,14 +66,14 @@ public interface CompressionProvider {
         public byte[] decompress(byte[] compressed, int maxSize) throws Exception {
             return Zlib.inflateRaw(compressed, maxSize);
         }
-
-        @Override
-        public byte getPrefix() {
-            return (byte) 0x00;
-        }
     };
 
     CompressionProvider SNAPPY = new CompressionProvider() {
+        @Override
+        public byte getPrefix() {
+            return (byte) 0x01;
+        }
+
         @Override
         public byte[] compress(BinaryStream packet, int level) throws Exception {
             return SnappyCompression.compress(packet.getBuffer());
@@ -66,31 +88,7 @@ public interface CompressionProvider {
         public byte[] decompress(byte[] compressed, int maxSize) throws Exception {
             return SnappyCompression.decompress(compressed, maxSize);
         }
-
-        @Override
-        public byte getPrefix() {
-            return (byte) 0x01;
-        }
     };
-
-
-    byte[] compress(BinaryStream packet, int level) throws Exception;
-    byte[] decompress(byte[] compressed) throws Exception;
-
-    default byte[] decompress(byte[] compressed, int maxSize) throws Exception {
-        return this.decompress(compressed);
-    }
-
-    static CompressionProvider from(PacketCompressionAlgorithm algorithm) {
-        if (algorithm == null) {
-            return NONE;
-        } else if (algorithm == PacketCompressionAlgorithm.ZLIB) {
-            return ZLIB_RAW;
-        } else if (algorithm == PacketCompressionAlgorithm.SNAPPY) {
-            return SNAPPY;
-        }
-        throw new UnsupportedOperationException();
-    }
 
     default byte getPrefix() {
         throw new UnsupportedOperationException();
@@ -106,5 +104,24 @@ public interface CompressionProvider {
                 return NONE;
         }
         throw new IllegalArgumentException("Unknown compression type: " + prefix);
+    }
+
+    byte[] compress(BinaryStream packet, int level) throws Exception;
+
+    default byte[] decompress(byte[] compressed, int maxSize) throws Exception {
+        return this.decompress(compressed);
+    }
+
+    byte[] decompress(byte[] compressed) throws Exception;
+
+    static CompressionProvider from(PacketCompressionAlgorithm algorithm, int raknetVersion) {
+        if (algorithm == null) {
+            return NONE;
+        } else if (algorithm == PacketCompressionAlgorithm.ZLIB) {
+            return raknetVersion < 10 ? ZLIB : ZLIB_RAW;
+        } else if (algorithm == PacketCompressionAlgorithm.SNAPPY) {
+            return SNAPPY;
+        }
+        throw new UnsupportedOperationException();
     }
 }

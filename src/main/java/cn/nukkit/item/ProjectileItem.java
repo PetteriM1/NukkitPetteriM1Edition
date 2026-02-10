@@ -27,6 +27,9 @@ public abstract class ProjectileItem extends Item {
 
     abstract public float getThrowForce();
 
+    protected void correctNBT(CompoundTag nbt) {
+    }
+
     public boolean onClickAir(Player player, Vector3 directionVector) {
         Vector3 motion;
 
@@ -86,8 +89,5 @@ public abstract class ProjectileItem extends Item {
         }
 
         return true;
-    }
-
-    protected void correctNBT(CompoundTag nbt) {
     }
 }

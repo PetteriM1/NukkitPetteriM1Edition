@@ -4,13 +4,18 @@ import cn.nukkit.block.properties.OxidizationLevel;
 import cn.nukkit.utils.BlockColor;
 
 public class BlockStairsCopperCutWeathered extends BlockStairsCopperCut {
-    
+
     public BlockStairsCopperCutWeathered() {
         this(0);
     }
-    
+
     public BlockStairsCopperCutWeathered(int meta) {
         super(meta);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WARPED_STEM_BLOCK_COLOR;
     }
 
     @Override
@@ -21,10 +26,5 @@ public class BlockStairsCopperCutWeathered extends BlockStairsCopperCut {
     @Override
     public OxidizationLevel getOxidizationLevel() {
         return OxidizationLevel.WEATHERED;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.WARPED_STEM_BLOCK_COLOR;
     }
 }

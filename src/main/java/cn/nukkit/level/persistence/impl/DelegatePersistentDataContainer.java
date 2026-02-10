@@ -8,13 +8,16 @@ public abstract class DelegatePersistentDataContainer implements PersistentDataC
 
     private PersistentDataContainer delegate;
 
-    protected abstract PersistentDataContainer createDelegate();
-
     protected final PersistentDataContainer getDelegate() {
         if (this.delegate == null) {
             this.delegate = this.createDelegate();
         }
         return this.delegate;
+    }
+
+    @Override
+    public CompoundTag getReadStorage() {
+        return this.delegate == null ? ImmutableCompoundTag.EMPTY : this.getStorage();
     }
 
     @Override
@@ -27,8 +30,5 @@ public abstract class DelegatePersistentDataContainer implements PersistentDataC
         this.getDelegate().setStorage(storage);
     }
 
-    @Override
-    public CompoundTag getReadStorage() {
-        return this.delegate == null ? ImmutableCompoundTag.EMPTY : this.getStorage();
-    }
+    protected abstract PersistentDataContainer createDelegate();
 }

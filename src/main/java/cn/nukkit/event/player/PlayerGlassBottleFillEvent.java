@@ -16,11 +16,11 @@ public class PlayerGlassBottleFillEvent extends PlayerEvent implements Cancellab
         this.item = item.clone();
     }
 
-    public Item getItem() {
-        return item;
-    }
-
     public Block getBlock() {
         return target;
+    }
+
+    public Item getItem() {
+        return item;
     }
 }

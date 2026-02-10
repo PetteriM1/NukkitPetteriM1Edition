@@ -8,23 +8,18 @@ import cn.nukkit.event.HandlerList;
 public class AnvilDamageEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private final int oldDamage;
     private int newDamage;
     private final DamageCause cause;
     private final Player player;
-
     /**
      * This event is called when an anvil is damaged.
-     * @param block The block (anvil) that has been damaged.
+     *
+     * @param block     The block (anvil) that has been damaged.
      * @param oldDamage Old damage value.
      * @param newDamage New damage value.
-     * @param cause Cause of the anvil being damaged.
-     * @param player The player who used the anvil.
+     * @param cause     Cause of the anvil being damaged.
+     * @param player    The player who used the anvil.
      */
     public AnvilDamageEvent(Block block, int oldDamage, int newDamage, DamageCause cause, Player player) {
         super(block);
@@ -34,28 +29,32 @@ public class AnvilDamageEvent extends BlockEvent implements Cancellable {
         this.player = player;
     }
 
-    public int getOldDamage() {
-        return this.oldDamage;
-    }
-
-    public int getNewDamage() {
-        return this.newDamage;
-    }
-
-    public void setNewDamage(int newDamage) {
-        this.newDamage = newDamage;
+    public enum DamageCause {
+        USE,
+        FALL
     }
 
     public DamageCause getCause() {
         return this.cause;
     }
 
+    public static HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public int getNewDamage() {
+        return this.newDamage;
+    }
+
+    public int getOldDamage() {
+        return this.oldDamage;
+    }
+
     public Player getPlayer() {
         return this.player;
     }
 
-    public enum DamageCause {
-        USE,
-        FALL
+    public void setNewDamage(int newDamage) {
+        this.newDamage = newDamage;
     }
 }

@@ -16,8 +16,8 @@ public class BlockSlabWarped extends BlockSlab {
     }
 
     @Override
-    public String getSlabName() {
-        return "Warped";
+    public BlockColor getColor() {
+        return BlockColor.CYAN_BLOCK_COLOR;
     }
 
     @Override
@@ -26,13 +26,8 @@ public class BlockSlabWarped extends BlockSlab {
     }
 
     @Override
-    public boolean hasTopBit() {
-        return (this.getDamage() & 0x01) == 1;
-    }
-
-    @Override
-    public void setTopBit(boolean topBit) {
-        this.setDamage(topBit ? 1 : 0);
+    public String getSlabName() {
+        return "Warped";
     }
 
     @Override
@@ -41,22 +36,22 @@ public class BlockSlabWarped extends BlockSlab {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{ this.toItem() };
+    public void setTopBit(boolean topBit) {
+        this.setDamage(topBit ? 1 : 0);
     }
 
     @Override
-    public double getResistance() {
-        return 3;
+    public Item[] getDrops(Item item) {
+        return new Item[]{this.toItem()};
+    }
+
+    @Override
+    public boolean hasTopBit() {
+        return (this.getDamage() & 0x01) == 1;
     }
 
     @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.CYAN_BLOCK_COLOR;
     }
 }

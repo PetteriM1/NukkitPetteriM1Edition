@@ -30,6 +30,11 @@ public class TranslationContainer extends TextContainer implements Cloneable {
         this.params = params;
     }
 
+    @Override
+    public TranslationContainer clone() {
+        return new TranslationContainer(this.text, this.params.clone());
+    }
+
     public String getParameter(int i) {
         return (i >= 0 && i < this.params.length) ? this.params[i] : null;
     }
@@ -38,10 +43,5 @@ public class TranslationContainer extends TextContainer implements Cloneable {
         if (i >= 0 && i < this.params.length) {
             this.params[i] = str;
         }
-    }
-
-    @Override
-    public TranslationContainer clone() {
-        return new TranslationContainer(this.text, this.params.clone());
     }
 }

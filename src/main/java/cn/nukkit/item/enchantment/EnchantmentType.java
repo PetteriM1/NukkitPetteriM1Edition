@@ -1,6 +1,5 @@
 package cn.nukkit.item.enchantment;
 
-import cn.nukkit.block.BlockID;
 import cn.nukkit.item.*;
 
 /**
@@ -21,7 +20,9 @@ public enum EnchantmentType {
     BOW,
     WEARABLE,
     TRIDENT,
-    CROSSBOW;
+    CROSSBOW,
+    MACE,
+    SPEAR;
 
     public boolean canEnchantItem(Item item) {
         if (this == ALL) {
@@ -58,11 +59,13 @@ public enum EnchantmentType {
                 case FISHING_ROD:
                     return item instanceof ItemFishingRod;
                 case WEARABLE:
-                    return item instanceof ItemSkull || item.getId() == (255 - BlockID.CARVED_PUMPKIN);
+                    return item instanceof ItemSkull || item.getId() == (255 - Item.CARVED_PUMPKIN);
                 case TRIDENT:
                     return item instanceof ItemTrident;
                 case CROSSBOW:
                     return item instanceof ItemCrossbow;
+                case MACE:
+                    return item instanceof ItemMace;
                 default:
                     return false;
             }

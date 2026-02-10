@@ -19,17 +19,17 @@ public class ByteEntityData extends EntityData<Integer> {
         return data;
     }
 
+    @Override
+    public int getType() {
+        return Entity.DATA_TYPE_BYTE;
+    }
+
     public void setData(Integer data) {
         if (data == null) {
             this.data = 0;
         } else {
             this.data = data;
         }
-    }
-
-    @Override
-    public int getType() {
-        return Entity.DATA_TYPE_BYTE;
     }
 
     @Override

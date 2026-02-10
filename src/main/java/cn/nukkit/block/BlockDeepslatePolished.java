@@ -7,12 +7,12 @@ public class BlockDeepslatePolished extends BlockDeepslateCobbled {
     }
 
     @Override
-    public String getName() {
-        return "Polished Deepslate";
+    public int getId() {
+        return POLISHED_DEEPSLATE;
     }
 
     @Override
-    public int getId() {
-        return POLISHED_DEEPSLATE;
+    public String getName() {
+        return "Polished Deepslate";
     }
 }

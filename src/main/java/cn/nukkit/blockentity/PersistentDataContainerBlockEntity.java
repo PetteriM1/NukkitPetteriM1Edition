@@ -14,21 +14,8 @@ public class PersistentDataContainerBlockEntity extends BlockEntity implements P
     }
 
     @Override
-    public boolean onUpdate() {
-        if (!this.isBlockEntityValid()) {
-            this.close();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return this.level.getBlockIdAt(this.chunk, (int) this.x, (int) this.y, (int) this.z) != BlockID.AIR;
-    }
-
-    @Override
-    public boolean isValid() {
-        return super.isValid() && this.isBlockEntityValid();
+    public PersistentDataContainer getPersistentDataContainer() {
+        return this;
     }
 
     @Override
@@ -43,14 +30,24 @@ public class PersistentDataContainerBlockEntity extends BlockEntity implements P
     }
 
     @Override
+    public boolean isBlockEntityValid() {
+        return this.level.getBlockIdAt(this.chunk, (int) this.x, (int) this.y, (int) this.z) != BlockID.AIR;
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && this.isBlockEntityValid();
+    }
+
+    @Override
     public void setStorage(CompoundTag storage) {
         this.namedTag.put(STORAGE_TAG, storage);
         setDirty();
     }
 
     @Override
-    public PersistentDataContainer getPersistentDataContainer() {
-        return this;
+    public boolean canSaveToStorage() {
+        return !this.isEmpty();
     }
 
     @Override
@@ -59,8 +56,11 @@ public class PersistentDataContainerBlockEntity extends BlockEntity implements P
     }
 
     @Override
-    public boolean canSaveToStorage() {
-        return !this.isEmpty();
+    public boolean onUpdate() {
+        if (!this.isBlockEntityValid()) {
+            this.close();
+        }
+        return false;
     }
 
     @Override

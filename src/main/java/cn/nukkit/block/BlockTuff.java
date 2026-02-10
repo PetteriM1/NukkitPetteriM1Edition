@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockTuff extends BlockSolid {
 
@@ -10,13 +12,8 @@ public class BlockTuff extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Tuff";
-    }
-
-    @Override
-    public int getId() {
-        return TUFF;
+    public BlockColor getColor() {
+        return BlockColor.GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -25,13 +22,23 @@ public class BlockTuff extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 6;
+    public int getId() {
+        return TUFF;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Tuff";
+    }
+
+    @Override
+    public double getResistance() {
+        return 6;
     }
 
     @Override
@@ -40,12 +47,17 @@ public class BlockTuff extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GRAY_TERRACOTA_BLOCK_COLOR;
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
     public boolean canHarvestWithHand() {
         return false;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.STONE;
     }
 }

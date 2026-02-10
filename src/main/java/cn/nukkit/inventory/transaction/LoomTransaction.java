@@ -19,13 +19,34 @@ public class LoomTransaction extends InventoryTransaction {
         super(source, actions);
     }
 
+    public Item getOutputItem() {
+        return this.outputItem;
+    }
+
     @Override
     public void addAction(InventoryAction action) {
-        super.addAction(action);
-
         if (action instanceof LoomItemAction) {
-            outputItem = action.getSourceItem();
+            if (this.outputItem != null) {
+                this.invalid = true;
+                source.getServer().getLogger().debug("Duplicate addAction for outputItem");
+                return;
+            }
+            this.outputItem = action.getSourceItem();
         }
+        super.addAction(action);
+    }
+
+    @Override
+    protected boolean callExecuteEvent() {
+        LoomInventory inventory = (LoomInventory) getSource().getWindowById(Player.LOOM_WINDOW_ID);
+        LoomItemEvent event = new LoomItemEvent(inventory, this.outputItem, this.source);
+        this.source.getServer().getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            this.sendInventories();
+            source.setNeedSendInventory(true);
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -72,20 +93,8 @@ public class LoomTransaction extends InventoryTransaction {
     }
 
     @Override
-    protected boolean callExecuteEvent() {
-        LoomInventory inventory = (LoomInventory) getSource().getWindowById(Player.LOOM_WINDOW_ID);
-        LoomItemEvent event = new LoomItemEvent(inventory, this.outputItem, this.source);
-        this.source.getServer().getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            this.sendInventories();
-            source.setNeedSendInventory(true);
-            return false;
-        }
-        return true;
-    }
-
-    public Item getOutputItem() {
-        return this.outputItem;
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        return isIn(actions);
     }
 
     public static boolean isIn(List<InventoryAction> actions) {
@@ -93,10 +102,5 @@ public class LoomTransaction extends InventoryTransaction {
             if (action instanceof LoomItemAction) return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        return isIn(actions);
     }
 }

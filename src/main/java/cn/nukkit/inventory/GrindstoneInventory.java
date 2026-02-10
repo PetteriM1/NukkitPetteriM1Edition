@@ -19,6 +19,14 @@ public class GrindstoneInventory extends FakeBlockUIComponent {
         super(playerUI, InventoryType.GRINDSTONE, 16, position);
     }
 
+    public Item getEquipment() {
+        return getItem(EQUIPMENT);
+    }
+
+    public Item getIngredient() {
+        return getItem(INGREDIENT);
+    }
+
     public Item getResult() {
         Item eq = getEquipment();
         if (!(eq instanceof ItemDurable)) {
@@ -41,16 +49,8 @@ public class GrindstoneInventory extends FakeBlockUIComponent {
         return eq;
     }
 
-    public Item getEquipment() {
-        return getItem(EQUIPMENT);
-    }
-
     public void setEquipment(Item equipment) {
         setItem(EQUIPMENT, equipment);
-    }
-
-    public Item getIngredient() {
-        return getItem(INGREDIENT);
     }
 
     public void setIngredient(Item ingredient) {

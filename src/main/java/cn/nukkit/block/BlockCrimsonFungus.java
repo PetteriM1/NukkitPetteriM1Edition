@@ -10,6 +10,16 @@ public class BlockCrimsonFungus extends BlockFungus {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
+    }
+
+    @Override
+    protected int getGround() {
+        return CRIMSON_NYLIUM;
+    }
+
+    @Override
     public int getId() {
         return CRIMSON_FUNGUS;
     }
@@ -22,15 +32,5 @@ public class BlockCrimsonFungus extends BlockFungus {
     @Override
     protected ObjectNetherTree getTree() {
         return new ObjectCrimsonTree();
-    }
-
-    @Override
-    protected int getGround() {
-        return CRIMSON_NYLIUM;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 }

@@ -18,8 +18,35 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
     public double getHardness() {
         return 1.25;
+    }
+
+    @Override
+    public int getId() {
+        return BlockID.BASALT;
+    }
+
+    @Override
+    public String getName() {
+        return "Basalt";
+    }
+
+    public BlockFace.Axis getPillarAxis() {
+        switch (this.getDamage() % 3) {
+            case 2:
+                return BlockFace.Axis.Z;
+            case 1:
+                return BlockFace.Axis.X;
+            case 0:
+            default:
+                return BlockFace.Axis.Y;
+        }
     }
 
     @Override
@@ -28,10 +55,8 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setPillarAxis(face.getAxis());
-        this.getLevel().setBlock(block, this, true, true);
-        return true;
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     public void setPillarAxis(BlockFace.Axis axis) {
@@ -48,31 +73,9 @@ public class BlockBasalt extends BlockSolidMeta {
         }
     }
 
-    public BlockFace.Axis getPillarAxis() {
-        switch (this.getDamage() % 3) {
-            case 2:
-                return BlockFace.Axis.Z;
-            case 1:
-                return BlockFace.Axis.X;
-            case 0:
-            default:
-                return BlockFace.Axis.Y;
-        }
-    }
-
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public String getName() {
-        return "Basalt";
-    }
-
-    @Override
-    public int getId() {
-        return BlockID.BASALT;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -87,13 +90,10 @@ public class BlockBasalt extends BlockSolidMeta {
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setPillarAxis(face.getAxis());
+        this.getLevel().setBlock(block, this, true, true);
+        return true;
     }
 
     @Override

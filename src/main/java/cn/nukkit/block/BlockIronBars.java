@@ -12,8 +12,13 @@ import cn.nukkit.utils.BlockColor;
 public class BlockIronBars extends BlockThin {
 
     @Override
-    public String getName() {
-        return "Iron Bars";
+    public BlockColor getColor() {
+        return BlockColor.IRON_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 5;
     }
 
     @Override
@@ -22,8 +27,8 @@ public class BlockIronBars extends BlockThin {
     }
 
     @Override
-    public double getHardness() {
-        return 5;
+    public String getName() {
+        return "Iron Bars";
     }
 
     @Override
@@ -37,8 +42,13 @@ public class BlockIronBars extends BlockThin {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -53,17 +63,7 @@ public class BlockIronBars extends BlockThin {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.IRON_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

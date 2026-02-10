@@ -17,49 +17,16 @@ public abstract class SimpleChunkManager implements ChunkManager {
     }
 
     @Override
-    public int getBlockIdAt(int x, int y, int z, BlockLayer layer) {
-        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
-            return 0;
-        }
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            return chunk.getBlockId(x & 0xf, y, z & 0xf, layer);
-        }
-        return 0;
+    public long getSeed() {
+        return seed;
     }
 
-    @Override
-    public void setBlockIdAt(int x, int y, int z, BlockLayer layer, int id) {
-        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
-            return;
-        }
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.setBlockId(x & 0xf, y, z & 0xf, layer, id);
-        }
+    public void setSeed(long seed) {
+        this.seed = seed;
     }
 
-    @Override
-    public void setBlockAt(int x, int y, int z, int id, int data) {
-        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
-            return;
-        }
-
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.setBlock(x & 0xf, y, z & 0xf, id, data);
-        }
-    }
-
-    @Override
-    public void setBlockFullIdAt(int x, int y, int z, BlockLayer layer, int fullId) {
-        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
-            return;
-        }
-        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.setFullBlockId(x & 0xf, y, z & 0xf, layer, fullId);
-        }
+    public void cleanChunks(long seed) {
+        this.seed = seed;
     }
 
     @Override
@@ -75,10 +42,26 @@ public abstract class SimpleChunkManager implements ChunkManager {
     }
 
     @Override
-    public void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data) {
+    public int getBlockIdAt(int x, int y, int z, BlockLayer layer) {
+        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
+            return 0;
+        }
         FullChunk chunk = this.getChunk(x >> 4, z >> 4);
         if (chunk != null) {
-            chunk.setBlockData(x & 0xf, y, z & 0xf, layer, data);
+            return chunk.getBlockId(x & 0xf, y, z & 0xf, layer);
+        }
+        return 0;
+    }
+
+    @Override
+    public void setBlockAt(int x, int y, int z, int id, int data) {
+        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
+            return;
+        }
+
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setBlock(x & 0xf, y, z & 0xf, id, data);
         }
     }
 
@@ -100,20 +83,37 @@ public abstract class SimpleChunkManager implements ChunkManager {
     }
 
     @Override
-    public void setChunk(int chunkX, int chunkZ) {
-        this.setChunk(chunkX, chunkZ, null);
+    public void setBlockDataAt(int x, int y, int z, BlockLayer layer, int data) {
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setBlockData(x & 0xf, y, z & 0xf, layer, data);
+        }
     }
 
     @Override
-    public long getSeed() {
-        return seed;
+    public void setBlockFullIdAt(int x, int y, int z, BlockLayer layer, int fullId) {
+        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
+            return;
+        }
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setFullBlockId(x & 0xf, y, z & 0xf, layer, fullId);
+        }
     }
 
-    public void setSeed(long seed) {
-        this.seed = seed;
+    @Override
+    public void setBlockIdAt(int x, int y, int z, BlockLayer layer, int id) {
+        if (y < this.getMinBlockY() || y > this.getMaxBlockY()) {
+            return;
+        }
+        FullChunk chunk = this.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.setBlockId(x & 0xf, y, z & 0xf, layer, id);
+        }
     }
 
-    public void cleanChunks(long seed) {
-        this.seed = seed;
+    @Override
+    public void setChunk(int chunkX, int chunkZ) {
+        this.setChunk(chunkX, chunkZ, null);
     }
 }

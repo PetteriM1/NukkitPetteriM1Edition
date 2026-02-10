@@ -18,33 +18,6 @@ public class EntityZombieHorse extends EntityHorseBase implements EntitySmite {
     }
 
     @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
-    }
-
-    @Override
-    public float getWidth() {
-        if (this.isBaby()) {
-            return 0.6982f;
-        }
-        return 1.3965f;
-    }
-
-    @Override
-    public float getHeight() {
-        if (this.isBaby()) {
-            return 0.8f;
-        }
-        return 1.6f;
-    }
-
-    @Override
-    public void initEntity() {
-        this.setMaxHealth(15);
-        super.initEntity();
-    }
-
-    @Override
     public Item[] getDrops() {
         List<Item> drops = new ArrayList<>();
 
@@ -58,11 +31,47 @@ public class EntityZombieHorse extends EntityHorseBase implements EntitySmite {
             }
         }
 
+        if (this.isSaddled()) {
+            drops.add(Item.get(Item.SADDLE, 0, 1));
+        }
+
         return drops.toArray(new Item[0]);
+    }
+
+    @Override
+    public float getHeight() {
+        if (this.isBaby()) {
+            return 0.8f;
+        }
+        return 1.6f;
     }
 
     @Override
     public String getName() {
         return "Zombie Horse";
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    @Override
+    public float getWidth() {
+        if (this.isBaby()) {
+            return 0.6982f;
+        }
+        return 1.3965f;
+    }
+
+    @Override
+    public void initEntity() {
+        this.setMaxHealth(15);
+        super.initEntity();
+    }
+
+    @Override
+    public boolean isFeedItem(Item item) {
+        return false;
     }
 }

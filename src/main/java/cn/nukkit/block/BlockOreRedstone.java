@@ -16,6 +16,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockOreRedstone extends BlockOre {
 
     @Override
+    public int getDropExp() {
+        return Utils.rand(1, 5);
+    }
+
+    @Override
     public int getId() {
         return REDSTONE_ORE;
     }
@@ -23,6 +28,16 @@ public class BlockOreRedstone extends BlockOre {
     @Override
     public String getName() {
         return "Redstone Ore";
+    }
+
+    @Override
+    protected int getRawMaterial() {
+        return ItemID.REDSTONE_DUST;
+    }
+
+    @Override
+    public int getToolTier() {
+        return ItemTool.TIER_IRON;
     }
 
     @Override
@@ -48,11 +63,6 @@ public class BlockOreRedstone extends BlockOre {
     }
 
     @Override
-    protected int getRawMaterial() {
-        return ItemID.REDSTONE_DUST;
-    }
-
-    @Override
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_TOUCH) {
             this.getLevel().setBlock(this, Block.get(GLOWING_REDSTONE_ORE), false, true);
@@ -62,15 +72,5 @@ public class BlockOreRedstone extends BlockOre {
         }
 
         return 0;
-    }
-
-    @Override
-    public int getDropExp() {
-        return Utils.rand(1, 5);
-    }
-
-    @Override
-    public int getToolTier() {
-        return ItemTool.TIER_IRON;
     }
 }

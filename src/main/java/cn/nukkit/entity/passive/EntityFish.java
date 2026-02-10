@@ -13,6 +13,8 @@ public abstract class EntityFish extends EntityWaterAnimal {
         super(chunk, nbt);
     }
 
+    protected abstract int getBucketMeta();
+
     @Override
     public int getKillExperience() {
         return this.isBaby() ? 0 : Utils.rand(1, 3);
@@ -35,6 +37,4 @@ public abstract class EntityFish extends EntityWaterAnimal {
         }
         return super.onInteract(player, item, clickedPos);
     }
-
-    protected abstract int getBucketMeta();
 }

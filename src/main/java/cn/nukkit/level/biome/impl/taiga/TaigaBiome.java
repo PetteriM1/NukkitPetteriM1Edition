@@ -1,5 +1,6 @@
 package cn.nukkit.level.biome.impl.taiga;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.BlockDoublePlant;
 import cn.nukkit.block.BlockFlower;
 import cn.nukkit.block.BlockSapling;
@@ -18,7 +19,7 @@ public class TaigaBiome extends GrassyBiome {
     public TaigaBiome() {
         super();
 
-        PopulatorTree trees = new PopulatorTree(BlockSapling.SPRUCE + ObjectTree.SNOWY_TREE);
+        PopulatorTree trees = new PopulatorTree(BlockSapling.SPRUCE + (this.isFreezing() && !Server.getInstance().getPropertyBoolean("wgenext.vanilla-overworld") ? ObjectTree.SNOWY_TREE : 0));
         trees.setBaseAmount(10);
         this.addPopulator(trees);
 

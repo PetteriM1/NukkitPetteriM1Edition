@@ -42,164 +42,14 @@ public class Metrics {
     // The uuid of the server
     private final String serverUUID;
 
-    // Should failed requests be logged?
-    private static boolean logFailedRequests = false;
-
     // The logger for the failed requests
-    private static MainLogger logger;
+    private final MainLogger logger;
 
     public Metrics(String name, String serverUUID, boolean logFailedRequests, MainLogger logger) {
         this.name = name;
         this.serverUUID = serverUUID;
-        Metrics.logFailedRequests = logFailedRequests;
-        Metrics.logger = logger;
-
-        // Start submitting the data
-        startSubmitting();
-    }
-
-    /**
-     * Adds a custom chart.
-     *
-     * @param chart The chart to add.
-     */
-    public void addCustomChart(CustomChart chart) {
-        if (chart == null) {
-            throw new IllegalArgumentException("Chart cannot be null!");
-        }
-        charts.add(chart);
-    }
-
-    /**
-     * Starts the Scheduler which submits our data every 30 minutes.
-     */
-    private void startSubmitting() {
-        final Runnable submitTask = this::submitData;
-
-        // Many servers tend to restart at a fixed time at xx:00 which causes an uneven distribution of requests on the
-        // bStats backend. To circumvent this problem, we introduce some randomness into the initial and second delay.
-        // WARNING: You must not modify and part of this Metrics class, including the submit delay or frequency!
-        // WARNING: Modifying this code will get your plugin banned on bStats. Just don't do it!
-        long initialDelay = (long) (1000 * 60 * (3 + ThreadLocalRandom.current().nextDouble() * 3));
-        long secondDelay = (long) (1000 * 60 * (ThreadLocalRandom.current().nextDouble() * 30));
-        scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
-        scheduler.scheduleAtFixedRate(submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Gets the plugin specific data.
-     *
-     * @return The plugin specific data.
-     */
-    private JsonObject getPluginData() {
-        JsonObject data = new JsonObject();
-        data.add("pluginName", new JsonPrimitive(name)); // Append the name of the server software
-        JsonArray customCharts = new JsonArray();
-        for (CustomChart customChart : charts) {
-            // Add the data of the custom charts
-            JsonObject chart = customChart.getRequestJsonObject();
-            if (chart == null) { // If the chart is null, we skip it
-                continue;
-            }
-            customCharts.add(chart);
-        }
-        data.add("customCharts", customCharts);
-        return data;
-    }
-
-    /**
-     * Gets the server specific data.
-     *
-     * @return The server specific data.
-     */
-    private JsonObject getServerData() {
-        // OS specific data
-        String osName = System.getProperty("os.name");
-        String osArch = System.getProperty("os.arch");
-        String osVersion = System.getProperty("os.version");
-        int coreCount = Runtime.getRuntime().availableProcessors();
-
-        JsonObject data = new JsonObject();
-        data.add("serverUUID", new JsonPrimitive(serverUUID));
-        data.add("osName", new JsonPrimitive(osName));
-        data.add("osArch", new JsonPrimitive(osArch));
-        data.add("osVersion", new JsonPrimitive(osVersion));
-        data.add("coreCount", new JsonPrimitive(coreCount));
-        return data;
-    }
-
-    /**
-     * Collects the data and sends it afterwards.
-     */
-    private void submitData() {
-        final JsonObject data = getServerData();
-
-        JsonArray pluginData = new JsonArray();
-        pluginData.add(getPluginData());
-        data.add("plugins", pluginData);
-
-        try {
-            // We are still in the Thread of the timer, so nothing get blocked :)
-            sendData(data);
-        } catch (Exception e) {
-            // Something went wrong! :(
-            if (logFailedRequests) {
-                logger.warning("Could not submit stats of " + name, e);
-            }
-        }
-    }
-
-    /**
-     * Sends the data to the bStats server.
-     *
-     * @param data The data to send.
-     * @throws Exception If the request failed.
-     */
-    private static void sendData(JsonObject data) throws Exception {
-        if (data == null) {
-            throw new IllegalArgumentException("Data cannot be null!");
-        }
-
-        HttpsURLConnection connection = (HttpsURLConnection) new java.net.URL(URL).openConnection();
-
-        // Compress the data to save bandwidth
-        byte[] compressedData = compress(data.toString());
-
-        // Add headers
-        connection.setRequestMethod("POST");
-        connection.addRequestProperty("Accept", "application/json");
-        connection.addRequestProperty("Connection", "close");
-        connection.addRequestProperty("Content-Encoding", "gzip"); // We gzip our request
-        connection.addRequestProperty("Content-Length", String.valueOf(compressedData.length));
-        connection.setRequestProperty("Content-Type", "application/json"); // We send our data in JSON format
-        connection.setRequestProperty("User-Agent", "MC-Server/" + B_STATS_VERSION);
-
-        // Send data
-        connection.setDoOutput(true);
-        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-        outputStream.write(compressedData);
-        outputStream.flush();
-        outputStream.close();
-
-        connection.getInputStream().close(); // We don't care about the response - Just send our data :)
-    }
-
-    /**
-     * Gzips the given String.
-     *
-     * @param str The string to gzip.
-     * @return The gzipped String.
-     * @throws IOException If the compression failed.
-     */
-    private static byte[] compress(final String str) throws IOException {
-        if (str == null) {
-            return null;
-        }
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        GZIPOutputStream gzip = new GZIPOutputStream(outputStream);
-        gzip.write(str.getBytes(StandardCharsets.UTF_8));
-        gzip.close();
-        return outputStream.toByteArray();
+        this.logger = logger;
+        this.startSubmitting();
     }
 
     /**
@@ -222,6 +72,8 @@ public class Metrics {
             this.chartId = chartId;
         }
 
+        protected abstract JsonObject getChartData() throws Exception;
+
         private JsonObject getRequestJsonObject() {
             JsonObject chart = new JsonObject();
             chart.add("chartId", new JsonPrimitive(chartId));
@@ -238,8 +90,6 @@ public class Metrics {
             return chart;
         }
 
-        protected abstract JsonObject getChartData() throws Exception;
-
     }
 
     /**
@@ -252,7 +102,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SimplePie(String chartId, Callable<String> callable) {
@@ -283,7 +133,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
@@ -327,7 +177,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public DrilldownPie(String chartId, Callable<Map<String, Map<String, Integer>>> callable) {
@@ -376,7 +226,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SingleLineChart(String chartId, Callable<Integer> callable) {
@@ -408,7 +258,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public MultiLineChart(String chartId, Callable<Map<String, Integer>> callable) {
@@ -453,7 +303,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SimpleBarChart(String chartId, Callable<Map<String, Integer>> callable) {
@@ -491,7 +341,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public AdvancedBarChart(String chartId, Callable<Map<String, int[]>> callable) {
@@ -527,6 +377,147 @@ public class Metrics {
             data.add("values", values);
             return data;
         }
+    }
 
+    /**
+     * Gets the plugin specific data.
+     *
+     * @return The plugin specific data.
+     */
+    private JsonObject getPluginData() {
+        JsonObject data = new JsonObject();
+        data.add("pluginName", new JsonPrimitive(name)); // Append the name of the server software
+        JsonArray customCharts = new JsonArray();
+        for (CustomChart customChart : charts) {
+            // Add the data of the custom charts
+            JsonObject chart = customChart.getRequestJsonObject();
+            if (chart == null) { // If the chart is null, we skip it
+                continue;
+            }
+            customCharts.add(chart);
+        }
+        data.add("customCharts", customCharts);
+        return data;
+    }
+
+    /**
+     * Gets the server specific data.
+     *
+     * @return The server specific data.
+     */
+    private JsonObject getServerData() {
+        // OS specific data
+        String osName = System.getProperty("os.name");
+        String osArch = System.getProperty("os.arch");
+        String osVersion = System.getProperty("os.version");
+        int coreCount = Runtime.getRuntime().availableProcessors();
+        JsonObject data = new JsonObject();
+        data.add("serverUUID", new JsonPrimitive(serverUUID));
+        data.add("osName", new JsonPrimitive(osName));
+        data.add("osArch", new JsonPrimitive(osArch));
+        data.add("osVersion", new JsonPrimitive(osVersion));
+        data.add("coreCount", new JsonPrimitive(coreCount));
+        return data;
+    }
+
+    /**
+     * Adds a custom chart.
+     *
+     * @param chart The chart to add.
+     */
+    public void addCustomChart(CustomChart chart) {
+        if (chart == null) {
+            throw new IllegalArgumentException("Chart cannot be null!");
+        }
+        charts.add(chart);
+    }
+
+    /**
+     * Gzips the given String.
+     *
+     * @param str The string to gzip.
+     * @return The gzipped String.
+     * @throws IOException If the compression failed.
+     */
+    private static byte[] compress(final String str) throws IOException {
+        if (str == null) {
+            return null;
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(outputStream);
+        gzip.write(str.getBytes(StandardCharsets.UTF_8));
+        gzip.close();
+        return outputStream.toByteArray();
+    }
+
+    /**
+     * Sends the data to the bStats server.
+     *
+     * @param data The data to send.
+     * @throws Exception If the request failed.
+     */
+    private static void sendData(JsonObject data) throws Exception {
+        if (data == null) {
+            throw new IllegalArgumentException("Data cannot be null!");
+        }
+
+        HttpsURLConnection connection = (HttpsURLConnection) new java.net.URL(URL).openConnection();
+
+        // Compress the data to save bandwidth
+        byte[] compressedData = compress(data.toString());
+
+        // Add headers
+        connection.setRequestMethod("POST");
+        connection.addRequestProperty("Accept", "application/json");
+        connection.addRequestProperty("Connection", "close");
+        connection.addRequestProperty("Content-Encoding", "gzip"); // We gzip our request
+        connection.addRequestProperty("Content-Length", String.valueOf(compressedData.length));
+        connection.setRequestProperty("Content-Type", "application/json"); // We send our data in JSON format
+        connection.setRequestProperty("User-Agent", "MC-Server/" + B_STATS_VERSION);
+
+        // Send data
+        connection.setDoOutput(true);
+        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+        outputStream.write(compressedData);
+        outputStream.flush();
+        outputStream.close();
+
+        connection.getInputStream().close(); // We don't care about the response - Just send our data :)
+    }
+
+    /**
+     * Starts the Scheduler which submits our data every 30 minutes.
+     */
+    private void startSubmitting() {
+        final Runnable submitTask = this::submitData;
+
+        // Many servers tend to restart at a fixed time at xx:00 which causes an uneven distribution of requests on the
+        // bStats backend. To circumvent this problem, we introduce some randomness into the initial and second delay.
+        // WARNING: You must not modify and part of this Metrics class, including the submit delay or frequency!
+        // WARNING: Modifying this code will get your plugin banned on bStats. Just don't do it!
+        long initialDelay = (long) (60000 * (3 + ThreadLocalRandom.current().nextDouble() * 3));
+        long secondDelay = (long) (60000 * (ThreadLocalRandom.current().nextDouble() * 30));
+        scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(submitTask, initialDelay + secondDelay, 1800000, TimeUnit.MILLISECONDS);
+
+        logger.debug("Metrics started");
+    }
+
+    /**
+     * Collects the data and sends it afterwards.
+     */
+    private void submitData() {
+        final JsonObject data = getServerData();
+
+        JsonArray pluginData = new JsonArray();
+        pluginData.add(getPluginData());
+        data.add("plugins", pluginData);
+
+        try {
+            // We are still in the Thread of the timer, so nothing get blocked :)
+            sendData(data);
+        } catch (Exception e) {
+            logger.debug("Could not submit stats of " + name, e);
+        }
     }
 }

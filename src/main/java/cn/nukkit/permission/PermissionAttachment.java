@@ -29,25 +29,16 @@ public class PermissionAttachment {
         this.plugin = plugin;
     }
 
-    public Plugin getPlugin() {
-        return plugin;
-    }
-
-    public void setRemovalCallback(PermissionRemovedExecutor executor) {
-        this.removed = executor;
-    }
-
-    public PermissionRemovedExecutor getRemovalCallback() {
-        return removed;
-    }
-
     public Map<String, Boolean> getPermissions() {
         return permissions;
     }
 
-    public void clearPermissions() {
-        this.permissions.clear();
-        this.permissible.recalculatePermissions();
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
+    public PermissionRemovedExecutor getRemovalCallback() {
+        return removed;
     }
 
     public void setPermissions(Map<String, Boolean> permissions) {
@@ -59,15 +50,17 @@ public class PermissionAttachment {
         this.permissible.recalculatePermissions();
     }
 
-    public void unsetPermissions(List<String> permissions) {
-        for (String node : permissions) {
-            this.permissions.remove(node);
-        }
+    public void setRemovalCallback(PermissionRemovedExecutor executor) {
+        this.removed = executor;
+    }
+
+    public void clearPermissions() {
+        this.permissions.clear();
         this.permissible.recalculatePermissions();
     }
 
-    public void setPermission(Permission permission, boolean value) {
-        this.setPermission(permission.getName(), value);
+    public void remove() {
+        this.permissible.removeAttachment(this);
     }
 
     public void setPermission(String name, boolean value) {
@@ -81,8 +74,8 @@ public class PermissionAttachment {
         this.permissible.recalculatePermissions();
     }
 
-    public void unsetPermission(Permission permission, boolean value) {
-        this.unsetPermission(permission.getName(), value);
+    public void setPermission(Permission permission, boolean value) {
+        this.setPermission(permission.getName(), value);
     }
 
     public void unsetPermission(String name, boolean value) {
@@ -92,7 +85,14 @@ public class PermissionAttachment {
         }
     }
 
-    public void remove() {
-        this.permissible.removeAttachment(this);
+    public void unsetPermission(Permission permission, boolean value) {
+        this.unsetPermission(permission.getName(), value);
+    }
+
+    public void unsetPermissions(List<String> permissions) {
+        for (String node : permissions) {
+            this.permissions.remove(node);
+        }
+        this.permissible.recalculatePermissions();
     }
 }

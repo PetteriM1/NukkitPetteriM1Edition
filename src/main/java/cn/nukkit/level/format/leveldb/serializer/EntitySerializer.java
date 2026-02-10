@@ -21,6 +21,14 @@ import java.util.function.Consumer;
 
 public class EntitySerializer {
 
+    private static void deserializeNbt(CompoundTag nbt, Consumer<CompoundTag> handle) {
+        // TODO: convert LevelDB format to our legacy
+        if (!nbt.contains("id") || !nbt.contains("Pos")) {
+            return;
+        }
+        handle.accept(nbt);
+    }
+
     public static void loadEntities(DB db, ChunkBuilder builder) {
         byte[] key = LevelDBKey.ENTITIES.getKey(builder.getX(), builder.getZ(), builder.getProvider().getLevel().getDimension());
 
@@ -62,14 +70,6 @@ public class EntitySerializer {
             throw new RuntimeException("Can not create out stream", e);
         }
         db.put(key, value);
-    }
-
-    private static void deserializeNbt(CompoundTag nbt, Consumer<CompoundTag> handle) {
-        // TODO: convert LevelDB format to our legacy
-        if (!nbt.contains("id") || !nbt.contains("Pos")) {
-            return;
-        }
-        handle.accept(nbt);
     }
 
     private static void serializeNbt(CompoundTag nbt, Consumer<CompoundTag> handle) {

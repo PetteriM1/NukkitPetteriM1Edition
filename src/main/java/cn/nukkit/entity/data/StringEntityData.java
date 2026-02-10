@@ -12,6 +12,7 @@ public class StringEntityData extends EntityData<String> {
 
     public StringEntityData(int id, String data) {
         super(id);
+        if (data == null) throw new NullPointerException("data must not be null");
         this.data = data;
     }
 
@@ -19,13 +20,14 @@ public class StringEntityData extends EntityData<String> {
         return data;
     }
 
-    public void setData(String data) {
-        this.data = data;
-    }
-
     @Override
     public int getType() {
         return Entity.DATA_TYPE_STRING;
+    }
+
+    public void setData(String data) {
+        if (data == null) throw new NullPointerException("data must not be null");
+        this.data = data;
     }
 
     @Override

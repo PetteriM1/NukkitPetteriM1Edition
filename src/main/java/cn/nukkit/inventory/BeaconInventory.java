@@ -21,14 +21,14 @@ public class BeaconInventory extends FakeBlockUIComponent {
         who.craftingType = Player.BEACON_WINDOW_ID;
     }
 
+    public void setMaterial() {
+        this.material = this.getItemFast(0).getId();
+        this.setItem(0, Item.get(Item.AIR));
+    }
+
     public int useMaterial() {
         int usedMaterial = this.material;
         this.material = 0;
         return usedMaterial;
-    }
-
-    public void setMaterial() {
-        this.material = this.getItemFast(0).getId();
-        this.setItem(0, Item.get(Item.AIR));
     }
 }

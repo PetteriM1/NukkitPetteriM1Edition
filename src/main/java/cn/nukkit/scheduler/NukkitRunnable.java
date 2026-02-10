@@ -11,12 +11,31 @@ public abstract class NukkitRunnable implements Runnable {
     private TaskHandler taskHandler;
 
     /**
+     * Gets the task id for this runnable.
+     *
+     * @return the task id that this runnable was scheduled as
+     * @throws IllegalStateException if task was not scheduled yet
+     */
+    public synchronized int getTaskId() throws IllegalStateException {
+        if (taskHandler == null) {
+            throw new IllegalStateException("Not scheduled yet");
+        }
+        return taskHandler.getTaskId();
+    }
+
+    /**
      * Attempts to cancel this task.
      *
      * @throws IllegalStateException if task was not scheduled yet
      */
     public synchronized void cancel() throws IllegalStateException {
         taskHandler.cancel();
+    }
+
+    private void checkState() {
+        if (taskHandler != null) {
+            throw new IllegalStateException("Already scheduled as " + taskHandler.getTaskId());
+        }
     }
 
     public synchronized Runnable runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
@@ -53,24 +72,5 @@ public abstract class NukkitRunnable implements Runnable {
         checkState();
         this.taskHandler = Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(plugin, this, delay, period, true);
         return taskHandler.getTask();
-    }
-
-    /**
-     * Gets the task id for this runnable.
-     *
-     * @return the task id that this runnable was scheduled as
-     * @throws IllegalStateException if task was not scheduled yet
-     */
-    public synchronized int getTaskId() throws IllegalStateException {
-        if (taskHandler == null) {
-            throw new IllegalStateException("Not scheduled yet");
-        }
-        return taskHandler.getTaskId();
-    }
-
-    private void checkState() {
-        if (taskHandler != null) {
-            throw new IllegalStateException("Already scheduled as " + taskHandler.getTaskId());
-        }
     }
 }

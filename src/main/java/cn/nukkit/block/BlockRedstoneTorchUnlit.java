@@ -20,11 +20,6 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
     }
 
     @Override
-    public String getName() {
-        return "Unlit Redstone Torch";
-    }
-
-    @Override
     public int getId() {
         return UNLIT_REDSTONE_TORCH;
     }
@@ -35,8 +30,27 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(REDSTONE_TORCH));
+    public String getName() {
+        return "Unlit Redstone Torch";
+    }
+
+    protected boolean checkState() {
+        BlockFace face = getBlockFace().getOpposite();
+
+        if (!this.level.isSidePowered(this.getSideVec(face), face)) {
+            this.level.setBlock(this, Block.get(REDSTONE_TORCH, getDamage()), false, true);
+
+            for (BlockFace side : BlockFace.values()) {
+                if (side == face) {
+                    continue;
+                }
+
+                this.level.updateAroundRedstone(this.getSideVec(side), null);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -60,27 +74,13 @@ public class BlockRedstoneTorchUnlit extends BlockTorch {
         return 0;
     }
 
-    protected boolean checkState() {
-        BlockFace face = getBlockFace().getOpposite();
-
-        if (!this.level.isSidePowered(this.getSideVec(face), face)) {
-            this.level.setBlock(this, Block.get(REDSTONE_TORCH, getDamage()), false, true);
-
-            for (BlockFace side : BlockFace.values()) {
-                if (side == face) {
-                    continue;
-                }
-
-                this.level.updateAroundRedstone(this.getSideVec(side), null);
-            }
-            return true;
-        }
-
-        return false;
-    }
-
     @Override
     public int tickRate() {
         return 2;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(REDSTONE_TORCH));
     }
 }

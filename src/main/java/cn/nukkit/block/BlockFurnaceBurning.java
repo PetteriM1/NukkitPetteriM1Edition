@@ -30,23 +30,34 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
     }
 
     @Override
-    public int getId() {
-        return BURNING_FURNACE;
-    }
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
 
-    @Override
-    public String getName() {
-        return "Burning Furnace";
-    }
+        if (blockEntity instanceof BlockEntityFurnace) {
+            return ContainerInventory.calculateRedstone(((BlockEntityFurnace) blockEntity).getInventory());
+        }
 
-    @Override
-    public boolean canBeActivated() {
-        return true;
+        return super.getComparatorInputOverride();
     }
 
     @Override
     public double getHardness() {
         return 3.5;
+    }
+
+    @Override
+    public int getId() {
+        return BURNING_FURNACE;
+    }
+
+    @Override
+    public int getLightLevel() {
+        return 13;
+    }
+
+    @Override
+    public String getName() {
+        return "Burning Furnace";
     }
 
     @Override
@@ -60,8 +71,60 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
     }
 
     @Override
-    public int getLightLevel() {
-        return 13;
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            return new Item[]{
+                    this.toItem()
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityFurnace)) {
+                return false;
+            }
+
+            BlockEntityFurnace furnace = (BlockEntityFurnace) t;
+            if (furnace.namedTag.contains("Lock") && furnace.namedTag.get("Lock") instanceof StringTag) {
+                if (!furnace.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return true;
+                }
+            }
+
+            player.addWindow(furnace.getInventory());
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onBreak(Item item) {
+        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
+        return true;
     }
 
     @Override
@@ -91,70 +154,7 @@ public class BlockFurnaceBurning extends BlockSolidMeta {
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        this.getLevel().setBlock(this, Block.get(BlockID.AIR), true, true);
-        return true;
-    }
-
-    @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityFurnace)) {
-                return false;
-            }
-
-            BlockEntityFurnace furnace = (BlockEntityFurnace) t;
-            if (furnace.namedTag.contains("Lock") && furnace.namedTag.get("Lock") instanceof StringTag) {
-                if (!furnace.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return true;
-                }
-            }
-
-            player.addWindow(furnace.getInventory());
-        }
-
-        return true;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(FURNACE));
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            return new Item[]{
-                    this.toItem()
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public int getComparatorInputOverride() {
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (blockEntity instanceof BlockEntityFurnace) {
-            return ContainerInventory.calculateRedstone(((BlockEntityFurnace) blockEntity).getInventory());
-        }
-
-        return super.getComparatorInputOverride();
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
     }
 }

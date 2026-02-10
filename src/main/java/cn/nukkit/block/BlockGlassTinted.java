@@ -1,7 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockGlassTinted extends BlockGlass {
 
@@ -10,8 +13,8 @@ public class BlockGlassTinted extends BlockGlass {
     }
 
     @Override
-    public String getName() {
-        return "Tinted Glass";
+    public BlockColor getColor() {
+        return BlockColor.GRAY_BLOCK_COLOR;
     }
 
     @Override
@@ -20,8 +23,13 @@ public class BlockGlassTinted extends BlockGlass {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[] { this.toItem() };
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Tinted Glass";
     }
 
     @Override
@@ -30,7 +38,17 @@ public class BlockGlassTinted extends BlockGlass {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.GRAY_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.GLASS;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return DyeColor.GRAY.getWoolData();
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{this.toItem()};
     }
 }

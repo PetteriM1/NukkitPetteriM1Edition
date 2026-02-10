@@ -16,13 +16,23 @@ public class BlockSlabBlackstone extends BlockSlab {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return BLACKSTONE_SLAB;
     }
 
     @Override
-    public boolean hasTopBit() {
-        return (this.getDamage() & 0x01) == 1;
+    public String getName() {
+        return "Blackstone Slab";
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -31,17 +41,8 @@ public class BlockSlabBlackstone extends BlockSlab {
     }
 
     @Override
-    public String getName() {
-        return "Blackstone Slab";
-    }
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getResistance() {
-        return 6;
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -54,17 +55,12 @@ public class BlockSlabBlackstone extends BlockSlab {
     }
 
     @Override
+    public boolean hasTopBit() {
+        return (this.getDamage() & 0x01) == 1;
+    }
+
+    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
     }
 }

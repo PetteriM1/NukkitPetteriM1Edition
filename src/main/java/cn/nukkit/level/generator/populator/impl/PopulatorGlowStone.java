@@ -11,9 +11,22 @@ import cn.nukkit.math.NukkitRandom;
 
 public class PopulatorGlowStone extends Populator {
 
+    private static int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
+        int y;
+        // Start scanning a bit lower down to allow space for placing on top
+        for (y = 120; y >= 0; y--) {
+            int b = chunk.getBlockId(x, y, z);
+            if (b == Block.AIR) {
+                break;
+            }
+        }
+        return y == 0 ? -1 : y;
+    }
+
     @Override
     public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        if (random.nextBoundedInt(9) < 8 || Biome.getBiome(chunk.getBiomeId(7, 7)).getId() == EnumBiome.SOULSAND_VALLEY.id) return;
+        if (random.nextBoundedInt(9) < 8 || Biome.getBiome(chunk.getBiomeId(7, 7)).getId() == EnumBiome.SOULSAND_VALLEY.id)
+            return;
         int x = NukkitMath.randomRange(random, chunkX << 4, (chunkX << 4) + 15);
         int z = NukkitMath.randomRange(random, chunkZ << 4, (chunkZ << 4) + 15);
         int y = getHighestWorkableBlock(chunk, x & 0xF, z & 0xF) + 1;
@@ -32,17 +45,5 @@ public class PopulatorGlowStone extends Populator {
                 }
             }
         }
-    }
-
-    private static int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
-        int y;
-        // Start scanning a bit lower down to allow space for placing on top
-        for (y = 120; y >= 0; y--) {
-            int b = chunk.getBlockId(x, y, z);
-            if (b == Block.AIR) {
-                break;
-            }
-        }
-        return y == 0 ? -1 : y;
     }
 }

@@ -24,18 +24,34 @@ public class BlockBlastFurnaceLit extends BlockFurnaceBurning {
     }
 
     @Override
-    public String getName() {
-        return "Lit Blast Furnace";
-    }
-
-    @Override
     public int getId() {
         return LIT_BLAST_FURNACE;
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(BLAST_FURNACE));
+    public String getName() {
+        return "Lit Blast Furnace";
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityBlastFurnace)) {
+                return false;
+            }
+
+            BlockEntityBlastFurnace furnace = (BlockEntityBlastFurnace) t;
+            if (furnace.namedTag.contains("Lock") && furnace.namedTag.get("Lock") instanceof StringTag) {
+                if (!furnace.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return true;
+                }
+            }
+
+            player.addWindow(furnace.getInventory());
+        }
+
+        return true;
     }
 
     @Override
@@ -65,23 +81,7 @@ public class BlockBlastFurnaceLit extends BlockFurnaceBurning {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityBlastFurnace)) {
-                return false;
-            }
-
-            BlockEntityBlastFurnace furnace = (BlockEntityBlastFurnace) t;
-            if (furnace.namedTag.contains("Lock") && furnace.namedTag.get("Lock") instanceof StringTag) {
-                if (!furnace.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return true;
-                }
-            }
-
-            player.addWindow(furnace.getInventory());
-        }
-
-        return true;
+    public Item toItem() {
+        return new ItemBlock(Block.get(BLAST_FURNACE));
     }
 }

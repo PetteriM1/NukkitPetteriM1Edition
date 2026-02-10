@@ -25,13 +25,8 @@ public class BlockEndRod extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "End Rod";
-    }
-
-    @Override
-    public int getId() {
-        return END_ROD;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     @Override
@@ -40,28 +35,13 @@ public class BlockEndRod extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getResistance() {
-        return 0;
+    public int getId() {
+        return END_ROD;
     }
 
     @Override
     public int getLightLevel() {
         return 14;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getMinX() {
-        return this.x + 0.4;
-    }
-
-    @Override
-    public double getMinZ() {
-        return this.z + 0.4;
     }
 
     @Override
@@ -75,21 +55,28 @@ public class BlockEndRod extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(FACES[player != null ? face.getIndex() : 0]);
-        this.getLevel().setBlock(block, this, true, true);
-
-        return true;
+    public double getMinX() {
+        return this.x + 0.4;
     }
 
     @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
+    public double getMinZ() {
+        return this.z + 0.4;
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    public String getName() {
+        return "End Rod";
+    }
+
+    @Override
+    public double getResistance() {
+        return 0;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -100,5 +87,18 @@ public class BlockEndRod extends BlockTransparentMeta implements Faceable {
     @Override
     public boolean canBeFlowedInto() {
         return false;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(FACES[player != null ? face.getIndex() : 0]);
+        this.getLevel().setBlock(block, this, true, true);
+
+        return true;
+    }
+
+    @Override
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 }

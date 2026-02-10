@@ -9,7 +9,9 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.inventory.CampfireInventory;
 import cn.nukkit.inventory.CampfireRecipe;
 import cn.nukkit.inventory.ContainerInventory;
-import cn.nukkit.item.*;
+import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
+import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Level;
 import cn.nukkit.math.BlockFace;
@@ -33,8 +35,29 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Campfire";
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(getDamage() & 0x3);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.SPRUCE_BLOCK_COLOR;
+    }
+
+    @Override
+    public int getComparatorInputOverride() {
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityCampfire) {
+            return ContainerInventory.calculateRedstone(((BlockEntityCampfire) blockEntity).getInventory());
+        }
+
+        return super.getComparatorInputOverride();
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.5; //2
     }
 
     @Override
@@ -48,13 +71,18 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getResistance() {
-        return 2;
+    public double getMaxY() {
+        return y + 0.5;
     }
 
     @Override
-    public double getHardness() {
-        return 2;
+    public String getName() {
+        return "Campfire";
+    }
+
+    @Override
+    public double getResistance() {
+        return 10;
     }
 
     @Override
@@ -63,41 +91,43 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[] {Item.get(ItemID.COAL, 0, 1 + ThreadLocalRandom.current().nextInt(1))};
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
     public WaterloggingType getWaterloggingType() {
         return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
+    public boolean isExtinguished() {
+        return (this.getDamage() & 0x4) == 0x4;
+    }
+
+    public void setBlockFace(BlockFace face) {
+        if (face == BlockFace.UP || face == BlockFace.DOWN) {
+            return;
+        }
+
+        this.setDamage((this.getDamage() & 0x4) | face.getHorizontalIndex());
+    }
+
+    public void setExtinguished(boolean extinguished) {
+        this.setDamage((this.getDamage() & 0x3) | (extinguished ? 0x4 : 0x0));
+    }
+
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (this.down().getId() == CAMPFIRE_BLOCK) {
-            return false;
-        }
+    public boolean breakWhenPushed() {
+        return true;
+    }
 
-        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
-        Block layer1 = block.getLevelBlock(BlockLayer.WATERLOGGED);
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
 
-        boolean defaultLayerCheck = (block instanceof BlockWater && block.getDamage() == 0 || block.getDamage() >= 8) || block instanceof BlockIceFrosted;
-        boolean layer1Check = (layer1 instanceof BlockWater && layer1.getDamage() == 0 || layer1.getDamage() >= 8) || layer1 instanceof BlockIceFrosted;
-        if (defaultLayerCheck || layer1Check) {
-            this.setExtinguished(true);
-            this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
-            this.level.setBlock(this, BlockLayer.WATERLOGGED, defaultLayerCheck ? block : layer1, false, false);
-        } else {
-            this.level.setBlock(this, BlockLayer.WATERLOGGED, Block.get(Block.AIR), false, false);
-        }
+    @Override
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
+    }
 
-        this.getLevel().setBlock(this, this, true, true);
-        this.createBlockEntity(item);
+    @Override
+    public boolean canSilkTouch() {
         return true;
     }
 
@@ -119,36 +149,17 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{Item.get(ItemID.COAL, 0, 1 + ThreadLocalRandom.current().nextInt(1))};
+    }
+
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
     public boolean hasEntityCollision() {
         return true;
-    }
-
-    @Override
-    public void onEntityCollide(Entity entity) {
-        if (!this.isExtinguished() && !entity.isSneaking()) {
-            entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.FIRE, this instanceof BlockCampfireSoul ? 2 : 1));
-        }
-    }
-
-    @Override
-    public boolean canBeActivated() {
-        return true;
-    }
-
-    @Override
-    public int onUpdate(int type) {
-        if (type == Level.BLOCK_UPDATE_NORMAL) {
-            if (!this.isExtinguished()) {
-                Block layer1 = this.getLevelBlock(BlockLayer.WATERLOGGED);
-                if (layer1 instanceof BlockWater || layer1 instanceof BlockIceFrosted) {
-                    this.setExtinguished(true);
-                    this.level.setBlock(this, this, true, true);
-                    this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
-                }
-            }
-            return type;
-        }
-        return 0;
     }
 
     @Override
@@ -194,63 +205,54 @@ public class BlockCampfire extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getMaxY() {
-        return y + 0.5;
+    public void onEntityCollide(Entity entity) {
+        if (!this.isExtinguished() && !entity.isSneaking()) {
+            entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.FIRE, this instanceof BlockCampfireSoul ? 2 : 1));
+        }
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.SPRUCE_BLOCK_COLOR;
-    }
-
-    public boolean isExtinguished() {
-        return (this.getDamage() & 0x4) == 0x4;
-    }
-
-    public void setExtinguished(boolean extinguished) {
-        this.setDamage((this.getDamage() & 0x3) | (extinguished? 0x4 : 0x0));
+    public int onUpdate(int type) {
+        if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!this.isExtinguished()) {
+                Block layer1 = this.getLevelBlock(BlockLayer.WATERLOGGED);
+                if (layer1 instanceof BlockWater || layer1 instanceof BlockIceFrosted) {
+                    this.setExtinguished(true);
+                    this.level.setBlock(this, this, true, true);
+                    this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
+                }
+            }
+            return type;
+        }
+        return 0;
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(getDamage() & 0x3);
-    }
-
-    public void setBlockFace(BlockFace face) {
-        if (face == BlockFace.UP || face == BlockFace.DOWN) {
-            return;
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.down().getId() == CAMPFIRE_BLOCK) {
+            return false;
         }
 
-        this.setDamage((this.getDamage() & 0x4) | face.getHorizontalIndex());
+        this.setDamage(player != null ? player.getDirection().getOpposite().getHorizontalIndex() : 0);
+        Block layer1 = block.getLevelBlock(BlockLayer.WATERLOGGED);
+
+        boolean defaultLayerCheck = (block instanceof BlockWater && block.getDamage() == 0 || block.getDamage() >= 8) || block instanceof BlockIceFrosted;
+        boolean layer1Check = (layer1 instanceof BlockWater && layer1.getDamage() == 0 || layer1.getDamage() >= 8) || layer1 instanceof BlockIceFrosted;
+        if (defaultLayerCheck || layer1Check) {
+            this.setExtinguished(true);
+            this.getLevel().addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_FIZZ);
+            this.level.setBlock(this, BlockLayer.WATERLOGGED, defaultLayerCheck ? block : layer1, false, false);
+        } else {
+            this.level.setBlock(this, BlockLayer.WATERLOGGED, Block.get(Block.AIR), false, false);
+        }
+
+        this.getLevel().setBlock(this, this, true, true);
+        this.createBlockEntity(item);
+        return true;
     }
 
     @Override
     public Item toItem() {
         return Item.get(ItemID.CAMPFIRE);
-    }
-
-    public boolean hasComparatorInputOverride() {
-        return true;
-    }
-
-    @Override
-    public int getComparatorInputOverride() {
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (blockEntity instanceof BlockEntityCampfire) {
-            return ContainerInventory.calculateRedstone(((BlockEntityCampfire) blockEntity).getInventory());
-        }
-
-        return super.getComparatorInputOverride();
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
     }
 }

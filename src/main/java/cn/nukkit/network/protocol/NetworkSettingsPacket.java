@@ -15,8 +15,8 @@ public class NetworkSettingsPacket extends DataPacket {
     public float clientThrottleScalar;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
+    public void decode() {
+        this.decodeUnsupported();
     }
 
     @Override
@@ -24,13 +24,15 @@ public class NetworkSettingsPacket extends DataPacket {
         this.reset();
         this.putLShort(this.compressionThreshold);
         this.putLShort(this.compressionAlgorithm.ordinal());
-        this.putBoolean(this.clientThrottleEnabled);
-        this.putByte(this.clientThrottleThreshold);
-        this.putLFloat(this.clientThrottleScalar);
+        if (protocol >= ProtocolInfo.v1_19_30) {
+            this.putBoolean(this.clientThrottleEnabled);
+            this.putByte(this.clientThrottleThreshold);
+            this.putLFloat(this.clientThrottleScalar);
+        }
     }
 
     @Override
-    public void decode() {
-        this.decodeUnsupported();
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -18,12 +18,12 @@ public class MesaPlateauFBiome extends MesaPlateauBiome {
     }
 
     @Override
-    public int getCoverId(int x, int z) {
-        return GRASS << Block.DATA_BITS;
+    public String getName() {
+        return "Mesa Plateau F";
     }
 
     @Override
-    public String getName() {
-        return "Mesa Plateau F";
+    public int getCoverId(int x, int z) {
+        return GRASS << Block.DATA_BITS;
     }
 }

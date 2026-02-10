@@ -29,16 +29,6 @@ public class Chunk extends BaseChunk {
     protected boolean terrainPopulated;
     protected boolean terrainGenerated;
 
-    @Override
-    public Chunk clone() {
-        return (Chunk) super.clone();
-    }
-
-    @Override
-    public Chunk cloneForChunkSending() {
-        return (Chunk) super.cloneForChunkSending();
-    }
-
     public Chunk(LevelProvider level) {
         this(level, null);
     }
@@ -103,8 +93,8 @@ public class Chunk extends BaseChunk {
             int[] biomeColors = nbt.getIntArray("BiomeColors");
             if (biomeColors != null && biomeColors.length == 256) {
                 BiomePalette palette = new BiomePalette(biomeColors);
-                for (int x = 0; x < 16; x++)    {
-                    for (int z = 0; z < 16; z++)    {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
                         this.biomes[(x << 4) | z] = (byte) (palette.get(x, z) >> 24);
                     }
                 }
@@ -169,42 +159,6 @@ public class Chunk extends BaseChunk {
         this.terrainGenerated = nbt.getBoolean("TerrainGenerated");
     }
 
-    @Override
-    public boolean isPopulated() {
-        return this.terrainPopulated;
-    }
-
-    @Override
-    public void setPopulated() {
-        this.setPopulated(true);
-    }
-
-    @Override
-    public void setPopulated(boolean value) {
-        if (value != this.terrainPopulated) {
-            this.terrainPopulated = value;
-            setChanged();
-        }
-    }
-
-    @Override
-    public boolean isGenerated() {
-        return this.terrainGenerated || this.terrainPopulated;
-    }
-
-    @Override
-    public void setGenerated() {
-        this.setGenerated(true);
-    }
-
-    @Override
-    public void setGenerated(boolean value) {
-        if (this.terrainGenerated != value) {
-            this.terrainGenerated = value;
-            setChanged();
-        }
-    }
-
     public CompoundTag getNBT() {
         CompoundTag tag = new CompoundTag();
 
@@ -219,66 +173,29 @@ public class Chunk extends BaseChunk {
         return tag;
     }
 
-    public static Chunk fromBinary(byte[] data) {
-        return fromBinary(data, null);
+    @Override
+    public boolean isGenerated() {
+        return this.terrainGenerated || this.terrainPopulated;
     }
-
-    public static Chunk fromBinary(byte[] data, LevelProvider provider) {
-        try {
-            CompoundTag chunk = NBTIO.read(new ByteArrayInputStream(Zlib.inflate(data)), ByteOrder.BIG_ENDIAN);
-
-            Tag levelTag = chunk.get("Level");
-            if (!(levelTag instanceof CompoundTag)) {
-                return null;
-            }
-
-            return new Chunk(provider, (CompoundTag) levelTag);
-        } catch (Exception e) {
-            Server.getInstance().getLogger().logException(e);
-            return null;
-        }
-    }
-
-
-    public static Chunk fromFastBinary(byte[] data) {
-        return fromFastBinary(data, null);
-    }
-
-    public static Chunk fromFastBinary(byte[] data, LevelProvider provider) {
-        try {
-            CompoundTag chunk = NBTIO.read(new DataInputStream(new ByteArrayInputStream(data)), ByteOrder.BIG_ENDIAN);
-
-            Tag levelTag = chunk.get("Level");
-            if (!(levelTag instanceof CompoundTag)) {
-                return null;
-            }
-
-            return new Chunk(provider, (CompoundTag) levelTag);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
 
     @Override
-    public byte[] toFastBinary() {
-        CompoundTag chunk = chunkNBT();
+    public boolean isPopulated() {
+        return this.terrainPopulated;
+    }
 
-        try {
-            return NBTIO.write(chunk, ByteOrder.BIG_ENDIAN);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    @Override
+    public void setGenerated(boolean value) {
+        if (this.terrainGenerated != value) {
+            this.terrainGenerated = value;
+            setChanged();
         }
     }
 
     @Override
-    public byte[] toBinary() {
-        CompoundTag chunk = chunkNBT();
-
-        try {
-            return Zlib.deflate(NBTIO.write(chunk, ByteOrder.BIG_ENDIAN), 7);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public void setPopulated(boolean value) {
+        if (value != this.terrainPopulated) {
+            this.terrainPopulated = value;
+            setChanged();
         }
     }
 
@@ -295,7 +212,11 @@ public class Chunk extends BaseChunk {
             }
             CompoundTag s = new CompoundTag();
             s.putByte("Y", (section.getY()));
-            s.putByteArray("Blocks", section.getIdArray());
+            s.putByteArray("Blocks", section.getIdArray(1));
+            byte[] blocks2 = section.getIdArray(2);
+            if (!Utils.isByteArrayEmpty(blocks2)) {
+                s.putByteArray("Blocks2PM1E", blocks2);
+            }
             s.putByteArray("Data", section.getDataArray());
             s.putByteArray("BlockLight", section.getLightArray());
             s.putByteArray("SkyLight", section.getSkyLightArray());
@@ -369,6 +290,88 @@ public class Chunk extends BaseChunk {
     }
 
     @Override
+    public Chunk clone() {
+        return (Chunk) super.clone();
+    }
+
+    @Override
+    public Chunk cloneForChunkSending() {
+        return (Chunk) super.cloneForChunkSending();
+    }
+
+    @Override
+    public boolean compress() {
+        super.compress();
+        boolean result = false;
+        for (cn.nukkit.level.format.ChunkSection section : getSections()) {
+            if (section instanceof ChunkSection) {
+                ChunkSection anvilSection = (ChunkSection) section;
+                if (!anvilSection.isEmpty()) {
+                    result |= anvilSection.compress();
+                }
+            }
+        }
+        return result;
+    }
+
+    public static Chunk fromBinary(byte[] data) {
+        return fromBinary(data, null);
+    }
+
+    public static Chunk fromBinary(byte[] data, LevelProvider provider) {
+        try {
+            CompoundTag chunk = NBTIO.read(new ByteArrayInputStream(Zlib.inflate(data)), ByteOrder.BIG_ENDIAN);
+
+            Tag levelTag = chunk.get("Level");
+            if (!(levelTag instanceof CompoundTag)) {
+                return null;
+            }
+
+            return new Chunk(provider, (CompoundTag) levelTag);
+        } catch (Exception e) {
+            Server.getInstance().getLogger().logException(e);
+            return null;
+        }
+    }
+
+
+    public static Chunk fromFastBinary(byte[] data) {
+        return fromFastBinary(data, null);
+    }
+
+    public static Chunk fromFastBinary(byte[] data, LevelProvider provider) {
+        try {
+            CompoundTag chunk = NBTIO.read(new DataInputStream(new ByteArrayInputStream(data)), ByteOrder.BIG_ENDIAN);
+
+            Tag levelTag = chunk.get("Level");
+            if (!(levelTag instanceof CompoundTag)) {
+                return null;
+            }
+
+            return new Chunk(provider, (CompoundTag) levelTag);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public int getBlockLight(int x, int y, int z) {
+        cn.nukkit.level.format.ChunkSection section = this.sections[y >> 4];
+        if (section instanceof cn.nukkit.level.format.anvil.ChunkSection) {
+            cn.nukkit.level.format.anvil.ChunkSection anvilSection = (cn.nukkit.level.format.anvil.ChunkSection) section;
+            if (anvilSection.blockLight != null) {
+                return section.getBlockLight(x, y & 0x0f, z);
+            } else if (!anvilSection.hasBlockLight) {
+                return 0;
+            } else {
+                return section.getBlockLight(x, y & 0x0f, z);
+            }
+        } else {
+            return section.getBlockLight(x, y & 0x0f, z);
+        }
+    }
+
+    @Override
     public int getBlockSkyLight(int x, int y, int z) {
         cn.nukkit.level.format.ChunkSection section = this.sections[y >> 4];
         if (section instanceof cn.nukkit.level.format.anvil.ChunkSection) {
@@ -389,23 +392,6 @@ public class Chunk extends BaseChunk {
             }
         } else {
             return section.getBlockSkyLight(x, y & 0x0f, z);
-        }
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        cn.nukkit.level.format.ChunkSection section = this.sections[y >> 4];
-        if (section instanceof cn.nukkit.level.format.anvil.ChunkSection) {
-            cn.nukkit.level.format.anvil.ChunkSection anvilSection = (cn.nukkit.level.format.anvil.ChunkSection) section;
-            if (anvilSection.blockLight != null) {
-                return section.getBlockLight(x, y & 0x0f, z);
-            } else if (!anvilSection.hasBlockLight) {
-                return 0;
-            } else {
-                return section.getBlockLight(x, y & 0x0f, z);
-            }
-        } else {
-            return section.getBlockLight(x, y & 0x0f, z);
         }
     }
 
@@ -435,18 +421,35 @@ public class Chunk extends BaseChunk {
     }
 
     @Override
-    public boolean compress() {
-        super.compress();
-        boolean result = false;
-        for (cn.nukkit.level.format.ChunkSection section : getSections()) {
-            if (section instanceof ChunkSection) {
-                ChunkSection anvilSection = (ChunkSection) section;
-                if (!anvilSection.isEmpty()) {
-                    result |= anvilSection.compress();
-                }
-            }
+    public void setGenerated() {
+        this.setGenerated(true);
+    }
+
+    @Override
+    public void setPopulated() {
+        this.setPopulated(true);
+    }
+
+    @Override
+    public byte[] toBinary() {
+        CompoundTag chunk = chunkNBT();
+
+        try {
+            return Zlib.deflate(NBTIO.write(chunk, ByteOrder.BIG_ENDIAN), 7);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return result;
+    }
+
+    @Override
+    public byte[] toFastBinary() {
+        CompoundTag chunk = chunkNBT();
+
+        try {
+            return NBTIO.write(chunk, ByteOrder.BIG_ENDIAN);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

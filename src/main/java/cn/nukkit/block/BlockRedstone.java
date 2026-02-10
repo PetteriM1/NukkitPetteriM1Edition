@@ -1,6 +1,7 @@
 package cn.nukkit.block;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.BlockFace;
@@ -13,13 +14,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockRedstone extends BlockSolid {
 
     @Override
-    public int getId() {
-        return REDSTONE_BLOCK;
-    }
-
-    @Override
-    public double getResistance() {
-        return 10;
+    public BlockColor getColor() {
+        return BlockColor.REDSTONE_BLOCK_COLOR;
     }
 
     @Override
@@ -28,8 +24,8 @@ public class BlockRedstone extends BlockSolid {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getId() {
+        return REDSTONE_BLOCK;
     }
 
     @Override
@@ -38,21 +34,28 @@ public class BlockRedstone extends BlockSolid {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        if (!super.place(item, block, target, face, fx, fy, fz, player)) {
-            return false;
-        }
-        this.level.updateAroundRedstone(this, null);
+    public double getResistance() {
+        return 10;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean isPowerSource() {
         return true;
     }
 
     @Override
-    public boolean onBreak(Item item) {
-        if (!super.onBreak(item)) {
-            return false;
-        }
-        this.level.updateAroundRedstone(this, null);
-        return true;
+    public boolean canBePushed() {
+        return Server.getInstance().unsafeRedstone; // TODO: remove when crash issue fixed
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
     }
 
     @Override
@@ -67,27 +70,25 @@ public class BlockRedstone extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.REDSTONE_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean isPowerSource() {
-        return true;
-    }
-
-    @Override
     public int getWeakPower(BlockFace face) {
         return 15;
     }
 
     @Override
-    public boolean canHarvestWithHand() {
-        return false;
+    public boolean onBreak(Item item) {
+        if (!super.onBreak(item)) {
+            return false;
+        }
+        this.level.updateAroundRedstone(this, null);
+        return true;
     }
 
     @Override
-    public boolean canBePushed() {
-        return false; // TODO: remove when crash issue fixed
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (!super.place(item, block, target, face, fx, fy, fz, player)) {
+            return false;
+        }
+        this.level.updateAroundRedstone(this, null);
+        return true;
     }
 }

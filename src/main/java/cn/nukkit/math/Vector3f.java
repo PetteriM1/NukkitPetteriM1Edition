@@ -31,6 +31,38 @@ public class Vector3f implements Cloneable {
         this.z = z;
     }
 
+    public int getFloorX() {
+        return NukkitMath.floorFloat(this.x);
+    }
+
+    public int getFloorY() {
+        return NukkitMath.floorFloat(this.y);
+    }
+
+    public int getFloorZ() {
+        return NukkitMath.floorFloat(this.z);
+    }
+
+    public float getForward() {
+        return this.z;
+    }
+
+    public float getRight() {
+        return this.x;
+    }
+
+    public float getSouth() {
+        return this.x;
+    }
+
+    public float getUp() {
+        return this.y;
+    }
+
+    public float getWest() {
+        return this.z;
+    }
+
     public float getX() {
         return this.x;
     }
@@ -58,36 +90,8 @@ public class Vector3f implements Cloneable {
         return this;
     }
 
-    public int getFloorX() {
-        return NukkitMath.floorFloat(this.x);
-    }
-
-    public int getFloorY() {
-        return NukkitMath.floorFloat(this.y);
-    }
-
-    public int getFloorZ() {
-        return NukkitMath.floorFloat(this.z);
-    }
-
-    public float getRight() {
-        return this.x;
-    }
-
-    public float getUp() {
-        return this.y;
-    }
-
-    public float getForward() {
-        return this.z;
-    }
-
-    public float getSouth() {
-        return this.x;
-    }
-
-    public float getWest() {
-        return this.z;
+    public Vector3f abs() {
+        return new Vector3f((int) Math.abs(this.x), (int) Math.abs(this.y), (int) Math.abs(this.z));
     }
 
     public Vector3f add(float x) {
@@ -106,149 +110,35 @@ public class Vector3f implements Cloneable {
         return new Vector3f(this.x + x.x, this.y + x.y, this.z + x.z);
     }
 
-    public Vector3f subtract() {
-        return this.subtract(0, 0, 0);
+    /**
+     * Calculates the angle between this and the supplied Vector.
+     *
+     * @param v the Vector to calculate the angle to.
+     * @return the Angle between the two Vectors.
+     */
+    public Angle angleBetween(Vector3f v) {
+        return Angle.fromRadian(Math.acos(Math.min(Math.max(this.normalize().dot(v.normalize()), -1.0f), 1.0f)));
     }
 
-    public Vector3f subtract(float x) {
-        return this.subtract(x, 0, 0);
+    public BlockVector3 asBlockVector3() {
+        return new BlockVector3(getFloorX(), getFloorY(), getFloorZ());
     }
 
-    public Vector3f subtract(float x, float y) {
-        return this.subtract(x, y, 0);
-    }
-
-    public Vector3f subtract(float x, float y, float z) {
-        return this.add(-x, -y, -z);
-    }
-
-    public Vector3f subtract(Vector3f x) {
-        return this.add(-x.x, -x.y, -x.z);
-    }
-
-    public Vector3f multiply(float number) {
-        return new Vector3f(this.x * number, this.y * number, this.z * number);
-    }
-
-    public Vector3f divide(float number) {
-        return new Vector3f(this.x / number, this.y / number, this.z / number);
+    public Vector3 asVector3() {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     public Vector3f ceil() {
         return new Vector3f((int) Math.ceil(this.x), (int) Math.ceil(this.y), (int) Math.ceil(this.z));
     }
 
-    public Vector3f floor() {
-        return new Vector3f(this.getFloorX(), this.getFloorY(), this.getFloorZ());
-    }
-
-    public Vector3f round() {
-        return new Vector3f(Math.round(this.x), Math.round(this.y), Math.round(this.z));
-    }
-
-    public Vector3f abs() {
-        return new Vector3f((int) Math.abs(this.x), (int) Math.abs(this.y), (int) Math.abs(this.z));
-    }
-
-    public Vector3f getSide(int side) {
-        return this.getSide(side, 1);
-    }
-
-    public Vector3f getSide(int side, int step) {
-        switch (side) {
-            case Vector3f.SIDE_DOWN:
-                return new Vector3f(this.x, this.y - step, this.z);
-            case Vector3f.SIDE_UP:
-                return new Vector3f(this.x, this.y + step, this.z);
-            case Vector3f.SIDE_NORTH:
-                return new Vector3f(this.x, this.y, this.z - step);
-            case Vector3f.SIDE_SOUTH:
-                return new Vector3f(this.x, this.y, this.z + step);
-            case Vector3f.SIDE_WEST:
-                return new Vector3f(this.x - step, this.y, this.z);
-            case Vector3f.SIDE_EAST:
-                return new Vector3f(this.x + step, this.y, this.z);
-            default:
-                return this;
+    @Override
+    public Vector3f clone() {
+        try {
+            return (Vector3f) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
         }
-    }
-
-    public static int getOppositeSide(int side) {
-        switch (side) {
-            case Vector3f.SIDE_DOWN:
-                return Vector3f.SIDE_UP;
-            case Vector3f.SIDE_UP:
-                return Vector3f.SIDE_DOWN;
-            case Vector3f.SIDE_NORTH:
-                return Vector3f.SIDE_SOUTH;
-            case Vector3f.SIDE_SOUTH:
-                return Vector3f.SIDE_NORTH;
-            case Vector3f.SIDE_WEST:
-                return Vector3f.SIDE_EAST;
-            case Vector3f.SIDE_EAST:
-                return Vector3f.SIDE_WEST;
-            default:
-                return -1;
-        }
-    }
-
-    public double distance(Vector3f pos) {
-        return Math.sqrt(this.distanceSquared(pos));
-    }
-
-    public double distanceSquared(Vector3f pos) {
-        return Math.pow(this.x - pos.x, 2) + Math.pow(this.y - pos.y, 2) + Math.pow(this.z - pos.z, 2);
-    }
-
-    public float maxPlainDistance() {
-        return this.maxPlainDistance(0, 0);
-    }
-
-    public float maxPlainDistance(float x) {
-        return this.maxPlainDistance(x, 0);
-    }
-
-    public float maxPlainDistance(float x, float z) {
-        return Math.max(Math.abs(this.x - x), Math.abs(this.z - z));
-    }
-
-    public float maxPlainDistance(Vector2f vector) {
-        return this.maxPlainDistance(vector.x, vector.y);
-    }
-
-    public float maxPlainDistance(Vector3f x) {
-        return this.maxPlainDistance(x.x, x.z);
-    }
-
-    /**
-     * Calculates the Length of this Vector
-     *
-     * @return The Length of this Vector.
-     */
-    public double length() {
-        return Math.sqrt(this.lengthSquared());
-    }
-
-    public float lengthSquared() {
-        return this.x * this.x + this.y * this.y + this.z * this.z;
-    }
-
-    public Vector3f normalize() {
-        float len = this.lengthSquared();
-        if (len > 0) {
-            return this.divide((float) Math.sqrt(len));
-        }
-        return new Vector3f(0, 0, 0);
-    }
-
-    /**
-     * Scalar Product of this Vector and the Vector supplied.
-     *
-     * @param v Vector to calculate the scalar product to.
-     * @return Scalar Product
-     */
-    public float dot(Vector3f v) {
-        return this.x * v.x + this.y * v.y + this.z * v.z;
     }
 
     /**
@@ -265,14 +155,44 @@ public class Vector3f implements Cloneable {
         );
     }
 
+    public double distance(Vector3f pos) {
+        return Math.sqrt(this.distanceSquared(pos));
+    }
+
+    public double distanceSquared(Vector3f pos) {
+        double dx = this.x - pos.x;
+        double dy = this.y - pos.y;
+        double dz = this.z - pos.z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    public Vector3f divide(float number) {
+        return new Vector3f(this.x / number, this.y / number, this.z / number);
+    }
+
     /**
-     * Calculates the angle between this and the supplied Vector.
+     * Scalar Product of this Vector and the Vector supplied.
      *
-     * @param v the Vector to calculate the angle to.
-     * @return the Angle between the two Vectors.
+     * @param v Vector to calculate the scalar product to.
+     * @return Scalar Product
      */
-    public Angle angleBetween(Vector3f v) {
-        return Angle.fromRadian(Math.acos(Math.min(Math.max(this.normalize().dot(v.normalize()), -1.0f), 1.0f)));
+    public float dot(Vector3f v) {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Vector3f)) {
+            return false;
+        }
+
+        Vector3f other = (Vector3f) obj;
+
+        return this.x == other.x && this.y == other.y && this.z == other.z;
+    }
+
+    public Vector3f floor() {
+        return new Vector3f(this.getFloorX(), this.getFloorY(), this.getFloorZ());
     }
 
     /**
@@ -344,6 +264,101 @@ public class Vector3f implements Cloneable {
         }
     }
 
+    public static int getOppositeSide(int side) {
+        switch (side) {
+            case Vector3f.SIDE_DOWN:
+                return Vector3f.SIDE_UP;
+            case Vector3f.SIDE_UP:
+                return Vector3f.SIDE_DOWN;
+            case Vector3f.SIDE_NORTH:
+                return Vector3f.SIDE_SOUTH;
+            case Vector3f.SIDE_SOUTH:
+                return Vector3f.SIDE_NORTH;
+            case Vector3f.SIDE_WEST:
+                return Vector3f.SIDE_EAST;
+            case Vector3f.SIDE_EAST:
+                return Vector3f.SIDE_WEST;
+            default:
+                return -1;
+        }
+    }
+
+    public Vector3f getSide(int side) {
+        return this.getSide(side, 1);
+    }
+
+    public Vector3f getSide(int side, int step) {
+        switch (side) {
+            case Vector3f.SIDE_DOWN:
+                return new Vector3f(this.x, this.y - step, this.z);
+            case Vector3f.SIDE_UP:
+                return new Vector3f(this.x, this.y + step, this.z);
+            case Vector3f.SIDE_NORTH:
+                return new Vector3f(this.x, this.y, this.z - step);
+            case Vector3f.SIDE_SOUTH:
+                return new Vector3f(this.x, this.y, this.z + step);
+            case Vector3f.SIDE_WEST:
+                return new Vector3f(this.x - step, this.y, this.z);
+            case Vector3f.SIDE_EAST:
+                return new Vector3f(this.x + step, this.y, this.z);
+            default:
+                return this;
+        }
+    }
+
+    /**
+     * Calculates the Length of this Vector
+     *
+     * @return The Length of this Vector.
+     */
+    public double length() {
+        return Math.sqrt(this.lengthSquared());
+    }
+
+    public float lengthSquared() {
+        return this.x * this.x + this.y * this.y + this.z * this.z;
+    }
+
+    public float maxPlainDistance() {
+        return this.maxPlainDistance(0, 0);
+    }
+
+    public float maxPlainDistance(float x) {
+        return this.maxPlainDistance(x, 0);
+    }
+
+    public float maxPlainDistance(float x, float z) {
+        return Math.max(Math.abs(this.x - x), Math.abs(this.z - z));
+    }
+
+    public float maxPlainDistance(Vector2f vector) {
+        return this.maxPlainDistance(vector.x, vector.y);
+    }
+
+    public float maxPlainDistance(Vector3f x) {
+        return this.maxPlainDistance(x.x, x.z);
+    }
+
+    public Vector3f multiply(float number) {
+        return new Vector3f(this.x * number, this.y * number, this.z * number);
+    }
+
+    public Vector3f normalize() {
+        float len = this.lengthSquared();
+        if (len > 0) {
+            return this.divide((float) Math.sqrt(len));
+        }
+        return new Vector3f(0, 0, 0);
+    }
+
+    public int rawHashCode() {
+        return super.hashCode();
+    }
+
+    public Vector3f round() {
+        return new Vector3f(Math.round(this.x), Math.round(this.y), Math.round(this.z));
+    }
+
     public Vector3f setComponents(float x, float y, float z) {
         this.x = x;
         this.y = y;
@@ -351,40 +366,28 @@ public class Vector3f implements Cloneable {
         return this;
     }
 
+    public Vector3f subtract() {
+        return this.subtract(0, 0, 0);
+    }
+
+    public Vector3f subtract(float x) {
+        return this.subtract(x, 0, 0);
+    }
+
+    public Vector3f subtract(float x, float y) {
+        return this.subtract(x, y, 0);
+    }
+
+    public Vector3f subtract(float x, float y, float z) {
+        return this.add(-x, -y, -z);
+    }
+
+    public Vector3f subtract(Vector3f x) {
+        return this.add(-x.x, -x.y, -x.z);
+    }
+
     @Override
     public String toString() {
         return "Vector3f(x=" + this.x + ",y=" + this.y + ",z=" + this.z + ')';
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Vector3f)) {
-            return false;
-        }
-
-        Vector3f other = (Vector3f) obj;
-
-        return this.x == other.x && this.y == other.y && this.z == other.z;
-    }
-
-    public int rawHashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public Vector3f clone() {
-        try {
-            return (Vector3f) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
-        }
-    }
-
-    public Vector3 asVector3() {
-        return new Vector3(this.x, this.y, this.z);
-    }
-
-    public BlockVector3 asBlockVector3() {
-        return new BlockVector3(getFloorX(), getFloorY(), getFloorZ());
     }
 }

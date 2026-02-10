@@ -40,26 +40,18 @@ public class ItemBow extends ItemTool {
     }
 
     @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_BOW;
-    }
-
-    @Override
     public int getEnchantAbility() {
         return 1;
     }
 
     @Override
-    public boolean onClickAir(Player player, Vector3 directionVector) {
-        return playerHasArrow(player) || player.isCreative();
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_BOW;
     }
 
-    private boolean playerHasArrow(Player p) {
-        if (p.getOffhandInventory().getItemFast(0).getId() == ItemID.ARROW) return true;
-        for (Item i : p.getInventory().getContents().values()) {
-            if (i.getId() == ItemID.ARROW) return true;
-        }
-        return false;
+    @Override
+    public boolean onClickAir(Player player, Vector3 directionVector) {
+        return playerHasArrow(player) || player.isCreative();
     }
 
     @Override
@@ -179,5 +171,13 @@ public class ItemBow extends ItemTool {
         }
 
         return true;
+    }
+
+    private boolean playerHasArrow(Player p) {
+        if (p.getOffhandInventory().getItemFast(0).getId() == ItemID.ARROW) return true;
+        for (Item i : p.getInventory().getContents().values()) {
+            if (i.getId() == ItemID.ARROW) return true;
+        }
+        return false;
     }
 }

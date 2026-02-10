@@ -5,6 +5,11 @@ import cn.nukkit.item.Item;
 public class BlockInfoUpdate extends BlockSolid {
 
     @Override
+    public double getHardness() {
+        return 0.1;
+    }
+
+    @Override
     public int getId() {
         return INFO_UPDATE;
     }
@@ -12,11 +17,6 @@ public class BlockInfoUpdate extends BlockSolid {
     @Override
     public String getName() {
         return "Update Game Block";
-    }
-
-    @Override
-    public double getHardness() {
-        return 0.1;
     }
 
     @Override

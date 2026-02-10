@@ -7,20 +7,10 @@ import cn.nukkit.math.NukkitRandom;
 
 /**
  * @author DaPorkchop_
- *
+ * <p>
  * A populator that populates a single block type.
  */
 public abstract class PopulatorSurfaceBlock extends PopulatorCount {
-
-    @Override
-    protected void populateCount(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        int x = random.nextBoundedInt(16);
-        int z = random.nextBoundedInt(16);
-        int y = getHighestWorkableBlock(level, x, z, chunk);
-        if (y > 0 && canStay(x, y, z, chunk)) {
-            placeBlock(x, y, z, getBlockId(x, z, random, chunk), chunk, random);
-        }
-    }
 
     protected abstract boolean canStay(int x, int y, int z, FullChunk chunk);
 
@@ -41,5 +31,15 @@ public abstract class PopulatorSurfaceBlock extends PopulatorCount {
 
     protected void placeBlock(int x, int y, int z, int id, FullChunk chunk, NukkitRandom random) {
         chunk.setFullBlockId(x, y, z, id);
+    }
+
+    @Override
+    protected void populateCount(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
+        int x = random.nextBoundedInt(16);
+        int z = random.nextBoundedInt(16);
+        int y = getHighestWorkableBlock(level, x, z, chunk);
+        if (y > 0 && canStay(x, y, z, chunk)) {
+            placeBlock(x, y, z, getBlockId(x, z, random, chunk), chunk, random);
+        }
     }
 }

@@ -17,6 +17,11 @@ public class BlockFenceGateBirch extends BlockFenceGate {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.SAND_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return FENCE_GATE_BIRCH;
     }
@@ -24,10 +29,5 @@ public class BlockFenceGateBirch extends BlockFenceGate {
     @Override
     public String getName() {
         return "Birch Fence Gate";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.SAND_BLOCK_COLOR;
     }
 }

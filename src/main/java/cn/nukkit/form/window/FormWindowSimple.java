@@ -1,7 +1,6 @@
 package cn.nukkit.form.window;
 
-import cn.nukkit.form.element.ElementButton;
-import cn.nukkit.form.element.SimpleElement;
+import cn.nukkit.form.element.*;
 import cn.nukkit.form.response.FormResponseSimple;
 
 import java.util.ArrayList;
@@ -10,11 +9,11 @@ import java.util.List;
 public class FormWindowSimple extends FormWindow {
 
     @SuppressWarnings("unused")
-    private final String type = "form"; // This variable is used for JSON import operations. Do NOT delete :) -- @Snake1999
+    private final String type = "form";
     private String title = "";
     private String content = "";
     @SuppressWarnings("FieldMayBeFinal")
-    private transient List<ElementButton> buttons;
+    private List<ElementButton> buttons;
     @SuppressWarnings("FieldMayBeFinal")
     private List<SimpleElement> elements;
 
@@ -35,44 +34,28 @@ public class FormWindowSimple extends FormWindow {
         this.elements = elements;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public List<ElementButton> getButtons() {
+        return buttons;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public List<ElementButton> getButtons() {
-        return buttons;
-    }
-
-    public void addButton(ElementButton button) {
-        this.buttons.add(button);
-        this.elements.add(button);
-    }
-
     public List<SimpleElement> getElements() {
         return elements;
     }
 
-    public void addElement(SimpleElement element) {
-        if (element instanceof ElementButton) {
-            this.buttons.add((ElementButton) element);
-        }
-        this.elements.add(element);
-    }
-
     public FormResponseSimple getResponse() {
         return response;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public void setResponse(String data) {
@@ -91,5 +74,21 @@ public class FormWindowSimple extends FormWindow {
             return;
         }
         this.response = new FormResponseSimple(buttonID, buttons.get(buttonID));
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void addButton(ElementButton button) {
+        this.buttons.add(button);
+        this.elements.add(button);
+    }
+
+    public void addElement(SimpleElement element) {
+        if (element instanceof ElementButton) {
+            this.buttons.add((ElementButton) element);
+        }
+        this.elements.add(element);
     }
 }

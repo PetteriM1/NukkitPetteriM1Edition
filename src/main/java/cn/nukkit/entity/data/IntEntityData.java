@@ -19,17 +19,17 @@ public class IntEntityData extends EntityData<Integer> {
         return data;
     }
 
+    @Override
+    public int getType() {
+        return Entity.DATA_TYPE_INT;
+    }
+
     public void setData(Integer data) {
         if (data == null) {
             this.data = 0;
         } else {
             this.data = data;
         }
-    }
-
-    @Override
-    public int getType() {
-        return Entity.DATA_TYPE_INT;
     }
 
     @Override

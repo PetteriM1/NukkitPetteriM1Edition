@@ -59,41 +59,31 @@ public class Location extends Position {
         this.level = level;
     }
 
-    public static Location fromObject(Vector3 pos) {
-        return fromObject(pos, null, 0.0f, 0.0f, 0.0f);
-    }
-
-    public static Location fromObject(Vector3 pos, Level level) {
-        return fromObject(pos, level, 0.0f, 0.0f, 0.0f);
-    }
-
-    public static Location fromObject(Vector3 pos, Level level, double yaw) {
-        return fromObject(pos, level, yaw, 0.0f, 0.0f);
-    }
-
-    public static Location fromObject(Vector3 pos, Level level, double yaw, double pitch) {
-        return fromObject(pos, level, yaw, pitch, 0.0f);
-    }
-
-    public static Location fromObject(Vector3 pos, Level level, double yaw, double pitch, double headYaw) {
-        return new Location(pos.x, pos.y, pos.z, yaw, pitch, headYaw, (level == null) ? ((pos instanceof Position) ? ((Position) pos).level : null) : level);
-    }
-
-    public double getYaw() {
-        return this.yaw;
-    }
-
-    public double getPitch() {
-        return this.pitch;
+    public Vector3 getDirectionVector() {
+        double pitch = ((this.pitch + 90) * Math.PI) / 180;
+        double yaw = ((this.yaw + 90) * Math.PI) / 180;
+        double x = Math.sin(pitch) * Math.cos(yaw);
+        double z = Math.sin(pitch) * Math.sin(yaw);
+        double y = Math.cos(pitch);
+        return new Vector3(x, y, z).normalize();
     }
 
     public double getHeadYaw() {
         return this.headYaw;
     }
 
-    public Location setYaw(double yaw) {
-        this.yaw = yaw;
-        return this;
+    @Override
+    public Location getLocation() {
+        if (this.isValid()) return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw, this.level);
+        else throw new LevelException("Undefined Level reference");
+    }
+
+    public double getPitch() {
+        return this.pitch;
+    }
+
+    public double getYaw() {
+        return this.yaw;
     }
 
     public Location setBothYaw(double yaw) {
@@ -102,25 +92,24 @@ public class Location extends Position {
         return this;
     }
 
-    public Location setPitch(double pitch) {
-        this.pitch = pitch;
-        return this;
-    }
-
     public Location setHeadYaw(double headYaw) {
         this.headYaw = headYaw;
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "Location(level=" + (this.isValid() ? this.getLevel().getName() : "null") + ", x=" + this.x + ", y=" + this.y + ", z=" + this.z + ", yaw=" + this.yaw + ", pitch=" + this.pitch + ", headYaw=" + this.headYaw + ')';
+    public Location setPitch(double pitch) {
+        this.pitch = pitch;
+        return this;
+    }
+
+    public Location setYaw(double yaw) {
+        this.yaw = yaw;
+        return this;
     }
 
     @Override
-    public Location getLocation() {
-        if (this.isValid()) return new Location(this.x, this.y, this.z, this.yaw, this.pitch, this.headYaw, this.level);
-        else throw new LevelException("Undefined Level reference");
+    public Location abs() {
+        return new Location((int) Math.abs(this.x), (int) Math.abs(this.y), (int) Math.abs(this.z), this.yaw, this.pitch, this.headYaw, this.level);
     }
 
     @Override
@@ -141,6 +130,56 @@ public class Location extends Position {
     @Override
     public Location add(Vector3 x) {
         return new Location(this.x + x.getX(), this.y + x.getY(), this.z + x.getZ(), this.yaw, this.pitch, this.headYaw, this.level);
+    }
+
+    @Override
+    public Location ceil() {
+        return new Location((int) Math.ceil(this.x), (int) Math.ceil(this.y), (int) Math.ceil(this.z), this.yaw, this.pitch, this.headYaw, this.level);
+    }
+
+    @Override
+    public Location clone() {
+        return (Location) super.clone();
+    }
+
+    @Override
+    public Location divide(double number) {
+        return new Location(this.x / number, this.y / number, this.z / number, this.yaw, this.pitch, this.headYaw, this.level);
+    }
+
+    @Override
+    public Location floor() {
+        return new Location(this.getFloorX(), this.getFloorY(), this.getFloorZ(), this.yaw, this.pitch, this.headYaw, this.level);
+    }
+
+    public static Location fromObject(Vector3 pos) {
+        return fromObject(pos, null, 0.0f, 0.0f, 0.0f);
+    }
+
+    public static Location fromObject(Vector3 pos, Level level) {
+        return fromObject(pos, level, 0.0f, 0.0f, 0.0f);
+    }
+
+    public static Location fromObject(Vector3 pos, Level level, double yaw) {
+        return fromObject(pos, level, yaw, 0.0f, 0.0f);
+    }
+
+    public static Location fromObject(Vector3 pos, Level level, double yaw, double pitch) {
+        return fromObject(pos, level, yaw, pitch, 0.0f);
+    }
+
+    public static Location fromObject(Vector3 pos, Level level, double yaw, double pitch, double headYaw) {
+        return new Location(pos.x, pos.y, pos.z, yaw, pitch, headYaw, (level == null) ? ((pos instanceof Position) ? ((Position) pos).level : null) : level);
+    }
+
+    @Override
+    public Location multiply(double number) {
+        return new Location(this.x * number, this.y * number, this.z * number, this.yaw, this.pitch, this.headYaw, this.level);
+    }
+
+    @Override
+    public Location round() {
+        return new Location(Math.round(this.x), Math.round(this.y), Math.round(this.z), this.yaw, this.pitch, this.headYaw, this.level);
     }
 
     @Override
@@ -169,46 +208,7 @@ public class Location extends Position {
     }
 
     @Override
-    public Location multiply(double number) {
-        return new Location(this.x * number, this.y * number, this.z * number, this.yaw, this.pitch, this.headYaw, this.level);
-    }
-
-    @Override
-    public Location divide(double number) {
-        return new Location(this.x / number, this.y / number, this.z / number, this.yaw, this.pitch, this.headYaw, this.level);
-    }
-
-    @Override
-    public Location ceil() {
-        return new Location((int) Math.ceil(this.x), (int) Math.ceil(this.y), (int) Math.ceil(this.z), this.yaw, this.pitch, this.headYaw, this.level);
-    }
-
-    @Override
-    public Location floor() {
-        return new Location(this.getFloorX(), this.getFloorY(), this.getFloorZ(), this.yaw, this.pitch, this.headYaw, this.level);
-    }
-
-    @Override
-    public Location round() {
-        return new Location(Math.round(this.x), Math.round(this.y), Math.round(this.z), this.yaw, this.pitch, this.headYaw, this.level);
-    }
-
-    @Override
-    public Location abs() {
-        return new Location((int) Math.abs(this.x), (int) Math.abs(this.y), (int) Math.abs(this.z), this.yaw, this.pitch, this.headYaw, this.level);
-    }
-
-    public Vector3 getDirectionVector() {
-        double pitch = ((this.pitch + 90) * Math.PI) / 180;
-        double yaw = ((this.yaw + 90) * Math.PI) / 180;
-        double x = Math.sin(pitch) * Math.cos(yaw);
-        double z = Math.sin(pitch) * Math.sin(yaw);
-        double y = Math.cos(pitch);
-        return new Vector3(x, y, z).normalize();
-    }
-
-    @Override
-    public Location clone() {
-        return (Location) super.clone();
+    public String toString() {
+        return "Location(level=" + (this.isValid() ? this.getLevel().getName() : "null") + ", x=" + this.x + ", y=" + this.y + ", z=" + this.z + ", yaw=" + this.yaw + ", pitch=" + this.pitch + ", headYaw=" + this.headYaw + ')';
     }
 }

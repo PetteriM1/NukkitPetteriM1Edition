@@ -33,6 +33,29 @@ public class BlockTrappedChest extends BlockChest {
     }
 
     @Override
+    public boolean isPowerSource() {
+        return true;
+    }
+
+    @Override
+    public int getStrongPower(BlockFace side) {
+        return side == BlockFace.UP ? this.getWeakPower(side) : 0;
+    }
+
+    @Override
+    public int getWeakPower(BlockFace face) {
+        int playerCount = 0;
+
+        BlockEntity blockEntity = this.level.getBlockEntity(this);
+
+        if (blockEntity instanceof BlockEntityChest) {
+            playerCount = ((BlockEntityChest) blockEntity).getInventory().getViewers().size();
+        }
+
+        return Math.min(playerCount, 15);
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         BlockEntityChest chest = null;
         this.setDamage(Block.FACES2534[player != null ? player.getDirection().getHorizontalIndex() : 0]);
@@ -82,29 +105,6 @@ public class BlockTrappedChest extends BlockChest {
             blockEntity.pairWith(chest);
         }
 
-        return true;
-    }
-
-    @Override
-    public int getWeakPower(BlockFace face) {
-        int playerCount = 0;
-
-        BlockEntity blockEntity = this.level.getBlockEntity(this);
-
-        if (blockEntity instanceof BlockEntityChest) {
-            playerCount = ((BlockEntityChest) blockEntity).getInventory().getViewers().size();
-        }
-
-        return Math.min(playerCount, 15);
-    }
-
-    @Override
-    public int getStrongPower(BlockFace side) {
-        return side == BlockFace.UP ? this.getWeakPower(side) : 0;
-    }
-
-    @Override
-    public boolean isPowerSource() {
         return true;
     }
 }

@@ -1,5 +1,6 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Server;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.math.AxisAlignedBB;
 import cn.nukkit.math.BlockFace;
@@ -23,23 +24,13 @@ public class BlockWall extends BlockTransparentMeta {
     }
 
     @Override
-    public int getId() {
-        return STONE_WALL;
-    }
-
-    @Override
-    public boolean isSolid() {
-        return false;
-    }
-
-    @Override
     public double getHardness() {
         return 2;
     }
 
     @Override
-    public double getResistance() {
-        return 30;
+    public int getId() {
+        return STONE_WALL;
     }
 
     @Override
@@ -79,7 +70,47 @@ public class BlockWall extends BlockTransparentMeta {
     }
 
     @Override
+    public double getResistance() {
+        return 30;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
+    }
+
+    public boolean canConnect(Block block) {
+        return (!(block.getId() != COBBLE_WALL && block.getId() != FENCE_GATE)) || block.isSolid() && !block.isTransparent();
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
     protected AxisAlignedBB recalculateBoundingBox() {
+        if (Thread.currentThread() != Server.getInstance().getPrimaryThread()) {
+            return new SimpleAxisAlignedBB(
+                    this.x + 1,
+                    this.y,
+                    this.z + 1,
+                    this.x + 1,
+                    this.y + 1.5,
+                    this.z + 1
+            ); // Hack: Fix asynchronous calls (mob AI) causing issues by trying to load chunks
+        }
+
         boolean north = this.canConnect(this.getSide(BlockFace.NORTH));
         boolean south = this.canConnect(this.getSide(BlockFace.SOUTH));
         boolean west = this.canConnect(this.getSide(BlockFace.WEST));
@@ -106,24 +137,5 @@ public class BlockWall extends BlockTransparentMeta {
                 this.y + 1.5,
                 this.z + s
         );
-    }
-
-    public boolean canConnect(Block block) {
-        return (!(block.getId() != COBBLE_WALL && block.getId() != FENCE_GATE)) || block.isSolid() && !block.isTransparent();
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

@@ -2,7 +2,6 @@ package cn.nukkit.entity.item;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
-import cn.nukkit.block.BlockID;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityInteractable;
 import cn.nukkit.entity.data.StringEntityData;
@@ -48,21 +47,8 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
         }
     }
 
-    private static int getArmorSlot(ItemArmor armorItem) {
-        if (armorItem.canBePutInHelmetSlot()) {
-            return 0;
-        } else if (armorItem.isChestplate()) {
-            return 1;
-        } else if (armorItem.isLeggings()) {
-            return 2;
-        } else {
-            return 3;
-        }
-    }
-
-    @Override
-    public int getNetworkId() {
-        return NETWORK_ID;
+    public EntityEquipmentInventory getEquipmentInventory() {
+        return this.equipmentInventory;
     }
 
     @Override
@@ -76,8 +62,144 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
     }
 
     @Override
+    public String getInteractButtonText() {
+        return "action.interact.armorstand.equip";
+    }
+
+    @Override
+    public EntityArmorInventory getInventory() {
+        return this.armorInventory;
+    }
+
+    @Override
+    public String getName() {
+        return this.hasCustomName() ? this.getNameTag() : "Armor Stand";
+    }
+
+    @Override
+    public String getNameTag() {
+        return this.nameTag == null ? "" : this.nameTag;
+    }
+
+    @Override
+    public int getNetworkId() {
+        return NETWORK_ID;
+    }
+
+    public int getPose() {
+        return this.pose;
+    }
+
+    @Override
     public float getWidth() {
         return 0.5f;
+    }
+
+    @Override
+    public void setNameTag(String name) {
+        this.nameTag = name;
+        if (this.namedTag.contains("CustomNameVisible") || this.namedTag.contains("CustomNameAlwaysVisible")) { // Hack: Vanilla: Disable client side name tag while keeping custom name in nbt
+            this.setDataProperty(new StringEntityData(DATA_NAMETAG, name));
+        }
+    }
+
+    public void setPose(int pose) {
+        this.pose = pose;
+        this.dataProperties.putInt(Entity.DATA_ARMOR_STAND_POSE_INDEX, pose);
+    }
+
+    @Override
+    public boolean attack(EntityDamageEvent source) {
+        if (source.getCause() == EntityDamageEvent.DamageCause.CONTACT) {
+            source.setCancelled(true);
+        }
+
+        if (!this.isAlive() || !super.attack(source)) {
+            return false;
+        }
+
+        if (!source.isCancelled() && !this.closed) {
+            this.setGenericFlag(Entity.DATA_FLAG_VIBRATING, true);
+            this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
+            this.kill(); // Using close() here would not leave any time for the vibrating effect to display
+            if (source instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) source;
+                if (event.getDamager() instanceof Player) {
+                    Player player = (Player) event.getDamager();
+                    if (player.isCreative()) {
+                        this.close();
+                        return true;
+                    }
+
+                    boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
+                    if (drop) {
+                        this.level.dropItem(this, Item.get(Item.ARMOR_STAND));
+                    }
+                    if (this.equipmentInventory != null) {
+                        if (drop) {
+                            this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                        }
+                        this.equipmentInventory.clearAll();
+                    }
+                    if (this.armorInventory != null) {
+                        if (drop) {
+                            this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                        }
+                        this.armorInventory.clearAll();
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean canDoInteraction() {
+        return true;
+    }
+
+    private static int getArmorSlot(ItemArmor armorItem) {
+        if (armorItem.canBePutInHelmetSlot()) {
+            return 0;
+        } else if (armorItem.isChestplate()) {
+            return 1;
+        } else if (armorItem.isLeggings()) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
+    @Override
+    public boolean goToNewChunk(FullChunk chunk) {
+        if (chunk.getEntities().size() > 200) {
+            if (!this.isClosed() && this.isAlive()) {
+                boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
+                if (drop) {
+                    this.level.dropItem(this, Item.get(Item.ARMOR_STAND));
+                }
+                if (this.equipmentInventory != null) {
+                    if (drop) {
+                        this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                    }
+                    this.equipmentInventory.clearAll();
+                }
+                if (this.armorInventory != null) {
+                    if (drop) {
+                        this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
+                    }
+                    this.armorInventory.clearAll();
+                }
+            }
+            this.close();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return this.nameTag != null;
     }
 
     @Override
@@ -150,7 +272,7 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
                 isArmorSlot = true;
             }
 
-            if (flag && (item.getId() == Item.SKULL) || item.getId() == (255 - BlockID.CARVED_PUMPKIN)) {
+            if (flag && (item.getId() == Item.SKULL) || item.getId() == (255 - Item.CARVED_PUMPKIN)) {
                 i = 0;
                 isArmorSlot = true;
             }
@@ -182,135 +304,6 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
             return false; // Item set in tryChangeEquipment
         }
         return false;
-    }
-
-    private void tryChangeEquipment(Player player, Item newItem, int slot, boolean isArmorSlot) {
-        Item currentItem = isArmorSlot ? this.armorInventory.getItem(slot) : this.equipmentInventory.getItem(slot);
-
-        if (currentItem.equals(newItem)) {
-            return;
-        }
-
-        if (newItem.isNull()) {
-            if (isArmorSlot) {
-                this.armorInventory.setItem(slot, Item.get(Item.AIR));
-            } else {
-                this.equipmentInventory.setItem(slot, Item.get(Item.AIR));
-            }
-        } else {
-            if (!player.isCreative()) {
-                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
-            }
-
-            Item itemToAdd = newItem.clone();
-            itemToAdd.setCount(1);
-            if (isArmorSlot) {
-                this.armorInventory.setItem(slot, itemToAdd);
-            } else {
-                this.equipmentInventory.setItem(slot, itemToAdd);
-            }
-        }
-
-        if (!currentItem.isNull()) {
-            player.getInventory().addItem(currentItem);
-        }
-
-        Collection<Player> viewers = this.getViewers().values();
-        this.equipmentInventory.sendContents(viewers);
-        this.armorInventory.sendContents(viewers);
-    }
-
-    public int getPose() {
-        return this.pose;
-    }
-
-    public void setPose(int pose) {
-        this.pose = pose;
-        this.dataProperties.putInt(Entity.DATA_ARMOR_STAND_POSE_INDEX, pose);
-    }
-
-    @Override
-    public void saveNBT() {
-        super.saveNBT();
-
-        this.namedTag.put(TAG_MAINHAND, NBTIO.putItemHelper(this.equipmentInventory.getItemInHand()));
-        this.namedTag.put(TAG_OFFHAND, NBTIO.putItemHelper(this.equipmentInventory.getOffHandItem()));
-
-        if (this.armorInventory != null) {
-            ListTag<CompoundTag> armorTag = new ListTag<>(TAG_ARMOR);
-            for (int i = 0; i < 4; i++) {
-                armorTag.add(NBTIO.putItemHelper(this.armorInventory.getItem(i), i));
-            }
-            this.namedTag.putList(armorTag);
-        }
-
-        this.namedTag.putInt(TAG_POSE_INDEX, this.getPose());
-    }
-
-    @Override
-    public void spawnTo(Player player) {
-        super.spawnTo(player);
-        this.equipmentInventory.sendContents(player);
-        this.armorInventory.sendContents(player);
-    }
-
-    @Override
-    public boolean attack(EntityDamageEvent source) {
-        if (source.getCause() == EntityDamageEvent.DamageCause.CONTACT) {
-            source.setCancelled(true);
-        }
-
-        if (!this.isAlive() || !super.attack(source)) {
-            return false;
-        }
-
-        if (!source.isCancelled() && !this.closed) {
-            this.setGenericFlag(Entity.DATA_FLAG_VIBRATING, true);
-            this.level.addParticle(new DestroyBlockParticle(this, Block.get(Block.WOODEN_PLANKS)));
-            this.kill(); // Using close() here would not leave any time for the vibrating effect to display
-            if (source instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) source;
-                if (event.getDamager() instanceof Player) {
-                    Player player = (Player) event.getDamager();
-                    if (player.isCreative()) {
-                        this.close();
-                        return true;
-                    }
-
-                    boolean drop = this.level.getGameRules().getBoolean(GameRule.DO_ENTITY_DROPS);
-                    if (drop) {
-                        this.level.dropItem(this, Item.get(Item.ARMOR_STAND));
-                    }
-                    if (this.equipmentInventory != null) {
-                        if (drop) {
-                            this.equipmentInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-                        }
-                        this.equipmentInventory.clearAll();
-                    }
-                    if (this.armorInventory != null) {
-                        if (drop) {
-                            this.armorInventory.getContents().values().forEach(items -> this.level.dropItem(this, items));
-                        }
-                        this.armorInventory.clearAll();
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public String getName() {
-        return this.hasCustomName() ? this.getNameTag() : "Armor Stand";
-    }
-
-    public EntityEquipmentInventory getEquipmentInventory() {
-        return this.equipmentInventory;
-    }
-
-    @Override
-    public EntityArmorInventory getInventory() {
-        return this.armorInventory;
     }
 
     @Override
@@ -349,30 +342,63 @@ public class EntityArmorStand extends Entity implements InventoryHolder, EntityI
     }
 
     @Override
-    public String getInteractButtonText() {
-        return "action.interact.armorstand.equip";
-    }
+    public void saveNBT() {
+        super.saveNBT();
 
-    @Override
-    public boolean canDoInteraction() {
-        return true;
-    }
+        this.namedTag.put(TAG_MAINHAND, NBTIO.putItemHelper(this.equipmentInventory.getItemInHand()));
+        this.namedTag.put(TAG_OFFHAND, NBTIO.putItemHelper(this.equipmentInventory.getOffHandItem()));
 
-    @Override
-    public void setNameTag(String name) {
-        this.nameTag = name;
-        if (this.namedTag.contains("CustomNameVisible") || this.namedTag.contains("CustomNameAlwaysVisible")) { // Hack: Vanilla: Disable client side name tag while keeping custom name in nbt
-            this.setDataProperty(new StringEntityData(DATA_NAMETAG, name));
+        if (this.armorInventory != null) {
+            ListTag<CompoundTag> armorTag = new ListTag<>(TAG_ARMOR);
+            for (int i = 0; i < 4; i++) {
+                armorTag.add(NBTIO.putItemHelper(this.armorInventory.getItem(i), i));
+            }
+            this.namedTag.putList(armorTag);
         }
+
+        this.namedTag.putInt(TAG_POSE_INDEX, this.getPose());
     }
 
     @Override
-    public boolean hasCustomName() {
-        return this.nameTag != null;
+    public void spawnTo(Player player) {
+        super.spawnTo(player);
+        this.equipmentInventory.sendContents(player);
+        this.armorInventory.sendContents(player);
     }
 
-    @Override
-    public String getNameTag() {
-        return this.nameTag == null ? "" : this.nameTag;
+    private void tryChangeEquipment(Player player, Item newItem, int slot, boolean isArmorSlot) {
+        Item currentItem = isArmorSlot ? this.armorInventory.getItem(slot) : this.equipmentInventory.getItem(slot);
+
+        if (currentItem.equals(newItem)) {
+            return;
+        }
+
+        if (newItem.isNull()) {
+            if (isArmorSlot) {
+                this.armorInventory.setItem(slot, Item.get(Item.AIR));
+            } else {
+                this.equipmentInventory.setItem(slot, Item.get(Item.AIR));
+            }
+        } else {
+            if (!player.isCreative()) {
+                player.getInventory().decreaseCount(player.getInventory().getHeldItemIndex());
+            }
+
+            Item itemToAdd = newItem.clone();
+            itemToAdd.setCount(1);
+            if (isArmorSlot) {
+                this.armorInventory.setItem(slot, itemToAdd);
+            } else {
+                this.equipmentInventory.setItem(slot, itemToAdd);
+            }
+        }
+
+        if (!currentItem.isNull()) {
+            player.getInventory().addItem(currentItem);
+        }
+
+        Collection<Player> viewers = this.getViewers().values();
+        this.equipmentInventory.sendContents(viewers);
+        this.armorInventory.sendContents(viewers);
     }
 }

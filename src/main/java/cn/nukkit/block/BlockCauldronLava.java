@@ -27,11 +27,6 @@ public class BlockCauldronLava extends BlockCauldron {
     }
 
     @Override
-    public String getName() {
-        return "Lava Cauldron";
-    }
-
-    @Override
     public int getId() {
         return LAVA_CAULDRON;
     }
@@ -42,8 +37,13 @@ public class BlockCauldronLava extends BlockCauldron {
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return true;
+    public String getName() {
+        return "Lava Cauldron";
+    }
+
+    @Override
+    public boolean isFull() {
+        return this.getDamage() == 14;
     }
 
     @Override
@@ -53,21 +53,8 @@ public class BlockCauldronLava extends BlockCauldron {
     }
 
     @Override
-    public void onEntityCollide(Entity entity) {
-        if (!entity.fireProof || !entity.isOnFire() || !(entity instanceof BaseEntity)) { // Improve performance
-            if (!entity.fireProof || !entity.isOnFire()) {
-
-                EntityCombustByBlockEvent ev = new EntityCombustByBlockEvent(this, entity, 8);
-                Server.getInstance().getPluginManager().callEvent(ev);
-                if (!ev.isCancelled() && entity.isAlive() && entity.noDamageTicks == 0) {
-                    entity.setOnFire(ev.getDuration());
-                }
-            }
-
-            if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
-                entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.LAVA, 4));
-            }
-        }
+    public boolean hasEntityCollision() {
+        return true;
     }
 
     @Override
@@ -102,8 +89,21 @@ public class BlockCauldronLava extends BlockCauldron {
     }
 
     @Override
-    public boolean isFull() {
-        return this.getDamage() == 14;
+    public void onEntityCollide(Entity entity) {
+        if (!entity.fireProof || !entity.isOnFire() || !(entity instanceof BaseEntity)) { // Improve performance
+            if (!entity.fireProof || !entity.isOnFire()) {
+
+                EntityCombustByBlockEvent ev = new EntityCombustByBlockEvent(this, entity, 8);
+                Server.getInstance().getPluginManager().callEvent(ev);
+                if (!ev.isCancelled() && entity.isAlive() && entity.noDamageTicks == 0) {
+                    entity.setOnFire(ev.getDuration());
+                }
+            }
+
+            if (!entity.hasEffect(Effect.FIRE_RESISTANCE)) {
+                entity.attack(new EntityDamageByBlockEvent(this, entity, EntityDamageEvent.DamageCause.LAVA, 4));
+            }
+        }
     }
 
     @Override

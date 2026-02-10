@@ -1,7 +1,9 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockCrimsonPlanks extends BlockSolid {
 
@@ -14,13 +16,8 @@ public class BlockCrimsonPlanks extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Planks";
-    }
-
-    @Override
-    public int getId() {
-        return CRIMSON_PLANKS;
+    public BlockColor getColor() {
+        return BlockColor.CRIMSON_STEM_BLOCK_COLOR;
     }
 
     @Override
@@ -29,8 +26,23 @@ public class BlockCrimsonPlanks extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return CRIMSON_PLANKS;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_16_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Crimson Planks";
+    }
+
+    @Override
     public double getResistance() {
-        return 3;
+        return 15;
     }
 
     @Override
@@ -39,7 +51,7 @@ public class BlockCrimsonPlanks extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.CRIMSON_STEM_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.PLANKS;
     }
 }

@@ -41,19 +41,13 @@ public class NBTInputStream implements DataInput, AutoCloseable {
         return network;
     }
 
-    @Override
-    public void readFully(byte[] b) throws IOException {
-        this.stream.readFully(b);
+    public int available() throws IOException {
+        return this.stream.available();
     }
 
     @Override
-    public void readFully(byte[] b, int off, int len) throws IOException {
-        this.stream.readFully(b, off, len);
-    }
-
-    @Override
-    public int skipBytes(int n) throws IOException {
-        return this.stream.skipBytes(n);
+    public void close() throws IOException {
+        this.stream.close();
     }
 
     @Override
@@ -67,31 +61,40 @@ public class NBTInputStream implements DataInput, AutoCloseable {
     }
 
     @Override
-    public int readUnsignedByte() throws IOException {
-        return this.stream.readUnsignedByte();
-    }
-
-    @Override
-    public short readShort() throws IOException {
-        short s = this.stream.readShort();
-        if (endianness == ByteOrder.LITTLE_ENDIAN) {
-            s = Short.reverseBytes(s);
-        }
-        return s;
-    }
-
-    @Override
-    public int readUnsignedShort() throws IOException {
-        return this.readShort() & 0xFFFF;
-    }
-
-    @Override
     public char readChar() throws IOException {
         char c = this.stream.readChar();
         if (endianness == ByteOrder.LITTLE_ENDIAN) {
             c = Character.reverseBytes(c);
         }
         return c;
+    }
+
+    @Override
+    public double readDouble() throws IOException {
+        long l = this.stream.readLong();
+        if (endianness == ByteOrder.LITTLE_ENDIAN) {
+            l = Long.reverseBytes(l);
+        }
+        return Double.longBitsToDouble(l);
+    }
+
+    @Override
+    public float readFloat() throws IOException {
+        int i = this.stream.readInt();
+        if (endianness == ByteOrder.LITTLE_ENDIAN) {
+            i = Integer.reverseBytes(i);
+        }
+        return Float.intBitsToFloat(i);
+    }
+
+    @Override
+    public void readFully(byte[] b) throws IOException {
+        this.stream.readFully(b);
+    }
+
+    @Override
+    public void readFully(byte[] b, int off, int len) throws IOException {
+        this.stream.readFully(b, off, len);
     }
 
     @Override
@@ -107,6 +110,12 @@ public class NBTInputStream implements DataInput, AutoCloseable {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    public String readLine() throws IOException {
+        return this.stream.readLine();
+    }
+
+    @Override
     public long readLong() throws IOException {
         if (network) {
             return VarInt.readVarLong(this.stream);
@@ -119,27 +128,12 @@ public class NBTInputStream implements DataInput, AutoCloseable {
     }
 
     @Override
-    public float readFloat() throws IOException {
-        int i = this.stream.readInt();
+    public short readShort() throws IOException {
+        short s = this.stream.readShort();
         if (endianness == ByteOrder.LITTLE_ENDIAN) {
-            i = Integer.reverseBytes(i);
+            s = Short.reverseBytes(s);
         }
-        return Float.intBitsToFloat(i);
-    }
-
-    @Override
-    public double readDouble() throws IOException {
-        long l = this.stream.readLong();
-        if (endianness == ByteOrder.LITTLE_ENDIAN) {
-            l = Long.reverseBytes(l);
-        }
-        return Double.longBitsToDouble(l);
-    }
-
-    @Override
-    @Deprecated
-    public String readLine() throws IOException {
-        return this.stream.readLine();
+        return s;
     }
 
     @Override
@@ -153,19 +147,25 @@ public class NBTInputStream implements DataInput, AutoCloseable {
     public String readUTF(int maxLen) throws IOException {
         int length = network ? (int) VarInt.readUnsignedVarInt(stream) : this.readUnsignedShort();
         if (length > maxLen) {
-            throw new RuntimeException("Input too long!");
+            throw new RuntimeException("Input too long! " + length);
         }
         byte[] bytes = new byte[length];
         this.stream.read(bytes);
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    public int available() throws IOException {
-        return this.stream.available();
+    @Override
+    public int readUnsignedByte() throws IOException {
+        return this.stream.readUnsignedByte();
     }
 
     @Override
-    public void close() throws IOException {
-        this.stream.close();
+    public int readUnsignedShort() throws IOException {
+        return this.readShort() & 0xFFFF;
+    }
+
+    @Override
+    public int skipBytes(int n) throws IOException {
+        return this.stream.skipBytes(n);
     }
 }

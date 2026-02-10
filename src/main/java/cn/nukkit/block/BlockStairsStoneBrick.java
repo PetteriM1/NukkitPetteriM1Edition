@@ -17,18 +17,18 @@ public class BlockStairsStoneBrick extends BlockStairs {
     }
 
     @Override
+    public double getHardness() {
+        return 1.5;
+    }
+
+    @Override
     public int getId() {
         return STONE_BRICK_STAIRS;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
-    }
-
-    @Override
-    public double getHardness() {
-        return 1.5;
+    public String getName() {
+        return "Stone Brick Stairs";
     }
 
     @Override
@@ -37,7 +37,7 @@ public class BlockStairsStoneBrick extends BlockStairs {
     }
 
     @Override
-    public String getName() {
-        return "Stone Brick Stairs";
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 }

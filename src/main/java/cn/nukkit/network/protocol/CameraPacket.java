@@ -11,11 +11,6 @@ public class CameraPacket extends DataPacket {
     public long playerUniqueId;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -25,5 +20,10 @@ public class CameraPacket extends DataPacket {
         this.reset();
         this.putEntityUniqueId(this.cameraUniqueId);
         this.putEntityUniqueId(this.playerUniqueId);
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

@@ -42,6 +42,26 @@ public class CraftingTransaction extends InventoryTransaction {
         init(source, actions);
     }
 
+    public List<Item> getInputList() {
+        return inputs;
+    }
+
+    public Item getPrimaryOutput() {
+        return primaryOutput;
+    }
+
+    public CraftingRecipe getRecipe() {
+        return recipe;
+    }
+
+    public void setExtraOutput(Item item) {
+        if (secondaryOutputs.size() < gridSize * gridSize) {
+            secondaryOutputs.add(item.clone());
+        } else {
+            throw new RuntimeException("Output list is full can't add " + item);
+        }
+    }
+
     public void setInput(Item item) {
         if (inputs.size() < gridSize * gridSize) {
             for (Item existingInput : this.inputs) {
@@ -56,37 +76,12 @@ public class CraftingTransaction extends InventoryTransaction {
         }
     }
 
-    public List<Item> getInputList() {
-        return inputs;
-    }
-
-    public void setExtraOutput(Item item) {
-        if (secondaryOutputs.size() < gridSize * gridSize) {
-            secondaryOutputs.add(item.clone());
-        } else {
-            throw new RuntimeException("Output list is full can't add " + item);
-        }
-    }
-
-    public Item getPrimaryOutput() {
-        return primaryOutput;
-    }
-
     public void setPrimaryOutput(Item item) {
         if (primaryOutput == null) {
             primaryOutput = item.clone();
         } else if (!primaryOutput.equals(item)) {
             throw new RuntimeException("Primary result item has already been set and does not match the current item (expected " + primaryOutput + ", got " + item + ')');
         }
-    }
-
-    public CraftingRecipe getRecipe() {
-        return recipe;
-    }
-
-    public boolean canExecute() {
-        this.recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);
-        return this.recipe != null && super.canExecute();
     }
 
     protected boolean callExecuteEvent() {
@@ -96,29 +91,39 @@ public class CraftingTransaction extends InventoryTransaction {
         return !ev.isCancelled();
     }
 
-    protected void sendInventories() {
-        super.sendInventories();
+    public boolean canExecute() {
+        this.recipe = source.getServer().getCraftingManager().matchRecipe(inputs, this.primaryOutput, this.secondaryOutputs);
+        return this.recipe != null && super.canExecute();
+    }
 
-        if (source.craftingType == Player.CRAFTING_SMALL) {
-            return; // Already closed
-        }
-
-        /*
-         * TODO: HACK!
-         * we can't resend the contents of the crafting window, so we force the client to close it instead.
-         * So people don't whine about messy desync issues when someone cancels CraftItemEvent, or when a crafting
-         * transaction goes wrong.
-         */
-        source.getServer().getScheduler().scheduleDelayedTask(null, () -> {
-            if (source.isOnline() && source.isAlive()) {
-                ContainerClosePacket pk = new ContainerClosePacket();
-                pk.windowId = ContainerIds.NONE;
-                pk.wasServerInitiated = true;
-                source.dataPacket(pk);
+    @Override
+    public boolean checkForItemPart(List<InventoryAction> actions) {
+        for (InventoryAction action : actions) {
+            if (action instanceof SlotChangeAction) {
+                SlotChangeAction slotChangeAction = (SlotChangeAction) action;
+                if (slotChangeAction.getInventory().getType() == InventoryType.UI) {
+                    if (slotChangeAction.getSlot() == 50) {
+                        if (!slotChangeAction.getSourceItem().equals(slotChangeAction.getTargetItem())) {
+                            return true;
+                        } else {
+                            Server.getInstance().getLogger().debug("Source equals target");
+                            return false;
+                        }
+                    } else {
+                        Server.getInstance().getLogger().debug("Invalid slot: " + slotChangeAction.getSlot());
+                        return false;
+                    }
+                } else {
+                    Server.getInstance().getLogger().debug("Invalid action type: " + slotChangeAction.getInventory().getType());
+                    return false;
+                }
+            } else {
+                Server.getInstance().getLogger().debug("SlotChangeAction expected, got " + action);
+                return false;
             }
-        }, 10);
-
-        this.source.resetCraftingGridType();
+        }
+        Server.getInstance().getLogger().debug("No actions on the list");
+        return false;
     }
 
     public boolean execute() {
@@ -171,33 +176,28 @@ public class CraftingTransaction extends InventoryTransaction {
         return false;
     }
 
-    @Override
-    public boolean checkForItemPart(List<InventoryAction> actions) {
-        for (InventoryAction action : actions) {
-            if (action instanceof SlotChangeAction) {
-                SlotChangeAction slotChangeAction = (SlotChangeAction) action;
-                if (slotChangeAction.getInventory().getType() == InventoryType.UI) {
-                    if (slotChangeAction.getSlot() == 50) {
-                        if (!slotChangeAction.getSourceItem().equals(slotChangeAction.getTargetItem())) {
-                            return true;
-                        } else {
-                            Server.getInstance().getLogger().debug("Source equals target");
-                            return false;
-                        }
-                    } else {
-                        Server.getInstance().getLogger().debug("Invalid slot: " + slotChangeAction.getSlot());
-                        return false;
-                    }
-                } else {
-                    Server.getInstance().getLogger().debug("Invalid action type: " + slotChangeAction.getInventory().getType());
-                    return false;
-                }
-            } else {
-                Server.getInstance().getLogger().debug("SlotChangeAction expected, got " + action);
-                return false;
-            }
+    protected void sendInventories() {
+        super.sendInventories();
+
+        if (source.craftingType == Player.CRAFTING_SMALL) {
+            return; // Already closed
         }
-        Server.getInstance().getLogger().debug("No actions on the list");
-        return false;
+
+        /*
+         * TODO: HACK!
+         * we can't resend the contents of the crafting window, so we force the client to close it instead.
+         * So people don't whine about messy desync issues when someone cancels CraftItemEvent, or when a crafting
+         * transaction goes wrong.
+         */
+        source.getServer().getScheduler().scheduleDelayedTask(null, () -> {
+            if (source.isOnline() && source.isAlive()) {
+                ContainerClosePacket pk = new ContainerClosePacket();
+                pk.windowId = ContainerIds.NONE;
+                pk.wasServerInitiated = true;
+                source.dataPacket(pk);
+            }
+        }, 10);
+
+        this.source.resetCraftingGridType();
     }
 }

@@ -18,18 +18,8 @@ public class BlockConduit extends BlockTransparentMeta {
     }
 
     @Override
-    public String getName() {
-        return "Conduit";
-    }
-
-    @Override
-    public int getId() {
-        return CONDUIT;
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
+    public BlockColor getColor() {
+        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 
     @Override
@@ -38,18 +28,28 @@ public class BlockConduit extends BlockTransparentMeta {
     }
 
     @Override
+    public int getId() {
+        return CONDUIT;
+    }
+
+    @Override
     public int getLightLevel() {
         return 15;
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public String getName() {
+        return "Conduit";
     }
 
     @Override
-    public boolean canBePushed() {
-        return false;
+    public double getResistance() {
+        return 3;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -63,16 +63,16 @@ public class BlockConduit extends BlockTransparentMeta {
     }
 
     @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         if (this.getLevel().setBlock(this, this, true, true)) {
             BlockEntity.createBlockEntity(BlockEntity.CONDUIT, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.CONDUIT));
             return true;
         }
         return false;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIAMOND_BLOCK_COLOR;
     }
 }

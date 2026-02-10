@@ -25,32 +25,6 @@ public class TypesGeneratorHelper {
     private static final String BLOCKS_FILE = "block_types.txt";
     private static final String TAGS_FILE = "material_tags.txt";
 
-    public static void main(String[] args) throws Exception {
-        RuntimeItems.init();
-
-        generateItems();
-        generateBlocks();
-        generateTags();
-    }
-
-    private static void generateItems() throws Exception {
-        Map<Integer, List<String>> types = new TreeMap<>();
-
-        for (Field field : ItemID.class.getDeclaredFields()) {
-            field.setAccessible(true);
-
-            String name = field.getName();
-
-            int legacyId = field.getInt(null);
-
-            types.computeIfAbsent(field.getInt(null), id -> new ArrayList<>())
-                    .add("public static final ItemType " + name + " = register(\"" + getIdentifierFromId(legacyId) + "\", ItemID." + name + ");");
-        }
-
-        log.info("Saving {} item types to {}", types.size(), ITEMS_FILE);
-        saveFile(toString(types), ITEMS_FILE);
-    }
-
     private static void generateBlocks() throws Exception {
         Map<Integer, List<String>> types = new TreeMap<>();
 
@@ -73,6 +47,24 @@ public class TypesGeneratorHelper {
         saveFile(toString(types), BLOCKS_FILE);
     }
 
+    private static void generateItems() throws Exception {
+        Map<Integer, List<String>> types = new TreeMap<>();
+
+        for (Field field : ItemID.class.getDeclaredFields()) {
+            field.setAccessible(true);
+
+            String name = field.getName();
+
+            int legacyId = field.getInt(null);
+
+            types.computeIfAbsent(field.getInt(null), id -> new ArrayList<>())
+                    .add("public static final ItemType " + name + " = register(\"" + getIdentifierFromId(legacyId) + "\", ItemID." + name + ");");
+        }
+
+        log.info("Saving {} item types to {}", types.size(), ITEMS_FILE);
+        saveFile(toString(types), ITEMS_FILE);
+    }
+
     private static void generateTags() throws Exception {
         StringJoiner joiner = new StringJoiner("\n");
 
@@ -93,6 +85,32 @@ public class TypesGeneratorHelper {
         saveFile(joiner.toString(), TAGS_FILE);
     }
 
+    private static String getIdentifierFromId(int legacyId) {
+        // yes, we still use legacy identifiers internally
+        String identifier = RuntimeItems.getLegacyStringFromLegacyId(legacyId);
+        if (legacyId == 0) {
+            identifier = "minecraft:air";
+        }
+        return identifier;
+    }
+
+    public static void main(String[] args) throws Exception {
+        RuntimeItems.init();
+
+        generateItems();
+        generateBlocks();
+        generateTags();
+    }
+
+    private static void saveFile(String buffer, String path) {
+        try {
+            Files.write(Paths.get(path), buffer.getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            log.error("Unable to save file " + path, e);
+        }
+    }
+
     private static String toString(Map<Integer, List<String>> types) {
         StringJoiner joiner = new StringJoiner("\n");
         for (List<String> value : types.values()) {
@@ -103,21 +121,4 @@ public class TypesGeneratorHelper {
         return joiner.toString();
     }
 
-    private static void saveFile(String buffer, String path)  {
-        try {
-            Files.write(Paths.get(path), buffer.getBytes(StandardCharsets.UTF_8),
-                    StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (IOException e) {
-            log.error("Unable to save file " + path, e);
-        }
-    }
-
-    private static String getIdentifierFromId(int legacyId) {
-        // yes, we still use legacy identifiers internally
-        String identifier = RuntimeItems.getLegacyStringFromLegacyId(legacyId);
-        if (legacyId == 0) {
-            identifier = "minecraft:air";
-        }
-        return identifier;
-    }
 }

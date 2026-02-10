@@ -6,8 +6,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockStructureBlock extends BlockSolid {
 
     @Override
-    public int getId() {
-        return STRUCTURE_BLOCK;
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_BLOCK_COLOR;
     }
 
     @Override
@@ -16,8 +16,8 @@ public class BlockStructureBlock extends BlockSolid {
     }
 
     @Override
-    public double getResistance() {
-        return 18000000;
+    public int getId() {
+        return STRUCTURE_BLOCK;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class BlockStructureBlock extends BlockSolid {
     }
 
     @Override
-    public boolean isBreakable(Item item) {
-        return false;
+    public double getResistance() {
+        return 18000000;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class BlockStructureBlock extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_BLOCK_COLOR;
+    public boolean isBreakable(Item item) {
+        return false;
     }
 }

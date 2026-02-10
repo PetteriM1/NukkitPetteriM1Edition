@@ -3,6 +3,8 @@ package cn.nukkit.block;
 import cn.nukkit.Player;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.blockentity.BlockEntityEnderChest;
+import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.mob.EntityPiglin;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
@@ -31,8 +33,18 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean canBeActivated() {
-        return true;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.OBSIDIAN_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 22.5;
     }
 
     @Override
@@ -51,11 +63,6 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public double getHardness() {
-        return 22.5;
-    }
-
-    @Override
     public double getResistance() {
         return 3000;
     }
@@ -63,6 +70,82 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;
+    }
+
+    public Set<Player> getViewers() {
+        return viewers;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
+    }
+
+    @Override
+    public boolean canBeActivated() {
+        return true;
+    }
+
+    @Override
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        if (item.isPickaxe()) {
+            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
+                return new Item[]{this.toItem()};
+            }
+            return new Item[]{
+                    Item.get(Item.OBSIDIAN, 0, 8)
+            };
+        } else {
+            return new Item[0];
+        }
+    }
+
+    @Override
+    public boolean onActivate(Item item, Player player) {
+        if (player != null) {
+            Block top = this.up();
+            if (!top.isTransparent()) {
+                return true;
+            }
+
+            BlockEntity t = this.getLevel().getBlockEntity(this);
+            if (!(t instanceof BlockEntityEnderChest)) {
+                return false;
+            }
+
+            BlockEntityEnderChest chest = (BlockEntityEnderChest) t;
+            if (chest.namedTag.contains("Lock") && chest.namedTag.get("Lock") instanceof StringTag) {
+                if (!chest.namedTag.getString("Lock").equals(item.getCustomName())) {
+                    return true;
+                }
+            }
+
+            player.setViewingEnderChest(this);
+            player.addWindow(player.getEnderChestInventory());
+
+            for (Entity e : this.getChunk().getEntities().values()) {
+                if (e instanceof EntityPiglin) {
+                    ((EntityPiglin) e).setAngry(600);
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -93,82 +176,7 @@ public class BlockEnderChest extends BlockTransparentMeta implements Faceable {
     }
 
     @Override
-    public boolean onActivate(Item item, Player player) {
-        if (player != null) {
-            Block top = this.up();
-            if (!top.isTransparent()) {
-                return true;
-            }
-
-            BlockEntity t = this.getLevel().getBlockEntity(this);
-            if (!(t instanceof BlockEntityEnderChest)) {
-                return false;
-            }
-
-            BlockEntityEnderChest chest = (BlockEntityEnderChest) t;
-            if (chest.namedTag.contains("Lock") && chest.namedTag.get("Lock") instanceof StringTag) {
-                if (!chest.namedTag.getString("Lock").equals(item.getCustomName())) {
-                    return true;
-                }
-            }
-
-            player.setViewingEnderChest(this);
-            player.addWindow(player.getEnderChestInventory());
-        }
-
-        return true;
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        if (item.isPickaxe()) {
-            if (item.hasEnchantment(Enchantment.ID_SILK_TOUCH)) {
-                return new Item[]{this.toItem()};
-            }
-            return new Item[]{
-                    Item.get(Item.OBSIDIAN, 0, 8)
-            };
-        } else {
-            return new Item[0];
-        }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.OBSIDIAN_BLOCK_COLOR;
-    }
-
-    public Set<Player> getViewers() {
-        return viewers;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 }

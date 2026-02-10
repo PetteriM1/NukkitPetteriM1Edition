@@ -1,6 +1,8 @@
 package cn.nukkit;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockID;
+import cn.nukkit.block.custom.CustomBlockManager;
 import cn.nukkit.blockentity.*;
 import cn.nukkit.command.*;
 import cn.nukkit.console.NukkitConsole;
@@ -14,16 +16,17 @@ import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.*;
 import cn.nukkit.entity.projectile.*;
+import cn.nukkit.entity.route.RouteFinderThreadPool;
 import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.level.LevelInitEvent;
 import cn.nukkit.event.level.LevelLoadEvent;
-import cn.nukkit.event.server.PlayerDataSerializeEvent;
-import cn.nukkit.event.server.QueryRegenerateEvent;
-import cn.nukkit.event.server.ServerStopEvent;
+import cn.nukkit.event.server.*;
 import cn.nukkit.inventory.CraftingManager;
 import cn.nukkit.inventory.Recipe;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemMap;
+import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.item.custom.CustomItemManager;
 import cn.nukkit.item.enchantment.Enchantment;
@@ -50,10 +53,10 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.BatchingHelper;
 import cn.nukkit.network.Network;
 import cn.nukkit.network.RakNetInterface;
 import cn.nukkit.network.SourceInterface;
+import cn.nukkit.network.encryption.EncryptionUtils;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.network.rcon.RCON;
@@ -74,11 +77,20 @@ import cn.nukkit.resourcepacks.loader.JarPluginResourcePackLoader;
 import cn.nukkit.resourcepacks.loader.ZippedResourcePackLoader;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.scheduler.Task;
+import cn.nukkit.scheduler.TaskHandler;
 import cn.nukkit.utils.*;
 import cn.nukkit.utils.bugreport.ExceptionHandler;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import lombok.extern.log4j.Log4j2;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
@@ -86,18 +98,14 @@ import org.iq80.leveldb.Options;
 import org.iq80.leveldb.impl.Iq80DBFactory;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -127,7 +135,7 @@ public class Server {
     private final Config operators;
     private final Config whitelist;
     private final Config properties;
-    private final Config config;
+    private final Config mapInfo;
 
     private final String filePath;
     private final String dataPath;
@@ -157,9 +165,10 @@ public class Server {
     private boolean autoSave = true; // setAutoSave
     private int difficulty; // setDifficulty
     int spawnThresholdRadius;
+    private final boolean suomiCraftPEMode;
     private String ip;
     private int port;
-    private final UUID serverID = UUID.randomUUID();
+    private final UUID serverID;
     private RCON rcon;
     private final Network network;
     private QueryHandler queryHandler;
@@ -172,39 +181,68 @@ public class Server {
     final Map<UUID, Player> playerList = new HashMap<>();
 
     private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.dat$");
-
-    private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
+    private Level[] levelArray = new Level[0];    private final Map<Integer, Level> levels = new HashMap<Integer, Level>() {
         public Level put(Integer key, Level value) {
             Level result = super.put(key, value);
             levelArray = levels.values().toArray(new Level[0]);
             return result;
         }
+
         public boolean remove(Object key, Object value) {
             boolean result = super.remove(key, value);
             levelArray = levels.values().toArray(new Level[0]);
             return result;
         }
+
         public Level remove(Object key) {
             Level result = super.remove(key);
             levelArray = levels.values().toArray(new Level[0]);
             return result;
         }
     };
-
-    private Level[] levelArray = new Level[0];
     private final ServiceManager serviceManager = new NKServiceManager();
     private Level defaultLevel;
     private final Thread currentThread;
     private Watchdog watchdog;
-    private final DB nameLookup;
+    private DB nameLookup;
     private PlayerDataSerializer playerDataSerializer;
-    private final BatchingHelper batchingHelper;
-    private final Set<String> ignoredPackets = new HashSet<>();
-
+    private TaskHandler spawnerTask;
+    /**
+     * Worlds where automatic mob spawning is disabled.
+     */
+    public static final Set<String> disabledSpawnWorlds = new HashSet<>();
+    /**
+     * Worlds where periodic automatic saving is disabled.
+     */
+    public static final Set<String> nonAutoSaveWorlds = new HashSet<>();
+    /**
+     * Worlds that have their own nether worlds.
+     */
+    public static final Set<String> multiNetherWorlds = new HashSet<>();
+    /**
+     * Worlds that have their own end worlds.
+     */
+    public static final Set<String> multiEndWorlds = new HashSet<>();
+    /**
+     * Worlds where random block ticking is disabled.
+     */
+    public static final Set<String> noTickingWorlds = new HashSet<>();
+    /**
+     * Worlds where anti xray is enabled.
+     */
+    public static final Set<String> antiXrayWorlds = new HashSet<>();
     /**
      * The server's MOTD. Remember to call network.setName() when updated.
      */
     private String motd;
+    /**
+     * Disconnection message shown to players who are not allowed to join due to whitelist.
+     */
+    String whitelistReason;
+    /**
+     * Mob AI enabled.
+     */
+    private boolean mobAiEnabled;
     /**
      * Default player data saving enabled.
      */
@@ -226,6 +264,14 @@ public class Server {
      */
     private boolean forceGamemode;
     /**
+     * Level garbage collection between ticks enabled.
+     */
+    private boolean doLevelGC;
+    /**
+     * Call BatchPacketsEvent on batch packet sending.
+     */
+    public boolean callBatchPkEvent;
+    /**
      * Whitelist enabled.
      */
     public boolean whitelistEnabled;
@@ -233,6 +279,18 @@ public class Server {
      * Xbox authentication enabled.
      */
     public boolean xboxAuth;
+    /**
+     * Spawn eggs enabled.
+     */
+    public boolean spawnEggsEnabled;
+    /**
+     * Call DataPacketSendEvent on data packet sending.
+     */
+    public boolean callDataPkSendEvent;
+    /**
+     * Bed spawnpoints enabled.
+     */
+    public boolean bedSpawnpoints;
     /**
      * Server side achievements enabled.
      */
@@ -245,6 +303,14 @@ public class Server {
      * Announce server side announcements to all players.
      */
     boolean announceAchievements;
+    /**
+     * Disable player interaction spam limiter.
+     */
+    boolean doNotLimitInteractions;
+    /**
+     * Whether vanilla mob despawning outside activation range is enabled.
+     */
+    public boolean despawnMobs;
     /**
      * How many chunks are sent to player per tick.
      */
@@ -274,6 +340,10 @@ public class Server {
      */
     private int spawnRadius;
     /**
+     * Minimum allowed protocol version. Set -1 to disable multiversion.
+     */
+    public int minimumProtocol;
+    /**
      * How often auto save should happen.
      */
     private int autoSaveTicks;
@@ -282,13 +352,61 @@ public class Server {
      */
     private int autoTickRateLimit;
     /**
+     * How many seconds a chunk should be unused before it's unloaded.
+     */
+    public int chunkUnloadDelay;
+    /**
+     * Do not limit the maximum size of player skins.
+     */
+    public boolean doNotLimitSkinGeometry;
+    /**
+     * Mob spawning from blocks and items enabled.
+     */
+    public boolean mobsFromBlocks;
+    /**
+     * Explosions breaking blocks enabled.
+     */
+    public boolean explosionBreakBlocks;
+    /**
+     * Boss bars enabled for wither and ender dragon.
+     */
+    public boolean vanillaBossBar;
+    /**
      * Showing plugins in query enabled.
      */
     public boolean queryPlugins;
     /**
+     * Strong RakNet level IP bans enabled.
+     */
+    public boolean strongIPBans;
+    /**
+     * Player data is saved by player uuid instead of by player name.
+     */
+    public boolean savePlayerDataByUuid; // public for plugins
+    /**
+     * More vanilla like portal logics enabled.
+     */
+    boolean vanillaPortals;
+    /**
+     * Persona skins allowed.
+     */
+    boolean personaSkins;
+    /**
      * Chunk caching enabled.
      */
     public boolean cacheChunks;
+    /**
+     * Check for new releases automatically.
+     */
+    boolean updateChecks;
+    /**
+     * Include player's location in the login message.
+     */
+    boolean logJoinLocation;
+    /**
+     * Make redstone work but with possible crash exploits.
+     */
+    public boolean unsafeRedstone;
     /**
      * Whether attacking an entity should stop player from sprinting.
      */
@@ -306,6 +424,10 @@ public class Server {
      */
     private boolean alwaysTickPlayers;
     /**
+     * Reduce network traffic by not sending some non-critical data.
+     */
+    public boolean reduceTraffic;
+    /**
      * Don't disable client's own packs when force-resources is enabled.
      */
     boolean forceResourcesAllowOwnPacks;
@@ -322,24 +444,31 @@ public class Server {
      */
     public int networkCompressionThreshold;
     /**
+     * Use raw ore drops for iron and gold.
+     */
+    public boolean useRawOres;
+    /**
      * Temporary disable world saving to allow safe backup of leveldb worlds.
      */
     public boolean holdWorldSave;
-
-    Server(final String filePath, String dataPath, String pluginPath, String predefinedLanguage) {
+    /**
+     * How close to player a mob must be for it to be ticked (squared distance)
+     */
+    public double entityActivationRange;
+    /**
+     * Whether "Unbreakable" nbt should be ignored in Item isUnbreakable()
+     */
+    public boolean ignoreUnbreakableItems;
+    Server(final String filePath, String dataPath, String pluginPath, boolean loadPlugins, boolean debug) {
         Preconditions.checkState(instance == null, "Already initialized!");
-        currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
         instance = this;
+        currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
+        log.info("§b-- §cNukkit §aPetteriM1 Edition §b--");
 
         this.filePath = filePath;
         if (!new File(dataPath + "worlds/").exists()) {
             //noinspection ResultOfMethodCallIgnored
             new File(dataPath + "worlds/").mkdirs();
-        }
-
-        if (!new File(dataPath + "players/").exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            new File(dataPath + "players/").mkdirs();
         }
 
         if (!new File(pluginPath).exists()) {
@@ -350,89 +479,57 @@ public class Server {
         this.dataPath = new File(dataPath).getAbsolutePath() + '/';
         this.pluginPath = new File(pluginPath).getAbsolutePath() + '/';
 
-        this.playerDataSerializer = new DefaultPlayerDataSerializer(this);
-
-        this.console = new NukkitConsole();
-        this.consoleThread = new ConsoleThread();
-        this.consoleThread.start();
-
-        if (!new File(this.dataPath + "nukkit.yml").exists()) {
-            this.getLogger().info(TextFormat.GREEN + "Welcome! Please choose a language first!");
-            try {
-                InputStream languageList = this.getClass().getClassLoader().getResourceAsStream("lang/language.list");
-                if (languageList == null) {
-                    throw new IllegalStateException("lang/language.list is missing. If you are running a development version, make sure you have run 'git submodule update --init'.");
-                }
-                String[] lines = Utils.readFile(languageList).split("\n");
-                for (String line : lines) {
-                    this.getLogger().info(line);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            String fallback = BaseLang.FALLBACK_LANGUAGE;
-            String language = null;
-            while (language == null) {
-                String lang;
-                if (predefinedLanguage != null) {
-                    log.info("Trying to load language from predefined language: " + predefinedLanguage);
-                    lang = predefinedLanguage;
-                } else {
-                    lang = this.console.readLine();
-                }
-
-                InputStream conf = this.getClass().getClassLoader().getResourceAsStream("lang/" + lang + "/lang.ini");
-                if (conf != null) {
-                    language = lang;
-                } else if(predefinedLanguage != null) {
-                    log.warn("No language found for predefined language: " + predefinedLanguage + ", please choose a valid language");
-                    predefinedLanguage = null;
-                }
-            }
-
-            InputStream advacedConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + language + "/nukkit.yml");
-            if (advacedConf == null) {
-                advacedConf = this.getClass().getClassLoader().getResourceAsStream("lang/" + fallback + "/nukkit.yml");
-            }
-
-            try {
-                Utils.writeFile(this.dataPath + "nukkit.yml", advacedConf);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
-
         log.info("Loading server properties...");
+        this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ServerProperties());
 
-        Nukkit.DEBUG = NukkitMath.clamp(this.getConfig("debug.level", 1), 1, 3);
+        int debugLvl = NukkitMath.clamp(this.getPropertyInt("debug-level", 1), 1, 3);
+        if (debug && debugLvl < 2) {
+            debugLvl = 2;
+        }
+        Nukkit.DEBUG = debugLvl;
 
-        int logLevel = (Nukkit.DEBUG + 3) * 100;
         org.apache.logging.log4j.Level currentLevel = Nukkit.getLogLevel();
         for (org.apache.logging.log4j.Level level : org.apache.logging.log4j.Level.values()) {
-            if (level.intLevel() == logLevel && level.intLevel() > currentLevel.intLevel()) {
+            if (level.intLevel() == (Nukkit.DEBUG + 3) * 100 && level.intLevel() > currentLevel.intLevel()) {
                 Nukkit.setLogLevel(level);
                 break;
             }
         }
 
-        this.ignoredPackets.addAll(getConfig().getStringList("debug.ignored-packets"));
+        // Settings that should not be modified after startup
+        this.useSnappy = this.getPropertyBoolean("use-snappy-compression", false);
+        Normal.seaHeight = this.getPropertyInt("generator-force-sea-height", 64); // default 64 for backwards compatibility, 62 on vanilla
+        this.suomiCraftPEMode = this.getPropertyBoolean("suomicraftpe-mode", false); // not in default config
 
-        this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ServerProperties());
-
-        // Should not be modified after startup
-        this.useSnappy = this.getConfig("network.compression-use-snappy", false);
-
-        this.baseLang = new BaseLang(this.getConfig("settings.language", BaseLang.FALLBACK_LANGUAGE));
+        if (this.getPropertyBoolean("legacy-protocol-support", false)) {
+            ProtocolInfo.ENABLED_PROTOCOLS.addAll(Arrays.asList(ProtocolInfo.v1_2_0, ProtocolInfo.v1_2_5_11, ProtocolInfo.v1_2_5, ProtocolInfo.v1_2_6, ProtocolInfo.v1_2_7,
+                    ProtocolInfo.v1_2_10, ProtocolInfo.v1_2_13, ProtocolInfo.v1_2_13_11, ProtocolInfo.v1_4_0, ProtocolInfo.v1_5_0, ProtocolInfo.v1_6_0_5, ProtocolInfo.v1_6_0,
+                    ProtocolInfo.v1_7_0, ProtocolInfo.v1_8_0, ProtocolInfo.v1_9_0, ProtocolInfo.v1_10_0, ProtocolInfo.v1_11_0, ProtocolInfo.v1_12_0));
+        }
 
         this.loadSettings();
 
-        log.info(this.getLanguage().translateString("language.selected", new String[]{getLanguage().getName(), getLanguage().getLang()}));
-        log.info(getLanguage().translateString("nukkit.server.start", TextFormat.AQUA + this.getVersion() + TextFormat.RESET));
+        if (debugLvl < 2/*this.getPropertyBoolean("automatic-bug-report", true)*/) {
+            ExceptionHandler.initSentry();
+            ExceptionHandler.registerExceptionHandler();
+        }
 
-        Object poolSize = this.getConfig("settings.async-workers", "auto");
+        log.debug("Setting up auth environment...");
+        //noinspection ResultOfMethodCallIgnored
+        EncryptionUtils.getMojangPublicKey();
+
+        if (!new File(dataPath + "players/").exists() && this.shouldSavePlayerData) {
+            //noinspection ResultOfMethodCallIgnored
+            new File(dataPath + "players/").mkdirs();
+        }
+
+        this.baseLang = new BaseLang(BaseLang.FALLBACK_LANGUAGE); // Only English is implemented
+        this.playerDataSerializer = new DefaultPlayerDataSerializer(this);
+        this.console = new NukkitConsole();
+        this.consoleThread = new ConsoleThread();
+        this.consoleThread.start();
+
+        Object poolSize = this.getProperty("async-workers", "auto");
         if (!(poolSize instanceof Integer)) {
             try {
                 poolSize = Integer.valueOf((String) poolSize);
@@ -447,8 +544,6 @@ public class Server {
 
         this.console.setExecutingCommands(true); // Scheduler needs to be ready
 
-        this.batchingHelper = new BatchingHelper();
-
         if (this.getPropertyBoolean("enable-rcon", false)) {
             try {
                 this.rcon = new RCON(this, this.getPropertyString("rcon.password", ""), (!this.getIp().isEmpty()) ? this.getIp() : "0.0.0.0", this.getPropertyInt("rcon.port", this.getPort()));
@@ -456,6 +551,9 @@ public class Server {
                 log.error(baseLang.translateString(e.getMessage(), e.getCause().getMessage()));
             }
         }
+
+        this.mapInfo = new Config(this.dataPath + "maps.yml", Config.YAML);
+        ItemMap.mapCount = this.mapInfo.getLong("map_count_do_not_edit");
 
         this.entityMetadata = new EntityMetadataStore();
         this.playerMetadata = new PlayerMetadataStore();
@@ -485,23 +583,43 @@ public class Server {
         Potion.init();
         Attribute.init();
         DispenseBehaviorRegister.init();
+        Skin.initDefaultSkin();
+        CustomBlockManager.init(this);
         //noinspection ResultOfMethodCallIgnored
         EntityManager.get();
         //noinspection ResultOfMethodCallIgnored
-        BiomeDefinitionListPacket.getCachedPacket();
+        BiomeDefinitionListPacket.getCachedPacket(ProtocolInfo.CURRENT_PROTOCOL);
         //noinspection ResultOfMethodCallIgnored
-        TrimDataPacket.getCachedPacket();
+        TrimDataPacket.getCachedPacket(ProtocolInfo.CURRENT_PROTOCOL);
 
         // Convert legacy data before plugins get the chance to mess with it
         try {
-            nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
-                            .createIfMissing(true)
-                            .compressionType(CompressionType.ZLIB_RAW));
+            if (this.shouldSavePlayerData || this.savePlayerDataByUuid) {
+                if (this.getPropertyBoolean("use-old-leveldb", false)) {
+                    this.getLogger().debug("nameLookup: Using old LevelDB");
+                    nameLookup = org.iq80.oldleveldb.impl.Iq80DBFactory.factory.open(new File(dataPath, "players"),
+                            new Options().createIfMissing(true).compressionType(CompressionType.ZLIB_RAW));
+                } else {
+                    nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"),
+                            new Options().createIfMissing(true).compressionType(CompressionType.ZLIB_RAW));
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        convertLegacyPlayerData();
+        if (this.savePlayerDataByUuid) {
+            convertLegacyPlayerData();
+        }
+
+        String uuid = this.getPropertyString("uuid", null);
+        UUID serverID;
+        try {
+            serverID = UUID.fromString(uuid);
+        } catch (Exception ignore) {
+            serverID = UUID.randomUUID();
+        }
+        this.serverID = serverID;
 
         this.craftingManager = new CraftingManager();
         this.resourcePackManager = new ResourcePackManager(
@@ -522,27 +640,44 @@ public class Server {
         this.network.registerInterface(new RakNetInterface(this));
 
         if (!this.encryptionEnabled) {
-            this.getLogger().warning("Encryption is not enabled! For better security, it's recommended to enable it (network.encryption: true in nukkit.yml) if you don't use a proxy software.");
+            this.getLogger().warning("Encryption is not enabled! For better security, it's recommended to enable it (encryption=on) if you don't use a proxy software.");
         }
 
-        if (!this.xboxAuth) {
-            this.getLogger().warning("Xbox authentication is not enabled! It's recommended to enable it (xbox-auth=on in server.properties) if you don't use a proxy software or an authentication plugin.");
+        if (!this.xboxAuth && !this.suomiCraftPEMode) {
+            this.getLogger().warning("Xbox authentication is not enabled! It's recommended to enable it (xbox-auth=on) if you don't use a proxy software or an authentication plugin.");
         }
 
-        log.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
-        log.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
+        if (loadPlugins) {
+            this.pluginManager.loadPlugins(this.pluginPath);
+            this.enablePlugins(PluginLoadOrder.STARTUP);
+        }
 
-        ExceptionHandler.registerExceptionHandler();
+        boolean regenerateItemPalette = false;
 
-        this.pluginManager.loadPlugins(this.pluginPath);
-        this.enablePlugins(PluginLoadOrder.STARTUP);
+        try {
+            if (CustomBlockManager.get().closeRegistry()) {
+                regenerateItemPalette = true;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to init custom blocks", e);
+        }
 
-        CustomItemManager.get().closeRegistry();
+        if (CustomItemManager.get().closeRegistry()) {
+            regenerateItemPalette = true;
+        }
+
+        if (regenerateItemPalette) {
+            for (RuntimeItemMapping mapping : RuntimeItems.VALUES) {
+                mapping.generatePalette();
+            }
+        }
+
         EntityManager.get().closeRegistry();
 
         Item.initCreativeItems();
 
-        craftingManager.rebuildPacket();
+        // We don't call craftingManager.rebuildPacket() here anymore as we only want to generate cached packet for versions players use
+        craftingManager.getCachedPacket(ProtocolInfo.CURRENT_PROTOCOL); // Always cache the packet for the current protocol
 
         LevelProviderManager.addProvider(this, Anvil.class);
         LevelProviderManager.addProvider(this, LevelDBProvider.class);
@@ -554,34 +689,7 @@ public class Server {
         Generator.addGenerator(TheEnd.class, "the_end", Generator.TYPE_THE_END);
         Generator.addGenerator(cn.nukkit.level.generator.Void.class, "void", Generator.TYPE_VOID);
 
-        for (String name : this.getConfig("worlds", new HashMap<String, Object>()).keySet()) {
-            if (!this.loadLevel(name)) {
-                long seed;
-                String seedString = String.valueOf(this.getConfig("worlds." + name + ".seed", System.currentTimeMillis()));
-                try {
-                    seed = Long.parseLong(seedString);
-                } catch (NumberFormatException e) {
-                    seed = seedString.hashCode();
-                }
-
-                Map<String, Object> options = new HashMap<>();
-                String[] opts = (this.getConfig("worlds." + name + ".generator", Generator.getGenerator("default").getSimpleName())).split(":");
-                Class<? extends Generator> generator = Generator.getGenerator(opts[0]);
-                if (opts.length > 1) {
-                    StringBuilder preset = new StringBuilder();
-                    for (int i = 1; i < opts.length; i++) {
-                        preset.append(opts[i]).append(":");
-                    }
-                    preset = new StringBuilder(preset.substring(0, preset.length() - 1));
-
-                    options.put("preset", preset.toString());
-                }
-
-                this.generateLevel(name, seed, generator, options);
-            }
-        }
-
-        if (this.getDefaultLevel() == null) {
+        if (this.defaultLevel == null) {
             String defaultName = this.getPropertyString("level-name", "world");
             if (defaultName == null || defaultName.trim().isEmpty()) {
                 this.getLogger().warning("level-name cannot be null, using default");
@@ -612,60 +720,694 @@ public class Server {
         this.properties.save(true);
 
         //for (Map.Entry<Integer, Level> entry : this.getLevels().entrySet()) {
-            Level level = this.defaultLevel;//entry.getValue();
-            this.getLogger().debug("Preparing spawn region for level " + level.getName());
-            Vector3 spawn = level.getProvider().getSpawn();
-            level.populateChunk(spawn.getChunkX(), spawn.getChunkZ(), true);
+        Level level = this.defaultLevel;//entry.getValue();
+        this.getLogger().debug("Preparing spawn region for level " + level.getName());
+        Vector3 spawn = level.getProvider().getSpawn();
+        level.populateChunk(spawn.getChunkX(), spawn.getChunkZ(), true);
         //}
 
-        EnumLevel.initLevels();
+        // Load levels
+        if (this.getPropertyBoolean("load-all-worlds", true)) {
+            try {
+                for (File fs : new File(new File("").getCanonicalPath() + "/worlds/").listFiles()) {
+                    if ((fs.isDirectory() && !this.isLevelLoaded(fs.getName()))) {
+                        this.loadLevel(fs.getName());
+                    }
+                }
+                EnumLevel.initLevels();
+            } catch (Exception e) {
+                this.getLogger().error("Unable to load levels", e);
+            }
+        }
 
-        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        checkMobSpawnerTask();
 
-        if (Nukkit.DEBUG < 2) {
-            this.watchdog = new Watchdog(this, 60000);
+        if (loadPlugins) {
+            this.enablePlugins(PluginLoadOrder.POSTWORLD);
+        }
+
+        int watchdogTick = this.getPropertyInt("thread-watchdog-tick", 60000);
+        if (watchdogTick > 0) {
+            this.watchdog = new Watchdog(this, watchdogTick);
             this.watchdog.start();
         }
 
-        // Initialize metrics
-        new NukkitMetrics(this);
+        if (!this.getPropertyBoolean("disable-bstats-metrics", false)) {
+            new NukkitMetrics(this);
+        }
+
+        Plugin wgext = this.getPluginManager().getPlugin("WorldGeneratorExtension");
+        if (wgext == null) {
+            if (this.defaultLevel.getGenerator() instanceof Normal) {
+                this.getLogger().warning("WorldGeneratorExtension not found! If you want structures to generate, you can download it from https://github.com/PetteriM1/WorldGeneratorExtension/releases");
+            }
+        } else if ("worldgeneratorextension.Loader".equals(wgext.getDescription().getMain()) && Integer.parseInt(wgext.getDescription().getVersion().split("\\.")[1]) < 8) {
+            this.getLogger().warning("There is a new version of WorldGeneratorExtension available! You can download it from https://github.com/PetteriM1/WorldGeneratorExtension/releases");
+        }
+
+        this.getLogger().debug("Checking for updates...");
+        this.updateNotification(this.getConsoleSender(), false);
 
         this.start();
     }
+    private static final byte[] PREFIX = {(byte) 0xfe, (byte) 0xfd};
+    private int lastLevelGC;
 
-    @SuppressWarnings("UnusedReturnValue")
-    public int broadcastMessage(String message) {
-        return this.broadcast(message, BROADCAST_CHANNEL_USERS);
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public int broadcastMessage(TextContainer message) {
-        return this.broadcast(message, BROADCAST_CHANNEL_USERS);
-    }
-
-    public int broadcastMessage(String message, CommandSender[] recipients) {
-        for (CommandSender recipient : recipients) {
-            recipient.sendMessage(message);
+    /**
+     * This class contains all default server.properties values.
+     */
+    private static class ServerProperties extends ConfigSection {
+        {
+            put("motd", "A Minecraft Server");
+            put("sub-motd", "Powered by Nukkit PM1E");
+            put("server-port", 19132);
+            put("server-ip", "0.0.0.0");
+            put("view-distance", 8);
+            put("achievements", true);
+            put("announce-player-achievements", true);
+            put("spawn-protection", 10);
+            put("max-players", 50);
+            put("spawn-animals", true);
+            put("spawn-mobs", true);
+            put("gamemode", 0);
+            put("force-gamemode", true);
+            put("difficulty", 2);
+            put("hardcore", false);
+            put("pvp", true);
+            put("white-list", false);
+            put("whitelist-reason", "Server is white-listed");
+            put("generator-settings", "");
+            put("level-name", "world");
+            put("level-seed", "");
+            put("level-type", "default");
+            put("generator-force-sea-height", 64);
+            put("enable-rcon", false);
+            put("rcon.password", Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes(StandardCharsets.UTF_8)).substring(3, 13));
+            put("force-resources", false);
+            put("force-resources-allow-client-packs", false);
+            put("xbox-auth", true);
+            put("encryption", true);
+            put("auto-save", true);
+            put("save-player-data", true);
+            put("bed-spawnpoints", true);
+            put("explosion-break-blocks", true);
+            put("stop-in-game", false);
+            put("op-in-game", true);
+            put("attack-stop-sprint", true);
+            put("use-raw-ores", true);
+            put("spawn-eggs", true);
+            put("mob-ai", true);
+            put("force-language", false);
+            put("shutdown-message", "Server closed");
+            put("enable-query", false);
+            put("query-plugins", false);
+            put("debug-level", 1);
+            put("async-workers", "auto");
+            put("auto-tick-rate", true);
+            put("auto-tick-rate-limit", 20);
+            put("base-tick-rate", 1);
+            put("always-tick-players", false);
+            put("clear-chunk-tick-list", false);
+            put("do-level-gc", true);
+            put("spawn-threshold", 56);
+            put("entity-activation-blocks", 80);
+            put("chunk-sending-per-tick", 4);
+            put("chunk-ticking-per-tick", 40);
+            put("chunk-ticking-radius", 3);
+            put("chunk-unload-delay", 30);
+            put("chunk-generation-population-queue-size", 8);
+            put("ticks-per-autosave", 6000);
+            put("ticks-per-entity-spawns", 200);
+            put("entity-despawn-task", true);
+            put("thread-watchdog-tick", 60000);
+            put("allow-nether", true);
+            put("allow-the-end", true);
+            put("vanilla-portals", true);
+            put("multi-nether-worlds", "");
+            put("multi-end-worlds", "");
+            put("do-not-tick-worlds", "");
+            put("worlds-entity-spawning-disabled", "");
+            put("anti-xray-worlds", "");
+            put("worlds-level-auto-save-disabled", "");
+            put("load-all-worlds", true);
+            put("ansi-title", true);
+            put("block-listener", true);
+            put("allow-flight", false);
+            put("vanilla-bossbars", true);
+            put("strong-ip-bans", false);
+            put("save-player-data-by-uuid", true);
+            put("log-join-location", true);
+            //put("automatic-bug-report", true);
+            //put("bstats-metrics", true);
+            put("update-notifications", true);
+            put("do-not-limit-interactions", false);
+            put("do-not-limit-skin-geometry", true);
+            put("persona-skins", true);
+            put("skin-change-cooldown", 15);
+            put("compression-level", 5);
+            put("compression-threshold", 256);
+            put("use-snappy-compression", false);
+            put("max-mtu", 1400);
+            put("timeout-milliseconds", 20000);
+            put("multiversion-min-protocol", 0);
+            put("reduce-traffic", false);
+            put("cache-chunks", false);
+            put("leveldb-cache-mb", 80);
+            put("unsafe-redstone", true);
+            put("new-blocks-preview", false);
+            put("force-new-generator", false);
+            put("uuid", UUID.randomUUID().toString());
         }
-
-        return recipients.length;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public int broadcastMessage(String message, Collection<? extends CommandSender> recipients) {
-        for (CommandSender recipient : recipients) {
-            recipient.sendMessage(message);
-        }
+    private class ConsoleThread extends Thread implements InterruptibleThread {
 
-        return recipients.size();
+        @Override
+        public void run() {
+            console.start();
+        }
     }
 
-    public int broadcastMessage(TextContainer message, Collection<? extends CommandSender> recipients) {
-        for (CommandSender recipient : recipients) {
-            recipient.sendMessage(message);
-        }
+    public boolean getAllowFlight() {
+        return allowFlight;
+    }
 
-        return recipients.size();
+    public String getApiVersion() {
+        return "9.9.9.PM1E-" + Nukkit.BUILD_VERSION_NUMBER;
+    }
+
+    public boolean getAutoSave() {
+        return this.autoSave;
+    }
+
+    public String getCodename() {
+        return "PM1E";
+    }
+
+    /**
+     * Nukkit PM1E: Not implemented!
+     * Load command aliases from config
+     */
+    public Map<String, List<String>> getCommandAliases() {
+        return new LinkedHashMap<>();
+    }
+
+    /**
+     * Get command map
+     *
+     * @return command map
+     */
+    public SimpleCommandMap getCommandMap() {
+        return commandMap;
+    }
+
+    /**
+     * Get server console CommandSender
+     *
+     * @return ConsoleCommandSender
+     */
+    public ConsoleCommandSender getConsoleSender() {
+        return consoleSender;
+    }
+
+    public CraftingManager getCraftingManager() {
+        return craftingManager;
+    }
+
+    public String getDataPath() {
+        return dataPath;
+    }
+
+    public int getDefaultGamemode() {
+        return this.getGamemode();
+    }
+
+    /**
+     * Get default level
+     *
+     * @return default level
+     */
+    public Level getDefaultLevel() {
+        return defaultLevel;
+    }
+
+    public int getDifficulty() {
+        return this.difficulty;
+    }
+
+    public EntityMetadataStore getEntityMetadata() {
+        return entityMetadata;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public boolean getForceGamemode() {
+        return this.forceGamemode;
+    }
+
+    public boolean getForceResources() {
+        return this.forceResources;
+    }
+
+    public int getGamemode() {
+        return gamemode;
+    }
+
+    /**
+     * Get list of IP bans
+     *
+     * @return IP bans
+     */
+    public BanList getIPBans() {
+        return this.banByIP;
+    }
+
+    /**
+     * Get the Server instance
+     *
+     * @return Server
+     */
+    public static Server getInstance() {
+        return instance;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    /**
+     * Get BaseLang (server's default language)
+     *
+     * @return BaseLang
+     */
+    public BaseLang getLanguage() {
+        return baseLang;
+    }
+
+    public LevelMetadataStore getLevelMetadata() {
+        return levelMetadata;
+    }
+
+    public String getLevelType() {
+        return this.getPropertyString("level-type", "default");
+    }
+
+    /**
+     * Get all levels
+     *
+     * @return levels
+     */
+    public Map<Integer, Level> getLevels() {
+        return levels;
+    }
+
+    public MainLogger getLogger() {
+        return MainLogger.getLogger();
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public boolean getMobAiEnabled() {
+        return this.mobAiEnabled;
+    }
+
+    /**
+     * Get MOTD
+     *
+     * @return motd
+     */
+    public String getMotd() {
+        return motd;
+    }
+
+    public String getName() {
+        return Nukkit.NUKKIT_PM1E;
+    }
+
+    /**
+     * Get list of banned players
+     *
+     * @return ban list
+     */
+    public BanList getNameBans() {
+        return this.banByName;
+    }
+
+    /**
+     * Get Network
+     *
+     * @return Network
+     */
+    public Network getNetwork() {
+        return network;
+    }
+
+    public long getNextTick() {
+        return nextTick;
+    }
+
+    public String getNukkitVersion() {
+        return Nukkit.VERSION;
+    }
+
+    /**
+     * Get all online players
+     *
+     * @return online players
+     */
+    public Map<UUID, Player> getOnlinePlayers() {
+        return ImmutableMap.copyOf(playerList);
+    }
+
+    /**
+     * Get online player count
+     *
+     * @return online player count
+     */
+    public int getOnlinePlayersCount() {
+        return this.playerList.size();
+    }
+
+    /**
+     * Get all online players
+     *
+     * @return online players
+     */
+    public List<Player> getOnlinePlayersList() {
+        return ImmutableList.copyOf(playerList.values());
+    }
+
+    /**
+     * Get operator list config
+     *
+     * @return operators
+     */
+    public Config getOps() {
+        return operators;
+    }
+
+    /**
+     * Get player data serializer that is used to save player data
+     *
+     * @return player data serializer
+     */
+    public PlayerDataSerializer getPlayerDataSerializer() {
+        return playerDataSerializer;
+    }
+
+    public PlayerMetadataStore getPlayerMetadata() {
+        return playerMetadata;
+    }
+
+    /**
+     * How often player is allowed to change skin in game (in seconds)
+     *
+     * @return skin change cooldown
+     */
+    public int getPlayerSkinChangeCooldown() {
+        return skinChangeCooldown;
+    }
+
+    public PluginManager getPluginManager() {
+        return this.pluginManager;
+    }
+
+    public String getPluginPath() {
+        return pluginPath;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * Get server's primary thread
+     *
+     * @return primary thread
+     */
+    public Thread getPrimaryThread() {
+        return currentThread;
+    }
+
+    /**
+     * Get server.properties
+     *
+     * @return server.properties as a Config
+     */
+    public Config getProperties() {
+        return this.properties;
+    }
+
+    public QueryRegenerateEvent getQueryInformation() {
+        return this.queryRegenerateEvent;
+    }
+
+    public ResourcePackManager getResourcePackManager() {
+        return resourcePackManager;
+    }
+
+    public ServerScheduler getScheduler() {
+        return scheduler;
+    }
+
+    public UUID getServerUniqueId() {
+        return this.serverID;
+    }
+
+    /**
+     * Get service manager
+     *
+     * @return service manager
+     */
+    public ServiceManager getServiceManager() {
+        return serviceManager;
+    }
+
+    public int getSpawnRadius() {
+        return spawnRadius;
+    }
+
+    /**
+     * Get the mob spawner task
+     *
+     * @return spawner task or null if both monster and animal spawning are disabled
+     */
+    public SpawnerTask getSpawnerTask() {
+        return this.spawnerTask == null ? null : (SpawnerTask) this.spawnerTask.getTask();
+    }
+
+    /**
+     * Get Sub-MOTD (level name)
+     *
+     * @return sub-motd
+     */
+    public String getSubMotd() {
+        String sub = this.getPropertyString("sub-motd", "Powered by Nukkit PM1E");
+        if (sub.isEmpty()) sub = "Powered by Nukkit PM1E";
+        return sub;
+    }
+
+    /**
+     * Get current tick
+     *
+     * @return current tick
+     */
+    public int getTick() {
+        return tickCounter;
+    }
+
+    /**
+     * Get main thread load
+     *
+     * @return tick usage %
+     */
+    public float getTickUsage() {
+        return (float) NukkitMath.round(this.maxUse * 100, 2);
+    }
+
+    /**
+     * Get average main thread load
+     *
+     * @return average main thread load
+     */
+    public float getTickUsageAverage() {
+        float sum = 0;
+        for (float aUseAverage : this.useAverage) {
+            sum += aUseAverage;
+        }
+        return ((float) Math.round(sum / this.useAverage.length * 100)) / 100;
+    }
+
+    /**
+     * Get ticks per second
+     *
+     * @return TPS
+     */
+    public float getTicksPerSecond() {
+        return ((float) Math.round(this.maxTick * 100)) / 100;
+    }
+
+    /**
+     * Get average ticks per second
+     *
+     * @return average TPS
+     */
+    public float getTicksPerSecondAverage() {
+        float sum = 0;
+        int count = this.tickAverage.length;
+        for (float aTickAverage : this.tickAverage) {
+            sum += aTickAverage;
+        }
+        return (float) NukkitMath.round(sum / count, 2);
+    }
+
+    public String getVersion() {
+        return ProtocolInfo.MINECRAFT_VERSION;
+    }
+
+    public int getViewDistance() {
+        return viewDistance;
+    }
+
+    /**
+     * Get whitelist config
+     *
+     * @return whitelist
+     */
+    public Config getWhitelist() {
+        return whitelist;
+    }
+
+    public boolean isHardcore() {
+        return this.isHardcore;
+    }
+
+    /**
+     * Is forcing language enabled
+     *
+     * @return force-language enabled
+     */
+    public boolean isLanguageForced() {
+        return forceLanguage;
+    }
+
+    /**
+     * Is nether enabled on this server
+     *
+     * @return nether enabled
+     */
+    public boolean isNetherAllowed() {
+        return EnumLevel.NETHER.getLevel() != null;
+    }
+
+    /**
+     * Checks the current thread against the expected primary thread for the server.
+     * <p>
+     * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
+     *
+     * @return true if the current thread matches the expected primary thread, false otherwise
+     */
+    public boolean isPrimaryThread() {
+        return Thread.currentThread() == currentThread;
+    }
+
+    public boolean isRunning() {
+        return isRunning.get();
+    }
+
+    public void setAutoSave(boolean autoSave) {
+        this.autoSave = autoSave;
+        for (Level level : this.levelArray) {
+            level.setAutoSave(this.autoSave);
+        }
+    }
+
+    /**
+     * Change the default level
+     *
+     * @param defaultLevel new default level
+     */
+    public void setDefaultLevel(Level defaultLevel) {
+        if (defaultLevel == null || (this.isLevelLoaded(defaultLevel.getFolderName()) && defaultLevel != this.defaultLevel)) {
+            this.defaultLevel = defaultLevel;
+        }
+    }
+
+    public void setDifficulty(int difficulty) {
+        int value = difficulty;
+        if (value < 0) value = 0;
+        if (value > 3) value = 3;
+        this.difficulty = value;
+        this.setPropertyInt("difficulty", value);
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+    }
+
+    /**
+     * Set player data serializer that is used to save player data
+     *
+     * @param playerDataSerializer player data serializer
+     */
+    public void setPlayerDataSerializer(PlayerDataSerializer playerDataSerializer) {
+        this.playerDataSerializer = Preconditions.checkNotNull(playerDataSerializer, "playerDataSerializer");
+    }
+
+    public void addOnlinePlayer(Player player) {
+        this.playerList.put(player.getUniqueId(), player);
+        player.updatePlayerListData(false);
+    }
+
+    /**
+     * Give player the operator status
+     *
+     * @param name player name
+     */
+    public void addOp(String name) {
+        this.operators.set(name.toLowerCase(Locale.ROOT), true);
+        Player player = this.getPlayerExact(name);
+        if (player != null) {
+            player.recalculatePermissions();
+        }
+        this.operators.save(true);
+    }
+
+    public void addPlayer(InetSocketAddress socketAddress, Player player) {
+        this.players.put(socketAddress, player);
+    }
+
+    /**
+     * Register a recipe to CraftingManager.
+     * Please use getCraftingManager().registerRecipe(protocol, recipe) instead
+     *
+     * @param recipe recipe
+     */
+    public void addRecipe(Recipe recipe) {
+        this.craftingManager.registerRecipe(recipe);
+    }
+
+    /**
+     * Add a player to whitelist
+     *
+     * @param name player name
+     */
+    public void addWhitelist(String name) {
+        this.whitelist.set(name.toLowerCase(Locale.ROOT), true);
+        this.whitelist.save(true);
+    }
+
+    @Deprecated
+    public void batchPackets(Player[] players, DataPacket[] packets) {
+        for (DataPacket packet : packets) {
+            for (Player player : players) {
+                sendPacketOrdered(player, packet);
+            }
+        }
     }
 
     public int broadcast(String message, String permissions) {
@@ -704,49 +1446,180 @@ public class Server {
         return recipients.size();
     }
 
-    public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
-        packet.tryEncode();
+    @SuppressWarnings("UnusedReturnValue")
+    public int broadcastMessage(String message) {
+        return this.broadcast(message, BROADCAST_CHANNEL_USERS);
+    }
 
+    @SuppressWarnings("UnusedReturnValue")
+    public int broadcastMessage(TextContainer message) {
+        return this.broadcast(message, BROADCAST_CHANNEL_USERS);
+    }
+
+    public int broadcastMessage(String message, CommandSender[] recipients) {
+        for (CommandSender recipient : recipients) {
+            recipient.sendMessage(message);
+        }
+
+        return recipients.length;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public int broadcastMessage(String message, Collection<? extends CommandSender> recipients) {
+        for (CommandSender recipient : recipients) {
+            recipient.sendMessage(message);
+        }
+
+        return recipients.size();
+    }
+
+    public int broadcastMessage(TextContainer message, Collection<? extends CommandSender> recipients) {
+        for (CommandSender recipient : recipients) {
+            recipient.sendMessage(message);
+        }
+
+        return recipients.size();
+    }
+
+    public static void broadcastPacket(Collection<Player> players, DataPacket packet) {
         for (Player player : players) {
             player.dataPacket(packet);
         }
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
-        packet.tryEncode();
-
         for (Player player : players) {
             player.dataPacket(packet);
         }
     }
 
-    public void batchPackets(Player[] players, DataPacket[] packets) {
-        this.batchingHelper.batchPackets(this, players, packets);
+    private void checkMobSpawnerTask() {
+        // loadSettings is called before scheduler is created on startup
+        if (this.scheduler == null) {
+            return;
+        }
+
+        boolean spawnAnimals = this.getPropertyBoolean("spawn-animals", true);
+        boolean spawnMonsters = this.getPropertyBoolean("spawn-mobs", true);
+
+        if (this.spawnerTask == null) {
+            if (spawnAnimals || spawnMonsters) {
+                // Run the spawner on 2x speed but spawn only either monsters or animals
+                int spawnerTicks = Math.max(this.getPropertyInt("ticks-per-entity-spawns", 200), 2) >> 1;
+                this.spawnerTask = this.scheduler.scheduleDelayedRepeatingTask(new SpawnerTask(spawnAnimals, spawnMonsters), spawnerTicks, spawnerTicks);
+            }
+        } else {
+            this.spawnerTask.cancel();
+
+            if (spawnAnimals || spawnMonsters) {
+                // Run the spawner on 2x speed but spawn only either monsters or animals
+                int spawnerTicks = Math.max(this.getPropertyInt("ticks-per-entity-spawns", 200), 2) >> 1;
+                this.spawnerTask = this.scheduler.scheduleDelayedRepeatingTask(new SpawnerTask(spawnAnimals, spawnMonsters), spawnerTicks, spawnerTicks);
+            } else {
+                this.spawnerTask = null;
+            }
+        }
     }
 
-    /**
-     * Enable all plugins with matching load order
-     * @param type load order
-     */
-    public void enablePlugins(PluginLoadOrder type) {
-        for (Plugin plugin : new ArrayList<>(this.pluginManager.getPlugins().values())) {
-            if (!plugin.isEnabled() && type == plugin.getDescription().getOrder()) {
-                this.enablePlugin(plugin);
+    private void checkTickUpdates(int currentTick) {
+        if (this.alwaysTickPlayers) {
+            for (Player p : new ArrayList<>(this.players.values())) {
+                p.onUpdate(currentTick);
             }
         }
 
-        if (type == PluginLoadOrder.POSTWORLD) {
-            this.commandMap.registerServerAliases();
-            DefaultPermissions.registerCorePermissions();
+        for (Player p : this.getOnlinePlayersList()) {
+            p.resetPacketCounters();
+        }
+
+        // Do level ticks
+        for (Level level : this.levelArray) {
+            if (level.isBeingConverted || (level.getTickRate() > this.baseTickRate && --level.tickRateCounter > 0)) {
+                continue;
+            }
+
+            try {
+                long levelTime = System.currentTimeMillis();
+                level.doTick(currentTick);
+                int tickMs = (int) (System.currentTimeMillis() - levelTime);
+                level.tickRateTime = tickMs;
+
+                if (this.autoTickRate) {
+                    int limit = level.getAutoTickRateThreshold();
+
+                    if (tickMs < limit && level.getTickRate() > this.baseTickRate) {
+                        int r;
+                        level.setTickRate(r = level.getTickRate() - 1);
+                        if (r > this.baseTickRate) {
+                            level.tickRateCounter = level.getTickRate();
+                        }
+                        this.getLogger().debug("Raising level \"" + level.getName() + "\" tick rate to " + level.getTickRate() + " ticks");
+                    } else if (tickMs >= limit) {
+                        if (level.getTickRate() == this.baseTickRate) {
+                            level.setTickRate(Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, tickMs / limit)));
+                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                        } else if ((tickMs / level.getTickRate()) >= limit && level.getTickRate() < this.autoTickRateLimit) {
+                            level.setTickRate(level.getTickRate() + 1);
+                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
+                        }
+                        level.tickRateCounter = level.getTickRate();
+                    }
+                }
+            } catch (Exception e) {
+                log.error(this.baseLang.translateString("nukkit.level.tickError", new String[]{level.getFolderName(), Utils.getExceptionMessage(e)}));
+            }
         }
     }
 
     /**
-     * Enable a plugin
-     * @param plugin plugin
+     * Internal: Convert legacy player saves to the uuid based saving
      */
-    public void enablePlugin(Plugin plugin) {
-        this.pluginManager.enablePlugin(plugin);
+    private void convertLegacyPlayerData() {
+        File dataDirectory = new File(getDataPath(), "players/");
+
+        File[] files = dataDirectory.listFiles(file -> {
+            String name = file.getName();
+            return !UUID_PATTERN.matcher(name).matches() && name.endsWith(".dat");
+        });
+
+        if (files == null) {
+            return;
+        }
+
+        for (File legacyData : files) {
+            String name = legacyData.getName();
+            // Remove file extension
+            name = name.substring(0, name.length() - 4);
+
+            log.debug("Attempting legacy player data conversion for {}", name);
+
+            CompoundTag tag = getOfflinePlayerDataInternal(name, false, false);
+
+            if (tag == null || !tag.contains("UUIDLeast") || !tag.contains("UUIDMost")) {
+                // No UUID so we cannot convert. Wait until player logs in.
+                continue;
+            }
+
+            UUID uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
+            if (!tag.contains("NameTag")) {
+                tag.putString("NameTag", name);
+            }
+
+            if (new File(getDataPath() + "players/" + uuid + ".dat").exists()) {
+                // We don't want to overwrite existing data.
+                continue;
+            }
+
+            saveOfflinePlayerData(uuid.toString(), tag, false, false);
+
+            // Add name to lookup table
+            updateName(uuid, name);
+
+            // Delete legacy data
+            if (!legacyData.delete()) {
+                log.warn("Unable to delete legacy data for {}", name);
+            }
+        }
     }
 
     /**
@@ -758,7 +1631,8 @@ public class Server {
 
     /**
      * Run a command as CommandSender. Use server.getConsoleSender() to run as CONSOLE.
-     * @param sender command sender
+     *
+     * @param sender      command sender
      * @param commandLine command without slash
      * @return command was found and attempted to be executed
      */
@@ -781,60 +1655,70 @@ public class Server {
         return false;
     }
 
-    /**
-     * Get server console CommandSender
-     * @return ConsoleCommandSender
-     */
-    public ConsoleCommandSender getConsoleSender() {
-        return consoleSender;
+    public void doAutoSave() {
+        if (this.autoSave) {
+            log.debug("Running auto save...");
+
+            for (Player player : this.players.values()) {
+                if (player.isOnline()) {
+                    player.save(true);
+                }
+            }
+
+            int saveDelay = 0;
+            for (Level level : this.levelArray) {
+                if (level.getAutoSave()) {
+                    this.scheduler.scheduleDelayedTask(null, () -> {
+                        if (level.getProvider() != null) {
+                            try {
+                                level.save();
+                            } catch (Exception ex) {
+                                getLogger().error("Failed to auto save " + level.getName(), ex);
+                                ExceptionHandler.handleSilently(ex);
+                            }
+                        }
+                    }, saveDelay++);
+                }
+            }
+
+            if (ItemMap.mapCount != this.mapInfo.getLong("map_count_do_not_edit")) {
+                this.mapInfo.set("map_count_do_not_edit", ItemMap.mapCount);
+                this.mapInfo.save(false, true);
+            }
+        }
     }
 
     /**
-     * Reload the server. Notice: may cause issues with some plugins.
+     * Enable a plugin
+     *
+     * @param plugin plugin
      */
-    public void reload() {
-        log.info("Saving levels...");
-        for (Level level : this.levelArray) {
-            level.save();
-        }
-
-        this.pluginManager.clearPlugins();
-        this.commandMap.clearCommands();
-
-        log.info("Reloading server properties...");
-        this.properties.reload();
-        this.loadSettings();
-
-        this.banByIP.load();
-        this.banByName.load();
-        this.reloadWhitelist();
-        this.operators.reload();
-
-        for (BanEntry entry : this.banByIP.getEntires().values()) {
-            try {
-                this.network.blockAddress(InetAddress.getByName(entry.getName()));
-            } catch (UnknownHostException ignore) {}
-        }
-
-        log.info("Reloading plugins...");
-        this.pluginManager.registerInterface(JavaPluginLoader.class);
-        this.pluginManager.loadPlugins(this.pluginPath);
-        this.enablePlugins(PluginLoadOrder.STARTUP);
-        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+    public void enablePlugin(Plugin plugin) {
+        this.pluginManager.enablePlugin(plugin);
     }
 
     /**
-     * Mark the server to be shut down.
+     * Enable all plugins with matching load order
+     *
+     * @param type load order
      */
-    public void shutdown() {
-        isRunning.compareAndSet(true, false);
+    public void enablePlugins(PluginLoadOrder type) {
+        for (Plugin plugin : new ArrayList<>(this.pluginManager.getPlugins().values())) {
+            if (!plugin.isEnabled() && type == plugin.getDescription().getOrder()) {
+                this.enablePlugin(plugin);
+            }
+        }
+
+        if (type == PluginLoadOrder.POSTWORLD) {
+            DefaultPermissions.registerCorePermissions();
+        }
     }
 
     /**
      * Shut down the server immediately.
      */
     public void forceShutdown() {
-        this.forceShutdown(this.getConfig("settings.shutdown-message", "Server closed"));
+        this.forceShutdown(this.getPropertyString("shutdown-message", "Server closed").replace("§n", "\n"));
     }
 
     /**
@@ -879,17 +1763,21 @@ public class Server {
             this.scheduler.cancelAllTasks();
             this.scheduler.mainThreadHeartbeat(Integer.MAX_VALUE);
 
+            RouteFinderThreadPool.shutdown();
+            Config.shutdownWriter();
+
             this.getLogger().debug("Unloading all levels...");
             for (Level level : this.levelArray) {
                 this.unloadLevel(level, true);
                 this.nextTick = System.currentTimeMillis(); // Fix Watchdog killing the server while saving worlds
             }
 
+            this.getLogger().debug("Saving map count...");
+            this.mapInfo.set("map_count_do_not_edit", ItemMap.mapCount);
+            this.mapInfo.save(false);
+
             this.getLogger().debug("Closing console...");
             this.consoleThread.interrupt();
-
-            this.getLogger().debug("Closing BatchingHelper...");
-            this.batchingHelper.shutdown();
 
             this.getLogger().debug("Stopping network interfaces...");
             for (SourceInterface interfaz : this.network.getInterfaces()) {
@@ -913,33 +1801,537 @@ public class Server {
     }
 
     /**
-     * Internal: Start the server
+     * Generate a new level
+     *
+     * @param name level name
+     * @return generated
      */
-    public void start() {
-        if (this.getPropertyBoolean("enable-query", false)) {
-            this.queryHandler = new QueryHandler();
-        }
-
-        for (BanEntry entry : this.banByIP.getEntires().values()) {
-            try {
-                this.network.blockAddress(InetAddress.getByName(entry.getName()));
-            } catch (UnknownHostException ignore) {}
-        }
-
-        this.tickCounter = 0;
-
-        //log.info(this.getLanguage().translateString("nukkit.server.defaultGameMode", getGamemodeString(this.getGamemode())));
-
-        log.info(this.baseLang.translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
-
-        this.tickProcessor();
-        this.forceShutdown();
+    public boolean generateLevel(String name) {
+        return this.generateLevel(name, ThreadLocalRandom.current().nextLong());
     }
 
-    private static final byte[] QUERY_PREFIX = {(byte) 0xfe, (byte) 0xfd};
+    /**
+     * Generate a new level
+     *
+     * @param name level name
+     * @param seed level seed
+     * @return generated
+     */
+    public boolean generateLevel(String name, long seed) {
+        return this.generateLevel(name, seed, null);
+    }
+
+    /**
+     * Generate a new level
+     *
+     * @param name      level name
+     * @param seed      level seed
+     * @param generator level generator
+     * @return generated
+     */
+    public boolean generateLevel(String name, long seed, Class<? extends Generator> generator) {
+        return this.generateLevel(name, seed, generator, new HashMap<>());
+    }
+
+    /**
+     * Generate a new level
+     *
+     * @param name      level name
+     * @param seed      level seed
+     * @param generator level generator
+     * @param options   level generator options
+     * @return generated
+     */
+    public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {
+        return generateLevel(name, seed, generator, options, null);
+    }
+
+    /**
+     * Generate a new level
+     *
+     * @param name      level name
+     * @param seed      level seed
+     * @param generator level generator
+     * @param options   level generator options
+     * @param provider  level provider
+     * @return generated
+     */
+    public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options, Class<? extends LevelProvider> provider) {
+        if (Objects.equals(name.trim(), "") || this.isLevelGenerated(name)) {
+            return false;
+        }
+
+        if (!options.containsKey("preset")) {
+            options.put("preset", this.getPropertyString("generator-settings", ""));
+        }
+
+        if (generator == null) {
+            generator = Generator.getGenerator(this.getLevelType());
+        }
+
+        if (provider == null) {
+            provider = LevelProviderManager.getProviderByName("leveldb");
+        }
+
+        String path;
+
+        if (name.contains("/") || name.contains("\\")) {
+            path = name;
+
+            if (this.suomiCraftPEMode) {
+                String[] pathParts = path.split("/");
+                name = pathParts[pathParts.length - 1];
+            }
+        } else {
+            path = this.dataPath + "worlds/" + name + '/';
+        }
+
+        Level level;
+        try {
+            provider.getMethod("generate", String.class, String.class, long.class, Class.class, Map.class).invoke(null, path, name, seed, generator, options);
+
+            level = new Level(this, name, path, provider);
+
+            level.initLevel();
+
+            this.levels.put(level.getId(), level);
+
+            level.setTickRate(this.baseTickRate);
+        } catch (Exception e) {
+            log.error(this.baseLang.translateString("nukkit.level.generationError", new String[]{name, Utils.getExceptionMessage(e)}));
+            return false;
+        }
+
+        this.pluginManager.callEvent(new LevelInitEvent(level));
+        this.pluginManager.callEvent(new LevelLoadEvent(level));
+        return true;
+    }
+
+    public static int getDifficultyFromString(String str) {
+        switch (str.trim().toLowerCase(Locale.ROOT)) {
+            case "0":
+            case "peaceful":
+            case "p":
+                return 0;
+            case "1":
+            case "easy":
+            case "e":
+                return 1;
+            case "2":
+            case "normal":
+            case "n":
+                return 2;
+            case "3":
+            case "hard":
+            case "h":
+                return 3;
+        }
+        return -1;
+    }
+
+    /**
+     * Get end world for a level
+     *
+     * @param world level
+     * @return end world for that level
+     */
+    public Level getEndWorld(String world) {
+        return multiEndWorlds.contains(world) ? this.getLevelByName(world + "-the_end") : this.getLevelByName("the_end");
+    }
+
+    public static int getGamemodeFromString(String str) {
+        switch (str.trim().toLowerCase(Locale.ROOT)) {
+            case "0":
+            case "survival":
+            case "s":
+                return Player.SURVIVAL;
+            case "1":
+            case "creative":
+            case "c":
+                return Player.CREATIVE;
+            case "2":
+            case "adventure":
+            case "a":
+                return Player.ADVENTURE;
+            case "3":
+            case "spectator":
+            case "spc":
+            case "view":
+            case "v":
+                return Player.SPECTATOR;
+            case "default":
+                return Server.getInstance().getDefaultGamemode();
+        }
+        return -1;
+    }
+
+    public static String getGamemodeString(int mode) {
+        return getGamemodeString(mode, false);
+    }
+
+    public static String getGamemodeString(int mode, boolean direct) {
+        switch (mode) {
+            case Player.SURVIVAL:
+                return direct ? "Survival" : "%gameMode.survival";
+            case Player.CREATIVE:
+                return direct ? "Creative" : "%gameMode.creative";
+            case Player.ADVENTURE:
+                return direct ? "Adventure" : "%gameMode.adventure";
+            case Player.SPECTATOR:
+                return direct ? "Spectator" : "%gameMode.spectator";
+        }
+        return "UNKNOWN";
+    }
+
+    /**
+     * Get a level by ID
+     *
+     * @param levelId level ID
+     * @return Level or null
+     */
+    public Level getLevel(int levelId) {
+        return this.levels.get(levelId);
+    }
+
+    /**
+     * Get a level by name
+     *
+     * @param name level name
+     * @return Level or null
+     */
+    public Level getLevelByName(String name) {
+        if (this.suomiCraftPEMode && name.startsWith(getDataPath())) {
+            String[] pathParts = name.split("/");
+            name = pathParts[pathParts.length - 1];
+        }
+
+        for (Level level : this.levelArray) {
+            if (level.getFolderName().equalsIgnoreCase(name)) {
+                return level;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get nether world for a level
+     *
+     * @param world level
+     * @return nether world for that level
+     */
+    public Level getNetherWorld(String world) {
+        return multiNetherWorlds.contains(world) ? this.getLevelByName(world + "-nether") : this.getLevelByName("nether");
+    }
+
+    public IPlayer getOfflinePlayer(final String name) {
+        IPlayer result = this.getPlayerExact(name);
+        if (result != null) {
+            return result;
+        }
+
+        return lookupName(name).map(uuid -> new OfflinePlayer(this, uuid, name))
+                .orElse(new OfflinePlayer(this, name));
+    }
+
+    public IPlayer getOfflinePlayer(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid");
+        Optional<Player> onlinePlayer = getPlayer(uuid);
+        if (onlinePlayer.isPresent()) {
+            return onlinePlayer.get();
+        }
+
+        return new OfflinePlayer(this, uuid);
+    }
+
+    public CompoundTag getOfflinePlayerData(UUID uuid) {
+        return getOfflinePlayerData(uuid, false);
+    }
+
+    public CompoundTag getOfflinePlayerData(UUID uuid, boolean create) {
+        return getOfflinePlayerDataInternal(uuid.toString(), true, create);
+    }
+
+    public CompoundTag getOfflinePlayerData(String name) {
+        return getOfflinePlayerData(name, false);
+    }
+
+    public CompoundTag getOfflinePlayerData(String name, boolean create) {
+        name = name.toLowerCase(Locale.ROOT); // Make sure offline player data is found even if plugins gets it with non-lowercase name
+
+        if (this.savePlayerDataByUuid) {
+            Optional<UUID> uuid = lookupName(name);
+            return getOfflinePlayerDataInternal(uuid.map(UUID::toString).orElse(name), true, create);
+        } else {
+            return getOfflinePlayerDataInternal(name, true, create);
+        }
+    }
+
+    private CompoundTag getOfflinePlayerDataInternal(String name, boolean runEvent, boolean create) {
+        Preconditions.checkNotNull(name, "name");
+
+        PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(name, playerDataSerializer);
+        if (runEvent) {
+            pluginManager.callEvent(event);
+        }
+
+        Optional<InputStream> dataStream = Optional.empty();
+        try {
+            dataStream = event.getSerializer().read(name, event.getUuid().orElse(null));
+            if (dataStream.isPresent()) {
+                return NBTIO.readCompressed(dataStream.get());
+            }
+        } catch (IOException e) {
+            log.warn(this.getLanguage().translateString("nukkit.data.playerCorrupted", name), e);
+        } finally {
+            if (dataStream.isPresent()) {
+                try {
+                    dataStream.get().close();
+                } catch (IOException e) {
+                    log.throwing(e);
+                }
+            }
+        }
+        CompoundTag nbt = null;
+        if (create) {
+            Vector3 spawn = this.getDefaultLevel().getProvider().getSpawn();
+            long time = System.currentTimeMillis();
+            nbt = new CompoundTag()
+                    .putLong("firstPlayed", time / 1000)
+                    .putLong("lastPlayed", time / 1000)
+                    .putList(new ListTag<DoubleTag>("Pos")
+                            .add(new DoubleTag("0", spawn.x))
+                            .add(new DoubleTag("1", spawn.y))
+                            .add(new DoubleTag("2", spawn.z)))
+                    .putString("Level", this.getDefaultLevel().getName())
+                    .putList(new ListTag<>("Inventory"))
+                    .putCompound("Achievements", new CompoundTag())
+                    .putInt("playerGameType", this.getGamemode())
+                    .putList(new ListTag<DoubleTag>("Motion")
+                            .add(new DoubleTag("0", 0))
+                            .add(new DoubleTag("1", 0))
+                            .add(new DoubleTag("2", 0)))
+                    .putList(new ListTag<FloatTag>("Rotation")
+                            .add(new FloatTag("0", 0))
+                            .add(new FloatTag("1", 0)))
+                    .putFloat("FallDistance", 0)
+                    .putShort("Fire", 0)
+                    .putShort("Air", 400)
+                    .putBoolean("OnGround", true)
+                    .putBoolean("Invulnerable", false);
+
+            this.saveOfflinePlayerData(name, nbt, true, runEvent);
+        }
+        return nbt;
+    }
+
+    /**
+     * Get an online player by uuid
+     *
+     * @param uuid uuid
+     * @return Optional Player
+     */
+    public Optional<Player> getPlayer(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid");
+        return Optional.ofNullable(playerList.get(uuid));
+    }
+
+    /**
+     * Get an online player by name
+     *
+     * @param name player name
+     * @return Player or null
+     */
+    public Player getPlayer(String name) {
+        Player found = null;
+        name = name.toLowerCase(Locale.ROOT);
+        int delta = Integer.MAX_VALUE;
+
+        if (this.suomiCraftPEMode) {
+            for (Player player : this.getOnlinePlayersList()) {
+                if (player.getDisplayName().toLowerCase(Locale.ROOT).startsWith(name)) {
+                    int curDelta = player.getDisplayName().length() - name.length();
+                    if (curDelta < delta) {
+                        found = player;
+                        delta = curDelta;
+                    }
+                    if (curDelta == 0) {
+                        break;
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        for (Player player : this.getOnlinePlayersList()) {
+            if (player.getName().toLowerCase(Locale.ROOT).startsWith(name)) {
+                int curDelta = player.getName().length() - name.length();
+                if (curDelta < delta) {
+                    found = player;
+                    delta = curDelta;
+                }
+                if (curDelta == 0) {
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Get an online player by exact player name
+     *
+     * @param name exact player name
+     * @return Player or null
+     */
+    public Player getPlayerExact(String name) {
+        if (this.suomiCraftPEMode) {
+            int index = name.indexOf('(');
+            if (index > 1 && name.length() > index + 1) { // DisplayName (Guest_XXXXXX)
+                name = name.substring(index + 1, name.length() - 1);
+            }
+        }
+
+        for (Player player : this.getOnlinePlayersList()) {
+            if (player.getName().equalsIgnoreCase(name)) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get plugin commands
+     *
+     * @param name command name
+     * @return PluginIdentifiableCommand or null
+     */
+    public PluginIdentifiableCommand getPluginCommand(String name) {
+        Command command = this.commandMap.getCommand(name);
+        if (command instanceof PluginIdentifiableCommand) {
+            return (PluginIdentifiableCommand) command;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get a value from server.properties
+     *
+     * @param variable key
+     * @return value
+     */
+    public Object getProperty(String variable) {
+        return this.getProperty(variable, null);
+    }
+
+    /**
+     * Get a value from server.properties
+     *
+     * @param variable     key
+     * @param defaultValue default value
+     * @return value
+     */
+    public Object getProperty(String variable, Object defaultValue) {
+        Object value = this.properties.get(variable);
+        return value == null ? defaultValue : value;
+    }
+
+    /**
+     * Get a boolean value from server.properties
+     *
+     * @param variable key
+     * @return value
+     */
+    public boolean getPropertyBoolean(String variable) {
+        return this.getPropertyBoolean(variable, null);
+    }
+
+    /**
+     * Get a boolean value from server.properties
+     *
+     * @param variable     key
+     * @param defaultValue default value
+     * @return value
+     */
+    public boolean getPropertyBoolean(String variable, Object defaultValue) {
+        Object value = this.properties.get(variable);
+        if (value == null) {
+            value = defaultValue;
+        }
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        switch (String.valueOf(value).trim().toLowerCase(Locale.ROOT)) {
+            case "on":
+            case "true":
+            case "1":
+            case "yes":
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get an int value from server.properties
+     *
+     * @param variable key
+     * @return value
+     */
+    public int getPropertyInt(String variable) {
+        return this.getPropertyInt(variable, null);
+    }
+
+    /**
+     * Get an int value from server.properties
+     *
+     * @param variable     key
+     * @param defaultValue default value
+     * @return value
+     */
+    public int getPropertyInt(String variable, Integer defaultValue) {
+        Object value = this.properties.get(variable);
+        if (value == null) {
+            value = defaultValue;
+        }
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        String trimmed = String.valueOf(value).trim();
+        if (trimmed.isEmpty()) {
+            return defaultValue;
+        }
+        return Integer.parseInt(trimmed);
+    }
+
+    /**
+     * Get a string value from server.properties
+     *
+     * @param key key
+     * @return value
+     */
+    public String getPropertyString(String key) {
+        return this.getPropertyString(key, null);
+    }
+
+    /**
+     * Get a string value from server.properties
+     *
+     * @param key          key
+     * @param defaultValue default value
+     * @return value
+     */
+    public String getPropertyString(String key, String defaultValue) {
+        Object value = this.properties.get(key);
+        return value == null ? defaultValue : value.toString();
+    }
 
     /**
      * Internal: Handle query
+     *
      * @param address sender address
      * @param payload payload
      */
@@ -950,7 +2342,7 @@ public class Server {
             }
             byte[] prefix = new byte[2];
             payload.readBytes(prefix);
-            if (Arrays.equals(prefix, QUERY_PREFIX)) {
+            if (Arrays.equals(prefix, PREFIX)) {
                 this.queryHandler.handle(address, payload);
             }
         } catch (Exception e) {
@@ -959,62 +2351,534 @@ public class Server {
         }
     }
 
-    private int lastLevelGC;
+    public boolean hasWhitelist() {
+        return this.whitelistEnabled;
+    }
 
     /**
-     * Internal: Tick the server
+     * Check whether a level by name is generated
+     *
+     * @param name level name
+     * @return level found
      */
-    public void tickProcessor() {
-        this.nextTick = System.currentTimeMillis();
-        try {
-            while (this.isRunning.get()) {
-                try {
-                    this.tick();
+    public boolean isLevelGenerated(String name) {
+        if (Objects.equals(name.trim(), "")) {
+            return false;
+        }
 
-                    long next = this.nextTick;
-                    long current = System.currentTimeMillis();
+        if (this.getLevelByName(name) == null) {
+            String path;
 
-                    if (next - 0.1 > current) {
-                        long allocated = next - current - 1;
-
-                        // Instead of wasting time, do something potentially useful
-                        int offset = 0;
-                        for (int i = 0; i < levelArray.length; i++) {
-                            offset = (i + lastLevelGC) % levelArray.length;
-                            Level level = levelArray[offset];
-                            if (!level.isBeingConverted) {
-                                level.doGarbageCollection(allocated - 1);
-                            }
-                            allocated = next - System.currentTimeMillis();
-                            if (allocated <= 0) break;
-                        }
-                        lastLevelGC = offset + 1;
-
-                        if (allocated > 0) {
-                            try {
-                                Thread.sleep(allocated, 900000);
-                            } catch (Exception e) {
-                                this.getLogger().logException(e);
-                            }
-                        }
-                    }
-                } catch (RuntimeException e) {
-                    this.getLogger().logException(e);
-                }
+            if (name.contains("/") || name.contains("\\")) {
+                path = name;
+            } else {
+                path = this.dataPath + "worlds/" + name + '/';
             }
-        } catch (Throwable e) {
-            log.fatal("Exception happened while ticking server", e);
-            log.fatal(Utils.getAllThreadDumps());
+
+            return LevelProviderManager.getProvider(path) != null;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check whether a level is loaded
+     *
+     * @param name level name
+     * @return is loaded
+     */
+    public boolean isLevelLoaded(String name) {
+        return this.getLevelByName(name) != null;
+    }
+
+    /**
+     * Check whether a player is an operator
+     *
+     * @param name player name
+     * @return is operator
+     */
+    public boolean isOp(String name) {
+        return name != null && this.operators.exists(name, true);
+    }
+
+    /**
+     * Check whether a player is whitelisted
+     *
+     * @param name player name
+     * @return is whitelisted or whitelist is not enabled
+     */
+    public boolean isWhitelisted(String name) {
+        return !this.hasWhitelist() || this.operators.exists(name, true) || this.whitelist.exists(name, true);
+    }
+
+    /**
+     * Load a level by name
+     *
+     * @param name level name
+     * @return loaded
+     */
+    public boolean loadLevel(String name) {
+        if (Objects.equals(name.trim(), "")) {
+            throw new LevelException("Invalid empty level name");
+        }
+
+        if (!this.isPrimaryThread()) {
+            getLogger().warning("Level loaded asynchronously: " + name);
+        }
+
+        if (this.isLevelLoaded(name)) {
+            return true;
+        } else if (!this.isLevelGenerated(name)) {
+            log.warn(this.baseLang.translateString("nukkit.level.notFound", name));
+            return false;
+        }
+
+        String path;
+
+        if (name.contains("/") || name.contains("\\")) {
+            path = name;
+
+            if (this.suomiCraftPEMode) {
+                String[] pathParts = path.split("/");
+                name = pathParts[pathParts.length - 1];
+            }
+        } else {
+            path = this.dataPath + "worlds/" + name + '/';
+        }
+
+        Class<? extends LevelProvider> provider = LevelProviderManager.getProvider(path);
+
+        if (provider == null) {
+            log.error(this.baseLang.translateString("nukkit.level.loadError", new String[]{name, "Unknown provider"}));
+            return false;
+        }
+
+        Level level;
+        try {
+            level = new Level(this, name, path, provider);
+        } catch (Exception e) {
+            log.error(this.baseLang.translateString("nukkit.level.loadError", new String[]{name, e.getMessage()}));
+            return false;
+        }
+
+        level.initLevel();
+
+        this.levels.put(level.getId(), level);
+
+        level.setTickRate(this.baseTickRate);
+
+        this.pluginManager.callEvent(new LevelLoadEvent(level));
+        return true;
+    }
+
+    /**
+     * Load some settings from server.properties
+     */
+    private void loadSettings() {
+        if (!this.getPropertyBoolean("ansi-title", true)) Nukkit.TITLE = false;
+        this.maxPlayers = this.getPropertyInt("max-players", 50);
+        this.forceLanguage = this.getPropertyBoolean("force-language", false);
+        this.networkCompressionLevel = Math.max(Math.min(this.getPropertyInt("compression-level", 5), 9), 0);
+        this.networkCompressionThreshold = Math.max(this.getPropertyInt("compression-threshold", 256), 0);
+        this.autoTickRate = this.getPropertyBoolean("auto-tick-rate", true);
+        this.autoTickRateLimit = this.getPropertyInt("auto-tick-rate-limit", 20);
+        this.alwaysTickPlayers = this.getPropertyBoolean("always-tick-players", false);
+        this.baseTickRate = Math.max(this.getPropertyInt("base-tick-rate", 1), 1);
+        this.doLevelGC = this.getPropertyBoolean("do-level-gc", true);
+        this.mobAiEnabled = this.getPropertyBoolean("mob-ai", true);
+        this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
+        this.bedSpawnpoints = this.getPropertyBoolean("bed-spawnpoints", true);
+        this.achievementsEnabled = this.getPropertyBoolean("achievements", true);
+        this.pvpEnabled = this.getPropertyBoolean("pvp", true);
+        this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", true);
+        this.spawnEggsEnabled = this.getPropertyBoolean("spawn-eggs", true);
+        this.shouldSavePlayerData = this.getPropertyBoolean("save-player-data", true);
+        this.mobsFromBlocks = this.getPropertyBoolean("block-listener", true);
+        this.explosionBreakBlocks = this.getPropertyBoolean("explosion-break-blocks", true);
+        this.vanillaBossBar = this.getPropertyBoolean("vanilla-bossbars", true);
+        this.queryPlugins = this.getPropertyBoolean("query-plugins", false);
+        this.allowFlight = this.getPropertyBoolean("allow-flight", false);
+        this.isHardcore = this.getPropertyBoolean("hardcore", false);
+        this.forceResources = this.getPropertyBoolean("force-resources", false);
+        this.forceResourcesAllowOwnPacks = this.getPropertyBoolean("force-resources-allow-client-packs", false);
+        this.whitelistEnabled = this.getPropertyBoolean("white-list", false);
+        this.forceGamemode = this.getPropertyBoolean("force-gamemode", true);
+        this.doNotLimitInteractions = this.getPropertyBoolean("do-not-limit-interactions", false);
+        this.motd = this.getPropertyString("motd", "A Minecraft Server");
+        this.viewDistance = this.getPropertyInt("view-distance", 8);
+        this.despawnMobs = this.getPropertyBoolean("entity-despawn-task", true);
+        this.port = this.getPropertyInt("server-port", 19132);
+        this.ip = this.getPropertyString("server-ip", "0.0.0.0");
+        this.skinChangeCooldown = this.getPropertyInt("skin-change-cooldown", 15);
+        this.strongIPBans = this.getPropertyBoolean("strong-ip-bans", false);
+        this.spawnRadius = this.getPropertyInt("spawn-protection", 10);
+        this.autoSaveTicks = this.getPropertyInt("ticks-per-autosave", 6000);
+        this.doNotLimitSkinGeometry = this.getPropertyBoolean("do-not-limit-skin-geometry", true);
+        this.chunksPerTick = this.getPropertyInt("chunk-sending-per-tick", 4);
+        this.spawnThreshold = this.getPropertyInt("spawn-threshold", 56);
+        this.savePlayerDataByUuid = this.getPropertyBoolean("save-player-data-by-uuid", true);
+        this.vanillaPortals = this.getPropertyBoolean("vanilla-portals", true);
+        this.personaSkins = this.getPropertyBoolean("persona-skins", true);
+        this.cacheChunks = this.getPropertyBoolean("cache-chunks", false);
+        this.updateChecks = this.getPropertyBoolean("update-notifications", true);
+        this.minimumProtocol = this.getPropertyInt("multiversion-min-protocol", 0);
+        if (this.minimumProtocol == -1) {
+            this.minimumProtocol = ProtocolInfo.CURRENT_PROTOCOL;
+        }
+        this.useRawOres = this.getPropertyBoolean("use-raw-ores", true);
+        this.whitelistReason = this.getPropertyString("whitelist-reason", "Server is white-listed").replace("§n", "\n");
+        this.logJoinLocation = this.getPropertyBoolean("log-join-location", true);
+        this.unsafeRedstone = this.getPropertyBoolean("unsafe-redstone", true);
+        this.attackStopSprint = this.getPropertyBoolean("attack-stop-sprint", true);
+        this.reduceTraffic = this.getPropertyBoolean("reduce-traffic", false);
+        this.encryptionEnabled = this.getPropertyBoolean("encryption", true);
+        this.ignoreUnbreakableItems = this.getPropertyBoolean("ignore-unbreakable-items", false);
+        this.chunkUnloadDelay = this.getPropertyInt("chunk-unload-delay", 30) * 1000;
+        this.spawnThresholdRadius = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
+        this.entityActivationRange = this.getPropertyInt("entity-activation-blocks", 80);
+        this.entityActivationRange *= this.entityActivationRange;
+        this.setAutoSave(this.getPropertyBoolean("auto-save", true));
+        try {
+            this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
+        } catch (NumberFormatException exception) {
+            this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode", "0")) & 0b11;
+        }
+        String list = this.getPropertyString("do-not-tick-worlds", "");
+        if (!list.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(list, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                noTickingWorlds.add(tokenizer.nextToken());
+            }
+        }
+        if (this.isHardcore && this.difficulty < 3) {
+            this.setDifficulty(3);
+        } else {
+            this.setDifficulty(getDifficultyFromString(this.getPropertyString("difficulty", "2")));
+        }
+        antiXrayWorlds.clear();
+        String antiXray = this.getPropertyString("anti-xray-worlds", "");
+        if (!antiXray.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(antiXray, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                antiXrayWorlds.add(tokenizer.nextToken());
+            }
+        }
+        Level.xrayableBlocks[BlockID.NETHER_GOLD_ORE] = this.suomiCraftPEMode;
+        disabledSpawnWorlds.clear();
+        String noSpawning = this.getPropertyString("worlds-entity-spawning-disabled", "");
+        if (!noSpawning.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(noSpawning, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                disabledSpawnWorlds.add(tokenizer.nextToken());
+            }
+        }
+        nonAutoSaveWorlds.clear();
+        String noAutoSave = this.getPropertyString("worlds-level-auto-save-disabled", "");
+        if (!noAutoSave.trim().isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(noAutoSave, ", ");
+            while (tokenizer.hasMoreTokens()) {
+                nonAutoSaveWorlds.add(tokenizer.nextToken());
+            }
+        }
+
+        checkMobSpawnerTask();
+    }
+
+    /**
+     * Get known player uuid by player name
+     *
+     * @param name player name
+     * @return Optional UUID
+     */
+    public Optional<UUID> lookupName(String name) {
+        if (nameLookup == null) {
+            return Optional.empty();
+        }
+
+        byte[] nameBytes = name.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8);
+        byte[] uuidBytes = nameLookup.get(nameBytes);
+        if (uuidBytes == null) {
+            return Optional.empty();
+        }
+
+        if (uuidBytes.length != 16) {
+            log.warn("Invalid uuid in name lookup database, removing: " + name);
+            nameLookup.delete(nameBytes);
+            return Optional.empty();
+        }
+
+        ByteBuffer buffer = ByteBuffer.wrap(uuidBytes);
+        return Optional.of(new UUID(buffer.getLong(), buffer.getLong()));
+    }
+
+    /**
+     * Get players that match with the name
+     *
+     * @param partialName name
+     * @return matching players
+     */
+    public Player[] matchPlayer(String partialName) {
+        partialName = partialName.toLowerCase(Locale.ROOT);
+        List<Player> matchedPlayer = new ArrayList<>();
+        for (Player player : this.getOnlinePlayersList()) {
+            if (player.getName().toLowerCase(Locale.ROOT).equals(partialName)) {
+                return new Player[]{player};
+            } else if (player.getName().toLowerCase(Locale.ROOT).contains(partialName)) {
+                matchedPlayer.add(player);
+            }
+        }
+
+        return matchedPlayer.toArray(new Player[0]);
+    }
+
+    /**
+     * Internal: Warn user about non multiversion compatible plugins.
+     */
+    public static void mvw(String action) {
+        if (getInstance().minimumProtocol != ProtocolInfo.CURRENT_PROTOCOL) {
+            getInstance().getLogger().logException(new PluginException("Default " + action + " used by a plugin. This can cause instability with the multiversion."));
         }
     }
 
-    public void addPlayer(InetSocketAddress socketAddress, Player player) {
-        this.players.put(socketAddress, player);
+    /**
+     * Internal method to register all default block entities
+     */
+    private static void registerBlockEntities() {
+        BlockEntity.registerBlockEntity(BlockEntity.FURNACE, BlockEntityFurnace.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CHEST, BlockEntityChest.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SIGN, BlockEntitySign.class);
+        BlockEntity.registerBlockEntity(BlockEntity.ENCHANT_TABLE, BlockEntityEnchantTable.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SKULL, BlockEntitySkull.class);
+        BlockEntity.registerBlockEntity(BlockEntity.FLOWER_POT, BlockEntityFlowerPot.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BREWING_STAND, BlockEntityBrewingStand.class);
+        BlockEntity.registerBlockEntity(BlockEntity.ITEM_FRAME, BlockEntityItemFrame.class);
+        BlockEntity.registerBlockEntity(BlockEntity.GLOW_ITEM_FRAME, BlockEntityItemFrameGlow.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CAULDRON, BlockEntityCauldron.class);
+        BlockEntity.registerBlockEntity(BlockEntity.ENDER_CHEST, BlockEntityEnderChest.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BEACON, BlockEntityBeacon.class);
+        BlockEntity.registerBlockEntity(BlockEntity.PISTON_ARM, BlockEntityPistonArm.class);
+        BlockEntity.registerBlockEntity(BlockEntity.COMPARATOR, BlockEntityComparator.class);
+        BlockEntity.registerBlockEntity(BlockEntity.HOPPER, BlockEntityHopper.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BED, BlockEntityBed.class);
+        BlockEntity.registerBlockEntity(BlockEntity.JUKEBOX, BlockEntityJukebox.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SHULKER_BOX, BlockEntityShulkerBox.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BANNER, BlockEntityBanner.class);
+        BlockEntity.registerBlockEntity(BlockEntity.DROPPER, BlockEntityDropper.class);
+        BlockEntity.registerBlockEntity(BlockEntity.DISPENSER, BlockEntityDispenser.class);
+        BlockEntity.registerBlockEntity(BlockEntity.MOB_SPAWNER, BlockEntitySpawner.class);
+        BlockEntity.registerBlockEntity(BlockEntity.MUSIC, BlockEntityMusic.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CAMPFIRE, BlockEntityCampfire.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BARREL, BlockEntityBarrel.class);
+        BlockEntity.registerBlockEntity(BlockEntity.LECTERN, BlockEntityLectern.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BLAST_FURNACE, BlockEntityBlastFurnace.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SMOKER, BlockEntitySmoker.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BELL, BlockEntityBell.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CONDUIT, BlockEntityConduit.class);
+
+        // Not fully implemented yet but keep NBT for future use
+        BlockEntity.registerBlockEntity(BlockEntity.MOVING_BLOCK, BlockEntityMovingBlock.class);
+        BlockEntity.registerBlockEntity(BlockEntity.DAYLIGHT_DETECTOR, BlockEntityDaylightDetector.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SCULK_CATALYST, BlockEntitySculkCatalyst.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SCULK_SHRIEKER, BlockEntitySculkShrieker.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SCULK_SENSOR, BlockEntitySculkSensor.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CALIBRATED_SCULK_SENSOR, BlockEntityCalibratedSculkSensor.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CHISELED_BOOKSHELF, BlockEntityChiseledBookshelf.class);
+        BlockEntity.registerBlockEntity(BlockEntity.TRIAL_SPAWNER, BlockEntityTrialSpawner.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BEEHIVE, BlockEntityBeehive.class);
+        BlockEntity.registerBlockEntity(BlockEntity.HANGING_SIGN, BlockEntityHangingSign.class);
+        BlockEntity.registerBlockEntity(BlockEntity.DECORATED_POT, BlockEntityDecoratedPot.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CRAFTER, BlockEntityCrafter.class);
+        BlockEntity.registerBlockEntity(BlockEntity.CREAKING_HEART, BlockEntityCreakingHeart.class);
+        BlockEntity.registerBlockEntity(BlockEntity.VAULT, BlockEntityVault.class);
+        BlockEntity.registerBlockEntity(BlockEntity.SPORE_BLOSSOM, BlockEntitySporeBlossom.class);
+        BlockEntity.registerBlockEntity(BlockEntity.STRUCTURE_BLOCK, BlockEntityStructureBlock.class);
+        BlockEntity.registerBlockEntity(BlockEntity.END_PORTAL, BlockEntityEndPortal.class);
+        BlockEntity.registerBlockEntity(BlockEntity.LODESTONE, BlockEntityLodestone.class);
+        BlockEntity.registerBlockEntity(BlockEntity.BRUSHABLE_BLOCK, BlockEntityBrushableBlock.class);
+        BlockEntity.registerBlockEntity(BlockEntity.COMMAND_BLOCK, BlockEntityCommandBlock.class);
+        BlockEntity.registerBlockEntity(BlockEntity.JIGSAW, BlockEntityJigsaw.class);
+        BlockEntity.registerBlockEntity(BlockEntity.JIGSAW_BLOCK, BlockEntityJigsawBlock.class);
+        BlockEntity.registerBlockEntity(BlockEntity.END_GATEWAY, BlockEntityEndGateway.class);
+
+        // Persistent container, not on vanilla
+        BlockEntity.registerBlockEntity(BlockEntity.PERSISTENT_CONTAINER, PersistentDataContainerBlockEntity.class);
     }
 
-    public void addOnlinePlayer(Player player) {
-        this.playerList.put(player.getUniqueId(), player);
-        player.updatePlayerListData(false);
+    /**
+     * Internal method to register all default entities
+     */
+    private static void registerEntities() {
+        //Items
+        Entity.registerEntity("Item", EntityItem.class);
+        Entity.registerEntity("Painting", EntityPainting.class);
+        Entity.registerEntity("XpOrb", EntityXPOrb.class);
+        Entity.registerEntity("ArmorStand", EntityArmorStand.class);
+        Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
+        Entity.registerEntity("FallingSand", EntityFallingBlock.class);
+        Entity.registerEntity("PrimedTnt", EntityPrimedTNT.class);
+        Entity.registerEntity("Firework", EntityFirework.class);
+        //Projectiles
+        Entity.registerEntity("Arrow", EntityArrow.class);
+        Entity.registerEntity("Snowball", EntitySnowball.class);
+        Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
+        Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
+        Entity.registerEntity("ThrownPotion", EntityPotion.class);
+        Entity.registerEntity("Egg", EntityEgg.class);
+        Entity.registerEntity("BlazeFireBall", EntityBlazeFireBall.class);
+        Entity.registerEntity("GhastFireBall", EntityGhastFireBall.class);
+        Entity.registerEntity("ShulkerBullet", EntityShulkerBullet.class);
+        Entity.registerEntity("ThrownLingeringPotion", EntityPotionLingering.class);
+        Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
+        Entity.registerEntity("WitherSkull", EntityWitherSkull.class);
+        Entity.registerEntity("BlueWitherSkull", EntityBlueWitherSkull.class);
+        Entity.registerEntity("LlamaSpit", EntityLlamaSpit.class);
+        Entity.registerEntity("EvocationFangs", EntityEvocationFangs.class);
+        Entity.registerEntity("EnderCharge", EntityEnderCharge.class);
+        Entity.registerEntity("FishingHook", EntityFishingHook.class);
+        Entity.registerEntity("EnderEye", EntityEnderEye.class);
+        Entity.registerEntity("AreaEffectCloud", EntityAreaEffectCloud.class);
+        //Monsters
+        Entity.registerEntity("Blaze", EntityBlaze.class);
+        Entity.registerEntity("Creeper", EntityCreeper.class);
+        Entity.registerEntity("CaveSpider", EntityCaveSpider.class);
+        Entity.registerEntity("Drowned", EntityDrowned.class);
+        Entity.registerEntity("ElderGuardian", EntityElderGuardian.class);
+        Entity.registerEntity("EnderDragon", EntityEnderDragon.class);
+        Entity.registerEntity("Enderman", EntityEnderman.class);
+        Entity.registerEntity("Endermite", EntityEndermite.class);
+        Entity.registerEntity("Evoker", EntityEvoker.class);
+        Entity.registerEntity("Ghast", EntityGhast.class);
+        Entity.registerEntity("Guardian", EntityGuardian.class);
+        Entity.registerEntity("Husk", EntityHusk.class);
+        Entity.registerEntity("MagmaCube", EntityMagmaCube.class);
+        Entity.registerEntity("Phantom", EntityPhantom.class);
+        Entity.registerEntity("Ravager", EntityRavager.class);
+        Entity.registerEntity("Shulker", EntityShulker.class);
+        Entity.registerEntity("Silverfish", EntitySilverfish.class);
+        Entity.registerEntity("Skeleton", EntitySkeleton.class);
+        Entity.registerEntity("SkeletonHorse", EntitySkeletonHorse.class);
+        Entity.registerEntity("Slime", EntitySlime.class);
+        Entity.registerEntity("Spider", EntitySpider.class);
+        Entity.registerEntity("Stray", EntityStray.class);
+        Entity.registerEntity("Vindicator", EntityVindicator.class);
+        Entity.registerEntity("Vex", EntityVex.class);
+        Entity.registerEntity("WitherSkeleton", EntityWitherSkeleton.class);
+        Entity.registerEntity("Wither", EntityWither.class);
+        Entity.registerEntity("Witch", EntityWitch.class);
+        Entity.registerEntity("ZombiePigman", EntityZombiePigman.class);
+        Entity.registerEntity("ZombieVillager", EntityZombieVillagerV1.class);
+        Entity.registerEntity("Zombie", EntityZombie.class);
+        Entity.registerEntity("Pillager", EntityPillager.class);
+        Entity.registerEntity("ZombieVillagerV2", EntityZombieVillager.class);
+        Entity.registerEntity("Hoglin", EntityHoglin.class);
+        Entity.registerEntity("Piglin", EntityPiglin.class);
+        Entity.registerEntity("Zoglin", EntityZoglin.class);
+        Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
+        Entity.registerEntity("Warden", EntityWarden.class);
+        Entity.registerEntity("Breeze", EntityBreeze.class);
+        Entity.registerEntity("Bogged", EntityBogged.class);
+        Entity.registerEntity("Creaking", EntityCreaking.class);
+        //Passive
+        Entity.registerEntity("Bat", EntityBat.class);
+        Entity.registerEntity("Cat", EntityCat.class);
+        Entity.registerEntity("Chicken", EntityChicken.class);
+        Entity.registerEntity("Cod", EntityCod.class);
+        Entity.registerEntity("Cow", EntityCow.class);
+        Entity.registerEntity("Dolphin", EntityDolphin.class);
+        Entity.registerEntity("Donkey", EntityDonkey.class);
+        Entity.registerEntity("Horse", EntityHorse.class);
+        Entity.registerEntity("IronGolem", EntityIronGolem.class);
+        Entity.registerEntity("Llama", EntityLlama.class);
+        Entity.registerEntity("Mooshroom", EntityMooshroom.class);
+        Entity.registerEntity("Mule", EntityMule.class);
+        Entity.registerEntity("Panda", EntityPanda.class);
+        Entity.registerEntity("Parrot", EntityParrot.class);
+        Entity.registerEntity("PolarBear", EntityPolarBear.class);
+        Entity.registerEntity("Pig", EntityPig.class);
+        Entity.registerEntity("Pufferfish", EntityPufferfish.class);
+        Entity.registerEntity("Rabbit", EntityRabbit.class);
+        Entity.registerEntity("Salmon", EntitySalmon.class);
+        Entity.registerEntity("Sheep", EntitySheep.class);
+        Entity.registerEntity("Squid", EntitySquid.class);
+        Entity.registerEntity("SnowGolem", EntitySnowGolem.class);
+        Entity.registerEntity("TropicalFish", EntityTropicalFish.class);
+        Entity.registerEntity("Turtle", EntityTurtle.class);
+        Entity.registerEntity("Wolf", EntityWolf.class);
+        Entity.registerEntity("Ocelot", EntityOcelot.class);
+        Entity.registerEntity("Villager", EntityVillagerV1.class);
+        Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
+        Entity.registerEntity("WanderingTrader", EntityWanderingTrader.class);
+        Entity.registerEntity("VillagerV2", EntityVillager.class);
+        Entity.registerEntity("Fox", EntityFox.class);
+        Entity.registerEntity("Bee", EntityBee.class);
+        Entity.registerEntity("Strider", EntityStrider.class);
+        Entity.registerEntity("Goat", EntityGoat.class);
+        Entity.registerEntity("Axolotl", EntityAxolotl.class);
+        Entity.registerEntity("GlowSquid", EntityGlowSquid.class);
+        Entity.registerEntity("Allay", EntityAllay.class);
+        Entity.registerEntity("Frog", EntityFrog.class);
+        Entity.registerEntity("Tadpole", EntityTadpole.class);
+        Entity.registerEntity("Camel", EntityCamel.class);
+        Entity.registerEntity("Sniffer", EntitySniffer.class);
+        Entity.registerEntity("Armadillo", EntityArmadillo.class);
+        Entity.registerEntity("HappyGhast", EntityHappyGhast.class);
+        Entity.registerEntity("CopperGolem", EntityCopperGolem.class);
+        Entity.registerEntity("Nautilus", EntityNautilus.class);
+        Entity.registerEntity("ZombieNautilus", EntityZombieNautilus.class);
+        Entity.registerEntity("Parched", EntityParched.class);
+        Entity.registerEntity("CamelHusk", EntityCamelHusk.class);
+        //Vehicles
+        Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
+        Entity.registerEntity("MinecartChest", EntityMinecartChest.class);
+        Entity.registerEntity("MinecartHopper", EntityMinecartHopper.class);
+        Entity.registerEntity("MinecartTnt", EntityMinecartTNT.class);
+        Entity.registerEntity("Boat", EntityBoat.class);
+        Entity.registerEntity("ChestBoat", EntityChestBoat.class);
+        //Others
+        Entity.registerEntity("Human", EntityHuman.class, true);
+        Entity.registerEntity("Lightning", EntityLightning.class);
+    }
+
+    /**
+     * Reload the server. Notice: may cause issues with some plugins.
+     */
+    public void reload() {
+        log.info("Saving levels...");
+        for (Level level : this.levelArray) {
+            level.save();
+        }
+
+        this.pluginManager.clearPlugins();
+        this.commandMap.clearCommands();
+
+        log.info("Reloading server properties...");
+        this.properties.reload();
+        this.loadSettings();
+
+        this.banByIP.load();
+        this.banByName.load();
+        this.reloadWhitelist();
+        this.operators.reload();
+
+        for (BanEntry entry : this.banByIP.getEntires().values()) {
+            try {
+                this.network.blockAddress(InetAddress.getByName(entry.getName()));
+            } catch (UnknownHostException ignore) {
+            }
+        }
+
+        log.info("Reloading plugins...");
+        this.pluginManager.registerInterface(JavaPluginLoader.class);
+        this.pluginManager.loadPlugins(this.pluginPath);
+        this.enablePlugins(PluginLoadOrder.STARTUP);
+        this.enablePlugins(PluginLoadOrder.POSTWORLD);
+    }
+
+    /**
+     * Reload whitelist
+     */
+    public void reloadWhitelist() {
+        this.whitelist.reload();
     }
 
     public void removeOnlinePlayer(Player player) {
@@ -1030,31 +2894,36 @@ public class Server {
         }
     }
 
-    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin) {
-        this.updatePlayerListData(uuid, entityId, name, skin, "", this.playerList.values());
+    /**
+     * Remove player's operator status
+     *
+     * @param name player name
+     */
+    public void removeOp(String name) {
+        this.operators.remove(name.toLowerCase(Locale.ROOT));
+        Player player = this.getPlayerExact(name);
+        if (player != null) {
+            player.recalculatePermissions();
+        }
+        this.operators.save();
     }
 
-    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId) {
-        this.updatePlayerListData(uuid, entityId, name, skin, xboxUserId, this.playerList.values());
-    }
+    /**
+     * Internal: Remove a player from the server
+     *
+     * @param player player
+     */
+    public void removePlayer(Player player) {
+        if (this.players.remove(player.getSocketAddress()) != null) {
+            return;
+        }
 
-    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, Player[] players) {
-        this.updatePlayerListData(uuid, entityId, name, skin, "", players);
-    }
-
-    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Player[] players) {
-        this.updatePlayerListData(new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId, Color.WHITE), players);
-    }
-
-    public void updatePlayerListData(PlayerListPacket.Entry playerListEntry, Player[] players) {
-        PlayerListPacket pk = new PlayerListPacket();
-        pk.type = PlayerListPacket.TYPE_ADD;
-        pk.entries = new PlayerListPacket.Entry[]{playerListEntry};
-        this.batchPackets(players, new DataPacket[]{pk}); // This is sent "directly" so it always gets through before possible TYPE_REMOVE packet for NPCs etc.
-    }
-
-    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
-        this.updatePlayerListData(uuid, entityId, name, skin, xboxUserId, players.toArray(new Player[0]));
+        for (InetSocketAddress socketAddress : new ArrayList<>(this.players.keySet())) {
+            if (player == this.players.get(socketAddress)) {
+                this.players.remove(socketAddress);
+                break;
+            }
+        }
     }
 
     public void removePlayerListData(UUID uuid) {
@@ -1068,6 +2937,10 @@ public class Server {
         Server.broadcastPacket(players, pk);
     }
 
+    public void removePlayerListData(UUID uuid, Collection<Player> players) {
+        this.removePlayerListData(uuid, players.toArray(new Player[0]));
+    }
+
     public void removePlayerListData(UUID uuid, Player player) {
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_REMOVE;
@@ -1075,8 +2948,83 @@ public class Server {
         player.dataPacket(pk);
     }
 
-    public void removePlayerListData(UUID uuid, Collection<Player> players) {
-        this.removePlayerListData(uuid, players.toArray(new Player[0]));
+    /**
+     * Remove a player from whitelist
+     *
+     * @param name player name
+     */
+    public void removeWhitelist(String name) {
+        this.whitelist.remove(name.toLowerCase(Locale.ROOT));
+        this.whitelist.save(true);
+    }
+
+    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag) {
+        this.saveOfflinePlayerData(uuid, tag, false);
+    }
+
+    public void saveOfflinePlayerData(String name, CompoundTag tag) {
+        this.saveOfflinePlayerData(name, tag, false);
+    }
+
+    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag, boolean async) {
+        this.saveOfflinePlayerData(uuid.toString(), tag, async);
+    }
+
+    public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
+        if (this.savePlayerDataByUuid) {
+            Optional<UUID> uuid = lookupName(name);
+            saveOfflinePlayerData(uuid.map(UUID::toString).orElse(name), tag, async, true);
+        } else {
+            saveOfflinePlayerData(name, tag, async, true);
+        }
+    }
+
+    private void saveOfflinePlayerData(String name, CompoundTag tag, boolean async, boolean runEvent) {
+        if (this.shouldSavePlayerData()) {
+            String nameLower = name.toLowerCase(Locale.ROOT);
+            PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(nameLower, playerDataSerializer);
+            if (runEvent) {
+                pluginManager.callEvent(event);
+            }
+
+            if (async) {
+                this.getScheduler().scheduleTask(new Task() {
+                    private volatile boolean hasRun = false;
+
+                    // Doing it like this ensures that the player data will be saved in a server shutdown
+                    @Override
+                    public void onCancel() {
+                        if (!this.hasRun) {
+                            this.hasRun = true;
+                            saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+                        }
+                    }
+
+                    @Override
+                    public void onRun(int currentTick) {
+                        this.onCancel();
+                    }
+                }, true);
+            } else {
+                saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
+            }
+        }
+    }
+
+    /**
+     * Internal: Save offline player data
+     *
+     * @param serializer serializer
+     * @param tag        compound tag
+     * @param name       player name
+     * @param uuid       player uuid
+     */
+    private void saveOfflinePlayerDataInternal(PlayerDataSerializer serializer, CompoundTag tag, String name, UUID uuid) {
+        try (OutputStream dataStream = serializer.write(name, uuid)) {
+            NBTIO.writeGZIPCompressed(tag, dataStream, ByteOrder.BIG_ENDIAN);
+        } catch (Exception e) {
+            log.error(this.getLanguage().translateString("nukkit.data.saveError", name, e), e);
+        }
     }
 
     public void sendFullPlayerListData(Player player) {
@@ -1094,80 +3042,139 @@ public class Server {
         player.dataPacket(pk);
     }
 
+    void sendPacketOrdered(Player player, DataPacket packet) {
+        if (this.callBatchPkEvent) {
+            //noinspection deprecation
+            if (new BatchPacketsEvent(new Player[]{player}, new DataPacket[]{packet}, true).call().isCancelled()) {
+                return;
+            }
+        }
+
+        if (this.suomiCraftPEMode) {
+            if (packet instanceof PlayerListPacket || packet instanceof PlayerSkinPacket) {
+                new SuomiCraftPEModeEvent(SuomiCraftPEModeEvent.EventType.SEND_SKIN_PACKET, player, packet).call();
+            }
+        }
+
+        player.getNetworkSession().sendPacket(packet);
+    }
+
     public void sendRecipeList(Player player) {
-        player.dataPacket(CraftingManager.packet);
+        DataPacket pk = craftingManager.getCachedPacket(player.protocol);
+        if (pk != null) {
+            player.dataPacket(pk);
+        } else {
+            log.debug("No recipe list available for protocol " + player.protocol);
+        }
     }
 
-    private void checkTickUpdates(int currentTick) {
-        if (this.alwaysTickPlayers) {
-            for (Player p : new ArrayList<>(this.players.values())) {
-                p.onUpdate(currentTick);
-            }
+    /**
+     * Set a boolean value in server.properties
+     *
+     * @param variable key
+     * @param value    value
+     */
+    public void setPropertyBoolean(String variable, boolean value) {
+        this.properties.set(variable, value);
+        this.properties.save();
+    }
+
+    /**
+     * Set an int value in server.properties
+     *
+     * @param variable key
+     * @param value    value
+     */
+    public void setPropertyInt(String variable, int value) {
+        this.properties.set(variable, value);
+        this.properties.save();
+    }
+
+    /**
+     * Set a string value in server.properties
+     *
+     * @param variable key
+     * @param value    value
+     */
+    public void setPropertyString(String variable, String value) {
+        this.properties.set(variable, value);
+        this.properties.save();
+    }
+
+    /**
+     * Should player data saving be enabled
+     *
+     * @return player data saving enabled
+     */
+    public boolean shouldSavePlayerData() {
+        return shouldSavePlayerData;
+    }
+
+    /**
+     * Mark the server to be shut down.
+     */
+    public void shutdown() {
+        isRunning.compareAndSet(true, false);
+    }
+
+    /**
+     * Sort players by protocol version
+     *
+     * @param players players
+     * @return players sorted by protocol
+     */
+    public static Int2ObjectMap<ObjectList<Player>> sortPlayers(Player[] players) {
+        Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
+        for (Player player : players) {
+            targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
+        }
+        return targets;
+    }
+
+    /**
+     * Sort players by protocol version
+     *
+     * @param players players
+     * @return players sorted by protocol
+     */
+    public static Int2ObjectMap<ObjectList<Player>> sortPlayers(Collection<Player> players) {
+        Int2ObjectMap<ObjectList<Player>> targets = new Int2ObjectOpenHashMap<>();
+        for (Player player : players) {
+            targets.computeIfAbsent(player.protocol, i -> new ObjectArrayList<>()).add(player);
+        }
+        return targets;
+    }
+
+    /**
+     * Internal: Start the server
+     */
+    public void start() {
+        if (this.getPropertyBoolean("enable-query", false)) {
+            this.queryHandler = new QueryHandler();
         }
 
-        for (Player p : this.getOnlinePlayers().values()) {
-            p.resetPacketCounters();
-        }
-
-        // Do level ticks
-        for (Level level : this.levelArray) {
-            if (level.isBeingConverted || (level.getTickRate() > this.baseTickRate && --level.tickRateCounter > 0)) {
-                continue;
-            }
-
+        for (BanEntry entry : this.banByIP.getEntires().values()) {
             try {
-                long levelTime = System.currentTimeMillis();
-                level.doTick(currentTick);
-                int tickMs = (int) (System.currentTimeMillis() - levelTime);
-                level.tickRateTime = tickMs;
-
-                if (this.autoTickRate) {
-                    if (tickMs < 50 && level.getTickRate() > this.baseTickRate) {
-                        int r;
-                        level.setTickRate(r = level.getTickRate() - 1);
-                        if (r > this.baseTickRate) {
-                            level.tickRateCounter = level.getTickRate();
-                        }
-                        this.getLogger().debug("Raising level \"" + level.getName() + "\" tick rate to " + level.getTickRate() + " ticks");
-                    } else if (tickMs >= 50) {
-                        if (level.getTickRate() == this.baseTickRate) {
-                            level.setTickRate(Math.max(this.baseTickRate + 1, Math.min(this.autoTickRateLimit, tickMs / 50)));
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
-                        } else if ((tickMs / level.getTickRate()) >= 50 && level.getTickRate() < this.autoTickRateLimit) {
-                            level.setTickRate(level.getTickRate() + 1);
-                            this.getLogger().debug("Level \"" + level.getName() + "\" took " + tickMs + "ms, setting tick rate to " + level.getTickRate() + " ticks");
-                        }
-                        level.tickRateCounter = level.getTickRate();
-                    }
-                }
-            } catch (Exception e) {
-                log.error(this.baseLang.translateString("nukkit.level.tickError", new String[]{level.getFolderName(), Utils.getExceptionMessage(e)}));
+                this.network.blockAddress(InetAddress.getByName(entry.getName()));
+            } catch (UnknownHostException ignore) {
             }
         }
+
+        this.tickCounter = 0;
+
+        log.info(this.baseLang.translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));
+
+        this.tickProcessor();
+        this.forceShutdown();
     }
 
-    public void doAutoSave() {
-        if (this.autoSave) {
-            log.debug("Running auto save...");
-
-            for (Player player : this.players.values()) {
-                if (player.isOnline()) {
-                    player.save(true);
-                }
-            }
-
-            for (Level level : this.levelArray) {
-                if (level.getAutoSave()) {
-                    if (level.getProvider() != null) {
-                        try {
-                            level.save();
-                        } catch (Exception ex) {
-                            getLogger().error("Failed to auto save " + level.getName(), ex);
-                        }
-                    }
-                }
-            }
-        }
+    /**
+     * SuomiCraft PE mode tweaks some stuff to work better on SuomiCraft PE server.
+     *
+     * @return SuomiCraft PE mode enabled
+     */
+    public boolean suomiCraftPEMode() {
+        return this.suomiCraftPEMode;
     }
 
     private void tick() {
@@ -1263,8 +3270,53 @@ public class Server {
         }
     }
 
-    public long getNextTick() {
-        return nextTick;
+    /**
+     * Internal: Tick the server
+     */
+    public void tickProcessor() {
+        this.nextTick = System.currentTimeMillis();
+        try {
+            while (this.isRunning.get()) {
+                try {
+                    this.tick();
+
+                    long next = this.nextTick;
+                    long current = System.currentTimeMillis();
+
+                    if (next - 0.1 > current) {
+                        long allocated = next - current - 1;
+
+                        // Instead of wasting time, do something potentially useful
+                        if (this.doLevelGC) {
+                            int offset = 0;
+                            for (int i = 0; i < levelArray.length; i++) {
+                                offset = (i + lastLevelGC) % levelArray.length;
+                                Level level = levelArray[offset];
+                                if (!level.isBeingConverted) {
+                                    level.doGarbageCollection(allocated - 1);
+                                }
+                                allocated = next - System.currentTimeMillis();
+                                if (allocated <= 0) break;
+                            }
+                            lastLevelGC = offset + 1;
+                        }
+
+                        if (allocated > 0 || !this.doLevelGC) {
+                            try {
+                                Thread.sleep(allocated, 900000);
+                            } catch (Exception e) {
+                                this.getLogger().logException(e);
+                            }
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    this.getLogger().logException(e);
+                }
+            }
+        } catch (Throwable e) {
+            log.fatal("Exception happened while ticking server", e);
+            log.fatal(Utils.getAllThreadDumps());
+        }
     }
 
     private void titleTick() {
@@ -1274,748 +3326,13 @@ public class Server {
         Runtime runtime = Runtime.getRuntime();
         double used = NukkitMath.round((double) (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024, 2);
         double max = NukkitMath.round(((double) runtime.maxMemory()) / 1024 / 1024, 2);
-        System.out.print((char) 0x1b + "]0;Nukkit " + Nukkit.VERSION  +
+        System.out.print((char) 0x1b + "]0;Nukkit PM1E " + Nukkit.BUILD_VERSION +
                 " | Online " + this.playerList.size() + '/' + this.maxPlayers +
                 " | Memory " + Math.round(used / max * 100) + '%' +
                 /*" | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2) +
                 " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s" +*/
                 " | TPS " + this.getTicksPerSecond() +
                 " | Load " + this.getTickUsage() + '%' + (char) 0x07);
-    }
-
-    public QueryRegenerateEvent getQueryInformation() {
-        return this.queryRegenerateEvent;
-    }
-
-    public String getName() {
-        return "Nukkit";
-    }
-
-    public boolean isRunning() {
-        return isRunning.get();
-    }
-
-    public String getNukkitVersion() {
-        return Nukkit.VERSION;
-    }
-
-    public String getCodename() {
-        return "";
-    }
-
-    public String getVersion() {
-        return ProtocolInfo.MINECRAFT_VERSION;
-    }
-
-    public String getApiVersion() {
-        return Nukkit.API_VERSION;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public String getDataPath() {
-        return dataPath;
-    }
-
-    public String getPluginPath() {
-        return pluginPath;
-    }
-
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    public void setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public int getViewDistance() {
-        return viewDistance;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public UUID getServerUniqueId() {
-        return this.serverID;
-    }
-
-    public boolean getAutoSave() {
-        return this.autoSave;
-    }
-
-    public void setAutoSave(boolean autoSave) {
-        this.autoSave = autoSave;
-        for (Level level : this.levelArray) {
-            level.setAutoSave(this.autoSave);
-        }
-    }
-
-    public String getLevelType() {
-        return this.getPropertyString("level-type", "default");
-    }
-
-    public int getGamemode() {
-        return gamemode;
-    }
-
-    public boolean getForceGamemode() {
-        return this.forceGamemode;
-    }
-
-    public static String getGamemodeString(int mode) {
-        return getGamemodeString(mode, false);
-    }
-
-    public static String getGamemodeString(int mode, boolean direct) {
-        switch (mode) {
-            case Player.SURVIVAL:
-                return direct ? "Survival" : "%gameMode.survival";
-            case Player.CREATIVE:
-                return direct ? "Creative" : "%gameMode.creative";
-            case Player.ADVENTURE:
-                return direct ? "Adventure" : "%gameMode.adventure";
-            case Player.SPECTATOR:
-                return direct ? "Spectator" : "%gameMode.spectator";
-        }
-        return "UNKNOWN";
-    }
-
-    public static int getGamemodeFromString(String str) {
-        switch (str.trim().toLowerCase(Locale.ROOT)) {
-            case "0":
-            case "survival":
-            case "s":
-                return Player.SURVIVAL;
-            case "1":
-            case "creative":
-            case "c":
-                return Player.CREATIVE;
-            case "2":
-            case "adventure":
-            case "a":
-                return Player.ADVENTURE;
-            case "3":
-            case "spectator":
-            case "spc":
-            case "view":
-            case "v":
-                return Player.SPECTATOR;
-            case "default":
-                return Server.getInstance().getDefaultGamemode();
-        }
-        return -1;
-    }
-
-    public static int getDifficultyFromString(String str) {
-        switch (str.trim().toLowerCase(Locale.ROOT)) {
-            case "0":
-            case "peaceful":
-            case "p":
-                return 0;
-            case "1":
-            case "easy":
-            case "e":
-                return 1;
-            case "2":
-            case "normal":
-            case "n":
-                return 2;
-            case "3":
-            case "hard":
-            case "h":
-                return 3;
-        }
-        return -1;
-    }
-
-    public int getDifficulty() {
-        return this.difficulty;
-    }
-
-    public void setDifficulty(int difficulty) {
-        int value = difficulty;
-        if (value < 0) value = 0;
-        if (value > 3) value = 3;
-        this.difficulty = value;
-        this.setPropertyInt("difficulty", value);
-    }
-
-    public boolean hasWhitelist() {
-        return this.whitelistEnabled;
-    }
-
-    public int getSpawnRadius() {
-        return spawnRadius;
-    }
-
-    public boolean getAllowFlight() {
-        return allowFlight;
-    }
-
-    public boolean isHardcore() {
-        return this.isHardcore;
-    }
-
-    public int getDefaultGamemode() {
-        return this.getGamemode();
-    }
-
-    /**
-     * Get MOTD
-     * @return motd
-     */
-    public String getMotd() {
-        return motd;
-    }
-
-    /**
-     * Get Sub-MOTD (level name)
-     * @return sub-motd
-     */
-    public String getSubMotd() {
-        String sub = this.getPropertyString("sub-motd", "Powered by Nukkit");
-        if (sub.isEmpty()) sub = "Powered by Nukkit";
-        return sub;
-    }
-
-    public boolean getForceResources() {
-        return this.forceResources;
-    }
-
-    public MainLogger getLogger() {
-        return MainLogger.getLogger();
-    }
-
-    public EntityMetadataStore getEntityMetadata() {
-        return entityMetadata;
-    }
-
-    public PlayerMetadataStore getPlayerMetadata() {
-        return playerMetadata;
-    }
-
-    public LevelMetadataStore getLevelMetadata() {
-        return levelMetadata;
-    }
-
-    public PluginManager getPluginManager() {
-        return this.pluginManager;
-    }
-
-    public CraftingManager getCraftingManager() {
-        return craftingManager;
-    }
-
-    public ResourcePackManager getResourcePackManager() {
-        return resourcePackManager;
-    }
-
-    public ServerScheduler getScheduler() {
-        return scheduler;
-    }
-
-    /**
-     * Get current tick
-     *
-     * @return current tick
-     */
-    public int getTick() {
-        return tickCounter;
-    }
-
-    /**
-     * Get ticks per second
-     *
-     * @return TPS
-     */
-    public float getTicksPerSecond() {
-        return ((float) Math.round(this.maxTick * 100)) / 100;
-    }
-
-    /**
-     * Get average ticks per second
-     *
-     * @return average TPS
-     */
-    public float getTicksPerSecondAverage() {
-        float sum = 0;
-        int count = this.tickAverage.length;
-        for (float aTickAverage : this.tickAverage) {
-            sum += aTickAverage;
-        }
-        return (float) NukkitMath.round(sum / count, 2);
-    }
-
-    /**
-     * Get main thread load
-     *
-     * @return tick usage %
-     */
-    public float getTickUsage() {
-        return (float) NukkitMath.round(this.maxUse * 100, 2);
-    }
-
-    /**
-     * Get average main thread load
-     *
-     * @return average main thread load
-     */
-    public float getTickUsageAverage() {
-        float sum = 0;
-        for (float aUseAverage : this.useAverage) {
-            sum += aUseAverage;
-        }
-        return ((float) Math.round(sum / this.useAverage.length * 100)) / 100;
-    }
-
-    /**
-     * Get command map
-     *
-     * @return command map
-     */
-    public SimpleCommandMap getCommandMap() {
-        return commandMap;
-    }
-
-    /**
-     * Get all online players
-     *
-     * @return online players
-     */
-    public Map<UUID, Player> getOnlinePlayers() {
-        return ImmutableMap.copyOf(playerList);
-    }
-
-    /**
-     * Get online player count
-     *
-     * @return online player count
-     */
-    public int getOnlinePlayersCount() {
-        return this.playerList.size();
-    }
-
-    /**
-     * Register a recipe to CraftingManager.
-     * Please use getCraftingManager().registerRecipe(protocol, recipe) instead
-     * @param recipe recipe
-     */
-    public void addRecipe(Recipe recipe) {
-        this.craftingManager.registerRecipe(recipe);
-    }
-
-    /**
-     * Get an online player by uuid
-     *
-     * @param uuid uuid
-     * @return Optional Player
-     */
-    public Optional<Player> getPlayer(UUID uuid) {
-        Preconditions.checkNotNull(uuid, "uuid");
-        return Optional.ofNullable(playerList.get(uuid));
-    }
-
-    /**
-     * Get known player uuid by player name
-     *
-     * @param name player name
-     * @return Optional UUID
-     */
-    public Optional<UUID> lookupName(String name) {
-        byte[] nameBytes = name.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8);
-        byte[] uuidBytes = nameLookup.get(nameBytes);
-        if (uuidBytes == null) {
-            return Optional.empty();
-        }
-
-        if (uuidBytes.length != 16) {
-            log.warn("Invalid uuid in name lookup database, removing: " + name);
-            nameLookup.delete(nameBytes);
-            return Optional.empty();
-        }
-
-        ByteBuffer buffer = ByteBuffer.wrap(uuidBytes);
-        return Optional.of(new UUID(buffer.getLong(), buffer.getLong()));
-    }
-
-    void updateName(UUID uuid, String name) {
-        byte[] nameBytes = name.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8);
-
-        ByteBuffer buffer = ByteBuffer.allocate(16);
-        buffer.putLong(uuid.getMostSignificantBits());
-        buffer.putLong(uuid.getLeastSignificantBits());
-
-        nameLookup.put(nameBytes, buffer.array());
-    }
-
-    @Deprecated
-    public IPlayer getOfflinePlayer(final String name) {
-        IPlayer result = this.getPlayerExact(name);
-        if (result != null) {
-            return result;
-        }
-
-        return lookupName(name).map(uuid -> new OfflinePlayer(this, uuid, name))
-                .orElse(new OfflinePlayer(this, name));
-    }
-
-    public IPlayer getOfflinePlayer(UUID uuid) {
-        Preconditions.checkNotNull(uuid, "uuid");
-        Optional<Player> onlinePlayer = getPlayer(uuid);
-        if (onlinePlayer.isPresent()) {
-            return onlinePlayer.get();
-        }
-
-        return new OfflinePlayer(this, uuid);
-    }
-
-    public CompoundTag getOfflinePlayerData(UUID uuid) {
-        return getOfflinePlayerData(uuid, false);
-    }
-
-    public CompoundTag getOfflinePlayerData(UUID uuid, boolean create) {
-        return getOfflinePlayerDataInternal(uuid.toString(), true, create);
-    }
-
-    @Deprecated
-    public CompoundTag getOfflinePlayerData(String name) {
-        return getOfflinePlayerData(name, false);
-    }
-
-    @Deprecated
-    public CompoundTag getOfflinePlayerData(String name, boolean create) {
-        Optional<UUID> uuid = lookupName(name);
-        return getOfflinePlayerDataInternal(uuid.map(UUID::toString).orElse(name), true, create);
-    }
-
-    private CompoundTag getOfflinePlayerDataInternal(String name, boolean runEvent, boolean create) {
-        Preconditions.checkNotNull(name, "name");
-
-        PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(name, playerDataSerializer);
-        if (runEvent) {
-            pluginManager.callEvent(event);
-        }
-
-        Optional<InputStream> dataStream = Optional.empty();
-        try {
-            dataStream = event.getSerializer().read(name, event.getUuid().orElse(null));
-            if (dataStream.isPresent()) {
-                return NBTIO.readCompressed(dataStream.get());
-            }
-        } catch (IOException e) {
-            log.warn(this.getLanguage().translateString("nukkit.data.playerCorrupted", name), e);
-        } finally {
-            if (dataStream.isPresent()) {
-                try {
-                    dataStream.get().close();
-                } catch (IOException e) {
-                    log.throwing(e);
-                }
-            }
-        }
-        CompoundTag nbt = null;
-        if (create) {
-            if (this.shouldSavePlayerData()) {
-                log.info(this.getLanguage().translateString("nukkit.data.playerNotFound", name));
-            }
-            Vector3 spawn = this.getDefaultLevel().getProvider().getSpawn();
-            long time = System.currentTimeMillis();
-            nbt = new CompoundTag()
-                    .putLong("firstPlayed", time / 1000)
-                    .putLong("lastPlayed", time / 1000)
-                    .putList(new ListTag<DoubleTag>("Pos")
-                            .add(new DoubleTag("0", spawn.x))
-                            .add(new DoubleTag("1", spawn.y))
-                            .add(new DoubleTag("2", spawn.z)))
-                    .putString("Level", this.getDefaultLevel().getName())
-                    .putList(new ListTag<>("Inventory"))
-                    .putCompound("Achievements", new CompoundTag())
-                    .putInt("playerGameType", this.getGamemode())
-                    .putList(new ListTag<DoubleTag>("Motion")
-                            .add(new DoubleTag("0", 0))
-                            .add(new DoubleTag("1", 0))
-                            .add(new DoubleTag("2", 0)))
-                    .putList(new ListTag<FloatTag>("Rotation")
-                            .add(new FloatTag("0", 0))
-                            .add(new FloatTag("1", 0)))
-                    .putFloat("FallDistance", 0)
-                    .putShort("Fire", 0)
-                    .putShort("Air", 400)
-                    .putBoolean("OnGround", true)
-                    .putBoolean("Invulnerable", false);
-
-            this.saveOfflinePlayerData(name, nbt, true, runEvent);
-        }
-        return nbt;
-    }
-
-    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag) {
-        this.saveOfflinePlayerData(uuid, tag, false);
-    }
-
-    public void saveOfflinePlayerData(String name, CompoundTag tag) {
-        this.saveOfflinePlayerData(name, tag, false);
-    }
-
-    public void saveOfflinePlayerData(UUID uuid, CompoundTag tag, boolean async) {
-        this.saveOfflinePlayerData(uuid.toString(), tag, async);
-    }
-
-    public void saveOfflinePlayerData(String name, CompoundTag tag, boolean async) {
-        Optional<UUID> uuid = lookupName(name);
-        saveOfflinePlayerData(uuid.map(UUID::toString).orElse(name), tag, async, true);
-    }
-
-    private void saveOfflinePlayerData(String name, CompoundTag tag, boolean async, boolean runEvent) {
-        if (this.shouldSavePlayerData()) {
-            String nameLower = name.toLowerCase(Locale.ROOT);
-            PlayerDataSerializeEvent event = new PlayerDataSerializeEvent(nameLower, playerDataSerializer);
-            if (runEvent) {
-                pluginManager.callEvent(event);
-            }
-
-            if (async) {
-                this.getScheduler().scheduleTask(null, new Task() {
-                    private volatile boolean hasRun = false;
-
-                    @Override
-                    public void onRun(int currentTick) {
-                        this.onCancel();
-                    }
-
-                    // Doing it like this ensures that the player data will be saved in a server shutdown
-                    @Override
-                    public void onCancel() {
-                        if (!this.hasRun) {
-                            this.hasRun = true;
-                            saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
-                        }
-                    }
-                }, true);
-            } else {
-                saveOfflinePlayerDataInternal(event.getSerializer(), tag, nameLower, event.getUuid().orElse(null));
-            }
-        }
-    }
-
-    /**
-     * Internal: Save offline player data
-     *
-     * @param serializer serializer
-     * @param tag compound tag
-     * @param name player name
-     * @param uuid player uuid
-     */
-    private void saveOfflinePlayerDataInternal(PlayerDataSerializer serializer, CompoundTag tag, String name, UUID uuid) {
-        try (OutputStream dataStream = serializer.write(name, uuid)) {
-            NBTIO.writeGZIPCompressed(tag, dataStream, ByteOrder.BIG_ENDIAN);
-        } catch (Exception e) {
-            log.error(this.getLanguage().translateString("nukkit.data.saveError", name, e), e);
-        }
-    }
-
-    /**
-     * Internal: Convert legacy player saves to the uuid based saving
-     */
-    private void convertLegacyPlayerData() {
-        File dataDirectory = new File(getDataPath(), "players/");
-
-        File[] files = dataDirectory.listFiles(file -> {
-            String name = file.getName();
-            return !UUID_PATTERN.matcher(name).matches() && name.endsWith(".dat");
-        });
-
-        if (files == null) {
-            return;
-        }
-
-        for (File legacyData : files) {
-            String name = legacyData.getName();
-            // Remove file extension
-            name = name.substring(0, name.length() - 4);
-
-            log.debug("Attempting legacy player data conversion for {}", name);
-
-            CompoundTag tag = getOfflinePlayerDataInternal(name, false, false);
-
-            if (tag == null || !tag.contains("UUIDLeast") || !tag.contains("UUIDMost")) {
-                // No UUID so we cannot convert. Wait until player logs in.
-                continue;
-            }
-
-            UUID uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
-            if (!tag.contains("NameTag")) {
-                tag.putString("NameTag", name);
-            }
-
-            if (new File(getDataPath() + "players/" + uuid.toString() + ".dat").exists()) {
-                // We don't want to overwrite existing data.
-                continue;
-            }
-
-            saveOfflinePlayerData(uuid.toString(), tag, false, false);
-
-            // Add name to lookup table
-            updateName(uuid, name);
-
-            // Delete legacy data
-            if (!legacyData.delete()) {
-                log.warn("Unable to delete legacy data for {}", name);
-            }
-        }
-    }
-
-    /**
-     * Get an online player by name
-     *
-     * @param name player name
-     * @return Player or null
-     */
-    public Player getPlayer(String name) {
-        Player found = null;
-        name = name.toLowerCase(Locale.ROOT);
-        int delta = Integer.MAX_VALUE;
-        for (Player player : this.getOnlinePlayers().values()) {
-            if (player.getName().toLowerCase(Locale.ROOT).startsWith(name)) {
-                int curDelta = player.getName().length() - name.length();
-                if (curDelta < delta) {
-                    found = player;
-                    delta = curDelta;
-                }
-                if (curDelta == 0) {
-                    break;
-                }
-            }
-        }
-
-        return found;
-    }
-
-    /**
-     * Get an online player by exact player name
-     *
-     * @param name exact player name
-     * @return Player or null
-     */
-    public Player getPlayerExact(String name) {
-        for (Player player : this.getOnlinePlayers().values()) {
-            if (player.getName().equalsIgnoreCase(name)) {
-                return player;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get players that match with the name
-     *
-     * @param partialName name
-     * @return matching players
-     */
-    public Player[] matchPlayer(String partialName) {
-        partialName = partialName.toLowerCase(Locale.ROOT);
-        List<Player> matchedPlayer = new ArrayList<>();
-        for (Player player : this.getOnlinePlayers().values()) {
-            if (player.getName().toLowerCase(Locale.ROOT).equals(partialName)) {
-                return new Player[]{player};
-            } else if (player.getName().toLowerCase(Locale.ROOT).contains(partialName)) {
-                matchedPlayer.add(player);
-            }
-        }
-
-        return matchedPlayer.toArray(new Player[0]);
-    }
-
-    /**
-     * Internal: Remove a player from the server
-     *
-     * @param player player
-     */
-    public void removePlayer(Player player) {
-        if (this.players.remove(player.getSocketAddress()) != null) {
-            return;
-        }
-
-        for (InetSocketAddress socketAddress : new ArrayList<>(this.players.keySet())) {
-            if (player == this.players.get(socketAddress)) {
-                this.players.remove(socketAddress);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Get all levels
-     *
-     * @return levels
-     */
-    public Map<Integer, Level> getLevels() {
-        return levels;
-    }
-
-    /**
-     * Get default level
-     *
-     * @return default level
-     */
-    public Level getDefaultLevel() {
-        return defaultLevel;
-    }
-
-    /**
-     * Change the default level
-     *
-     * @param defaultLevel new default level
-     */
-    public void setDefaultLevel(Level defaultLevel) {
-        if (defaultLevel == null || (this.isLevelLoaded(defaultLevel.getFolderName()) && defaultLevel != this.defaultLevel)) {
-            this.defaultLevel = defaultLevel;
-        }
-    }
-
-    /**
-     * Check whether a level is loaded
-     *
-     * @param name level name
-     * @return is loaded
-     */
-    public boolean isLevelLoaded(String name) {
-        return this.getLevelByName(name) != null;
-    }
-
-    /**
-     * Get a level by ID
-     *
-     * @param levelId level ID
-     * @return Level or null
-     */
-    public Level getLevel(int levelId) {
-        return this.levels.get(levelId);
-    }
-
-    /**
-     * Get a level by name
-     *
-     * @param name level name
-     * @return Level or null
-     */
-    public Level getLevelByName(String name) {
-        for (Level level : this.levelArray) {
-            if (level.getFolderName().equalsIgnoreCase(name)) {
-                return level;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -2035,7 +3352,7 @@ public class Server {
      * <p>
      * Notice: the default level cannot be unloaded without forceUnload=true
      *
-     * @param level Level
+     * @param level       Level
      * @param forceUnload force unload (ignore cancelled events and default level)
      * @return unloaded
      */
@@ -2047,919 +3364,152 @@ public class Server {
         return level.unload(forceUnload);
     }
 
-    /**
-     * Load a level by name
-     *
-     * @param name level name
-     * @return loaded
-     */
-    public boolean loadLevel(String name) {
-        if (Objects.equals(name.trim(), "")) {
-            throw new LevelException("Invalid empty level name");
+    void updateName(UUID uuid, String name) {
+        if (nameLookup == null) {
+            return;
         }
 
-        if (!this.isPrimaryThread()) {
-            getLogger().warning("Level loaded asynchronously: " + name);
-        }
+        byte[] nameBytes = name.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.UTF_8);
 
-        if (this.isLevelLoaded(name)) {
-            return true;
-        } else if (!this.isLevelGenerated(name)) {
-            log.warn(this.baseLang.translateString("nukkit.level.notFound", name));
-            return false;
-        }
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
 
-        String path;
-
-        if (name.contains("/") || name.contains("\\")) {
-            path = name;
-        } else {
-            path = this.dataPath + "worlds/" + name + '/';
-        }
-
-        Class<? extends LevelProvider> provider = LevelProviderManager.getProvider(path);
-
-        if (provider == null) {
-            log.error(this.baseLang.translateString("nukkit.level.loadError", new String[]{name, "Unknown provider"}));
-            return false;
-        }
-
-        Level level;
-        try {
-            level = new Level(this, name, path, provider);
-        } catch (Exception e) {
-            log.error(this.baseLang.translateString("nukkit.level.loadError", new String[]{name, e.getMessage()}));
-            return false;
-        }
-
-        level.initLevel();
-
-        this.levels.put(level.getId(), level);
-
-        level.setTickRate(this.baseTickRate);
-
-        this.pluginManager.callEvent(new LevelLoadEvent(level));
-        return true;
+        nameLookup.put(nameBytes, buffer.array());
     }
 
     /**
-     * Generate a new level
+     * Check for updates and notify target
      *
-     * @param name level name
-     * @return generated
+     * @param sender         target
+     * @param notifyNoUpdate whether the already on the latest version message should be shown
      */
-    public boolean generateLevel(String name) {
-        return this.generateLevel(name, ThreadLocalRandom.current().nextLong());
-    }
-
-    /**
-     * Generate a new level
-     *
-     * @param name level name
-     * @param seed level seed
-     * @return generated
-     */
-    public boolean generateLevel(String name, long seed) {
-        return this.generateLevel(name, seed, null);
-    }
-
-    /**
-     * Generate a new level
-     *
-     * @param name level name
-     * @param seed level seed
-     * @param generator level generator
-     * @return generated
-     */
-    public boolean generateLevel(String name, long seed, Class<? extends Generator> generator) {
-        return this.generateLevel(name, seed, generator, new HashMap<>());
-    }
-
-    /**
-     * Generate a new level
-     *
-     * @param name level name
-     * @param seed level seed
-     * @param generator level generator
-     * @param options level generator options
-     * @return generated
-     */
-    public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options) {
-        return generateLevel(name, seed, generator, options, null);
-    }
-
-    /**
-     * Generate a new level
-     *
-     * @param name level name
-     * @param seed level seed
-     * @param generator level generator
-     * @param options level generator options
-     * @param provider level provider
-     * @return generated
-     */
-    public boolean generateLevel(String name, long seed, Class<? extends Generator> generator, Map<String, Object> options, Class<? extends LevelProvider> provider) {
-        if (Objects.equals(name.trim(), "") || this.isLevelGenerated(name)) {
-            return false;
-        }
-
-        if (!options.containsKey("preset")) {
-            options.put("preset", this.getPropertyString("generator-settings", ""));
-        }
-
-        if (generator == null) {
-            generator = Generator.getGenerator(this.getLevelType());
-        }
-
-        if (provider == null) {
-            provider = LevelProviderManager.getProviderByName("leveldb");
-        }
-
-        String path;
-
-        if (name.contains("/") || name.contains("\\")) {
-            path = name;
-        } else {
-            path = this.dataPath + "worlds/" + name + '/';
-        }
-
-        Level level;
-        try {
-            provider.getMethod("generate", String.class, String.class, long.class, Class.class, Map.class).invoke(null, path, name, seed, generator, options);
-
-            level = new Level(this, name, path, provider);
-
-            level.initLevel();
-
-            this.levels.put(level.getId(), level);
-
-            level.setTickRate(this.baseTickRate);
-        } catch (Exception e) {
-            log.error(this.baseLang.translateString("nukkit.level.generationError", new String[]{name, Utils.getExceptionMessage(e)}));
-            return false;
-        }
-
-        this.pluginManager.callEvent(new LevelInitEvent(level));
-        this.pluginManager.callEvent(new LevelLoadEvent(level));
-        return true;
-    }
-
-    /**
-     * Check whether a level by name is generated
-     *
-     * @param name level name
-     * @return level found
-     */
-    public boolean isLevelGenerated(String name) {
-        if (Objects.equals(name.trim(), "")) {
-            return false;
-        }
-
-        if (this.getLevelByName(name) == null) {
-            String path;
-
-            if (name.contains("/") || name.contains("\\")) {
-                path = name;
-            } else {
-                path = this.dataPath + "worlds/" + name + '/';
-            }
-
-            return LevelProviderManager.getProvider(path) != null;
-        }
-
-        return true;
-    }
-
-    /**
-     * Get BaseLang (server's default language)
-     *
-     * @return BaseLang
-     */
-    public BaseLang getLanguage() {
-        return baseLang;
-    }
-
-    /**
-     * Is forcing language enabled
-     *
-     * @return force-language enabled
-     */
-    public boolean isLanguageForced() {
-        return forceLanguage;
-    }
-
-    /**
-     * Get Network
-     *
-     * @return Network
-     */
-    public Network getNetwork() {
-        return network;
-    }
-
-    /**
-     * Get nukkit.yml
-     *
-     * @return config
-     */
-    public Config getConfig() {
-        return this.config;
-    }
-
-    public <T> T getConfig(String variable) {
-        return this.getConfig(variable, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getConfig(String variable, T defaultValue) {
-        Object value = this.config.get(variable);
-        return value == null ? defaultValue : (T) value;
-    }
-
-    /**
-     * Get server.properties
-     *
-     * @return server.properties as a Config
-     */
-    public Config getProperties() {
-        return this.properties;
-    }
-
-    /**
-     * Get a value from server.properties
-     *
-     * @param variable key
-     * @return value
-     */
-    public Object getProperty(String variable) {
-        return this.getProperty(variable, null);
-    }
-
-    /**
-     * Get a value from server.properties
-     *
-     * @param variable key
-     * @param defaultValue default value
-     * @return value
-     */
-    public Object getProperty(String variable, Object defaultValue) {
-        Object value = this.properties.get(variable);
-        return value == null ? defaultValue : value;
-    }
-
-    /**
-     * Set a string value in server.properties
-     *
-     * @param variable key
-     * @param value value
-     */
-    public void setPropertyString(String variable, String value) {
-        this.properties.set(variable, value);
-        this.properties.save();
-    }
-
-    /**
-     * Get a string value from server.properties
-     *
-     * @param key key
-     * @return value
-     */
-    public String getPropertyString(String key) {
-        return this.getPropertyString(key, null);
-    }
-
-    /**
-     * Get a string value from server.properties
-     *
-     * @param key key
-     * @param defaultValue default value
-     * @return value
-     */
-    public String getPropertyString(String key, String defaultValue) {
-        Object value = this.properties.get(key);
-        return value == null ? defaultValue : value.toString();
-    }
-
-    /**
-     * Get an int value from server.properties
-     *
-     * @param variable key
-     * @return value
-     */
-    public int getPropertyInt(String variable) {
-        return this.getPropertyInt(variable, null);
-    }
-
-    /**
-     * Get an int value from server.properties
-     *
-     * @param variable key
-     * @param defaultValue default value
-     * @return value
-     */
-    public int getPropertyInt(String variable, Integer defaultValue) {
-        Object value = this.properties.get(variable);
-        if (value == null) {
-            value = defaultValue;
-        }
-        if (value instanceof Integer) {
-            return (Integer) value;
-        }
-        String trimmed = String.valueOf(value).trim();
-        if (trimmed.isEmpty()) {
-            return defaultValue;
-        }
-        return Integer.parseInt(trimmed);
-    }
-
-    /**
-     * Set an int value in server.properties
-     *
-     * @param variable key
-     * @param value value
-     */
-    public void setPropertyInt(String variable, int value) {
-        this.properties.set(variable, value);
-        this.properties.save();
-    }
-
-    /**
-     * Get a boolean value from server.properties
-     *
-     * @param variable key
-     * @return value
-     */
-    public boolean getPropertyBoolean(String variable) {
-        return this.getPropertyBoolean(variable, null);
-    }
-
-    /**
-     * Get a boolean value from server.properties
-     *
-     * @param variable key
-     * @param defaultValue default value
-     * @return value
-     */
-    public boolean getPropertyBoolean(String variable, Object defaultValue) {
-        Object value = this.properties.get(variable);
-        if (value == null) {
-            value = defaultValue;
-        }
-        if (value instanceof Boolean) {
-            return (Boolean) value;
-        }
-        switch (String.valueOf(value).trim().toLowerCase(Locale.ROOT)) {
-            case "on":
-            case "true":
-            case "1":
-            case "yes":
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set a boolean value in server.properties
-     *
-     * @param variable key
-     * @param value value
-     */
-    public void setPropertyBoolean(String variable, boolean value) {
-        this.properties.set(variable, value);
-        this.properties.save();
-    }
-
-    /**
-     * Get plugin commands
-     *
-     * @param name command name
-     * @return PluginIdentifiableCommand or null
-     */
-    public PluginIdentifiableCommand getPluginCommand(String name) {
-        Command command = this.commandMap.getCommand(name);
-        if (command instanceof PluginIdentifiableCommand) {
-            return (PluginIdentifiableCommand) command;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Get list of banned players
-     *
-     * @return ban list
-     */
-    public BanList getNameBans() {
-        return this.banByName;
-    }
-
-    /**
-     * Get list of IP bans
-     *
-     * @return IP bans
-     */
-    public BanList getIPBans() {
-        return this.banByIP;
-    }
-
-    /**
-     * Give player the operator status
-     *
-     * @param name player name
-     */
-    public void addOp(String name) {
-        this.operators.set(name.toLowerCase(Locale.ROOT), true);
-        Player player = this.getPlayerExact(name);
-        if (player != null) {
-            player.recalculatePermissions();
-        }
-        this.operators.save(true);
-    }
-
-    /**
-     * Remove player's operator status
-     *
-     * @param name player name
-     */
-    public void removeOp(String name) {
-        this.operators.remove(name.toLowerCase(Locale.ROOT));
-        Player player = this.getPlayerExact(name);
-        if (player != null) {
-            player.recalculatePermissions();
-        }
-        this.operators.save();
-    }
-
-    /**
-     * Add a player to whitelist
-     *
-     * @param name player name
-     */
-    public void addWhitelist(String name) {
-        this.whitelist.set(name.toLowerCase(Locale.ROOT), true);
-        this.whitelist.save(true);
-    }
-
-    /**
-     * Remove a player from whitelist
-     *
-     * @param name player name
-     */
-    public void removeWhitelist(String name) {
-        this.whitelist.remove(name.toLowerCase(Locale.ROOT));
-        this.whitelist.save(true);
-    }
-
-    /**
-     * Check whether a player is whitelisted
-     *
-     * @param name player name
-     * @return is whitelisted or whitelist is not enabled
-     */
-    public boolean isWhitelisted(String name) {
-        return !this.hasWhitelist() || this.operators.exists(name, true) || this.whitelist.exists(name, true);
-    }
-
-    /**
-     * Check whether a player is an operator
-     *
-     * @param name player name
-     * @return is operator
-     */
-    public boolean isOp(String name) {
-        return name != null && this.operators.exists(name, true);
-    }
-
-    /**
-     * Get whitelist config
-     *
-     * @return whitelist
-     */
-    public Config getWhitelist() {
-        return whitelist;
-    }
-
-    /**
-     * Get operator list config
-     *
-     * @return operators
-     */
-    public Config getOps() {
-        return operators;
-    }
-
-    /**
-     * Reload whitelist
-     */
-    public void reloadWhitelist() {
-        this.whitelist.reload();
-    }
-
-    /**
-     * Load command aliases from nukkit.yml
-     */
-    public Map<String, List<String>> getCommandAliases() {
-        Object section = this.getConfig("aliases");
-        Map<String, List<String>> result = new LinkedHashMap<>();
-
-        if (section instanceof Map) {
-            for (Map.Entry entry : (Set<Map.Entry>) ((Map) section).entrySet()) {
-                List<String> commands = new ArrayList<>();
-                String key = (String) entry.getKey();
-                Object value = entry.getValue();
-                if (value instanceof List) {
-                    commands.addAll((List<String>) value);
-                } else {
-                    commands.add((String) value);
+    public void updateNotification(CommandSender sender, boolean notifyNoUpdate) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                if (!Nukkit.getBranch().equals(Nukkit.MAIN_BRANCH)) {
+                    if (sender instanceof ConsoleCommandSender) {
+                        this.getLogger().warning("§eDevelopment build! Branch: " + Nukkit.getBranch());
+                    }
+                    return;
                 }
 
-                result.put(key, commands);
+                URLConnection request = new URL(Nukkit.RELEASES).openConnection();
+                request.connect();
+                InputStreamReader content = new InputStreamReader((InputStream) request.getContent(), StandardCharsets.UTF_8);
+                JsonElement element = JsonParser.parseReader(content);
+                content.close();
+
+                String latestReleaseTag = null;
+                String latestPreReleaseTag = null;
+                String latestReleaseName = null;
+                String latestPreReleaseName = null;
+
+                // Find the latest release & pre-release
+                for (JsonElement releaseElement : element.getAsJsonArray().getAsJsonArray()) {
+                    if (!(releaseElement instanceof JsonObject)) {
+                        continue;
+                    }
+
+                    if (latestReleaseTag != null && latestPreReleaseTag != null) {
+                        break; // Both latest versions found already
+                    }
+
+                    JsonObject release = (JsonObject) releaseElement;
+                    boolean preRelease = release.has("prerelease") && release.get("prerelease").getAsBoolean();
+
+                    if (preRelease) {
+                        if (latestPreReleaseTag == null) {
+                            latestPreReleaseTag = release.get("tag_name").getAsString();
+
+                            String releaseName = release.get("name").getAsString();
+                            if (releaseName != null && !releaseName.isEmpty() && !releaseName.contains("(DEV)")) {
+                                latestPreReleaseName = releaseName.replace("Nukkit PM1E ", "");
+                            }
+                        }
+                    } else {
+                        if (latestReleaseTag == null) {
+                            latestReleaseTag = release.get("tag_name").getAsString();
+
+                            String releaseName = release.get("name").getAsString();
+                            if (releaseName == null || releaseName.isEmpty()) {
+                                latestReleaseName = "Invalid release info for build " + latestReleaseTag;
+                            } else {
+                                latestReleaseName = releaseName.replace("Nukkit PM1E ", "");
+                            }
+                        }
+                    }
+                }
+
+                if (latestReleaseTag == null) {
+                    log.debug("Could not check for updates");
+                    return;
+                }
+
+                try {
+                    int currentVersion = Integer.parseInt(Nukkit.BUILD_VERSION_NUMBER);
+                    int latestVersion = Integer.parseInt(latestReleaseTag);
+
+                    if (currentVersion < latestVersion) { // Current build is not the latest release
+                        sender.sendMessage("§c[Update] §eThere is a new version of Nukkit PetteriM1 Edition available! Current: " + Nukkit.BUILD_VERSION + " Latest: " + latestReleaseName);
+
+                        if (sender instanceof ConsoleCommandSender) {
+                            this.getLogger().info("§c[Update] §eYou can download the latest version from https://github.com/PetteriM1/NukkitPetteriM1Edition/releases");
+                        }
+                    } else if (currentVersion > latestVersion) { // Current build is unreleased
+                        if (sender instanceof ConsoleCommandSender) {
+                            log.warn("§eUnreleased build! Current: " + Nukkit.BUILD_VERSION + " Latest: " + latestReleaseName);
+                        }
+                    } else if (latestPreReleaseTag != null && latestPreReleaseName != null) { // Current build is the latest release and there's a pre-release available
+                        int latestPreVersion = Integer.parseInt(latestPreReleaseTag);
+
+                        if (currentVersion < latestPreVersion) {
+                            sender.sendMessage("§c[Update] §eThere is a new pre-release version of Nukkit PetteriM1 Edition available! Current: " + Nukkit.BUILD_VERSION + " Latest: " + latestPreReleaseName);
+
+                            if (sender instanceof ConsoleCommandSender) {
+                                this.getLogger().info("§c[Update] §eYou can download the latest version from https://github.com/PetteriM1/NukkitPetteriM1Edition/releases");
+                            }
+                        }
+                    } else { // No updates available
+                        if (notifyNoUpdate) {
+                            sender.sendMessage("§aYou are running the latest version.");
+                        }
+                    }
+                } catch (Exception ex) {
+                    log.debug("Failed to parse build info", ex);
+                }
+            } catch (Exception ex) {
+                log.debug("Update check failed", ex);
             }
-        }
-
-        return result;
+        });
     }
 
-    /**
-     * Get service manager
-     *
-     * @return service manager
-     */
-    public ServiceManager getServiceManager() {
-        return serviceManager;
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin) {
+        this.updatePlayerListData(uuid, entityId, name, skin, "", this.playerList.values());
     }
 
-    /**
-     * Should player data saving be enabled
-     *
-     * @return player data saving enabled
-     */
-    public boolean shouldSavePlayerData() {
-        return shouldSavePlayerData;
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId) {
+        this.updatePlayerListData(uuid, entityId, name, skin, xboxUserId, this.playerList.values());
     }
 
-    /**
-     * How often player is allowed to change skin in game (in seconds)
-     *
-     * @return skin change cooldown
-     */
-    public int getPlayerSkinChangeCooldown() {
-        return skinChangeCooldown;
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, Player[] players) {
+        this.updatePlayerListData(uuid, entityId, name, skin, "", players);
     }
 
-    /**
-     * Checks the current thread against the expected primary thread for the server.
-     * <p>
-     * <b>Note:</b> this method should not be used to indicate the current synchronized state of the runtime. A current thread matching the main thread indicates that it is synchronized, but a mismatch does not preclude the same assumption.
-     *
-     * @return true if the current thread matches the expected primary thread, false otherwise
-     */
-    public final boolean isPrimaryThread() {
-        return Thread.currentThread() == currentThread;
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Player[] players) {
+        this.updatePlayerListData(new PlayerListPacket.Entry(uuid, entityId, name, skin, xboxUserId, Color.WHITE), players);
     }
 
-    /**
-     * Get server's primary thread
-     *
-     * @return primary thread
-     */
-    public Thread getPrimaryThread() {
-        return currentThread;
+    public void updatePlayerListData(PlayerListPacket.Entry playerListEntry, Player[] players) {
+        PlayerListPacket pk = new PlayerListPacket();
+        pk.type = PlayerListPacket.TYPE_ADD;
+        pk.entries = new PlayerListPacket.Entry[]{playerListEntry};
+        Server.broadcastPacket(players, pk);
     }
 
-    /**
-     * Internal method to register all default entities
-     */
-    private static void registerEntities() {
-        //Items
-        Entity.registerEntity("Item", EntityItem.class);
-        Entity.registerEntity("Painting", EntityPainting.class);
-        Entity.registerEntity("XpOrb", EntityXPOrb.class);
-        Entity.registerEntity("ArmorStand", EntityArmorStand.class);
-        Entity.registerEntity("EndCrystal", EntityEndCrystal.class);
-        Entity.registerEntity("FallingSand", EntityFallingBlock.class);
-        Entity.registerEntity("PrimedTnt", EntityPrimedTNT.class);
-        Entity.registerEntity("Firework", EntityFirework.class);
-        //Projectiles
-        Entity.registerEntity("Arrow", EntityArrow.class);
-        Entity.registerEntity("Snowball", EntitySnowball.class);
-        Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
-        Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
-        Entity.registerEntity("ThrownPotion", EntityPotion.class);
-        Entity.registerEntity("Egg", EntityEgg.class);
-        Entity.registerEntity("ThrownLingeringPotion", EntityPotionLingering.class);
-        Entity.registerEntity("ThrownTrident", EntityThrownTrident.class);
-        Entity.registerEntity("FishingHook", EntityFishingHook.class);
-        Entity.registerEntity("EnderEye", EntityEnderEye.class);
-        Entity.registerEntity("AreaEffectCloud", EntityAreaEffectCloud.class);
-        //Monsters
-        Entity.registerEntity("Blaze", EntityBlaze.class);
-        Entity.registerEntity("Creeper", EntityCreeper.class);
-        Entity.registerEntity("CaveSpider", EntityCaveSpider.class);
-        Entity.registerEntity("Drowned", EntityDrowned.class);
-        Entity.registerEntity("ElderGuardian", EntityElderGuardian.class);
-        Entity.registerEntity("EnderDragon", EntityEnderDragon.class);
-        Entity.registerEntity("Enderman", EntityEnderman.class);
-        Entity.registerEntity("Endermite", EntityEndermite.class);
-        Entity.registerEntity("Evoker", EntityEvoker.class);
-        Entity.registerEntity("Ghast", EntityGhast.class);
-        Entity.registerEntity("Guardian", EntityGuardian.class);
-        Entity.registerEntity("Husk", EntityHusk.class);
-        Entity.registerEntity("MagmaCube", EntityMagmaCube.class);
-        Entity.registerEntity("Phantom", EntityPhantom.class);
-        Entity.registerEntity("Ravager", EntityRavager.class);
-        Entity.registerEntity("Shulker", EntityShulker.class);
-        Entity.registerEntity("Silverfish", EntitySilverfish.class);
-        Entity.registerEntity("Skeleton", EntitySkeleton.class);
-        Entity.registerEntity("SkeletonHorse", EntitySkeletonHorse.class);
-        Entity.registerEntity("Slime", EntitySlime.class);
-        Entity.registerEntity("Spider", EntitySpider.class);
-        Entity.registerEntity("Stray", EntityStray.class);
-        Entity.registerEntity("Vindicator", EntityVindicator.class);
-        Entity.registerEntity("Vex", EntityVex.class);
-        Entity.registerEntity("WitherSkeleton", EntityWitherSkeleton.class);
-        Entity.registerEntity("Wither", EntityWither.class);
-        Entity.registerEntity("Witch", EntityWitch.class);
-        Entity.registerEntity("ZombiePigman", EntityZombiePigman.class);
-        Entity.registerEntity("ZombieVillager", EntityZombieVillagerV1.class);
-        Entity.registerEntity("Zombie", EntityZombie.class);
-        Entity.registerEntity("Pillager", EntityPillager.class);
-        Entity.registerEntity("ZombieVillagerV2", EntityZombieVillager.class);
-        Entity.registerEntity("Hoglin", EntityHoglin.class);
-        Entity.registerEntity("Piglin", EntityPiglin.class);
-        Entity.registerEntity("Zoglin", EntityZoglin.class);
-        Entity.registerEntity("PiglinBrute", EntityPiglinBrute.class);
-        Entity.registerEntity("Warden", EntityWarden.class);
-        Entity.registerEntity("Breeze", EntityBreeze.class);
-        Entity.registerEntity("Bogged", EntityBogged.class);
-        Entity.registerEntity("Creaking", EntityCreaking.class);
-        //Passive
-        Entity.registerEntity("Bat", EntityBat.class);
-        Entity.registerEntity("Cat", EntityCat.class);
-        Entity.registerEntity("Chicken", EntityChicken.class);
-        Entity.registerEntity("Cod", EntityCod.class);
-        Entity.registerEntity("Cow", EntityCow.class);
-        Entity.registerEntity("Dolphin", EntityDolphin.class);
-        Entity.registerEntity("Donkey", EntityDonkey.class);
-        Entity.registerEntity("Horse", EntityHorse.class);
-        Entity.registerEntity("IronGolem", EntityIronGolem.class);
-        Entity.registerEntity("Llama", EntityLlama.class);
-        Entity.registerEntity("Mooshroom", EntityMooshroom.class);
-        Entity.registerEntity("Mule", EntityMule.class);
-        Entity.registerEntity("Panda", EntityPanda.class);
-        Entity.registerEntity("Parrot", EntityParrot.class);
-        Entity.registerEntity("PolarBear", EntityPolarBear.class);
-        Entity.registerEntity("Pig", EntityPig.class);
-        Entity.registerEntity("Pufferfish", EntityPufferfish.class);
-        Entity.registerEntity("Rabbit", EntityRabbit.class);
-        Entity.registerEntity("Salmon", EntitySalmon.class);
-        Entity.registerEntity("Sheep", EntitySheep.class);
-        Entity.registerEntity("Squid", EntitySquid.class);
-        Entity.registerEntity("SnowGolem", EntitySnowGolem.class);
-        Entity.registerEntity("TropicalFish", EntityTropicalFish.class);
-        Entity.registerEntity("Turtle", EntityTurtle.class);
-        Entity.registerEntity("Wolf", EntityWolf.class);
-        Entity.registerEntity("Ocelot", EntityOcelot.class);
-        Entity.registerEntity("Villager", EntityVillagerV1.class);
-        Entity.registerEntity("ZombieHorse", EntityZombieHorse.class);
-        Entity.registerEntity("WanderingTrader", EntityWanderingTrader.class);
-        Entity.registerEntity("VillagerV2", EntityVillager.class);
-        Entity.registerEntity("Fox", EntityFox.class);
-        Entity.registerEntity("Bee", EntityBee.class);
-        Entity.registerEntity("Strider", EntityStrider.class);
-        Entity.registerEntity("Goat", EntityGoat.class);
-        Entity.registerEntity("Axolotl", EntityAxolotl.class);
-        Entity.registerEntity("GlowSquid", EntityGlowSquid.class);
-        Entity.registerEntity("Allay", EntityAllay.class);
-        Entity.registerEntity("Frog", EntityFrog.class);
-        Entity.registerEntity("Tadpole", EntityTadpole.class);
-        Entity.registerEntity("Camel", EntityCamel.class);
-        Entity.registerEntity("Sniffer", EntitySniffer.class);
-        Entity.registerEntity("Armadillo", EntityArmadillo.class);
-        Entity.registerEntity("HappyGhast", EntityHappyGhast.class);
-        Entity.registerEntity("CopperGolem", EntityCopperGolem.class);
-        //Vehicles
-        Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
-        Entity.registerEntity("MinecartChest", EntityMinecartChest.class);
-        Entity.registerEntity("MinecartHopper", EntityMinecartHopper.class);
-        Entity.registerEntity("MinecartTnt", EntityMinecartTNT.class);
-        Entity.registerEntity("Boat", EntityBoat.class);
-        Entity.registerEntity("ChestBoat", EntityChestBoat.class);
-        //Others
-        Entity.registerEntity("Human", EntityHuman.class, true);
-        Entity.registerEntity("Lightning", EntityLightning.class);
+    public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, String xboxUserId, Collection<Player> players) {
+        this.updatePlayerListData(uuid, entityId, name, skin, xboxUserId, players.toArray(new Player[0]));
     }
 
-    /**
-     * Internal method to register all default block entities
-     */
-    private static void registerBlockEntities() {
-        BlockEntity.registerBlockEntity(BlockEntity.FURNACE, BlockEntityFurnace.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CHEST, BlockEntityChest.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SIGN, BlockEntitySign.class);
-        BlockEntity.registerBlockEntity(BlockEntity.ENCHANT_TABLE, BlockEntityEnchantTable.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SKULL, BlockEntitySkull.class);
-        BlockEntity.registerBlockEntity(BlockEntity.FLOWER_POT, BlockEntityFlowerPot.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BREWING_STAND, BlockEntityBrewingStand.class);
-        BlockEntity.registerBlockEntity(BlockEntity.ITEM_FRAME, BlockEntityItemFrame.class);
-        BlockEntity.registerBlockEntity(BlockEntity.GLOW_ITEM_FRAME, BlockEntityItemFrameGlow.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CAULDRON, BlockEntityCauldron.class);
-        BlockEntity.registerBlockEntity(BlockEntity.ENDER_CHEST, BlockEntityEnderChest.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BEACON, BlockEntityBeacon.class);
-        BlockEntity.registerBlockEntity(BlockEntity.PISTON_ARM, BlockEntityPistonArm.class);
-        BlockEntity.registerBlockEntity(BlockEntity.COMPARATOR, BlockEntityComparator.class);
-        BlockEntity.registerBlockEntity(BlockEntity.HOPPER, BlockEntityHopper.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BED, BlockEntityBed.class);
-        BlockEntity.registerBlockEntity(BlockEntity.JUKEBOX, BlockEntityJukebox.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SHULKER_BOX, BlockEntityShulkerBox.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BANNER, BlockEntityBanner.class);
-        BlockEntity.registerBlockEntity(BlockEntity.DROPPER, BlockEntityDropper.class);
-        BlockEntity.registerBlockEntity(BlockEntity.DISPENSER, BlockEntityDispenser.class);
-        BlockEntity.registerBlockEntity(BlockEntity.MOB_SPAWNER, BlockEntitySpawner.class);
-        BlockEntity.registerBlockEntity(BlockEntity.MUSIC, BlockEntityMusic.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CAMPFIRE, BlockEntityCampfire.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BARREL, BlockEntityBarrel.class);
-        BlockEntity.registerBlockEntity(BlockEntity.LECTERN, BlockEntityLectern.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BLAST_FURNACE, BlockEntityBlastFurnace.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SMOKER, BlockEntitySmoker.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BELL, BlockEntityBell.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CONDUIT, BlockEntityConduit.class);
 
-        // Not fully implemented yet but keep NBT for future use
-        BlockEntity.registerBlockEntity(BlockEntity.MOVING_BLOCK, BlockEntityMovingBlock.class);
-        BlockEntity.registerBlockEntity(BlockEntity.DAYLIGHT_DETECTOR, BlockEntityDaylightDetector.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SCULK_CATALYST, BlockEntitySculkCatalyst.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SCULK_SHRIEKER, BlockEntitySculkShrieker.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SCULK_SENSOR, BlockEntitySculkSensor.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CALIBRATED_SCULK_SENSOR, BlockEntityCalibratedSculkSensor.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CHISELED_BOOKSHELF, BlockEntityChiseledBookshelf.class);
-        BlockEntity.registerBlockEntity(BlockEntity.TRIAL_SPAWNER, BlockEntityTrialSpawner.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BEEHIVE, BlockEntityBeehive.class);
-        BlockEntity.registerBlockEntity(BlockEntity.HANGING_SIGN, BlockEntityHangingSign.class);
-        BlockEntity.registerBlockEntity(BlockEntity.DECORATED_POT, BlockEntityDecoratedPot.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CRAFTER, BlockEntityCrafter.class);
-        BlockEntity.registerBlockEntity(BlockEntity.CREAKING_HEART, BlockEntityCreakingHeart.class);
-        BlockEntity.registerBlockEntity(BlockEntity.VAULT, BlockEntityVault.class);
-        BlockEntity.registerBlockEntity(BlockEntity.SPORE_BLOSSOM, BlockEntitySporeBlossom.class);
-        BlockEntity.registerBlockEntity(BlockEntity.STRUCTURE_BLOCK, BlockEntityStructureBlock.class);
-        BlockEntity.registerBlockEntity(BlockEntity.END_PORTAL, BlockEntityEndPortal.class);
-        BlockEntity.registerBlockEntity(BlockEntity.LODESTONE, BlockEntityLodestone.class);
-        BlockEntity.registerBlockEntity(BlockEntity.BRUSHABLE_BLOCK, BlockEntityBrushableBlock.class);
-        BlockEntity.registerBlockEntity(BlockEntity.COMMAND_BLOCK, BlockEntityCommandBlock.class);
-        BlockEntity.registerBlockEntity(BlockEntity.JIGSAW, BlockEntityJigsaw.class);
-        BlockEntity.registerBlockEntity(BlockEntity.JIGSAW_BLOCK, BlockEntityJigsawBlock.class);
-        BlockEntity.registerBlockEntity(BlockEntity.END_GATEWAY, BlockEntityEndGateway.class);
-
-        // Persistent container, not on vanilla
-        BlockEntity.registerBlockEntity(BlockEntity.PERSISTENT_CONTAINER, PersistentDataContainerBlockEntity.class);
-    }
-
-    /**
-     * Is nether enabled on this server
-     *
-     * @return nether enabled
-     */
-    public boolean isNetherAllowed() {
-        return EnumLevel.NETHER.getLevel() != null;
-    }
-
-    /**
-     * Get player data serializer that is used to save player data
-     *
-     * @return player data serializer
-     */
-    public PlayerDataSerializer getPlayerDataSerializer() {
-        return playerDataSerializer;
-    }
-
-    /**
-     * Set player data serializer that is used to save player data
-     *
-     * @param playerDataSerializer player data serializer
-     */
-    public void setPlayerDataSerializer(PlayerDataSerializer playerDataSerializer) {
-        this.playerDataSerializer = Preconditions.checkNotNull(playerDataSerializer, "playerDataSerializer");
-    }
-
-    boolean isIgnoredPacket(Class<? extends DataPacket> clazz) {
-        return this.ignoredPackets.contains(clazz.getSimpleName());
-    }
-
-    /**
-     * Get the Server instance
-     *
-     * @return Server
-     */
-    public static Server getInstance() {
-        return instance;
-    }
-
-    /**
-     * Load server config
-     */
-    private void loadSettings() {
-        /* nukkit.yml */
-
-        this.forceLanguage = this.getConfig("settings.force-language", false);
-        this.queryPlugins = this.getConfig("settings.query-plugins", true);
-
-        this.networkCompressionThreshold = this.getConfig("network.batch-threshold", 256);
-        this.networkCompressionLevel = Math.max(Math.min(this.getConfig("network.compression-level", 5), 9), 0);
-        this.encryptionEnabled = this.getConfig("network.encryption", false);
-
-        this.autoTickRate = this.getConfig("level-settings.auto-tick-rate", true);
-        this.autoTickRateLimit = this.getConfig("level-settings.auto-tick-rate-limit", 20);
-        this.baseTickRate = this.getConfig("level-settings.base-tick-rate", 1);
-        this.alwaysTickPlayers = this.getConfig("level-settings.always-tick-players", false);
-
-        this.autoSaveTicks = this.getConfig("ticks-per.autosave", 6000);
-
-        this.shouldSavePlayerData = this.getConfig("player.save-player-data", true);
-        this.skinChangeCooldown = this.getConfig("player.skin-change-cooldown", 15);
-        this.attackStopSprint = this.getConfig("player.attack-stop-sprint", true);
-
-        this.chunksPerTick = this.getConfig("chunk-sending.per-tick", 4);
-        this.spawnThreshold = this.getConfig("spawn-threshold", 56);
-        this.cacheChunks = this.getConfig("cache-chunks", false);
-
-        this.spawnThresholdRadius = (int) Math.ceil(Math.sqrt(this.spawnThreshold));
-
-        /* server.properties */
-
-        this.maxPlayers = this.getPropertyInt("max-players", 20);
-        this.xboxAuth = this.getPropertyBoolean("xbox-auth", true);
-        this.achievementsEnabled = this.getPropertyBoolean("achievements", true);
-        this.pvpEnabled = this.getPropertyBoolean("pvp", true);
-        this.announceAchievements = this.getPropertyBoolean("announce-player-achievements", true);
-        this.allowFlight = this.getPropertyBoolean("allow-flight", false);
-        this.isHardcore = this.getPropertyBoolean("hardcore", false);
-        this.forceResources = this.getPropertyBoolean("force-resources", false);
-        this.forceResourcesAllowOwnPacks = this.getPropertyBoolean("force-resources-allow-client-packs", false);
-        this.whitelistEnabled = this.getPropertyBoolean("white-list", false);
-        this.forceGamemode = this.getPropertyBoolean("force-gamemode", false);
-        this.motd = this.getPropertyString("motd", "A Minecraft Server");
-        this.viewDistance = this.getPropertyInt("view-distance", 10);
-        this.port = this.getPropertyInt("server-port", 19132);
-        this.ip = this.getPropertyString("server-ip", "0.0.0.0");
-        this.spawnRadius = this.getPropertyInt("spawn-protection", 16);
-
-        this.setAutoSave(this.getPropertyBoolean("auto-save", true));
-
-        try {
-            this.gamemode = this.getPropertyInt("gamemode", 0) & 0b11;
-        } catch (NumberFormatException exception) {
-            this.gamemode = getGamemodeFromString(this.getPropertyString("gamemode", "0")) & 0b11;
-        }
-
-        if (this.isHardcore && this.difficulty < 3) {
-            this.setDifficulty(3);
-        } else {
-            this.setDifficulty(getDifficultyFromString(this.getPropertyString("difficulty", "2")));
-        }
-    }
-
-    /**
-     * This class contains all default server.properties values.
-     */
-    private static class ServerProperties extends ConfigSection {
-        {
-            put("motd", "A Minecraft Server");
-            put("sub-motd", "Powered by Nukkit");
-            put("server-port", 19132);
-            put("server-ip", "0.0.0.0");
-            put("view-distance", 10);
-            put("achievements", true);
-            put("announce-player-achievements", true);
-            put("spawn-protection", 16);
-            put("gamemode", 0);
-            put("force-gamemode", false);
-            put("difficulty", 2);
-            put("hardcore", false);
-            put("pvp", true);
-            put("white-list", false);
-            put("generator-settings", "");
-            put("level-name", "world");
-            put("level-seed", "");
-            put("level-type", "default");
-            put("enable-rcon", false);
-            put("rcon.password", Base64.getEncoder().encodeToString(UUID.randomUUID().toString().replace("-", "").getBytes(StandardCharsets.UTF_8)).substring(3, 13));
-            put("force-resources", false);
-            put("force-resources-allow-client-packs", false);
-            put("xbox-auth", true);
-            put("auto-save", true);
-            put("force-language", false);
-            put("enable-query", false);
-            put("allow-flight", false);
-            put("allow-nether", true);
-            put("allow-the-end", true);
-        }
-    }
-
-    private class ConsoleThread extends Thread implements InterruptibleThread {
-
-        @Override
-        public void run() {
-            console.start();
-        }
-    }
 }

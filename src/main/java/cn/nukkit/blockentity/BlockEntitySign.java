@@ -7,6 +7,7 @@ import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.nbt.tag.ByteTag;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.IntTag;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
@@ -24,6 +25,46 @@ public class BlockEntitySign extends BlockEntitySpawnable {
 
     public BlockEntitySign(FullChunk chunk, CompoundTag nbt) {
         super(chunk, nbt);
+    }
+
+    public BlockColor getColor() {
+        return new BlockColor(this.namedTag.getInt("SignTextColor"), true);
+    }
+
+    @Override
+    public CompoundTag getSpawnCompound() {
+        return new CompoundTag()
+                .putString("id", BlockEntity.SIGN)
+                .putString("Text", this.namedTag.getString("Text"))
+                .putInt("SignTextColor", this.getColor().getARGB())
+                .putBoolean("IgnoreLighting", this.isGlowing())
+                .putBoolean("TextIgnoreLegacyBugResolved", true)
+                .putInt("x", (int) this.x)
+                .putInt("y", (int) this.y)
+                .putInt("z", (int) this.z);
+    }
+
+    public String[] getText() {
+        return text;
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return getLevelBlock() instanceof BlockSignPost;
+    }
+
+    public boolean isGlowing() {
+        return this.namedTag.getBoolean("IgnoreLighting");
+    }
+
+    public void setColor(BlockColor color) {
+        this.namedTag.putInt("SignTextColor", color.getARGB());
+        setDirty();
+    }
+
+    public void setGlowing(boolean glowing) {
+        this.namedTag.putBoolean("IgnoreLighting", glowing);
+        setDirty();
     }
 
     @Override
@@ -71,15 +112,19 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         super.initBlockEntity();
     }
 
+    private static void sanitizeText(String[] lines) {
+        for (int i = 0; i < lines.length; i++) {
+            // Don't allow excessive text per line
+            if (lines[i] != null) {
+                lines[i] = lines[i].substring(0, Math.min(200, lines[i].length()));
+            }
+        }
+    }
+
     @Override
     public void saveNBT() {
         super.saveNBT();
         this.namedTag.remove("Creator");
-    }
-
-    @Override
-    public boolean isBlockEntityValid() {
-        return getLevelBlock() instanceof BlockSignPost;
     }
 
     public boolean setText(String... lines) {
@@ -97,28 +142,6 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         return true;
     }
 
-    public String[] getText() {
-        return text;
-    }
-
-    public BlockColor getColor() {
-        return new BlockColor(this.namedTag.getInt("SignTextColor"), true);
-    }
-
-    public void setColor(BlockColor color) {
-        this.namedTag.putInt("SignTextColor", color.getARGB());
-        setDirty();
-    }
-
-    public boolean isGlowing() {
-        return this.namedTag.getBoolean("IgnoreLighting");
-    }
-
-    public void setGlowing(boolean glowing) {
-        this.namedTag.putBoolean("IgnoreLighting", glowing);
-        setDirty();
-    }
-
     @Override
     public boolean updateCompoundTag(CompoundTag nbt, Player player) {
         if (!nbt.getString("id").equals(BlockEntity.SIGN)) {
@@ -126,7 +149,7 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         }
         String[] lines = new String[4];
         Arrays.fill(lines, "");
-        String receivedText = nbt.getCompound("FrontText").getString("Text");
+        String receivedText = player.protocol >= ProtocolInfo.v1_19_80 ? nbt.getCompound("FrontText").getString("Text") : nbt.getString("Text");
         String[] splitLines = receivedText.split("\n", 4);
         System.arraycopy(splitLines, 0, lines, 0, splitLines.length);
 
@@ -152,27 +175,5 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         }
 
         return false;
-    }
-
-    @Override
-    public CompoundTag getSpawnCompound() {
-        return new CompoundTag()
-                .putString("id", BlockEntity.SIGN)
-                .putString("Text", this.namedTag.getString("Text"))
-                .putInt("SignTextColor", this.getColor().getARGB())
-                .putBoolean("IgnoreLighting", this.isGlowing())
-                .putBoolean("TextIgnoreLegacyBugResolved", true)
-                .putInt("x", (int) this.x)
-                .putInt("y", (int) this.y)
-                .putInt("z", (int) this.z);
-    }
-
-    private static void sanitizeText(String[] lines) {
-        for (int i = 0; i < lines.length; i++) {
-            // Don't allow excessive text per line
-            if (lines[i] != null) {
-                lines[i] = lines[i].substring(0, Math.min(200, lines[i].length()));
-            }
-        }
     }
 }

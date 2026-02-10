@@ -10,13 +10,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BlockDragonEgg extends BlockFallable {
 
     @Override
-    public String getName() {
-        return "Dragon Egg";
-    }
-
-    @Override
-    public int getId() {
-        return DRAGON_EGG;
+    public BlockColor getColor() {
+        return BlockColor.BLACK_BLOCK_COLOR;
     }
 
     @Override
@@ -25,8 +20,8 @@ public class BlockDragonEgg extends BlockFallable {
     }
 
     @Override
-    public double getResistance() {
-        return 9;
+    public int getId() {
+        return DRAGON_EGG;
     }
 
     @Override
@@ -35,12 +30,32 @@ public class BlockDragonEgg extends BlockFallable {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.BLACK_BLOCK_COLOR;
+    public String getName() {
+        return "Dragon Egg";
+    }
+
+    @Override
+    public double getResistance() {
+        return 9;
+    }
+
+    @Override
+    public WaterloggingType getWaterloggingType() {
+        return WaterloggingType.WHEN_PLACED_IN_WATER;
     }
 
     @Override
     public boolean isTransparent() {
+        return true;
+    }
+
+    @Override
+    public boolean alwaysDropsOnExplosion() {
+        return true;
+    }
+
+    @Override
+    public boolean breakWhenPushed() {
         return true;
     }
 
@@ -53,6 +68,7 @@ public class BlockDragonEgg extends BlockFallable {
     }
 
     public void teleport() {
+        if (!level.randomTickingEnabled()) return;
         ThreadLocalRandom random = ThreadLocalRandom.current();
         for (int i = 0; i < 1000; ++i) {
             Block to = this.getLevel().getBlock(this.add(random.nextInt(-16, 16), random.nextInt(-16, 16), random.nextInt(-16, 16)));
@@ -76,20 +92,5 @@ public class BlockDragonEgg extends BlockFallable {
                 return;
             }
         }
-    }
-
-    @Override
-    public WaterloggingType getWaterloggingType() {
-        return WaterloggingType.WHEN_PLACED_IN_WATER;
-    }
-
-    @Override
-    public boolean breakWhenPushed() {
-        return true;
-    }
-
-    @Override
-    public boolean alwaysDropsOnExplosion() {
-        return true;
     }
 }

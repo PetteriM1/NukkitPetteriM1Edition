@@ -1,11 +1,13 @@
 package cn.nukkit.network.protocol.types;
 
+import cn.nukkit.Nukkit;
 import cn.nukkit.Player;
-import cn.nukkit.block.BlockID;
 import cn.nukkit.inventory.*;
 import cn.nukkit.inventory.transaction.action.*;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemID;
 import cn.nukkit.network.protocol.InventoryTransactionPacket;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import lombok.ToString;
 
 import java.util.Optional;
@@ -18,7 +20,7 @@ public class NetworkInventoryAction {
 
     public static final int SOURCE_CONTAINER = 0;
 
-    public static final int SOURCE_WORLD = 2; //drop/pickup item entity
+    public static final int SOURCE_WORLD = 2;
     public static final int SOURCE_CREATIVE = 3;
     public static final int SOURCE_TODO = 99999;
     public static final int SOURCE_CRAFT_SLOT = 100;
@@ -66,71 +68,6 @@ public class NetworkInventoryAction {
     public Item oldItem;
     public Item newItem;
 
-    public NetworkInventoryAction read(InventoryTransactionPacket packet) {
-        this.sourceType = (int) packet.getUnsignedVarInt();
-
-        switch (this.sourceType) {
-            case SOURCE_CONTAINER:
-                this.windowId = packet.getVarInt();
-                break;
-            case SOURCE_WORLD:
-                this.flags = packet.getUnsignedVarInt();
-                break;
-            case SOURCE_CREATIVE:
-                break;
-            case SOURCE_CRAFT_SLOT:
-            case SOURCE_TODO:
-                this.windowId = packet.getVarInt();
-
-                switch (this.windowId) {
-                    case SOURCE_TYPE_CRAFTING_RESULT:
-                    case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
-                        packet.isCraftingPart = true;
-                        break;
-                    case SOURCE_TYPE_ENCHANT_INPUT:
-                    case SOURCE_TYPE_ENCHANT_OUTPUT:
-                    case SOURCE_TYPE_ENCHANT_MATERIAL:
-                        packet.isEnchantingPart = true;
-                        break;
-                    case SOURCE_TYPE_ANVIL_INPUT:
-                    case SOURCE_TYPE_ANVIL_MATERIAL:
-                    case SOURCE_TYPE_ANVIL_RESULT:
-                        packet.isRepairItemPart = true;
-                        break;
-                }
-                break;
-        }
-
-        this.inventorySlot = (int) packet.getUnsignedVarInt();
-        this.oldItem = packet.getSlot();
-        this.newItem = packet.getSlot();
-
-        return this;
-    }
-
-    public void write(InventoryTransactionPacket packet) {
-        packet.putUnsignedVarInt(this.sourceType);
-
-        switch (this.sourceType) {
-            case SOURCE_CONTAINER:
-                packet.putVarInt(this.windowId);
-                break;
-            case SOURCE_WORLD:
-                packet.putUnsignedVarInt(this.flags);
-                break;
-            case SOURCE_CREATIVE:
-                break;
-            case SOURCE_CRAFT_SLOT:
-            case SOURCE_TODO:
-                packet.putVarInt(this.windowId);
-                break;
-        }
-
-        packet.putUnsignedVarInt(this.inventorySlot);
-        packet.putSlot(this.oldItem);
-        packet.putSlot(this.newItem);
-    }
-
     public InventoryAction createInventoryAction(Player player) {
         switch (this.sourceType) {
             case SOURCE_CONTAINER:
@@ -138,19 +75,23 @@ public class NetworkInventoryAction {
                     this.inventorySlot += 36;
                     this.windowId = ContainerIds.INVENTORY;
                     if (this.newItem == null ||
-                            (this.inventorySlot == 36 && !(this.newItem.canBePutInHelmetSlot() || this.newItem.getId() == (255 - BlockID.CARVED_PUMPKIN)) && !(this.oldItem.canBePutInHelmetSlot() || this.oldItem.getId() == (255 - BlockID.CARVED_PUMPKIN))) ||
+                            (this.inventorySlot == 36 && !(this.newItem.canBePutInHelmetSlot() || this.newItem.getId() == (255 - Item.CARVED_PUMPKIN)) && !(this.oldItem.canBePutInHelmetSlot() || this.oldItem.getId() == (255 - Item.CARVED_PUMPKIN))) ||
                             (this.inventorySlot == 37 && !this.newItem.isChestplate() && !this.oldItem.isChestplate()) ||
                             (this.inventorySlot == 38 && !this.newItem.isLeggings() && !this.oldItem.isLeggings()) ||
                             (this.inventorySlot == 39 && !this.newItem.isBoots()) && !this.oldItem.isBoots()) {
                         player.getServer().getLogger().warning(player.getName() + " tried to set an invalid armor item");
+                        if (Nukkit.DEBUG > 1 || player.getServer().suomiCraftPEMode()) {
+                            player.getServer().getLogger().warning("newItem=" + this.newItem + ", oldItem=" + this.oldItem);
+                        }
                         return null;
                     }
                 }
 
                 // ID 124 with slot 14/15 is enchant inventory
-                if (this.windowId == ContainerIds.UI) {
+                if (this.windowId == ContainerIds.UI && player.protocol >= ProtocolInfo.v1_16_0) {
                     switch (this.inventorySlot) {
                         case PlayerUIComponent.CREATED_ITEM_OUTPUT_UI_SLOT:
+                            // This is used by both crafting table and anvil
                             if (player.getWindowById(Player.ANVIL_WINDOW_ID) instanceof AnvilInventory) {
                                 this.windowId = Player.ANVIL_WINDOW_ID;
                                 this.inventorySlot = 2;
@@ -344,11 +285,61 @@ public class NetworkInventoryAction {
 
                     switch (this.windowId) {
                         case SOURCE_TYPE_ENCHANT_INPUT:
-                            return new EnchantingAction(this.oldItem, this.newItem, SOURCE_TYPE_ENCHANT_INPUT);
+                            if (player.protocol < 407) {
+                                if (this.inventorySlot != 0) {
+                                    // Input should only be in slot 0
+                                    return null;
+                                }
+                                break;
+                            } else {
+                                return new EnchantingAction(this.oldItem, this.newItem, SOURCE_TYPE_ENCHANT_INPUT);
+                            }
                         case SOURCE_TYPE_ENCHANT_MATERIAL:
-                            return new EnchantingAction(this.newItem, this.oldItem, SOURCE_TYPE_ENCHANT_MATERIAL); // Mojang ish backwards?
+                            if (player.protocol < 407) {
+                                if (this.inventorySlot != 1) {
+                                    // Material should only be in slot 1
+                                    return null;
+                                }
+                            } else {
+                                return new EnchantingAction(this.newItem, this.oldItem, SOURCE_TYPE_ENCHANT_MATERIAL); // Mojang ish backwards?
+                            }
+                            break;
                         case SOURCE_TYPE_ENCHANT_OUTPUT:
-                            return new EnchantingAction(this.oldItem, this.newItem, SOURCE_TYPE_ENCHANT_OUTPUT);
+                            if (player.protocol < 407) {
+                                if (this.inventorySlot != 0) {
+                                    // Outputs should only be in slot 0
+                                    return null;
+                                }
+                                if (Item.get(Item.DYE, 4).equals(this.newItem, true, false)) {
+                                    this.inventorySlot = 2; // Fake slot to store used material
+                                    if (this.newItem.getCount() < 1 || this.newItem.getCount() > 3) {
+                                        // Invalid material
+                                        return null;
+                                    }
+                                    Item material = enchant.getItem(1);
+                                    // Material to take away.
+                                    int toRemove = this.newItem.getCount();
+                                    if (material.getId() != ItemID.DYE && material.getDamage() != 4 &&
+                                            material.getCount() < toRemove) {
+                                        // Invalid material or not enough
+                                        return null;
+                                    }
+                                } else {
+                                    Item toEnchant = enchant.getItem(0);
+                                    Item material = enchant.getItem(1);
+                                    if (toEnchant.equals(this.newItem, true, true) &&
+                                            (material.getId() == ItemID.DYE && material.getDamage() == 4 || player.isCreative())) {
+                                        this.inventorySlot = 3; // Fake slot to store the resultant item
+
+                                        //TODO: Check (old) item has valid enchantments
+                                        enchant.setItem(3, this.oldItem, false);
+                                    } else {
+                                        return null;
+                                    }
+                                }
+                            } else {
+                                return new EnchantingAction(this.oldItem, this.newItem, SOURCE_TYPE_ENCHANT_OUTPUT);
+                            }
                     }
 
                     return new SlotChangeAction(enchant, this.inventorySlot, this.oldItem, this.newItem);
@@ -372,6 +363,79 @@ public class NetworkInventoryAction {
             default:
                 player.getServer().getLogger().debug("Unknown inventory source type " + this.sourceType);
                 return null;
+        }
+    }
+
+    public NetworkInventoryAction read(InventoryTransactionPacket packet) {
+        this.sourceType = (int) packet.getUnsignedVarInt();
+
+        switch (this.sourceType) {
+            case SOURCE_CONTAINER:
+                this.windowId = packet.getVarInt();
+                break;
+            case SOURCE_WORLD:
+                this.flags = packet.getUnsignedVarInt();
+                break;
+            case SOURCE_CREATIVE:
+                break;
+            case SOURCE_CRAFT_SLOT:
+            case SOURCE_TODO:
+                this.windowId = packet.getVarInt();
+
+                switch (this.windowId) {
+                    case SOURCE_TYPE_CRAFTING_RESULT:
+                    case SOURCE_TYPE_CRAFTING_USE_INGREDIENT:
+                        packet.isCraftingPart = true;
+                        break;
+                    case SOURCE_TYPE_ENCHANT_INPUT:
+                    case SOURCE_TYPE_ENCHANT_OUTPUT:
+                    case SOURCE_TYPE_ENCHANT_MATERIAL:
+                        packet.isEnchantingPart = true;
+                        break;
+                    case SOURCE_TYPE_ANVIL_INPUT:
+                    case SOURCE_TYPE_ANVIL_MATERIAL:
+                    case SOURCE_TYPE_ANVIL_RESULT:
+                        packet.isRepairItemPart = true;
+                        break;
+                }
+                break;
+        }
+
+        this.inventorySlot = (int) packet.getUnsignedVarInt();
+        this.oldItem = packet.getSlot(packet.protocol);
+        this.newItem = packet.getSlot(packet.protocol);
+
+        if (packet.hasNetworkIds && packet.protocol >= 407 && packet.protocol < ProtocolInfo.v1_16_220) {
+            packet.getVarInt(); //stackNetworkId
+        }
+
+        return this;
+    }
+
+    public void write(InventoryTransactionPacket packet) {
+        packet.putUnsignedVarInt(this.sourceType);
+
+        switch (this.sourceType) {
+            case SOURCE_CONTAINER:
+                packet.putVarInt(this.windowId);
+                break;
+            case SOURCE_WORLD:
+                packet.putUnsignedVarInt(this.flags);
+                break;
+            case SOURCE_CREATIVE:
+                break;
+            case SOURCE_CRAFT_SLOT:
+            case SOURCE_TODO:
+                packet.putVarInt(this.windowId);
+                break;
+        }
+
+        packet.putUnsignedVarInt(this.inventorySlot);
+        packet.putSlot(packet.protocol, this.oldItem);
+        packet.putSlot(packet.protocol, this.newItem);
+
+        if (packet.hasNetworkIds && packet.protocol >= 407 && packet.protocol < ProtocolInfo.v1_16_220) {
+            packet.putVarInt(0); //stackNetworkId
         }
     }
 }

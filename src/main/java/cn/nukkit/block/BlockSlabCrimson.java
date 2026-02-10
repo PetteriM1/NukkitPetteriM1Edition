@@ -16,8 +16,8 @@ public class BlockSlabCrimson extends BlockSlab {
     }
 
     @Override
-    public String getSlabName() {
-        return "Crimson";
+    public BlockColor getColor() {
+        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 
     @Override
@@ -26,18 +26,18 @@ public class BlockSlabCrimson extends BlockSlab {
     }
 
     @Override
-    public boolean hasTopBit() {
-        return (this.getDamage() & 0x01) == 1;
-    }
-
-    @Override
-    public void setTopBit(boolean topBit) {
-        this.setDamage(topBit ? 1 : 0);
+    public String getSlabName() {
+        return "Crimson";
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_AXE;
+    }
+
+    @Override
+    public void setTopBit(boolean topBit) {
+        this.setDamage(topBit ? 1 : 0);
     }
 
     @Override
@@ -48,17 +48,12 @@ public class BlockSlabCrimson extends BlockSlab {
     }
 
     @Override
+    public boolean hasTopBit() {
+        return (this.getDamage() & 0x01) == 1;
+    }
+
+    @Override
     public Item toItem() {
         return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public double getResistance() {
-        return 3;
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.NETHERRACK_BLOCK_COLOR;
     }
 }

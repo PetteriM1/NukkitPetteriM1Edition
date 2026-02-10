@@ -43,13 +43,30 @@ public class BlockRailDetector extends BlockRail {
     }
 
     @Override
-    public int getWeakPower(BlockFace side) {
-        return isActive() ? 15 : 0;
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                toItem()
+        };
     }
 
     @Override
     public int getStrongPower(BlockFace side) {
         return !isActive() ? 0 : (side == BlockFace.UP ? 15 : 0);
+    }
+
+    @Override
+    public int getWeakPower(BlockFace side) {
+        return isActive() ? 15 : 0;
+    }
+
+    @Override
+    public boolean hasEntityCollision() {
+        return true;
+    }
+
+    @Override
+    public void onEntityCollide(Entity entity) {
+        updateState();
     }
 
     @Override
@@ -62,13 +79,8 @@ public class BlockRailDetector extends BlockRail {
     }
 
     @Override
-    public boolean hasEntityCollision() {
-        return true;
-    }
-
-    @Override
-    public void onEntityCollide(Entity entity) {
-        updateState();
+    public Item toItem() {
+        return new ItemBlock(Block.get(this.getId(), 0), 0);
     }
 
     protected void updateState() {
@@ -106,17 +118,5 @@ public class BlockRailDetector extends BlockRail {
         if (changed) {
             level.updateComparatorOutputLevel(this);
         }
-    }
-
-    @Override
-    public Item toItem() {
-        return new ItemBlock(Block.get(this.getId(), 0), 0);
-    }
-
-    @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                toItem()
-        };
     }
 }

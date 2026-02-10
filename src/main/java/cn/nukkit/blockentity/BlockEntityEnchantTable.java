@@ -15,30 +15,8 @@ public class BlockEntityEnchantTable extends BlockEntitySpawnable implements Blo
     }
 
     @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.ENCHANT_TABLE;
-    }
-
-    @Override
     public String getName() {
         return this.hasName() ? this.namedTag.getString("CustomName") : "Enchanting Table";
-    }
-
-    @Override
-    public boolean hasName() {
-        return this.namedTag.contains("CustomName");
-    }
-
-    @Override
-    public void setName(String name) {
-        setDirty();
-
-        if (name == null || name.isEmpty()) {
-            this.namedTag.remove("CustomName");
-            return;
-        }
-
-        this.namedTag.putString("CustomName", name);
     }
 
     @Override
@@ -54,5 +32,27 @@ public class BlockEntityEnchantTable extends BlockEntitySpawnable implements Blo
         }
 
         return c;
+    }
+
+    @Override
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.ENCHANT_TABLE;
+    }
+
+    @Override
+    public void setName(String name) {
+        setDirty();
+
+        if (name == null || name.isEmpty()) {
+            this.namedTag.remove("CustomName");
+            return;
+        }
+
+        this.namedTag.putString("CustomName", name);
+    }
+
+    @Override
+    public boolean hasName() {
+        return this.namedTag.contains("CustomName");
     }
 }

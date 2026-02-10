@@ -7,7 +7,7 @@ import cn.nukkit.math.BlockFace;
 
 public class BlockWoodBark extends BlockWood {
 
-    private static final String[] NAMES = {
+    private static final String[] names = {
             "Oak Wood",
             "Spruce Wood",
             "Birch Wood",
@@ -26,11 +26,6 @@ public class BlockWoodBark extends BlockWood {
     }
 
     @Override
-    public void setDamage(int meta) {
-        super.setDamage(meta);
-    }
-
-    @Override
     public int getId() {
         return WOOD_BARK;
     }
@@ -38,15 +33,10 @@ public class BlockWoodBark extends BlockWood {
     @Override
     public String getName() {
         int variant = (this.getDamage() & 0x7);
-        if (NAMES.length <= variant) {
-            return NAMES[0];
+        if (names.length <= variant) {
+            return names[0];
         }
-        return NAMES[variant];
-    }
-
-    @Override
-    protected int getStrippedId() {
-        return this.getId();
+        return names[variant];
     }
 
     @Override
@@ -55,14 +45,24 @@ public class BlockWoodBark extends BlockWood {
     }
 
     @Override
-    public Item toItem() {
-        int meta = this.getDamage() & 0xF;
-        return new ItemBlock(Block.get(WOOD_BARK, meta), meta);
+    protected int getStrippedId() {
+        return this.getId();
+    }
+
+    @Override
+    public void setDamage(int meta) {
+        super.setDamage(meta);
     }
 
     @Override
     public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
         //this.setPillarAxis(face.getAxis());
         return this.getLevel().setBlock(block, this, true, true);
+    }
+
+    @Override
+    public Item toItem() {
+        int meta = this.getDamage() & 0xF;
+        return new ItemBlock(Block.get(WOOD_BARK, meta), meta);
     }
 }

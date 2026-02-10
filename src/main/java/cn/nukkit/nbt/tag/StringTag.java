@@ -20,28 +20,8 @@ public class StringTag extends Tag {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeUTF(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readUTF();
-    }
-
-    @Override
-    public String parseValue() {
-        return this.data;
-    }
-
-    @Override
     public byte getId() {
         return TAG_String;
-    }
-
-    @Override
-    public String toString() {
-        return "StringTag " + this.getName() + " (data: " + data + ')';
     }
 
     @Override
@@ -56,5 +36,25 @@ public class StringTag extends Tag {
             return ((data == null && o.data == null) || (data != null && data.equals(o.data)));
         }
         return false;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readUTF(65535);
+    }
+
+    @Override
+    public String parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "StringTag " + this.getName() + " (data: " + data + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeUTF(data);
     }
 }

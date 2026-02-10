@@ -3,6 +3,7 @@ package cn.nukkit.item.enchantment;
 /**
  * @author Nukkit Project Team
  */
+@Deprecated
 public class EnchantmentList {
 
     private final EnchantmentEntry[] enchantments;
@@ -11,21 +12,16 @@ public class EnchantmentList {
         this.enchantments = new EnchantmentEntry[size];
     }
 
-    /**
-     * @param slot  The index of enchantment.
-     * @param entry The given enchantment entry.
-     * @return {@link EnchantmentList}
-     */
-    public EnchantmentList setSlot(int slot, EnchantmentEntry entry) {
-        enchantments[slot] = entry;
-        return this;
+    public int getSize() {
+        return enchantments.length;
     }
 
     public EnchantmentEntry getSlot(int slot) {
         return enchantments[slot];
     }
 
-    public int getSize() {
-        return enchantments.length;
+    public EnchantmentList setSlot(int slot, EnchantmentEntry entry) {
+        enchantments[slot] = entry;
+        return this;
     }
 }

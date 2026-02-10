@@ -5,8 +5,8 @@ import cn.nukkit.item.ItemTool;
 public class BlockSmoothStone extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Smooth Stone";
+    public double getHardness() {
+        return 1.5; // 2
     }
 
     @Override
@@ -15,8 +15,8 @@ public class BlockSmoothStone extends BlockSolid {
     }
 
     @Override
-    public double getHardness() {
-        return 2;
+    public String getName() {
+        return "Smooth Stone";
     }
 
     @Override

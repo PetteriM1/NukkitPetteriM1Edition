@@ -18,13 +18,8 @@ public class BlockStonecutterBlock extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public String getName() {
-        return "Stonecutter Block";
-    }
-
-    @Override
-    public int getId() {
-        return STONECUTTER_BLOCK;
+    public BlockFace getBlockFace() {
+        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
     }
 
     @Override
@@ -33,18 +28,8 @@ public class BlockStonecutterBlock extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public double getResistance() {
-        return 17.5;
-    }
-
-    @Override
-    public boolean canHarvestWithHand() {
-        return false;
-    }
-
-    @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public int getId() {
+        return STONECUTTER_BLOCK;
     }
 
     @Override
@@ -53,14 +38,29 @@ public class BlockStonecutterBlock extends BlockSolidMeta implements Faceable {
     }
 
     @Override
-    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
-        this.setDamage(Block.FACES2534[player != null ? player.getDirection().getHorizontalIndex() : 0]);
-        return super.place(item, block, target, face, fx, fy, fz, player);
+    public String getName() {
+        return "Stonecutter Block";
     }
 
     @Override
-    public BlockFace getBlockFace() {
-        return BlockFace.fromHorizontalIndex(this.getDamage() & 0x7);
+    public double getResistance() {
+        return 17.5;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
+    }
+
+    @Override
+    public boolean canHarvestWithHand() {
+        return false;
+    }
+
+    @Override
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        this.setDamage(Block.FACES2534[player != null ? player.getDirection().getHorizontalIndex() : 0]);
+        return super.place(item, block, target, face, fx, fy, fz, player);
     }
 
     @Override

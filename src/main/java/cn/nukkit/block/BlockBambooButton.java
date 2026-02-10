@@ -1,5 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.material.BlockType;
+
 public class BlockBambooButton extends BlockButtonWooden {
 
     public BlockBambooButton() {
@@ -11,12 +14,22 @@ public class BlockBambooButton extends BlockButtonWooden {
     }
 
     @Override
+    public int getId() {
+        return BAMBOO_BUTTON;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
     public String getName() {
         return "Bamboo Button";
     }
 
     @Override
-    public int getId() {
-        return BAMBOO_BUTTON;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.WOODEN_BUTTON;
     }
 }

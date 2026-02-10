@@ -13,10 +13,6 @@ public class CampfireRecipe implements Recipe {
         this.ingredient = ingredient.clone();
     }
 
-    public void setInput(Item item) {
-        this.ingredient = item.clone();
-    }
-
     public Item getInput() {
         return this.ingredient.clone();
     }
@@ -27,12 +23,16 @@ public class CampfireRecipe implements Recipe {
     }
 
     @Override
-    public void registerToCraftingManager(CraftingManager manager) {
-        manager.registerCampfireRecipe(this);
+    public RecipeType getType() {
+        return this.ingredient.hasMeta() ? RecipeType.CAMPFIRE_DATA : RecipeType.CAMPFIRE;
+    }
+
+    public void setInput(Item item) {
+        this.ingredient = item.clone();
     }
 
     @Override
-    public RecipeType getType() {
-        return this.ingredient.hasMeta() ? RecipeType.CAMPFIRE_DATA : RecipeType.CAMPFIRE;
+    public void registerToCraftingManager(CraftingManager manager) {
+        manager.registerCampfireRecipe(this);
     }
 }

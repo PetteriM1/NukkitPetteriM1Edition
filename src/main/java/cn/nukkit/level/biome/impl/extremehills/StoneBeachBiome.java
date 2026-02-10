@@ -6,7 +6,7 @@ import cn.nukkit.level.biome.type.CoveredBiome;
  * @author DaPorkchop_
  * <p>
  * Occurs when Extreme hills and variants touch the ocean.
- *
+ * <p>
  * Nearly ertical cliffs, but no overhangs. Height difference is 2-7 near ocean, and pretty much flat everywhere else
  */
 public class StoneBeachBiome extends CoveredBiome {
@@ -17,13 +17,8 @@ public class StoneBeachBiome extends CoveredBiome {
     }
 
     @Override
-    public int getSurfaceDepth(int x, int y, int z) {
-        return 0;
-    }
-
-    @Override
-    public int getSurfaceId(int x, int y, int z) {
-        return 0;
+    public String getName() {
+        return "Stone Beach";
     }
 
     @Override
@@ -37,7 +32,12 @@ public class StoneBeachBiome extends CoveredBiome {
     }
 
     @Override
-    public String getName() {
-        return "Stone Beach";
+    public int getSurfaceDepth(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override
+    public int getSurfaceId(int x, int y, int z) {
+        return 0;
     }
 }

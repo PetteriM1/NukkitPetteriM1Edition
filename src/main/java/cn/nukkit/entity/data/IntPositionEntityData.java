@@ -31,17 +31,17 @@ public class IntPositionEntityData extends EntityData<BlockVector3> {
     }
 
     @Override
+    public int getType() {
+        return Entity.DATA_TYPE_POS;
+    }
+
+    @Override
     public void setData(BlockVector3 data) {
         if (data != null) {
             this.x = data.x;
             this.y = data.y;
             this.z = data.z;
         }
-    }
-
-    @Override
-    public int getType() {
-        return Entity.DATA_TYPE_POS;
     }
 
     @Override

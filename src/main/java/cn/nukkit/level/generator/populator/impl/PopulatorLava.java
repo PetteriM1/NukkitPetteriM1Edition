@@ -13,32 +13,62 @@ public class PopulatorLava extends Populator {
     private int baseAmount;
     private NukkitRandom random;
 
-    public void setRandomAmount(int amount) {
-        this.randomAmount = amount;
-    }
-
     public void setBaseAmount(int amount) {
         this.baseAmount = amount;
     }
 
-    @Override
-    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
-        this.random = random;
-        if (random.nextRange(0, 100) < 5) {
-            this.level = level;
-            int amount = random.nextRange(0, this.randomAmount + 1) + this.baseAmount;
-            int bx = chunkX << 4;
-            int bz = chunkZ << 4;
-            for (int i = 0; i < amount; ++i) {
-                int x = random.nextRange(0, 15);
-                int z = random.nextRange(0, 15);
-                int y = getHighestWorkableBlock(chunk, x, z);
-                if (y != -1 && chunk.getBlockId(x, y, z) == Block.AIR) {
-                    chunk.setBlock(x, y, z, Block.LAVA);
-                    chunk.setBlockLight(x, y, z, Block.getBlockLight(Block.LAVA));
-                    this.lavaSpread(bx + x, y, bz + z);
+    public void setRandomAmount(int amount) {
+        this.randomAmount = amount;
+    }
+
+    private int calculateFlowCost(int xx, int yy, int zz, int accumulatedCost, int previousDirection) {
+        int cost = 1000;
+        for (int j = 0; j < 4; ++j) {
+            if (
+                    (j == 0 && previousDirection == 1) ||
+                            (j == 1 && previousDirection == 0) ||
+                            (j == 2 && previousDirection == 3) ||
+                            (j == 3 && previousDirection == 2)
+            ) {
+                int x = xx;
+                int z = zz;
+                if (j == 0) {
+                    --x;
+                } else if (j == 1) {
+                    ++x;
+                } else if (j == 2) {
+                    --z;
+                } else if (j == 3) {
+                    ++z;
+                }
+                if (!this.canFlowInto(x, yy, z)) {
+                    continue;
+                } else if (this.canFlowInto(x, yy, z) && this.level.getBlockDataAt(x, yy, z) == 0) {
+                    continue;
+                } else if (this.canFlowInto(x, yy - 1, z)) {
+                    return accumulatedCost;
+                }
+                if (accumulatedCost >= 4) {
+                    continue;
+                }
+                int realCost = this.calculateFlowCost(x, yy, z, accumulatedCost + 1, j);
+                if (realCost < cost) {
+                    cost = realCost;
                 }
             }
+        }
+        return cost;
+    }
+
+    private boolean canFlowInto(int x, int y, int z) {
+        int id = this.level.getBlockIdAt(x, y, z);
+        return id == Block.AIR || id == Block.LAVA || id == Block.STILL_LAVA;
+    }
+
+    private void flowIntoBlock(int x, int y, int z, int newFlowDecay) {
+        if (this.level.getBlockIdAt(x, y, z) == Block.AIR) {
+            this.level.setBlockAt(x, y, z, Block.LAVA, newFlowDecay);
+            this.lavaSpread(x, y, z);
         }
     }
 
@@ -48,6 +78,61 @@ public class PopulatorLava extends Populator {
         } else {
             return this.level.getBlockDataAt(x2, y2, z2);
         }
+    }
+
+    private static int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
+        int y;
+        for (y = 127; y >= 0; y--) {
+            int b = chunk.getBlockId(x, y, z);
+            if (b == Block.AIR) {
+                break;
+            }
+        }
+        return y == 0 ? -1 : y;
+    }
+
+    private boolean[] getOptimalFlowDirections(int xx, int yy, int zz) {
+        int[] flowCost = {0, 0, 0, 0};
+        boolean[] isOptimalFlowDirection = {false, false, false, false};
+        for (int j = 0; j < 4; ++j) {
+            flowCost[j] = 1000;
+            int x = xx;
+            int z = zz;
+            if (j == 0) {
+                --x;
+            } else if (j == 1) {
+                ++x;
+            } else if (j == 2) {
+                --z;
+            } else if (j == 3) {
+                ++z;
+            }
+            if (this.canFlowInto(x, yy - 1, z)) {
+                flowCost[j] = 0;
+            } else {
+                flowCost[j] = this.calculateFlowCost(x, yy, z, 1, j);
+            }
+        }
+        int minCost = flowCost[0];
+        for (int i = 1; i < 4; ++i) {
+            if (flowCost[i] < minCost) {
+                minCost = flowCost[i];
+            }
+        }
+        for (int i = 0; i < 4; ++i) {
+            isOptimalFlowDirection[i] = (flowCost[i] == minCost);
+        }
+        return isOptimalFlowDirection;
+    }
+
+    private int getSmallestFlowDecay(int x1, int y1, int z1, int x2, int y2, int z2, int decay) {
+        int blockDecay = this.getFlowDecay(x1, y1, z1, x2, y2, z2);
+        if (blockDecay < 0) {
+            return decay;
+        } else if (blockDecay >= 8) {
+            blockDecay = 0;
+        }
+        return (decay >= 0 && blockDecay >= decay) ? decay : blockDecay;
     }
 
     private void lavaSpread(int x, int y, int z) {
@@ -118,110 +203,24 @@ public class PopulatorLava extends Populator {
         }
     }
 
-    private void flowIntoBlock(int x, int y, int z, int newFlowDecay) {
-        if (this.level.getBlockIdAt(x, y, z) == Block.AIR) {
-            this.level.setBlockAt(x, y, z, Block.LAVA, newFlowDecay);
-            this.lavaSpread(x, y, z);
-        }
-    }
-
-    private boolean canFlowInto(int x, int y, int z) {
-        int id = this.level.getBlockIdAt(x, y, z);
-        return id == Block.AIR || id == Block.LAVA || id == Block.STILL_LAVA;
-    }
-
-    private int calculateFlowCost(int xx, int yy, int zz, int accumulatedCost, int previousDirection) {
-        int cost = 1000;
-        for (int j = 0; j < 4; ++j) {
-            if (
-                    (j == 0 && previousDirection == 1) ||
-                            (j == 1 && previousDirection == 0) ||
-                            (j == 2 && previousDirection == 3) ||
-                            (j == 3 && previousDirection == 2)
-                    ) {
-                int x = xx;
-                int z = zz;
-                if (j == 0) {
-                    --x;
-                } else if (j == 1) {
-                    ++x;
-                } else if (j == 2) {
-                    --z;
-                } else if (j == 3) {
-                    ++z;
-                }
-                if (!this.canFlowInto(x, yy, z)) {
-                    continue;
-                } else if (this.canFlowInto(x, yy, z) && this.level.getBlockDataAt(x, yy, z) == 0) {
-                    continue;
-                } else if (this.canFlowInto(x, yy - 1, z)) {
-                    return accumulatedCost;
-                }
-                if (accumulatedCost >= 4) {
-                    continue;
-                }
-                int realCost = this.calculateFlowCost(x, yy, z, accumulatedCost + 1, j);
-                if (realCost < cost) {
-                    cost = realCost;
+    @Override
+    public void populate(ChunkManager level, int chunkX, int chunkZ, NukkitRandom random, FullChunk chunk) {
+        this.random = random;
+        if (random.nextRange(0, 100) < 5) {
+            this.level = level;
+            int amount = random.nextRange(0, this.randomAmount + 1) + this.baseAmount;
+            int bx = chunkX << 4;
+            int bz = chunkZ << 4;
+            for (int i = 0; i < amount; ++i) {
+                int x = random.nextRange(0, 15);
+                int z = random.nextRange(0, 15);
+                int y = getHighestWorkableBlock(chunk, x, z);
+                if (y != -1 && chunk.getBlockId(x, y, z) == Block.AIR) {
+                    chunk.setBlock(x, y, z, Block.LAVA);
+                    chunk.setBlockLight(x, y, z, Block.getBlockLight(Block.LAVA));
+                    this.lavaSpread(bx + x, y, bz + z);
                 }
             }
         }
-        return cost;
-    }
-
-    private boolean[] getOptimalFlowDirections(int xx, int yy, int zz) {
-        int[] flowCost = {0, 0, 0, 0};
-        boolean[] isOptimalFlowDirection = {false, false, false, false};
-        for (int j = 0; j < 4; ++j) {
-            flowCost[j] = 1000;
-            int x = xx;
-            int z = zz;
-            if (j == 0) {
-                --x;
-            } else if (j == 1) {
-                ++x;
-            } else if (j == 2) {
-                --z;
-            } else if (j == 3) {
-                ++z;
-            }
-            if (this.canFlowInto(x, yy - 1, z)) {
-                flowCost[j] = 0;
-            } else {
-                flowCost[j] = this.calculateFlowCost(x, yy, z, 1, j);
-            }
-        }
-        int minCost = flowCost[0];
-        for (int i = 1; i < 4; ++i) {
-            if (flowCost[i] < minCost) {
-                minCost = flowCost[i];
-            }
-        }
-        for (int i = 0; i < 4; ++i) {
-            isOptimalFlowDirection[i] = (flowCost[i] == minCost);
-        }
-        return isOptimalFlowDirection;
-    }
-
-    private int getSmallestFlowDecay(int x1, int y1, int z1, int x2, int y2, int z2, int decay) {
-        int blockDecay = this.getFlowDecay(x1, y1, z1, x2, y2, z2);
-        if (blockDecay < 0) {
-            return decay;
-        } else if (blockDecay >= 8) {
-            blockDecay = 0;
-        }
-        return (decay >= 0 && blockDecay >= decay) ? decay : blockDecay;
-    }
-
-
-    private static int getHighestWorkableBlock(FullChunk chunk, int x, int z) {
-        int y;
-        for (y = 127; y >= 0; y--) {
-            int b = chunk.getBlockId(x, y, z);
-            if (b == Block.AIR) {
-                break;
-            }
-        }
-        return y == 0 ? -1 : y;
     }
 }

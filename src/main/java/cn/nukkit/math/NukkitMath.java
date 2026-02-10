@@ -6,13 +6,47 @@ package cn.nukkit.math;
  */
 public class NukkitMath {
 
-    public static int floorDouble(double n) {
-        int i = (int) n;
-        return n >= i ? i : i - 1;
+    public static double boundary(double start, double distance) {
+        if (distance == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        if (distance < 0) {
+            start = -start;
+            distance = -distance;
+
+            if (Math.floor(start) == start) {
+                return 0;
+            }
+        }
+
+        return (1 - (start - Math.floor(start))) / distance;
     }
 
     public static int ceilDouble(double n) {
         int i = (int) (n + 1);
+        return n >= i ? i : i - 1;
+    }
+
+    public static int ceilFloat(float n) {
+        int i = (int) (n + 1);
+        return n >= i ? i : i - 1;
+    }
+
+    public static double clamp(double value, double min, double max) {
+        return value < min ? min : (value > max ? max : value);
+    }
+
+    public static int clamp(int value, int min, int max) {
+        return value < min ? min : (value > max ? max : value);
+    }
+
+    public static float clamp(float value, float min, float max) {
+        return value < min ? min : (value > max ? max : value);
+    }
+
+    public static int floorDouble(double n) {
+        int i = (int) n;
         return n >= i ? i : i - 1;
     }
 
@@ -21,9 +55,15 @@ public class NukkitMath {
         return n >= i ? i : i - 1;
     }
 
-    public static int ceilFloat(float n) {
-        int i = (int) (n + 1);
-        return n >= i ? i : i - 1;
+    public static double getDirection(double diffX, double diffZ) {
+        diffX = Math.abs(diffX);
+        diffZ = Math.abs(diffZ);
+
+        return Math.max(diffX, diffZ);
+    }
+
+    public static double lerp(double a, double b, double t) {
+        return a + (b - a) * t;
     }
 
     public static int randomRange(NukkitRandom random) {
@@ -46,26 +86,15 @@ public class NukkitMath {
         return ((double) Math.round(d * Math.pow(10, precision))) / Math.pow(10, precision);
     }
 
-    public static double clamp(double value, double min, double max) {
-        return value < min ? min : (value > max ? max : value);
-    }
+    public static double sign(double d) {
+        if (d > 0) {
+            return 1;
+        }
 
-    public static int clamp(int value, int min, int max) {
-        return value < min ? min : (value > max ? max : value);
-    }
+        if (d < 0) {
+            return -1;
+        }
 
-    public static float clamp(float value, float min, float max) {
-        return value < min ? min : (value > max ? max : value);
-    }
-
-    public static double getDirection(double diffX, double diffZ) {
-        diffX = Math.abs(diffX);
-        diffZ = Math.abs(diffZ);
-
-        return Math.max(diffX, diffZ);
-    }
-
-    public static double lerp(double a, double b, double t) {
-        return a + (b - a) * t;
+        return 0;
     }
 }

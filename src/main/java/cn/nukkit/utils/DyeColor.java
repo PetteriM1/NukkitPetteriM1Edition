@@ -45,6 +45,16 @@ public enum DyeColor {
         this.dyeName = dyeName;
     }
 
+    static {
+        BY_DYE_DATA = values();
+        BY_WOOL_DATA = values();
+
+        for (DyeColor color : values()) {
+            BY_WOOL_DATA[color.woolColorMeta & 0x0f] = color;
+            BY_DYE_DATA[color.dyeColorMeta & 0x0f] = color;
+        }
+    }
+
     /**
      * Get as BlockColor
      *
@@ -52,10 +62,6 @@ public enum DyeColor {
      */
     public BlockColor getColor() {
         return this.blockColor;
-    }
-
-    public BlockColor getSignColor() {
-        return this.signColor;
     }
 
     /**
@@ -68,12 +74,12 @@ public enum DyeColor {
     }
 
     /**
-     * Get as wool block meta value
+     * Get dye name
      *
-     * @return wool block meta value of the DyeColor
+     * @return dye name
      */
-    public int getWoolData() {
-        return this.woolColorMeta;
+    public String getDyeName() {
+        return this.dyeName;
     }
 
     /**
@@ -85,23 +91,17 @@ public enum DyeColor {
         return this.colorName;
     }
 
-    /**
-     * Get dye name
-     *
-     * @return dye name
-     */
-    public String getDyeName() {
-        return this.dyeName;
+    public BlockColor getSignColor() {
+        return this.signColor;
     }
 
-    static {
-        BY_DYE_DATA = values();
-        BY_WOOL_DATA = values();
-
-        for (DyeColor color : values()) {
-            BY_WOOL_DATA[color.woolColorMeta & 0x0f] = color;
-            BY_DYE_DATA[color.dyeColorMeta & 0x0f] = color;
-        }
+    /**
+     * Get as wool block meta value
+     *
+     * @return wool block meta value of the DyeColor
+     */
+    public int getWoolData() {
+        return this.woolColorMeta;
     }
 
     /**

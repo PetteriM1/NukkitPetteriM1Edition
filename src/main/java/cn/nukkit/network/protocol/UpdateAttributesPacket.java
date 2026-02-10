@@ -16,11 +16,6 @@ public class UpdateAttributesPacket extends DataPacket {
     public long frame;
 
     @Override
-    public byte pid() {
-        return NETWORK_ID;
-    }
-
-    @Override
     public void decode() {
         this.decodeUnsupported();
     }
@@ -39,15 +34,26 @@ public class UpdateAttributesPacket extends DataPacket {
                 this.putLFloat(entry.getMinValue());
                 this.putLFloat(entry.getMaxValue());
                 this.putLFloat(entry.getValue());
-                this.putLFloat(entry.getMinValue()); // defaultMinValue
-                this.putLFloat(entry.getMaxValue()); // defaultMaxValue
+                if (protocol >= ProtocolInfo.v1_21_30) {
+                    this.putLFloat(entry.getMinValue()); // defaultMinValue
+                    this.putLFloat(entry.getMaxValue()); // defaultMaxValue
+                }
                 this.putLFloat(entry.getDefaultValue());
                 this.putString(entry.getName());
 
-                this.putUnsignedVarInt(0); // Modifiers
+                if (protocol >= ProtocolInfo.v1_19_20) {
+                    this.putUnsignedVarInt(0); // Modifiers
+                }
             }
         }
 
-        this.putUnsignedVarInt(this.frame);
+        if (protocol >= ProtocolInfo.v1_16_100) {
+            this.putUnsignedVarInt(this.frame);
+        }
+    }
+
+    @Override
+    public byte pid() {
+        return NETWORK_ID;
     }
 }

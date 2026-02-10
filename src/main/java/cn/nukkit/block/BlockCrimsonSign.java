@@ -14,18 +14,13 @@ public class BlockCrimsonSign extends BlockSignPost {
     }
 
     @Override
-    public String getName() {
-        return "Crimson Sign";
-    }
-
-    @Override
     public int getId() {
         return CRIMSON_STANDING_SIGN;
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(ItemID.CRIMSON_SIGN);
+    public String getName() {
+        return "Crimson Sign";
     }
 
     @Override
@@ -36,5 +31,10 @@ public class BlockCrimsonSign extends BlockSignPost {
     @Override
     protected int getWallId() {
         return CRIMSON_WALL_SIGN;
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(ItemID.CRIMSON_SIGN);
     }
 }

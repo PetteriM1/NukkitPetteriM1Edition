@@ -13,37 +13,34 @@ import java.net.InetSocketAddress;
  */
 public interface SourceInterface {
 
-    @Deprecated
-    default Integer putPacket(Player player, DataPacket packet) {
-        player.getNetworkSession().sendPacket(packet);
-        return null;
-    }
-
-    @Deprecated
-    default Integer putPacket(Player player, DataPacket packet, boolean needACK) {
-        player.getNetworkSession().sendPacket(packet);
-        return null;
-    }
-
-    @Deprecated
-    default Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
-        player.getNetworkSession().sendPacket(packet);
-        return null;
-    }
-
-    NetworkPlayerSession getSession(InetSocketAddress address);
-
-    int getNetworkLatency(Player player);
+    void setName(String name);
 
     void close(Player player);
 
     void close(Player player, String reason);
 
-    void setName(String name);
+    void emergencyShutdown();
+
+    int getNetworkLatency(Player player);
+
+    NetworkPlayerSession getSession(InetSocketAddress address);
 
     boolean process();
 
-    void shutdown();
+    default Integer putPacket(Player player, DataPacket packet) {
+        player.getNetworkSession().sendPacket(packet);
+        return null;
+    }
 
-    void emergencyShutdown();
+    default Integer putPacket(Player player, DataPacket packet, boolean needACK) {
+        player.getNetworkSession().sendPacket(packet);
+        return null;
+    }
+
+    default Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
+        player.getNetworkSession().sendPacket(packet);
+        return null;
+    }
+
+    void shutdown();
 }

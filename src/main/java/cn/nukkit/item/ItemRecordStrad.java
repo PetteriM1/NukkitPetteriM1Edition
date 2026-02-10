@@ -18,12 +18,12 @@ public class ItemRecordStrad extends ItemRecord {
     }
 
     @Override
-    public String getSoundId() {
-        return "record.strad";
+    public String getDiscName() {
+        return "C418 - strad";
     }
 
     @Override
-    public String getDiscName() {
-        return "C418 - strad";
+    public String getSoundId() {
+        return "record.strad";
     }
 }

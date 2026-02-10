@@ -1,6 +1,7 @@
 package cn.nukkit.item;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.block.*;
 import cn.nukkit.event.block.BlockIgniteEvent;
 import cn.nukkit.level.Level;
@@ -8,6 +9,7 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.level.particle.ItemBreakParticle;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.network.protocol.LevelSoundEventPacket;
+import cn.nukkit.utils.Utils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -30,13 +32,18 @@ public class ItemFlintSteel extends ItemTool {
     }
 
     @Override
+    public int getMaxDurability() {
+        return ItemTool.DURABILITY_FLINT_STEEL;
+    }
+
+    @Override
     public boolean canBeActivated() {
         return true;
     }
 
     @Override
     public boolean onActivate(Level level, Player player, Block block, Block target, BlockFace face, double fx, double fy, double fz) {
-        if (player.isAdventure()) {
+        if (player.isAdventure() && !player.getServer().suomiCraftPEMode()) { //SCPE: allow flint & steel in adventure mode so the pvp world doesn't need a separate world protection system
             return false;
         }
 
@@ -62,7 +69,7 @@ public class ItemFlintSteel extends ItemTool {
 
                 if (!e.isCancelled()) {
                     level.setBlock(fire, fire, true);
-                    level.scheduleUpdate(fire, fire.tickRate() + ThreadLocalRandom.current().nextInt(10));
+                    level.scheduleUpdate(fire, Server.getInstance().suomiCraftPEMode() ? Utils.rand(200, 400) : (fire.tickRate() + ThreadLocalRandom.current().nextInt(10)));
                     level.addLevelSoundEvent(block, LevelSoundEventPacket.SOUND_IGNITE);
 
                     if (!player.isCreative()) {
@@ -81,10 +88,5 @@ public class ItemFlintSteel extends ItemTool {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public int getMaxDurability() {
-        return ItemTool.DURABILITY_FLINT_STEEL;
     }
 }

@@ -1,7 +1,10 @@
 package cn.nukkit.block;
 
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.DyeColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockAmethyst extends BlockSolid {
 
@@ -10,13 +13,8 @@ public class BlockAmethyst extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Amethyst Block";
-    }
-
-    @Override
-    public int getId() {
-        return AMETHYST_BLOCK;
+    public BlockColor getColor() {
+        return BlockColor.PURPLE_BLOCK_COLOR;
     }
 
     @Override
@@ -25,8 +23,23 @@ public class BlockAmethyst extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return AMETHYST_BLOCK;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Amethyst Block";
+    }
+
+    @Override
     public double getResistance() {
-        return 1.5;
+        return 7.5;
     }
 
     @Override
@@ -40,8 +53,13 @@ public class BlockAmethyst extends BlockSolid {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.PURPLE_BLOCK_COLOR;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.CONCRETE;
+    }
+
+    @Override
+    public int getAlternateMeta(int protocol) {
+        return DyeColor.PURPLE.getWoolData();
     }
 
     // TODO:

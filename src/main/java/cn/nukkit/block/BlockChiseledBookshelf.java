@@ -1,10 +1,15 @@
 package cn.nukkit.block;
 
+import cn.nukkit.Player;
+import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBlock;
 import cn.nukkit.item.ItemTool;
 import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.math.BlockFace;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockChiseledBookshelf extends BlockSolidMeta {
 
@@ -17,8 +22,23 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public String getName() {
-        return "Chiseled Bookshelf";
+    public int getBurnAbility() {
+        return 20;
+    }
+
+    @Override
+    public int getBurnChance() {
+        return 30;
+    }
+
+    @Override
+    public BlockColor getColor() {
+        return BlockColor.WOOD_BLOCK_COLOR;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.5;
     }
 
     @Override
@@ -27,8 +47,13 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public double getHardness() {
-        return 1.5;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_20_0_23;
+    }
+
+    @Override
+    public String getName() {
+        return "Chiseled Bookshelf";
     }
 
     @Override
@@ -42,13 +67,18 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public int getBurnChance() {
-        return 30;
+    public boolean canBePushed() {
+        return false; // prevent item loss issue with pistons until a working implementation
     }
 
     @Override
-    public int getBurnAbility() {
-        return 20;
+    public boolean canSilkTouch() {
+        return true;
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.BOOKSHELF;
     }
 
     @Override
@@ -60,17 +90,11 @@ public class BlockChiseledBookshelf extends BlockSolidMeta {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.WOOD_BLOCK_COLOR;
-    }
-
-    @Override
-    public boolean canSilkTouch() {
-        return true;
-    }
-
-    @Override
-    public boolean canBePushed() {
-        return false; // prevent item loss issue with pistons until a working implementation
+    public boolean place(Item item, Block block, Block target, BlockFace face, double fx, double fy, double fz, Player player) {
+        if (this.getLevel().setBlock(this, this, true, true)) {
+            BlockEntity.createBlockEntity(BlockEntity.CHISELED_BOOKSHELF, this.getChunk(), BlockEntity.getDefaultCompound(this, BlockEntity.CHISELED_BOOKSHELF));
+            return true;
+        }
+        return false;
     }
 }

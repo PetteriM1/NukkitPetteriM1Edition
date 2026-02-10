@@ -28,11 +28,6 @@ public class BlockBeetroot extends BlockCrops {
     }
 
     @Override
-    public Item toItem() {
-        return Item.get(Item.BEETROOT_SEEDS);
-    }
-
-    @Override
     public Item[] getDrops(Item item) {
         if (this.getDamage() >= 0x07) {
             return new Item[]{
@@ -44,5 +39,10 @@ public class BlockBeetroot extends BlockCrops {
                     Item.get(Item.BEETROOT_SEEDS, 0, 1)
             };
         }
+    }
+
+    @Override
+    public Item toItem() {
+        return Item.get(Item.BEETROOT_SEEDS);
     }
 }

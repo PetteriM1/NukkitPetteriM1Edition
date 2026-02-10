@@ -40,52 +40,13 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
     }
 
     @Override
-    public int getMetaForValue(Integer value) {
-        if (value == null) {
-            return 0;
-        }
-        
-        long unsigned = removeSign(value);
-        try {
-            this.validateDirectly(unsigned);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidBlockPropertyValueException(this, null, value, e);
-        }
-        return (int) (unsigned - minValue);
+    public int getDefaultIntValue() {
+        return (int) this.minValue;
     }
 
     @Override
-    public Integer getValueForMeta(int meta) {
-        return this.getIntValueForMeta(meta);
-    }
-
-    @Override
-    public int getIntValueForMeta(int meta) {
-        try {
-            this.validateMetaDirectly(meta);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidBlockPropertyMetaException(this, meta, meta, e);
-        }
-        return (int) (this.minValue + meta);
-    }
-    
-    @Override
-    protected void validateDirectly(Integer value) {
-        if (value == null) {
-            return;
-        }
-        this.validateDirectly(removeSign(value));
-    }
-
-    private void validateDirectly(long unsigned) {
-        Preconditions.checkArgument(unsigned >= this.minValue, "New value (%s) must be higher or equals to %s", unsigned, this.minValue);
-        Preconditions.checkArgument(this.maxValue >= unsigned, "New value (%s) must be less or equals to %s", unsigned, this.maxValue);
-    }
-    
-    @Override
-    protected void validateMetaDirectly(int meta) {
-        long max = this.maxValue - this.minValue;
-        Preconditions.checkArgument(0 <= meta && meta <= max, "The meta %s is outside the range of 0 .. ", meta, max);
+    public Integer getDefaultValue() {
+        return (int) this.minValue;
     }
 
     public long getMaxValue() {
@@ -97,37 +58,12 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
     }
 
     @Override
-    public Integer getDefaultValue() {
-        return (int) this.minValue;
+    public Class<Integer> getValueClass() {
+        return Integer.class;
     }
 
-    @Override
-    public boolean isDefaultValue(Integer value) {
-        return value == null || removeSign(value) == this.minValue;
-    }
-
-    @Override
-    public boolean isDefaultIntValue(int value) {
-        return removeSign(value) == this.minValue;
-    }
-    
-    @Override
-    public int getDefaultIntValue() {
-        return (int) this.minValue;
-    }
-
-    @Override
-    public Serializable getPersistenceValueForMeta(int meta) {
-        return removeSign(this.getIntValueForMeta(meta));
-    }
-
-    @Override
-    public int getMetaForPersistenceValue(String persistenceValue) {
-        try {
-            return this.getMetaForValue(addSign(Long.parseLong(persistenceValue)));
-        } catch (NumberFormatException | InvalidBlockPropertyValueException e) {
-            throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue, e);
-        }
+    private static int addSign(long value) {
+        return (int) (value & 0xFFFFFFFFL);
     }
 
     @Override
@@ -141,15 +77,79 @@ public class UnsignedIntBlockProperty extends BlockProperty<Integer> {
     }
 
     @Override
-    public Class<Integer> getValueClass() {
-        return Integer.class;
+    public int getIntValueForMeta(int meta) {
+        try {
+            this.validateMetaDirectly(meta);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidBlockPropertyMetaException(this, meta, meta, e);
+        }
+        return (int) (this.minValue + meta);
+    }
+
+    @Override
+    public int getMetaForPersistenceValue(String persistenceValue) {
+        try {
+            return this.getMetaForValue(addSign(Long.parseLong(persistenceValue)));
+        } catch (NumberFormatException | InvalidBlockPropertyValueException e) {
+            throw new InvalidBlockPropertyPersistenceValueException(this, null, persistenceValue, e);
+        }
+    }
+
+    @Override
+    public int getMetaForValue(Integer value) {
+        if (value == null) {
+            return 0;
+        }
+
+        long unsigned = removeSign(value);
+        try {
+            this.validateDirectly(unsigned);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidBlockPropertyValueException(this, null, value, e);
+        }
+        return (int) (unsigned - minValue);
+    }
+
+    @Override
+    public Serializable getPersistenceValueForMeta(int meta) {
+        return removeSign(this.getIntValueForMeta(meta));
+    }
+
+    @Override
+    public Integer getValueForMeta(int meta) {
+        return this.getIntValueForMeta(meta);
+    }
+
+    @Override
+    public boolean isDefaultIntValue(int value) {
+        return removeSign(value) == this.minValue;
+    }
+
+    @Override
+    public boolean isDefaultValue(Integer value) {
+        return value == null || removeSign(value) == this.minValue;
     }
 
     private static long removeSign(int value) {
         return (long) value & 0xFFFFFFFFL;
     }
 
-    private static int addSign(long value) {
-        return (int) (value & 0xFFFFFFFFL);
+    @Override
+    protected void validateDirectly(Integer value) {
+        if (value == null) {
+            return;
+        }
+        this.validateDirectly(removeSign(value));
+    }
+
+    private void validateDirectly(long unsigned) {
+        Preconditions.checkArgument(unsigned >= this.minValue, "New value (%s) must be higher or equals to %s", unsigned, this.minValue);
+        Preconditions.checkArgument(this.maxValue >= unsigned, "New value (%s) must be less or equals to %s", unsigned, this.maxValue);
+    }
+
+    @Override
+    protected void validateMetaDirectly(int meta) {
+        long max = this.maxValue - this.minValue;
+        Preconditions.checkArgument(0 <= meta && meta <= max, "The meta %s is outside the range of 0 .. ", meta, max);
     }
 }

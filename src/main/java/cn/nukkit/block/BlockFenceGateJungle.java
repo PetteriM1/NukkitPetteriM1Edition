@@ -17,6 +17,11 @@ public class BlockFenceGateJungle extends BlockFenceGate {
     }
 
     @Override
+    public BlockColor getColor() {
+        return BlockColor.DIRT_BLOCK_COLOR;
+    }
+
+    @Override
     public int getId() {
         return FENCE_GATE_JUNGLE;
     }
@@ -24,10 +29,5 @@ public class BlockFenceGateJungle extends BlockFenceGate {
     @Override
     public String getName() {
         return "Jungle Fence Gate";
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.DIRT_BLOCK_COLOR;
     }
 }

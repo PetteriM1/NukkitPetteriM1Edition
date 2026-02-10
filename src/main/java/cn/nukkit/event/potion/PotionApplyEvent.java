@@ -13,13 +13,7 @@ import cn.nukkit.potion.Potion;
 public class PotionApplyEvent extends PotionEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
-
-    public static HandlerList getHandlers() {
-        return handlers;
-    }
-
     private Effect applyEffect;
-
     private final Entity entity;
 
     public PotionApplyEvent(Potion potion, Effect applyEffect, Entity entity) {
@@ -28,12 +22,16 @@ public class PotionApplyEvent extends PotionEvent implements Cancellable {
         this.entity = entity;
     }
 
+    public Effect getApplyEffect() {
+        return applyEffect;
+    }
+
     public Entity getEntity() {
         return entity;
     }
 
-    public Effect getApplyEffect() {
-        return applyEffect;
+    public static HandlerList getHandlers() {
+        return handlers;
     }
 
     public void setApplyEffect(Effect applyEffect) {

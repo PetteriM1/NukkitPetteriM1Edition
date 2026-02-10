@@ -20,6 +20,7 @@ public abstract class BlockFallable extends BlockSolid {
 
     public int onUpdate(int type) {
         if (type == Level.BLOCK_UPDATE_NORMAL) {
+            if (!this.getLevel().randomTickingEnabled()) return type;
             Block down = this.down();
             if (down.getId() == AIR || down instanceof BlockLiquid || down instanceof BlockFire) {
                 BlockFallEvent event = new BlockFallEvent(this);

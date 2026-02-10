@@ -13,8 +13,8 @@ public class BlockFroglightPearlescent extends BlockFroglight {
     }
 
     @Override
-    public String getName() {
-        return "Pearlescent Froglight";
+    public BlockColor getColor() {
+        return BlockColor.PINK_BLOCK_COLOR;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class BlockFroglightPearlescent extends BlockFroglight {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.PINK_BLOCK_COLOR;
+    public String getName() {
+        return "Pearlescent Froglight";
     }
 }

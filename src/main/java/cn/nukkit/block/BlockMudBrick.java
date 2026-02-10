@@ -2,7 +2,9 @@ package cn.nukkit.block;
 
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemTool;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockMudBrick extends BlockSolid {
 
@@ -10,13 +12,8 @@ public class BlockMudBrick extends BlockSolid {
     }
 
     @Override
-    public String getName() {
-        return "Mud Brick";
-    }
-
-    @Override
-    public int getId() {
-        return MUD_BRICKS;
+    public BlockColor getColor() {
+        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 
     @Override
@@ -25,8 +22,28 @@ public class BlockMudBrick extends BlockSolid {
     }
 
     @Override
+    public int getId() {
+        return MUD_BRICKS;
+    }
+
+    @Override
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_19_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Mud Brick";
+    }
+
+    @Override
     public double getResistance() {
         return 3;
+    }
+
+    @Override
+    public int getToolType() {
+        return ItemTool.TYPE_PICKAXE;
     }
 
     @Override
@@ -35,8 +52,8 @@ public class BlockMudBrick extends BlockSolid {
     }
 
     @Override
-    public int getToolType() {
-        return ItemTool.TYPE_PICKAXE;
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.SANDSTONE;
     }
 
     @Override
@@ -48,10 +65,5 @@ public class BlockMudBrick extends BlockSolid {
         } else {
             return new Item[0];
         }
-    }
-
-    @Override
-    public BlockColor getColor() {
-        return BlockColor.LIGHT_GRAY_TERRACOTA_BLOCK_COLOR;
     }
 }

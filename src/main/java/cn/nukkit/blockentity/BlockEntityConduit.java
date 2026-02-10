@@ -33,16 +33,12 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
         super(chunk, nbt);
     }
 
-    @Override
-    protected void initBlockEntity() {
-        this.scheduleUpdate();
-
-        super.initBlockEntity();
+    public int getAttackRadius() {
+        return this.frameBlocks >= 42 ? 8 : 0;
     }
 
-    @Override
-    public boolean isBlockEntityValid() {
-        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.CONDUIT;
+    public int getEffectRadius() {
+        return (this.frameBlocks / 7) * 16;
     }
 
     @Override
@@ -57,45 +53,11 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
     }
 
     @Override
-    public void setDirty() {
-        super.setDirty();
-        this.spawnToAll();
+    public boolean isBlockEntityValid() {
+        return level.getBlockIdAt(chunk, (int) x, (int) y, (int) z) == Block.CONDUIT;
     }
 
     // Adapted from https://github.com/PowerNukkit/PowerNukkit/blob/master/src/main/java/cn/nukkit/blockentity/BlockEntityConduit.java
-
-    @Override
-    public boolean onUpdate() {
-        if (this.closed) {
-            return false;
-        }
-
-        if (level.getCurrentTick() % 40 != 0) {
-            return true;
-        }
-
-        boolean activeBefore = this.active;
-        this.active = checkStructure();
-
-        if (activeBefore != this.active) {
-            this.spawnToAll();
-
-            if (activeBefore && !this.active) {
-                this.target = -1;
-
-                level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_CONDUIT_DEACTIVATE);
-            } else if (!activeBefore && this.active) {
-                level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_CONDUIT_ACTIVATE);
-            }
-        }
-
-        if (this.active) {
-            attackMob();
-            addEffectToPlayers();
-        }
-
-        return true;
-    }
 
     private void addEffectToPlayers() {
         int radius = getEffectRadius();
@@ -106,7 +68,7 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
         Vector2 conduit = new Vector2(x, z);
         int radiusSquared = radius * radius;
 
-        level.getPlayers().values().stream()
+        level.getPlayersList().stream()
                 .filter(this::canAffect)
                 .filter(p -> conduit.distanceSquared(p.x, p.z) <= radiusSquared)
                 .forEach(p -> p.addEffect(Effect.getEffect(Effect.CONDUIT_POWER).setDuration(260).setAmbient(true), EntityPotionEffectEvent.Cause.CONDUIT));
@@ -154,34 +116,12 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
         }
     }
 
-    private boolean canAttack(Entity target) {
-        return target instanceof EntityMob && canAffect(target);
-    }
-
     private boolean canAffect(Entity target) {
         return target.isInsideOfWater() || (level.isRaining() && target.canSeeSky());
     }
 
-    private boolean checkWater() {
-        int tileX = (int) this.x;
-        int tileY = (int) this.y;
-        int tileZ = (int) this.z;
-
-        for (int xx = -1; xx <= 1; xx++) {
-            for (int zz = -1; zz <= 1; zz++) {
-                for (int yy = -1; yy <= 1; yy++) {
-                    Block block = level.getBlock(this.chunk, tileX + xx, tileY + yy, tileZ + zz, BlockLayer.NORMAL, false);
-                    if (!Block.isWater(block.getId())) {
-                        block = level.getBlock(this.chunk, tileX + xx, tileY + yy, tileZ + zz, BlockLayer.WATERLOGGED, false);
-                        if (!Block.isWater(block.getId())) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-        return true;
+    private boolean canAttack(Entity target) {
+        return target instanceof EntityMob && canAffect(target);
     }
 
     private int checkFrame() {
@@ -251,11 +191,71 @@ public class BlockEntityConduit extends BlockEntitySpawnable {
         return true;
     }
 
-    public int getEffectRadius() {
-        return (this.frameBlocks / 7) * 16;
+    private boolean checkWater() {
+        int tileX = (int) this.x;
+        int tileY = (int) this.y;
+        int tileZ = (int) this.z;
+
+        for (int xx = -1; xx <= 1; xx++) {
+            for (int zz = -1; zz <= 1; zz++) {
+                for (int yy = -1; yy <= 1; yy++) {
+                    Block block = level.getBlock(this.chunk, tileX + xx, tileY + yy, tileZ + zz, BlockLayer.NORMAL, false);
+                    if (!Block.isWater(block.getId())) {
+                        block = level.getBlock(this.chunk, tileX + xx, tileY + yy, tileZ + zz, BlockLayer.WATERLOGGED, false);
+                        if (!Block.isWater(block.getId())) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
-    public int getAttackRadius() {
-        return this.frameBlocks >= 42 ? 8 : 0;
+    @Override
+    protected void initBlockEntity() {
+        this.scheduleUpdate();
+
+        super.initBlockEntity();
+    }
+
+    @Override
+    public boolean onUpdate() {
+        if (this.closed) {
+            return false;
+        }
+
+        if (level.getCurrentTick() % 40 != 0) {
+            return true;
+        }
+
+        boolean activeBefore = this.active;
+        this.active = checkStructure();
+
+        if (activeBefore != this.active) {
+            this.spawnToAll();
+
+            if (activeBefore && !this.active) {
+                this.target = -1;
+
+                level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_CONDUIT_DEACTIVATE);
+            } else if (!activeBefore && this.active) {
+                level.addLevelSoundEvent(this, LevelSoundEventPacket.SOUND_CONDUIT_ACTIVATE);
+            }
+        }
+
+        if (this.active) {
+            attackMob();
+            addEffectToPlayers();
+        }
+
+        return true;
+    }
+
+    @Override
+    public void setDirty() {
+        super.setDirty();
+        this.spawnToAll();
     }
 }

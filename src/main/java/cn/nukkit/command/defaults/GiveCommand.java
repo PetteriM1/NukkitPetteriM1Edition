@@ -10,6 +10,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.RuntimeItemMapping;
 import cn.nukkit.item.RuntimeItems;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.TextFormat;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ public class GiveCommand extends VanillaCommand {
         this.commandParameters.clear();
         this.commandParameters.put("default", new CommandParameter[]{
                 CommandParameter.newType("player", CommandParamType.TARGET),
-                new CommandParameter("itemName", false, "Item"),
+                new CommandParameter("itemName", false, CommandParameter.ENUM_TYPE_ITEM_LIST),
                 CommandParameter.newType("amount", true, CommandParamType.INT),
                 CommandParameter.newType("tags", true, CommandParamType.RAWTEXT)
         });
@@ -59,7 +60,7 @@ public class GiveCommand extends VanillaCommand {
 
         Collection<Player> targets;
         if (args[0].equals("@a")) {
-            targets = Server.getInstance().getOnlinePlayers().values();
+            targets = Server.getInstance().getOnlinePlayersList();
         } else {
             Player target = sender.getServer().getPlayerExact(args[0].replace("@s", sender.getName()));
             if (target != null) {
@@ -96,7 +97,7 @@ public class GiveCommand extends VanillaCommand {
             if (!identifier.contains(":")) {
                 identifier = "minecraft:" + identifier;
             }
-            RuntimeItemMapping.LegacyEntry entry = RuntimeItems.getMapping().fromIdentifier(identifier);
+            RuntimeItemMapping.LegacyEntry entry = RuntimeItems.getMapping(ProtocolInfo.CURRENT_PROTOCOL).fromIdentifier(identifier);
 
             if (entry != null) {
                 item = Item.get(entry.getLegacyId(), entry.getDamage(), count);

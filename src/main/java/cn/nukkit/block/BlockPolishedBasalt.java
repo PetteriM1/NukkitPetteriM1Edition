@@ -11,12 +11,12 @@ public class BlockPolishedBasalt extends BlockBasalt {
     }
 
     @Override
-    public String getName() {
-        return "Polished Basalt";
+    public int getId() {
+        return BlockID.POLISHED_BASALT;
     }
 
     @Override
-    public int getId() {
-        return BlockID.POLISHED_BASALT;
+    public String getName() {
+        return "Polished Basalt";
     }
 }

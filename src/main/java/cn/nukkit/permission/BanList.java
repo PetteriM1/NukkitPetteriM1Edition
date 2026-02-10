@@ -28,12 +28,7 @@ public class BanList {
         this.file = file;
     }
 
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    private static class LinkedListTypeToken extends TypeToken<LinkedList<TreeMap<String, String>>> {
     }
 
     public LinkedHashMap<String, BanEntry> getEntires() {
@@ -41,14 +36,12 @@ public class BanList {
         return this.list;
     }
 
-    public boolean isBanned(String name) {
-        if (!this.enable || name == null) {
-            return false;
-        } else {
-            this.removeExpired();
+    public boolean isEnable() {
+        return enable;
+    }
 
-            return this.list.containsKey(name.toLowerCase(Locale.ROOT));
-        }
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     public void add(BanEntry entry) {
@@ -79,21 +72,13 @@ public class BanList {
         return entry;
     }
 
-    public void remove(String name) {
-        name = name.toLowerCase(Locale.ROOT);
-        if (this.list.containsKey(name)) {
-            this.list.remove(name);
-            this.save();
-        }
-    }
+    public boolean isBanned(String name) {
+        if (!this.enable || name == null) {
+            return false;
+        } else {
+            this.removeExpired();
 
-
-    public void removeExpired() {
-        for (String name : new ArrayList<>(this.list.keySet())) {
-            BanEntry entry = this.list.get(name);
-            if (entry.hasExpired()) {
-                list.remove(name);
-            }
+            return this.list.containsKey(name.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -117,6 +102,23 @@ public class BanList {
         }
     }
 
+    public void remove(String name) {
+        name = name.toLowerCase(Locale.ROOT);
+        if (this.list.containsKey(name)) {
+            this.list.remove(name);
+            this.save();
+        }
+    }
+
+    public void removeExpired() {
+        for (String name : new ArrayList<>(this.list.keySet())) {
+            BanEntry entry = this.list.get(name);
+            if (entry.hasExpired()) {
+                list.remove(name);
+            }
+        }
+    }
+
     public void save() {
         this.removeExpired();
 
@@ -134,8 +136,5 @@ public class BanList {
         } catch (IOException e) {
             MainLogger.getLogger().error("Could not save ban list", e);
         }
-    }
-
-    private static class LinkedListTypeToken extends TypeToken<LinkedList<TreeMap<String, String>>> {
     }
 }

@@ -7,18 +7,8 @@ import cn.nukkit.utils.BlockColor;
 public class BlockNetherWartBlock extends BlockSolid {
 
     @Override
-    public String getName() {
-        return "Nether Wart Block";
-    }
-
-    @Override
-    public int getId() {
-        return BLOCK_NETHER_WART_BLOCK;
-    }
-
-    @Override
-    public double getResistance() {
-        return 1;
+    public BlockColor getColor() {
+        return BlockColor.RED_BLOCK_COLOR;
     }
 
     @Override
@@ -27,19 +17,29 @@ public class BlockNetherWartBlock extends BlockSolid {
     }
 
     @Override
-    public Item[] getDrops(Item item) {
-        return new Item[]{
-                toItem()
-        };
+    public int getId() {
+        return BLOCK_NETHER_WART_BLOCK;
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.RED_BLOCK_COLOR;
+    public String getName() {
+        return "Nether Wart Block";
+    }
+
+    @Override
+    public double getResistance() {
+        return 5;
     }
 
     @Override
     public int getToolType() {
         return ItemTool.TYPE_HOE;
+    }
+
+    @Override
+    public Item[] getDrops(Item item) {
+        return new Item[]{
+                toItem()
+        };
     }
 }

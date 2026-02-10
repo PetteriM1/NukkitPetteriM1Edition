@@ -9,16 +9,6 @@ public class DoubleTag extends NumberTag<Double> {
 
     public double data;
 
-    @Override
-    public Double getData() {
-        return data;
-    }
-
-    @Override
-    public void setData(Double data) {
-        this.data = data == null ? 0 : data;
-    }
-
     public DoubleTag(String name) {
         super(name);
     }
@@ -29,18 +19,8 @@ public class DoubleTag extends NumberTag<Double> {
     }
 
     @Override
-    void write(NBTOutputStream dos) throws IOException {
-        dos.writeDouble(data);
-    }
-
-    @Override
-    public void load(NBTInputStream dis) throws IOException {
-        data = dis.readDouble();
-    }
-
-    @Override
-    public Double parseValue() {
-        return this.data;
+    public Double getData() {
+        return data;
     }
 
     @Override
@@ -49,8 +29,8 @@ public class DoubleTag extends NumberTag<Double> {
     }
 
     @Override
-    public String toString() {
-        return "DoubleTag " + this.getName() + " (data: " + data + ')';
+    public void setData(Double data) {
+        this.data = data == null ? 0 : data;
     }
 
     @Override
@@ -65,5 +45,25 @@ public class DoubleTag extends NumberTag<Double> {
             return data == o.data;
         }
         return false;
+    }
+
+    @Override
+    public void load(NBTInputStream dis) throws IOException {
+        data = dis.readDouble();
+    }
+
+    @Override
+    public Double parseValue() {
+        return this.data;
+    }
+
+    @Override
+    public String toString() {
+        return "DoubleTag " + this.getName() + " (data: " + data + ')';
+    }
+
+    @Override
+    public void write(NBTOutputStream dos) throws IOException {
+        dos.writeDouble(data);
     }
 }

@@ -1,6 +1,8 @@
 package cn.nukkit.block;
 
+import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.utils.BlockColor;
+import cn.nukkit.utils.material.BlockType;
 
 public class BlockRawIron extends BlockRawOreVariant {
 
@@ -8,8 +10,8 @@ public class BlockRawIron extends BlockRawOreVariant {
     }
 
     @Override
-    public String getName() {
-        return "Block of Raw Iron";
+    public BlockColor getColor() {
+        return BlockColor.RAW_IRON_BLOCK_COLOR;
     }
 
     @Override
@@ -18,7 +20,17 @@ public class BlockRawIron extends BlockRawOreVariant {
     }
 
     @Override
-    public BlockColor getColor() {
-        return BlockColor.RAW_IRON_BLOCK_COLOR;
+    public int getMinimumVersion() {
+        return ProtocolInfo.v1_17_0;
+    }
+
+    @Override
+    public String getName() {
+        return "Block of Raw Iron";
+    }
+
+    @Override
+    public BlockType getAlternateBlock(int protocol) {
+        return BlockTypes.IRON_ORE;
     }
 }
